@@ -30,7 +30,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"bitbucket.org/microservicemanagement/register-go/reglog"
+	"github.com/usmanager/manager/register-go/reglog"
 	"github.com/clbanning/mxj/x2j"
 )
 

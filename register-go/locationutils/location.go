@@ -33,7 +33,7 @@ import (
 	"time"
 
 	"github.com/danielfct/master-thesis/tree/master/usmanager/register-go/api"
-	"bitbucket.org/microservicemanagement/register-go/reglog"
+	"github.com/usmanager/manager/register-go/reglog"
 )
 
 var sendDataPeriod = 5 * time.Second

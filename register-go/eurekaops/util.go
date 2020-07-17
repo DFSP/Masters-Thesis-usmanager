@@ -28,7 +28,7 @@ import (
 	"math/rand"
 	"strings"
 
-	"bitbucket.org/microservicemanagement/register-go/api"
+	"github.com/usmanager/manager/register-go/api"
 )
 
 //GetBestInstance returns the best app instance

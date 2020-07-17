@@ -5,6 +5,17 @@
       <profile default="true" name="Default" enabled="true">
         <outputRelativeToContentRoot value="true" />
       </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="queue-master" />
+        <module name="master-manager" />
+        <module name="shipping" />
+        <module name="carts" />
+        <module name="orders" />
+        <module name="registration-server" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="launcher" target="1.5" />

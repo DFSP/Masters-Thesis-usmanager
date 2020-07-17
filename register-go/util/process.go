@@ -27,7 +27,7 @@ package util
 import (
 	"strings"
 
-	"bitbucket.org/microservicemanagement/register-go/reglog"
+	"github.com/usmanager/manager/register-go/reglog"
 	"github.com/mitchellh/go-ps"
 )
 

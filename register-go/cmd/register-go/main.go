@@ -36,13 +36,13 @@ import (
 	"syscall"
 	"time"
 
-	"bitbucket.org/microservicemanagement/register-go/util"
-	"github.com/gorilla/mux"
+	"github.com/usmanager/manager/register-go/util"
+	"github.com/gorilla/mux"d .
 
-	"bitbucket.org/microservicemanagement/register-go/api"
-	eureka "bitbucket.org/microservicemanagement/register-go/eurekaops"
-	"bitbucket.org/microservicemanagement/register-go/locationutils"
-	"bitbucket.org/microservicemanagement/register-go/reglog"
+	"github.com/usmanager/manager/register-go/api"
+	eureka "github.com/usmanager/manager/register-go/eurekaops"
+	"github.com/usmanager/manager/register-go/locationutils"
+	"github.com/usmanager/manager/register-go/reglog"
 )
 
 //HEARTBEATINTERVAL on timer

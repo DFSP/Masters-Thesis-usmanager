@@ -35,7 +35,7 @@ import (
 	"net/url"
 	"time"
 
-	"bitbucket.org/microservicemanagement/register-go/reglog"
+	"github.com/usmanager/manager/register-go/reglog"
 )
 
 var HttpClient = &http.Client{
