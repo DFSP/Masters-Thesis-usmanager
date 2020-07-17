@@ -29,6 +29,7 @@
       <module name="local-manager" options="-parameters" />
       <module name="managerLocal" options="-parameters" />
       <module name="master-manager" options="-parameters" />
+      <module name="registration-server" options="-parameters" />
     </option>
   </component>
 </project>

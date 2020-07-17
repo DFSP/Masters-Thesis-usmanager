@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/local-manager/local-manager.iml" filepath="$PROJECT_DIR$/local-manager/local-manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/register-go/register-go.iml" filepath="$PROJECT_DIR$/register-go/register-go.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/usmanager.iml" filepath="$PROJECT_DIR$/.idea/usmanager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web-manager.iml" filepath="$PROJECT_DIR$/.idea/modules/web-manager.iml" />
     </modules>
   </component>
 </project>

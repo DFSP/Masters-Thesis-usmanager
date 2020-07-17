@@ -30,8 +30,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/usmanager/manager/register-go/reglog"
 	"github.com/clbanning/mxj/x2j"
+	"github.com/usmanager/manager/register-go/reglog"
 )
 
 // ParseAllMetadata iterates through all instances in an application

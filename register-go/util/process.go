@@ -27,8 +27,8 @@ package util
 import (
 	"strings"
 
-	"github.com/usmanager/manager/register-go/reglog"
 	"github.com/mitchellh/go-ps"
+	"github.com/usmanager/manager/register-go/reglog"
 )
 
 // FindProcess : Find system process

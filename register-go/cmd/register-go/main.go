@@ -92,8 +92,8 @@ func main() {
 	serviceCity = flag.String("serviceCity", os.Getenv("SERVICE_CITY"), "Service location: city")
 
 	autoRegister = flag.String("autoregister", "true", "True: register-go will register app on Eureka; False: app will trigger the register")
-	monitorExecApp = flag.String("monitorexecapp", "true", "True: register-go will monitor exex app; False: no monitoring")
-	appEndpointCacheTime = flag.String("appendpointcachetime", "10", "Time to keep and instances endpoints before conctact Eureka")
+	monitorExecApp = flag.String("monitorexecapp", "true", "True: register-go will monitor exec app; False: no monitoring")
+	appEndpointCacheTime = flag.String("appendpointcachetime", "10", "Time to keep an instances endpoints before contacting Eureka")
 
 	sendLocationDataPeriod = flag.String("locationdatatime", "5", "Interval time to send location data")
 
@@ -244,7 +244,7 @@ func GetAppByName(w http.ResponseWriter, r *http.Request) {
 		if beforeSomeSeconds(lastAppsUpdate[appName], seconds) {
 			foundApp = true
 			app := eureka.GetBestInstance(&instance, lastApps[appName])
-			reglog.Logger.Infof("Instance choosed for '%s': %s", appName, app.InstanceId)
+			reglog.Logger.Infof("Instance chosen for '%s': %s", appName, app.InstanceId)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(app)
 		}
@@ -264,7 +264,7 @@ func GetAppByName(w http.ResponseWriter, r *http.Request) {
 				app := eureka.GetBestInstance(&instance, instances)
 				lastApps[appName] = instances
 				lastAppsUpdate[appName] = time.Now()
-				reglog.Logger.Infof("Instance choosed for '%s': %s", appName, app.InstanceId)
+				reglog.Logger.Infof("Instance chosen for '%s': %s", appName, app.InstanceId)
 				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(app)
 			}
