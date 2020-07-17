@@ -6,5 +6,5 @@ RUN ["chmod", "+x", "docker-init.sh"]
 
 ENTRYPOINT ["./docker-init.sh"]
 
-# externalPort, internalPort, hostname, zone
-CMD ["8761", "8761", "127.0.0.1", "http://127.0.0.1:8761/eureka/"]
+# externalPort, internalPort, hostname
+CMD ["8761", "8761", "127.0.0.1"]
