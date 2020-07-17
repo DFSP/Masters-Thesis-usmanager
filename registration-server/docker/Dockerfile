@@ -1,6 +1,6 @@
 FROM danielfct/jdk-glibc
 WORKDIR /usr/src/app
-COPY ../target/*.jar ./app.jar
+COPY ../target/registration-server-0.0.1.jar ./app.jar
 COPY ../scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
 
