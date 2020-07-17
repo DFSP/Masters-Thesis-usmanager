@@ -36,8 +36,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/usmanager/manager/register-go/util"
-	"github.com/gorilla/mux"d .
 
 	"github.com/usmanager/manager/register-go/api"
 	eureka "github.com/usmanager/manager/register-go/eurekaops"

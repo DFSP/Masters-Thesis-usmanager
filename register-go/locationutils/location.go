@@ -32,7 +32,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/danielfct/master-thesis/tree/master/usmanager/register-go/api"
+	"github.com/usmanager/manager/register-go/api"
 	"github.com/usmanager/manager/register-go/reglog"
 )
 
