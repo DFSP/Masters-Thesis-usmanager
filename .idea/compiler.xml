@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="launcher" target="1.5" />
+      <module name="local-manager" target="11" />
+      <module name="managerLocal" target="11" />
+      <module name="swagger-java-client" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="local-manager" options="-parameters" />
+      <module name="managerLocal" options="-parameters" />
+      <module name="master-manager" options="-parameters" />
+    </option>
+  </component>
+</project>

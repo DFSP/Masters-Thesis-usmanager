@@ -1,0 +1,17 @@
+.container {
+    padding: 5% 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    color: red;
+    font-size: 4rem;
+}
+
+.message {
+    color: white;
+    margin: 0 !important;
+    padding: 25px;
+}

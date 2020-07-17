@@ -1,0 +1,14 @@
+.container {
+    margin: 0 40px;
+}
+
+.collapsibleSubtitle {
+    background-color: #1F1F1F;
+    padding: 0.5rem 0;
+    width: fit-content;
+}
+
+.collapsibleCardList {
+    background-color: #1F1F1F;
+    border: unset;
+}

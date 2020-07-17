@@ -1,0 +1,19 @@
+.container {
+    position: absolute;
+    top: 66px;
+    right: 10px;
+    bottom: unset;
+    padding: 5px;
+    background-color: #36393F;
+    outline: 1px solid black;
+}
+
+@media only screen and (max-width: 760px) {
+    .container {
+        visibility: hidden;
+    }
+}
+
+.message {
+    color: #F44336 !important;
+}

@@ -1,0 +1,37 @@
+.dropdown {
+    width: auto !important;
+    overflow-y: hidden;
+    background-color: #282828;
+}
+
+ul.dropdown li a {
+    background-color: #282828;
+    font-size: 14px;
+}
+
+ul.dropdown li a:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+ul.dropdown li.disabled a {
+    border-bottom: solid 1px #666;
+    color: grey;
+}
+
+.dropdownEmpty {
+    border-bottom: solid 1px black !important;
+}
+
+ul.dropdown li.disabled a:hover {
+    background-color: #282828;
+    cursor: default;
+}
+
+.nolabelCheckbox {
+    display: inline-block;
+    text-align: center;
+}
+
+.nolabelCheckbox label span {
+    margin-bottom: -7.5px;
+}
