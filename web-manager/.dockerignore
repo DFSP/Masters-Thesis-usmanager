@@ -2,3 +2,7 @@
 .eslintrc.*
 node_modules
 .gitignore
+build
+.dockerignore
+Dockerfile
+Dockerfile.prod

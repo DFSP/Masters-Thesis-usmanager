@@ -147,7 +147,7 @@ class Navbar extends React.Component<Props, State> {
                           </ul>
                           {showSearchbar && <SearchBar/>}
                           <ul className="right">
-                              <li className="components">
+                              {!loggingIn && <li className="components">
                                   <Dropdown<IComponent>
                                     id={'components'}
                                     name={'components'}
@@ -158,7 +158,7 @@ class Navbar extends React.Component<Props, State> {
                                         values: components,
                                         optionToString: this.componentOption}}>
                                   </Dropdown>
-                              </li>
+                              </li>}
                               <li className="username">
                                   {loggedInUser}
                               </li>
