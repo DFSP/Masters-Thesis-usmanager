@@ -46,7 +46,7 @@ public class ITCartRepository {
         Cart original = new Cart("customerId");
         cartRepository.save(original);
 
-        List<Cart> found = cartRepository.findByCustomerId(original.customerId);
+        List<Cart> found = cartRepository.findByCustomerId(original.getCustomerId());
         assertEquals(1, found.size());
         assertEquals(original, found.get(0));
     }

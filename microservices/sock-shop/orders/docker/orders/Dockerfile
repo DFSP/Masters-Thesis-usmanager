@@ -1,4 +1,4 @@
-FROM danielfct/register-go
+FROM danielfct/registration-client
 
 FROM danielfct/jdk-glibc
 WORKDIR /usr/src/app

@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/local-manager/local-manager.iml" filepath="$PROJECT_DIR$/local-manager/local-manager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/register-go/register-go.iml" filepath="$PROJECT_DIR$/register-go/register-go.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registration-client/registration-client.iml" filepath="$PROJECT_DIR$/registration-client/registration-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/usmanager.iml" filepath="$PROJECT_DIR$/.idea/usmanager.iml" />
     </modules>
   </component>

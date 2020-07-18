@@ -31,13 +31,15 @@ import works.weave.socks.shipping.middleware.HTTPMonitoringInterceptor;
 
 @Configuration
 public class WebMvcConfig {
-    @Bean
-    HTTPMonitoringInterceptor httpMonitoringInterceptor() {
-        return new HTTPMonitoringInterceptor();
-    }
 
-    @Bean
-    public MappedInterceptor myMappedInterceptor(HTTPMonitoringInterceptor interceptor) {
-        return new MappedInterceptor(new String[]{"/**"}, interceptor);
-    }
+  @Bean
+  HTTPMonitoringInterceptor httpMonitoringInterceptor() {
+    return new HTTPMonitoringInterceptor();
+  }
+
+  @Bean
+  public MappedInterceptor myMappedInterceptor(HTTPMonitoringInterceptor interceptor) {
+    return new MappedInterceptor(new String[]{"/**"}, interceptor);
+  }
+
 }

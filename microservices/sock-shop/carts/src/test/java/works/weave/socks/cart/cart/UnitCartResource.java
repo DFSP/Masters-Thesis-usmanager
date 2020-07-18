@@ -29,7 +29,7 @@ public class UnitCartResource {
     public void whenCartDoesntExistCreateNew() {
         CartResource cartResource = new CartResource(fake, customerId);
         assertThat(cartResource.value().get(), is(notNullValue()));
-        assertThat(cartResource.value().get().customerId, is(equalTo(customerId)));
+        assertThat(cartResource.value().get().getCustomerId(), is(equalTo(customerId)));
     }
 
     @Test

@@ -24,6 +24,8 @@
 
 package works.weave.socks.shipping.configuration;
 
+import java.util.Collection;
+
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.prometheus.client.spring.boot.SpringBootMetricsCollector;
@@ -35,25 +37,24 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collection;
-
 @Configuration
 @ConditionalOnClass(SpringBootMetricsCollector.class)
 class PrometheusAutoConfiguration {
-    @Bean
-    @ConditionalOnMissingBean(SpringBootMetricsCollector.class)
-    SpringBootMetricsCollector springBootMetricsCollector(Collection<PublicMetrics> publicMetrics) {
-        SpringBootMetricsCollector springBootMetricsCollector = new SpringBootMetricsCollector
-                (publicMetrics);
-        springBootMetricsCollector.register();
-        return springBootMetricsCollector;
-    }
 
-    @Bean
-    @ConditionalOnMissingBean(name = "prometheusMetricsServletRegistrationBean")
-    ServletRegistrationBean prometheusMetricsServletRegistrationBean(@Value("${prometheus.metrics" +
-            ".path:/metrics}") String metricsPath) {
-        DefaultExports.initialize();
-        return new ServletRegistrationBean(new MetricsServlet(), metricsPath);
-    }
+  @Bean
+  @ConditionalOnMissingBean(SpringBootMetricsCollector.class)
+  SpringBootMetricsCollector springBootMetricsCollector(Collection<PublicMetrics> publicMetrics) {
+    SpringBootMetricsCollector springBootMetricsCollector = new SpringBootMetricsCollector(publicMetrics);
+    springBootMetricsCollector.register();
+    return springBootMetricsCollector;
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(name = "prometheusMetricsServletRegistrationBean")
+  ServletRegistrationBean prometheusMetricsServletRegistrationBean(@Value("${prometheus.metrics.path:/metrics}")
+                                                                       String metricsPath) {
+    DefaultExports.initialize();
+    return new ServletRegistrationBean(new MetricsServlet(), metricsPath);
+  }
+
 }

@@ -24,69 +24,86 @@
 
 package works.weave.socks.cart.entities;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-
 @Document
 public class Cart {
-    @NotNull
-    public String customerId; // Public instead of getters/setters.
-    @Id
-    private String id;
-    @DBRef
-    private List<Item> items = new ArrayList<>();
 
-    public Cart(String customerId) {
-        this.customerId = customerId;
+  @NotNull
+  private String customerId; // Public instead of getters/setters.
+
+  @Id
+  private String id;
+
+  @DBRef
+  private final List<Item> items = new ArrayList<>();
+
+  public Cart(String customerId) {
+    this.customerId = customerId;
+  }
+
+  public Cart() {
+    this(null);
+  }
+
+  public void setCustomerId(String customerId) {
+    this.customerId = customerId;
+  }
+
+  public String getCustomerId() {
+    return customerId;
+  }
+
+  public List<Item> contents() {
+    return items;
+  }
+
+  public Cart add(Item item) {
+    items.add(item);
+    return this;
+  }
+
+  public Cart remove(Item item) {
+    items.remove(item);
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    return "Cart{"
+        + "id='" + id + '\''
+        + ", customerId='" + customerId + '\''
+        + ", items=" + items
+        + '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public Cart() {
-        this(null);
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
-
-    public List<Item> contents() {
-        return items;
+    Cart cart = (Cart) o;
+    if (!Objects.equals(customerId, cart.getCustomerId())) {
+      return false;
     }
+    return Objects.equals(id, cart.id);
+  }
 
-    public Cart add(Item item) {
-        items.add(item);
-        return this;
-    }
+  @Override
+  public int hashCode() {
+    int result = customerId != null ? customerId.hashCode() : 0;
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    return result;
+  }
 
-    public Cart remove(Item item) {
-        items.remove(item);
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "Cart{" +
-                "id='" + id + '\'' +
-                ", customerId='" + customerId + '\'' +
-                ", items=" + items +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Cart cart = (Cart) o;
-
-        if (customerId != null ? !customerId.equals(cart.customerId) : cart.customerId != null) return false;
-      return id != null ? id.equals(cart.id) : cart.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = customerId != null ? customerId.hashCode() : 0;
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
-    }
 }

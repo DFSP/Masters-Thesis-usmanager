@@ -33,6 +33,8 @@ import java.util.List;
 
 @RepositoryRestResource(exported = false)
 public interface CartRepository extends MongoRepository<Cart, String> {
+
     List<Cart> findByCustomerId(@Param("custId") String id);
+
 }
 

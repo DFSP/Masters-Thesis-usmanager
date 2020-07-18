@@ -29,4 +29,4 @@ import:
   subpackages:
   - middleware
 - package: golang.org/x/oauth2
-- package: bitbucket.org/microservicemanagement/go-client-register-go
+- package: bitbucket.org/microservicemanagement/go-client-registration-client

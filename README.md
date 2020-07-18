@@ -18,9 +18,9 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [launcher](launcher)
 
-- [local-manager](local-manager)
-
 - [master-manager](master-manager)
+
+- [local-manager](local-manager)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 
@@ -32,7 +32,7 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [registration-server](registration-server)
 
-- [register-go](register-go)
+- [registration-client](registration-client)
 
 - microservices
   - sock-shop

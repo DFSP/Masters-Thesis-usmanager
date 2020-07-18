@@ -24,107 +24,118 @@
 
 package works.weave.socks.cart.entities;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Document
 public class Item {
-    @Id
-    private String id;
 
-    @NotNull(message = "Item Id must not be null")
-    private String itemId;
-    private int quantity;
-    private float unitPrice;
+  @Id
+  private String id;
 
-    public Item(String id, String itemId, int quantity, float unitPrice) {
-        this.id = id;
-        this.itemId = itemId;
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-    }
+  @NotNull(message = "Item Id must not be null")
+  private String itemId;
 
-    public Item() {
-        this(null, "", 1, 0F);
-    }
+  private int quantity;
 
-    public Item(String itemId) {
-        this(null, itemId, 1, 0F);
-    }
+  private float unitPrice;
 
-    public Item(Item item, String id) {
-        this(id, item.itemId, item.quantity, item.unitPrice);
-    }
+  public Item(String id, String itemId, int quantity, float unitPrice) {
+    this.id = id;
+    this.itemId = itemId;
+    this.quantity = quantity;
+    this.unitPrice = unitPrice;
+  }
 
-    public Item(Item item, int quantity) {
-        this(item.id(), item.itemId, quantity, item.unitPrice);
-    }
+  public Item() {
+    this(null, "", 1, 0F);
+  }
 
-    public String id() {
-        return id;
-    }
+  public Item(String itemId) {
+    this(null, itemId, 1, 0F);
+  }
 
-    public String itemId() {
-        return itemId;
-    }
+  public Item(Item item, String id) {
+    this(id, item.itemId, item.quantity, item.unitPrice);
+  }
 
-    public int quantity() {
-        return quantity;
-    }
+  public Item(Item item, int quantity) {
+    this(item.id(), item.itemId, quantity, item.unitPrice);
+  }
 
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id='" + id + '\'' +
-                ", itemId='" + itemId + '\'' +
-                ", quantity=" + quantity +
-                ", unitPrice=" + unitPrice +
-                '}';
-    }
+  public String id() {
+    return id;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  public String itemId() {
+    return itemId;
+  }
 
-        Item item = (Item) o;
+  public int quantity() {
+    return quantity;
+  }
 
-        return itemId != null ? itemId.equals(item.itemId) : item.itemId == null;
-    }
+  @Override
+  public String toString() {
+    return "Item{"
+        + "id='" + id + '\''
+        + ", itemId='" + itemId + '\''
+        + ", quantity=" + quantity
+        + ", unitPrice=" + unitPrice
+        + '}';
+  }
 
-    // ****** Crappy getter/setters for Jackson JSON invoking ********
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-    public String getId() {
-        return id;
-    }
+    Item item = (Item) o;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    return itemId != null ? itemId.equals(item.itemId) : item.itemId == null;
+  }
 
-    public String getItemId() {
-        return itemId;
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, itemId, quantity, unitPrice);
+  }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
+  // ****** Crappy getter/setters for Jackson JSON invoking ********
 
-    public int getQuantity() {
-        return quantity;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public float getUnitPrice() {
-        return unitPrice;
-    }
+  public String getItemId() {
+    return itemId;
+  }
 
-    public void setUnitPrice(float unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+  public void setItemId(String itemId) {
+    this.itemId = itemId;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(int quantity) {
+    this.quantity = quantity;
+  }
+
+  public float getUnitPrice() {
+    return unitPrice;
+  }
+
+  public void setUnitPrice(float unitPrice) {
+    this.unitPrice = unitPrice;
+  }
+
 }

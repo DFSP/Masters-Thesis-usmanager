@@ -143,7 +143,7 @@
     }
     
     var options = {
-      uri: 'http://localhost:1906/api/locationdata',
+      uri: 'http://localhost:1906/api/metrics',
       method: 'POST',
       json: {
         "fromContinent": continent,
@@ -155,7 +155,7 @@
     };
     request(options, function (error, response, body) {
       if (error) {
-        console.log("=> Error sending location info to register-go...");
+        console.log("=> Error sending location info to registration-client...");
       }
     });
   };

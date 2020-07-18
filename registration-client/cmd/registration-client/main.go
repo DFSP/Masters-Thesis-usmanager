@@ -37,22 +37,22 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/usmanager/manager/registration-client/util"
 
 	"github.com/usmanager/manager/registration-client/api"
 	eureka "github.com/usmanager/manager/registration-client/eurekaops"
 	"github.com/usmanager/manager/registration-client/locationutils"
 	"github.com/usmanager/manager/registration-client/reglog"
+	"github.com/usmanager/manager/registration-client/util"
 )
 
-//HEARTBEATINTERVAL on timer
-const HEARTBEATINTERVAL = 30 * time.Second
+// heartbeatInterval on timer
+const heartbeatInterval = 30 * time.Second
 
-//REGISTERDELAY to register on eureka
-const REGISTERDELAY = 30 * time.Second
+// registerDelay to register on eureka
+const registerDelay = 30 * time.Second
 
-//MAXHEARTBEATRETRIES max heartbeat retries when not found process
-const MAXHEARTBEATRETRIES = 5
+// maxHeartbeatsTries max heartbeat retries when not found process
+const maxHeartbeatsTries = 5
 
 var instance eureka.Instance
 var e eureka.EurekaConnection
@@ -78,7 +78,7 @@ var appIsUp = true
 var sendLocationDataPeriod *string
 
 func main() {
-	reglog.Logger.Infof("Started register-go")
+	reglog.Logger.Infof("Started registration-client")
 
 	execapp = flag.String("execapp", "exec-app", "App to monitor")
 	app = flag.String("app", "app-name", "App name")
@@ -91,8 +91,8 @@ func main() {
 	serviceCountry = flag.String("serviceCountry", os.Getenv("SERVICE_COUNTRY"), "Service location: country")
 	serviceCity = flag.String("serviceCity", os.Getenv("SERVICE_CITY"), "Service location: city")
 
-	autoRegister = flag.String("autoregister", "true", "True: register-go will register app on Eureka; False: app will trigger the register")
-	monitorExecApp = flag.String("monitorexecapp", "true", "True: register-go will monitor exec app; False: no monitoring")
+	autoRegister = flag.String("autoregister", "true", "True: registration-client will register app on Eureka; False: app will trigger the register")
+	monitorExecApp = flag.String("monitorexecapp", "true", "True: registration-client will monitor exec app; False: no monitoring")
 	appEndpointCacheTime = flag.String("appendpointcachetime", "10", "Time to keep an instances endpoints before contacting Eureka")
 
 	sendLocationDataPeriod = flag.String("locationdatatime", "5", "Interval time to send location data")
@@ -111,8 +111,8 @@ func main() {
 		router.HandleFunc("/api/apps/{appName}", GetAppByName).Methods("GET")
 		router.HandleFunc("/api/apps/{appName}/all", GetAllAppsByName).Methods("GET")
 		router.HandleFunc("/api/register", RegisterApp).Methods("GET")
-		router.HandleFunc("/api/locationdata", ReceiveCustomLocationData).Methods("POST")
-		reglog.Logger.Infof("Register-go is listening on port %s. Go to http://127.0.0.1:%s", *serverPort, *serverPort)
+		router.HandleFunc("/api/metrics", ReceiveCustomLocationData).Methods("POST")
+		reglog.Logger.Infof("Registration-client is listening on port %s. Go to http://127.0.0.1:%s", *serverPort, *serverPort)
 		reglog.Logger.Fatal(http.ListenAndServe(":"+*serverPort, router))
 	}()
 
@@ -126,7 +126,7 @@ func main() {
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		errc <- fmt.Errorf("%s", <-c)
 	}()
-	prepareToTerminateApp(&instance, <-errc)
+	prepareToTerminateApp(&instance)
 }
 
 func registerInstance() {
@@ -134,7 +134,7 @@ func registerInstance() {
 		e = eureka.NewConn("http://" + *eurekaHost + "/eureka")
 		setInstance(strings.ToLower(*app), *hostname, *port, *serviceContinent, *serviceRegion, *serviceCountry, *serviceCity)
 		if strings.EqualFold(*autoRegister, "true") {
-			time.Sleep(REGISTERDELAY)
+			time.Sleep(registerDelay)
 		}
 		err := e.ReregisterInstance(&instance)
 		if err == nil {
@@ -186,9 +186,9 @@ func heartbeat() {
 	var isMonitorOn = strings.EqualFold(*monitorExecApp, "true")
 	var heartbeatError = false
 	var foundProcess = false
-	time.Sleep(HEARTBEATINTERVAL)
-	c := time.Tick(HEARTBEATINTERVAL)
-	for hearthbeatTime := range c {
+	time.Sleep(heartbeatInterval)
+	c := time.Tick(heartbeatInterval)
+	for hearthBeatTime := range c {
 		if appIsRegistered && appIsUp {
 			if isMonitorOn {
 				pid, processName, found := util.FindProcess(*execapp)
@@ -203,11 +203,11 @@ func heartbeat() {
 				} else {
 					retries = 0
 					heartbeatError = false
-					reglog.Logger.Infof("Heartbeat to eureka server at: %v", hearthbeatTime)
+					reglog.Logger.Infof("Heartbeat to eureka server at: %v", hearthBeatTime)
 				}
 			}
 			if (!foundProcess && isMonitorOn) || heartbeatError {
-				if retries < MAXHEARTBEATRETRIES {
+				if retries < maxHeartbeatsTries {
 					retries++
 					reglog.Logger.Errorf("Heartbeat not sended...")
 					err := e.UpdateInstanceStatus(&instance, eureka.DOWN)
@@ -250,7 +250,7 @@ func GetAppByName(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !foundApp {
-		instances, err := e.GetInstancesByVIPAddress(appName, false, eureka.InstanceQueryOption(eureka.ThatAreUp))
+		instances, err := e.GetInstancesByVIPAddress(appName, false, eureka.ThatAreUp)
 		if err != nil {
 			reglog.Logger.Errorf("Error getting instances from eureka: %s", err.Error())
 			w.WriteHeader(http.StatusNotFound)
@@ -322,7 +322,7 @@ func ReceiveCustomLocationData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(msg)
 }
 
-func prepareToTerminateApp(instance *eureka.Instance, errc error) {
+func prepareToTerminateApp(instance *eureka.Instance) {
 	appIsUp = false
 	err := e.UpdateInstanceStatus(instance, eureka.DOWN)
 	if err != nil {
@@ -332,13 +332,13 @@ func prepareToTerminateApp(instance *eureka.Instance, errc error) {
 }
 
 func exitApp(instance *eureka.Instance) {
-	reglog.Logger.Info("Register-go is finishing app deregisting, before exit...")
+	reglog.Logger.Info("Registration-client is finishing app de-registing, before exit...")
 	time.Sleep(20 * time.Second)
 	err := e.DeregisterInstance(instance)
 	if err != nil {
 		reglog.Logger.Errorf("Deregister instance error: %s", err.Error())
 	}
-	reglog.Logger.Info("Exit register-go")
+	reglog.Logger.Info("Exit registration-client")
 	os.Exit(0)
 }
 

@@ -1,4 +1,4 @@
-# Register-go
+# Registration-client
 Register a service on a Eureka server and gets other apps endpoints from Eureka.
 
 

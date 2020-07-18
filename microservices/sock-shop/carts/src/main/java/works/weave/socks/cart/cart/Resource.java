@@ -24,48 +24,51 @@
 
 package works.weave.socks.cart.cart;
 
-import works.weave.socks.cart.entities.Cart;
-
 import java.util.function.Supplier;
 
+import works.weave.socks.cart.entities.Cart;
+
 public interface Resource<T> {
-    Runnable destroy();
 
-    Supplier<T> create();
+  Runnable destroy();
 
-    Supplier<T> value();
+  Supplier<T> create();
 
-    Runnable merge(T toMerge);
+  Supplier<T> value();
 
-    class CartFake implements Resource<Cart> {
-        private final String customerId;
-        private Cart cart = null;
+  Runnable merge(T toMerge);
 
-        public CartFake(String customerId) {
-            this.customerId = customerId;
-        }
+  class CartFake implements Resource<Cart> {
 
-        @Override
-        public Runnable destroy() {
-            return () -> cart = null;
-        }
+    private final String customerId;
 
-        @Override
-        public Supplier<Cart> create() {
-            return () -> cart = new Cart(customerId);
-        }
+    private Cart cart;
 
-        @Override
-        public Supplier<Cart> value() {
-            if (cart == null) {
-                create().get();
-            }
-            return () -> cart;
-        }
-
-        @Override
-        public Runnable merge(Cart toMerge) {
-            return null;
-        }
+    public CartFake(String customerId) {
+      this.customerId = customerId;
     }
+
+    @Override
+    public Runnable destroy() {
+      return () -> cart = null;
+    }
+
+    @Override
+    public Supplier<Cart> create() {
+      return () -> cart = new Cart(customerId);
+    }
+
+    @Override
+    public Supplier<Cart> value() {
+      if (cart == null) {
+        create().get();
+      }
+      return () -> cart;
+    }
+
+    @Override
+    public Runnable merge(Cart toMerge) {
+      return null;
+    }
+  }
 }

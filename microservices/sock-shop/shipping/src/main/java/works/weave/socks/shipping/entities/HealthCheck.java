@@ -24,60 +24,61 @@
 
 package works.weave.socks.shipping.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Calendar;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HealthCheck {
-   private String service;
-   private String status;
 
-   @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-   private Date date = Calendar.getInstance().getTime();
+  private String service;
+  private String status;
 
-   public HealthCheck() {
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+  private Date date = Calendar.getInstance().getTime();
 
-   }
-
-   public HealthCheck(String service, String status, Date date) {
-      this.service = service;
-      this.status = status;
-      this.date = date;
+  public HealthCheck() {
   }
 
-   @Override
-   public String toString() {
-      return "HealthCheck{" +
-               "service='" + service + '\'' +
-               ", status='" + status + '\'' +
-               ", date='" + date +
-               '}';
-   }
+  public HealthCheck(String service, String status, Date date) {
+    this.service = service;
+    this.status = status;
+    this.date = date;
+  }
 
-   public String getService() {
-      return service;
-   }
+  @Override
+  public String toString() {
+    return "HealthCheck{"
+        + "service='" + service + '\''
+        + ", status='" + status + '\''
+        + ", date='" + date
+        + '}';
+  }
 
-   public void setService(String service) {
-      this.service = service;
-   }
+  public String getService() {
+    return service;
+  }
 
-   public String getStatus() {
-      return status;
-   }
+  public void setService(String service) {
+    this.service = service;
+  }
 
-   public void setStatus(String status) {
-      this.status = status;
-   }
+  public String getStatus() {
+    return status;
+  }
 
-   public Date getDate() {
-      return date;
-   }
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-   public void setDate(Date date) {
-      this.date = date;
-   }
+  public Date getDate() {
+    return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
+
 }

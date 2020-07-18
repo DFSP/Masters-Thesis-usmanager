@@ -38,7 +38,7 @@ import (
 
 	corelog "log"
 
-	"bitbucket.org/microservicemanagement/go-client-register-go"
+	"bitbucket.org/microservicemanagement/go-client-registration-client"
 	"bitbucket.org/microservicemanagement/user/api"
 	"bitbucket.org/microservicemanagement/user/db"
 	"bitbucket.org/microservicemanagement/user/db/mongodb"

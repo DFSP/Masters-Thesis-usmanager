@@ -37,13 +37,6 @@
 	<packaging>jar</packaging>
 	<name>registration-server</name>
 	<description>Eureka Client</description>
-	<repositories>
-		<repository>
-			<id>registration-server</id>
-			<name>Registration server</name>
-			<url>github.com/usmanager/manager</url>
-		</repository>
-	</repositories>
 	<licenses>
 		<license>
 			<name>MIT</name>

@@ -24,75 +24,80 @@
 
 package works.weave.socks.orders.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-
 @Document
 public class Cart {
-    @NotNull
-    private String customerId;
-    @Id
-    private String id;
-    @DBRef
-    private List<Item> items = new ArrayList<>();
 
-    public Cart(String customerId) {
-        this.customerId = customerId;
-    }
+  @NotNull
+  private String customerId;
 
-    public Cart() {
-        this(null);
-    }
+  @Id
+  private String id;
 
-    public List<Item> contents() {
-        return items;
-    }
+  @DBRef
+  private List<Item> items = new ArrayList<>();
 
-    public Cart add(Item item) {
-        items.add(item);
-        return this;
-    }
+  public Cart(String customerId) {
+    this.customerId = customerId;
+  }
 
-    public Cart remove(Item item) {
-        items.remove(item);
-        return this;
-    }
+  public Cart() {
+    this(null);
+  }
 
-    public String getCustomerId() {
-        return customerId;
-    }
+  public List<Item> contents() {
+    return items;
+  }
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
+  public Cart add(Item item) {
+    items.add(item);
+    return this;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public Cart remove(Item item) {
+    items.remove(item);
+    return this;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getCustomerId() {
+    return customerId;
+  }
 
-    public List<Item> getItems() {
-        return items;
-    }
+  public void setCustomerId(String customerId) {
+    this.customerId = customerId;
+  }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
+  public String getId() {
+    return id;
+  }
 
-    @Override
-    public String toString() {
-        return "Cart{" +
-                "id='" + id + '\'' +
-                ", customerId='" + customerId + '\'' +
-                ", items=" + items +
-                '}';
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public List<Item> getItems() {
+    return items;
+  }
+
+  public void setItems(List<Item> items) {
+    this.items = items;
+  }
+
+  @Override
+  public String toString() {
+    return "Cart{"
+        + "id='" + id + '\''
+        + ", customerId='" + customerId + '\''
+        + ", items=" + items
+        + '}';
+  }
+
 }

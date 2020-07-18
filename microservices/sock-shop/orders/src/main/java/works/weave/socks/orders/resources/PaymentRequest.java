@@ -29,60 +29,62 @@ import works.weave.socks.orders.entities.Card;
 import works.weave.socks.orders.entities.Customer;
 
 public class PaymentRequest {
-    private Address address;
-    private Card card;
-    private Customer customer;
-    private float amount;
 
-    // For jackson
-    public PaymentRequest() {
-    }
+  private Address address;
+  private Card card;
+  private Customer customer;
+  private float amount;
 
-    public PaymentRequest(Address address, Card card, Customer customer, float amount) {
-        this.address = address;
-        this.customer = customer;
-        this.card = card;
-        this.amount = amount;
-    }
+  // For jackson
+  public PaymentRequest() {
+  }
 
-    @Override
-    public String toString() {
-        return "PaymentRequest{" +
-                "address=" + address +
-                ", card=" + card +
-                ", customer=" + customer +
-                '}';
-    }
+  public PaymentRequest(Address address, Card card, Customer customer, float amount) {
+    this.address = address;
+    this.customer = customer;
+    this.card = card;
+    this.amount = amount;
+  }
 
-    public Address getAddress() {
-        return address;
-    }
+  @Override
+  public String toString() {
+    return "PaymentRequest{"
+        + "address=" + address
+        + ", card=" + card
+        + ", customer=" + customer
+        + '}';
+  }
 
-    public void setAddress(Address address) {
-        this.address = address;
-    }
+  public Address getAddress() {
+    return address;
+  }
 
-    public Card getCard() {
-        return card;
-    }
+  public void setAddress(Address address) {
+    this.address = address;
+  }
 
-    public void setCard(Card card) {
-        this.card = card;
-    }
+  public Card getCard() {
+    return card;
+  }
 
-    public Customer getCustomer() {
-        return customer;
-    }
+  public void setCard(Card card) {
+    this.card = card;
+  }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
+  public Customer getCustomer() {
+    return customer;
+  }
 
-    public float getAmount() {
-        return amount;
-    }
+  public void setCustomer(Customer customer) {
+    this.customer = customer;
+  }
 
-    public void setAmount(float amount) {
-        this.amount = amount;
-    }
+  public float getAmount() {
+    return amount;
+  }
+
+  public void setAmount(float amount) {
+    this.amount = amount;
+  }
+
 }

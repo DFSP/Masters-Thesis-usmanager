@@ -24,17 +24,74 @@
 
 package works.weave.socks.orders.resources;
 
-import org.hibernate.validator.constraints.URL;
-
 import java.net.URI;
 
+import org.hibernate.validator.constraints.URL;
+
 public class NewOrderResource {
-    @URL
-    public URI customer;
-    @URL
-    public URI address;
-    @URL
-    public URI card;
-    @URL
-    public URI items;
+
+  @URL
+  private URI customer;
+
+  @URL
+  private URI address;
+
+  @URL
+  private URI card;
+
+  @URL
+  private URI items;
+
+  public NewOrderResource() {
+  }
+
+  public NewOrderResource(URI customer, URI address, URI card, URI items) {
+    this.customer = customer;
+    this.address = address;
+    this.card = card;
+    this.items = items;
+  }
+
+  @Override
+  public String toString() {
+    return "NewOrderResource{"
+        + "customer=" + customer
+        + ", address=" + address
+        + ", card=" + card
+        + ", items=" + items
+        + '}';
+  }
+
+  public URI getCustomer() {
+    return customer;
+  }
+
+  public void setCustomer(URI customer) {
+    this.customer = customer;
+  }
+
+  public URI getAddress() {
+    return address;
+  }
+
+  public void setAddress(URI address) {
+    this.address = address;
+  }
+
+  public URI getCard() {
+    return card;
+  }
+
+  public void setCard(URI card) {
+    this.card = card;
+  }
+
+  public URI getItems() {
+    return items;
+  }
+
+  public void setItems(URI items) {
+    this.items = items;
+  }
+
 }

@@ -65,7 +65,7 @@ docker:
     password: password
     port: 2375
   hub:
-    username: danielfct
+    username: usmanager
   swarm:
     manager: ${dockerManager:daniel@dpimenta.ddns.net}
     max-workers: 1

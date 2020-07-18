@@ -35,13 +35,6 @@
 	<description>Microservices master manager. Decides to replicate and/or migrate
 		docker containered microservices between cloud and edge endpoints, based on
 		predefined rules and metrics collected globally</description>
-	<repositories>
-		<repository>
-			<id>master-manager</id>
-			<name>Master Manager</name>
-			<url>github.com/usmanager/manager</url>
-		</repository>
-	</repositories>
 	<licenses>
 		<license>
 			<name>MIT</name>

@@ -24,8 +24,11 @@
 
 package works.weave.socks.shipping.configuration;
 
-
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -36,62 +39,61 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class RabbitMqConfiguration {
 
-    final static String queueName = "shipping-task";
+  private static final String QUEUE_NAME = "shipping-task";
 
-    @Value("${spring.rabbitmq.host}")
-    private String host;
+  @Value("${spring.rabbitmq.host}")
+  private String host;
 
-    @Bean
-    public ConnectionFactory connectionFactory() {
-    	String[] hostSplit = host.split(":");
-        CachingConnectionFactory connectionFactory = null;
-        if(hostSplit.length > 1) {
-        	int port = Integer.parseInt(hostSplit[1]);
-        	connectionFactory = new CachingConnectionFactory(hostSplit[0], port);
-        }
-        else {
-        	connectionFactory = new CachingConnectionFactory(host);
-        }
-        connectionFactory.setCloseTimeout(5000);
-        connectionFactory.setConnectionTimeout(5000);
-        connectionFactory.setUsername("guest");
-        connectionFactory.setPassword("guest");
-        return connectionFactory;
+  @Bean
+  public ConnectionFactory connectionFactory() {
+    String[] hostSplit = host.split(":");
+    CachingConnectionFactory connectionFactory = null;
+    if (hostSplit.length > 1) {
+      int port = Integer.parseInt(hostSplit[1]);
+      connectionFactory = new CachingConnectionFactory(hostSplit[0], port);
+    } else {
+      connectionFactory = new CachingConnectionFactory(host);
     }
+    connectionFactory.setCloseTimeout(5000);
+    connectionFactory.setConnectionTimeout(5000);
+    connectionFactory.setUsername("guest");
+    connectionFactory.setPassword("guest");
+    return connectionFactory;
+  }
 
-    @Bean
-    public AmqpAdmin amqpAdmin() {
-        return new RabbitAdmin(connectionFactory());
-    }
+  @Bean
+  public AmqpAdmin amqpAdmin() {
+    return new RabbitAdmin(connectionFactory());
+  }
 
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
+  @Bean
+  public MessageConverter jsonMessageConverter() {
+    return new Jackson2JsonMessageConverter();
+  }
 
-    @Bean
-    public RabbitTemplate rabbitTemplate() {
-        RabbitTemplate template = new RabbitTemplate(connectionFactory());
-        template.setMessageConverter(jsonMessageConverter());
-        return template;
-    }
+  @Bean
+  public RabbitTemplate rabbitTemplate() {
+    RabbitTemplate template = new RabbitTemplate(connectionFactory());
+    template.setMessageConverter(jsonMessageConverter());
+    return template;
+  }
 
-    @Bean
-    Queue queue() {
-        return new Queue(queueName, false);
-    }
+  @Bean
+  Queue queue() {
+    return new Queue(QUEUE_NAME, false);
+  }
 
-    @Bean
-    TopicExchange exchange() {
-        return new TopicExchange("shipping-task-exchange");
-    }
+  @Bean
+  TopicExchange exchange() {
+    return new TopicExchange("shipping-task-exchange");
+  }
 
-    @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(queueName);
-    }
+  @Bean
+  Binding binding(Queue queue, TopicExchange exchange) {
+    return BindingBuilder.bind(queue).to(exchange).with(QUEUE_NAME);
+  }
+
 }

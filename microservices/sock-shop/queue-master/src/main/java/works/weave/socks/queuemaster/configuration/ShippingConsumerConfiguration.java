@@ -34,38 +34,39 @@ import org.springframework.context.annotation.Configuration;
 import works.weave.socks.queuemaster.ShippingTaskHandler;
 
 @Configuration
-public class ShippingConsumerConfiguration extends RabbitMqConfiguration
-{
-	protected final String queueName = "shipping-task";
+public class ShippingConsumerConfiguration extends RabbitMqConfiguration {
 
-    @Autowired
-    private ShippingTaskHandler shippingTaskHandler;
+  private static final String QUEUE_NAME = "shipping-task";
 
-	@Bean
-	public RabbitTemplate rabbitTemplate() {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory());
-		template.setQueue(this.queueName);
-        template.setMessageConverter(jsonMessageConverter());
-		return template;
-	}
+  @Autowired
+  private ShippingTaskHandler shippingTaskHandler;
 
-    @Bean
-	public Queue queueName() {
-		return new Queue(this.queueName, false);
-	}
+  @Bean
+  public RabbitTemplate rabbitTemplate() {
+    RabbitTemplate template = new RabbitTemplate(connectionFactory());
+    template.setQueue(QUEUE_NAME);
+    template.setMessageConverter(jsonMessageConverter());
+    return template;
+  }
 
-	@Bean
-	public SimpleMessageListenerContainer listenerContainer() {
-		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory());
-		container.setQueueNames(this.queueName);
-		container.setMessageListener(messageListenerAdapter());
+  @Bean
+  public Queue queueName() {
+    return new Queue(QUEUE_NAME, false);
+  }
 
-		return container;
-	}
+  @Bean
+  public SimpleMessageListenerContainer listenerContainer() {
+    SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+    container.setConnectionFactory(connectionFactory());
+    container.setQueueNames(QUEUE_NAME);
+    container.setMessageListener(messageListenerAdapter());
 
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter() {
-        return new MessageListenerAdapter(shippingTaskHandler, jsonMessageConverter());
-    }
+    return container;
+  }
+
+  @Bean
+  public MessageListenerAdapter messageListenerAdapter() {
+    return new MessageListenerAdapter(shippingTaskHandler, jsonMessageConverter());
+  }
+
 }

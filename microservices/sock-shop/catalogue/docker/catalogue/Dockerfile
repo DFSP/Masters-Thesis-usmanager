@@ -1,4 +1,4 @@
-FROM danielfct/register-go
+FROM danielfct/registration-client
 
 FROM golang:1.10
 COPY . /go/src/bitbucket.org/microservicemanagement/catalogue

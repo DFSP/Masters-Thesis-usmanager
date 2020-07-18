@@ -11,6 +11,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="queue-master" />
         <module name="master-manager" />
+        <module name="swagger-java-client" />
         <module name="shipping" />
         <module name="carts" />
         <module name="orders" />
@@ -21,7 +22,6 @@
       <module name="launcher" target="1.5" />
       <module name="local-manager" target="11" />
       <module name="managerLocal" target="11" />
-      <module name="swagger-java-client" target="1.7" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

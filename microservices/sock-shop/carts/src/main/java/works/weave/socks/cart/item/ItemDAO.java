@@ -24,36 +24,38 @@
 
 package works.weave.socks.cart.item;
 
-import works.weave.socks.cart.entities.Item;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import works.weave.socks.cart.entities.Item;
+
 public interface ItemDAO {
-    Item save(Item item);
 
-    void destroy(Item item);
+  Item save(Item item);
 
-    Item findOne(String id);
+  void destroy(Item item);
 
-    class Fake implements ItemDAO {
-        private Map<String, Item> store = new HashMap<>();
+  Item findOne(String id);
 
-        @Override
-        public Item save(Item item) {
-            return store.put(item.itemId(), item);
-        }
+  class Fake implements ItemDAO {
+    private final Map<String, Item> store = new HashMap<>();
 
-        @Override
-        public void destroy(Item item) {
-            store.remove(item.itemId());
-
-        }
-
-        @Override
-        public Item findOne(String id) {
-            return store.entrySet().stream().filter(i -> i.getValue().id().equals(id)).map(Map.Entry::getValue)
-                    .findFirst().orElse(null);
-        }
+    @Override
+    public Item save(Item item) {
+      return store.put(item.itemId(), item);
     }
+
+    @Override
+    public void destroy(Item item) {
+      store.remove(item.itemId());
+
+    }
+
+    @Override
+    public Item findOne(String id) {
+      return store.entrySet().stream().filter(i -> i.getValue().id().equals(id)).map(Map.Entry::getValue)
+          .findFirst().orElse(null);
+    }
+  }
+
 }

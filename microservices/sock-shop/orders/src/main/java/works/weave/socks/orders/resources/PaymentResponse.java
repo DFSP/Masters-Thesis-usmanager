@@ -25,39 +25,41 @@
 package works.weave.socks.orders.resources;
 
 public class PaymentResponse {
-    private boolean authorised = false;
-    private String  message;
 
-    // For jackson
-    public PaymentResponse() {
-    }
+  private boolean authorised;
+  private String message;
 
-    public PaymentResponse(boolean authorised, String message) {
-        this.authorised = authorised;
-        this.message = message;
-    }
+  // For jackson
+  public PaymentResponse() {
+  }
 
-    @Override
-    public String toString() {
-        return "PaymentResponse{" +
-                "authorised=" + authorised +
-                ", message=" + message +
-                '}';
-    }
+  public PaymentResponse(boolean authorised, String message) {
+    this.authorised = authorised;
+    this.message = message;
+  }
 
-    public boolean isAuthorised() {
-        return authorised;
-    }
+  @Override
+  public String toString() {
+    return "PaymentResponse{"
+        + "authorised=" + authorised
+        + ", message=" + message
+        + '}';
+  }
 
-    public void setAuthorised(boolean authorised) {
-        this.authorised = authorised;
-    }
+  public boolean isAuthorised() {
+    return authorised;
+  }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+  public void setAuthorised(boolean authorised) {
+    this.authorised = authorised;
+  }
 
-    public String getMessage() {
-        return message;
-    }
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
 }

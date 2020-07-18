@@ -24,109 +24,103 @@
 
 package works.weave.socks.orders.entities;
 
-
 import org.springframework.data.annotation.Id;
 
 public class Address {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    private String number;
-    private String street;
-    private String city;
-    private String postcode;
-    private String country;
+  private String number;
+  private String street;
+  private String city;
+  private String postcode;
+  private String country;
 
-    public Address() {
+  public Address(String id, String number, String street, String city, String postcode, String country) {
+    this.id = id;
+    this.number = number;
+    this.street = street;
+    this.city = city;
+    this.postcode = postcode;
+    this.country = country;
+  }
+
+  @Override
+  public String toString() {
+    return "Address{"
+        + "id=" + id
+        + ", number='" + number + '\''
+        + ", street='" + street + '\''
+        + ", city='" + city + '\''
+        + ", country='" + country + '\''
+        + ", postcode='" + postcode + '\''
+        + '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public Address(String id, String number, String street, String city, String postcode, String country) {
-        this.id = id;
-        this.number = number;
-        this.street = street;
-        this.city = city;
-        this.postcode = postcode;
-        this.country = country;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    Address address = (Address) o;
+    return getId().equals(address.getId());
 
-    public Address(String number, String street, String city, String postcode, String country) {
-        this(null, number, street, city, postcode, country);
-    }
+  }
 
-    @Override
-    public String toString() {
-        return "Address{" +
-                "id=" + id +
-                ", number='" + number + '\'' +
-                ", street='" + street + '\'' +
-                ", city='" + city + '\'' +
-                ", country='" + country + '\'' +
-                ", postcode='" + postcode + '\'' +
-                '}';
-    }
+  @Override
+  public int hashCode() {
+    return getId().hashCode();
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  public String getId() {
+    return id;
+  }
 
-        Address address = (Address) o;
+  public void setId(String id) {
+    this.id = id;
+  }
 
-        return getId().equals(address.getId());
+  public String getNumber() {
+    return number;
+  }
 
-    }
+  public void setNumber(String number) {
+    this.number = number;
+  }
 
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
+  public String getStreet() {
+    return street;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public void setStreet(String street) {
+    this.street = street;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getCity() {
+    return city;
+  }
 
-    public String getNumber() {
-        return number;
-    }
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-    public void setNumber(String number) {
-        this.number = number;
-    }
+  public String getCountry() {
+    return country;
+  }
 
-    public String getStreet() {
-        return street;
-    }
+  public void setCountry(String country) {
+    this.country = country;
+  }
 
-    public void setStreet(String street) {
-        this.street = street;
-    }
+  public String getPostcode() {
+    return postcode;
+  }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getPostcode() {
-        return postcode;
-    }
-
-    public void setPostcode(String postcode) {
-        this.postcode = postcode;
-    }
+  public void setPostcode(String postcode) {
+    this.postcode = postcode;
+  }
 }

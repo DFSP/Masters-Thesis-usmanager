@@ -28,82 +28,82 @@ import org.springframework.data.annotation.Id;
 
 public class Card {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    private String longNum;
-    private String expires;
-    private String ccv;
+  private String longNum;
+  private String expires;
+  private String ccv;
 
-    public Card() {
+  public Card(String id, String longNum, String expires, String ccv) {
+    this.id = id;
+    this.longNum = longNum;
+    this.expires = expires;
+    this.ccv = ccv;
+  }
+
+  public Card(String longNum, String expires, String ccv) {
+    this(null, longNum, expires, ccv);
+  }
+
+  @Override
+  public String toString() {
+    return "Card{"
+        + "id=" + id
+        + ", longNum='" + longNum + '\''
+        + ", expires='" + expires + '\''
+        + ", ccv='" + ccv + '\''
+        + '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public Card(String id, String longNum, String expires, String ccv) {
-        this.id = id;
-        this.longNum = longNum;
-        this.expires = expires;
-        this.ccv = ccv;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    Card card = (Card) o;
+    return getId().equals(card.getId());
 
-    public Card(String longNum, String expires, String ccv) {
-        this(null, longNum, expires, ccv);
-    }
+  }
 
-    @Override
-    public String toString() {
-        return "Card{" +
-                "id=" + id +
-                ", longNum='" + longNum + '\'' +
-                ", expires='" + expires + '\'' +
-                ", ccv='" + ccv + '\'' +
-                '}';
-    }
+  @Override
+  public int hashCode() {
+    return getId().hashCode();
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  public String getId() {
+    return id;
+  }
 
-        Card card = (Card) o;
+  public void setId(String id) {
+    this.id = id;
+  }
 
-        return getId().equals(card.getId());
+  public String getLongNum() {
+    return longNum;
+  }
 
-    }
+  public void setLongNum(String longNum) {
+    this.longNum = longNum;
+  }
 
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
+  public String getExpires() {
+    return expires;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public void setExpires(String expires) {
+    this.expires = expires;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getCcv() {
+    return ccv;
+  }
 
-    public String getLongNum() {
-        return longNum;
-    }
+  public void setCcv(String ccv) {
+    this.ccv = ccv;
+  }
 
-    public void setLongNum(String longNum) {
-        this.longNum = longNum;
-    }
-
-    public String getExpires() {
-        return expires;
-    }
-
-    public void setExpires(String expires) {
-        this.expires = expires;
-    }
-
-    public String getCcv() {
-        return ccv;
-    }
-
-    public void setCcv(String ccv) {
-        this.ccv = ccv;
-    }
 }
