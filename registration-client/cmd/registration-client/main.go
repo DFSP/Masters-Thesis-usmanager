@@ -37,12 +37,12 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/usmanager/manager/register-go/util"
+	"github.com/usmanager/manager/registration-client/util"
 
-	"github.com/usmanager/manager/register-go/api"
-	eureka "github.com/usmanager/manager/register-go/eurekaops"
-	"github.com/usmanager/manager/register-go/locationutils"
-	"github.com/usmanager/manager/register-go/reglog"
+	"github.com/usmanager/manager/registration-client/api"
+	eureka "github.com/usmanager/manager/registration-client/eurekaops"
+	"github.com/usmanager/manager/registration-client/locationutils"
+	"github.com/usmanager/manager/registration-client/reglog"
 )
 
 //HEARTBEATINTERVAL on timer

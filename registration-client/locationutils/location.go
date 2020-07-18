@@ -32,8 +32,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/usmanager/manager/register-go/api"
-	"github.com/usmanager/manager/register-go/reglog"
+	"github.com/usmanager/manager/registration-client/api"
+	"github.com/usmanager/manager/registration-client/reglog"
 )
 
 var sendDataPeriod = 5 * time.Second

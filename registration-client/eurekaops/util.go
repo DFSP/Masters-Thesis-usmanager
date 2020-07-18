@@ -28,7 +28,7 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/usmanager/manager/register-go/api"
+	"github.com/usmanager/manager/registration-client/api"
 )
 
 //GetBestInstance returns the best app instance

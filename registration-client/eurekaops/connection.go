@@ -30,7 +30,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/usmanager/manager/register-go/reglog"
+	"github.com/usmanager/manager/registration-client/reglog"
 )
 
 func init() {

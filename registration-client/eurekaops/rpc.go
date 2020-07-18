@@ -35,7 +35,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/usmanager/manager/register-go/reglog"
+	"github.com/usmanager/manager/registration-client/reglog"
 )
 
 var HttpClient = &http.Client{

@@ -31,7 +31,7 @@ import (
 	"fmt"
 
 	"github.com/clbanning/mxj/x2j"
-	"github.com/usmanager/manager/register-go/reglog"
+	"github.com/usmanager/manager/registration-client/reglog"
 )
 
 // ParseAllMetadata iterates through all instances in an application
