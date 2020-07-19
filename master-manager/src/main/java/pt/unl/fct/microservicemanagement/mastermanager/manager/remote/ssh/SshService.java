@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
-import net.schmizz.sshj.connection.ConnectionException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
@@ -186,7 +185,6 @@ public class SshService {
     log.info("Failed to connect to {}", hostname);
     return false;
   }
-
 
 
 }

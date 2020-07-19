@@ -24,10 +24,11 @@
 
 package works.weave.socks.cart.entities;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -36,14 +37,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Cart {
 
-  @NotNull
-  private String customerId; // Public instead of getters/setters.
-
-  @Id
-  private String id;
-
   @DBRef
   private final List<Item> items = new ArrayList<>();
+  @NotNull
+  private String customerId; // Public instead of getters/setters.
+  @Id
+  private String id;
 
   public Cart(String customerId) {
     this.customerId = customerId;
@@ -53,12 +52,12 @@ public class Cart {
     this(null);
   }
 
-  public void setCustomerId(String customerId) {
-    this.customerId = customerId;
-  }
-
   public String getCustomerId() {
     return customerId;
+  }
+
+  public void setCustomerId(String customerId) {
+    this.customerId = customerId;
   }
 
   public List<Item> contents() {

@@ -45,12 +45,6 @@ class RulesContainerList extends BaseComponent<Props, {}> {
     this.props.loadRulesContainer();
   }
 
-  private rule = (rule: IRuleContainer): JSX.Element =>
-    <RuleContainerCard key={rule.id} rule={rule}/>;
-
-  private predicate = (rule: IRuleContainer, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<IRuleContainer>
@@ -62,6 +56,12 @@ class RulesContainerList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private rule = (rule: IRuleContainer): JSX.Element =>
+    <RuleContainerCard key={rule.id} rule={rule}/>;
+
+  private predicate = (rule: IRuleContainer, search: string): boolean =>
+    rule.name.toLowerCase().includes(search);
 
 }
 

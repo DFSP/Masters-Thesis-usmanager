@@ -24,7 +24,7 @@ export default class ActionButton extends React.Component<Props, State> {
     isActive: (this.props.automatic && this.props.active) || false
   };
 
-  handleOnClick = () =>  {
+  handleOnClick = () => {
     if (this.props.automatic) {
       this.setState(state => ({isActive: !state.isActive}));
     }

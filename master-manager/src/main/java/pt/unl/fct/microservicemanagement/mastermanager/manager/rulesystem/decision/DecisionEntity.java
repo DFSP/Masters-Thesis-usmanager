@@ -13,6 +13,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decis
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -37,7 +38,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 @Entity
 @Builder(toBuilder = true)

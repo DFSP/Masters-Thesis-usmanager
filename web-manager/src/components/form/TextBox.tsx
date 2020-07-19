@@ -27,9 +27,6 @@ export class TextBox<T> extends React.Component<TextBoxProps<T>, State> {
     M.updateTextFields();
   }
 
-  private handleToggleVisibility = () =>
-    this.setState({ show: !this.state.show });
-
   render(): any {
     const {className, id, name, value, disabled, hidden, valueToString, onChange, onBlur} = this.props;
     const {show} = this.state;
@@ -52,5 +49,8 @@ export class TextBox<T> extends React.Component<TextBoxProps<T>, State> {
       </>
     )
   }
+
+  private handleToggleVisibility = () =>
+    this.setState({show: !this.state.show});
 
 }

@@ -10,6 +10,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
+
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Objects;
@@ -32,7 +34,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
 @Entity
 @Builder(toBuilder = true)

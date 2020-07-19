@@ -27,7 +27,6 @@ package util
 import (
 	"strings"
 
-	"github.com/mitchellh/go-ps"
 	"github.com/usmanager/manager/registration-client/reglog"
 )
 

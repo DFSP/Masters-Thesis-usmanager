@@ -14,9 +14,6 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
 
   private modal = createRef<HTMLDivElement>();
 
-  private initModal = () =>
-    M.Modal.init(this.modal.current as Element, { startingTop: '38.5%', endingTop: '38.5%', preventScrolling: false });
-
   public componentDidMount(): void {
     this.initModal();
   }
@@ -29,7 +26,9 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
     return (
       <div id={this.props.id} className='modal dialog' ref={this.modal}>
         <div className="modal-content">
-          <div className="modal-message">Are you sure you want to <div className="dialog-message">{this.props.message}</div>?</div>
+          <div className="modal-message">Are you sure you want to <div
+            className="dialog-message">{this.props.message}</div>?
+          </div>
         </div>
         <div className={`modal-footer dialog-footer`}>
           <button className="modal-close waves-effect waves-red btn-flat white-text"
@@ -44,5 +43,8 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
       </div>
     );
   }
+
+  private initModal = () =>
+    M.Modal.init(this.modal.current as Element, {startingTop: '38.5%', endingTop: '38.5%', preventScrolling: false});
 
 }

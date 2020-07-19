@@ -25,16 +25,15 @@ interface State {
 
 class Tabs extends React.Component<Props, State> {
 
-  private tabsRef = createRef<HTMLUListElement>();
-  private rightScrollTimer: NodeJS.Timeout | null = null;
-  private leftScrollTimer: NodeJS.Timeout | null = null;
-
   state: State = {
     previousScrollLeft: null,
     previousScrollRight: null,
     showScrollLeft: false,
     showScrollRight: false,
   }
+  private tabsRef = createRef<HTMLUListElement>();
+  private rightScrollTimer: NodeJS.Timeout | null = null;
+  private leftScrollTimer: NodeJS.Timeout | null = null;
 
   componentDidMount() {
     M.Tabs.init(this.tabsRef.current as Element);
@@ -64,92 +63,6 @@ class Tabs extends React.Component<Props, State> {
 
   componentWillUnmount(): void {
     window.removeEventListener('resize', this.handleResize);
-  }
-
-  private handleResize = () => {
-    this.setState({
-      showScrollLeft: this.shouldShowScrollLeft(),
-      showScrollRight: this.shouldShowScrollRight(),
-    })
-  }
-
-  private shouldShowScrollLeft = (): boolean => {
-    const tabs = this.tabsRef.current;
-    if (tabs) {
-      const show = tabs.scrollWidth > tabs.clientWidth && tabs.scrollLeft > 0;
-      this.setState({showScrollLeft: show});
-      return show;
-    }
-    return false;
-  }
-
-  private shouldShowScrollRight = (): boolean => {
-    const tabs = this.tabsRef.current;
-    if (tabs) {
-      const show = tabs.scrollWidth > tabs.clientWidth && tabs.scrollLeft + tabs.clientWidth !== tabs.scrollWidth;
-      this.setState({showScrollRight: show});
-      return show;
-    }
-    return false;
-  }
-
-  private setRightScrollTimer = () => {
-    this.stopLeftScrollTimer();
-    if (!this.rightScrollTimer) {
-      this.rightScrollTimer = setInterval(this.executeRightScroll,25)
-    }
-  }
-
-  private executeRightScroll = () => {
-    const tabs = this.tabsRef.current;
-    if (tabs) {
-      if (this.state.previousScrollRight === tabs.scrollLeft) {
-        this.stopRightScrollTimer();
-      }
-      this.setState({previousScrollRight: tabs.scrollLeft});
-      tabs.scrollTo(tabs.scrollLeft + 10, 0);
-      this.shouldShowScrollLeft();
-      this.shouldShowScrollRight();
-    }
-    else {
-      this.stopRightScrollTimer();
-    }
-  }
-
-  private stopRightScrollTimer = () => {
-    if (this.rightScrollTimer) {
-      clearInterval(this.rightScrollTimer);
-    }
-    this.rightScrollTimer = null;
-  }
-
-  private executeLeftScroll = () => {
-    const tabs = this.tabsRef.current;
-    if (tabs) {
-      if (this.state.previousScrollLeft === tabs.scrollLeft) {
-        this.stopLeftScrollTimer();
-      }
-      this.setState({previousScrollLeft: tabs.scrollLeft});
-      tabs.scrollTo(tabs.scrollLeft - 10, 0);
-      this.shouldShowScrollLeft();
-      this.shouldShowScrollRight();
-    }
-    else {
-      this.stopLeftScrollTimer();
-    }
-  }
-
-  private setLeftScrollTimer = () => {
-
-    this.stopRightScrollTimer();
-    this.leftScrollTimer = setInterval(this.executeLeftScroll,25)
-  }
-
-  private stopLeftScrollTimer = () => {
-    if (this.leftScrollTimer) {
-      clearInterval(this.leftScrollTimer)
-    }
-    this.leftScrollTimer = null;
   }
 
   public render() {
@@ -195,6 +108,90 @@ class Tabs extends React.Component<Props, State> {
       </div>
 
     )
+  }
+
+  private handleResize = () => {
+    this.setState({
+      showScrollLeft: this.shouldShowScrollLeft(),
+      showScrollRight: this.shouldShowScrollRight(),
+    })
+  }
+
+  private shouldShowScrollLeft = (): boolean => {
+    const tabs = this.tabsRef.current;
+    if (tabs) {
+      const show = tabs.scrollWidth > tabs.clientWidth && tabs.scrollLeft > 0;
+      this.setState({showScrollLeft: show});
+      return show;
+    }
+    return false;
+  }
+
+  private shouldShowScrollRight = (): boolean => {
+    const tabs = this.tabsRef.current;
+    if (tabs) {
+      const show = tabs.scrollWidth > tabs.clientWidth && tabs.scrollLeft + tabs.clientWidth !== tabs.scrollWidth;
+      this.setState({showScrollRight: show});
+      return show;
+    }
+    return false;
+  }
+
+  private setRightScrollTimer = () => {
+    this.stopLeftScrollTimer();
+    if (!this.rightScrollTimer) {
+      this.rightScrollTimer = setInterval(this.executeRightScroll, 25)
+    }
+  }
+
+  private executeRightScroll = () => {
+    const tabs = this.tabsRef.current;
+    if (tabs) {
+      if (this.state.previousScrollRight === tabs.scrollLeft) {
+        this.stopRightScrollTimer();
+      }
+      this.setState({previousScrollRight: tabs.scrollLeft});
+      tabs.scrollTo(tabs.scrollLeft + 10, 0);
+      this.shouldShowScrollLeft();
+      this.shouldShowScrollRight();
+    } else {
+      this.stopRightScrollTimer();
+    }
+  }
+
+  private stopRightScrollTimer = () => {
+    if (this.rightScrollTimer) {
+      clearInterval(this.rightScrollTimer);
+    }
+    this.rightScrollTimer = null;
+  }
+
+  private executeLeftScroll = () => {
+    const tabs = this.tabsRef.current;
+    if (tabs) {
+      if (this.state.previousScrollLeft === tabs.scrollLeft) {
+        this.stopLeftScrollTimer();
+      }
+      this.setState({previousScrollLeft: tabs.scrollLeft});
+      tabs.scrollTo(tabs.scrollLeft - 10, 0);
+      this.shouldShowScrollLeft();
+      this.shouldShowScrollRight();
+    } else {
+      this.stopLeftScrollTimer();
+    }
+  }
+
+  private setLeftScrollTimer = () => {
+
+    this.stopRightScrollTimer();
+    this.leftScrollTimer = setInterval(this.executeLeftScroll, 25)
+  }
+
+  private stopLeftScrollTimer = () => {
+    if (this.leftScrollTimer) {
+      clearInterval(this.leftScrollTimer)
+    }
+    this.leftScrollTimer = null;
   }
 
 }

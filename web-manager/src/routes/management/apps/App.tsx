@@ -2,7 +2,12 @@ import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {
-  ICustomButton, IFields, IFormLoading, IValues, required, requiredAndTrimmed
+  ICustomButton,
+  IFields,
+  IFormLoading,
+  IValues,
+  required,
+  requiredAndTrimmed
 } from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
@@ -74,12 +79,11 @@ interface State {
 
 class App extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedServices: [],
     loading: undefined,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.props.loadRegions();
@@ -89,6 +93,17 @@ class App extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadApp = () => {
@@ -179,7 +194,7 @@ class App extends BaseComponent<Props, State> {
   private onSaveServicesSuccess = (app: IApp): void => {
     this.props.addAppServices(app.name, this.state.unsavedServices);
     if (this.mounted) {
-      this.setState({ unsavedServices: [] });
+      this.setState({unsavedServices: []});
     }
   };
 
@@ -197,17 +212,17 @@ class App extends BaseComponent<Props, State> {
       region: {
         id: 'region',
         label: 'region',
-        validation: { rule: required }
+        validation: {rule: required}
       },
       country: {
         id: 'country',
         label: 'country',
-        validation: { rule: requiredAndTrimmed }
+        validation: {rule: requiredAndTrimmed}
       },
       city: {
         id: 'city',
         label: 'city',
-        validation: { rule: requiredAndTrimmed }
+        validation: {rule: requiredAndTrimmed}
       }
     }
   );
@@ -221,7 +236,8 @@ class App extends BaseComponent<Props, State> {
                       dropdown={{
                         defaultValue: 'Select region',
                         values: this.getSelectableRegions(),
-                        optionToString: this.regionDropdown}}/>
+                        optionToString: this.regionDropdown
+                      }}/>
       <Field key='country'
              id={'country'}
              label='country'/>
@@ -244,8 +260,9 @@ class App extends BaseComponent<Props, State> {
       buttons.push({
         button:
           <>
-            <button className={`modal-trigger btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
-                    data-target={'launch-app-modal'}>
+            <button
+              className={`modal-trigger btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
+              data-target={'launch-app-modal'}>
               Launch
             </button>
           </>
@@ -257,7 +274,7 @@ class App extends BaseComponent<Props, State> {
   private launchApp = (location: ILaunchLocation) => {
     const app = this.getApp();
     const url = `apps/${app.name}/launch`;
-    this.setState({ loading: { method: 'post', url: url } });
+    this.setState({loading: {method: 'post', url: url}});
     postData(url, location,
       (reply: IReply<ILaunchApp>) => this.onLaunchSuccess(reply.data),
       (reason: string) => this.onLaunchFailure(reason, app));
@@ -285,7 +302,7 @@ class App extends BaseComponent<Props, State> {
 
   private updateApp = (app: IApp) => {
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
-    const formApp = { ...app };
+    const formApp = {...app};
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, loading: undefined});
   };
@@ -296,7 +313,7 @@ class App extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation: {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -383,17 +400,6 @@ class App extends BaseComponent<Props, State> {
     }
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(app: Partial<IApp>) {
@@ -408,10 +414,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const app = isNew(props.location.search) ? buildNewApp() : state.entities.apps.data[name];
   let formApp;
   if (app) {
-    formApp = { ...app };
+    formApp = {...app};
     removeFields(formApp);
   }
-  return  {
+  return {
     isLoading,
     error,
     app,

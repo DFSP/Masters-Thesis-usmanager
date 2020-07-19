@@ -28,13 +28,6 @@ class Regions extends BaseComponent<Props, {}> {
     this.props.loadRegions();
   }
 
-  private region = (region: IRegion): JSX.Element =>
-    <RegionCard key={region.id} region={region}/>;
-
-  private predicate = (region: IRegion, search: string): boolean =>
-    region.name.toLowerCase().includes(search)
-    || region.description.toLowerCase().includes(search);
-
   public render() {
     return (
       <MainLayout>
@@ -52,6 +45,13 @@ class Regions extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private region = (region: IRegion): JSX.Element =>
+    <RegionCard key={region.id} region={region}/>;
+
+  private predicate = (region: IRegion, search: string): boolean =>
+    region.name.toLowerCase().includes(search)
+    || region.description.toLowerCase().includes(search);
 
 }
 

@@ -47,37 +47,17 @@ type Props = DispatchToProps & RouteComponentProps;
 
 class Login extends BaseComponent<Props, State> {
 
-  private tabs = createRef<HTMLUListElement>();
-
   state = {
     username: '',
     password: '',
     showPassword: false,
   };
+  private tabs = createRef<HTMLUListElement>();
 
   public componentDidMount(): void {
     M.Tabs.init(this.tabs.current as Element);
     M.updateTextFields();
   }
-
-  private handleChange = ({ target: { name, value } }: React.ChangeEvent<HTMLInputElement>) =>
-    this.setState({ [name]: value } as Pick<State, any>);
-
-  private handleShowPassword = () =>
-    this.setState({ showPassword: !this.state.showPassword });
-
-  private handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const {username, password} = this.state;
-    basicAuthenticate(username, password)
-      .then(() => {
-        registerSuccessfulLogin(username, password);
-        super.toast(`Welcome ${username}`, undefined, undefined, true, true);
-        this.props.history.push(`/home`);
-      }).catch((e:AxiosError) => {
-      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true, true);
-    })
-  };
 
   public render() {
     if (isAuthenticated()) {
@@ -119,9 +99,28 @@ class Login extends BaseComponent<Props, State> {
     );
   }
 
+  private handleChange = ({target: {name, value}}: React.ChangeEvent<HTMLInputElement>) =>
+    this.setState({[name]: value} as Pick<State, any>);
+
+  private handleShowPassword = () =>
+    this.setState({showPassword: !this.state.showPassword});
+
+  private handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const {username, password} = this.state;
+    basicAuthenticate(username, password)
+      .then(() => {
+        registerSuccessfulLogin(username, password);
+        super.toast(`Welcome ${username}`, undefined, undefined, true, true);
+        this.props.history.push(`/home`);
+      }).catch((e: AxiosError) => {
+      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true, true);
+    })
+  };
+
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ showSidenavByUser }, dispatch);
+  bindActionCreators({showSidenavByUser}, dispatch);
 
 export default connect(null, mapDispatchToProps)(Login);

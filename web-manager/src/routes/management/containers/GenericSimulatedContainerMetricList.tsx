@@ -37,17 +37,6 @@ class GenericSimulatedContainerMetricList extends BaseComponent<Props, {}> {
     this.props.loadSimulatedContainerMetrics();
   }
 
-  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericSimulatedContainerMetrics.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{simulatedMetric}</span>
-      </div>
-      <Link to={`/simulated-metrics/containers/${simulatedMetric}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
-
   public render() {
     const SimulatedMetricsList = List<string>();
     return (
@@ -59,6 +48,17 @@ class GenericSimulatedContainerMetricList extends BaseComponent<Props, {}> {
     );
   }
 
+  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.props.genericSimulatedContainerMetrics.length - 1}>
+      <div className={`${styles.linkedItemContent}`}>
+        <span>{simulatedMetric}</span>
+      </div>
+      <Link to={`/simulated-metrics/containers/${simulatedMetric}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
+    </ListItem>;
+
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
@@ -66,8 +66,8 @@ function mapStateToProps(state: ReduxState): StateToProps {
     isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
     error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
     genericSimulatedContainerMetrics: Object.entries(state.entities.simulatedMetrics.containers.data)
-                                          .filter(([_, simulatedMetric]) => simulatedMetric.generic)
-                                          .map(([simulatedMetricName, _]) => simulatedMetricName)
+                                            .filter(([_, simulatedMetric]) => simulatedMetric.generic)
+                                            .map(([simulatedMetricName, _]) => simulatedMetricName)
   }
 }
 

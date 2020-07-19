@@ -24,15 +24,15 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("docker")
 public class DockerProperties {
 
+  private final Api api;
+  private final ApiProxy apiProxy;
+  private final Hub hub;
+  private final Swarm swarm;
   private String installScript;
   private String installScriptPath;
   private String uninstallScript;
   private String uninstallScriptPath;
   private String repository;
-  private final Api api;
-  private final ApiProxy apiProxy;
-  private final Hub hub;
-  private final Swarm swarm;
 
   public DockerProperties() {
     this.api = new Api();

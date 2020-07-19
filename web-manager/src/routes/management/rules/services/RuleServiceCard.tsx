@@ -12,7 +12,6 @@ import React from "react";
 import {IRuleService} from "./RuleService";
 import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
-import {IRuleContainer} from "../containers/RuleContainer";
 
 interface ServiceRuleCardProps {
   rule: IRuleService;

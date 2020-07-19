@@ -37,17 +37,6 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
     this.props.loadRulesHost();
   }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/hosts/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
-
   public render() {
     const RulesList = List<string>();
     return (
@@ -58,6 +47,17 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
                  show={this.rule}/>
     );
   }
+
+  private rule = (rule: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
+      <div className={`${styles.linkedItemContent}`}>
+        <span>{rule}</span>
+      </div>
+      <Link to={`/rules/hosts/${rule}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
+    </ListItem>;
 
 }
 

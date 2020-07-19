@@ -36,17 +36,55 @@ class LogsList extends React.Component<Props, {}> {
     }
   }
 
+  public render() {
+    const {error, logs} = this.props;
+    let isLoading = this.props.isLoading;
+    const LogsList = List<ILogs>();
+    return (
+      <>
+        <ActionButton icon={'cached'}
+                      tooltip={{
+                        activatedText: 'Deactivate automatic reload',
+                        deactivatedText: 'Activate automatic reload',
+                        position: 'bottom'
+                      }}
+                      clickCallback={this.onReloadClick}
+                      automatic/>
+        <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
+          <LogsList
+            isLoading={isLoading}
+            error={error}
+            emptyMessage={'No logs to show'}
+            list={logs}
+            show={this.log}
+            paginate={{
+              pagesize: {initial: 25, options: [5, 10, 25, 50, 100, 'all']},
+              page: {last: true},
+              position: 'top-bottom'
+            }}
+            predicate={this.predicate}
+            header={this.header}/>
+        </div>
+      </>
+    );
+  }
+
   private predicate = (logs: ILogs, search: string): boolean =>
     logs.formattedMessage.toLowerCase().includes(search)
     || logs.levelString.toLowerCase().includes(search);
 
   private getLevelColor = (levelString: string) => {
     switch (levelString.toLowerCase()) {
-      case 'trace': return 'grey-text';
-      case 'debug': return 'green-text';
-      case 'info': return 'blue-text';
-      case 'warn': return 'yellow-text';
-      case 'error': return 'red-text';
+      case 'trace':
+        return 'grey-text';
+      case 'debug':
+        return 'green-text';
+      case 'info':
+        return 'blue-text';
+      case 'warn':
+        return 'yellow-text';
+      case 'error':
+        return 'red-text';
     }
   };
 
@@ -84,36 +122,10 @@ class LogsList extends React.Component<Props, {}> {
     if (this.reloadLogs) {
       clearTimeout(this.reloadLogs);
       this.reloadLogs = null;
-    }
-    else {
+    } else {
       this.reloadLogs = setInterval(this.props.loadLogs, 5000);
     }
   };
-
-  public render() {
-    const {error, logs} = this.props;
-    let isLoading = this.props.isLoading;
-    const LogsList = List<ILogs>();
-    return (
-      <>
-        <ActionButton icon={'cached'}
-                      tooltip={{activatedText: 'Deactivate automatic reload', deactivatedText: 'Activate automatic reload', position: 'bottom'}}
-                      clickCallback={this.onReloadClick}
-                      automatic/>
-        <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
-          <LogsList
-            isLoading={isLoading}
-            error={error}
-            emptyMessage={'No logs to show'}
-            list={logs}
-            show={this.log}
-            paginate={{pagesize: { initial: 25, options: [5, 10, 25, 50, 100, 'all'] }, page: { last: true }, position: 'top-bottom'}}
-            predicate={this.predicate}
-            header={this.header}/>
-        </div>
-      </>
-    );
-  }
 
 }
 

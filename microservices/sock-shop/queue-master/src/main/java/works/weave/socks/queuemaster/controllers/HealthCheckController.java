@@ -50,7 +50,8 @@ public class HealthCheckController {
 
   @ResponseStatus(HttpStatus.OK)
   @RequestMapping(method = RequestMethod.GET, path = "/health")
-  public @ResponseBody Map<String, List<HealthCheck>> getHealth() {
+  public @ResponseBody
+  Map<String, List<HealthCheck>> getHealth() {
     Map<String, List<HealthCheck>> map = new HashMap<>();
     List<HealthCheck> healthChecks = new ArrayList<>();
     Date dateNow = Calendar.getInstance().getTime();

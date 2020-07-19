@@ -10,6 +10,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -17,7 +19,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 @Getter
 @Setter

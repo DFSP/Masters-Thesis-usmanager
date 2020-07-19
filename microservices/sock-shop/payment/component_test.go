@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
 )
 

@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event
 
 public enum EventType {
 
-    CONTAINER,
-    HOST;
+  CONTAINER,
+  HOST;
 
 }

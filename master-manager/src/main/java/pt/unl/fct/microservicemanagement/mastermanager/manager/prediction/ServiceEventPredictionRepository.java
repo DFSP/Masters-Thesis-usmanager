@@ -25,7 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

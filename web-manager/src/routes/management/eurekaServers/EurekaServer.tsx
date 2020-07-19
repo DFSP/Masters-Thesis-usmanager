@@ -18,11 +18,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {
-  loadEurekaServers,
-  addEurekaServer,
-  loadRegions,
-} from "../../../actions";
+import {addEurekaServer, loadEurekaServers, loadRegions,} from "../../../actions";
 import {connect} from "react-redux";
 import {IRegion} from "../region/Region";
 import {IReply} from "../../../utils/api";
@@ -70,10 +66,8 @@ interface State {
 
 class EurekaServer extends BaseComponent<Props, State> {
 
+  state: State = {};
   private mounted = false;
-
-  state: State = {
-  };
 
   public componentDidMount(): void {
     this.loadEurekaServer();
@@ -83,6 +77,16 @@ class EurekaServer extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadEurekaServer = () => {
@@ -104,16 +108,15 @@ class EurekaServer extends BaseComponent<Props, State> {
   private onPostSuccess = (reply: IReply<IEurekaServer[]>): void => {
     const eurekaServers = reply.data;
     eurekaServers.forEach(eurekaServer => {
-        super.toast(`<span class="green-text">Eureka server ${this.mounted ? `<b class="white-text">${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} launched</span>`);
-        this.props.addEurekaServer(eurekaServer);
+      super.toast(`<span class="green-text">Eureka server ${this.mounted ? `<b class="white-text">${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} launched</span>`);
+      this.props.addEurekaServer(eurekaServer);
     });
     if (this.mounted) {
       if (eurekaServers.length === 1) {
         const eurekaServer = eurekaServers[0];
         this.updateEurekaServer(eurekaServer);
         this.props.history.replace(eurekaServer.containerId)
-      }
-      else {
+      } else {
         this.props.history.push('/eureka-servers');
       }
     }
@@ -134,7 +137,7 @@ class EurekaServer extends BaseComponent<Props, State> {
 
   private updateEurekaServer = (eurekaServer: IEurekaServer) => {
     eurekaServer = Object.values(normalize(eurekaServer, Schemas.EUREKA_SERVER).entities.eurekaServers || {})[0];
-    const formEurekaServer = { ...eurekaServer };
+    const formEurekaServer = {...eurekaServer};
     removeFields(formEurekaServer);
     this.setState({eurekaServer: eurekaServer, formEurekaServer: formEurekaServer});
   };
@@ -146,8 +149,8 @@ class EurekaServer extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: requiredAndTrimmed }
+            ? {rule: requiredAndNumberAndMin, args: 0}
+            : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -210,16 +213,6 @@ class EurekaServer extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(eurekaServer: Partial<IEurekaServer>) {
@@ -238,13 +231,13 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const regions = state.entities.regions.data;
   let formEurekaServer;
   if (newEurekaServer) {
-    formEurekaServer = { ...newEurekaServer, regions: Object.keys(regions) };
+    formEurekaServer = {...newEurekaServer, regions: Object.keys(regions)};
   }
   if (eurekaServer) {
-    formEurekaServer = { ...eurekaServer };
+    formEurekaServer = {...eurekaServer};
     removeFields(formEurekaServer);
   }
-  return  {
+  return {
     isLoading,
     error,
     newEurekaServer,

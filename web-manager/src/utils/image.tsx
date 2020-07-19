@@ -24,37 +24,38 @@
 
 import {
   FaAddressCard,
+  FaBan,
   FaClock,
   FaCodeBranch,
   FaDatabase,
   FaDocker,
+  FaDoorClosed,
+  FaDoorOpen,
+  FaGlobe,
   FaGlobeAmericas,
   FaGlobeEurope,
+  FaGreaterThanEqual,
+  FaHdd,
+  FaHourglassHalf,
   FaIdBadge,
+  FaLessThanEqual,
+  FaList,
+  FaListUl,
   FaMapMarkedAlt,
+  FaMapMarkerAlt,
   FaMapPin,
   FaMinus,
+  FaPowerOff,
+  FaSdCard,
+  FaSortAmountDown,
+  FaSuperpowers,
+  FaTasks,
   FaTerminal,
+  FaThList,
   FaThumbsDown,
   FaThumbsUp,
-  FaMapMarkerAlt,
-  FaHdd,
-  FaSdCard,
-  FaTasks,
-  FaPowerOff,
-  FaSortAmountDown,
-  FaGlobe,
-  FaToolbox,
-  FaListUl,
-  FaThList,
-  FaList,
-  FaSuperpowers,
-  FaGreaterThanEqual,
-  FaLessThanEqual,
-  FaHourglassHalf, FaBan
+  FaToolbox
 } from "react-icons/all";
-import {FaDoorOpen} from "react-icons/all";
-import {FaDoorClosed} from "react-icons/all";
 import React from "react";
 import {IRegion} from "../routes/management/region/Region";
 import {IState} from "../routes/management/hosts/cloud/CloudHost";
@@ -71,9 +72,12 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   }
   if (label === 'state') {
     switch (value) {
-      case 'ready': return <FaThumbsUp/>;
-      case 'down': return <FaThumbsDown/>;
-      case 'drain': return <FaMinus/>;
+      case 'ready':
+        return <FaThumbsUp/>;
+      case 'down':
+        return <FaThumbsDown/>;
+      case 'drain':
+        return <FaMinus/>;
     }
   }
   if (label === 'username') {
@@ -206,11 +210,15 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label === 'state') {
     const state = value as IState;
     switch (state.name) {
-      case 'running': return 'check';
+      case 'running':
+        return 'check';
       case 'pending':
-      case 'stopping': return <FaHourglassHalf/>;
-      case 'stopped': return <FaBan/>;
-      case 'shutting_down': return '';
+      case 'stopping':
+        return <FaHourglassHalf/>;
+      case 'stopped':
+        return <FaBan/>;
+      case 'shutting_down':
+        return '';
     }
   }
   if (value === true) {

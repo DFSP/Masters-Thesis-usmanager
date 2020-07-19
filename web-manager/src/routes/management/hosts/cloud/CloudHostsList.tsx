@@ -35,13 +35,6 @@ class CloudHostsList extends BaseComponent<Props, {}> {
     this.props.loadCloudHosts();
   }
 
-  private cloudHost = (host: ICloudHost): JSX.Element =>
-    <CloudHostCard key={host.instanceId} cloudHost={host}/>;
-
-  private predicate = (host: ICloudHost, search: string): boolean =>
-    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search))
-    || host.instanceId.includes(search);
-
   public render() {
     return (
       <CardList<ICloudHost>
@@ -53,6 +46,13 @@ class CloudHostsList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     )
   }
+
+  private cloudHost = (host: ICloudHost): JSX.Element =>
+    <CloudHostCard key={host.instanceId} cloudHost={host}/>;
+
+  private predicate = (host: ICloudHost, search: string): boolean =>
+    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search))
+    || host.instanceId.includes(search);
 
 
 }

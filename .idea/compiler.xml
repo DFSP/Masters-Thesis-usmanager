@@ -11,7 +11,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="queue-master" />
         <module name="master-manager" />
-        <module name="swagger-java-client" />
+        <module name="registration-client-java" />
         <module name="shipping" />
         <module name="carts" />
         <module name="orders" />

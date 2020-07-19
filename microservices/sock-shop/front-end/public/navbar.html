@@ -25,15 +25,15 @@
 <!-- *** NAVBAR ***
 _________________________________________________________ -->
 
-<div class="navbar navbar-default yamm" role="navigation" id="navbar">
+<div class="navbar navbar-default yamm" id="navbar" role="navigation">
     <div class="container">
         <div class="navbar-header">
 
-            <a class="navbar-brand home" href="index.html"
-               data-animate-hover="bounce">
-                <img src="img/logo.png" alt="WeaveSocks logo" class="hidden-xs">
-                <img src="img/logo-small.png" alt="WeaveSocks logo"
-                     class="visible-xs"><span class="sr-only">WeaveSocks - go to homepage</span>
+            <a class="navbar-brand home" data-animate-hover="bounce"
+               href="index.html">
+                <img alt="WeaveSocks logo" class="hidden-xs" src="img/logo.png">
+                <img alt="WeaveSocks logo" class="visible-xs"
+                     src="img/logo-small.png"><span class="sr-only">WeaveSocks - go to homepage</span>
             </a>
         </div>
         <!--/.navbar-header -->
@@ -43,8 +43,8 @@ _________________________________________________________ -->
             <ul class="nav navbar-nav navbar-left">
                 <li id="tabIndex"><a href="index.html">Home</a>
                 </li>
-                <li id="tabCatalogue" class="dropdown yamm-fw">
-                    <a href="category.html" class="dropdown-toggle">Catalogue <b
+                <li class="dropdown yamm-fw" id="tabCatalogue">
+                    <a class="dropdown-toggle" href="category.html">Catalogue <b
                             class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
@@ -185,7 +185,7 @@ _________________________________________________________ -->
         <div class="navbar-buttons">
 
             <div class="navbar-collapse collapse right" id="basket-overview">
-                <a href="basket.html" class="btn btn-primary navbar-btn"><i
+                <a class="btn btn-primary navbar-btn" href="basket.html"><i
                         class="fa fa-shopping-cart"></i><span class="hidden-sm"
                                                               id="numItemsInCart">0 items in cart</span></a>
             </div>

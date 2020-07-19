@@ -2,7 +2,6 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {INode} from "./Node";
-import {ISimulatedServiceMetric} from "../metrics/services/SimulatedServiceMetric";
 
 interface NodeCardProps {
   node: INode;

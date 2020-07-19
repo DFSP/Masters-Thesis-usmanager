@@ -35,12 +35,6 @@ class EurekaServersList extends BaseComponent<Props, {}> {
     this.props.loadEurekaServers();
   }
 
-  private eurekaServer = (eurekaServer: IEurekaServer): JSX.Element =>
-    <EurekaServerCard key={eurekaServer.containerId} eurekaServer={eurekaServer}/>;
-
-  private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
-    eurekaServer.hostname.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<IEurekaServer>
@@ -52,6 +46,12 @@ class EurekaServersList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private eurekaServer = (eurekaServer: IEurekaServer): JSX.Element =>
+    <EurekaServerCard key={eurekaServer.containerId} eurekaServer={eurekaServer}/>;
+
+  private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
+    eurekaServer.hostname.toLowerCase().includes(search);
 
 }
 

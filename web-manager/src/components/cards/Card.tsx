@@ -39,13 +39,29 @@ class GenericCard<T> extends React.Component<Props<T>, {}> {
     }
   }
 
+  public render() {
+    const {link, margin} = this.props;
+    return (
+      <div className={`col s6 m4 l3`} style={{margin}}>
+        {link
+          ? <Link to={{
+            pathname: link?.to.pathname,
+            state: link?.to.state
+          }}>
+            {this.cardElement()}
+          </Link>
+          : this.cardElement()}
+      </div>
+    )
+  }
+
   private getChildrenCount = (): number =>
     React.Children.count(this.props.children);
 
   private getHeight = (): number => {
     let height = this.props.height || this.getChildrenCount() * this.CARD_ITEM_HEIGHT;
     if (typeof height == 'string') {
-      height = Number(height.replace(/[^0-9]/g,''));
+      height = Number(height.replace(/[^0-9]/g, ''));
     }
     return height;
   };
@@ -68,7 +84,9 @@ class GenericCard<T> extends React.Component<Props<T>, {}> {
           <div className={`card gridCard`}
                style={{height: this.getHeight()}}
                ref={this.card}>
-            <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
+            <ScrollBar ref={(ref) => {
+              this.scrollbar = ref;
+            }}
                        component="div">
               <div className='card-content' ref={this.cardContent}>
                 {children}
@@ -78,20 +96,6 @@ class GenericCard<T> extends React.Component<Props<T>, {}> {
       </div>
     )
   };
-
-  public render() {
-    const {link, margin} = this.props;
-    return (
-      <div className={`col s6 m4 l3`} style={{margin}}>
-        {link
-          ? <Link to={{
-            pathname: link?.to.pathname,
-            state: link?.to.state}}>
-            {this.cardElement()}
-          </Link>
-          : this.cardElement()}
-      </div>
-    )}
 
 }
 

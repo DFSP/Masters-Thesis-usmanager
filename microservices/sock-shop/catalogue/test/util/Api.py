@@ -1,5 +1,6 @@
 import requests
 
+
 class Api:
     def noResponse(self, url):
         try:

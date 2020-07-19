@@ -57,15 +57,13 @@ public class MonitoringController {
   }
 
   @GetMapping("/services/{serviceName}/avg")
-  public List<ServiceFieldAvg> getMonitoringServiceLogsByService(@PathVariable String serviceName)
-      {
+  public List<ServiceFieldAvg> getMonitoringServiceLogsByService(@PathVariable String serviceName) {
     return containersMonitoringService.getAvgServiceFields(serviceName);
   }
 
   @GetMapping("/services/{serviceName}/fields/{field}/avg")
   public ServiceFieldAvg getMonitoringServiceLogsByServiceAndField(@PathVariable String serviceName,
-                                                                   @PathVariable String field)
-      {
+                                                                   @PathVariable String field) {
     return containersMonitoringService.getAvgServiceField(serviceName, field);
   }
 
@@ -80,8 +78,7 @@ public class MonitoringController {
   }
 
   @GetMapping("/hosts/{hostname}/fields/{field}/avg")
-  public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field)
-      {
+  public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field) {
     return hostsMonitoringService.getAvgHostField(hostname, field);
   }
 
@@ -91,14 +88,12 @@ public class MonitoringController {
   }
 
   @GetMapping("/logs/services/{serviceName}")
-  public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByServiceName(@PathVariable String serviceName)
-      {
+  public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByServiceName(@PathVariable String serviceName) {
     return testLogsService.getMonitoringServiceLogTestsByServiceName(serviceName);
   }
 
   @GetMapping("/logs/containers/{containerId}")
-  public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByContainerId(@PathVariable String containerId)
-      {
+  public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByContainerId(@PathVariable String containerId) {
     return testLogsService.getMonitoringServiceLogTestsByContainerId(containerId);
   }
 

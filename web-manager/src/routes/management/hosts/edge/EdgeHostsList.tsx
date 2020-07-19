@@ -35,13 +35,6 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
     this.props.loadEdgeHosts();
   }
 
-  private edgeHost = (host: IEdgeHost): JSX.Element =>
-    <EdgeHostCard key={host.id} edgeHost={host}/>;
-
-  private predicate = (host: IEdgeHost, search: string): boolean =>
-    (!!host.publicDnsName && host.publicDnsName.toLowerCase().includes(search))
-    || (!!host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search));
-
   public render() {
     return (
       <CardList<IEdgeHost>
@@ -53,6 +46,13 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private edgeHost = (host: IEdgeHost): JSX.Element =>
+    <EdgeHostCard key={host.id} edgeHost={host}/>;
+
+  private predicate = (host: IEdgeHost, search: string): boolean =>
+    (!!host.publicDnsName && host.publicDnsName.toLowerCase().includes(search))
+    || (!!host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search));
 
 }
 

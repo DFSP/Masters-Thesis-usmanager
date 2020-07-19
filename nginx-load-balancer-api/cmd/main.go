@@ -30,7 +30,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	
+
 	"github.com/usmanager/manager/nginx-load-balancer-api/api"
 )
 

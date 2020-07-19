@@ -22,7 +22,8 @@ import {
   addCloudHost,
   addCloudHostRule,
   addCloudHostSimulatedMetrics,
-  loadCloudHosts, updateCloudHost
+  loadCloudHosts,
+  updateCloudHost
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -36,7 +37,6 @@ import {isNew} from "../../../../utils/router";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
-import {INode} from "../../nodes/Node";
 
 export interface ICloudHost extends IDatabaseData {
   instanceId: string;
@@ -68,16 +68,15 @@ export interface IPlacement {
   tenancy: string;
 }
 
-const buildNewCloudHost = (): Partial<ICloudHost> => ({
-});
+const buildNewCloudHost = (): Partial<ICloudHost> => ({});
 
 export const awsInstanceStates = {
-  PENDING: { name: "pending", code: 0 },
-  RUNNING: { name: "running", code: 16 },
-  SHUTTING_DOWN: { name: "shutting-down", code: 32 },
-  TERMINATED: { name: "terminated", code: 48 },
-  STOPPING: { name: "stopping", code: 64 },
-  STOPPED: { name: "stopped", code: 80 }
+  PENDING: {name: "pending", code: 0},
+  RUNNING: {name: "running", code: 16},
+  SHUTTING_DOWN: {name: "shutting-down", code: 32},
+  TERMINATED: {name: "terminated", code: 48},
+  STOPPING: {name: "stopping", code: 64},
+  STOPPED: {name: "stopped", code: 80}
 };
 
 interface StateToProps {
@@ -111,13 +110,12 @@ interface State {
 
 class CloudHost extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedRules: [],
     unsavedSimulatedMetrics: [],
     loading: undefined,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadCloudHost();
@@ -126,6 +124,17 @@ class CloudHost extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadCloudHost = () => {
@@ -191,7 +200,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private onSaveRulesSuccess = (cloudHost: ICloudHost): void => {
     this.state.unsavedRules.forEach(rule => this.props.addCloudHostRule(cloudHost.instanceId, rule));
     if (this.mounted) {
-      this.setState({ unsavedRules: [] });
+      this.setState({unsavedRules: []});
     }
   };
 
@@ -222,13 +231,12 @@ class CloudHost extends BaseComponent<Props, State> {
   private onSaveSimulatedMetricsSuccess = (cloudHost: ICloudHost): void => {
     this.props.addCloudHostSimulatedMetrics(cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
-      this.setState({ unsavedSimulatedMetrics: [] });
+      this.setState({unsavedSimulatedMetrics: []});
     }
   };
 
   private onSaveSimulatedMetricsFailure = (cloudHost: ICloudHost, reason: string): void =>
     super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} cloud host`, 10000, reason, true);
-
 
   private startStopTerminateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -256,8 +264,9 @@ class CloudHost extends BaseComponent<Props, State> {
         && !state?.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
       buttons.push({
         button:
-          <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${formStyles.formButton}`}
-                  data-target='terminate-cloudHost'>
+          <button
+            className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${formStyles.formButton}`}
+            data-target='terminate-cloudHost'>
             Terminate
           </button>,
         confirm: {
@@ -273,7 +282,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private startCloudHost = () => {
     const cloudHost = this.getCloudHost();
     const url = `hosts/cloud/${cloudHost.instanceId}/state`;
-    this.setState({ loading: { method: 'post', url: url } });
+    this.setState({loading: {method: 'post', url: url}});
     postData(url, 'start',
       (reply: IReply<ICloudHost>) => this.onStartSuccess(reply.data),
       (reason) => this.onStartFailure(reason, cloudHost));
@@ -300,7 +309,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private stopCloudHost = () => {
     const cloudHost = this.getCloudHost();
     const url = `hosts/cloud/${cloudHost.instanceId}/state`;
-    this.setState({ loading: { method: 'post', url: url } });
+    this.setState({loading: {method: 'post', url: url}});
     postData(url, 'stop',
       (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
       (reason) => this.onStopFailure(reason, cloudHost));
@@ -327,7 +336,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private terminateCloudHost = () => {
     const cloudHost = this.getCloudHost();
     const url = `hosts/cloud/${cloudHost.instanceId}`;
-    this.setState({ loading: { method: 'delete', url: url } });
+    this.setState({loading: {method: 'delete', url: url}});
     deleteData(url,
       () => this.onTerminateSuccess(cloudHost),
       (reason) => this.onTerminateFailure(reason, cloudHost));
@@ -350,7 +359,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private updateCloudHost = (cloudHost: ICloudHost) => {
     cloudHost = Object.values(normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts || {})[0];
-    const formCloudHost = { ...cloudHost };
+    const formCloudHost = {...cloudHost};
     removeFields(formCloudHost);
     this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, loading: undefined});
   };
@@ -457,17 +466,6 @@ class CloudHost extends BaseComponent<Props, State> {
     },
   ];
 
-  render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(cloudHost: Partial<ICloudHost>) {
@@ -495,7 +493,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formCloudHost = {...cloudHost};
     removeFields(formCloudHost);
   }
-  return  {
+  return {
     isLoading,
     error,
     cloudHost,

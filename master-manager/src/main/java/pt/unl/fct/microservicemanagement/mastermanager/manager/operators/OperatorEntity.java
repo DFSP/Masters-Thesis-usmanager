@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 import java.util.HashSet;
@@ -49,6 +48,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)

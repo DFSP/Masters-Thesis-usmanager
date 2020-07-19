@@ -10,12 +10,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerPortMapping;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import lombok.Data;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerPortMapping;
 
 @Data
 public final class DockerContainer {

@@ -54,10 +54,8 @@ interface State {
 
 class Region extends BaseComponent<Props, State> {
 
+  state: State = {};
   private mounted = false;
-
-  state: State = {
-  };
 
   public componentDidMount(): void {
     this.loadRegion();
@@ -66,6 +64,16 @@ class Region extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadRegion = () => {
@@ -125,7 +133,7 @@ class Region extends BaseComponent<Props, State> {
 
   private updateRegion = (region: IRegion) => {
     region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
-    const formRegion = { ...region };
+    const formRegion = {...region};
     removeFields(formRegion);
     this.setState({region: region, formRegion: formRegion});
   };
@@ -138,8 +146,8 @@ class Region extends BaseComponent<Props, State> {
           label: key,
           validation:
             key === 'description'
-              ? { rule: requiredAndTrimmedAndSizeRestriction, args: 255 }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndTrimmedAndSizeRestriction, args: 255}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -183,12 +191,13 @@ class Region extends BaseComponent<Props, State> {
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           defaultValue: "Is region active?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    defaultValue: "Is region active?",
+                                    values: [true, false]
+                                  }}/>
                 : key === 'description'
                 ? <Field key={index}
                          id={key}
@@ -212,16 +221,6 @@ class Region extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(region: Partial<IRegion>) {
@@ -235,10 +234,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const region = isNew(props.location.search) ? buildNewRegion() : state.entities.regions.data[name];
   let formRegion;
   if (region) {
-    formRegion = { ...region };
+    formRegion = {...region};
     removeFields(formRegion);
   }
-  return  {
+  return {
     isLoading,
     error,
     region,

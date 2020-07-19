@@ -1,10 +1,8 @@
 import argparse
 import sys
 import unittest
-import os
-from util.Api import Api
 from time import sleep
-
+from util.Api import Api
 from util.Docker import Docker
 from util.Dredd import Dredd
 
@@ -16,7 +14,7 @@ class PaymentContainerTest(unittest.TestCase):
     def __init__(self, methodName='runTest'):
         super(PaymentContainerTest, self).__init__(methodName)
         self.ip = ""
-        
+
     def setUp(self):
         command = ['docker', 'run',
                    '-d',
@@ -36,15 +34,15 @@ class PaymentContainerTest(unittest.TestCase):
                 self.fail("Couldn't get the API running")
             limit = limit - 1
             sleep(1)
-        
+
         out = Dredd().test_against_endpoint("payment",
                                             'http://' + self.ip + ':80/',
                                             links=[self.container_name],
                                             dump_streams=True)
-        
+
         self.assertGreater(out.find("0 failing"), -1)
         self.assertGreater(out.find("0 errors"), -1)
-        
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;

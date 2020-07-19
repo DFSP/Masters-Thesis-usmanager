@@ -28,24 +28,24 @@ import {API_URL, setupAxiosInterceptors} from "./api";
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
 export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse<any>> =>
-    axios.get(`${API_URL}/basicauth`, {
-        headers: {
-            authorization: createBasicAuthToken(username, password)
-        }
-    });
+  axios.get(`${API_URL}/basicauth`, {
+    headers: {
+      authorization: createBasicAuthToken(username, password)
+    }
+  });
 
 export const createBasicAuthToken = (username: string, password: string): string =>
-    `Basic ` + window.btoa(username + ":" + password);
+  `Basic ` + window.btoa(username + ":" + password);
 
 export const isAuthenticated = (): boolean => !!sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
 
 export const registerSuccessfulLogin = (username: string, password: string): void => {
-    sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username);
-    setupAxiosInterceptors(createBasicAuthToken(username, password))
+  sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username);
+  setupAxiosInterceptors(createBasicAuthToken(username, password))
 };
 
 export const getLoggedInUser = () =>
-    sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+  sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
 
 export const logout = () =>
-    sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+  sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);

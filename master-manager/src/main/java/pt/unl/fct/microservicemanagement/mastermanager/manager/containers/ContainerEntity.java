@@ -83,7 +83,7 @@ public class ContainerEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "container_rule",
       joinColumns = @JoinColumn(name = "container_id"),
       inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -92,7 +92,7 @@ public class ContainerEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "container_simulated_metric",
       joinColumns = @JoinColumn(name = "container_id"),
       inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

@@ -10,15 +10,15 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SimulatedServiceMetricsRepository extends JpaRepository<SimulatedServiceMetricEntity, Long> {

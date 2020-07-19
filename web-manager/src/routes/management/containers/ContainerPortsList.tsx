@@ -15,16 +15,6 @@ type Props = ContainerPortsListProps;
 
 export default class ContainerPortsList extends BaseComponent<Props, {}> {
 
-  private ports = () =>
-    this.props.container?.ports || [];
-
-  private port = (port: IContainerPort, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.ports().length - 1}>
-      <div className={`${styles.listItemContent}`}>
-        <span>{port.privatePort}:{port.publicPort} {port.ip}/{port.type}</span>
-      </div>
-    </ListItem>;
-
   public render() {
     const PortsList = List<IContainerPort>();
     return (
@@ -35,5 +25,15 @@ export default class ContainerPortsList extends BaseComponent<Props, {}> {
                  show={this.port}/>
     );
   }
+
+  private ports = () =>
+    this.props.container?.ports || [];
+
+  private port = (port: IContainerPort, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.ports().length - 1}>
+      <div className={`${styles.listItemContent}`}>
+        <span>{port.privatePort}:{port.publicPort} {port.ip}/{port.type}</span>
+      </div>
+    </ListItem>;
 
 }

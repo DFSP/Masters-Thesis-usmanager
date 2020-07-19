@@ -144,7 +144,7 @@ public class DecisionsService {
   }
 
   public void addServiceDecisionValueFromFields(ServiceDecisionEntity serviceDecision,
-                                                    Map<String, Double> fields) {
+                                                Map<String, Double> fields) {
     serviceDecisionValues.saveAll(
         fields.entrySet().stream()
             .filter(field -> field.getKey().contains("effective-val"))

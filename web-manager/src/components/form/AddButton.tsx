@@ -45,16 +45,6 @@ export default class AddButton extends React.Component<Props, {}> {
   private dropdown = createRef<HTMLDivElement>();
   private scrollbar: (ScrollBar | null) = null;
 
-  private initDropdown = () => {
-    M.Dropdown.init(this.dropdown.current as Element,
-      {
-        onOpenEnd: this.onOpenDropdown
-      });
-  };
-
-  private onOpenDropdown = () =>
-    this.scrollbar?.updateScroll();
-
   public componentDidMount(): void {
     this.initDropdown();
   }
@@ -92,7 +82,9 @@ export default class AddButton extends React.Component<Props, {}> {
                   {dropdown.data.length ? dropdown.title : dropdown.empty}
                 </a>
               </li>
-              <ScrollBar ref={(ref) => { this.scrollbar = ref; }}>
+              <ScrollBar ref={(ref) => {
+                this.scrollbar = ref;
+              }}>
                 {dropdown.data.map((data, index) =>
                   <li key={index}>
                     <Link to={data.pathname}>
@@ -108,5 +100,15 @@ export default class AddButton extends React.Component<Props, {}> {
       </>
     );
   }
+
+  private initDropdown = () => {
+    M.Dropdown.init(this.dropdown.current as Element,
+      {
+        onOpenEnd: this.onOpenDropdown
+      });
+  };
+
+  private onOpenDropdown = () =>
+    this.scrollbar?.updateScroll();
 
 }

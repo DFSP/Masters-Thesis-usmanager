@@ -26,11 +26,7 @@ import React from "react";
 import ControlledList from "../../../../components/list/ControlledList";
 import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadEdgeHosts,
-  loadRuleHostEdgeHosts,
-  removeRuleHostEdgeHosts,
-} from "../../../../actions";
+import {loadEdgeHosts, loadRuleHostEdgeHosts, removeRuleHostEdgeHosts,} from "../../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {IEdgeHost} from "../../hosts/edge/EdgeHost";
@@ -67,7 +63,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -82,6 +78,29 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
     if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
+                           emptyMessage={`Edge hosts list is empty`}
+                           data={this.props.ruleEdgeHosts}
+                           dropdown={{
+                             id: 'edgeHosts',
+                             title: 'Add edge host',
+                             empty: 'No more edge hosts to add',
+                             data: this.getSelectableEdgeHostNames()
+                           }}
+                           show={this.edgeHost}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `rules/hosts/${this.props.ruleHost?.name}/edge-hosts`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -144,29 +163,6 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
     return Object.keys(edgeHosts)
                  .filter(edgeHost => !ruleEdgeHosts.includes(edgeHost) && !unsavedEdgeHosts.includes(edgeHost));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                           emptyMessage={`Edge hosts list is empty`}
-                           data={this.props.ruleEdgeHosts}
-                           dropdown={{
-                             id: 'edgeHosts',
-                             title: 'Add edge host',
-                             empty: 'No more edge hosts to add',
-                             data: this.getSelectableEdgeHostNames()
-                           }}
-                           show={this.edgeHost}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/hosts/${this.props.ruleHost?.name}/edge-hosts`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

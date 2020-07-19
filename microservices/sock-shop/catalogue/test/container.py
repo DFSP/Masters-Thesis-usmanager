@@ -1,29 +1,30 @@
 import argparse
+import requests
 import sys
 import unittest
-import requests
-
-from util.Api import Api
-from util.Dredd import Dredd
-from util.Docker import Docker
 from time import sleep
+from util.Api import Api
+from util.Docker import Docker
+from util.Dredd import Dredd
+
 
 class CatalogueContainerTest(unittest.TestCase):
     TAG = "latest"
     container_name = 'catalogue'
     mysql_container_name = Docker().random_container_name('catalogue-db')
+
     def __init__(self, methodName='runTest'):
         super(CatalogueContainerTest, self).__init__(methodName)
         self.ip = ""
 
     def setUp(self):
         Docker().start_container(container_name=self.mysql_container_name,
-                image="weaveworksdemos/catalogue-db:" + self.TAG,
-                host=self.mysql_container_name,
-                env=[("MYSQL_ROOT_PASSWORD", ""),
-                    ("MYSQL_ALLOW_EMPTY_PASSWORD", True),
-                    ("MYSQL_DATABASE", "socksdb")]
-                )
+                                 image="weaveworksdemos/catalogue-db:" + self.TAG,
+                                 host=self.mysql_container_name,
+                                 env=[("MYSQL_ROOT_PASSWORD", ""),
+                                      ("MYSQL_ALLOW_EMPTY_PASSWORD", True),
+                                      ("MYSQL_DATABASE", "socksdb")]
+                                 )
         # todo: a better way to ensure mysql is up
         sleep(30)
         command = ['docker', 'run',
@@ -40,13 +41,13 @@ class CatalogueContainerTest(unittest.TestCase):
         Docker().kill_and_remove(CatalogueContainerTest.mysql_container_name)
 
     def test_catalogue_has_item_id(self):
-        self.wait_or_fail('http://'+ self.ip +':80/catalogue')
+        self.wait_or_fail('http://' + self.ip + ':80/catalogue')
         r = requests.get('http://' + self.ip + '/catalogue', timeout=5)
         data = r.json()
         self.assertIsNotNone(data[0]['id'])
 
     def test_catalogue_has_image(self):
-        self.wait_or_fail('http://'+ self.ip +':80/catalogue')
+        self.wait_or_fail('http://' + self.ip + ':80/catalogue')
         r = requests.get('http://' + self.ip + '/catalogue', timeout=5)
         data = r.json()
         for item in data:
@@ -58,18 +59,20 @@ class CatalogueContainerTest(unittest.TestCase):
                                  msg="Issue with: " + imageUrl + ": " + r.headers.get("Content-Type"))
 
     def test_api_validated(self):
-        self.wait_or_fail('http://'+ self.ip +':80/catalogue')
-        out = Dredd().test_against_endpoint("catalogue", "http://catalogue/", links=[self.container_name, "{}:mysql".format(self.mysql_container_name)])
+        self.wait_or_fail('http://' + self.ip + ':80/catalogue')
+        out = Dredd().test_against_endpoint("catalogue", "http://catalogue/",
+                                            links=[self.container_name, "{}:mysql".format(self.mysql_container_name)])
         self.assertGreater(out.find("0 failing"), -1)
         self.assertGreater(out.find("0 errors"), -1)
         print(out)
 
-    def wait_or_fail(self,endpoint, limit=20):
+    def wait_or_fail(self, endpoint, limit=20):
         while Api().noResponse(endpoint):
             if limit == 0:
                 self.fail("Couldn't get the API running")
                 limit = limit - 1
                 sleep(1)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

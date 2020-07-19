@@ -37,17 +37,6 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
     this.props.loadRulesService();
   }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericServiceRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/services/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
-
   public render() {
     const RulesList = List<string>();
     return (
@@ -58,6 +47,17 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
                  show={this.rule}/>
     );
   }
+
+  private rule = (rule: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.props.genericServiceRules.length - 1}>
+      <div className={`${styles.linkedItemContent}`}>
+        <span>{rule}</span>
+      </div>
+      <Link to={`/rules/services/${rule}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
+    </ListItem>;
 
 }
 

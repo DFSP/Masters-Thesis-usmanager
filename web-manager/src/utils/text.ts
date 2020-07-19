@@ -30,18 +30,18 @@ export const snakeCaseToCamelCase = (text: string): string => text.replace(
 );
 
 export const camelCaseToSentenceCase = (text: string): string => {
-    let sentenceCase = text.replace( /([A-Z])/g, " $1" );
-    sentenceCase = sentenceCase.charAt(0).toUpperCase() + sentenceCase.slice(1);
-    return sentenceCase;
+  let sentenceCase = text.replace(/([A-Z])/g, " $1");
+  sentenceCase = sentenceCase.charAt(0).toUpperCase() + sentenceCase.slice(1);
+  return sentenceCase;
 };
 
 export const capitalize = (text: string): string =>
-    text.charAt(0).toUpperCase() + text.substring(1);
+  text.charAt(0).toUpperCase() + text.substring(1);
 
 export const decodeHTML = (html: string) => {
-    const txt = document.createElement('textarea');
-    txt.innerHTML = html;
-    return txt.value;
+  const txt = document.createElement('textarea');
+  txt.innerHTML = html;
+  return txt.value;
 };
 
 export const zeroPad = (num: number, maxLength: number) => String(num).padStart(maxLength, '0');

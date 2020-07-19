@@ -99,7 +99,7 @@ public class SimulatedHostMetricsService {
     return simulatedHostMetrics.getCloudHost(simulatedMetricName, instanceId).orElseThrow(() ->
         new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
   }
-  
+
   public void addCloudHost(String simulatedMetricName, String instanceId) {
     addCloudHosts(simulatedMetricName, List.of(instanceId));
   }

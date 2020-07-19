@@ -22,11 +22,11 @@ public final class SimpleNode {
 
   private final String id;
   private final String hostname;
-  private String state;
   private final NodeAvailability availability;
   private final NodeRole role;
   private final long version;
   private final Map<String, String> labels;
+  private String state;
 
   @JsonIgnore
   public String getPrivateIpAddress() {

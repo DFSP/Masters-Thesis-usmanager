@@ -27,19 +27,19 @@ import styles from './ListLoadingSpinner.module.css';
 
 const ListLoadingSpinner: React.FC = () =>
   <div className={styles.container}>
-      <div className="preloader-wrapper active">
-          <div className="spinner-layer spinner-white-only">
-              <div className="circle-clipper left">
-                  <div className="circle"/>
-              </div>
-              <div className="gap-patch">
-                  <div className="circle"/>
-              </div>
-              <div className="circle-clipper right">
-                  <div className="circle"/>
-              </div>
-          </div>
+    <div className="preloader-wrapper active">
+      <div className="spinner-layer spinner-white-only">
+        <div className="circle-clipper left">
+          <div className="circle"/>
+        </div>
+        <div className="gap-patch">
+          <div className="circle"/>
+        </div>
+        <div className="circle-clipper right">
+          <div className="circle"/>
+        </div>
       </div>
+    </div>
   </div>;
 
-export default  ListLoadingSpinner;
+export default ListLoadingSpinner;

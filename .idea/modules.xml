@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/catalogue/catalogue.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/catalogue/catalogue.iml" />
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/front-end/front-end.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/front-end/front-end.iml" />
-      <module fileurl="file://$PROJECT_DIR$/go-client-register-go/go-client-register-go.iml" filepath="$PROJECT_DIR$/go-client-register-go/go-client-register-go.iml" />
       <module fileurl="file://$PROJECT_DIR$/local-manager/local-manager.iml" filepath="$PROJECT_DIR$/local-manager/local-manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/nginx-basic-auth-proxy/nginx-basic-auth-proxy.iml" filepath="$PROJECT_DIR$/nginx-basic-auth-proxy/nginx-basic-auth-proxy.iml" />
       <module fileurl="file://$PROJECT_DIR$/nginx-load-balancer/nginx-load-balancer.iml" filepath="$PROJECT_DIR$/nginx-load-balancer/nginx-load-balancer.iml" />
@@ -12,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/payment/payment.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/payment/payment.iml" />
       <module fileurl="file://$PROJECT_DIR$/prometheus/prometheus.iml" filepath="$PROJECT_DIR$/prometheus/prometheus.iml" />
       <module fileurl="file://$PROJECT_DIR$/registration-client/registration-client.iml" filepath="$PROJECT_DIR$/registration-client/registration-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registration-client-go/registration-client-go.iml" filepath="$PROJECT_DIR$/registration-client-go/registration-client-go.iml" />
       <module fileurl="file://$PROJECT_DIR$/request-location-monitor/request-location-monitor.iml" filepath="$PROJECT_DIR$/request-location-monitor/request-location-monitor.iml" />
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/user/user.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/user/user.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/usmanager.iml" filepath="$PROJECT_DIR$/.idea/usmanager.iml" />

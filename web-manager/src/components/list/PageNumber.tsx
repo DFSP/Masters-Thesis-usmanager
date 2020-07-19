@@ -8,10 +8,6 @@ interface PageNumberProps {
 
 export class PageNumber extends React.Component<PageNumberProps, {}> {
 
-  private changePage = () => {
-    this.props.setPage(this.props.page - 1);
-  };
-
   public render() {
     const {page, active} = this.props;
     return (
@@ -19,5 +15,9 @@ export class PageNumber extends React.Component<PageNumberProps, {}> {
         <a onClick={this.changePage}>{page}</a>
       </li>
     );
+  };
+
+  private changePage = () => {
+    this.props.setPage(this.props.page - 1);
   };
 }

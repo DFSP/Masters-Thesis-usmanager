@@ -15,11 +15,7 @@ import React from "react";
 import ControlledList from "../../../../components/list/ControlledList";
 import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadContainers,
-  loadRulesContainer,
-  removeRuleContainers,
-} from "../../../../actions";
+import {loadContainers, loadRulesContainer, removeRuleContainers,} from "../../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {IContainer} from "../../containers/Container";
@@ -57,7 +53,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -74,6 +70,29 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     }
   }
 
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
+                           emptyMessage={`Containers list is empty`}
+                           data={this.props.ruleContainers}
+                           dropdown={{
+                             id: 'containers',
+                             title: 'Add container',
+                             empty: 'No more containers to add',
+                             data: this.getSelectableContainerNames()
+                           }}
+                           show={this.container}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
+  }
+
   private loadEntities = () => {
     if (this.props.ruleContainer?.name) {
       const {name} = this.props.ruleContainer;
@@ -85,7 +104,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     this.props.ruleContainer?.name === undefined;
 
   private container = (index: number, container: string, separate: boolean, checked: boolean,
-                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const isNew = this.isNew();
     const unsaved = this.props.unsavedContainers.includes(container);
     return (
@@ -134,29 +153,6 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     return Object.keys(containers)
                  .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
-                           emptyMessage={`Containers list is empty`}
-                           data={this.props.ruleContainers}
-                           dropdown={{
-                             id: 'containers',
-                             title: 'Add container',
-                             empty: 'No more containers to add',
-                             data: this.getSelectableContainerNames()
-                           }}
-                           show={this.container}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

@@ -24,13 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,7 +38,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -79,7 +76,7 @@ public class ServiceRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "serviceRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<ServiceEntity> services;
 
   @ManyToOne

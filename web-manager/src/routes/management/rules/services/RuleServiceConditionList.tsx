@@ -6,11 +6,7 @@ import React from "react";
 import ControlledList from "../../../../components/list/ControlledList";
 import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadConditions,
-  loadRuleServiceConditions,
-  removeRuleServiceConditions
-} from "../../../../actions";
+import {loadConditions, loadRuleServiceConditions, removeRuleServiceConditions} from "../../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {IRuleCondition} from "../conditions/RuleCondition";
@@ -47,7 +43,7 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -62,6 +58,29 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
     if (!prevProps.ruleService?.name && this.props.ruleService?.name) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
+                           emptyMessage={`Conditions list is empty`}
+                           data={this.props.ruleConditions}
+                           dropdown={{
+                             id: 'conditions',
+                             title: 'Add condition',
+                             empty: 'No more conditions to add',
+                             data: this.getSelectableConditionNames()
+                           }}
+                           show={this.condition}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `rules/services/${this.props.ruleService?.name}/conditions`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -124,29 +143,6 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
     return Object.keys(conditions)
                  .filter(condition => !ruleConditions.includes(condition) && !unsavedConditions.includes(condition));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
-                           emptyMessage={`Conditions list is empty`}
-                           data={this.props.ruleConditions}
-                           dropdown={{
-                             id: 'conditions',
-                             title: 'Add condition',
-                             empty: 'No more conditions to add',
-                             data: this.getSelectableConditionNames()
-                           }}
-                           show={this.condition}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/services/${this.props.ruleService?.name}/conditions`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

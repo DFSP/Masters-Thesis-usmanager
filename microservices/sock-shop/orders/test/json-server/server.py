@@ -1,8 +1,9 @@
-from flask import Flask, url_for, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request
 
 app = Flask(__name__)
 
-def get_data(customer_id, address_id = "57a98d98e4b00679b4a830b3", card_id="57a98d98e4b00679b4a830b4"):
+
+def get_data(customer_id, address_id="57a98d98e4b00679b4a830b3", card_id="57a98d98e4b00679b4a830b4"):
     customers = {
         "firstName": "User1",
         "lastName": "Name1",
@@ -10,98 +11,97 @@ def get_data(customer_id, address_id = "57a98d98e4b00679b4a830b3", card_id="57a9
         "username": "user1",
         "addresses": [
             {
-                  "street": "Maes-Y-Deri",
-                  "number": "4",
-                  "country": "United Kingdom",
-                  "city": "Aberdare",
-                  "postcode": "CF44 6TF",
-                  "id": address_id,
-                  "_links": {
-                          "address": {
-                                    "href": "http://user/addresses/" + address_id
-                                  },
-                          "self": {
-                                    "href": "http://user/addresses/" + address_id
-                                  }
-                        }
+                "street": "Maes-Y-Deri",
+                "number": "4",
+                "country": "United Kingdom",
+                "city": "Aberdare",
+                "postcode": "CF44 6TF",
+                "id": address_id,
+                "_links": {
+                    "address": {
+                        "href": "http://user/addresses/" + address_id
+                    },
+                    "self": {
+                        "href": "http://user/addresses/" + address_id
+                    }
                 }
-          ],
+            }
+        ],
         "cards": [
             {
-                  "longNum": "0908415193175205",
-                  "expires": "08/19",
-                  "ccv": "280",
-                  "id": card_id,
-                  "_links": {
-                          "card": {
-                                    "href": "http://user/cards/" + card_id
-                                  },
-                          "self": {
-                                    "href": "http://user/cards/" + card_id
-                                  }
-                        }
+                "longNum": "0908415193175205",
+                "expires": "08/19",
+                "ccv": "280",
+                "id": card_id,
+                "_links": {
+                    "card": {
+                        "href": "http://user/cards/" + card_id
+                    },
+                    "self": {
+                        "href": "http://user/cards/" + card_id
+                    }
                 }
-          ],
+            }
+        ],
         "id": customer_id,
         "_links": {
             "addresses": {
-                  "href": "http://user/customers/57a98d98e4b00679b4a830b5/addresses"
-                },
+                "href": "http://user/customers/57a98d98e4b00679b4a830b5/addresses"
+            },
             "cards": {
                 "href": "http://user/customers/57a98d98e4b00679b4a830b5/cards"
-                },
+            },
             "customer": {
-                  "href": "http://user/customers/" + customer_id
-                },
+                "href": "http://user/customers/" + customer_id
+            },
             "self": {
-                  "href": "http://user/customers/" + customer_id
-                }
-          }
+                "href": "http://user/customers/" + customer_id
+            }
+        }
     }
-
 
     customer_cards = {
         "_embedded": {
             "card": [
-                  {
-                          "longNum": "0908415193175205",
-                          "expires": "08/19",
-                          "ccv": "280",
-                          "id": card_id,
-                          "_links": {
-                                    "card": {
-                                                "href": "http://user/cards/" + card_id
-                                              },
-                                    "self": {
-                                                "href": "http://user/cards/" + card_id
-                                              }
-                                  }
+                {
+                    "longNum": "0908415193175205",
+                    "expires": "08/19",
+                    "ccv": "280",
+                    "id": card_id,
+                    "_links": {
+                        "card": {
+                            "href": "http://user/cards/" + card_id
+                        },
+                        "self": {
+                            "href": "http://user/cards/" + card_id
                         }
-                ]
-          }
+                    }
+                }
+            ]
+        }
     }
 
     customer_addresses = {
         "_embedded": {
             "address": [
-                  {
-                          "street": "Maes-Y-Deri",
-                          "number": "4",
-                          "country": "United Kingdom",
-                          "city": "Aberdare",
-                          "postcode": "CF44 6TF",
-                          "id": address_id,
-                          "_links": {
-                                    "address": {
-                                                "href": "http://user/addresses/" + address_id
-                                              },
-                                    "self": {
-                                                "href": "http://user/addresses/" + address_id
-                                              }
-                                  }
+                {
+                    "street": "Maes-Y-Deri",
+                    "number": "4",
+                    "country": "United Kingdom",
+                    "city": "Aberdare",
+                    "postcode": "CF44 6TF",
+                    "id": address_id,
+                    "_links": {
+                        "address": {
+                            "href": "http://user/addresses/" + address_id
+                        },
+                        "self": {
+                            "href": "http://user/addresses/" + address_id
                         }
-                ]
-          }
+                    }
+                }
+            ]
+        }
     }
     return customers, customer_cards, customer_addresses
 
@@ -126,11 +126,12 @@ def api_addresses(addressid):
     resp.headers['Content-Type'] = 'application/hal+json'
     return resp
 
+
 @app.route('/carts/<custid>')
 def api_carts(custid):
     resp = make_response(jsonify({
-	    "id": custid
-	}))
+        "id": custid
+    }))
     resp.headers['Content-Type'] = 'application/hal+json'
     return resp
 
@@ -156,6 +157,7 @@ def api_payment_auth():
         }))
     resp.headers['Content-Type'] = 'application/json'
     return resp
+
 
 @app.route('/shipping', methods=['POST'])
 def api_shipping():

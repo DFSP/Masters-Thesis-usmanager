@@ -24,8 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.util.Pair;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
@@ -42,6 +40,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service

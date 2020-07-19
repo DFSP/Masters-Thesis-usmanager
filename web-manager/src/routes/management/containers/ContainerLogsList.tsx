@@ -39,6 +39,34 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
     }
   }
 
+  public render() {
+    const logs = this.logs();
+    const LogsList = List<string>();
+    return (
+      <>
+        {!!logs.length && (
+          <div className='smallControlsContainer'>
+            <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
+                    data-position="left"
+                    data-tooltip="Reload"
+                    type="button"
+                    onClick={this.reloadLogs}>
+              <i className="large material-icons">cached</i>
+            </button>
+          </div>)}
+        <div className={styles.logsListContainer}>
+          <LogsList isLoading={this.props.isLoadingContainer || this.props.isLoading}
+                    error={this.props.loadContainerError || this.props.error}
+                    emptyMessage={`No logs available`}
+                    list={logs}
+                    show={this.log}
+                    paginate={{pagesize: {initial: 50}, position: 'top-bottom'}}/>
+        </div>
+      </>
+
+    );
+  }
+
   private loadEntities = () => {
     this.reloadLogs();
   };
@@ -55,8 +83,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
     if (logs) {
       // pop 1 to remove the last \n
       logs.pop();
-    }
-    else {
+    } else {
       logs = [];
     }
     return logs;
@@ -68,34 +95,6 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
         <span>{logs}</span>
       </div>
     </ListItem>;
-
-  public render() {
-    const logs = this.logs();
-    const LogsList = List<string>();
-    return (
-      <>
-        {!!logs.length && (
-          <div className='smallControlsContainer'>
-          <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
-                  data-position="left"
-                  data-tooltip="Reload"
-                  type="button"
-                  onClick={this.reloadLogs}>
-            <i className="large material-icons">cached</i>
-          </button>
-        </div>)}
-        <div className={styles.logsListContainer}>
-          <LogsList isLoading={this.props.isLoadingContainer || this.props.isLoading}
-                    error={this.props.loadContainerError || this.props.error}
-                    emptyMessage={`No logs available`}
-                    list={logs}
-                    show={this.log}
-                    paginate={{pagesize: {initial: 50}, position: 'top-bottom'}}/>
-        </div>
-      </>
-
-    );
-  }
 
 }
 

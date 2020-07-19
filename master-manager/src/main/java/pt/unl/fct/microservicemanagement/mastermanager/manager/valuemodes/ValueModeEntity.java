@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 import java.util.HashSet;
@@ -40,13 +39,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Builder(toBuilder = true)

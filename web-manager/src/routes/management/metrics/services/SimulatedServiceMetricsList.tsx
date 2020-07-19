@@ -35,12 +35,6 @@ class SimulatedServiceMetricsList extends BaseComponent<Props, {}> {
     this.props.loadSimulatedServiceMetrics();
   }
 
-  private simulatedServiceMetric = (simulatedMetric: ISimulatedServiceMetric): JSX.Element =>
-    <SimulatedServiceMetricCard key={simulatedMetric.id} simulatedServiceMetric={simulatedMetric}/>;
-
-  private predicate = (simulatedMetric: ISimulatedServiceMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<ISimulatedServiceMetric>
@@ -53,6 +47,12 @@ class SimulatedServiceMetricsList extends BaseComponent<Props, {}> {
     );
   }
 
+  private simulatedServiceMetric = (simulatedMetric: ISimulatedServiceMetric): JSX.Element =>
+    <SimulatedServiceMetricCard key={simulatedMetric.id} simulatedServiceMetric={simulatedMetric}/>;
+
+  private predicate = (simulatedMetric: ISimulatedServiceMetric, search: string): boolean =>
+    simulatedMetric.name.toLowerCase().includes(search);
+
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
@@ -60,7 +60,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
     error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
     simulatedServiceMetrics: (state.entities.simulatedMetrics.services.data
-                           && Object.values(state.entities.simulatedMetrics.services.data)) || [],
+                              && Object.values(state.entities.simulatedMetrics.services.data)) || [],
   }
 );
 

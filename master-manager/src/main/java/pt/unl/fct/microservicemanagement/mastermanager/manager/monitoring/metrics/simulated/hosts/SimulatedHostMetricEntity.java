@@ -11,13 +11,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts;
 
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,7 +38,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -73,12 +70,12 @@ public class SimulatedHostMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<EdgeHostEntity> edgeHosts;
 
   public void removeAssociations() {
@@ -95,7 +92,7 @@ public class SimulatedHostMetricEntity {
       edgeHost.getSimulatedHostMetrics().remove(this);
     }
   }
-  
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

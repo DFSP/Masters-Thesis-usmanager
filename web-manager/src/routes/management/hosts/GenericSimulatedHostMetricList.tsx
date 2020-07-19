@@ -37,17 +37,6 @@ class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
     this.props.loadSimulatedHostMetrics();
   }
 
-  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericSimulatedHostMetrics.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{simulatedMetric}</span>
-      </div>
-      <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
-
   public render() {
     const SimulatedMetricsList = List<string>();
     return (
@@ -58,6 +47,17 @@ class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
                             show={this.simulatedMetric}/>
     );
   }
+
+  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.props.genericSimulatedHostMetrics.length - 1}>
+      <div className={`${styles.linkedItemContent}`}>
+        <span>{simulatedMetric}</span>
+      </div>
+      <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
+    </ListItem>;
 
 }
 

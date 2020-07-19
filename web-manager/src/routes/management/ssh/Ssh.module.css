@@ -113,13 +113,25 @@
 }
 
 @keyframes shrink {
-    0% { left: 0; width: 100% }
-    100% { left: 200px; width: calc(100% - 200px) }
+    0% {
+        left: 0;
+        width: 100%
+    }
+    100% {
+        left: 200px;
+        width: calc(100% - 200px)
+    }
 }
 
 @keyframes expand {
-    0% { left: 200px; width: calc(100% - 200px) }
-    100% { left: 0; width: 100% }
+    0% {
+        left: 200px;
+        width: calc(100% - 200px)
+    }
+    100% {
+        left: 0;
+        width: 100%
+    }
 }
 
 

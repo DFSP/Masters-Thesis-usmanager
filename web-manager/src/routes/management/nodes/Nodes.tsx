@@ -28,15 +28,6 @@ class Nodes extends BaseComponent<Props, {}> {
     this.props.loadNodes();
   }
 
-  private node = (node: INode): JSX.Element =>
-    <NodeCard key={node.id} node={node}/>;
-
-  private predicate = (node: INode, search: string): boolean =>
-    node.id.toString().toLowerCase().includes(search)
-    || node.hostname.toLowerCase().includes(search)
-    || node.state.toLowerCase().includes(search)
-    || node.role.toLowerCase().includes(search);
-
   public render() {
     return (
       <MainLayout>
@@ -54,6 +45,15 @@ class Nodes extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private node = (node: INode): JSX.Element =>
+    <NodeCard key={node.id} node={node}/>;
+
+  private predicate = (node: INode, search: string): boolean =>
+    node.id.toString().toLowerCase().includes(search)
+    || node.hostname.toLowerCase().includes(search)
+    || node.state.toLowerCase().includes(search)
+    || node.role.toLowerCase().includes(search);
 
 }
 

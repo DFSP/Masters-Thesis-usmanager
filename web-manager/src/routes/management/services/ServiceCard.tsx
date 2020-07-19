@@ -26,7 +26,6 @@ import React from 'react';
 import CardItem from '../../../components/list/CardItem';
 import {IService} from "./Service";
 import Card from "../../../components/cards/Card";
-import {IRuleService} from "../rules/services/RuleService";
 
 interface ServiceCardProps {
   service: IService;
@@ -37,11 +36,9 @@ type Props = ServiceCardProps;
 const getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
   if (minReplicas === maxReplicas) {
     return `${minReplicas}`;
-  }
-  else if (maxReplicas === 0) {
+  } else if (maxReplicas === 0) {
     return `At least ${minReplicas}`
-  }
-  else {
+  } else {
     return `At least ${minReplicas} up to ${maxReplicas}`;
   }
 };

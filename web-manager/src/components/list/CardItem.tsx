@@ -32,7 +32,7 @@ interface CardItemProps {
 
 const CardItem: React.FC<CardItemProps> = ({label, value}) =>
   <div className={`${styles.cardItem}`}>
-      {label}: <p className={`${styles.cardValue}`}>{value}</p>
+    {label}: <p className={`${styles.cardValue}`}>{value}</p>
   </div>;
 
 export default CardItem;

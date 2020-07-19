@@ -11,11 +11,7 @@
 import {componentTypes, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
-import Form, {
-  IFields,
-  requiredAndNumberAndMinAndMax,
-  requiredAndTrimmed
-} from "../../../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
@@ -27,7 +23,8 @@ import {
   addRuleServiceConditions,
   addRuleServices,
   loadDecisions,
-  loadRulesService, updateRuleService,
+  loadRulesService,
+  updateRuleService,
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -38,7 +35,6 @@ import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleService extends IRule {
   services?: string[]
@@ -85,13 +81,12 @@ type State = {
 
 class RuleService extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedConditions: [],
     unsavedServices: [],
     isGeneric: this.props.ruleService?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadRuleService();
@@ -107,6 +102,17 @@ class RuleService extends BaseComponent<Props, State> {
     if (prevProps.ruleService?.generic !== this.props.ruleService?.generic) {
       this.setState({isGeneric: this.props.ruleService?.generic || false})
     }
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadRuleService = () => {
@@ -199,7 +205,7 @@ class RuleService extends BaseComponent<Props, State> {
   private onSaveConditionsSuccess = (rule: IRuleService): void => {
     this.props.addRuleServiceConditions(rule.name, this.state.unsavedConditions);
     if (this.mounted) {
-      this.setState({ unsavedConditions: [] });
+      this.setState({unsavedConditions: []});
     }
   };
 
@@ -229,7 +235,7 @@ class RuleService extends BaseComponent<Props, State> {
   private onSaveServicesSuccess = (rule: IRuleService): void => {
     this.props.addRuleServices(rule.name, this.state.unsavedServices);
     if (this.mounted) {
-      this.setState({ unsavedServices: [] });
+      this.setState({unsavedServices: []});
     }
   };
 
@@ -238,7 +244,7 @@ class RuleService extends BaseComponent<Props, State> {
 
   private updateRuleService = (ruleService: IRuleService) => {
     ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
-    const formRuleService = { ...ruleService };
+    const formRuleService = {...ruleService};
     removeFields(formRuleService);
     this.setState({ruleService: ruleService, formRuleService: formRuleService});
   };
@@ -251,8 +257,8 @@ class RuleService extends BaseComponent<Props, State> {
           label: key,
           validation:
             key === 'priority'
-              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -314,16 +320,18 @@ class RuleService extends BaseComponent<Props, State> {
                                     dropdown={{
                                       defaultValue: "Choose decision",
                                       values: this.getSelectableDecisions(),
-                                      optionToString: this.decisionDropdownOption}}/>
+                                      optionToString: this.decisionDropdownOption
+                                    }}/>
                 : key === 'generic'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           selectCallback: this.isGenericSelected,
-                           defaultValue: "Apply to all services?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    selectCallback: this.isGenericSelected,
+                                    defaultValue: "Apply to all services?",
+                                    values: [true, false]
+                                  }}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -370,17 +378,6 @@ class RuleService extends BaseComponent<Props, State> {
     }
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(ruleService: Partial<IRuleService>) {
@@ -396,11 +393,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const ruleService = isNew(props.location.search) ? buildNewServiceRule() : state.entities.rules.services.data[name];
   let formRuleService;
   if (ruleService) {
-    formRuleService = { ...ruleService };
+    formRuleService = {...ruleService};
     removeFields(formRuleService);
   }
   const decisions = state.entities.decisions.data;
-  return  {
+  return {
     isLoading,
     error,
     ruleService,

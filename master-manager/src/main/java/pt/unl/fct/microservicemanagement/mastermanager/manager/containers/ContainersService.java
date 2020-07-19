@@ -115,7 +115,7 @@ public class ContainersService {
     List<String> labelKeys = labels.stream().map(Pair::getFirst).collect(Collectors.toList());
     return containers.stream()
         .filter(container -> {
-          for (Map.Entry<String, String> containerLabel: container.getLabels().entrySet()) {
+          for (Map.Entry<String, String> containerLabel : container.getLabels().entrySet()) {
             String key = containerLabel.getKey();
             String value = containerLabel.getValue();
             if (labelKeys.contains(key) && !labels.contains(Pair.of(key, value))) {

@@ -11,11 +11,7 @@
 import {componentTypes, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
-import Form, {
-  IFields,
-  requiredAndNumberAndMinAndMax,
-  requiredAndTrimmed
-} from "../../../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
@@ -26,10 +22,12 @@ import {connect} from "react-redux";
 import React from "react";
 import {
   addRuleCloudHosts,
-  addRuleHostConditions,
   addRuleEdgeHosts,
+  addRuleHost,
+  addRuleHostConditions,
   loadDecisions,
-  loadRulesHost, addRuleHost, updateRuleHost,
+  loadRulesHost,
+  updateRuleHost,
 } from "../../../../actions";
 import {IReply, postData} from "../../../../utils/api";
 import HostRuleConditionList from "./RuleHostConditionList";
@@ -39,7 +37,6 @@ import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IEdgeHost} from "../../hosts/edge/EdgeHost";
 
 export interface IRuleHost extends IRule {
   cloudHosts?: string[],
@@ -88,14 +85,13 @@ type State = {
 
 class RuleHost extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedConditions: [],
     unsavedCloudHosts: [],
     unsavedEdgeHosts: [],
     isGeneric: this.props.ruleHost?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadRuleHost();
@@ -111,6 +107,17 @@ class RuleHost extends BaseComponent<Props, State> {
     if (prevProps.ruleHost?.generic !== this.props.ruleHost?.generic) {
       this.setState({isGeneric: this.props.ruleHost?.generic || false})
     }
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadRuleHost = () => {
@@ -205,7 +212,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private onSaveConditionsSuccess = (rule: IRuleHost): void => {
     this.props.addRuleHostConditions(rule.name, this.state.unsavedConditions);
     if (this.mounted) {
-      this.setState({ unsavedConditions: [] });
+      this.setState({unsavedConditions: []});
     }
   };
 
@@ -235,7 +242,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private onSaveCloudHostsSuccess = (rule: IRuleHost): void => {
     this.props.addRuleCloudHosts(rule.name, this.state.unsavedCloudHosts);
     if (this.mounted) {
-      this.setState({ unsavedCloudHosts: [] });
+      this.setState({unsavedCloudHosts: []});
     }
   };
 
@@ -265,16 +272,17 @@ class RuleHost extends BaseComponent<Props, State> {
   private onSaveEdgeHostsSuccess = (rule: IRuleHost): void => {
     this.props.addRuleEdgeHosts(rule.name, this.state.unsavedEdgeHosts);
     if (this.mounted) {
-      this.setState({ unsavedEdgeHosts: [] });
+      this.setState({unsavedEdgeHosts: []});
     }
   };
 
   private onSaveEdgeHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-    super.toast(`Unable to save edge hosts of ${this.mounted ? <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+    super.toast(`Unable to save edge hosts of ${this.mounted ?
+      <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
   private updateRuleHost = (ruleHost: IRuleHost) => {
     ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
-    const formRuleHost = { ...ruleHost };
+    const formRuleHost = {...ruleHost};
     removeFields(formRuleHost);
     this.setState({ruleHost: ruleHost, formRuleHost: formRuleHost});
   };
@@ -287,8 +295,8 @@ class RuleHost extends BaseComponent<Props, State> {
           label: key,
           validation:
             key === 'priority'
-              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -305,7 +313,7 @@ class RuleHost extends BaseComponent<Props, State> {
     this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
-     Object.values(this.props.decisions).filter(decision =>
+    Object.values(this.props.decisions).filter(decision =>
       decision.componentType.type.toLocaleLowerCase() === componentTypes.HOST.type.toLocaleLowerCase());
 
   private hostRule = () => {
@@ -350,16 +358,18 @@ class RuleHost extends BaseComponent<Props, State> {
                                     dropdown={{
                                       defaultValue: "Choose decision",
                                       values: this.getSelectableDecisions(),
-                                      optionToString: this.decisionDropdownOption}}/>
+                                      optionToString: this.decisionDropdownOption
+                                    }}/>
                 : key === 'generic'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           selectCallback: this.isGenericSelected,
-                           defaultValue: "Apply to all hosts?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    selectCallback: this.isGenericSelected,
+                                    defaultValue: "Apply to all hosts?",
+                                    values: [true, false]
+                                  }}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -420,17 +430,6 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(ruleHost: Partial<IRuleHost>) {
@@ -447,11 +446,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const ruleHost = isNew(props.location.search) ? buildNewHostRule() : state.entities.rules.hosts.data[name];
   let formRuleHost;
   if (ruleHost) {
-    formRuleHost = { ...ruleHost };
+    formRuleHost = {...ruleHost};
     removeFields(formRuleHost);
   }
   const decisions = state.entities.decisions.data;
-  return  {
+  return {
     isLoading,
     error,
     ruleHost,

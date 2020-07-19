@@ -11,11 +11,7 @@
 import {componentTypes, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
-import Form, {
-  IFields,
-  requiredAndNumberAndMinAndMax,
-  requiredAndTrimmed
-} from "../../../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
@@ -27,7 +23,8 @@ import {
   addRuleContainerConditions,
   addRuleContainers,
   loadDecisions,
-  loadRulesContainer, updateRuleContainer,
+  loadRulesContainer,
+  updateRuleContainer,
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -38,8 +35,6 @@ import RuleContainerContainersList from "./RuleContainerContainersList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleCondition} from "../conditions/RuleCondition";
-import {INode} from "../../nodes/Node";
 
 export interface IRuleContainer extends IRule {
   containers?: string[]
@@ -86,13 +81,12 @@ type State = {
 
 class RuleContainer extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedConditions: [],
     unsavedContainers: [],
     isGeneric: this.props.ruleContainer?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadRuleContainer();
@@ -108,6 +102,17 @@ class RuleContainer extends BaseComponent<Props, State> {
     if (prevProps.ruleContainer?.generic !== this.props.ruleContainer?.generic) {
       this.setState({isGeneric: this.props.ruleContainer?.generic || false})
     }
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadRuleContainer = () => {
@@ -200,7 +205,7 @@ class RuleContainer extends BaseComponent<Props, State> {
   private onSaveConditionsSuccess = (rule: IRuleContainer): void => {
     this.props.addRuleContainerConditions(rule.name, this.state.unsavedConditions);
     if (this.mounted) {
-      this.setState({ unsavedConditions: [] });
+      this.setState({unsavedConditions: []});
     }
   };
 
@@ -230,7 +235,7 @@ class RuleContainer extends BaseComponent<Props, State> {
   private onSaveContainersSuccess = (rule: IRuleContainer): void => {
     this.props.addRuleContainers(rule.name, this.state.unsavedContainers);
     if (this.mounted) {
-      this.setState({ unsavedContainers: [] });
+      this.setState({unsavedContainers: []});
     }
   };
 
@@ -239,7 +244,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private updateRuleContainer = (ruleContainer: IRuleContainer) => {
     ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];
-    const formRuleContainer = { ...ruleContainer };
+    const formRuleContainer = {...ruleContainer};
     removeFields(formRuleContainer);
     this.setState({ruleContainer: ruleContainer, formRuleContainer: formRuleContainer});
   };
@@ -252,8 +257,8 @@ class RuleContainer extends BaseComponent<Props, State> {
           label: key,
           validation:
             key === 'priority'
-              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -315,16 +320,18 @@ class RuleContainer extends BaseComponent<Props, State> {
                                     dropdown={{
                                       defaultValue: "Choose decision",
                                       values: this.getSelectableDecisions(),
-                                      optionToString: this.decisionDropdownOption}}/>
+                                      optionToString: this.decisionDropdownOption
+                                    }}/>
                 : key === 'generic'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           selectCallback: this.isGenericSelected,
-                           defaultValue: "Apply to all containers?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    selectCallback: this.isGenericSelected,
+                                    defaultValue: "Apply to all containers?",
+                                    values: [true, false]
+                                  }}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -338,19 +345,19 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private conditions = (): JSX.Element =>
     <RuleContainerConditionList isLoadingRuleContainer={this.props.isLoading}
-                              loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
-                              ruleContainer={this.getRuleContainer()}
-                              unsavedConditions={this.state.unsavedConditions}
-                              onAddRuleCondition={this.addRuleCondition}
-                              onRemoveRuleConditions={this.removeRuleConditions}/>;
+                                loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
+                                ruleContainer={this.getRuleContainer()}
+                                unsavedConditions={this.state.unsavedConditions}
+                                onAddRuleCondition={this.addRuleCondition}
+                                onRemoveRuleConditions={this.removeRuleConditions}/>;
 
   private containers = (): JSX.Element =>
     <RuleContainerContainersList isLoadingRuleContainer={this.props.isLoading}
-                             loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
-                             ruleContainer={this.getRuleContainer()}
-                             unsavedContainers={this.state.unsavedContainers}
-                             onAddRuleContainer={this.addRuleContainer}
-                             onRemoveRuleContainers={this.removeRuleContainers}/>;
+                                 loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
+                                 ruleContainer={this.getRuleContainer()}
+                                 unsavedContainers={this.state.unsavedContainers}
+                                 onAddRuleContainer={this.addRuleContainer}
+                                 onRemoveRuleContainers={this.removeRuleContainers}/>;
 
   private tabs = (): Tab[] => [
     {
@@ -371,17 +378,6 @@ class RuleContainer extends BaseComponent<Props, State> {
     }
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(ruleContainer: Partial<IRuleContainer>) {
@@ -397,11 +393,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const ruleContainer = isNew(props.location.search) ? buildNewContainerRule() : state.entities.rules.containers.data[name];
   let formRuleContainer;
   if (ruleContainer) {
-    formRuleContainer = { ...ruleContainer };
+    formRuleContainer = {...ruleContainer};
     removeFields(formRuleContainer);
   }
   const decisions = state.entities.decisions.data;
-  return  {
+  return {
     isLoading,
     error,
     ruleContainer,

@@ -10,10 +10,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface ServiceDecisionRepository extends JpaRepository<ServiceDecisionEntity, Long> {

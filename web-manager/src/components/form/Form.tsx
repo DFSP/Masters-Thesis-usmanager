@@ -23,10 +23,10 @@
  */
 
 import React, {createRef, RefObject} from "react";
-import {getCancelRequest, deleteData, postData, putData, deleteCancelRequest} from "../../utils/api";
+import {deleteCancelRequest, deleteData, getCancelRequest, postData, putData} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
-import {getTypeFromValue, FieldProps, IValidation} from "./Field";
+import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {isEqualWith} from "lodash";
@@ -247,6 +247,201 @@ class Form extends React.Component<Props, State> {
     this.initDropdown();
   }
 
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  public render() {
+    const context: IFormContext = {
+      values: this.state.values,
+      errors: this.state.errors,
+      isEditing: this.state.isEditing,
+      setValue: this.setValue,
+      addValue: this.addValue,
+      removeValue: this.removeValue,
+      validate: this.validate
+    };
+    const {saveRequired, loading} = this.state;
+    const {
+      id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
+      children
+    } = this.props;
+    return (
+      <>
+        {this.props.delete && (
+          <ConfirmDialog id={id}
+                         message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
+                         confirmCallback={this.onClickDelete}/>)}
+        <form onSubmit={this.handleSubmit} noValidate>
+          {(controlsMode === undefined || controlsMode === 'top') && (
+            <div>
+              <div className='controlsContainer noBorder'>
+                {switchDropdown && (
+                  <>
+                    <button
+                      className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                      data-position="bottom" data-tooltip={switchDropdown.title || 'Switch form'}
+                      data-target={`switch-dropdown`}
+                      ref={this.dropdown}>
+                      <i className="material-icons">keyboard_arrow_down</i>
+                    </button>
+                    <ul id='switch-dropdown'
+                        className={`dropdown-content ${styles.dropdown}`}>
+                      <li className={`${styles.disabled}`}>
+                        <a>
+                          {switchDropdown.title || 'Switch form'}
+                        </a>
+                      </li>
+                      <PerfectScrollbar ref={(ref) => {
+                        this.dropdownScrollbar = ref;
+                      }}>
+                        {switchDropdown.options.map((option, index) =>
+                          <li key={index} onClick={this.switchForm}>
+                            <a>
+                              {option}
+                            </a>
+                          </li>
+                        )}
+                      </PerfectScrollbar>
+                    </ul>
+                  </>
+                )}
+                {isNew && !loading
+                  ?
+                  <button
+                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
+                    type="submit">
+                    {this.props.post?.textButton || 'Save'}
+                  </button>
+                  :
+                  <>
+                    <div className={`${styles.controlButton}`}>
+                      {!loading && customButtons?.map((button, index) => (
+                        <div key={index} className={styles.customButton}>
+                          {button.confirm && (
+                            <ConfirmDialog key={button.confirm.id}
+                                           id={button.confirm.id}
+                                           message={button.confirm?.message}
+                                           confirmCallback={button.confirm?.onClickConfirm}/>)}
+                          {button.button}
+                        </div>
+                      ))}
+                      {deletable !== undefined && !loading && (
+                        <button
+                          className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
+                          type="button"
+                          data-target={id}>
+                          {this.props.delete?.textButton || 'Delete'}
+                        </button>)}
+                      {!loading && (
+                        <button
+                          className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
+                          style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                          type="submit">
+                          {this.props.post?.textButton || 'Save'}
+                        </button>)}
+                    </div>
+                    {editable !== undefined && !loading && (
+                      <button
+                        className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
+                        data-position="bottom"
+                        data-tooltip="Edit"
+                        type="button"
+                        onClick={this.onClickEdit}>
+                        <i className="large material-icons">edit</i>
+                      </button>
+                    )}
+                  </>
+                }
+                {loading && (
+                  <button
+                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide ${styles.formButton}`}
+                    onClick={this.cancelRequest}>
+                    Cancel
+                  </button>
+                )}
+                {dropdown && (
+                  <>
+                    <button
+                      className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
+                      data-position="bottom" data-tooltip={dropdown.title}
+                      data-target={`dropdown-${dropdown.id}`}
+                      ref={this.dropdown}>
+                      <i className="material-icons">add</i>
+                    </button>
+                    <ul id={`dropdown-${dropdown.id}`}
+                        className={`dropdown-content ${styles.dropdown}`}>
+                      <li className={`${styles.disabled}`}>
+                        <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : ''}`}>
+                          {dropdown.data.length ? dropdown.title : dropdown.empty}
+                        </a>
+                      </li>
+                      <PerfectScrollbar ref={(ref) => {
+                        this.dropdownScrollbar = ref;
+                      }}>
+                        {dropdown.data.map((data, index) =>
+                          <li key={index} onClick={this.onAdd}>
+                            <a>
+                              {data}
+                            </a>
+                          </li>
+                        )}
+                      </PerfectScrollbar>
+                    </ul>
+                  </>
+                )}
+              </div>
+              <ActionProgressBar loading={!!loading}/>
+            </div>
+          )}
+          {controlsMode?.includes('modal') ?
+            <ScrollBar ref={this.props.modal?.scrollbar}
+                       component={'div'}
+                       style={this.props.modal?.scrollMaxHeight
+                         ? {maxHeight: Math.floor(this.props.modal?.scrollMaxHeight)}
+                         : undefined}
+                       options={{
+                         useBothWheelAxes: false,
+                         suppressScrollX: true
+                       }}>
+              <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+                <FormContext.Provider value={context}>
+                  {children}
+                </FormContext.Provider>
+              </div>
+            </ScrollBar>
+            : <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+              <FormContext.Provider value={context}>
+                {children}
+              </FormContext.Provider>
+            </div>
+          }
+          {(controlsMode === 'modal' || controlsMode === 'modal-fullscreen') && (
+            <div
+              className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
+              <div>
+                <button className={`waves-effect waves-light btn-flat red-text ${styles.formButton}`}
+                        type="button"
+                        onClick={this.clearValues}>
+                  Clear
+                </button>
+                <button className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
+                        type="button">
+                  Cancel
+                </button>
+                <button className={`waves-effect waves-light btn-flat green-text ${styles.formButton}`}
+                        type="button"
+                        onClick={this.onModalConfirm}>
+                  Confirm
+                </button>
+              </div>
+            </div>
+          )}
+        </form>
+      </>
+    )
+  }
+
   private initDropdown = () =>
     M.Dropdown.init(this.dropdown.current as Element,
       {
@@ -255,10 +450,6 @@ class Form extends React.Component<Props, State> {
 
   private onOpenDropdown = () =>
     this.dropdownScrollbar?.updateScroll();
-
-  componentWillUnmount(): void {
-    this.mounted = false;
-  }
 
   private saveRequired = () => {
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
@@ -335,8 +526,7 @@ class Form extends React.Component<Props, State> {
           this.setState({loading: {method: 'post', url: post.url}});
         }
       }
-    }
-    else {
+    } else {
       const saveRequired = this.saveRequired();
       if (saveRequired) {
         if (put?.url && validate) {
@@ -355,8 +545,7 @@ class Form extends React.Component<Props, State> {
             });
           this.setState({loading: {method: 'put', url: put.url}});
         }
-      }
-      else {
+      } else {
         saveEntities?.(args);
       }
     }
@@ -372,12 +561,11 @@ class Form extends React.Component<Props, State> {
   };
 
   private setValue = (id: keyof IValues, value: IValues, validate?: boolean) => {
-    const values = { [id] : value };
+    const values = {[id]: value};
     if (validate === undefined || validate) {
-      this.setState({ values: { ...this.state.values, ...values } }, () => this.validate(id as string));
-    }
-    else {
-      this.setState({ values: { ...this.state.values, ...values } });
+      this.setState({values: {...this.state.values, ...values}}, () => this.validate(id as string));
+    } else {
+      this.setState({values: {...this.state.values, ...values}});
     }
 
   };
@@ -408,7 +596,7 @@ class Form extends React.Component<Props, State> {
   private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
     const data = decodeHTML((event.target as HTMLLIElement).innerHTML);
     // @ts-ignore
-    this.setState({ [data]: { value: data, isChecked: false, isNew: true } });
+    this.setState({[data]: {value: data, isChecked: false, isNew: true}});
   };
 
   private switchForm = (e: React.FormEvent<HTMLLIElement>) => {
@@ -416,183 +604,6 @@ class Form extends React.Component<Props, State> {
     this.props.switchDropdown?.onSwitch(selectedForm);
     this.clearValues();
   };
-
-  public render() {
-    const context: IFormContext = {
-      values: this.state.values,
-      errors: this.state.errors,
-      isEditing: this.state.isEditing,
-      setValue: this.setValue,
-      addValue: this.addValue,
-      removeValue: this.removeValue,
-      validate: this.validate
-    };
-    const {saveRequired, loading} = this.state;
-    const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
-      children} = this.props;
-    return (
-      <>
-        {this.props.delete && (
-          <ConfirmDialog id={id}
-                         message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
-                         confirmCallback={this.onClickDelete}/>)}
-        <form onSubmit={this.handleSubmit} noValidate>
-          {(controlsMode === undefined || controlsMode === 'top') && (
-            <div>
-              <div className='controlsContainer noBorder'>
-                {switchDropdown && (
-                  <>
-                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                            data-position="bottom" data-tooltip={switchDropdown.title || 'Switch form'}
-                            data-target={`switch-dropdown`}
-                            ref={this.dropdown}>
-                      <i className="material-icons">keyboard_arrow_down</i>
-                    </button>
-                    <ul id='switch-dropdown'
-                        className={`dropdown-content ${styles.dropdown}`}>
-                      <li className={`${styles.disabled}`}>
-                        <a>
-                          {switchDropdown.title || 'Switch form'}
-                        </a>
-                      </li>
-                      <PerfectScrollbar ref={(ref) => { this.dropdownScrollbar = ref; }}>
-                        {switchDropdown.options.map((option, index) =>
-                          <li key={index} onClick={this.switchForm}>
-                            <a>
-                              {option}
-                            </a>
-                          </li>
-                        )}
-                      </PerfectScrollbar>
-                    </ul>
-                  </>
-                )}
-                {isNew && !loading
-                  ?
-                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
-                          type="submit">
-                    {this.props.post?.textButton || 'Save'}
-                  </button>
-                  :
-                  <>
-                    <div className={`${styles.controlButton}`}>
-                      {!loading && customButtons?.map((button, index) => (
-                        <div key={index} className={styles.customButton}>
-                          {button.confirm && (
-                            <ConfirmDialog key={button.confirm.id}
-                                           id={button.confirm.id}
-                                           message={button.confirm?.message}
-                                           confirmCallback={button.confirm?.onClickConfirm}/>)}
-                          {button.button}
-                        </div>
-                      ))}
-                      {deletable !== undefined && !loading && (
-                        <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
-                                type="button"
-                                data-target={id}>
-                          {this.props.delete?.textButton || 'Delete'}
-                        </button>)}
-                      {!loading && (
-                        <button className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
-                                style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                                type="submit">
-                          {this.props.post?.textButton || 'Save'}
-                        </button>)}
-                    </div>
-                    {editable !== undefined && !loading && (
-                      <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
-                              data-position="bottom"
-                              data-tooltip="Edit"
-                              type="button"
-                              onClick={this.onClickEdit}>
-                        <i className="large material-icons">edit</i>
-                      </button>
-                    )}
-                  </>
-                }
-                {loading && (
-                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide ${styles.formButton}`}
-                          onClick={this.cancelRequest}>
-                    Cancel
-                  </button>
-                )}
-                {dropdown && (
-                  <>
-                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
-                            data-position="bottom" data-tooltip={dropdown.title}
-                            data-target={`dropdown-${dropdown.id}`}
-                            ref={this.dropdown}>
-                      <i className="material-icons">add</i>
-                    </button>
-                    <ul id={`dropdown-${dropdown.id}`}
-                        className={`dropdown-content ${styles.dropdown}`}>
-                      <li className={`${styles.disabled}`}>
-                        <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : ''}`}>
-                          {dropdown.data.length ? dropdown.title : dropdown.empty}
-                        </a>
-                      </li>
-                      <PerfectScrollbar ref={(ref) => { this.dropdownScrollbar = ref; }}>
-                        {dropdown.data.map((data, index) =>
-                          <li key={index} onClick={this.onAdd}>
-                            <a>
-                              {data}
-                            </a>
-                          </li>
-                        )}
-                      </PerfectScrollbar>
-                    </ul>
-                  </>
-                )}
-              </div>
-              <ActionProgressBar loading={!!loading}/>
-            </div>
-          )}
-          {controlsMode?.includes('modal') ?
-            <ScrollBar ref={this.props.modal?.scrollbar}
-                       component={'div'}
-                       style={this.props.modal?.scrollMaxHeight
-                         ? {maxHeight: Math.floor(this.props.modal?.scrollMaxHeight)}
-                         : undefined}
-                       options={{
-                         useBothWheelAxes: false,
-                         suppressScrollX: true
-                       }}>
-              <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
-                <FormContext.Provider value={context}>
-                  {children}
-                </FormContext.Provider>
-              </div>
-            </ScrollBar>
-            : <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
-              <FormContext.Provider value={context}>
-                {children}
-              </FormContext.Provider>
-            </div>
-          }
-          {(controlsMode === 'modal' || controlsMode === 'modal-fullscreen') && (
-            <div className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
-              <div>
-                <button className={`waves-effect waves-light btn-flat red-text ${styles.formButton}`}
-                        type="button"
-                        onClick={this.clearValues}>
-                  Clear
-                </button>
-                <button className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
-                        type="button">
-                  Cancel
-                </button>
-                <button className={`waves-effect waves-light btn-flat green-text ${styles.formButton}`}
-                        type="button"
-                        onClick={this.onModalConfirm}>
-                  Confirm
-                </button>
-              </div>
-            </div>
-          )}
-        </form>
-      </>
-    )
-  }
 
 }
 

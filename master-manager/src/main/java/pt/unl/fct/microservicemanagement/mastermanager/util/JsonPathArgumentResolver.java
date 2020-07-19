@@ -42,7 +42,8 @@ public class JsonPathArgumentResolver implements HandlerMethodArgumentResolver {
     Object result = null;
     try {
       result = JsonPath.read(body, path);
-    } catch (PathNotFoundException ignored) { }
+    } catch (PathNotFoundException ignored) {
+    }
     return result;
   }
 

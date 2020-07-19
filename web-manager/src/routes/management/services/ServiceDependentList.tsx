@@ -47,6 +47,17 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
     this.loadEntities();
   }
 
+  public render() {
+    const DependentsList = List<string>();
+    return (
+      <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
+                      error={this.props.loadServiceError || this.props.error}
+                      emptyMessage={`Dependents list is empty`}
+                      list={this.props.dependentNames}
+                      show={this.dependent}/>
+    );
+  }
+
   private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
@@ -64,17 +75,6 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
         <i className={`${styles.linkIcon} material-icons right`}>link</i>
       </Link>
     </ListItem>;
-
-  public render() {
-    const DependentsList = List<string>();
-    return (
-      <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
-                      error={this.props.loadServiceError || this.props.error}
-                      emptyMessage={`Dependents list is empty`}
-                      list={this.props.dependentNames}
-                      show={this.dependent}/>
-    );
-  }
 
 }
 

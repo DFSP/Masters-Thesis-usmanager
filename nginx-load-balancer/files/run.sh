@@ -21,6 +21,7 @@ htpasswd -bBc /etc/nginx/.htpasswd $BASIC_AUTH_USERNAME $BASIC_AUTH_PASSWORD
 sed \
   -e "s/##SERVER1##/$SERVER1/g" \
   -e "s/##SERVER_NAME##/$SERVER_NAME/g" \
-  nginx.conf.tmpl > /etc/nginx/nginx.conf
+  nginx.conf.tmpl >/etc/nginx/nginx.conf
 
-./nginx-load-balancer-api & exec nginx -g "daemon off;"
+./nginx-load-balancer-api &
+exec nginx -g "daemon off;"

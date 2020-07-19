@@ -35,12 +35,6 @@ class RulesServiceList extends BaseComponent<Props, {}> {
     this.props.loadRulesService();
   }
 
-  private rule = (rule: IRuleService): JSX.Element =>
-    <RuleServiceCard key={rule.id} rule={rule}/>;
-
-  private predicate = (rule: IRuleService, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<IRuleService>
@@ -52,6 +46,12 @@ class RulesServiceList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private rule = (rule: IRuleService): JSX.Element =>
+    <RuleServiceCard key={rule.id} rule={rule}/>;
+
+  private predicate = (rule: IRuleService, search: string): boolean =>
+    rule.name.toLowerCase().includes(search);
 
 }
 

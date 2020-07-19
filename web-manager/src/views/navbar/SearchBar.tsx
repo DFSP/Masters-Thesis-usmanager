@@ -39,10 +39,7 @@ interface DispatchToProps {
 
 type Props = DispatchToProps & StateToProps;
 
-class SearchBar extends React.Component<Props,{}> {
-
-  private setValue = ({target:{value}}:any) =>
-    this.props.updateSearch(value);
+class SearchBar extends React.Component<Props, {}> {
 
   public render() {
     return (
@@ -57,6 +54,9 @@ class SearchBar extends React.Component<Props,{}> {
     );
   }
 
+  private setValue = ({target: {value}}: any) =>
+    this.props.updateSearch(value);
+
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
@@ -66,6 +66,6 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
 );
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ updateSearch }, dispatch);
+  bindActionCreators({updateSearch}, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

@@ -24,7 +24,6 @@
 
 package works.weave.socks.orders.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;

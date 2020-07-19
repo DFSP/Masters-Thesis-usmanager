@@ -27,8 +27,8 @@ package works.weave.socks.queuemaster.entities;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HealthCheck {

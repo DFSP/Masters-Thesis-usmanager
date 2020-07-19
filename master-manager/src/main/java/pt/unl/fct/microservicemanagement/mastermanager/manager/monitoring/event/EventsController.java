@@ -50,20 +50,17 @@ public class EventsController {
   }
 
   @GetMapping("/hosts/{hostname}")
-  public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname)
-      {
+  public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname) {
     return hostsEventsService.getHostEventsByHostname(hostname);
   }
 
   @GetMapping("/services/{serviceName}")
-  public List<ServiceEventEntity> getServiceEventLogsByServiceName(@PathVariable String serviceName)
-      {
+  public List<ServiceEventEntity> getServiceEventLogsByServiceName(@PathVariable String serviceName) {
     return servicesEventsService.getServiceEventsByServiceName(serviceName);
   }
 
   @GetMapping("/containers/{containerId}")
-  public List<ServiceEventEntity> getServiceEventLogsByContainerId(@PathVariable String containerId)
-      {
+  public List<ServiceEventEntity> getServiceEventLogsByContainerId(@PathVariable String containerId) {
     return servicesEventsService.getServiceEventsByContainerId(containerId);
   }
 

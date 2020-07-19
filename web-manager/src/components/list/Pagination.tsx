@@ -20,18 +20,6 @@ type Props = StateToProps & PaginationProps;
 
 class Pagination extends React.Component<Props, {}> {
 
-  private noEllipsis = (max: number) =>
-    Array.from({length: max + 1}, (x, i) => i + 1);
-
-  private beforeEllipsis = (max: number, page: number): number[] =>
-    Array.from({length: page < 3 ? 3 : 1}, (x, i) => i + 1);
-
-  private afterEllipsis = (max: number, page: number): number[] =>
-    Array.from({length: page > max - 3 ? 3 : 1}, (x, i) => max - i + 1).reverse();
-
-  private betweenEllipsis = (max: number, page: number): number[] =>
-    Array.from({length: 1}, (x, i) => page + 1).reverse();
-
   public render() {
     const {max, page, setPage, prevPage, nextPage, sidenavVisible} = this.props;
     const needsEllipsis = max >= 10;
@@ -87,6 +75,18 @@ class Pagination extends React.Component<Props, {}> {
       </ul>
     )
   }
+
+  private noEllipsis = (max: number) =>
+    Array.from({length: max + 1}, (x, i) => i + 1);
+
+  private beforeEllipsis = (max: number, page: number): number[] =>
+    Array.from({length: page < 3 ? 3 : 1}, (x, i) => i + 1);
+
+  private afterEllipsis = (max: number, page: number): number[] =>
+    Array.from({length: page > max - 3 ? 3 : 1}, (x, i) => max - i + 1).reverse();
+
+  private betweenEllipsis = (max: number, page: number): number[] =>
+    Array.from({length: 1}, (x, i) => page + 1).reverse();
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (

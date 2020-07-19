@@ -10,6 +10,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 
 @Repository
 public interface SimulatedContainerMetricsRepository extends JpaRepository<SimulatedContainerMetricEntity, Long> {
@@ -66,8 +67,6 @@ public interface SimulatedContainerMetricsRepository extends JpaRepository<Simul
       + "where lower(m.name) = lower(:simulatedMetricName) and c.containerId = :containerId")
   Optional<ContainerEntity> getContainer(@Param("simulatedMetricName") String simulatedMetricName,
                                          @Param("containerId") String containerId);
-
-
 
 
 }

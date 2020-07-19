@@ -71,12 +71,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.users.UserEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UserRole;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersService;
 
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component

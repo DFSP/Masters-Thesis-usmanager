@@ -25,12 +25,6 @@ class RuleConditionsList extends BaseComponent<Props, {}> {
     this.props.loadConditions();
   }
 
-  private condition = (condition: IRuleCondition): JSX.Element =>
-    <RuleConditionCard key={condition.id} condition={condition}/>;
-
-  private predicate = (condition: IRuleCondition, search: string): boolean =>
-    condition.name.toString().toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<IRuleCondition>
@@ -42,6 +36,12 @@ class RuleConditionsList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     )
   }
+
+  private condition = (condition: IRuleCondition): JSX.Element =>
+    <RuleConditionCard key={condition.id} condition={condition}/>;
+
+  private predicate = (condition: IRuleCondition, search: string): boolean =>
+    condition.name.toString().toLowerCase().includes(search);
 
 }
 

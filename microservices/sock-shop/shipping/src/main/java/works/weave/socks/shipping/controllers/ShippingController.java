@@ -63,7 +63,8 @@ public class ShippingController {
 
   @ResponseStatus(HttpStatus.CREATED)
   @RequestMapping(value = "/shipping", method = RequestMethod.POST)
-  public @ResponseBody Shipment postShipping(@RequestBody Shipment shipment) {
+  public @ResponseBody
+  Shipment postShipping(@RequestBody Shipment shipment) {
     System.out.println("Adding shipment to queue...");
     try {
       rabbitTemplate.convertAndSend("shipping-task", shipment);
@@ -76,7 +77,8 @@ public class ShippingController {
 
   @ResponseStatus(HttpStatus.OK)
   @RequestMapping(method = RequestMethod.GET, path = "/health")
-  public @ResponseBody Map<String, List<HealthCheck>> getHealth() {
+  public @ResponseBody
+  Map<String, List<HealthCheck>> getHealth() {
     Map<String, List<HealthCheck>> map = new HashMap<String, List<HealthCheck>>();
     List<HealthCheck> healthChecks = new ArrayList<HealthCheck>();
     Date dateNow = Calendar.getInstance().getTime();

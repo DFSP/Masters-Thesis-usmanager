@@ -3,7 +3,6 @@ import CardItem from "../../../components/list/CardItem";
 import Card from "../../../components/cards/Card";
 import {ILoadBalancer} from "./LoadBalancer";
 import {IContainer} from "../containers/Container";
-import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 interface LoadBalancerCardProps {
   loadBalancer: ILoadBalancer;

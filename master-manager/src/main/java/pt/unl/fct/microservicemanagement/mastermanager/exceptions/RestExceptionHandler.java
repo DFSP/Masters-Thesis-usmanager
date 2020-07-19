@@ -177,6 +177,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   /**
    * Handle NoHandlerFoundException.
+   *
    * @param ex      NoHandlerFoundException
    * @param headers HttpHeaders
    * @param status  HttpStatus

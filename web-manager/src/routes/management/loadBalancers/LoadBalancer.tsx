@@ -18,12 +18,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {
-  loadLoadBalancers,
-  addLoadBalancer,
-  loadRegions,
-  loadServices
-} from "../../../actions";
+import {addLoadBalancer, loadLoadBalancers, loadRegions, loadServices} from "../../../actions";
 import {connect} from "react-redux";
 import {IService} from "../services/Service";
 import {IRegion} from "../region/Region";
@@ -76,10 +71,8 @@ interface State {
 
 class LoadBalancer extends BaseComponent<Props, State> {
 
+  state: State = {};
   private mounted = false;
-
-  state: State = {
-  };
 
   public componentDidMount(): void {
     this.loadLoadBalancer();
@@ -90,6 +83,16 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadLoadBalancer = () => {
@@ -111,16 +114,15 @@ class LoadBalancer extends BaseComponent<Props, State> {
   private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
     const loadBalancers = reply.data;
     loadBalancers.forEach(loadBalancer => {
-        super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
-        this.props.addLoadBalancer(loadBalancer);
+      super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
+      this.props.addLoadBalancer(loadBalancer);
     });
     if (this.mounted) {
       if (loadBalancers.length === 1) {
         const loadBalancer = loadBalancers[0];
         this.updateLoadBalancer(loadBalancer);
         this.props.history.replace(loadBalancer.containerId)
-      }
-      else {
+      } else {
         this.props.history.push('/load-balancers');
       }
     }
@@ -141,7 +143,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
   private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
     loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
-    const formLoadBalancer = { ...loadBalancer };
+    const formLoadBalancer = {...loadBalancer};
     removeFields(formLoadBalancer);
     this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});
   };
@@ -153,8 +155,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: requiredAndTrimmed }
+            ? {rule: requiredAndNumberAndMin, args: 0}
+            : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -205,7 +207,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
                            type={'dropdown'}
                            dropdown={{
                              defaultValue: "Select service",
-                             values: this.getSelectableServices()}}/>
+                             values: this.getSelectableServices()
+                           }}/>
                   : key === 'regions'
                   ? <Field key={index}
                            id={key}
@@ -230,16 +233,6 @@ class LoadBalancer extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(loadBalancer: Partial<ILoadBalancer>) {
@@ -258,14 +251,14 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const regions = state.entities.regions.data;
   let formLoadBalancer;
   if (newLoadBalancer) {
-    formLoadBalancer = { ...newLoadBalancer, regions: Object.keys(regions) };
+    formLoadBalancer = {...newLoadBalancer, regions: Object.keys(regions)};
   }
   if (loadBalancer) {
-    formLoadBalancer = { ...loadBalancer };
+    formLoadBalancer = {...loadBalancer};
     removeFields(formLoadBalancer);
   }
   const services = state.entities.services.data;
-  return  {
+  return {
     isLoading,
     error,
     newLoadBalancer,

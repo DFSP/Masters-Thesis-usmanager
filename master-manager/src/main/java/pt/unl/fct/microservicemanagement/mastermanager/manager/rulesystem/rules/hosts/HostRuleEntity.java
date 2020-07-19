@@ -24,14 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -55,7 +53,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -84,12 +81,12 @@ public class HostRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "hostRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "hostRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<EdgeHostEntity> edgeHosts;
 
   @Singular

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rules")
 public class ContainerRulesController {
-  
+
   private final ContainerRulesService containerRulesService;
 
   public ContainerRulesController(ContainerRulesService containerRulesService) {

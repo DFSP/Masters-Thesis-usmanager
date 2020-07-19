@@ -27,8 +27,8 @@ import ControlledList from "../../../../components/list/ControlledList";
 import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  loadSimulatedHostMetrics,
   loadEdgeHostSimulatedMetrics,
+  loadSimulatedHostMetrics,
   removeEdgeHostSimulatedMetrics
 } from "../../../../actions";
 import {connect} from "react-redux";
@@ -67,7 +67,7 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -84,6 +84,29 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
     if (!previousHostname && currentHostname) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
+                           emptyMessage={`Simulated metrics list is empty`}
+                           data={this.props.simulatedMetricsName}
+                           dropdown={{
+                             id: 'simulatedMetrics',
+                             title: 'Add simulated metric',
+                             empty: 'No more simulated metrics to add',
+                             data: this.getSelectableSimulatedMetrics()
+                           }}
+                           show={this.simulatedMetric}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `hosts/edge/${this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress}/simulated-metrics`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -145,29 +168,6 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
     const {simulatedMetrics, simulatedMetricsName, unsavedSimulatedMetrics} = this.props;
     return Object.keys(simulatedMetrics).filter(name => !simulatedMetricsName.includes(name) && !unsavedSimulatedMetrics.includes(name));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
-                           emptyMessage={`Simulated metrics list is empty`}
-                           data={this.props.simulatedMetricsName}
-                           dropdown={{
-                             id: 'simulatedMetrics',
-                             title: 'Add simulated metric',
-                             empty: 'No more simulated metrics to add',
-                             data: this.getSelectableSimulatedMetrics()
-                           }}
-                           show={this.simulatedMetric}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `hosts/edge/${this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress}/simulated-metrics`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

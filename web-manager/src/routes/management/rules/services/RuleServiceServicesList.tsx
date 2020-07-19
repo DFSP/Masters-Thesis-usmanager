@@ -15,11 +15,7 @@ import React from "react";
 import ControlledList from "../../../../components/list/ControlledList";
 import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadServices,
-  loadRuleServices,
-  removeRuleServices,
-} from "../../../../actions";
+import {loadRuleServices, loadServices, removeRuleServices,} from "../../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {IService} from "../../services/Service";
@@ -57,7 +53,7 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -72,6 +68,29 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
     if (!prevProps.ruleService?.name && this.props.ruleService?.name) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
+                           emptyMessage={`Services list is empty`}
+                           data={this.props.ruleServices}
+                           dropdown={{
+                             id: 'services',
+                             title: 'Add service',
+                             empty: 'No more services to add',
+                             data: this.getSelectableServiceNames()
+                           }}
+                           show={this.service}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `rules/services/${this.props.ruleService?.name}/services`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -134,29 +153,6 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
     return Object.keys(services)
                  .filter(service => !ruleServices.includes(service) && !unsavedServices.includes(service));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
-                           emptyMessage={`Services list is empty`}
-                           data={this.props.ruleServices}
-                           dropdown={{
-                             id: 'services',
-                             title: 'Add service',
-                             empty: 'No more services to add',
-                             data: this.getSelectableServiceNames()
-                           }}
-                           show={this.service}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/services/${this.props.ruleService?.name}/services`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

@@ -11,7 +11,11 @@
 import IDatabaseData from "../../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
-import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndNotValidIpAddress} from "../../../../components/form/Form";
+import Form, {
+  IFields,
+  requiredAndTrimmed,
+  requiredAndTrimmedAndNotValidIpAddress
+} from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
@@ -19,7 +23,12 @@ import Tabs, {Tab} from "../../../../components/tabs/Tabs";
 import MainLayout from "../../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../../reducers";
 import {
-  addEdgeHost, addEdgeHostRules, addEdgeHostSimulatedMetrics, loadEdgeHosts, loadRegions, updateEdgeHost
+  addEdgeHost,
+  addEdgeHostRules,
+  addEdgeHostSimulatedMetrics,
+  loadEdgeHosts,
+  loadRegions,
+  updateEdgeHost
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -93,12 +102,11 @@ interface State {
 
 class EdgeHost extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedRules: [],
     unsavedSimulatedMetrics: [],
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.props.loadRegions();
@@ -108,6 +116,17 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadEdgeHost = () => {
@@ -202,7 +221,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private onSaveRulesSuccess = (edgeHost: IEdgeHost): void => {
     this.props.addEdgeHostRules(edgeHost.publicDnsName || edgeHost.publicIpAddress, this.state.unsavedRules);
     if (this.mounted) {
-      this.setState({ unsavedRules: [] });
+      this.setState({unsavedRules: []});
     }
   };
 
@@ -233,7 +252,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private onSaveSimulatedMetricsSuccess = (edgeHost: IEdgeHost): void => {
     this.props.addEdgeHostSimulatedMetrics(edgeHost.publicDnsName || edgeHost.publicIpAddress, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
-      this.setState({ unsavedSimulatedMetrics: [] });
+      this.setState({unsavedSimulatedMetrics: []});
     }
   };
 
@@ -242,7 +261,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
-    const formEdgeHost = { ...edgeHost };
+    const formEdgeHost = {...edgeHost};
     removeFields(formEdgeHost);
     this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
   };
@@ -255,8 +274,8 @@ class EdgeHost extends BaseComponent<Props, State> {
           label: key,
           validation:
             key.toLowerCase().includes('address')
-              ? { rule: requiredAndTrimmedAndNotValidIpAddress }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndTrimmedAndNotValidIpAddress}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -313,7 +332,8 @@ class EdgeHost extends BaseComponent<Props, State> {
                                   label={key}
                                   dropdown={{
                                     defaultValue: "Is a local machine?",
-                                    values: [true, false]}}/>
+                                    values: [true, false]
+                                  }}/>
                 : key === 'region'
                 ? <Field<IRegion> key='region'
                                   id={'region'}
@@ -322,7 +342,8 @@ class EdgeHost extends BaseComponent<Props, State> {
                                   dropdown={{
                                     defaultValue: 'Select region',
                                     values: this.getSelectableRegions(),
-                                    optionToString: this.regionDropdownOption}}/>
+                                    optionToString: this.regionDropdownOption
+                                  }}/>
                 : key === 'password'
                   ? <Field key={index}
                            id={key}
@@ -388,17 +409,6 @@ class EdgeHost extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(edgeHost: Partial<IEdgeHost>) {
@@ -414,10 +424,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const edgeHost = isNew(props.location.search) ? buildNewEdgeHost() : state.entities.hosts.edge.data[hostname];
   let formEdgeHost;
   if (edgeHost) {
-    formEdgeHost = { ...edgeHost };
+    formEdgeHost = {...edgeHost};
     removeFields(formEdgeHost);
   }
-  return  {
+  return {
     isLoading,
     error,
     edgeHost,

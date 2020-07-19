@@ -13,9 +13,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.Event;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.Decision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

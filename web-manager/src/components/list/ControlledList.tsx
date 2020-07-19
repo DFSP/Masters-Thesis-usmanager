@@ -3,12 +3,12 @@ import M from "materialize-css";
 import List from "./List";
 import styles from "./ControlledList.module.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import ScrollBar from "react-perfect-scrollbar";
 import BaseComponent from "../BaseComponent";
 import {deleteData} from "../../utils/api";
 import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFormModal, IValues, RestOperation} from "../form/Form";
-import ScrollBar from "react-perfect-scrollbar";
 
 interface IDropdown {
   id: string,
@@ -47,16 +47,14 @@ interface State<T> {
 
 export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>> {
 
+  static defaultProps = {
+    dataKey: []
+  }
+  state: State<T> = {};
   private globalCheckbox = createRef<HTMLInputElement>();
   private dropdown = createRef<HTMLButtonElement>();
   private scrollbar: (ScrollBar | null) = null;
   private selected?: string;
-
-  state: State<T> = {};
-
-  static defaultProps = {
-    dataKey: []
-  }
 
   public componentDidMount(): void {
     this.initDropdown();
@@ -73,7 +71,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
       this.invalidateStateData(previousData);
       this.setState((this.props.data || []).reduce((state: State<T>, data) => {
         const dataStateKey = this.getDataStateKey(data);
-        state[dataStateKey] = { value: data, isChecked: false, isNew: false };
+        state[dataStateKey] = {value: data, isChecked: false, isNew: false};
         return state;
       }, {}));
     }
@@ -81,12 +79,95 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
       this.setState(Object.values(this.state).reduce((state: State<T>, data) => {
         if (data) {
           const dataStateKey = this.getDataStateKey(data.value);
-          state[dataStateKey] = { value: data.value, isChecked: false, isNew: false };
+          state[dataStateKey] = {value: data.value, isChecked: false, isNew: false};
         }
         return state;
       }, {}));
     }
     this.initDropdown();
+  }
+
+  public render() {
+    const {isLoading, error, emptyMessage, dropdown, formModal, sort} = this.props;
+    // @ts-ignore
+    let data: T[] = Object.values(this.state).filter(data => data).map(data => data.value);
+    if (sort) {
+      data = data.sort(sort);
+    }
+    const DataList = List<T>();
+    return (
+      <div>
+        <div className='controlsContainer'>
+          {!error && data.length > 0 && (
+            <p className={`${styles.nolabelCheckbox}`}>
+              <label>
+                <input type="checkbox"
+                       onChange={this.handleGlobalCheckbox}
+                       ref={this.globalCheckbox}/>
+                <span/>
+              </label>
+            </p>
+          )}
+          {!error && dropdown && (
+            <>
+              <button
+                className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
+                data-position="bottom" data-tooltip={dropdown.title}
+                data-target={`dropdown-${dropdown.id}`}
+                ref={this.dropdown}>
+                <i className="material-icons">add</i>
+              </button>
+              <ul id={`dropdown-${dropdown.id}`}
+                  className={`dropdown-content ${styles.dropdown}`}>
+                <li className={`${styles.disabled}`}>
+                  <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                    {dropdown.data.length ? dropdown.title : dropdown.empty}
+                  </a>
+                </li>
+                <PerfectScrollbar ref={(ref) => {
+                  this.scrollbar = ref;
+                }}>
+                  {dropdown.data.map((data, index) =>
+                    <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
+                      <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
+                        {data}
+                      </a>
+                    </li>
+                  )}
+                </PerfectScrollbar>
+              </ul>
+              {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
+            </>
+          )}
+          {(!error && formModal &&
+            <>
+                <button
+                    className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.button}`}
+                    data-position="bottom" data-tooltip={formModal.title}
+                    data-target={formModal.id}>
+                    <i className="material-icons">add</i>
+                </button>
+              {this.inputDialog(formModal)}
+            </>
+          )}
+          <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
+                  style={!error && Object.values(this.state)
+                                         .map(item => item?.isChecked || false)
+                                         .some(checked => checked)
+                    ? {transform: "scale(1)"}
+                    : {transform: "scale(0)"}}
+                  onClick={this.onRemove}>
+            Remove
+          </button>
+        </div>
+        <DataList
+          isLoading={isLoading}
+          error={error}
+          emptyMessage={emptyMessage}
+          list={data}
+          show={this.show}/>
+      </div>
+    )
   }
 
   private initDropdown = () =>
@@ -103,7 +184,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     this.setState(state =>
       Object.entries(state).filter(([_, data]) => data).reduce((newState: State<T>, [data, dataState]) => {
         if (dataState) {
-          newState[data] = { value: dataState.value, isChecked: checked, isNew: dataState.isNew};
+          newState[data] = {value: dataState.value, isChecked: checked, isNew: dataState.isNew};
         }
         return newState;
       }, {}));
@@ -113,7 +194,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     const {id: data, checked} = event.target;
     if (this.state[data]) {
       // @ts-ignore
-      this.setState(state => ({[data]: { value: state[data].value, isChecked: checked, isNew: state[data].isNew } }));
+      this.setState(state => ({[data]: {value: state[data].value, isChecked: checked, isNew: state[data].isNew}}));
     }
   };
 
@@ -149,7 +230,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
     const data = decodeHTML((event.target as HTMLLIElement).innerHTML);
     // @ts-ignore
-    this.setState({ [data]: { value: data, isChecked: false, isNew: true } });
+    this.setState({[data]: {value: data, isChecked: false, isNew: true}});
     this.props.onAdd?.(data);
   };
 
@@ -157,11 +238,11 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     if (this.selected) {
       let selectedProperty;
       for (let i = this.props.dataKey.length - 1; i >= 0; i--) {
-        selectedProperty = { [this.props.dataKey[i]]: selectedProperty ? selectedProperty : this.selected };
+        selectedProperty = {[this.props.dataKey[i]]: selectedProperty ? selectedProperty : this.selected};
       }
-      input = { ...selectedProperty, ...input };
+      input = {...selectedProperty, ...input};
       const key = this.getDataStateKey(input);
-      this.setState({ [key]: { value: input, isChecked: false, isNew: true } });
+      this.setState({[key]: {value: input, isChecked: false, isNew: true}});
       this.props.onAddInput?.(input);
     }
   };
@@ -171,7 +252,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     if (Object.keys(this.state).includes(key)) {
       return super.toast(`Unable to add ${key}`, 10000, 'already exists');
     }
-    this.setState({ [key]: { value: input, isChecked: false, isNew: true } });
+    this.setState({[key]: {value: input, isChecked: false, isNew: true}});
     this.props.onAddInput?.(input);
   };
 
@@ -190,8 +271,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
       const {url} = this.props.onDelete;
       if (persistedData.length === 1) {
         deleteData(`${url}/${persistedData[0]}`, () => this.onDeleteSuccess(persistedData), this.onDeleteFailure);
-      }
-      else {
+      } else {
         deleteData(url, () => this.onDeleteSuccess(persistedData), this.onDeleteFailure, persistedData);
       }
     }
@@ -228,84 +308,5 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     this.selected = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.props.dropdown?.onSelect?.(this.selected);
   };
-
-  public render() {
-    const {isLoading, error, emptyMessage, dropdown, formModal, sort} = this.props;
-    // @ts-ignore
-    let data: T[] = Object.values(this.state).filter(data => data).map(data => data.value);
-    if (sort) {
-      data = data.sort(sort);
-    }
-    const DataList = List<T>();
-    return (
-      <div>
-        <div className='controlsContainer'>
-          {!error && data.length > 0 && (
-            <p className={`${styles.nolabelCheckbox}`}>
-              <label>
-                <input type="checkbox"
-                       onChange={this.handleGlobalCheckbox}
-                       ref={this.globalCheckbox}/>
-                <span/>
-              </label>
-            </p>
-          )}
-          {!error && dropdown && (
-            <>
-              <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
-                      data-position="bottom" data-tooltip={dropdown.title}
-                      data-target={`dropdown-${dropdown.id}`}
-                      ref={this.dropdown}>
-                <i className="material-icons">add</i>
-              </button>
-              <ul id={`dropdown-${dropdown.id}`}
-                  className={`dropdown-content ${styles.dropdown}`}>
-                <li className={`${styles.disabled}`}>
-                  <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
-                    {dropdown.data.length ? dropdown.title : dropdown.empty}
-                  </a>
-                </li>
-                <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
-                  {dropdown.data.map((data, index) =>
-                    <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                      <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
-                        {data}
-                      </a>
-                    </li>
-                  )}
-                </PerfectScrollbar>
-              </ul>
-              {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
-            </>
-          )}
-          {(!error && formModal &&
-            <>
-                <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.button}`}
-                        data-position="bottom" data-tooltip={formModal.title}
-                        data-target={formModal.id}>
-                    <i className="material-icons">add</i>
-                </button>
-              {this.inputDialog(formModal)}
-            </>
-          )}
-          <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
-                  style={!error && Object.values(this.state)
-                                         .map(item => item?.isChecked || false)
-                                         .some(checked => checked)
-                    ? {transform: "scale(1)"}
-                    : {transform: "scale(0)"}}
-                  onClick={this.onRemove}>
-            Remove
-          </button>
-        </div>
-        <DataList
-          isLoading={isLoading}
-          error={error}
-          emptyMessage={emptyMessage}
-          list={data}
-          show={this.show}/>
-      </div>
-    )
-  }
 
 }

@@ -163,6 +163,7 @@ public class ContainersMonitoringService {
   public void initContainerMonitorTimer() {
     new Timer("MonitorContainersTimer", true).schedule(new TimerTask() {
       private long lastRun = System.currentTimeMillis();
+
       @Override
       public void run() {
         long currRun = System.currentTimeMillis();

@@ -14,7 +14,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.Contai
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,7 +36,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -70,7 +68,7 @@ public class SimulatedContainerMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedContainerMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "simulatedContainerMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<ContainerEntity> containers;
 
   public void removeAssociations() {
@@ -81,7 +79,7 @@ public class SimulatedContainerMetricEntity {
       container.getSimulatedContainerMetrics().remove(this);
     }
   }
-  
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

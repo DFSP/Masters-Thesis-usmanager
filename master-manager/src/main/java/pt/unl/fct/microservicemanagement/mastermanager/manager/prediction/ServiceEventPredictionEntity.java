@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.sql.Timestamp;

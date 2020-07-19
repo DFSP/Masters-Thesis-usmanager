@@ -18,7 +18,9 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {
-  loadServices, loadSimulatedServiceMetricServices, removeSimulatedServiceMetricServices,
+  loadServices,
+  loadSimulatedServiceMetricServices,
+  removeSimulatedServiceMetricServices,
 } from "../../../../actions";
 import {IService} from "../../services/Service";
 import {ISimulatedServiceMetric} from "./SimulatedServiceMetric";
@@ -55,7 +57,7 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -70,6 +72,30 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
     if (!prevProps.simulatedServiceMetric?.name && this.props.simulatedServiceMetric?.name) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList
+      isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
+      error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
+      emptyMessage={`Services list is empty`}
+      data={this.props.simulatedMetricServices}
+      dropdown={{
+        id: 'services',
+        title: 'Add service',
+        empty: 'No more services to add',
+        data: this.getSelectableServices()
+      }}
+      show={this.service}
+      onAdd={this.onAdd}
+      onRemove={this.onRemove}
+      onDelete={{
+        url: `simulated-metrics/services/${this.props.simulatedServiceMetric?.name}/services`,
+        successCallback: this.onDeleteSuccess,
+        failureCallback: this.onDeleteFailure
+      }}
+      entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -132,29 +158,6 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
     return Object.keys(services).filter(service => !simulatedMetricServices.includes(service)
                                                    && !unsavedServices.includes(service));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
-                           emptyMessage={`Services list is empty`}
-                           data={this.props.simulatedMetricServices}
-                           dropdown={{
-                             id: 'services',
-                             title: 'Add service',
-                             empty: 'No more services to add',
-                             data: this.getSelectableServices()
-                           }}
-                           show={this.service}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `simulated-metrics/services/${this.props.simulatedServiceMetric?.name}/services`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

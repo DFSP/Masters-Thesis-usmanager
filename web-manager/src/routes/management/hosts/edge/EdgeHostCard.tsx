@@ -22,7 +22,12 @@ type Props = EdgeHostCardProps;
 const CardEdgeHost = Card<IEdgeHost>();
 const EdgeHostCard = ({edgeHost}: Props) => (
   <CardEdgeHost title={edgeHost.publicDnsName || edgeHost.publicIpAddress}
-                link={{to: {pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`, state: edgeHost }}}
+                link={{
+                  to: {
+                    pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`,
+                    state: edgeHost
+                  }
+                }}
                 height={'215px'}
                 margin={'10px 0'}
                 hoverable>

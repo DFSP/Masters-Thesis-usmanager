@@ -18,7 +18,9 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {
-  loadCloudHosts, loadSimulatedHostMetricCloudHosts, removeSimulatedHostMetricCloudHosts,
+  loadCloudHosts,
+  loadSimulatedHostMetricCloudHosts,
+  removeSimulatedHostMetricCloudHosts,
 } from "../../../../actions";
 import {ICloudHost} from "../../hosts/cloud/CloudHost";
 import {ISimulatedHostMetric} from "./SimulatedHostMetric";
@@ -55,7 +57,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -69,6 +71,30 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
     if (!prevProps.simulatedHostMetric?.name && this.props.simulatedHostMetric?.name) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList
+      isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
+      error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
+      emptyMessage={`Cloud hosts list is empty`}
+      data={this.props.simulatedMetricCloudHosts}
+      dropdown={{
+        id: 'cloudHosts',
+        title: 'Add cloud host',
+        empty: 'No more cloud hosts to add',
+        data: this.getSelectableCloudHosts()
+      }}
+      show={this.cloudHost}
+      onAdd={this.onAdd}
+      onRemove={this.onRemove}
+      onDelete={{
+        url: `simulated-metrics/hosts/${this.props.simulatedHostMetric?.name}/cloud-hosts`,
+        successCallback: this.onDeleteSuccess,
+        failureCallback: this.onDeleteFailure
+      }}
+      entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {
@@ -131,29 +157,6 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
     const {cloudHosts, simulatedMetricCloudHosts, unsavedCloudHosts} = this.props;
     return Object.keys(cloudHosts).filter(cloudHost => !simulatedMetricCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
-                           emptyMessage={`Cloud hosts list is empty`}
-                           data={this.props.simulatedMetricCloudHosts}
-                           dropdown={{
-                             id: 'cloudHosts',
-                             title: 'Add cloud host',
-                             empty: 'No more cloud hosts to add',
-                             data: this.getSelectableCloudHosts()
-                           }}
-                           show={this.cloudHost}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `simulated-metrics/hosts/${this.props.simulatedHostMetric?.name}/cloud-hosts`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
 
 }
 

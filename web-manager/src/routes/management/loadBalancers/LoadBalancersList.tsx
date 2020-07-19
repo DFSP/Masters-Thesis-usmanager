@@ -35,12 +35,6 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
     this.props.loadLoadBalancers();
   }
 
-  private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
-    <LoadBalancerCard key={loadBalancer.containerId} loadBalancer={loadBalancer}/>;
-
-  private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
-    loadBalancer.hostname.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<ILoadBalancer>
@@ -52,6 +46,12 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
+    <LoadBalancerCard key={loadBalancer.containerId} loadBalancer={loadBalancer}/>;
+
+  private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
+    loadBalancer.hostname.toLowerCase().includes(search);
 
 }
 

@@ -9,13 +9,12 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(AppEntity.class)
 public abstract class AppEntity_ {
 
-	public static volatile SetAttribute<AppEntity, AppServiceEntity> appServices;
-	public static volatile SingularAttribute<AppEntity, String> name;
-	public static volatile SingularAttribute<AppEntity, Long> id;
-
-	public static final String APP_SERVICES = "appServices";
-	public static final String NAME = "name";
-	public static final String ID = "id";
+  public static final String APP_SERVICES = "appServices";
+  public static final String NAME = "name";
+  public static final String ID = "id";
+  public static volatile SetAttribute<AppEntity, AppServiceEntity> appServices;
+  public static volatile SingularAttribute<AppEntity, String> name;
+  public static volatile SingularAttribute<AppEntity, Long> id;
 
 }
 

@@ -17,17 +17,9 @@ import styles from "../../../components/list/ListItem.module.css";
 import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadServicePredictions,
-  removeServicePredictions
-} from "../../../actions";
+import {loadServicePredictions, removeServicePredictions} from "../../../actions";
 import {connect} from "react-redux";
-import {
-  IFields,
-  IValues,
-  requiredAndNumberAndMin,
-  requiredAndTrimmed
-} from "../../../components/form/Form";
+import {IFields, IValues, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 
 export interface IPrediction extends IDatabaseData {
@@ -82,7 +74,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -93,6 +85,35 @@ class ServicePredictionList extends BaseComponent<Props, State> {
     if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    console.log(window.innerWidth)
+    return <ControlledList<IPrediction>
+      isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+      error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+      emptyMessage='Predictions list is empty'
+      data={this.props.predictions}
+      dataKey={['name']}
+      formModal={{
+        id: 'servicePrediction',
+        title: 'Add prediction',
+        fields: this.getFields(),
+        values: emptyPrediction(),
+        content: this.predictionModal,
+        fullScreen: window.innerWidth < 993,
+      }}
+      show={this.prediction}
+      onAddInput={this.onAdd}
+      onRemove={this.onRemove}
+      onDelete={{
+        url: `services/${this.props.service?.serviceName}/predictions`,
+        successCallback: this.onDeleteSuccess,
+        failureCallback: this.onDeleteFailure
+      }}
+      entitySaved={this.state.entitySaved}/>;
+
   }
 
   private loadEntities = () => {
@@ -125,7 +146,8 @@ class ServicePredictionList extends BaseComponent<Props, State> {
           </label>
           <div className={`${styles.smallText}`}>
             {prediction.startDate === prediction.endDate ?
-              <div>{prediction.startDate} {prediction.startTime} <span className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
+              <div>{prediction.startDate} {prediction.startTime} <span
+                className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
               :
               <>
                 <div>{prediction.startDate} {prediction.startTime}</div>
@@ -162,8 +184,8 @@ class ServicePredictionList extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: requiredAndTrimmed }
+            ? {rule: requiredAndNumberAndMin, args: 0}
+            : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -191,34 +213,6 @@ class ServicePredictionList extends BaseComponent<Props, State> {
       </div>
       <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
     </div>;
-
-  public render() {
-    const isNew = this.isNew();
-    console.log(window.innerWidth)
-    return <ControlledList<IPrediction> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                                        error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                                        emptyMessage='Predictions list is empty'
-                                        data={this.props.predictions}
-                                        dataKey={['name']}
-                                        formModal={{
-                                          id: 'servicePrediction',
-                                          title: 'Add prediction',
-                                          fields: this.getFields(),
-                                          values: emptyPrediction(),
-                                          content: this.predictionModal,
-                                          fullScreen: window.innerWidth < 993,
-                                        }}
-                                        show={this.prediction}
-                                        onAddInput={this.onAdd}
-                                        onRemove={this.onRemove}
-                                        onDelete={{
-                                          url: `services/${this.props.service?.serviceName}/predictions`,
-                                          successCallback: this.onDeleteSuccess,
-                                          failureCallback: this.onDeleteFailure
-                                        }}
-                                        entitySaved={this.state.entitySaved}/>;
-
-  }
 
 }
 

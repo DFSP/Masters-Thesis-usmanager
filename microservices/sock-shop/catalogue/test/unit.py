@@ -11,9 +11,13 @@ class GoServices(unittest.TestCase):
         code_dir = script_dir + "/.."
         home = expanduser("~")
         goPath = os.environ['GOPATH']
-        command = ['docker', 'run', '--rm', '-v', goPath + ':/go/src/', '-v', code_dir + ':/go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue', '-w', '/go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue', '-e', 'GOPATH=/go/', 'golang:1.7', 'go', 'test', '-v', '-covermode=count', '-coverprofile=coverage.out']
+        command = ['docker', 'run', '--rm', '-v', goPath + ':/go/src/', '-v',
+                   code_dir + ':/go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue', '-w',
+                   '/go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue', '-e', 'GOPATH=/go/',
+                   'golang:1.7', 'go', 'test', '-v', '-covermode=count', '-coverprofile=coverage.out']
 
         print(Docker().execute(command))
+
 
 if __name__ == '__main__':
     unittest.main()

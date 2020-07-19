@@ -35,23 +35,23 @@ class RulesHostList extends BaseComponent<Props, {}> {
     this.props.loadRulesHost();
   }
 
+  public render() {
+    return (
+      <CardList<IRuleHost>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No cloud host rules to display"}
+        list={this.props.hostRules}
+        card={this.rule}
+        predicate={this.predicate}/>
+    );
+  }
+
   private rule = (rule: IRuleHost): JSX.Element =>
     <RuleHostCard key={rule.id} rule={rule}/>;
 
   private predicate = (rule: IRuleHost, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
-
-  public render() {
-    return (
-        <CardList<IRuleHost>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No cloud host rules to display"}
-          list={this.props.hostRules}
-          card={this.rule}
-          predicate={this.predicate}/>
-    );
-  }
 
 }
 

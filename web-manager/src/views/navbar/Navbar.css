@@ -58,6 +58,6 @@ li.components .select-wrapper input.select-dropdown {
     font-size: 14.5px;
 }
 
-li.components .dropdown-content li>a, .dropdown-content li>span {
+li.components .dropdown-content li > a, .dropdown-content li > span {
     font-size: 14.5px;
 }

@@ -47,17 +47,6 @@ class GenericContainerRuleList extends BaseComponent<Props, {}> {
     this.props.loadRulesContainer();
   }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericContainerRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/containers/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
-
   public render() {
     const RulesList = List<string>();
     return (
@@ -69,6 +58,17 @@ class GenericContainerRuleList extends BaseComponent<Props, {}> {
     );
   }
 
+  private rule = (rule: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.props.genericContainerRules.length - 1}>
+      <div className={`${styles.linkedItemContent}`}>
+        <span>{rule}</span>
+      </div>
+      <Link to={`/rules/containers/${rule}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
+    </ListItem>;
+
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
@@ -76,8 +76,8 @@ function mapStateToProps(state: ReduxState): StateToProps {
     isLoading: state.entities.rules.containers.isLoadingRules,
     error: state.entities.rules.containers.loadRulesError,
     genericContainerRules: Object.entries(state.entities.rules.containers.data)
-                            .filter(([_, rule]) => rule.generic)
-                            .map(([ruleName, _]) => ruleName)
+                                 .filter(([_, rule]) => rule.generic)
+                                 .map(([ruleName, _]) => ruleName)
   }
 }
 

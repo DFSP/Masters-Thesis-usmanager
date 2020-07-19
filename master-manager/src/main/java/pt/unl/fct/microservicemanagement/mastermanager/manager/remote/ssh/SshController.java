@@ -24,12 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 @RestController
 @RequestMapping("/ssh")

@@ -127,7 +127,7 @@ public class HostsController {
 
   @GetMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
   public SimulatedHostMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
-                                                                @PathVariable String simulatedMetricName) {
+                                                               @PathVariable String simulatedMetricName) {
     return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
   }
 

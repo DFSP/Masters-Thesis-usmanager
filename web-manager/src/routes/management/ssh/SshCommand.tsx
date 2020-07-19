@@ -43,43 +43,12 @@ interface DispatchToProps {
 }
 
 interface SshCommandProps {
-  onExecuteCommand : (command: ISshCommand) => void;
+  onExecuteCommand: (command: ISshCommand) => void;
 }
 
 type Props = SshCommandProps & StateToProps & DispatchToProps;
 
 class SshCommand extends BaseComponent<Props, {}> {
-
-  private onPostSuccess = (reply: IReply<ISshCommand>): void => {
-    const command = reply.data;
-    this.props.onExecuteCommand(command);
-  };
-
-  private onPostFailure = (reason: string): void =>
-    super.toast(`Command execution failed`, 10000, reason, true);
-
-  private getFields = (): IFields => (
-    {
-      hostname: {
-        id: 'hostname',
-        label: 'hostname',
-        validation: { rule: required }
-      },
-      command: {
-        id: 'command',
-        label: 'command',
-        validation: { rule: requiredAndTrimmed }
-      },
-    }
-  );
-
-  private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
 
   public render() {
     const command = buildNewSshCommand();
@@ -100,7 +69,8 @@ class SshCommand extends BaseComponent<Props, {}> {
                type={'dropdown'}
                dropdown={{
                  defaultValue: 'Select hostname',
-                 values: this.getSelectableHosts()}}/>
+                 values: this.getSelectableHosts()
+               }}/>
         <Field key='command'
                id={'command'}
                label='command'
@@ -109,12 +79,43 @@ class SshCommand extends BaseComponent<Props, {}> {
     );
   }
 
+  private onPostSuccess = (reply: IReply<ISshCommand>): void => {
+    const command = reply.data;
+    this.props.onExecuteCommand(command);
+  };
+
+  private onPostFailure = (reason: string): void =>
+    super.toast(`Command execution failed`, 10000, reason, true);
+
+  private getFields = (): IFields => (
+    {
+      hostname: {
+        id: 'hostname',
+        label: 'hostname',
+        validation: {rule: required}
+      },
+      command: {
+        id: 'command',
+        label: 'command',
+        validation: {rule: requiredAndTrimmed}
+      },
+    }
+  );
+
+  private getSelectableHosts = () => {
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+                             .map(instance => instance.publicIpAddress);
+    const edgeHosts = Object.keys(this.props.edgeHosts);
+    return cloudHosts.concat(edgeHosts);
+  };
+
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
-  return  {
+  return {
     cloudHosts,
     edgeHosts,
   }

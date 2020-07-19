@@ -2,7 +2,8 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {
   ICustomButton,
-  IFields, IFormLoading,
+  IFields,
+  IFormLoading,
   requiredAndNumberAndMin,
   requiredAndTrimmed
 } from "../../../components/form/Form";
@@ -124,11 +125,6 @@ interface State {
 
 class Container extends BaseComponent<Props, State> {
 
-  private mounted = false;
-  private replicateDropdown = createRef<HTMLButtonElement>();
-  private migrateDropdown = createRef<HTMLButtonElement>();
-  private scrollbar: (ScrollBar | null) = null;
-
   state: State = {
     loading: undefined,
     defaultInternalPort: 0,
@@ -136,6 +132,10 @@ class Container extends BaseComponent<Props, State> {
     unsavedRules: [],
     unsavedSimulatedMetrics: [],
   };
+  private mounted = false;
+  private replicateDropdown = createRef<HTMLButtonElement>();
+  private migrateDropdown = createRef<HTMLButtonElement>();
+  private scrollbar: (ScrollBar | null) = null;
 
   public componentDidMount(): void {
     this.loadContainer();
@@ -147,6 +147,21 @@ class Container extends BaseComponent<Props, State> {
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     this.init();
+  }
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private init = () => {
@@ -162,10 +177,6 @@ class Container extends BaseComponent<Props, State> {
 
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
-
-  componentWillUnmount(): void {
-    this.mounted = false;
-  }
 
   private loadContainer = () => {
     if (!isNew(this.props.location.search)) {
@@ -212,9 +223,10 @@ class Container extends BaseComponent<Props, State> {
     buttons.push({
         button:
           <>
-            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                    data-target={`replicate-dropdown-hostname`}
-                    ref={this.replicateDropdown}>
+            <button
+              className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+              data-target={`replicate-dropdown-hostname`}
+              ref={this.replicateDropdown}>
               Replicate
             </button>
             {this.chooseHostnameDropdown('replicate-dropdown-hostname', this.replicate)}
@@ -223,9 +235,10 @@ class Container extends BaseComponent<Props, State> {
       {
         button:
           <>
-            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                    data-target={`migrate-dropdown-hostname`}
-                    ref={this.migrateDropdown}>
+            <button
+              className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+              data-target={`migrate-dropdown-hostname`}
+              ref={this.migrateDropdown}>
               Migrate
             </button>
             {this.chooseHostnameDropdown('migrate-dropdown-hostname', this.migrate)}
@@ -238,7 +251,7 @@ class Container extends BaseComponent<Props, State> {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     const url = `containers/${container?.containerId}/replicate`;
-    this.setState({ loading: { method: 'post', url: url } });
+    this.setState({loading: {method: 'post', url: url}});
     postData(url, {hostname: hostname},
       (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
       (reason: string) => this.onReplicateFailure(reason, container));
@@ -262,8 +275,8 @@ class Container extends BaseComponent<Props, State> {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     const url = `containers/${container?.containerId}/migrate`;
-    this.setState({ loading: { method: 'post', url: url } });
-    postData(url, { hostname: hostname },
+    this.setState({loading: {method: 'post', url: url}});
+    postData(url, {hostname: hostname},
       (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
       (reason) => this.onMigrateFailure(reason, container));
   };
@@ -307,7 +320,7 @@ class Container extends BaseComponent<Props, State> {
   private onSaveRulesSuccess = (container: IContainer): void => {
     this.props.addContainerRules(container.containerId, this.state.unsavedRules);
     if (this.mounted) {
-      this.setState({ unsavedRules: [] });
+      this.setState({unsavedRules: []});
     }
   };
 
@@ -338,7 +351,7 @@ class Container extends BaseComponent<Props, State> {
   private onSaveSimulatedMetricsSuccess = (container: IContainer): void => {
     this.props.addContainerSimulatedMetrics(container.containerId, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
-      this.setState({ unsavedSimulatedMetrics: [] });
+      this.setState({unsavedSimulatedMetrics: []});
     }
   };
 
@@ -362,7 +375,9 @@ class Container extends BaseComponent<Props, State> {
           Choose hostname
         </a>
       </li>
-      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+      <PerfectScrollbar ref={(ref) => {
+        this.scrollbar = ref;
+      }}>
         {Object.values(this.props.cloudHosts).map((data, index) =>
           data.publicIpAddress &&
           <li key={index} onClick={onClick}>
@@ -383,7 +398,7 @@ class Container extends BaseComponent<Props, State> {
 
   private updateContainer = (container: IContainer) => {
     container = Object.values(normalize(container, Schemas.CONTAINER).entities.containers || {})[0];
-    const formContainer = { ...container };
+    const formContainer = {...container};
     removeFields(formContainer);
     this.setState({container: container, formContainer: formContainer, loading: undefined});
   };
@@ -395,8 +410,8 @@ class Container extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: requiredAndTrimmed }
+            ? {rule: requiredAndNumberAndMin, args: 0}
+            : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -422,7 +437,8 @@ class Container extends BaseComponent<Props, State> {
     const service = this.props.services[serviceName];
     this.setState({
       defaultExternalPort: service.defaultExternalPort,
-      defaultInternalPort: service.defaultInternalPort});
+      defaultInternalPort: service.defaultInternalPort
+    });
   };
 
   private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element =>
@@ -434,7 +450,8 @@ class Container extends BaseComponent<Props, State> {
                type={'dropdown'}
                dropdown={{
                  defaultValue: "Select hostname",
-                 values: this.getSelectableHosts()}}/>
+                 values: this.getSelectableHosts()
+               }}/>
         <Field key={'service'}
                id={'service'}
                label={'service'}
@@ -442,7 +459,8 @@ class Container extends BaseComponent<Props, State> {
                dropdown={{
                  defaultValue: "Select service",
                  values: this.getSelectableServices(),
-                 selectCallback: this.setDefaultPorts}}/>
+                 selectCallback: this.setDefaultPorts
+               }}/>
         <Field key={'internalPort'}
                id={'internalPort'}
                label={'internalPort'}
@@ -497,10 +515,12 @@ class Container extends BaseComponent<Props, State> {
                   failureCallback: this.onPostFailure
                 }}
                 delete={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')
-                  ? {textButton: 'Stop',
+                  ? {
+                    textButton: 'Stop',
                     url: `containers/${container.containerId}`,
                     successCallback: this.onDeleteSuccess,
-                    failureCallback: this.onDeleteFailure}
+                    failureCallback: this.onDeleteFailure
+                  }
                   : undefined}
                 customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
@@ -597,17 +617,6 @@ class Container extends BaseComponent<Props, State> {
     }
   ]);
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(container: Partial<IContainer>) {
@@ -627,16 +636,16 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const container = !isNew(props.location.search) ? state.entities.containers.data[id] : undefined;
   let formContainer;
   if (newContainer) {
-    formContainer = { ...newContainer };
+    formContainer = {...newContainer};
   }
   if (container) {
-    formContainer = { ...container };
+    formContainer = {...container};
     removeFields(formContainer);
   }
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
   const services = state.entities.services.data;
-  return  {
+  return {
     isLoading,
     error,
     newContainer,

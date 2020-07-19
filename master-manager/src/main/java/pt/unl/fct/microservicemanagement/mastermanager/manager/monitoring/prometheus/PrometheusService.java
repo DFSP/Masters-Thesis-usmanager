@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -42,9 +42,8 @@ public class PrometheusService {
 
   //TODO mudar as propriedades que são constantes para valores static final na respetiva classe?
 
-  private static final double PERCENT = 0.01;
-
   public static final String PROMETHEUS = "prometheus";
+  private static final double PERCENT = 0.01;
   private static final String DEFAULT_PORT = "9090";
   private static final String URL_FORMAT = "http://%s:%s/api/v1/query?query=%s&time=%s";
   private static final String HOST_AVAILABLE_MEMORY = "node_memory_MemAvailable_bytes";

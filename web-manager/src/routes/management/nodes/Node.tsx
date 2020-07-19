@@ -1,7 +1,12 @@
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {
-  ICustomButton, IFields, IFormLoading, requiredAndNumberAndMin, requiredAndTrimmed, trimmed
+  ICustomButton,
+  IFields,
+  IFormLoading,
+  requiredAndNumberAndMin,
+  requiredAndTrimmed,
+  trimmed
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -118,6 +123,16 @@ class Node extends BaseComponent<Props, State> {
     this.mounted = false;
   }
 
+  public render() {
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
+  }
+
   private loadNode = () => {
     if (!isNew(this.props.location.search)) {
       const nodeId = this.props.match.params.id;
@@ -144,8 +159,7 @@ class Node extends BaseComponent<Props, State> {
         this.updateNode(node);
         this.props.history.replace(node.id);
       }
-    }
-    else {
+    } else {
       super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.hostname} => ${node.id}`)}</b> have joined the swarm</span>`);
       this.props.history.push("/nodes");
     }
@@ -156,11 +170,9 @@ class Node extends BaseComponent<Props, State> {
     let message;
     if ("host" in place && place.host) {
       message = `Unable to start node at ${place.host}`;
-    }
-    else if ("city" in place) {
+    } else if ("city" in place) {
       message = `Unable to start node at ${place.city}`;
-    }
-    else {
+    } else {
       message = `Unable to start node`;
     }
     super.toast(message, 10000, reason, true);
@@ -173,11 +185,9 @@ class Node extends BaseComponent<Props, State> {
     const previousRole = previousNode?.role;
     if (node.availability !== previousAvailability) {
       super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} availability has been changed to ${node.availability}</span>`);
-    }
-    else if (node.role !== previousRole) {
+    } else if (node.role !== previousRole) {
       super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'MANAGER' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
-    }
-    else {
+    } else {
       super.toast(`<span class="green-text">Changes to node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} have been saved</span>`);
     }
     if (previousNode?.id) {
@@ -202,7 +212,6 @@ class Node extends BaseComponent<Props, State> {
   private onDeleteFailure = (reason: string, node: INode): void =>
     super.toast(`Unable to stop ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} node`, 10000, reason, true);
 
-
   private rejoinSwarmButton = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
     buttons.push({
@@ -218,7 +227,7 @@ class Node extends BaseComponent<Props, State> {
   private rejoinSwarm = () => {
     const node = this.getNode();
     const url = `nodes/${node?.id}/join`;
-    this.setState({ loading: { method: 'post', url: url } });
+    this.setState({loading: {method: 'post', url: url}});
     postData(url, {},
       (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
       (reason: string) => this.onRejoinSwarmFailure(reason, node));
@@ -242,7 +251,7 @@ class Node extends BaseComponent<Props, State> {
 
   private updateNode = (node: INode) => {
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
-    const formNode = { ...node };
+    const formNode = {...node};
     removeFields(formNode);
     this.setState({node: node, formNode: formNode});
   };
@@ -254,10 +263,10 @@ class Node extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 1 }
+            ? {rule: requiredAndNumberAndMin, args: 1}
             : key === 'country' || key === 'city'
-              ? { rule: trimmed }
-              : { rule: requiredAndTrimmed }
+              ? {rule: trimmed}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -408,8 +417,12 @@ class Node extends BaseComponent<Props, State> {
                   textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
                   url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).hostname}/leave`,
                   successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure}}
-                switchDropdown={isNewNode ? {options: ['On host', 'On location'], onSwitch: this.switchForm} : undefined}
+                  failureCallback: this.onDeleteFailure
+                }}
+                switchDropdown={isNewNode ? {
+                  options: ['On host', 'On location'],
+                  onSwitch: this.switchForm
+                } : undefined}
                 customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
             {this.formFields(isNewNode)}
           </Form>
@@ -444,16 +457,6 @@ class Node extends BaseComponent<Props, State> {
     }
   ]);
 
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 
@@ -472,14 +475,14 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
   let formNode;
   if (node) {
-    formNode = { ...node };
+    formNode = {...node};
     removeFields(formNode);
   }
   const nodes = state.entities.nodes.data;
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
   const regions = state.entities.regions.data;
-  return  {
+  return {
     isLoading,
     error,
     newNodeHost,

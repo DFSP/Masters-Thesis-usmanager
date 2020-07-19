@@ -1,5 +1,5 @@
 import React, {createRef} from "react";
-import M, { TimepickerOptions } from "materialize-css";
+import M, {TimepickerOptions} from "materialize-css";
 import {zeroPad} from "../../utils/text";
 
 interface Props {
@@ -19,22 +19,10 @@ interface State {
 
 export class Timepicker extends React.Component<Props, State> {
 
-  private timepicker = createRef<HTMLInputElement>();
-
   state: State = {
     selectedTime: '',
   };
-
-  private initTimepicker = (): void => {
-    M.Timepicker.init(this.timepicker.current as Element, {
-      twelveHour: false,
-      defaultTime: this.props.value,
-      showClearBtn: true,
-      onSelect: this.onSelect,
-      onCloseEnd: this.onClose,
-      ...this.props.options
-    });
-  };
+  private timepicker = createRef<HTMLInputElement>();
 
   public componentDidMount(): void {
     this.initTimepicker();
@@ -46,12 +34,6 @@ export class Timepicker extends React.Component<Props, State> {
     }
     M.updateTextFields();
   }
-
-  private onClose = () =>
-    this.props.onSelect(this.state.selectedTime);
-
-  private onSelect = (hour: number, minute: number): void =>
-    this.setState({ selectedTime: String(`${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`)});
 
   public render() {
     const {className, id, name, value, disabled, onChange} = this.props;
@@ -67,5 +49,22 @@ export class Timepicker extends React.Component<Props, State> {
              ref={this.timepicker}/>
     )
   }
+
+  private initTimepicker = (): void => {
+    M.Timepicker.init(this.timepicker.current as Element, {
+      twelveHour: false,
+      defaultTime: this.props.value,
+      showClearBtn: true,
+      onSelect: this.onSelect,
+      onCloseEnd: this.onClose,
+      ...this.props.options
+    });
+  };
+
+  private onClose = () =>
+    this.props.onSelect(this.state.selectedTime);
+
+  private onSelect = (hour: number, minute: number): void =>
+    this.setState({selectedTime: String(`${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`)});
 
 }

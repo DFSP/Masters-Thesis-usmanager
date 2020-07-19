@@ -33,17 +33,7 @@ interface ListItemProps<T> {
   longPressCallback?: () => void;
 }
 
-export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
-
-  private getSeparatorColor = (): string | undefined => {
-    const {separate} = this.props;
-    if (typeof separate === 'boolean' && separate) {
-      return "black";
-    }
-    else if (typeof separate === 'object') {
-      return separate.color ? separate.color : "black";
-    }
-  };
+export default class ListItem<T> extends React.Component<ListItemProps<T>, {}> {
 
   public render() {
     const {link, longPressCallback} = this.props;
@@ -64,5 +54,14 @@ export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
         </UseLongPress>
     );
   }
+
+  private getSeparatorColor = (): string | undefined => {
+    const {separate} = this.props;
+    if (typeof separate === 'boolean' && separate) {
+      return "black";
+    } else if (typeof separate === 'object') {
+      return separate.color ? separate.color : "black";
+    }
+  };
 }
 

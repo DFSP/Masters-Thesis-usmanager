@@ -23,12 +23,12 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("container")
 public class ContainerProperties {
 
+  private final Database database;
   private int monitorPeriod;
   private int replicateContainerOnEventCount;
   private int migrateContainerOnEventCount;
   private int stopContainerOnEventCount;
   private int delayBeforeStop;
-  private final Database database;
 
   public ContainerProperties() {
     this.database = new Database();

@@ -55,6 +55,13 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     window.removeEventListener('resize', this.handleResize);
   }
 
+  public render() {
+    const GenericList = List<T>();
+    return <GenericList {...this.props}
+                        show={this.props.card}
+                        paginate={{pagesize: {initial: this.state.pagesize}}}/>
+  }
+
   private handleResize = (_: Event) => {
     this.setState({pagesize: this.calcPagesize()})
   };
@@ -69,12 +76,5 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
       return 8;
     }
   };
-
-  public render() {
-    const GenericList = List<T>();
-    return <GenericList {...this.props}
-                        show={this.props.card}
-                        paginate={{pagesize: { initial: this.state.pagesize }}}/>
-  }
 
 }

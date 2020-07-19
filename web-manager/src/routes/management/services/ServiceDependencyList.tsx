@@ -17,7 +17,8 @@ import {
   addServiceDependencies,
   loadServiceDependencies,
   loadServices,
-  removeServiceDependencies} from "../../../actions";
+  removeServiceDependencies
+} from "../../../actions";
 import BaseComponent from "../../../components/BaseComponent";
 import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
@@ -59,7 +60,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -71,6 +72,30 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
     if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                           emptyMessage={`Dependencies list is empty`}
+                           data={this.props.dependencies}
+                           dropdown={{
+                             id: 'dependencies',
+                             title: 'Add dependency',
+                             empty: 'No more dependencies to add',
+                             data: this.getSelectableServicesNames()
+                           }}
+                           show={this.dependency}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `services/${this.props.service?.serviceName}/dependencies`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
+
   }
 
   private loadEntities = () => {
@@ -133,30 +158,6 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
     return Object.keys(services)
                  .filter(name => (!service || name !== service.serviceName) && !dependencies.includes(name) && !unsavedDependencies.includes(name));
   };
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                           emptyMessage={`Dependencies list is empty`}
-                           data={this.props.dependencies}
-                           dropdown={{
-                             id: 'dependencies',
-                             title: 'Add dependency',
-                             empty: 'No more dependencies to add',
-                             data: this.getSelectableServicesNames()
-                           }}
-                           show={this.dependency}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service?.serviceName}/dependencies`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-
-  }
 
 }
 

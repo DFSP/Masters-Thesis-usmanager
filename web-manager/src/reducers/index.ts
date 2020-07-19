@@ -22,25 +22,25 @@
  * SOFTWARE.
  */
 
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
 import entities, {EntitiesState} from "./entities";
 import {component, loadingBar, search, sidenav, UIState} from "./ui";
 
 export interface ReduxState {
-    ui: UIState;
-    entities: EntitiesState;
+  ui: UIState;
+  entities: EntitiesState;
 }
 
 const ui = combineReducers({
-    sidenav,
-    search,
-    component,
+  sidenav,
+  search,
+  component,
 });
 
 const rootReducer = combineReducers({
-    loadingBar,
-    ui,
-    entities,
+  loadingBar,
+  ui,
+  entities,
 });
 
 export default rootReducer;

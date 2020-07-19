@@ -45,17 +45,15 @@ public final class RestProxyTemplate {
 
   @Autowired
   private RestTemplate restTemplate;
+  @Value("${proxy.host:}")
+  private String host;
+  @Value("${proxy.port:}")
+  private String port;
 
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplate();
   }
-
-  @Value("${proxy.host:}")
-  private String host;
-
-  @Value("${proxy.port:}")
-  private String port;
 
   @PostConstruct
   public void init() {

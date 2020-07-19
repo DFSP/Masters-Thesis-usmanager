@@ -10,13 +10,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.util.Pair;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -31,6 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

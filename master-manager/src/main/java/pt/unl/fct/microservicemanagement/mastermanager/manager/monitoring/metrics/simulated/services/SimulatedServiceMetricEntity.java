@@ -10,12 +10,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -70,7 +68,7 @@ public class SimulatedServiceMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedServiceMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "simulatedServiceMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<ServiceEntity> services;
 
   public void removeAssociations() {

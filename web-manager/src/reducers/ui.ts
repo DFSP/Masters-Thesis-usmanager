@@ -22,67 +22,62 @@
  * SOFTWARE.
  */
 
-import {
-    CHANGE_COMPONENT,
-    SEARCH_UPDATE,
-    SIDENAV_SHOW_USER,
-    SIDENAV_SHOW_WIDTH
-} from "../actions";
+import {CHANGE_COMPONENT, SEARCH_UPDATE, SIDENAV_SHOW_USER, SIDENAV_SHOW_WIDTH} from "../actions";
 import {loadingBarReducer} from "react-redux-loading-bar";
 import {components, IComponent} from "../containers/Root.dev";
 
 export interface UIState {
-    sidenav: { user: boolean, width: boolean };
-    search: string;
-    component: IComponent;
+  sidenav: { user: boolean, width: boolean };
+  search: string;
+  component: IComponent;
 }
 
 export const loadingBar = loadingBarReducer;
 
 export const sidenav = (
-  state = { user: true, width: window.innerWidth > 992 },
+  state = {user: true, width: window.innerWidth > 992},
   action: { type: string, value: boolean },
 ) => {
-    const {type, value} = action;
-    switch (type) {
-        case SIDENAV_SHOW_USER:
-            return {
-                ...state,
-                user: value
-            };
-        case SIDENAV_SHOW_WIDTH:
-            return {
-                ...state,
-                width: value
-            };
-        default:
-            return state;
-    }
+  const {type, value} = action;
+  switch (type) {
+    case SIDENAV_SHOW_USER:
+      return {
+        ...state,
+        user: value
+      };
+    case SIDENAV_SHOW_WIDTH:
+      return {
+        ...state,
+        width: value
+      };
+    default:
+      return state;
+  }
 };
 
 export const search = (
   state = "",
-  action: { type: string, search: string}
+  action: { type: string, search: string }
 ) => {
-    const { type, search } = action;
-    switch (type) {
-        case SEARCH_UPDATE:
-            return search;
-        default:
-            return state;
-    }
+  const {type, search} = action;
+  switch (type) {
+    case SEARCH_UPDATE:
+      return search;
+    default:
+      return state;
+  }
 };
 
 export const component = (
   state = components[0],
-  action: { type: string, component: IComponent}
+  action: { type: string, component: IComponent }
 ) => {
-    const { type, component } = action;
-    switch (type) {
-        case CHANGE_COMPONENT:
-            return component;
-        default:
-            return state;
-    }
+  const {type, component} = action;
+  switch (type) {
+    case CHANGE_COMPONENT:
+      return component;
+    default:
+      return state;
+  }
 }
 

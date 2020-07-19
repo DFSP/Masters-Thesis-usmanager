@@ -1,5 +1,5 @@
 import React, {createRef} from "react";
-import M, { DatepickerOptions } from "materialize-css";
+import M, {DatepickerOptions} from "materialize-css";
 
 interface Props {
   className?: string;
@@ -18,23 +18,10 @@ interface State {
 
 export class Datepicker extends React.Component<Props, State> {
 
-  private datepicker = createRef<HTMLInputElement>();
-
   state: State = {
     selectedDate: '',
   };
-
-  private initDatepicker = (): void => {
-    M.Datepicker.init(this.datepicker.current as Element, {
-      format: 'dd/mm/yyyy',
-      minDate: new Date(),
-      defaultDate: new Date(this.props.value),
-      showClearBtn: true,
-      onSelect: this.onSelect,
-      onClose: this.onClose,
-      ...this.props.options
-    });
-  };
+  private datepicker = createRef<HTMLInputElement>();
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevState.selectedDate === this.state.selectedDate) {
@@ -42,12 +29,6 @@ export class Datepicker extends React.Component<Props, State> {
     }
     M.updateTextFields();
   }
-
-  private onClose = () =>
-    this.props.onSelect(this.state.selectedDate);
-
-  private onSelect = (selectedDate: Date): void =>
-    this.setState({ selectedDate: selectedDate.toLocaleDateString('pt') });
 
   public render() {
     const {className, id, name, value, disabled, onChange} = this.props;
@@ -64,5 +45,23 @@ export class Datepicker extends React.Component<Props, State> {
         ref={this.datepicker}/>
     );
   }
+
+  private initDatepicker = (): void => {
+    M.Datepicker.init(this.datepicker.current as Element, {
+      format: 'dd/mm/yyyy',
+      minDate: new Date(),
+      defaultDate: new Date(this.props.value),
+      showClearBtn: true,
+      onSelect: this.onSelect,
+      onClose: this.onClose,
+      ...this.props.options
+    });
+  };
+
+  private onClose = () =>
+    this.props.onSelect(this.state.selectedDate);
+
+  private onSelect = (selectedDate: Date): void =>
+    this.setState({selectedDate: selectedDate.toLocaleDateString('pt')});
 
 }

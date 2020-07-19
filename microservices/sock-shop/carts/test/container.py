@@ -1,22 +1,23 @@
 import argparse
+import os
 import sys
 import unittest
-import os
-from util.Api import Api
 from time import sleep
-
+from util.Api import Api
 from util.Docker import Docker
 from util.Dredd import Dredd
+
 
 class CartContainerTest(unittest.TestCase):
     TAG = "latest"
     COMMIT = ""
     container_name = Docker().random_container_name('carts')
     mongo_container_name = Docker().random_container_name('carts-db')
+
     def __init__(self, methodName='runTest'):
         super(CartContainerTest, self).__init__(methodName)
         self.ip = ""
-        
+
     def setUp(self):
         Docker().start_container(container_name=self.mongo_container_name, image="mongo", host="carts-db")
         command = ['docker', 'run',
@@ -40,7 +41,7 @@ class CartContainerTest(unittest.TestCase):
                 self.fail("Couldn't get the API running")
             limit = limit - 1
             sleep(1)
-        
+
         out = Dredd().test_against_endpoint(
             "carts", "http://carts/",
             links=[self.mongo_container_name, self.container_name],
@@ -49,6 +50,7 @@ class CartContainerTest(unittest.TestCase):
         self.assertGreater(out.find("0 failing"), -1)
         self.assertGreater(out.find("0 errors"), -1)
         print(out)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     if CartContainerTest.TAG == "":
         CartContainerTest.TAG = default_tag
 
-    CartContainerTest.COMMIT = os.environ["COMMIT"]   
+    CartContainerTest.COMMIT = os.environ["COMMIT"]
     # Now set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
     unittest.main()

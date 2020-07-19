@@ -34,7 +34,7 @@ public class SimulatedHostMetricsController {
   public SimulatedHostMetricsController(SimulatedHostMetricsService simulatedHostMetricsService) {
     this.simulatedHostMetricsService = simulatedHostMetricsService;
   }
-  
+
   @GetMapping
   public List<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
     return simulatedHostMetricsService.getSimulatedHostMetrics();

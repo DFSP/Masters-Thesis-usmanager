@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rules")
 public class HostRulesController {
-  
+
   private final HostRulesService hostRulesService;
 
   public HostRulesController(HostRulesService hostRulesService) {

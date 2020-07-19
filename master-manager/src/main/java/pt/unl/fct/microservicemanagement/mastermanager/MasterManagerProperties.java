@@ -39,10 +39,9 @@ import org.springframework.context.annotation.Configuration;
 public class MasterManagerProperties {
 
   public static final String MASTER_MANAGER = "master-manager";
-
+  private final Tests tests;
   private Mode mode;
   private int monitorPeriod;
-  private final Tests tests;
 
   public MasterManagerProperties() {
     this.tests = new Tests();

@@ -52,12 +52,6 @@ class Services extends BaseComponent<Props, {}> {
     this.props.loadServices();
   }
 
-  private service = (service: IService): JSX.Element =>
-    <ServiceCard key={service.id} service={service}/>;
-
-  private predicate = (service: IService, search: string): boolean =>
-    service.serviceName.toLowerCase().includes(search);
-
   public render() {
     return (
       <MainLayout>
@@ -75,6 +69,12 @@ class Services extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private service = (service: IService): JSX.Element =>
+    <ServiceCard key={service.id} service={service}/>;
+
+  private predicate = (service: IService, search: string): boolean =>
+    service.serviceName.toLowerCase().includes(search);
 
 }
 

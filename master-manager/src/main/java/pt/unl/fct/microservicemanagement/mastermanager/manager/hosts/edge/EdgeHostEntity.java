@@ -28,6 +28,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
+import java.util.Objects;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,9 +40,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import java.util.Objects;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -81,7 +81,7 @@ public class EdgeHostEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "edge_host_rule",
       joinColumns = @JoinColumn(name = "edge_host_id"),
       inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -90,7 +90,7 @@ public class EdgeHostEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "edge_host_simulated_metric",
       joinColumns = @JoinColumn(name = "edge_host_id"),
       inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

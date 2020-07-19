@@ -1,7 +1,8 @@
 import re
-from subprocess import Popen, PIPE
-from random import random
 import time
+from random import random
+from subprocess import Popen, PIPE
+
 
 # From http://blog.bordage.pro/avoid-docker-py/
 class Docker:
@@ -17,7 +18,7 @@ class Docker:
     def random_container_name(self, prefix):
         retstr = prefix + '-'
         for i in range(5):
-            retstr += chr(int(round(random() * (122-97) + 97)))
+            retstr += chr(int(round(random() * (122 - 97) + 97)))
         return retstr
 
     def get_container_ip(self, ctr_name):

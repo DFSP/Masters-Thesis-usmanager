@@ -35,12 +35,6 @@ class SimulatedContainerMetricsList extends BaseComponent<Props, {}> {
     this.props.loadSimulatedContainerMetrics();
   }
 
-  private simulatedContainerMetric = (simulatedMetric: ISimulatedContainerMetric): JSX.Element =>
-    <SimulatedContainerMetricCard key={simulatedMetric.id} simulatedContainerMetric={simulatedMetric}/>;
-
-  private predicate = (simulatedMetric: ISimulatedContainerMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<ISimulatedContainerMetric>
@@ -53,6 +47,12 @@ class SimulatedContainerMetricsList extends BaseComponent<Props, {}> {
     );
   }
 
+  private simulatedContainerMetric = (simulatedMetric: ISimulatedContainerMetric): JSX.Element =>
+    <SimulatedContainerMetricCard key={simulatedMetric.id} simulatedContainerMetric={simulatedMetric}/>;
+
+  private predicate = (simulatedMetric: ISimulatedContainerMetric, search: string): boolean =>
+    simulatedMetric.name.toLowerCase().includes(search);
+
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
@@ -60,7 +60,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
     error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
     simulatedContainerMetrics: (state.entities.simulatedMetrics.containers.data
-                           && Object.values(state.entities.simulatedMetrics.containers.data)) || [],
+                                && Object.values(state.entities.simulatedMetrics.containers.data)) || [],
   }
 );
 

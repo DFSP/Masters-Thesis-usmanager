@@ -90,17 +90,17 @@
             <version>0.8.10</version>
             <scope>test</scope>
         </dependency>
-        
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.5</version>
-		</dependency>
-		<dependency>
-    		<groupId>org.bitbucket.cloudedgemicroserviceteam</groupId>
-    		<artifactId>java-client-register-go</artifactId>
-    		<version>RELEASE-1.0.1</version>
-		</dependency>		
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitbucket.cloudedgemicroserviceteam</groupId>
+            <artifactId>java-client-register-go</artifactId>
+            <version>RELEASE-1.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -169,9 +169,9 @@
             <url>https://repo.spring.io/libs-release</url>
         </repository>
         <repository>
-        	<id>jitpack.io</id>
-        	<url>https://jitpack.io</url>
-    	</repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

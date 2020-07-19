@@ -7,7 +7,7 @@ interface Props<T> {
   name: string;
   value: any;
   disabled?: boolean;
-  dropdown: {defaultValue?: string | number, values: T[], optionToString?: (v: T) => string};
+  dropdown: { defaultValue?: string | number, values: T[], optionToString?: (v: T) => string };
   onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
@@ -15,10 +15,6 @@ interface Props<T> {
 export class Dropdown<T> extends React.Component<Props<T>, {}> {
 
   private dropdown = createRef<HTMLSelectElement>();
-
-  private initDropdown = (): void => {
-    M.FormSelect.init(this.dropdown.current as Element);
-  };
 
   public componentDidMount(): void {
     this.initDropdown();
@@ -64,5 +60,9 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
       </select>
     )
   }
+
+  private initDropdown = (): void => {
+    M.FormSelect.init(this.dropdown.current as Element);
+  };
 
 }

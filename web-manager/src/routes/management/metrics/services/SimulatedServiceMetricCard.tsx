@@ -12,7 +12,6 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedServiceMetric} from "./SimulatedServiceMetric";
-import {ISimulatedHostMetric} from "../hosts/SimulatedHostMetric";
 
 interface SimulatedServiceMetricCardProps {
   simulatedServiceMetric: ISimulatedServiceMetric;
@@ -23,7 +22,12 @@ type Props = SimulatedServiceMetricCardProps;
 const CardSimulatedServiceMetric = Card<ISimulatedServiceMetric>();
 const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
   <CardSimulatedServiceMetric title={simulatedServiceMetric.name}
-                              link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`, state: simulatedServiceMetric }}}
+                              link={{
+                                to: {
+                                  pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`,
+                                  state: simulatedServiceMetric
+                                }
+                              }}
                               height={'180px'}
                               margin={'10px 0'}
                               hoverable>

@@ -24,10 +24,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +56,7 @@ public class ServicesEventsService {
   ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
     DecisionEntity decision = decisionsService.getServicePossibleDecision(decisionName);
     ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEventEntity.builder()
-            .containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
+        .containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
     if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
       event.setDecision(decision);
       event.setCount(1);

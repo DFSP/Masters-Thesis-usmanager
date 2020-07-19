@@ -11,7 +11,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;

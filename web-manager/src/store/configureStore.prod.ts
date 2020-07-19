@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { createStore, applyMiddleware } from 'redux'
+import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 import promise from "redux-promise-middleware";
 import {loadingBarMiddleware} from "react-redux-loading-bar";
@@ -31,17 +31,17 @@ import rootReducer from "../reducers";
 import {loadState} from "./localStorage";
 
 const configureStore = (persistedState = loadState()) =>
-    createStore(
-        rootReducer,
-        persistedState,
-        applyMiddleware(
-            thunk,
-            api,
-            promise(),
-            loadingBarMiddleware({
-                promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
-            })
-        )
-    );
+  createStore(
+    rootReducer,
+    persistedState,
+    applyMiddleware(
+      thunk,
+      api,
+      promise(),
+      loadingBarMiddleware({
+        promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+      })
+    )
+  );
 
 export default configureStore;

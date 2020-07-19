@@ -28,18 +28,18 @@
 <head>
 
     <meta charset="utf-8">
-    <meta name="robots" content="all,follow">
-    <meta name="googlebot" content="index,follow,snippet,archive">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="WeaveSocks Demo App">
-    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
-    <meta name="keywords" content="">
+    <meta content="all,follow" name="robots">
+    <meta content="index,follow,snippet,archive" name="googlebot">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="WeaveSocks Demo App" name="description">
+    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
+    <meta content="" name="keywords">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta name="keywords" content="">
+    <meta content="" name="keywords">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +52,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
+    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link rel="shortcut icon" href="favicon.png">
+    <link href="favicon.png" rel="shortcut icon">
 
 
 </head>
@@ -74,7 +74,7 @@
     <div id="content">
         <div class="container">
 
-            <div id="user-message"> </div>
+            <div id="user-message"></div>
 
             <div class="col-md-12">
                 <ul class="breadcrumb">
@@ -118,7 +118,7 @@
 
                         <div class="box-footer">
                             <div class="pull-left">
-                                <a href="category.html" class="btn btn-default"><i
+                                <a class="btn btn-default" href="category.html"><i
                                         class="fa fa-chevron-left"></i> Continue
                                     shopping</a>
                             </div>
@@ -126,7 +126,7 @@
                                 <a class="btn btn-default" onclick="updateCart()"><i
                                         class="fa fa-refresh"></i> Update basket
                                 </a>
-                                <button id="orderButton" type="submit" class="btn btn-primary" disabled>
+                                <button class="btn btn-primary" disabled id="orderButton" type="submit">
                                     Proceed to checkout <i class="fa fa-chevron-right"></i>
                                 </button>
                             </div>
@@ -144,45 +144,54 @@
                             <div class="box-header">
                                 <h4 style="display: inline;">Shipping Address</h4>
                                 <p id="add_shipping" style="display: inline; float: right;">
-                                    <a data-toggle="modal" data-target="#address-modal" href="#add">Add</a>
+                                    <a data-target="#address-modal" data-toggle="modal" href="#add">Add</a>
                                 </p>
                             </div>
                             <p id="address"></p>
-                            <div class="modal fade" id="address-modal" tabindex="-1" role="dialog" aria-labelledby="address" aria-hidden="true">
+                            <div aria-hidden="true" aria-labelledby="address" class="modal fade" id="address-modal"
+                                 role="dialog" tabindex="-1">
                                 <div class="modal-dialog modal-sm">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal"
-                                                    aria-hidden="true">&times;</button>
+                                            <button aria-hidden="true" class="close" data-dismiss="modal"
+                                                    type="button">&times;
+                                            </button>
                                             <h4 class="modal-title" id="Login">Address</h4>
                                         </div>
                                         <div class="modal-body">
                                             <form action="" id="form-address">
                                                 <div class="form-group">
                                                     <label for="house-number">House Number</label>
-                                                    <input type="text" class="form-control" name="house-number" id="form-number" placeholder="Number">
+                                                    <input class="form-control" id="form-number" name="house-number"
+                                                           placeholder="Number" type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="street">Street Name</label>
-                                                    <input type="text" class="form-control" name="street" id="form-street" placeholder="Street">
+                                                    <input class="form-control" id="form-street" name="street"
+                                                           placeholder="Street" type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="city">City</label>
-                                                    <input type="text" class="form-control" name="city" id="form-city" placeholder="City">
+                                                    <input class="form-control" id="form-city" name="city"
+                                                           placeholder="City"
+                                                           type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="post-code">Post Code</label>
-                                                    <input type="text" class="form-control" name="post-code" id="form-post-code" placeholder="Post Code">
+                                                    <input class="form-control" id="form-post-code" name="post-code"
+                                                           placeholder="Post Code" type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="country">Country</label>
-                                                    <input type="text" class="form-control" name="country" id="form-country" placeholder="Country">
+                                                    <input class="form-control" id="form-country" name="country"
+                                                           placeholder="Country" type="text">
                                                 </div>
-                                                    <p class="text-center">
-                                                        <button class="btn btn-primary" href="#" onclick="return address()"><i
+                                                <p class="text-center">
+                                                    <button class="btn btn-primary" href="#" onclick="return address()">
+                                                        <i
                                                                 class="fa fa-refresh"></i> Update
-                                                        </button>
-                                                    </p>
+                                                    </button>
+                                                </p>
                                             </form>
                                         </div>
                                     </div>
@@ -195,31 +204,38 @@
                             <div class="box-header">
                                 <h4 style="display: inline;">Payment</h4>
                                 <p id="add_payment" style="display: inline; float: right;">
-                                    <a data-toggle="modal" data-target="#card-modal" href="#add">Add</a>
+                                    <a data-target="#card-modal" data-toggle="modal" href="#add">Add</a>
                                 </p>
                             </div>
                             <p id="number"></p>
-                            <div class="modal fade" id="card-modal" tabindex="-1" role="dialog" aria-labelledby="card" aria-hidden="true">
+                            <div aria-hidden="true" aria-labelledby="card" class="modal fade" id="card-modal"
+                                 role="dialog"
+                                 tabindex="-1">
                                 <div class="modal-dialog modal-sm">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal"
-                                                    aria-hidden="true">&times;</button>
+                                            <button aria-hidden="true" class="close" data-dismiss="modal"
+                                                    type="button">&times;
+                                            </button>
                                             <h4 class="modal-title" id="credit-card">Credit Card</h4>
                                         </div>
                                         <div class="modal-body">
                                             <form action="" id="form-card">
                                                 <div class="form-group">
                                                     <label for="card-number">Card Number</label>
-                                                    <input type="text" class="form-control" name="card-number" id="form-card-number" placeholder="Card Number">
+                                                    <input class="form-control" id="form-card-number" name="card-number"
+                                                           placeholder="Card Number" type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="expires">Expires</label>
-                                                    <input type="text" class="form-control" name="expires" id="form-expires" placeholder="MM/YY">
+                                                    <input class="form-control" id="form-expires" name="expires"
+                                                           placeholder="MM/YY" type="text">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="ccv">CCV</label>
-                                                    <input type="text" class="form-control" name="ccv" id="form-ccv" placeholder="CCV">
+                                                    <input class="form-control" id="form-ccv" name="ccv"
+                                                           placeholder="CCV"
+                                                           type="text">
                                                 </div>
                                             </form>
                                             <p class="text-right">
@@ -291,9 +307,9 @@
                     <form>
                         <div class="input-group">
 
-                            <input type="text" class="form-control">
+                            <input class="form-control" type="text">
 
-                                <span class="input-group-btn">
+                            <span class="input-group-btn">
 
 					<button class="btn btn-primary" type="button"><i
                             class="fa fa-gift"></i></button>
@@ -359,26 +375,25 @@ _________________________________________________________ -->
     }
 
     // function updateCart()
-	// for each item row in cart table call updateToCart (client.js - updateToCart(itemId, quantity, callback))
-	function updateCart() {
-		console.log("Updating Cart");
-		var cartsize = document.getElementById("cart-list").rows.length;
-		console.log("cart-list size: " + cartsize);
+    // for each item row in cart table call updateToCart (client.js - updateToCart(itemId, quantity, callback))
+    function updateCart() {
+        console.log("Updating Cart");
+        var cartsize = document.getElementById("cart-list").rows.length;
+        console.log("cart-list size: " + cartsize);
 
-		var idx = 0;
-		next = function(){
-			if (idx< cartsize) {
-				var id = document.getElementById("cart-list").rows[idx].cells[2].id;
-				var quantity = document.getElementById("cart-list").rows[idx].cells[2].getElementsByTagName('input')[0].value;
-				idx++;
-				updateToCart(id, quantity, next);
-			}
-			else {
-				location.reload();
-			}
-		};
-		next();
-	}
+        var idx = 0;
+        next = function () {
+            if (idx < cartsize) {
+                var id = document.getElementById("cart-list").rows[idx].cells[2].id;
+                var quantity = document.getElementById("cart-list").rows[idx].cells[2].getElementsByTagName('input')[0].value;
+                idx++;
+                updateToCart(id, quantity, next);
+            } else {
+                location.reload();
+            }
+        };
+        next();
+    }
 
     $(document).ready(function () {
         $.ajaxSetup({
@@ -422,18 +437,18 @@ _________________________________________________________ -->
                             console.log("Final counts: $" + cartTotal + ", with " + numItemsInCart + " items.");
                             $('#orderButton').prop('disabled', false);
                             if ($('p#address').text() === 'No address saved for user.' || $('p#number').text() === 'No credit card saved for user.') {
-                                $('#orderButton').click(function(event) {
+                                $('#orderButton').click(function (event) {
                                     event.stopPropagation();
                                     event.preventDefault();
                                     $("#user-message").html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> Could not place order. Missing shipping or payment information.</div>');
                                     return false;
                                 });
                             } else {
-                                $('#orderButton').click(function(event) {
+                                $('#orderButton').click(function (event) {
                                     if (orderPlaced == false) {
-                                      orderPlaced = true;
-                                      return order();
-				    }
+                                        orderPlaced = true;
+                                        return order();
+                                    }
                                 });
                             }
                             $('#numItemsInCart').text('You currently have ' + numItemsInCart + ' item(s) in your cart.');
@@ -448,7 +463,7 @@ _________________________________________________________ -->
             }
         });
 
-        $.getJSON('/card', function(data) {
+        $.getJSON('/card', function (data) {
             if (data.status_code !== 500) {
                 $("p#number").text("Card ending in " + data.number).css("color", "black");
                 $("#add_payment").hide();
@@ -458,7 +473,7 @@ _________________________________________________________ -->
             }
         });
 
-        $.getJSON('/address', function(data) {
+        $.getJSON('/address', function (data) {
             if (data.status_code !== 500) {
                 var text = data.number + " ";
                 text += data.street;
@@ -480,12 +495,12 @@ _________________________________________________________ -->
             if (data != null) {
                 $.each(data, function (index, element) {
                     $('#youMayAlsoLike').append(
-                            '<div class="col-md-3 col-sm-6">\
-                                <div class="product same-height">\
-                                    <div class="flip-container">\
-                                        <div class="flipper">\
-                                            <div class="front">\
-                                                <a href="detail.html?id=' + element.id + '">\
+                        '<div class="col-md-3 col-sm-6">\
+                            <div class="product same-height">\
+                                <div class="flip-container">\
+                                    <div class="flipper">\
+                                        <div class="front">\
+                                            <a href="detail.html?id=' + element.id + '">\
                                                     <img src="' + element.imageUrl[0] + '" alt="" class="img-responsive">\
                                                 </a>\
                                             </div>\
@@ -509,7 +524,7 @@ _________________________________________________________ -->
                 });
             }
         }).always(
-                $(window).trigger('resize')
+            $(window).trigger('resize')
         );
     });
 

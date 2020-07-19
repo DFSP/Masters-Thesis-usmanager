@@ -1,6 +1,5 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
@@ -14,6 +13,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 

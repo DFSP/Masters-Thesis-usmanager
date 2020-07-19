@@ -13,6 +13,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 @RestController
 @RequestMapping("/nodes")

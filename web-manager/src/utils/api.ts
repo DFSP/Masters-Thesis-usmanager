@@ -68,9 +68,9 @@ export function putData<T>(url: string, requestBody: any,
 
 export function patchData<T>(url: string, requestBody: any,
                              successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void,
-                             action?: "post" | "delete", ): void {
+                             action?: "post" | "delete",): void {
   if (action) {
-    requestBody = { request: action.toUpperCase(), body: requestBody };
+    requestBody = {request: action.toUpperCase(), body: requestBody};
   }
   sendData<T>(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
@@ -100,8 +100,7 @@ function sendData<T>(endpoint: string, method: Method, data: any,
     deleteCancelRequest(method, url.pathname);
     if (axios.isCancel(error)) {
       console.log(error.message || 'Request canceled');
-    }
-    else {
+    } else {
       const reason = buildErrorMessage(error);
       console.error(reason);
       failureCallback(reason);
@@ -133,8 +132,7 @@ export function deleteData(endpoint: string,
     deleteCancelRequest('delete', url.pathname);
     if (axios.isCancel(error)) {
       console.log(error.message || 'Request canceled');
-    }
-    else {
+    } else {
       const reason = buildErrorMessage(error);
       console.error(reason);
       failureCallback(reason);

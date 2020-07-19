@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 interface UseLongPressProps {
   callback?: () => void;
   ms: number;
 }
 
-const UseLongPress: React.FC<UseLongPressProps> = ({children, callback = () => {}, ms = 300}) => {
+const UseLongPress: React.FC<UseLongPressProps> = ({
+                                                     children, callback = () => {
+  }, ms = 300
+                                                   }) => {
   const [startLongPress, setStartLongPress] = useState(false);
 
   useEffect(() => {

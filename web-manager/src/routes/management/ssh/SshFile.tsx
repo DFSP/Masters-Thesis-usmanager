@@ -26,7 +26,6 @@ import {ReduxState} from "../../../reducers";
 import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
-import {ISshCommand} from "./SshCommand";
 import {IReply} from "../../../utils/api";
 
 export interface ISshFile {
@@ -50,7 +49,7 @@ interface DispatchToProps {
 }
 
 interface SshFileProps {
-  onTransferFile : (transfer: ISshFile) => void;
+  onTransferFile: (transfer: ISshFile) => void;
 }
 
 type Props = SshFileProps & StateToProps & DispatchToProps;
@@ -60,42 +59,6 @@ class SshFile extends BaseComponent<Props, {}> {
   public componentDidMount(): void {
     this.props.loadEdgeHosts();
     this.props.loadCloudHosts();
-  };
-
-  private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
-    super.toast(`<span class="green-text">File uploaded</span>`);
-    this.props.onTransferFile(args);
-  };
-
-  private onPostFailure = (reason: string): void =>
-    super.toast(`Failed to upload file`, 10000, reason, true);
-
-  private getFields = (): IFields => (
-    {
-      hostname: {
-        id: 'hostname',
-        label: 'hostname',
-        validation: { rule: required }
-      },
-      filename: {
-        id: 'filename',
-        label: 'filename',
-        validation: { rule: required }
-      },
-    }
-  );
-
-  private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
-
-  private getSelectableFiles = () => {
-    //TODO get available scripts from the server instead
-    return ['docker-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
   };
 
   public render() {
@@ -117,24 +80,62 @@ class SshFile extends BaseComponent<Props, {}> {
                type={'dropdown'}
                dropdown={{
                  defaultValue: 'Select hostname',
-                 values: this.getSelectableHosts()}}/>
+                 values: this.getSelectableHosts()
+               }}/>
         <Field key='filename'
                id={'filename'}
                label='filename'
                type={'dropdown'}
                dropdown={{
                  defaultValue: 'Select filename',
-                 values: this.getSelectableFiles()}}/>
+                 values: this.getSelectableFiles()
+               }}/>
       </Form>
     );
   }
+
+  private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
+    super.toast(`<span class="green-text">File uploaded</span>`);
+    this.props.onTransferFile(args);
+  };
+
+  private onPostFailure = (reason: string): void =>
+    super.toast(`Failed to upload file`, 10000, reason, true);
+
+  private getFields = (): IFields => (
+    {
+      hostname: {
+        id: 'hostname',
+        label: 'hostname',
+        validation: {rule: required}
+      },
+      filename: {
+        id: 'filename',
+        label: 'filename',
+        validation: {rule: required}
+      },
+    }
+  );
+
+  private getSelectableHosts = () => {
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+                             .map(instance => instance.publicIpAddress);
+    const edgeHosts = Object.keys(this.props.edgeHosts);
+    return cloudHosts.concat(edgeHosts);
+  };
+
+  private getSelectableFiles = () => {
+    //TODO get available scripts from the server instead
+    return ['docker-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
+  };
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
-  return  {
+  return {
     cloudHosts,
     edgeHosts,
   }

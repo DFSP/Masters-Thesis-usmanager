@@ -25,7 +25,6 @@
 package works.weave.socks.cart.configuration;
 
 import com.mongodb.MongoClientOptions;
-
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;

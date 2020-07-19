@@ -1,10 +1,9 @@
 import argparse
+import os
 import sys
 import unittest
-import os
-import urllib
-from util.Api import Api
 from time import sleep
+from util.Api import Api
 from util.Docker import Docker
 from util.Dredd import Dredd
 
@@ -90,6 +89,7 @@ class OrdersContainerTest(unittest.TestCase):
         self.assertGreater(out.find("0 failing"), -1)
         self.assertGreater(out.find("0 errors"), -1)
         print(out)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

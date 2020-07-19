@@ -45,4 +45,4 @@ const ActionProgressBar: React.FC<LoadingProgressProps> = (props: LoadingProgres
     </div>
   </div>;
 
-export default  ActionProgressBar;
+export default ActionProgressBar;

@@ -78,7 +78,8 @@ public class OrdersController {
 
   @ResponseStatus(HttpStatus.CREATED)
   @RequestMapping(path = "/orders", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-  public @ResponseBody CustomerOrder newOrder(@RequestBody NewOrderResource item) {
+  public @ResponseBody
+  CustomerOrder newOrder(@RequestBody NewOrderResource item) {
     try {
       if (item.getAddress() == null
           || item.getCustomer() == null
@@ -128,7 +129,8 @@ public class OrdersController {
       // Ship
       String customerId = customerFuture.get(timeout, TimeUnit.SECONDS).getId();
       Future<Shipment> shipmentFuture = asyncGetService.postResource(config.getShippingUri(), new Shipment(customerId),
-          new ParameterizedTypeReference<Shipment>() { }
+          new ParameterizedTypeReference<Shipment>() {
+          }
       );
       log.info("Shipping URI: " + config.getShippingUri());
       CustomerOrder order = new CustomerOrder(

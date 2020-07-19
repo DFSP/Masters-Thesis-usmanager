@@ -24,12 +24,12 @@
 
 package works.weave.socks.cart.entities;
 
+import java.util.Objects;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Objects;
 
 @Document
 public class Item {

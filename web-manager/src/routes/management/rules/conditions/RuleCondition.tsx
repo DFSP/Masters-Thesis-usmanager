@@ -23,8 +23,6 @@ import {IReply} from "../../../../utils/api";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRegion} from "../../region/Region";
-import {INode} from "../../nodes/Node";
 
 export interface IRuleCondition extends IDatabaseData {
   name: string;
@@ -47,9 +45,9 @@ interface StateToProps {
   error?: string | null;
   condition: Partial<IRuleCondition>;
   formCondition?: Partial<IRuleCondition>,
-  valueModes: { [key:string]: IValueMode };
-  fields: { [key:string]: IField };
-  operators: { [key:string]: IOperator };
+  valueModes: { [key: string]: IValueMode };
+  fields: { [key: string]: IField };
+  operators: { [key: string]: IOperator };
 }
 
 interface DispatchToProps {
@@ -74,10 +72,8 @@ type State = {
 
 class RuleCondition extends BaseComponent<Props, State> {
 
+  state: State = {};
   private mounted = false;
-
-  state: State = {
-  };
 
   public componentDidMount(): void {
     this.loadCondition();
@@ -89,6 +85,16 @@ class RuleCondition extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadCondition = () => {
@@ -144,11 +150,12 @@ class RuleCondition extends BaseComponent<Props, State> {
   };
 
   private onDeleteFailure = (reason: string, condition: IRuleCondition): void =>
-    super.toast(`Unable to delete ${this.mounted ? <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ?
+      <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
 
   private updateCondition = (condition: IRuleCondition) => {
     condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
-    const formCondition = { ...condition };
+    const formCondition = {...condition};
     removeFields(formCondition);
     this.setState({condition: condition, formCondition: formCondition});
   };
@@ -160,8 +167,8 @@ class RuleCondition extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: requiredAndTrimmed }
+            ? {rule: requiredAndNumberAndMin, args: 0}
+            : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -219,7 +226,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                            dropdown={{
                              defaultValue: "Select field",
                              values: Object.values(this.props.fields),
-                             optionToString: this.fieldOption}}/>
+                             optionToString: this.fieldOption
+                           }}/>
             <Field<IOperator> key='operators'
                               id='operator'
                               label='operator'
@@ -227,7 +235,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                               dropdown={{
                                 defaultValue: "Select operator",
                                 values: Object.values(this.props.operators),
-                                optionToString: this.operatorOption}}/>
+                                optionToString: this.operatorOption
+                              }}/>
             <Field<IValueMode> key='valueModes'
                                id='valueMode'
                                label='valueMode'
@@ -235,7 +244,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                                dropdown={{
                                  defaultValue: 'Select value mode',
                                  values: Object.values(this.props.valueModes),
-                                 optionToString: this.valueModeOption}}/>
+                                 optionToString: this.valueModeOption
+                               }}/>
             <Field key='value' id='value' label='value' type="number"/>
           </Form>
         )}
@@ -251,16 +261,6 @@ class RuleCondition extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(condition: Partial<IRuleCondition>) {
@@ -274,13 +274,13 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const condition = isNew(props.location.search) ? buildNewCondition() : state.entities.rules.conditions.data[name];
   let formCondition;
   if (condition) {
-    formCondition = { ...condition };
+    formCondition = {...condition};
     removeFields(formCondition);
   }
   const valueModes = state.entities.valueModes.data;
   const fields = state.entities.fields.data;
   const operators = state.entities.operators.data;
-  return  {
+  return {
     isLoading,
     error,
     condition,

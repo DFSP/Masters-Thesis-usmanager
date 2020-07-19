@@ -1,5 +1,8 @@
 package works.weave.socks.shipping.controllers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.AmqpException;
@@ -8,19 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import works.weave.socks.shipping.entities.Shipment;
 import works.weave.socks.shipping.entities.HealthCheck;
-
-import static org.hamcrest.CoreMatchers.*;
+import works.weave.socks.shipping.entities.Shipment;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

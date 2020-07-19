@@ -27,8 +27,8 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  loadSimulatedServiceMetrics,
   loadServiceSimulatedMetrics,
+  loadSimulatedServiceMetrics,
   removeServiceSimulatedMetrics
 } from "../../../actions";
 import {connect} from "react-redux";
@@ -67,7 +67,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -81,6 +81,29 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
     }
   }
 
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                           emptyMessage={`Simulated metrics list is empty`}
+                           data={this.props.simulatedMetricsName}
+                           dropdown={{
+                             id: 'simulatedMetrics',
+                             title: 'Add simulated metric',
+                             empty: 'No more simulated metrics to add',
+                             data: this.getSelectableSimulatedMetrics()
+                           }}
+                           show={this.simulatedMetric}
+                           onAdd={this.onAdd}
+                           onRemove={this.onRemove}
+                           onDelete={{
+                             url: `services/${this.props.service?.serviceName}/simulated-metrics`,
+                             successCallback: this.onDeleteSuccess,
+                             failureCallback: this.onDeleteFailure
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
+  }
+
   private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
@@ -92,7 +115,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
     this.props.service?.serviceName === undefined;
 
   private simulatedMetric = (index: number, simulatedMetric: string, separate: boolean, checked: boolean,
-                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+                             handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const isNew = this.isNew();
     const unsaved = this.props.unsavedSimulatedMetrics.includes(simulatedMetric);
     return (
@@ -141,29 +164,6 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
     return Object.keys(simulatedMetrics).filter(name => !simulatedMetricsName.includes(name) && !unsavedSimulatedMetrics.includes(name));
   };
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                           emptyMessage={`Simulated metrics list is empty`}
-                           data={this.props.simulatedMetricsName}
-                           dropdown={{
-                             id: 'simulatedMetrics',
-                             title: 'Add simulated metric',
-                             empty: 'No more simulated metrics to add',
-                             data: this.getSelectableSimulatedMetrics()
-                           }}
-                           show={this.simulatedMetric}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service?.serviceName}/simulated-metrics`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
-
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceSimulatedMetricListProps): StateToProps {
@@ -174,14 +174,14 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceSimulatedMetricList
     isLoading: state.entities.services.isLoadingSimulatedMetrics,
     error: state.entities.services.loadSimulatedMetricsError,
     simulatedMetrics: Object.entries(state.entities.simulatedMetrics.services.data)
-                 .filter(([_, simulatedMetric]) => !simulatedMetric.generic)
-                 .map(([key, value]) => ({[key]: value}))
-                 .reduce((fields, field) => {
-                   for (let key in field) {
-                     fields[key] = field[key];
-                   }
-                   return fields;
-                 }, {}),
+                            .filter(([_, simulatedMetric]) => !simulatedMetric.generic)
+                            .map(([key, value]) => ({[key]: value}))
+                            .reduce((fields, field) => {
+                              for (let key in field) {
+                                fields[key] = field[key];
+                              }
+                              return fields;
+                            }, {}),
     simulatedMetricsName: simulatedMetricsName || [],
   }
 }

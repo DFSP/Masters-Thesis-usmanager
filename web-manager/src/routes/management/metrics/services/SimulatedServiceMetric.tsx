@@ -22,7 +22,8 @@ import {
   addSimulatedServiceMetric,
   addSimulatedServiceMetricServices,
   loadFields,
-  loadSimulatedServiceMetrics, updateSimulatedServiceMetric
+  loadSimulatedServiceMetrics,
+  updateSimulatedServiceMetric
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -58,7 +59,7 @@ interface StateToProps {
   error?: string | null;
   simulatedServiceMetric: Partial<ISimulatedServiceMetric>;
   formSimulatedServiceMetric?: Partial<ISimulatedServiceMetric>;
-  fields: { [key:string]: IField };
+  fields: { [key: string]: IField };
 }
 
 interface DispatchToProps {
@@ -85,12 +86,11 @@ interface State {
 
 class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedServices: [],
     isGeneric: this.props.simulatedServiceMetric?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadSimulatedServiceMetric();
@@ -100,6 +100,17 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadSimulatedServiceMetric = () => {
@@ -190,7 +201,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
   private onSaveServicesSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
     this.props.addSimulatedServiceMetricServices(simulatedMetric.name, this.state.unsavedServices);
     if (this.mounted) {
-      this.setState({ unsavedServices: [] });
+      this.setState({unsavedServices: []});
     }
   };
 
@@ -199,9 +210,12 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
     simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
-    const formSimulatedServiceMetric = { ...simulatedServiceMetric };
+    const formSimulatedServiceMetric = {...simulatedServiceMetric};
     removeFields(formSimulatedServiceMetric);
-    this.setState({simulatedServiceMetric: simulatedServiceMetric, formSimulatedServiceMetric: formSimulatedServiceMetric});
+    this.setState({
+      simulatedServiceMetric: simulatedServiceMetric,
+      formSimulatedServiceMetric: formSimulatedServiceMetric
+    });
   };
 
   private getFields = (simulatedServiceMetric: Partial<ISimulatedServiceMetric>): IFields =>
@@ -210,7 +224,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation: {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -268,7 +282,8 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                  dropdown={{
                                    defaultValue: "Select field",
                                    values: Object.values(this.props.fields),
-                                   optionToString: this.fieldOption}}/>
+                                   optionToString: this.fieldOption
+                                 }}/>
                 : key === 'override'
                 ? <Field<boolean> key={index}
                                   id={key}
@@ -276,7 +291,8 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                   type="dropdown"
                                   dropdown={{
                                     defaultValue: "Override true metrics?",
-                                    values: [true, false]}}/>
+                                    values: [true, false]
+                                  }}/>
                 : key === 'generic'
                   ? <Field<boolean> key={index}
                                     id={key}
@@ -285,7 +301,8 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                     dropdown={{
                                       selectCallback: this.isGenericSelected,
                                       defaultValue: "Apply to all services?",
-                                      values: [true, false]}}/>
+                                      values: [true, false]
+                                    }}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -323,17 +340,6 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(simulatedServiceMetric: Partial<ISimulatedServiceMetric>) {
@@ -348,11 +354,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const simulatedServiceMetric = isNew(props.location.search) ? buildNewSimulatedServiceMetric() : state.entities.simulatedMetrics.services.data[name];
   let formSimulatedServiceMetric;
   if (simulatedServiceMetric) {
-    formSimulatedServiceMetric = { ...simulatedServiceMetric };
+    formSimulatedServiceMetric = {...simulatedServiceMetric};
     removeFields(formSimulatedServiceMetric);
   }
   const fields = state.entities.fields.data;
-  return  {
+  return {
     isLoading,
     error,
     simulatedServiceMetric,

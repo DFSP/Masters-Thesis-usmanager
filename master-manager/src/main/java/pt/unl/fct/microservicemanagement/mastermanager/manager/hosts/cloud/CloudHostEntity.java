@@ -87,7 +87,7 @@ public class CloudHostEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "cloud_host_rule",
       joinColumns = @JoinColumn(name = "cloud_host_id"),
       inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -96,7 +96,7 @@ public class CloudHostEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "cloud_host_simulated_metric",
       joinColumns = @JoinColumn(name = "cloud_host_id"),
       inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

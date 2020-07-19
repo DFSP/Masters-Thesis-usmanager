@@ -18,12 +18,7 @@ import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadApps,
-  loadAppServices,
-  loadServiceApps,
-  removeServiceApps
-} from "../../../actions";
+import {loadApps, loadAppServices, loadServiceApps, removeServiceApps} from "../../../actions";
 import Field from "../../../components/form/Field";
 import {IFields, IValues, requiredAndNumberAndMinAndMax} from "../../../components/form/Form";
 import List from "../../../components/list/List";
@@ -77,7 +72,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { entitySaved: !this.isNew() };
+    this.state = {entitySaved: !this.isNew()};
   }
 
   public componentDidMount(): void {
@@ -90,6 +85,41 @@ class ServiceAppList extends BaseComponent<Props, State> {
     if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
       this.setState({entitySaved: true});
     }
+  }
+
+  public render() {
+    const isNew = this.isNew();
+    return <ControlledList<string> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                                   error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                                   emptyMessage='Apps list is empty'
+                                   data={this.props.serviceApps}
+                                   dataKey={['name']}
+                                   dropdown={{
+                                     id: 'apps',
+                                     title: 'Add app',
+                                     empty: 'No more apps to add',
+                                     data: this.getSelectableAppsNames(),
+                                     onSelect: this.onSelectApp,
+                                     formModal: {
+                                       id: 'serviceApp',
+                                       title: 'Add app',
+                                       fields: this.getModalFields(),
+                                       values: this.getModalValues(),
+                                       content: this.serviceAppModal,
+                                       position: '20%',
+                                       scrollbar: this.scrollbar,
+                                     }
+                                   }}
+                                   show={this.app}
+                                   onAddInput={this.onAdd}
+                                   onRemove={this.onRemove}
+                                   onDelete={{
+                                     url: `services/${this.props.service?.serviceName}/apps`,
+                                     successCallback: this.onDeleteSuccess,
+                                     failureCallback: this.onDeleteFailure
+                                   }}
+                                   entitySaved={this.state.entitySaved}/>;
+
   }
 
   private loadEntities = () => {
@@ -176,7 +206,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
     return Object.values(services)
                  .filter(service => service.service.serviceName !== this.props.service?.serviceName)
-                 .sort((a,b) => a.launchOrder - b.launchOrder);
+                 .sort((a, b) => a.launchOrder - b.launchOrder);
   };
 
   private serviceAppModal = () => {
@@ -191,15 +221,15 @@ class ServiceAppList extends BaseComponent<Props, State> {
           {list && <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>}
         </Collapsible>
       </>
-    )};
-
+    )
+  };
 
   private getModalFields = (): IFields => (
     {
       launchOrder: {
         id: 'launchOrder',
         label: 'launchOrder',
-        validation: { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
+        validation: {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
       }
     }
   );
@@ -217,41 +247,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private updateModalScrollbar = () =>
     this.scrollbar.current?.updateScroll();
-
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList<string> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                                   error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                                   emptyMessage='Apps list is empty'
-                                   data={this.props.serviceApps}
-                                   dataKey={['name']}
-                                   dropdown={{
-                                     id: 'apps',
-                                     title: 'Add app',
-                                     empty: 'No more apps to add',
-                                     data: this.getSelectableAppsNames(),
-                                     onSelect: this.onSelectApp,
-                                     formModal: {
-                                       id: 'serviceApp',
-                                       title: 'Add app',
-                                       fields: this.getModalFields(),
-                                       values: this.getModalValues(),
-                                       content: this.serviceAppModal,
-                                       position: '20%',
-                                       scrollbar: this.scrollbar,
-                                     }
-                                   }}
-                                   show={this.app}
-                                   onAddInput={this.onAdd}
-                                   onRemove={this.onRemove}
-                                   onDelete={{
-                                     url: `services/${this.props.service?.serviceName}/apps`,
-                                     successCallback: this.onDeleteSuccess,
-                                     failureCallback: this.onDeleteFailure
-                                   }}
-                                   entitySaved={this.state.entitySaved}/>;
-
-  }
 
 }
 

@@ -24,13 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -82,7 +80,7 @@ public class ContainerRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "containerRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Set<ContainerEntity> containers;
 
   @Singular
@@ -98,7 +96,7 @@ public class ContainerRuleEntity {
       container.getContainerRules().remove(this);
     }
   }
-  
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

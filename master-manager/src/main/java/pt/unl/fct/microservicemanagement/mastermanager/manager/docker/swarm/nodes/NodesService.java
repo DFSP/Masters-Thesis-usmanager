@@ -14,7 +14,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFound
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +51,10 @@ public class NodesService {
         nodeStream = nodeStream.filter(filter);
       }
       return nodeStream
-          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
+          .map(n -> new SimpleNode(n.id(), n.status().addr(),
               NodeAvailability.valueOf(n.spec().availability().toUpperCase()),
-              NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index(), n.spec().labels()))
+              NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index(), n.spec().labels(),
+              n.status().state()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       throw new MasterManagerException(e.getMessage());

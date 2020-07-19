@@ -12,7 +12,6 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedHostMetric} from "./SimulatedHostMetric";
-import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 interface SimulatedHostMetricCardProps {
   simulatedHostMetric: ISimulatedHostMetric;
@@ -23,7 +22,12 @@ type Props = SimulatedHostMetricCardProps;
 const CardSimulatedHostMetric = Card<ISimulatedHostMetric>();
 const SimulatedHostMetricCard = ({simulatedHostMetric}: Props) => (
   <CardSimulatedHostMetric title={simulatedHostMetric.name}
-                           link={{to: {pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`, state: simulatedHostMetric }}}
+                           link={{
+                             to: {
+                               pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`,
+                               state: simulatedHostMetric
+                             }
+                           }}
                            height={'170px'}
                            margin={'10px 0'}
                            hoverable>

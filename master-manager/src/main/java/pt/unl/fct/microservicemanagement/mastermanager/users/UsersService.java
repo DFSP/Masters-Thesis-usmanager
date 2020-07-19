@@ -24,12 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.users;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

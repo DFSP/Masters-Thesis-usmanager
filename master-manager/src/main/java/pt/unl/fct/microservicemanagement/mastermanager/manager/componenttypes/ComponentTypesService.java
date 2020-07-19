@@ -1,6 +1,5 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
@@ -8,6 +7,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j

@@ -34,21 +34,11 @@ export default class extends React.Component<Props, State> {
     }
   }
 
-  private initCollapsible = () => {
-    M.Collapsible.init(this.collapsible.current as Element);
-  };
-
   componentWillUnmount() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
   }
-
-  private onChange = () => {
-    this.setState(state => ({isOpen: !state.isOpen}));
-    this.props.onChange?.();
-  }
-
 
   public render() {
     const {id, title, active, headerClassname, bodyClassname, children} = this.props;
@@ -66,6 +56,15 @@ export default class extends React.Component<Props, State> {
         </li>
       </ul>
     );
+  }
+
+  private initCollapsible = () => {
+    M.Collapsible.init(this.collapsible.current as Element);
+  };
+
+  private onChange = () => {
+    this.setState(state => ({isOpen: !state.isOpen}));
+    this.props.onChange?.();
   }
 
 }

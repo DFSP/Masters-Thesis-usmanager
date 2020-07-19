@@ -38,15 +38,14 @@ import (
 
 	corelog "log"
 
-	"github.com/usmanager/manager/go-client-register-go"
-	"github.com/usmanager/manager/microservices/sock-shop/user/api"
-	"github.com/usmanager/manager/microservices/sock-shop/user/db"
-	"github.com/usmanager/manager/microservices/sock-shop/user/db/mongodb"
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/usmanager/manager/microservices/sock-shop/user/api"
+	"github.com/usmanager/manager/microservices/sock-shop/user/db"
+	"github.com/usmanager/manager/microservices/sock-shop/user/db/mongodb"
 	commonMiddleware "github.com/weaveworks/common/middleware"
 )
 

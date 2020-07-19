@@ -49,7 +49,7 @@ html {
     padding-left: 200px;
 }
 
-@media only screen and (max-width : 992px) {
+@media only screen and (max-width: 992px) {
     .content {
         flex: 1 0 auto;
         padding-left: 0;
@@ -86,15 +86,15 @@ nav .search-bar {
 }
 
 ::-webkit-input-placeholder { /* Edge */
-    color: rgba(255,255,255,0.2);
+    color: rgba(255, 255, 255, 0.2);
 }
 
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-    color: rgba(255,255,255,0.2);
+    color: rgba(255, 255, 255, 0.2);
 }
 
 ::placeholder {
-    color: rgba(255,255,255,0.2);
+    color: rgba(255, 255, 255, 0.2);
 }
 
 nav.nav-extended {
@@ -124,13 +124,16 @@ nav li {
     nav.nav-extended .nav-wrapper {
         min-height: 56px;
     }
+
     nav a.sidenav-trigger {
         margin: 14px;
     }
+
     nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
         height: 56px;
         line-height: 56px;
     }
+
     .navbar-fixed {
         height: 56px;
     }
@@ -160,7 +163,7 @@ nav li {
 }
 
 .sidenav li:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidenav-trigger {
@@ -169,7 +172,7 @@ nav li {
 }
 
 .no-shadows {
-    box-shadow: none!important;
+    box-shadow: none !important;
 }
 
 p {
@@ -200,6 +203,7 @@ ul.tabs {
         position: absolute;
         top: 40%;
     }
+
     #index-banner .section {
         top: 10%;
     }
@@ -227,8 +231,8 @@ ul.tabs {
 .page-footer {
     height: 50px;
     position: absolute;
-    bottom:0;
-    width:100%;
+    bottom: 0;
+    width: 100%;
     background-color: #282828;
     padding: 0;
     margin: 0;
@@ -263,7 +267,7 @@ ul.tabs {
 .ps:hover > .ps__rail-x:hover,
 .ps:hover > .ps__rail-y:hover,
 .ps--scrolling-x:active > .ps__rail-x:active,
-.ps--scrolling-y:active > .ps__rail-y:active{
+.ps--scrolling-y:active > .ps__rail-y:active {
     background-color: transparent;
 }
 
@@ -302,8 +306,7 @@ input {
 }
 
 .input-field .prefix,
-.input-field .prefix.active
-{
+.input-field .prefix.active {
     color: white;
 }
 
@@ -338,7 +341,6 @@ ul.dropdown-content.select-dropdown li.disabled span:hover {
 }
 
 
-
 .tab-content {
     border-left: 1px solid black;
     border-right: 1px solid black;
@@ -366,7 +368,7 @@ button:hover {
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
-input:-webkit-autofill:active  {
+input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px #36393F inset !important;
 }
 
@@ -455,12 +457,12 @@ textarea.materialize-textarea[readonly="readonly"] {
     transform: translate(-50%, -50%);
 }
 
-[type="checkbox"]:checked+span:not(.lever):before {
+[type="checkbox"]:checked + span:not(.lever):before {
     border-right: 2px solid white;
     border-bottom: 2px solid white;
 }
 
-[type="checkbox"]+span:not(.lever) {
+[type="checkbox"] + span:not(.lever) {
     font-size: 1.1rem;
     color: white;
 }
@@ -469,8 +471,8 @@ textarea.materialize-textarea[readonly="readonly"] {
     width: 200px !important;
 }*/
 
-.dropdown-content li>a,
-.dropdown-content li>span {
+.dropdown-content li > a,
+.dropdown-content li > span {
     background-color: #282828;
     border: 1px solid black;
     color: white;
@@ -646,7 +648,7 @@ textarea {
 }
 
 .modal.datepicker-modal,
-.modal.timepicker-modal{
+.modal.timepicker-modal {
     width: 100%;
 }
 
@@ -725,7 +727,7 @@ select.no-validation-field ~ input.select-dropdown {
     width: 100%;
 }
 
-.input-field input[type=search]+.label-icon {
+.input-field input[type=search] + .label-icon {
     padding-left: 4px;
 }
 
@@ -740,7 +742,7 @@ select.no-validation-field ~ input.select-dropdown {
     background-color: black;
 }
 
-.col+.s6+.inline-field {
+.col + .s6 + .inline-field {
     margin-bottom: 18px;
 }
 
@@ -759,6 +761,7 @@ select.no-validation-field ~ input.select-dropdown {
 .react-resizable {
     position: relative;
 }
+
 .react-resizable-handle {
     position: absolute;
     width: 20px;
@@ -770,53 +773,63 @@ select.no-validation-field ~ input.select-dropdown {
     background-position: bottom right;
     padding: 0 3px 3px 0;
 }
+
 .react-resizable-handle-sw {
     bottom: 0;
     left: 0;
     cursor: sw-resize;
     transform: rotate(90deg);
 }
+
 .react-resizable-handle-se {
     bottom: 0;
     right: 0;
     cursor: se-resize;
 }
+
 .react-resizable-handle-nw {
     top: 0;
     left: 0;
     cursor: nw-resize;
     transform: rotate(180deg);
 }
+
 .react-resizable-handle-ne {
     top: 0;
     right: 0;
     cursor: ne-resize;
     transform: rotate(270deg);
 }
+
 .react-resizable-handle-w,
 .react-resizable-handle-e {
     top: 50%;
     margin-top: -10px;
     cursor: ew-resize;
 }
+
 .react-resizable-handle-w {
     left: 0;
     transform: rotate(135deg);
 }
+
 .react-resizable-handle-e {
     right: 0;
     transform: rotate(315deg);
 }
+
 .react-resizable-handle-n,
 .react-resizable-handle-s {
     left: 50%;
     margin-left: -10px;
     cursor: ns-resize;
 }
+
 .react-resizable-handle-n {
     top: 0;
     transform: rotate(225deg);
 }
+
 .react-resizable-handle-s {
     bottom: 0;
     transform: rotate(45deg);

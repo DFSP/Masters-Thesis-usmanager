@@ -30,24 +30,25 @@ let db;
 
 // Setup database connection before Dredd starts testing
 hooks.beforeAll((transactions, done) => {
-    db  = mysql.createConnection({
-	host     : process.env.MYSQL_PORT_3306_TCP_ADDR,
-	port     : 3306,
-	user     : "root",
-	password : process.env.MYSQL_ENV_MYSQL_ROOT_PASSWORD,
-	database : process.env.MYSQL_ENV_MYSQL_DATABASE,
-	multipleStatements: true
+    db = mysql.createConnection({
+        host: process.env.MYSQL_PORT_3306_TCP_ADDR,
+        port: 3306,
+        user: "root",
+        password: process.env.MYSQL_ENV_MYSQL_ROOT_PASSWORD,
+        database: process.env.MYSQL_ENV_MYSQL_DATABASE,
+        multipleStatements: true
     });
     db.connect();
     db.query("CREATE USER IF NOT EXISTS 'catalogue_user' IDENTIFIED BY 'default_password';\
             GRANT ALL ON socksdb.* TO 'catalogue_user';\
             );",
-	     (e, r) => {
-		 if (e) {
-		     console.error(r);
-		 }
-		 done ();});
-    
+        (e, r) => {
+            if (e) {
+                console.error(r);
+            }
+            done();
+        });
+
 });
 
 // Close database connection after Dredd finishes testing
@@ -127,20 +128,21 @@ hooks.beforeEach((transaction, done) => {
             INSERT INTO sock_tag VALUES (\"837ab141-399e-4c1f-9abc-bace40296bac\", \"3\");\
             \
    ", (e, r) => {
-       if (e) {
-	   console.error(e);
-       }
-       done ();});
-    
+        if (e) {
+            console.error(e);
+        }
+        done();
+    });
+
 });
 
 hooks.afterEach((transaction, done) => {
     db.query("DROP TABLE sock_tag;\
               DROP TABLE sock;\
               DROP TABLE tag;", (e, r) => {
-		  if (e) {
-		      console.error(e);
-		  }
-		  done ();
-	      });
+        if (e) {
+            console.error(e);
+        }
+        done();
+    });
 });

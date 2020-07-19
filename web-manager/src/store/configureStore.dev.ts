@@ -33,21 +33,21 @@ import rootReducer from "../reducers";
 import {loadState} from './localStorage'
 
 const configureStore = (persistedState = loadState()) =>
-    createStore(
-        rootReducer,
-        persistedState,
-        compose(
-            applyMiddleware(
-                thunk,
-                api,
-                promise(),
-                loadingBarMiddleware({
-                    promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
-                }),
-                createLogger(),
-            ),
-            DevTools.instrument(),
-        ),
-    );
+  createStore(
+    rootReducer,
+    persistedState,
+    compose(
+      applyMiddleware(
+        thunk,
+        api,
+        promise(),
+        loadingBarMiddleware({
+          promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+        }),
+        createLogger(),
+      ),
+      DevTools.instrument(),
+    ),
+  );
 
 export default configureStore;

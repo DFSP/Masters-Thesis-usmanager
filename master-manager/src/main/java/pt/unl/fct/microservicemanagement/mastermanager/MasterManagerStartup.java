@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ContainersMonitoringService;
@@ -34,6 +33,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.Master
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component

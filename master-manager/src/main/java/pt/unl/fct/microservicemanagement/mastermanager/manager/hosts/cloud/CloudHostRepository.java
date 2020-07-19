@@ -64,7 +64,7 @@ public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long
       + "from CloudHostEntity h join h.simulatedHostMetrics m "
       + "where h.instanceId = :instanceId and m.name = :simulatedMetricName")
   Optional<SimulatedHostMetricEntity> getSimulatedMetric(@Param("instanceId") String instanceId,
-                                                            @Param("simulatedMetricName") String simulatedMetricName);
+                                                         @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from CloudHostEntity h "

@@ -22,32 +22,34 @@
  * SOFTWARE.
  */
 
-(function (){
-  'use strict';
+(function () {
+    'use strict';
 
-  var express   = require("express")
-    , request   = require("request")
-    , endpoints = require("../endpoints")()
-    , helpers   = require("../../helpers")
-    , app       = express();
+    var express = require("express")
+        , request = require("request")
+        , endpoints = require("../endpoints")()
+        , helpers = require("../../helpers")
+        , app = express();
 
-  app.get("/catalogue/images*", function (req, res, next) {
-    helpers.processReqLocationHeaders(req);
-    var url = endpoints.catalogueUrl() + req.url.toString();
-    request.get(url)
-        .on('error', function(e) { next(e); })
-        .pipe(res);
-  });
+    app.get("/catalogue/images*", function (req, res, next) {
+        helpers.processReqLocationHeaders(req);
+        var url = endpoints.catalogueUrl() + req.url.toString();
+        request.get(url)
+            .on('error', function (e) {
+                next(e);
+            })
+            .pipe(res);
+    });
 
-  app.get("/catalogue*", function (req, res, next) {
-    helpers.processReqLocationHeaders(req);
-    helpers.simpleHttpRequest(endpoints.catalogueUrl() + req.url.toString(), res, next);
-  });
+    app.get("/catalogue*", function (req, res, next) {
+        helpers.processReqLocationHeaders(req);
+        helpers.simpleHttpRequest(endpoints.catalogueUrl() + req.url.toString(), res, next);
+    });
 
-  app.get("/tags", function(req, res, next) {
-    helpers.processReqLocationHeaders(req);
-    helpers.simpleHttpRequest(endpoints.tagsUrl(), res, next);
-  });
+    app.get("/tags", function (req, res, next) {
+        helpers.processReqLocationHeaders(req);
+        helpers.simpleHttpRequest(endpoints.tagsUrl(), res, next);
+    });
 
-  module.exports = app;
+    module.exports = app;
 }());

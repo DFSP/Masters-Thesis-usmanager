@@ -2,7 +2,6 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {IRuleCondition} from "./RuleCondition";
-import {INode} from "../../nodes/Node";
 
 interface ConditionCardProps {
   condition: IRuleCondition;

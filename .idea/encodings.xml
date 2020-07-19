@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/java-client-register-go/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/local-manager" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/master-manager" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/master-manager/src/main/java" charset="UTF-8" />
@@ -13,6 +12,7 @@
     <file url="file://$PROJECT_DIR$/microservices/sock-shop/queue-master/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/microservices/sock-shop/shipping" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/microservices/sock-shop/shipping/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/registration-client-java/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/registration-server" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/registration-server/src/main/java" charset="UTF-8" />
   </component>

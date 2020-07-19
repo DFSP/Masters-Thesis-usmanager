@@ -19,8 +19,12 @@ import Tabs, {Tab} from "../../../../components/tabs/Tabs";
 import MainLayout from "../../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../../reducers";
 import {
-  addSimulatedHostMetric, addSimulatedHostMetricCloudHosts, addSimulatedHostMetricEdgeHosts, loadFields,
-  loadSimulatedHostMetrics, updateSimulatedHostMetric
+  addSimulatedHostMetric,
+  addSimulatedHostMetricCloudHosts,
+  addSimulatedHostMetricEdgeHosts,
+  loadFields,
+  loadSimulatedHostMetrics,
+  updateSimulatedHostMetric
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -59,7 +63,7 @@ interface StateToProps {
   error?: string | null;
   simulatedHostMetric: Partial<ISimulatedHostMetric>;
   formSimulatedHostMetric?: Partial<ISimulatedHostMetric>;
-  fields: { [key:string]: IField };
+  fields: { [key: string]: IField };
 }
 
 interface DispatchToProps {
@@ -88,13 +92,12 @@ interface State {
 
 class SimulatedHostMetric extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedEdgeHosts: [],
     unsavedCloudHosts: [],
     isGeneric: this.props.simulatedHostMetric?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadSimulatedHostMetric();
@@ -104,6 +107,17 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadSimulatedHostMetric = () => {
@@ -196,7 +210,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
   private onSaveCloudHostsSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
     this.props.addSimulatedHostMetricCloudHosts(simulatedMetric.name, this.state.unsavedCloudHosts);
     if (this.mounted) {
-      this.setState({ unsavedCloudHosts: [] });
+      this.setState({unsavedCloudHosts: []});
     }
   };
 
@@ -227,7 +241,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
   private onSaveEdgeHostsSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
     this.props.addSimulatedHostMetricEdgeHosts(simulatedMetric.name, this.state.unsavedEdgeHosts);
     if (this.mounted) {
-      this.setState({ unsavedEdgeHosts: [] });
+      this.setState({unsavedEdgeHosts: []});
     }
   };
 
@@ -236,7 +250,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
     simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
-    const formSimulatedHostMetric = { ...simulatedHostMetric };
+    const formSimulatedHostMetric = {...simulatedHostMetric};
     removeFields(formSimulatedHostMetric);
     this.setState({simulatedHostMetric: simulatedHostMetric, formSimulatedHostMetric: formSimulatedHostMetric});
   };
@@ -247,7 +261,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation: {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -305,7 +319,8 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                  dropdown={{
                                    defaultValue: "Select field",
                                    values: Object.values(this.props.fields),
-                                   optionToString: this.fieldOption}}/>
+                                   optionToString: this.fieldOption
+                                 }}/>
                 : key === 'override'
                 ? <Field<boolean> key={index}
                                   id={key}
@@ -313,7 +328,8 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                   type="dropdown"
                                   dropdown={{
                                     defaultValue: "Override true metrics?",
-                                    values: [true, false]}}/>
+                                    values: [true, false]
+                                  }}/>
                 : key === 'generic'
                   ? <Field<boolean> key={index}
                                     id={key}
@@ -322,7 +338,8 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                     dropdown={{
                                       selectCallback: this.isGenericSelected,
                                       defaultValue: "Apply to all hosts?",
-                                      values: [true, false]}}/>
+                                      values: [true, false]
+                                    }}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -374,17 +391,6 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(simulatedHostMetric: Partial<ISimulatedHostMetric>) {
@@ -400,11 +406,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const simulatedHostMetric = isNew(props.location.search) ? buildNewSimulatedHostMetric() : state.entities.simulatedMetrics.hosts.data[name];
   let formSimulatedHostMetric;
   if (simulatedHostMetric) {
-    formSimulatedHostMetric = { ...simulatedHostMetric };
+    formSimulatedHostMetric = {...simulatedHostMetric};
     removeFields(formSimulatedHostMetric);
   }
   const fields = state.entities.fields.data;
-  return  {
+  return {
     isLoading,
     error,
     simulatedHostMetric,

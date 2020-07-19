@@ -28,12 +28,6 @@ class Apps extends BaseComponent<Props, {}> {
     this.props.loadApps();
   }
 
-  private app = (app: IApp): JSX.Element =>
-    <AppCard key={app.name} app={app}/>;
-
-  private predicate = (app: IApp, search: string): boolean =>
-    app.name.toString().toLowerCase().includes(search);
-
   public render() {
     return (
       <MainLayout>
@@ -51,6 +45,12 @@ class Apps extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private app = (app: IApp): JSX.Element =>
+    <AppCard key={app.name} app={app}/>;
+
+  private predicate = (app: IApp, search: string): boolean =>
+    app.name.toString().toLowerCase().includes(search);
 
 }
 

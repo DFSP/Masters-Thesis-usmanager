@@ -25,16 +25,6 @@ type Props = PortsListProps;
 
 export default class NodeLabelsList extends BaseComponent<Props, {}> {
 
-  private labels = (): string[] =>
-    Object.entries(this.props.node?.labels || []).map(([key, value]) => `${key} = ${value}`);
-
-  private label = (label: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.labels().length - 1}>
-      <div className={`${styles.listItemContent}`}>
-        <span>{label}</span>
-      </div>
-    </ListItem>;
-
   public render() {
     const LabelsList = List<string>();
     return (
@@ -45,5 +35,15 @@ export default class NodeLabelsList extends BaseComponent<Props, {}> {
                   show={this.label}/>
     );
   }
+
+  private labels = (): string[] =>
+    Object.entries(this.props.node?.labels || []).map(([key, value]) => `${key} = ${value}`);
+
+  private label = (label: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index !== this.labels().length - 1}>
+      <div className={`${styles.listItemContent}`}>
+        <span>{label}</span>
+      </div>
+    </ListItem>;
 
 }

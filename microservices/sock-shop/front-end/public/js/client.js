@@ -33,7 +33,7 @@ function login() {
             $("#login-message").html('<div class="alert alert-success">Login successful.</div>');
             console.log('posted: ' + textStatus);
             console.log("logged_in cookie: " + $.cookie('logged_in'));
-            setTimeout(function(){
+            setTimeout(function () {
                 location.reload();
             }, 1500);
         },
@@ -57,23 +57,23 @@ function register() {
     var firstName = $('#register-first-modal').val();
     var lastName = $('#register-last-modal').val();
     var postvals = JSON.stringify({
-		"username": username,
-		"password": password,
-		"email": email,
-		"firstName": firstName,
-		"lastName": lastName
-	});
-	console.log(postvals);
+        "username": username,
+        "password": password,
+        "email": email,
+        "firstName": firstName,
+        "lastName": lastName
+    });
+    console.log(postvals);
     $.ajax({
         url: "register",
         type: "POST",
         async: false,
-	data: postvals,
+        data: postvals,
         success: function (data, textStatus, jqXHR) {
             $("#registration-message").html('<div class="alert alert-success">Registration and login successful.</div>');
             console.log('posted: ' + textStatus);
             console.log("logged_in cookie: " + $.cookie('logged_in'));
-            setTimeout(function(){
+            setTimeout(function () {
                 location.reload();
             }, 1500);
         },
@@ -174,7 +174,7 @@ function addToCart(id) {
 // cart/update request sent to frontend server (index.js - app.post("/cart/update" function...)
 function updateToCart(id, quantity, next) {
 
-	console.log("Sending request to update cart: item: " + id + " quantity: " + quantity);
+    console.log("Sending request to update cart: item: " + id + " quantity: " + quantity);
     $.ajax({
         url: "cart/update",
         type: "POST",

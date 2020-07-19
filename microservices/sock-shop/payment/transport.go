@@ -31,14 +31,14 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/circuitbreaker"
+	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-        "github.com/streadway/handy/breaker"
+	"github.com/streadway/handy/breaker"
 	"golang.org/x/net/context"
 )
 

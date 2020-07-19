@@ -82,11 +82,11 @@ public class HostsService {
   private final LocationRequestService locationRequestService;
   private final RegionsService regionsService;
   private final String localMachineDns;
-  private String publicIp;
-  private String privateIp;
   private final int maxWorkers;
   private final int maxInstances;
   private final Mode mode;
+  private String publicIp;
+  private String privateIp;
 
   public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,

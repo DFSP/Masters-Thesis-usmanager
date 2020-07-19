@@ -30,18 +30,6 @@ class Containers extends BaseComponent<Props, {}> {
     this.props.loadContainers();
   }
 
-  private container = (container: IContainer): JSX.Element =>
-    <ContainerCard key={container.containerId} container={container}/>;
-
-  private predicate = (container: IContainer, search: string): boolean =>
-    container.containerId.toString().toLowerCase().includes(search)
-    || container.hostname.toLowerCase().includes(search)
-    || container.labels['serviceType'].toLowerCase().includes(search);
-
-  private reloadContainers = () => {
-    this.props.reloadContainers();
-  };
-
   public render() {
     return (
       <MainLayout>
@@ -64,6 +52,18 @@ class Containers extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private container = (container: IContainer): JSX.Element =>
+    <ContainerCard key={container.containerId} container={container}/>;
+
+  private predicate = (container: IContainer, search: string): boolean =>
+    container.containerId.toString().toLowerCase().includes(search)
+    || container.hostname.toLowerCase().includes(search)
+    || container.labels['serviceType'].toLowerCase().includes(search);
+
+  private reloadContainers = () => {
+    this.props.reloadContainers();
+  };
 
 }
 

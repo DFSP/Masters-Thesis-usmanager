@@ -12,7 +12,6 @@ import React from "react";
 import {IRuleContainer} from "./RuleContainer";
 import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
-import {IRuleCondition} from "../conditions/RuleCondition";
 
 interface ContainerRuleCardProps {
   rule: IRuleContainer;

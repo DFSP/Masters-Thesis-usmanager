@@ -24,19 +24,17 @@
 
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
-import Form, {
-  IFields,
-  requiredAndNumberAndMinAndMax,
-  requiredAndTrimmed
-} from "../../../components/form/Form"
+import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../components/form/Form"
 import IDatabaseData from "../../../components/IDatabaseData";
 import {
   addService,
   addServiceApps,
   addServiceDependencies,
   addServicePredictions,
-  addServiceRules, addServiceSimulatedMetrics,
-  loadServices, updateService
+  addServiceRules,
+  addServiceSimulatedMetrics,
+  loadServices,
+  updateService
 } from "../../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -152,6 +150,17 @@ class Service extends BaseComponent<Props, State> {
     this.mounted = false;
   }
 
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
+  }
+
   private loadService = () => {
     if (!this.isNew()) {
       const serviceName = this.props.match.params.name;
@@ -248,7 +257,7 @@ class Service extends BaseComponent<Props, State> {
   private onSaveAppsSuccess = (service: IService): void => {
     this.props.addServiceApps(service.serviceName, this.state.unsavedApps.map(app => app.name));
     if (this.mounted) {
-      this.setState({ unsavedApps: [] });
+      this.setState({unsavedApps: []});
     }
   };
 
@@ -279,7 +288,7 @@ class Service extends BaseComponent<Props, State> {
   private onSaveDependenciesSuccess = (service: IService): void => {
     this.props.addServiceDependencies(service.serviceName, this.state.unsavedDependencies);
     if (this.mounted) {
-      this.setState({ unsavedDependencies: [] });
+      this.setState({unsavedDependencies: []});
     }
   };
 
@@ -310,7 +319,7 @@ class Service extends BaseComponent<Props, State> {
   private onSavePredictionsSuccess = (service: IService): void => {
     this.props.addServicePredictions(service.serviceName, this.state.unsavedPredictions);
     if (this.mounted) {
-      this.setState({ unsavedPredictions: [] });
+      this.setState({unsavedPredictions: []});
     }
   };
 
@@ -341,7 +350,7 @@ class Service extends BaseComponent<Props, State> {
   private onSaveRulesSuccess = (service: IService): void => {
     this.props.addServiceRules(service.serviceName, this.state.unsavedRules);
     if (this.mounted) {
-      this.setState({ unsavedRules: [] });
+      this.setState({unsavedRules: []});
     }
   };
 
@@ -372,7 +381,7 @@ class Service extends BaseComponent<Props, State> {
   private onSaveSimulatedMetricsSuccess = (service: IService): void => {
     this.props.addServiceSimulatedMetrics(service.serviceName, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
-      this.setState({ unsavedSimulatedMetrics: [] });
+      this.setState({unsavedSimulatedMetrics: []});
     }
   };
 
@@ -381,7 +390,7 @@ class Service extends BaseComponent<Props, State> {
 
   private updateService = (service: IService) => {
     service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
-    const formService = { ...service };
+    const formService = {...service};
     removeFields(formService);
     this.setState({service: service, formService: formService});
   };
@@ -394,8 +403,8 @@ class Service extends BaseComponent<Props, State> {
           label: key,
           validation:
             getTypeFromValue(value) === 'number'
-              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
-              : { rule: requiredAndTrimmed }
+              ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
+              : {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -446,7 +455,8 @@ class Service extends BaseComponent<Props, State> {
                          label={key}
                          dropdown={{
                            defaultValue: "Choose service type",
-                           values: ["FRONTEND", "BACKEND", "DATABASE", "SYSTEM"]}}/>
+                           values: ["FRONTEND", "BACKEND", "DATABASE", "SYSTEM"]
+                         }}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -559,17 +569,6 @@ class Service extends BaseComponent<Props, State> {
     }
   ]);
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(service: Partial<IService>) {
@@ -589,10 +588,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const service = isNew(props.location.search) ? buildNewService() : state.entities.services.data[name];
   let formService;
   if (service) {
-    formService = { ...service };
+    formService = {...service};
     removeFields(formService);
   }
-  return  {
+  return {
     isLoading,
     error,
     service,

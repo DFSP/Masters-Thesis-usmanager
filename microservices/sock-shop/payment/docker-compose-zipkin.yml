@@ -16,7 +16,7 @@ services:
     ports:
       - "8082:80"
   zipkin:
-    image: openzipkin/zipkin 
+    image: openzipkin/zipkin
     hostname: zipkin
     restart: always
     cap_drop:

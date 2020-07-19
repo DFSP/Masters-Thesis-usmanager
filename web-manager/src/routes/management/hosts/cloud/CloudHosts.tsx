@@ -26,10 +26,6 @@ type Props = DispatchToProps;
 
 class CloudHosts extends BaseComponent<Props, {}> {
 
-  private syncCloudInstances = () => {
-    this.props.syncCloudHosts();
-  };
-
   public render() {
     return (
       <MainLayout>
@@ -46,6 +42,10 @@ class CloudHosts extends BaseComponent<Props, {}> {
       </MainLayout>
     );
   }
+
+  private syncCloudInstances = () => {
+    this.props.syncCloudHosts();
+  };
 
 }
 

@@ -22,7 +22,8 @@ import {
   addSimulatedContainerMetric,
   addSimulatedContainerMetricContainers,
   loadFields,
-  loadSimulatedContainerMetrics, updateSimulatedContainerMetric
+  loadSimulatedContainerMetrics,
+  updateSimulatedContainerMetric
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -33,9 +34,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedContainerMetricContainerList from "./SimulatedContainerMetricContainerList";
-import {IRuleHost} from "../../rules/hosts/RuleHost";
-import {IRuleCondition} from "../../rules/conditions/RuleCondition";
-import {IApp} from "../../apps/App";
 
 export interface ISimulatedContainerMetric extends IDatabaseData {
   name: string;
@@ -61,7 +59,7 @@ interface StateToProps {
   error?: string | null;
   simulatedContainerMetric: Partial<ISimulatedContainerMetric>;
   formSimulatedContainerMetric?: Partial<ISimulatedContainerMetric>;
-  fields: { [key:string]: IField };
+  fields: { [key: string]: IField };
 }
 
 interface DispatchToProps {
@@ -88,12 +86,11 @@ interface State {
 
 class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
-  private mounted = false;
-
   state: State = {
     unsavedContainers: [],
     isGeneric: this.props.simulatedContainerMetric?.generic || false,
   };
+  private mounted = false;
 
   public componentDidMount(): void {
     this.loadSimulatedContainerMetric();
@@ -103,6 +100,17 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  public render() {
+    return (
+      <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+        <div className="container">
+          <Tabs {...this.props} tabs={this.tabs()}/>
+        </div>
+      </MainLayout>
+    );
   }
 
   private loadSimulatedContainerMetric = () => {
@@ -194,7 +202,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
   private onSaveContainersSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
     this.props.addSimulatedContainerMetricContainers(simulatedMetric.name, this.state.unsavedContainers);
     if (this.mounted) {
-      this.setState({ unsavedContainers: [] });
+      this.setState({unsavedContainers: []});
     }
   };
 
@@ -203,9 +211,12 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
     simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
-    const formSimulatedContainerMetric = { ...simulatedContainerMetric };
+    const formSimulatedContainerMetric = {...simulatedContainerMetric};
     removeFields(formSimulatedContainerMetric);
-    this.setState({simulatedContainerMetric: simulatedContainerMetric, formSimulatedContainerMetric: formSimulatedContainerMetric});
+    this.setState({
+      simulatedContainerMetric: simulatedContainerMetric,
+      formSimulatedContainerMetric: formSimulatedContainerMetric
+    });
   };
 
   private getFields = (simulatedContainerMetric: Partial<ISimulatedContainerMetric>): IFields =>
@@ -214,7 +225,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation: {rule: requiredAndTrimmed}
         }
       };
     }).reduce((fields, field) => {
@@ -272,24 +283,27 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                  dropdown={{
                                    defaultValue: "Select field",
                                    values: Object.values(this.props.fields),
-                                   optionToString: this.fieldOption}}/>
+                                   optionToString: this.fieldOption
+                                 }}/>
                 : key === 'override'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           defaultValue: "Override true metrics?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    defaultValue: "Override true metrics?",
+                                    values: [true, false]
+                                  }}/>
                 : key === 'generic'
                   ? <Field<boolean> key={index}
-                           id={key}
-                           label={key}
-                           type="dropdown"
-                           dropdown={{
-                             selectCallback: this.isGenericSelected,
-                             defaultValue: "Apply to all containers?",
-                             values: [true, false]}}/>
+                                    id={key}
+                                    label={key}
+                                    type="dropdown"
+                                    dropdown={{
+                                      selectCallback: this.isGenericSelected,
+                                      defaultValue: "Apply to all containers?",
+                                      values: [true, false]
+                                    }}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -327,17 +341,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     },
   ];
 
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
 }
 
 function removeFields(simulatedContainerMetric: Partial<ISimulatedContainerMetric>) {
@@ -352,11 +355,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const simulatedContainerMetric = isNew(props.location.search) ? buildNewSimulatedContainerMetric() : state.entities.simulatedMetrics.containers.data[name];
   let formSimulatedContainerMetric;
   if (simulatedContainerMetric) {
-    formSimulatedContainerMetric = { ...simulatedContainerMetric };
+    formSimulatedContainerMetric = {...simulatedContainerMetric};
     removeFields(formSimulatedContainerMetric);
   }
   const fields = state.entities.fields.data;
-  return  {
+  return {
     isLoading,
     error,
     simulatedContainerMetric,

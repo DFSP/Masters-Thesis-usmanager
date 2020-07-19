@@ -26,6 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services.depende
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -39,8 +41,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)

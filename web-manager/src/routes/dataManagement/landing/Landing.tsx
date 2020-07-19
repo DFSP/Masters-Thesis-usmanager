@@ -24,11 +24,10 @@
 
 import React from 'react';
 import MainLayout from '../../../views/mainLayout/MainLayout';
-import styles from './Landing.module.css';
 
 const Landing = () =>
-    <MainLayout>
+  <MainLayout>
 
-    </MainLayout>;
+  </MainLayout>;
 
 export default Landing;

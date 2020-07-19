@@ -28,18 +28,18 @@
 <head>
 
     <meta charset="utf-8">
-    <meta name="robots" content="all,follow">
-    <meta name="googlebot" content="index,follow,snippet,archive">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="WeaveSocks Demo App">
-    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
-    <meta name="keywords" content="">
+    <meta content="all,follow" name="robots">
+    <meta content="index,follow,snippet,archive" name="googlebot">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="WeaveSocks Demo App" name="description">
+    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
+    <meta content="" name="keywords">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta name="keywords" content="">
+    <meta content="" name="keywords">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +52,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
+    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link rel="shortcut icon" href="favicon.png">
+    <link href="favicon.png" rel="shortcut icon">
 
 
 </head>
@@ -78,17 +78,17 @@
                 <div id="main-slider">
                     <div class="item">
                         <a href="detail.html?id=6d62d909-f957-430e-8689-b5129c0bb75e">
-                            <img class="img-responsive" src="img/weave1.jpg" alt="">
+                            <img alt="" class="img-responsive" src="img/weave1.jpg">
                         </a>
                     </div>
                     <div class="item">
                         <a href="detail.html?id=6d62d909-f957-430e-8689-b5129c0bb75e">
-                            <img class="img-responsive" src="img/weave2.jpg" alt="">
+                            <img alt="" class="img-responsive" src="img/weave2.jpg">
                         </a>
                     </div>
                     <div class="item">
                         <a href="detail.html?id=6d62d909-f957-430e-8689-b5129c0bb75e">
-                            <img class="img-responsive" src="img/weave3.jpg" alt="">
+                            <img alt="" class="img-responsive" src="img/weave3.jpg">
                         </a>
                     </div>
                 </div>
@@ -211,12 +211,12 @@ _________________________________________________________ -->
             if (data != null) {
                 $.each(data, function (index, element) {
                     $('#hot-slider').append(
-                            '<div class="item">\
-                            <div class="product">\
-                                <div class="flip-container">\
-                                    <div class="flipper">\
-                                        <div class="front">\
-                                            <a href="detail.html?id=' + element.id + '">\
+                        '<div class="item">\
+                        <div class="product">\
+                            <div class="flip-container">\
+                                <div class="flipper">\
+                                    <div class="front">\
+                                        <a href="detail.html?id=' + element.id + '">\
                                             <img src="' + element.imageUrl[0] + '" alt="" class="img-responsive">\
                                         </a>\
                                     </div>\

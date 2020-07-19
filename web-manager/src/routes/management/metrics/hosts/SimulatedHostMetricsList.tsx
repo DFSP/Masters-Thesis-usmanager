@@ -35,12 +35,6 @@ class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
     this.props.loadSimulatedHostMetrics();
   }
 
-  private simulatedHostMetric = (simulatedMetric: ISimulatedHostMetric): JSX.Element =>
-    <SimulatedHostMetricCard key={simulatedMetric.id} simulatedHostMetric={simulatedMetric}/>;
-
-  private predicate = (simulatedMetric: ISimulatedHostMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
-
   public render() {
     return (
       <CardList<ISimulatedHostMetric>
@@ -52,6 +46,12 @@ class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
         predicate={this.predicate}/>
     );
   }
+
+  private simulatedHostMetric = (simulatedMetric: ISimulatedHostMetric): JSX.Element =>
+    <SimulatedHostMetricCard key={simulatedMetric.id} simulatedHostMetric={simulatedMetric}/>;
+
+  private predicate = (simulatedMetric: ISimulatedHostMetric, search: string): boolean =>
+    simulatedMetric.name.toLowerCase().includes(search);
 
 }
 

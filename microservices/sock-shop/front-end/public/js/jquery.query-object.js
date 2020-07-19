@@ -59,7 +59,7 @@ new function (settings) {
                     target.push(tokens.length == 0 ? value : set(null, tokens.slice(0), value));
                 } else if (is(target, Object)) {
                     var i = 0;
-                    while (target[i++] != null);
+                    while (target[i++] != null) ;
                     target[--i] = tokens.length == 0 ? value : set(target[i], tokens.slice(0), value);
                 } else {
                     target = [];

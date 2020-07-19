@@ -28,18 +28,18 @@
 <head>
 
     <meta charset="utf-8">
-    <meta name="robots" content="all,follow">
-    <meta name="googlebot" content="index,follow,snippet,archive">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="WeaveSocks Demo App">
-    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
-    <meta name="keywords" content="">
+    <meta content="all,follow" name="robots">
+    <meta content="index,follow,snippet,archive" name="googlebot">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="WeaveSocks Demo App" name="description">
+    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
+    <meta content="" name="keywords">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta name="keywords" content="">
+    <meta content="" name="keywords">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +52,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
+    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link rel="shortcut icon" href="favicon.png">
+    <link href="favicon.png" rel="shortcut icon">
 
 
 </head>
@@ -90,8 +90,8 @@
                 <div class="row" id="productMain">
                     <div class="col-sm-6">
                         <div id="mainImage">
-                            <img id="imageMain" alt=""
-                                 class="img-responsive">
+                            <img alt="" class="img-responsive"
+                                 id="imageMain">
                         </div>
 
                         <div class="ribbon sale">
@@ -109,19 +109,19 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="box">
-                            <h1 id="title" class="text-center"></h1>
-                            <p class="goToDescription"><a href="#productDetails"
-                                                          class="scroll-to">Scroll
+                            <h1 class="text-center" id="title"></h1>
+                            <p class="goToDescription"><a class="scroll-to"
+                                                          href="#productDetails">Scroll
                                 to product details, material & care and
                                 sizing</a>
                             </p>
-                            <p id="price" class="price"></p>
+                            <p class="price" id="price"></p>
 
                             <p class="text-center buttons">
-                                <a id="buttonCart" class="btn btn-primary"><i
+                                <a class="btn btn-primary" id="buttonCart"><i
                                         class="fa fa-shopping-cart"></i> Add to
                                     cart</a>
-                                <a href="basket.html" class="btn btn-default"><i
+                                <a class="btn btn-default" href="basket.html"><i
                                         class="fa fa-heart"></i> Add to wishlist</a>
                             </p>
 
@@ -159,17 +159,17 @@
                     <div class="social">
                         <h4>Show it to your friends</h4>
                         <p>
-                            <a href="#" class="external facebook"
-                               data-animate-hover="pulse"><i
+                            <a class="external facebook" data-animate-hover="pulse"
+                               href="#"><i
                                     class="fa fa-facebook"></i></a>
-                            <a href="#" class="external gplus"
-                               data-animate-hover="pulse"><i
+                            <a class="external gplus" data-animate-hover="pulse"
+                               href="#"><i
                                     class="fa fa-google-plus"></i></a>
-                            <a href="#" class="external twitter"
-                               data-animate-hover="pulse"><i
+                            <a class="external twitter" data-animate-hover="pulse"
+                               href="#"><i
                                     class="fa fa-twitter"></i></a>
-                            <a href="#" class="email"
-                               data-animate-hover="pulse"><i
+                            <a class="email" data-animate-hover="pulse"
+                               href="#"><i
                                     class="fa fa-envelope"></i></a>
                         </p>
                     </div>
@@ -233,8 +233,8 @@ _________________________________________________________ -->
             var thumbHtml = "";
             for (var i = 0; i < data.imageUrl.length; i++) {
                 thumbHtml = thumbHtml +
-                        '<div class="col-xs-4">\
-                            <a href="' + data.imageUrl[i] + '" class="thumb">\
+                    '<div class="col-xs-4">\
+                        <a href="' + data.imageUrl[i] + '" class="thumb">\
                     <img src="' + data.imageUrl[i] + '" alt="" class="img-responsive">\
                     </a>\
                 </div>'
@@ -278,10 +278,6 @@ _________________________________________________________ -->
                 }
             });
         });
-
-
-
-
 
 
     });

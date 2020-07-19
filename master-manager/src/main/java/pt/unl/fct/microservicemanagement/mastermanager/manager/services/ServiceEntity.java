@@ -128,7 +128,7 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "service_affinity",
       joinColumns = @JoinColumn(name = "service_id"),
       inverseJoinColumns = @JoinColumn(name = "affinity_id")
@@ -157,7 +157,7 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "service_rule",
       joinColumns = @JoinColumn(name = "service_id"),
       inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -166,7 +166,7 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "service_simulated_metric",
       joinColumns = @JoinColumn(name = "service_id"),
       inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
