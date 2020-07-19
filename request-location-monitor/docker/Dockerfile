@@ -1,11 +1,11 @@
 FROM golang:1.10
 
-COPY ../. /go/src/bitbucket.org/microservicemanagement/request-location-monitor
-WORKDIR /go/src/bitbucket.org/microservicemanagement/request-location-monitor
+COPY ../. /go/src/github.com/usmanager/manager/request-location-monitor
+WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor
 
 RUN go get -u github.com/FiloSottile/gvt
 RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app bitbucket.org/microservicemanagement/request-location-monitor/cmd
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/request-location-monitor/cmd
 
 FROM danielfct/alpine-glibc
 WORKDIR /

@@ -27,7 +27,7 @@ package data
 import (
 	"time"
 
-	"bitbucket.org/microservicemanagement/request-location-monitor/utils"
+	"github.com/usmanager/manager/request-location-monitor/utils"
 )
 
 // LocationMonitoringData data

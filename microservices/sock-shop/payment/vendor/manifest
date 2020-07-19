@@ -732,8 +732,8 @@
 			"notests": true
 		},
 		{
-			"importpath": "bitbucket.org/microservicemanagement/go-client-register-go",
-			"repository": "https://bitbucket.org/microservicemanagement/go-client-register-go",
+			"importpath": "github.com/usmanager/manager/go-client-register-go",
+			"repository": "https://github.com/usmanager/manager/go-client-register-go",
 			"vcs": "git",
 			"revision": "0f3f1256238848e798172a49c294a956c3e1fccd",
 			"branch": "master",

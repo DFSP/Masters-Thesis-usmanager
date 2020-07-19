@@ -29,8 +29,8 @@ import (
 	"net/http"
 	"time"
 
-	"bitbucket.org/microservicemanagement/nginx-load-balancer-api/data"
-	"bitbucket.org/microservicemanagement/nginx-load-balancer-api/nginx"
+	"github.com/usmanager/manager/nginx-load-balancer-api/data"
+	"github.com/usmanager/manager/nginx-load-balancer-api/nginx"
 )
 
 const secondsDelayAddServer = 15

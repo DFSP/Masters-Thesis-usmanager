@@ -1,12 +1,12 @@
 FROM danielfct/registration-client
 
 FROM golang:1.10
-COPY . /go/src/bitbucket.org/microservicemanagement/payment
-WORKDIR /go/src/bitbucket.org/microservicemanagement/payment
+COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
+WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
 
 RUN go get -u github.com/FiloSottile/gvt
 RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app bitbucket.org/microservicemanagement/payment/cmd/paymentsvc
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/microservices/sock-shop/payment/cmd/paymentsvc
 
 FROM danielfct/alpine-glibc
 WORKDIR /

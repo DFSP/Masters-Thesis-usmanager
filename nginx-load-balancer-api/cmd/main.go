@@ -29,8 +29,9 @@ import (
 	"log"
 	"net/http"
 
-	"bitbucket.org/microservicemanagement/nginx-load-balancer-api/api"
 	"github.com/gorilla/mux"
+	
+	"github.com/usmanager/manager/nginx-load-balancer-api/api"
 )
 
 func main() {

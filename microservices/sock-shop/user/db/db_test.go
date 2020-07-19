@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"bitbucket.org/microservicemanagement/user/users"
+	"github.com/usmanager/manager/microservices/sock-shop/user/users"
 )
 
 var (

@@ -35,7 +35,7 @@ import (
 	"strings"
 	"sync"
 
-	"bitbucket.org/microservicemanagement/nginx-load-balancer-api/data"
+	"github.com/usmanager/manager/nginx-load-balancer-api/data"
 )
 
 const generatedPath = "/nginx-api-generated"

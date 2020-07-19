@@ -12,10 +12,10 @@ gvt restore
 
 #### Go tools
 In order to build the project locally you need to make sure that the repository directory is located in the correct
-$GOPATH directory: $GOPATH/src/bitbucket.org/cloudedgemicroserviceteam/nginx-load-balancer-api/. Once that is in place you can build by running:
+$GOPATH directory: $GOPATH/src/github.com/usmanager/manager/nginx-load-balancer-api/. Once that is in place you can build by running:
 
 ```
-cd $GOPATH/src/bitbucket.org/cloudedgemicroserviceteam/nginx-load-balancer-api/cmd/
+cd $GOPATH/src/github.com/usmanager/manager/nginx-load-balancer-api/cmd/
 go build -o nginx-load-balancer-api
 ```
 

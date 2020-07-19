@@ -10,8 +10,8 @@ class GoServices(unittest.TestCase):
         command = ['docker', 'run',
             '--rm',
             '-v', goPath + ':/go/',
-            '-v', code_dir + ':/go/src/bitbucket.org/cloudedgemicroserviceteam/payment',
-            '-w', '/go/src/bitbucket.org/cloudedgemicroserviceteam/payment',
+            '-v', code_dir + ':/go/src/github.com/usmanager/manager/microservices/sock-shop/payment',
+            '-w', '/go/src/github.com/usmanager/manager/microservices/sock-shop/payment',
             '-e', 'GOPATH=/go/',
             'golang:1.7',
             'go', 'test', '-v', '-covermode=count', '-coverprofile=coverage.out'

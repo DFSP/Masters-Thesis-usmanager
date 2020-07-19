@@ -1,7 +1,7 @@
 hash: 912cd1e6b3fcd65865b81c23a7a4c188dc304ee9b183b786372fb34b863bfb85
 updated: 2019-06-18T00:58:40.616472692+01:00
 imports:
-- name: bitbucket.org/microservicemanagement/go-client-register-go
+- name: github.com/usmanager/manager/microservices/sock-shop/go-client-register-go
   version: a9831e1778f6c3e16799747624f2f08d429ae3b6
 - name: github.com/afex/hystrix-go
   version: 39520ddd07a9d9a071d615f7476798659f5a3b89

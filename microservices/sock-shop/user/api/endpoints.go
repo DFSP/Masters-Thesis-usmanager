@@ -33,8 +33,8 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/tracing/opentracing"
-	"bitbucket.org/microservicemanagement/user/db"
-	"bitbucket.org/microservicemanagement/user/users"
+	"github.com/usmanager/manager/microservices/sock-shop/user/db"
+	"github.com/usmanager/manager/microservices/sock-shop/user/users"
 	stdopentracing "github.com/opentracing/opentracing-go"
 )
 

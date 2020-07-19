@@ -35,8 +35,8 @@ import (
 	"syscall"
 	"time"
 
-	"bitbucket.org/microservicemanagement/go-client-register-go"
-	"bitbucket.org/microservicemanagement/payment"
+	"github.com/usmanager/manager/go-client-register-go"
+	"github.com/usmanager/manager/microservices/sock-shop/payment"
 	"github.com/go-kit/kit/log"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"

@@ -29,7 +29,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
-	"bitbucket.org/microservicemanagement/user/users"
+	"github.com/usmanager/manager/microservices/sock-shop/user/users"
 )
 
 // Middleware decorates a service.

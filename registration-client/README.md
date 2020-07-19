@@ -12,14 +12,14 @@ gvt restore
 
 #### Go tools
 In order to build the project locally you need to make sure that the repository directory is located in the correct
-$GOPATH directory: $GOPATH/src/bitbucket.org/cloudedgemicroserviceteam/register/. Once that is in place you can build by running:
+$GOPATH directory: $GOPATH/src/github.com/usmanager/manager/registration-client/. Once that is in place you can build by running:
 
 ```
-cd $GOPATH/src/bitbucket.org/cloudedgemicroserviceteam/register/cmd/register-go/
-go build -o register
+cd $GOPATH/src/github.com/usmanager/manager/registration-client/cmd/registration-client/
+go build -o registration-client
 ```
 
-The result is a binary named `register-go`, in the current directory.
+The result is a binary named `registration-client`, in the current directory.
 
 ### API Endpoints
 

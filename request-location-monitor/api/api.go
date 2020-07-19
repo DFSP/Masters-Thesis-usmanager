@@ -33,8 +33,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"bitbucket.org/microservicemanagement/request-location-monitor/utils"
-	"bitbucket.org/microservicemanagement/request-location-monitor/data"
+
+	"github.com/usmanager/manager/request-location-monitor/data"
+	"github.com/usmanager/manager/request-location-monitor/utils"
 )
 
 var defaultInterval = 60

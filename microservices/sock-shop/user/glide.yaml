@@ -1,4 +1,4 @@
-package: bitbucket.org/microservicemanagement/user
+package: github.com/usmanager/manager/user
 import:
 - package: github.com/go-kit/kit
   version: v0.4.0
@@ -29,4 +29,4 @@ import:
   subpackages:
   - middleware
 - package: golang.org/x/oauth2
-- package: bitbucket.org/microservicemanagement/go-client-registration-client
+- package: github.com/usmanager/manager/go-client-registration-client

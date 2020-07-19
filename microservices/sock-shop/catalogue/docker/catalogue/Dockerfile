@@ -1,12 +1,12 @@
 FROM danielfct/registration-client
 
 FROM golang:1.10
-COPY . /go/src/bitbucket.org/microservicemanagement/catalogue
-WORKDIR /go/src/bitbucket.org/microservicemanagement/catalogue
+COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue
+WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue
 
 RUN go get -u github.com/FiloSottile/gvt
 RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app bitbucket.org/microservicemanagement/catalogue/cmd/cataloguesvc
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/microservices/sock-shop/catalogue/cmd/cataloguesvc
 
 FROM danielfct/alpine-glibc
 WORKDIR /

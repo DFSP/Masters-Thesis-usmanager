@@ -42,8 +42,8 @@ import (
 
 	"path/filepath"
 
-	"bitbucket.org/microservicemanagement/catalogue"
-	"bitbucket.org/microservicemanagement/go-client-register-go"
+	"catalogue"
+	"github.com/usmanager/manager/go-client-register-go"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"

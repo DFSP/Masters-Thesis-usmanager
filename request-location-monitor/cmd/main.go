@@ -29,8 +29,9 @@ import (
 	"log"
 	"net/http"
 
-	"bitbucket.org/microservicemanagement/request-location-monitor/api"
 	"github.com/gorilla/mux"
+
+	"github.com/usmanager/manager/request-location-monitor/api"
 )
 
 func main() {

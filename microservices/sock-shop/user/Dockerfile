@@ -1,5 +1,5 @@
 FROM golang:1.7-alpine
-ENV sourcesdir /go/src/bitbucket.org/microservicemanagement/user/
+ENV sourcesdir /go/src/github.com/usmanager/manager/microservices/sock-shop/user/
 ENV MONGO_HOST mytestdb:27017
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
