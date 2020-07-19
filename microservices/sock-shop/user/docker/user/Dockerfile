@@ -15,7 +15,7 @@ ENV USER_DATABASE mongodb
 ENV MONGO_HOST user-db:27017
 
 WORKDIR /
-COPY --from=0 /register ./register
+COPY --from=0 /registration-client ./registration-client
 COPY --from=1 /app /app
 COPY ./scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]

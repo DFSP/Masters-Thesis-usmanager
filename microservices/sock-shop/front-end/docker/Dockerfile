@@ -31,7 +31,7 @@ COPY yarn.lock /usr/src/app/
 RUN yarn install
 
 COPY . /usr/src/app
-COPY --from=0 /register ./register
+COPY --from=0 /registration-client ./registration-client
 COPY ./scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
 

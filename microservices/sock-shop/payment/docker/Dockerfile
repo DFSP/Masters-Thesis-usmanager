@@ -10,7 +10,7 @@ RUN gvt restore && \
 
 FROM usmanager/alpine-glibc
 WORKDIR /
-COPY --from=0 /register ./register
+COPY --from=0 /registration-client ./registration-client
 COPY --from=1 /app /app
 COPY ./scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]

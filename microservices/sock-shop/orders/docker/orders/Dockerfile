@@ -2,7 +2,7 @@ FROM usmanager/registration-client
 
 FROM usmanager/jdk-glibc
 WORKDIR /usr/src/app
-COPY --from=0 /register ./register
+COPY --from=0 /registration-client ./registration-client
 COPY ./target/*.jar ./app.jar
 COPY ./scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
