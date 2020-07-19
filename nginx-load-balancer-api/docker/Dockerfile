@@ -1,6 +1,6 @@
 FROM golang:1.10
 
-COPY ../. /go/src/github.com/usmanager/manager/nginx-load-balancer-api
+COPY . /go/src/github.com/usmanager/manager/nginx-load-balancer-api
 WORKDIR /go/src/github.com/usmanager/manager/nginx-load-balancer-api
 
 RUN go get -u github.com/FiloSottile/gvt

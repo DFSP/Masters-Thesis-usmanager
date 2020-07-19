@@ -1,6 +1,6 @@
 FROM golang:1.10
 
-COPY ../. /go/src/github.com/usmanager/manager/request-location-monitor
+COPY . /go/src/github.com/usmanager/manager/request-location-monitor
 WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor
 
 RUN go get -u github.com/FiloSottile/gvt
