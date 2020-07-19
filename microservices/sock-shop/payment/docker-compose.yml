@@ -4,7 +4,7 @@ services:
     payment:
         build: 
             context: .
-            dockerfile: docker/payment/Dockerfile
+            dockerfile: docker/Dockerfile
         image: weaveworksdemos/payment
         hostname: payment
         restart: always

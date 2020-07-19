@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/catalogue/catalogue.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/catalogue/catalogue.iml" />
-      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/docker-rabbitmq/docker-rabbitmq.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/docker-rabbitmq/docker-rabbitmq.iml" />
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/front-end/front-end.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/front-end/front-end.iml" />
       <module fileurl="file://$PROJECT_DIR$/go-client-register-go/go-client-register-go.iml" filepath="$PROJECT_DIR$/go-client-register-go/go-client-register-go.iml" />
       <module fileurl="file://$PROJECT_DIR$/local-manager/local-manager.iml" filepath="$PROJECT_DIR$/local-manager/local-manager.iml" />
