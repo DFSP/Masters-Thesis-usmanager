@@ -1,4 +1,4 @@
-FROM danielfct/nginx-load-balancer-api
+FROM usmanager/nginx-load-balancer-api
 FROM nginx:alpine
 
 # for htpasswd command

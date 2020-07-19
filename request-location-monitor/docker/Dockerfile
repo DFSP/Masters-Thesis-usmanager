@@ -7,7 +7,7 @@ RUN go get -u github.com/FiloSottile/gvt
 RUN gvt restore && \
     CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/request-location-monitor/cmd
 
-FROM danielfct/alpine-glibc
+FROM usmanager/alpine-glibc
 WORKDIR /
 COPY --from=0 /app /app
 COPY ./scripts/docker-init.sh ./docker-init.sh

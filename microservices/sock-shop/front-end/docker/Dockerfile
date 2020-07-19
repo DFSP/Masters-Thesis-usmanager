@@ -1,4 +1,4 @@
-FROM danielfct/registration-client
+FROM usmanager/registration-client
 
 FROM node:9-alpine
 ENV NODE_ENV "production"

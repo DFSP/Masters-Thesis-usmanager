@@ -1,4 +1,4 @@
-FROM danielfct/registration-client
+FROM usmanager/registration-client
 
 FROM golang:1.10
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
@@ -8,7 +8,7 @@ RUN go get -u github.com/FiloSottile/gvt
 RUN gvt restore && \
     CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/microservices/sock-shop/payment/cmd/paymentsvc
 
-FROM danielfct/alpine-glibc
+FROM usmanager/alpine-glibc
 WORKDIR /
 COPY --from=0 /register ./register
 COPY --from=1 /app /app

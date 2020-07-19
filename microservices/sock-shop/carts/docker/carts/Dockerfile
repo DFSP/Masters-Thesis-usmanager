@@ -1,6 +1,6 @@
-FROM danielfct/registration-client
+FROM usmanager/registration-client
 
-FROM danielfct/jdk-glibc
+FROM usmanager/jdk-glibc
 WORKDIR /usr/src/app
 COPY --from=0 /register ./register
 COPY ./target/*.jar ./app.jar

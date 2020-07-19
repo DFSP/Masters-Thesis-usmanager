@@ -1,4 +1,4 @@
-FROM danielfct/mongo3
+FROM usmanager/mongo3
 COPY ./docker/user-db/scripts /tmp/scripts
 RUN ["chmod", "+x", "/tmp/scripts/mongo_create_insert.sh"]
 

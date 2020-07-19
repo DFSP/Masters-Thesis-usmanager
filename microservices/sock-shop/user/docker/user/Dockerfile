@@ -1,4 +1,4 @@
-FROM danielfct/registration-client
+FROM usmanager/registration-client
 
 FROM golang:1.10-alpine
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/user
@@ -8,7 +8,7 @@ RUN apk add git
 RUN go get -v github.com/Masterminds/glide 
 RUN glide install && CGO_ENABLED=0 go build -a -installsuffix cgo -o /app main.go
 
-FROM danielfct/alpine-glibc
+FROM usmanager/alpine-glibc
 
 ENV HATEAOS user
 ENV USER_DATABASE mongodb

@@ -1,4 +1,4 @@
-FROM danielfct/jdk-glibc
+FROM usmanager/jdk-glibc
 WORKDIR /usr/src/app
 COPY target/*.jar ./app.jar
 COPY scripts/docker-init.sh ./docker-init.sh
