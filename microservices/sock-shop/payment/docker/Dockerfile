@@ -1,7 +1,7 @@
 FROM usmanager/registration-client
 
 FROM golang:1.10
-COPY payment /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
+COPY payment /go/src/github.com/usmanager/manager/microservices/sock-shop
 WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
 
 RUN go get -u github.com/FiloSottile/gvt
