@@ -1,9 +1,17 @@
-FROM openjdk:15-jdk-alpine
-
+#
+# Build stage
+#
+FROM maven:3.6.0-jdk-11-slim AS build
 WORKDIR /usr/src/app
+COPY src ./src
+COPY pom.xml .
+RUN mvn -f pom.xml clean package
 
-COPY ./src/main/resources/aws/ec2.pem ./ec2.pem
-COPY ./src/main/resources/logging/logback-spring.xml ./src/main/resources/logging/logback-spring.xml
-COPY ./target/*.jar ./app.jar
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
+COPY --from=build /usr/src/app/target/*.jar ./master-manager.jar
+EXPOSE 8080
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","./app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","./master-manager.jar"]

@@ -1,5 +1,4 @@
-target/*
-!target/*.jar
+target
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -118,3 +117,5 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+generated
