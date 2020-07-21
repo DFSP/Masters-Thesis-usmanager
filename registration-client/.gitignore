@@ -5,4 +5,4 @@ vendor/**
 !vendor/manifest
 
 cmd/registration-client/**
-!cmd/registration-client/main.go
+!cmd/registration-client/*.go
