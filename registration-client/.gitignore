@@ -1,8 +1,7 @@
 __pycache__/
 coverage.out
 
-vendor/**
-!vendor/manifest
+vendor
 
 cmd/registration-client/**
-!cmd/registration-client/*.go
+!cmd/registration-client/**.go

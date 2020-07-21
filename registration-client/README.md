@@ -5,7 +5,7 @@ Regista um serviço no [Servidor Eureka](../registration-server), e obtém o end
 #### Executar
 
 ```shell script
-cd registration-client/cmd
+cd cmd
 go build -o registration-client
 ./registration-client
 ```
