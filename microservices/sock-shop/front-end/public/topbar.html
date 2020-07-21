@@ -1,72 +1,47 @@
-<!--
-  ~ MIT License
-  ~
-  ~ Copyright (c) 2020 manager
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  -->
-
 <!-- *** TOPBAR ***
 _________________________________________________________ -->
 <div id="top">
     <div class="container">
         <div class="col-md-6 offer" data-animate="fadeInDown">
-            <a class="btn btn-success btn-sm" data-animate-hover="shake"
-               href="#">Offer of the day</a> <a href="#">Buy
+            <a href="#" class="btn btn-success btn-sm"
+               data-animate-hover="shake">Offer of the day</a> <a href="#">Buy
             1000 socks, get a shoe for free!</a>
         </div>
         <div class="col-md-6" data-animate="fadeInDown">
             <ul class="menu">
-                <li id="login"><a data-target="#login-modal" data-toggle="modal" href="#">Login</a></li>
+                <li id="login"><a href="#" data-toggle="modal" data-target="#login-modal">Login</a></li>
                 <li id="howdy"></li>
                 <li id="logout"><a href="index.html" onclick="logout()">Logout</a></li>
-                <li id="register"><a data-target="#register-modal" data-toggle="modal" href="#">Register</a></li>
+                <li id="register"><a href="#" data-toggle="modal" data-target="#register-modal">Register</a></li>
                 <!--<li><a href="contact.html">Contact</a></li>-->
                 <!--<li><a href="#">Recently viewed</a></li>-->
             </ul>
         </div>
     </div>
-    <div aria-hidden="true" aria-labelledby="Login" class="modal fade" id="login-modal"
-         role="dialog" tabindex="-1">
+    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
+         aria-labelledby="Login" aria-hidden="true">
         <div class="modal-dialog modal-sm">
 
             <div class="modal-content">
                 <div class="modal-header">
-                    <button aria-hidden="true" class="close" data-dismiss="modal"
-                            type="button">&times;
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="Login">Customer login</h4>
                 </div>
                 <div class="modal-body">
 
-                    <div id="login-message"></div>
+                    <div id="login-message"> </div>
 
                     <form action="index.html" method="get">
                         <div class="form-group">
-                            <input class="form-control" id="username-modal"
+                            <input type="text" class="form-control"
                                    name="username"
-                                   placeholder="username" type="text">
+                                   id="username-modal" placeholder="username">
                         </div>
                         <div class="form-group">
-                            <input class="form-control" id="password-modal"
+                            <input type="password" class="form-control"
                                    name="password"
-                                   placeholder="password" type="password">
+                                   id="password-modal" placeholder="password">
                         </div>
 
                         <p class="text-center">
@@ -84,47 +59,46 @@ _________________________________________________________ -->
             </div>
         </div>
     </div>
-    <div aria-hidden="true" aria-labelledby="Register" class="modal fade" id="register-modal"
-         role="dialog" tabindex="-1">
+    <div class="modal fade" id="register-modal" tabindex="-1" role="dialog"
+         aria-labelledby="Register" aria-hidden="true">
         <div class="modal-dialog modal-sm">
 
             <div class="modal-content">
                 <div class="modal-header">
-                    <button aria-hidden="true" class="close" data-dismiss="modal"
-                            type="button">&times;
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="Login">Register</h4>
                 </div>
                 <div class="modal-body">
 
-                    <div id="registration-message"></div>
+                    <div id="registration-message"> </div>
 
                     <form action="index.html" method="get">
 
                         <div class="form-group">
                             <label for="name">Username</label>
-                            <input class="form-control" id="register-username-modal" name="username"
-                                   placeholder="username" required type="text">
+                            <input type="text" class="form-control" name="username"
+			    	id="register-username-modal" placeholder="username"required>
                         </div>
                         <div class="form-group">
                             <label for="first-name">First name</label>
-                            <input class="form-control" id="register-first-modal" name="first-name"
-                                   placeholder="first name" required type="text">
+                            <input type="text" class="form-control" name="first-name"
+			    	id="register-first-modal" placeholder="first name" required>
                         </div>
                         <div class="form-group">
                             <label for="last-name">Last name</label>
-                            <input class="form-control" id="register-last-modal" name="last-name"
-                                   placeholder="last name" required type="text">
+                            <input type="text" class="form-control" name="last-name"
+			    	id="register-last-modal" placeholder="last name"required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input class="form-control" id="register-email-modal" name="email"
-                                   placeholder="email" required type="text">
+                            <input type="text" class="form-control" name="email"
+			    	id="register-email-modal" placeholder="email" required>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input class="form-control" id="register-password-modal" name="password"
-                                   required type="password">
+                            <input type="password" class="form-control" name="password"
+			    	id="register-password-modal"required>
                         </div>
                         <p class="text-center">
                             <button class="btn btn-primary" href="#" onclick="return register()"><i
@@ -162,12 +136,12 @@ _________________________________________________________ -->
                     $("#howdy").append('<a href="#">Logged in as ' + username + '<\/a>').hide().fadeIn(200);
                     $("#logout").hide().fadeIn(200);
                 } else {
-                    $("#howdy").remove();
+                    $("#howdy").remove()
                     $("#logout").remove()
                 }
             });
         } else {
-            $("#howdy").remove();
+            $("#howdy").remove()
             $("#logout").remove()
         }
 

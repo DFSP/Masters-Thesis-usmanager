@@ -86,6 +86,10 @@ Substituir o id da ami no application.yaml, propriedade aws.instance.ami.
 - [Criar](https://console.aws.amazon.com/iam/home#/users) um utilizador *iam* para aceder aos recursos aws através, 
 com tipo de acesso Programmatic access, e política AdministratorAccess. Substituir os valores da access key e secret access key no application.yaml, propriedades aws.access.key e aws.access.secret-key, respetivamente.
 
+##### Go
+
+Para usar repositórios privados com o go modules:  
+`go env -w GOPRIVATE=github.com/usmanager/*`
 
 ### Licença
 

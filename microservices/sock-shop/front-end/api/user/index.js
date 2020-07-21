@@ -1,54 +1,28 @@
-/*
- * MIT License
- *
- * Copyright (c) 2020 manager
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-(function () {
+(function() {
     'use strict';
 
-    var async = require("async"), express = require("express"), request = require("request"),
-        endpoints = require("../endpoints")(), helpers = require("../../helpers"), app = express(),
-        cookie_name = "logged_in";
+    var async = require("async"), express = require("express"), request = require("request"), endpoints = require("../endpoints")(), helpers = require("../../helpers"), app = express(), cookie_name = "logged_in"
 
 
-    app.get("/customers/:id", function (req, res, next) {
+    app.get("/customers/:id", function(req, res, next) {
         helpers.simpleHttpRequest(endpoints.customersUrl() + "/" + req.session.customerId, res, next);
     });
-    app.get("/cards/:id", function (req, res, next) {
+    app.get("/cards/:id", function(req, res, next) {
         helpers.simpleHttpRequest(endpoints.cardsUrl() + "/" + req.params.id, res, next);
     });
 
-    app.get("/customers", function (req, res, next) {
+    app.get("/customers", function(req, res, next) {
         helpers.simpleHttpRequest(endpoints.customersUrl(), res, next);
     });
-    app.get("/addresses", function (req, res, next) {
+    app.get("/addresses", function(req, res, next) {
         helpers.simpleHttpRequest(endpoints.addressUrl(), res, next);
     });
-    app.get("/cards", function (req, res, next) {
+    app.get("/cards", function(req, res, next) {
         helpers.simpleHttpRequest(endpoints.cardsUrl(), res, next);
     });
 
     // Create Customer - TO BE USED FOR TESTING ONLY (for now)
-    app.post("/customers", function (req, res, next) {
+    app.post("/customers", function(req, res, next) {
         var options = {
             uri: endpoints.customersUrl(),
             method: 'POST',
@@ -58,7 +32,7 @@
 
         console.log("Posting Customer: " + JSON.stringify(req.body));
 
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -68,7 +42,7 @@
         }));
     });
 
-    app.post("/addresses", function (req, res, next) {
+    app.post("/addresses", function(req, res, next) {
         req.body.userID = helpers.getCustomerId(req, app.get("env"));
 
         var options = {
@@ -78,7 +52,7 @@
             body: req.body
         };
         console.log("Posting Address: " + JSON.stringify(req.body));
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -88,18 +62,18 @@
         }));
     });
 
-    app.get("/card", function (req, res, next) {
+    app.get("/card", function(req, res, next) {
         var custId = helpers.getCustomerId(req, app.get("env"));
         var options = {
             uri: endpoints.customersUrl() + '/' + custId + '/cards',
             method: 'GET',
         };
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
             var data = JSON.parse(body);
-            if (data.status_code !== 500 && data._embedded.card.length !== 0) {
+            if (data.status_code !== 500 && data._embedded.card.length !== 0 ) {
                 var resp = {
                     "number": data._embedded.card[0].longNum.slice(-4)
                 };
@@ -111,18 +85,18 @@
         }));
     });
 
-    app.get("/address", function (req, res, next) {
+    app.get("/address", function(req, res, next) {
         var custId = helpers.getCustomerId(req, app.get("env"));
         var options = {
             uri: endpoints.customersUrl() + '/' + custId + '/addresses',
             method: 'GET',
         };
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
             var data = JSON.parse(body);
-            if (data.status_code !== 500 && data._embedded.address.length !== 0) {
+            if (data.status_code !== 500 && data._embedded.address.length !== 0 ) {
                 var resp = data._embedded.address[0];
                 return helpers.respondSuccessBody(res, JSON.stringify(resp));
             }
@@ -132,7 +106,7 @@
         }));
     });
 
-    app.post("/cards", function (req, res, next) {
+    app.post("/cards", function(req, res, next) {
         req.body.userID = helpers.getCustomerId(req, app.get("env"));
 
         var options = {
@@ -142,7 +116,7 @@
             body: req.body
         };
         console.log("Posting Card: " + JSON.stringify(req.body));
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -153,13 +127,13 @@
     });
 
     // Delete Customer - TO BE USED FOR TESTING ONLY (for now)
-    app.delete("/customers/:id", function (req, res, next) {
+    app.delete("/customers/:id", function(req, res, next) {
         console.log("Deleting Customer " + req.params.id);
         var options = {
             uri: endpoints.customersUrl() + "/" + req.params.id,
             method: 'DELETE'
         };
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -170,13 +144,13 @@
     });
 
     // Delete Address - TO BE USED FOR TESTING ONLY (for now)
-    app.delete("/addresses/:id", function (req, res, next) {
+    app.delete("/addresses/:id", function(req, res, next) {
         console.log("Deleting Address " + req.params.id);
         var options = {
             uri: endpoints.addressUrl() + "/" + req.params.id,
             method: 'DELETE'
         };
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -187,13 +161,13 @@
     });
 
     // Delete Card - TO BE USED FOR TESTING ONLY (for now)
-    app.delete("/cards/:id", function (req, res, next) {
+    app.delete("/cards/:id", function(req, res, next) {
         console.log("Deleting Card " + req.params.id);
         var options = {
             uri: endpoints.cardsUrl() + "/" + req.params.id,
             method: 'DELETE'
         };
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
@@ -203,7 +177,7 @@
         }));
     });
 
-    app.post("/register", function (req, res, next) {
+    app.post("/register", function(req, res, next) {
         helpers.processReqLocationHeaders(req);
         var options = {
             uri: endpoints.registerUrl(),
@@ -215,9 +189,9 @@
         console.log("Posting Customer: " + JSON.stringify(req.body));
 
         async.waterfall([
-                function (callback) {
-                    request(options, function (error, response, body) {
-                        if (error !== null) {
+                function(callback) {
+                    request(options, function(error, response, body) {
+                        if (error !== null ) {
                             callback(error);
                             return;
                         }
@@ -237,7 +211,7 @@
                         callback(true);
                     });
                 },
-                function (custId, callback) {
+                function(custId, callback) {
                     var sessionId = req.session.id;
                     console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
 
@@ -245,17 +219,17 @@
                         uri: endpoints.cartsUrl() + "/" + custId + "/merge" + "?sessionId=" + sessionId,
                         method: 'GET'
                     };
-                    request(options, function (error, response, body) {
+                    request(options, function(error, response, body) {
                         if (error) {
-                            if (callback) callback(error);
+                            if(callback) callback(error);
                             return;
                         }
                         console.log('Carts merged.');
-                        if (callback) callback(null, custId);
+                        if(callback) callback(null, custId);
                     });
                 }
             ],
-            function (err, custId) {
+            function(err, custId) {
                 if (err) {
                     console.log("Error with log in: " + err);
                     res.status(500);
@@ -269,24 +243,24 @@
                 }).send({id: custId});
                 console.log("Sent cookies.");
                 res.end();
-
+                return;
             }
         );
     });
 
-    app.get("/login", function (req, res, next) {
+    app.get("/login", function(req, res, next) {
         helpers.processReqLocationHeaders(req);
         console.log("Received login request");
 
         async.waterfall([
-                function (callback) {
+                function(callback) {
                     var options = {
                         headers: {
                             'Authorization': req.get('Authorization')
                         },
                         uri: endpoints.loginUrl()
                     };
-                    request(options, function (error, response, body) {
+                    request(options, function(error, response, body) {
                         if (error) {
                             callback(error);
                             return;
@@ -303,7 +277,7 @@
                         callback(true);
                     });
                 },
-                function (custId, callback) {
+                function(custId, callback) {
                     var sessionId = req.session.id;
                     console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
 
@@ -311,7 +285,7 @@
                         uri: endpoints.cartsUrl() + "/" + custId + "/merge" + "?sessionId=" + sessionId,
                         method: 'GET'
                     };
-                    request(options, function (error, response, body) {
+                    request(options, function(error, response, body) {
                         if (error) {
                             // if cart fails just log it, it prevenst login
                             console.log(error);
@@ -322,7 +296,7 @@
                     });
                 }
             ],
-            function (err, custId) {
+            function(err, custId) {
                 if (err) {
                     console.log("Error with log in: " + err);
                     res.status(401);
@@ -335,7 +309,7 @@
                 }).send('Cookie is set');
                 console.log("Sent cookies.");
                 res.end();
-
+                return;
             });
     });
 

@@ -1,45 +1,21 @@
-<!--
-  ~ MIT License
-  ~
-  ~ Copyright (c) 2020 manager
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="utf-8">
-    <meta content="all,follow" name="robots">
-    <meta content="index,follow,snippet,archive" name="googlebot">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="WeaveSocks Demo App" name="description">
-    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
-    <meta content="" name="keywords">
+    <meta name="robots" content="all,follow">
+    <meta name="googlebot" content="index,follow,snippet,archive">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeaveSocks Demo App">
+    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
+    <meta name="keywords" content="">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta content="" name="keywords">
+    <meta name="keywords" content="">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +28,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
+    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link href="favicon.png" rel="shortcut icon">
+    <link rel="shortcut icon" href="favicon.png">
 
 
 </head>
@@ -149,19 +125,19 @@ _________________________________________________________ -->
                             </tbody>
                             <tfoot>
                             <tr>
-                                <th class="text-right" colspan="5">Order
+                                <th colspan="5" class="text-right">Order
                                     subtotal
                                 </th>
                                 <th id="orderSubtotal"></th>
                             </tr>
                             <tr>
-                                <th class="text-right" colspan="5">Shipping and
+                                <th colspan="5" class="text-right">Shipping and
                                     handling
                                 </th>
                                 <th id="orderShipping"></th>
                             </tr>
                             <tr>
-                                <th class="text-right" colspan="5">Total</th>
+                                <th colspan="5" class="text-right">Total</th>
                                 <th id="orderTotal"></th>
                             </tr>
                             </tfoot>
@@ -188,6 +164,8 @@ _________________________________________________________ -->
         <!-- /.container -->
     </div>
     <!-- /#content -->
+
+
 
 
 </div>
@@ -261,7 +239,7 @@ _________________________________________________________ -->
                     $('#orderShipping').text('$' + shipping.toFixed(2));
                     $('#orderTotal').text('$' + (cartTotal + shipping).toFixed(2));
                 });
-            });
+            })
             $('#addressInvoice').replaceWith('\
                 <p>' + data.customer.firstName + ' ' + data.customer.lastName + '\
                     <br>' + data.address.number + ' ' + data.address.street + '\

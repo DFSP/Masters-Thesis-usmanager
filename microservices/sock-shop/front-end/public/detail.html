@@ -1,45 +1,21 @@
-<!--
-  ~ MIT License
-  ~
-  ~ Copyright (c) 2020 manager
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="utf-8">
-    <meta content="all,follow" name="robots">
-    <meta content="index,follow,snippet,archive" name="googlebot">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="WeaveSocks Demo App" name="description">
-    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
-    <meta content="" name="keywords">
+    <meta name="robots" content="all,follow">
+    <meta name="googlebot" content="index,follow,snippet,archive">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeaveSocks Demo App">
+    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
+    <meta name="keywords" content="">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta content="" name="keywords">
+    <meta name="keywords" content="">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +28,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
+    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link href="favicon.png" rel="shortcut icon">
+    <link rel="shortcut icon" href="favicon.png">
 
 
 </head>
@@ -90,8 +66,8 @@
                 <div class="row" id="productMain">
                     <div class="col-sm-6">
                         <div id="mainImage">
-                            <img alt="" class="img-responsive"
-                                 id="imageMain">
+                            <img id="imageMain" alt=""
+                                 class="img-responsive">
                         </div>
 
                         <div class="ribbon sale">
@@ -109,19 +85,19 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="box">
-                            <h1 class="text-center" id="title"></h1>
-                            <p class="goToDescription"><a class="scroll-to"
-                                                          href="#productDetails">Scroll
+                            <h1 id="title" class="text-center"></h1>
+                            <p class="goToDescription"><a href="#productDetails"
+                                                          class="scroll-to">Scroll
                                 to product details, material & care and
                                 sizing</a>
                             </p>
-                            <p class="price" id="price"></p>
+                            <p id="price" class="price"></p>
 
                             <p class="text-center buttons">
-                                <a class="btn btn-primary" id="buttonCart"><i
+                                <a id="buttonCart" class="btn btn-primary"><i
                                         class="fa fa-shopping-cart"></i> Add to
                                     cart</a>
-                                <a class="btn btn-default" href="basket.html"><i
+                                <a href="basket.html" class="btn btn-default"><i
                                         class="fa fa-heart"></i> Add to wishlist</a>
                             </p>
 
@@ -159,17 +135,17 @@
                     <div class="social">
                         <h4>Show it to your friends</h4>
                         <p>
-                            <a class="external facebook" data-animate-hover="pulse"
-                               href="#"><i
+                            <a href="#" class="external facebook"
+                               data-animate-hover="pulse"><i
                                     class="fa fa-facebook"></i></a>
-                            <a class="external gplus" data-animate-hover="pulse"
-                               href="#"><i
+                            <a href="#" class="external gplus"
+                               data-animate-hover="pulse"><i
                                     class="fa fa-google-plus"></i></a>
-                            <a class="external twitter" data-animate-hover="pulse"
-                               href="#"><i
+                            <a href="#" class="external twitter"
+                               data-animate-hover="pulse"><i
                                     class="fa fa-twitter"></i></a>
-                            <a class="email" data-animate-hover="pulse"
-                               href="#"><i
+                            <a href="#" class="email"
+                               data-animate-hover="pulse"><i
                                     class="fa fa-envelope"></i></a>
                         </p>
                     </div>
@@ -233,8 +209,8 @@ _________________________________________________________ -->
             var thumbHtml = "";
             for (var i = 0; i < data.imageUrl.length; i++) {
                 thumbHtml = thumbHtml +
-                    '<div class="col-xs-4">\
-                        <a href="' + data.imageUrl[i] + '" class="thumb">\
+                        '<div class="col-xs-4">\
+                            <a href="' + data.imageUrl[i] + '" class="thumb">\
                     <img src="' + data.imageUrl[i] + '" alt="" class="img-responsive">\
                     </a>\
                 </div>'
@@ -278,6 +254,10 @@ _________________________________________________________ -->
                 }
             });
         });
+
+
+
+
 
 
     });

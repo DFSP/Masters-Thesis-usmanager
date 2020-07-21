@@ -1,45 +1,21 @@
-<!--
-  ~ MIT License
-  ~
-  ~ Copyright (c) 2020 manager
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="utf-8">
-    <meta content="all,follow" name="robots">
-    <meta content="index,follow,snippet,archive" name="googlebot">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="WeaveSocks Demo App" name="description">
-    <meta content="Ondrej Svestka | ondrejsvestka.cz" name="author">
-    <meta content="" name="keywords">
+    <meta name="robots" content="all,follow">
+    <meta name="googlebot" content="index,follow,snippet,archive">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeaveSocks Demo App">
+    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
+    <meta name="keywords" content="">
 
     <title>
         WeaveSocks
     </title>
 
-    <meta content="" name="keywords">
+    <meta name="keywords" content="">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
           rel='stylesheet' type='text/css'>
@@ -52,14 +28,14 @@
     <link href="css/owl.theme.css" rel="stylesheet">
 
     <!-- theme stylesheet -->
-    <link href="css/style.blue.css" id="theme-stylesheet" rel="stylesheet">
+    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
 
     <!-- your stylesheet with modifications -->
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
 
-    <link href="favicon.png" rel="shortcut icon">
+    <link rel="shortcut icon" href="favicon.png">
 
 
 </head>
@@ -70,13 +46,13 @@ _________________________________________________________ -->
 <div id="top">
     <div class="container">
         <div class="col-md-6 offer" data-animate="fadeInDown">
-            <a class="btn btn-success btn-sm" data-animate-hover="shake"
-               href="#">Offer of the day</a> <a href="#">Get
+            <a href="#" class="btn btn-success btn-sm"
+               data-animate-hover="shake">Offer of the day</a> <a href="#">Get
             flat 35% off on orders over $50!</a>
         </div>
         <div class="col-md-6" data-animate="fadeInDown">
             <ul class="menu">
-                <li><a data-target="#login-modal" data-toggle="modal" href="#">Login</a>
+                <li><a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
                 </li>
                 <li><a href="register.html">Register</a>
                 </li>
@@ -87,26 +63,25 @@ _________________________________________________________ -->
             </ul>
         </div>
     </div>
-    <div aria-hidden="true" aria-labelledby="Login" class="modal fade" id="login-modal"
-         role="dialog" tabindex="-1">
+    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
+         aria-labelledby="Login" aria-hidden="true">
         <div class="modal-dialog modal-sm">
 
             <div class="modal-content">
                 <div class="modal-header">
-                    <button aria-hidden="true" class="close" data-dismiss="modal"
-                            type="button">&times;
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="Login">Customer login</h4>
                 </div>
                 <div class="modal-body">
                     <form action="customer-orders.html" method="post">
                         <div class="form-group">
-                            <input class="form-control" id="email-modal"
-                                   placeholder="email" type="text">
+                            <input type="text" class="form-control"
+                                   id="email-modal" placeholder="email">
                         </div>
                         <div class="form-group">
-                            <input class="form-control" id="password-modal"
-                                   placeholder="password" type="password">
+                            <input type="password" class="form-control"
+                                   id="password-modal" placeholder="password">
                         </div>
 
                         <p class="text-center">
@@ -136,24 +111,24 @@ _________________________________________________________ -->
 <!-- *** NAVBAR ***
 _________________________________________________________ -->
 
-<div class="navbar navbar-default yamm" id="navbar" role="navigation">
+<div class="navbar navbar-default yamm" role="navigation" id="navbar">
     <div class="container">
         <div class="navbar-header">
 
-            <a class="navbar-brand home" data-animate-hover="bounce"
-               href="index.html">
-                <img alt="WeaveSocks logo" class="hidden-xs" src="img/logo.png">
-                <img alt="WeaveSocks logo" class="visible-xs"
-                     src="img/logo-small.png"><span class="sr-only">WeaveSocks - go to homepage</span>
+            <a class="navbar-brand home" href="index.html"
+               data-animate-hover="bounce">
+                <img src="img/logo.png" alt="WeaveSocks logo" class="hidden-xs">
+                <img src="img/logo-small.png" alt="WeaveSocks logo"
+                     class="visible-xs"><span class="sr-only">WeaveSocks - go to homepage</span>
             </a>
             <div class="navbar-buttons">
-                <button class="navbar-toggle" data-target="#navigation"
-                        data-toggle="collapse" type="button">
+                <button type="button" class="navbar-toggle"
+                        data-toggle="collapse" data-target="#navigation">
                     <span class="sr-only">Toggle navigation</span>
                     <i class="fa fa-align-justify"></i>
                 </button>
-                <button class="navbar-toggle" data-target="#search"
-                        data-toggle="collapse" type="button">
+                <button type="button" class="navbar-toggle"
+                        data-toggle="collapse" data-target="#search">
                     <span class="sr-only">Toggle search</span>
                     <i class="fa fa-search"></i>
                 </button>
@@ -170,8 +145,8 @@ _________________________________________________________ -->
                 <li class="active"><a href="index.html">Home</a>
                 </li>
                 <li class="dropdown yamm-fw">
-                    <a class="dropdown-toggle" data-delay="200" data-hover="dropdown"
-                       data-toggle="dropdown" href="#">Men <b
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       data-hover="dropdown" data-delay="200">Men <b
                             class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
@@ -267,8 +242,8 @@ _________________________________________________________ -->
                 </li>
 
                 <li class="dropdown yamm-fw">
-                    <a class="dropdown-toggle" data-delay="200" data-hover="dropdown"
-                       data-toggle="dropdown" href="#">Ladies <b
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       data-hover="dropdown" data-delay="200">Ladies <b
                             class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
@@ -345,16 +320,16 @@ _________________________________________________________ -->
                                     <div class="col-sm-3">
                                         <div class="banner">
                                             <a href="#">
-                                                <img alt=""
+                                                <img src="img/banner.jpg"
                                                      class="img img-responsive"
-                                                     src="img/banner.jpg">
+                                                     alt="">
                                             </a>
                                         </div>
                                         <div class="banner">
                                             <a href="#">
-                                                <img alt=""
+                                                <img src="img/banner2.jpg"
                                                      class="img img-responsive"
-                                                     src="img/banner2.jpg">
+                                                     alt="">
                                             </a>
                                         </div>
                                     </div>
@@ -366,8 +341,8 @@ _________________________________________________________ -->
                 </li>
 
                 <li class="dropdown yamm-fw">
-                    <a class="dropdown-toggle" data-delay="200" data-hover="dropdown"
-                       data-toggle="dropdown" href="#">Template <b
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       data-hover="dropdown" data-delay="200">Template <b
                             class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
@@ -471,14 +446,14 @@ _________________________________________________________ -->
         <div class="navbar-buttons">
 
             <div class="navbar-collapse collapse right" id="basket-overview">
-                <a class="btn btn-primary navbar-btn" href="basket.html"><i
+                <a href="basket.html" class="btn btn-primary navbar-btn"><i
                         class="fa fa-shopping-cart"></i><span class="hidden-sm">3 items in cart</span></a>
             </div>
             <!--/.nav-collapse -->
 
             <div class="navbar-collapse collapse right" id="search-not-mobile">
-                <button class="btn navbar-btn btn-primary" data-target="#search"
-                        data-toggle="collapse" type="button">
+                <button type="button" class="btn navbar-btn btn-primary"
+                        data-toggle="collapse" data-target="#search">
                     <span class="sr-only">Toggle search</span>
                     <i class="fa fa-search"></i>
                 </button>
@@ -490,11 +465,11 @@ _________________________________________________________ -->
 
             <form class="navbar-form" role="search">
                 <div class="input-group">
-                    <input class="form-control" placeholder="Search"
-                           type="text">
-                    <span class="input-group-btn">
+                    <input type="text" class="form-control"
+                           placeholder="Search">
+                        <span class="input-group-btn">
 
-			<button class="btn btn-primary" type="submit"><i
+			<button type="submit" class="btn btn-primary"><i
                     class="fa fa-search"></i></button>
 
 		    </span>
@@ -543,19 +518,19 @@ _________________________________________________________ -->
                     <form action="customer-orders.html" method="post">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input class="form-control" id="name" type="text">
+                            <input type="text" class="form-control" id="name">
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input class="form-control" id="email" type="text">
+                            <input type="text" class="form-control" id="email">
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input class="form-control" id="password"
-                                   type="password">
+                            <input type="password" class="form-control"
+                                   id="password">
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-primary" type="submit"><i
+                            <button type="submit" class="btn btn-primary"><i
                                     class="fa fa-user-md"></i> Register
                             </button>
                         </div>
@@ -580,15 +555,15 @@ _________________________________________________________ -->
                     <form action="customer-orders.html" method="post">
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input class="form-control" id="email" type="text">
+                            <input type="text" class="form-control" id="email">
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input class="form-control" id="password"
-                                   type="password">
+                            <input type="password" class="form-control"
+                                   id="password">
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-primary" type="submit"><i
+                            <button type="submit" class="btn btn-primary"><i
                                     class="fa fa-sign-in"></i> Log in
                             </button>
                         </div>
@@ -601,6 +576,8 @@ _________________________________________________________ -->
         <!-- /.container -->
     </div>
     <!-- /#content -->
+
+
 
 
 </div>

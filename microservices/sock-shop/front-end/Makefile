@@ -12,7 +12,7 @@ dev: clean test-image server
 compose:
 	@docker-compose -f test/docker-compose.yml up -d
 
-# Installs OldNode.js project dependencies
+# Installs Node.js project dependencies
 deps:
 	@docker run               \
 		-it                     \
@@ -20,7 +20,7 @@ deps:
 		-v $$PWD:/usr/src/app   \
 		$(IMAGE) /usr/local/bin/npm install
 
-# Runs the OldNode.js application in a Docker container
+# Runs the Node.js application in a Docker container
 server:
 	@docker run               \
 		-d                      \

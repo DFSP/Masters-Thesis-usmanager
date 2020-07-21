@@ -1,32 +1,8 @@
-/*
- * MIT License
- *
- * Copyright (c) 2020 manager
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 if ($.cookie("theme_csspath")) {
     $('link#theme-stylesheet').attr("href", $.cookie("theme_csspath"));
 }
 
-$(function () {
+$(function() {
 
     animations();
     productDetailGallery(4000);
@@ -35,13 +11,13 @@ $(function () {
 });
 
 
-$(window).load(function () {
+$(window).load(function() {
     $(this).alignElementsSameHeight();
 });
 
-$(window).resize(function () {
-    setTimeout(function () {
-        $(this).alignElementsSameHeight();
+$(window).resize(function() {
+    setTimeout(function() {
+	$(this).alignElementsSameHeight();
     }, 150);
 });
 
@@ -50,34 +26,34 @@ $(window).resize(function () {
 function productDetailGallery(confDetailSwitch) {
     $('.thumb:first').addClass('active');
     timer = setInterval(autoSwitch, confDetailSwitch);
-    $(".thumb").click(function (e) {
+    $(".thumb").click(function(e) {
 
-            switchImage($(this));
-            clearInterval(timer);
-            timer = setInterval(autoSwitch, confDetailSwitch);
-            e.preventDefault();
-        }
+	switchImage($(this));
+	clearInterval(timer);
+	timer = setInterval(autoSwitch, confDetailSwitch);
+	e.preventDefault();
+    }
     );
-    $('#mainImage').hover(function () {
-        clearInterval(timer);
-    }, function () {
-        timer = setInterval(autoSwitch, confDetailSwitch);
+    $('#mainImage').hover(function() {
+	clearInterval(timer);
+    }, function() {
+	timer = setInterval(autoSwitch, confDetailSwitch);
     });
 
     function autoSwitch() {
-        var nextThumb = $('.thumb.active').closest('div').next('div').find('.thumb');
-        if (nextThumb.length == 0) {
-            nextThumb = $('.thumb:first');
-        }
-        switchImage(nextThumb);
+	var nextThumb = $('.thumb.active').closest('div').next('div').find('.thumb');
+	if (nextThumb.length == 0) {
+	    nextThumb = $('.thumb:first');
+	}
+	switchImage(nextThumb);
     }
 
     function switchImage(thumb) {
 
-        $('.thumb').removeClass('active');
-        var bigUrl = thumb.attr('href');
-        thumb.addClass('active');
-        $('#mainImage img').attr('src', bigUrl);
+	$('.thumb').removeClass('active');
+	var bigUrl = thumb.attr('href');
+	thumb.addClass('active');
+	$('#mainImage img').attr('src', bigUrl);
     }
 }
 
@@ -86,48 +62,47 @@ function utils() {
 
     /* click on the box activates the radio */
 
-    $('#checkout').on('click', '.box.shipping-method, .box.payment-method', function (e) {
-        var radio = $(this).find(':radio');
-        radio.prop('checked', true);
+    $('#checkout').on('click', '.box.shipping-method, .box.payment-method', function(e) {
+	var radio = $(this).find(':radio');
+	radio.prop('checked', true);
     });
     /* click on the box activates the link in it */
 
-    $('.box.clickable').on('click', function (e) {
+    $('.box.clickable').on('click', function(e) {
 
-        window.location = $(this).find('a').attr('href');
+	window.location = $(this).find('a').attr('href');
     });
     /* external links in new window*/
 
-    $('.external').on('click', function (e) {
+    $('.external').on('click', function(e) {
 
-        e.preventDefault();
-        window.open($(this).attr("href"));
+	e.preventDefault();
+	window.open($(this).attr("href"));
     });
     /* animated scrolling */
 
-    $('.scroll-to, .scroll-to-top').click(function (event) {
+    $('.scroll-to, .scroll-to-top').click(function(event) {
 
-        var full_url = this.href;
-        var parts = full_url.split("#");
-        if (parts.length > 1) {
+	var full_url = this.href;
+	var parts = full_url.split("#");
+	if (parts.length > 1) {
 
-            scrollTo(full_url);
-            event.preventDefault();
-        }
+	    scrollTo(full_url);
+	    event.preventDefault();
+	}
     });
-
     function scrollTo(full_url) {
-        var parts = full_url.split("#");
-        var trgt = parts[1];
-        var target_offset = $("#" + trgt).offset();
-        var target_top = target_offset.top - 100;
-        if (target_top < 0) {
-            target_top = 0;
-        }
+	var parts = full_url.split("#");
+	var trgt = parts[1];
+	var target_offset = $("#" + trgt).offset();
+	var target_top = target_offset.top - 100;
+	if (target_top < 0) {
+	    target_top = 0;
+	}
 
-        $('html, body').animate({
-            scrollTop: target_top
-        }, 1000);
+	$('html, body').animate({
+	    scrollTop: target_top
+	}, 1000);
     }
 }
 
@@ -136,13 +111,13 @@ function utils() {
 function carousels() {
 
     $("#get-inspired").owlCarousel({
-        navigation: true, // Show next and prev buttons
-        slideSpeed: 300,
-        paginationSpeed: 400,
-        autoPlay: true,
-        stopOnHover: true,
-        singleItem: true,
-        afterInit: ''
+	navigation: true, // Show next and prev buttons
+	slideSpeed: 300,
+	paginationSpeed: 400,
+	autoPlay: true,
+	stopOnHover: true,
+	singleItem: true,
+	afterInit: ''
     });
 }
 
@@ -151,67 +126,68 @@ function carousels() {
 function animations() {
     delayTime = 0;
     $('[data-animate]').css({opacity: '0'});
-    $('[data-animate]').waypoint(function (direction) {
-            delayTime += 150;
-            $(this).delay(delayTime).queue(function (next) {
-                $(this).toggleClass('animated');
-                $(this).toggleClass($(this).data('animate'));
-                delayTime = 0;
-                next();
-                //$(this).removeClass('animated');
-                //$(this).toggleClass($(this).data('animate'));
-            });
-        },
-        {
-            offset: '90%',
-            triggerOnce: true
-        });
+    $('[data-animate]').waypoint(function(direction) {
+	delayTime += 150;
+	$(this).delay(delayTime).queue(function(next) {
+	    $(this).toggleClass('animated');
+	    $(this).toggleClass($(this).data('animate'));
+	    delayTime = 0;
+	    next();
+	    //$(this).removeClass('animated');
+	    //$(this).toggleClass($(this).data('animate'));
+	});
+    },
+	    {
+		offset: '90%',
+		triggerOnce: true
+	    });
 
-    $('[data-animate-hover]').hover(function () {
-        $(this).css({opacity: 1});
-        $(this).addClass('animated');
-        $(this).removeClass($(this).data('animate'));
-        $(this).addClass($(this).data('animate-hover'));
-    }, function () {
-        $(this).removeClass('animated');
-        $(this).removeClass($(this).data('animate-hover'));
+    $('[data-animate-hover]').hover(function() {
+	$(this).css({opacity: 1});
+	$(this).addClass('animated');
+	$(this).removeClass($(this).data('animate'));
+	$(this).addClass($(this).data('animate-hover'));
+    }, function() {
+	$(this).removeClass('animated');
+	$(this).removeClass($(this).data('animate-hover'));
     });
 
 }
 
-$.fn.alignElementsSameHeight = function () {
-    $('.same-height-row').each(function () {
+$.fn.alignElementsSameHeight = function() {
+    $('.same-height-row').each(function() {
 
-        var maxHeight = 0;
+	var maxHeight = 0;
 
-        var children = $(this).find('.same-height');
+	var children = $(this).find('.same-height');
 
-        children.height('auto');
+	children.height('auto');
 
-        if ($(document).width() > 768) {
-            children.each(function () {
-                if ($(this).innerHeight() > maxHeight) {
-                    maxHeight = $(this).innerHeight();
-                }
-            });
+	if ($(document).width() > 768) {
+	    children.each(function() {
+		if ($(this).innerHeight() > maxHeight) {
+		    maxHeight = $(this).innerHeight();
+		}
+	    });
 
-            children.innerHeight(maxHeight);
-        }
+	    children.innerHeight(maxHeight);
+	}
 
-        maxHeight = 0;
-        children = $(this).find('.same-height-always');
+	maxHeight = 0;
+	children = $(this).find('.same-height-always');
 
-        children.height('auto');
+	children.height('auto');
 
-        children.each(function () {
-            if ($(this).innerHeight() > maxHeight) {
-                maxHeight = $(this).innerHeight();
-            }
-        });
+	children.each(function() {
+	    if ($(this).innerHeight() > maxHeight) {
+		maxHeight = $(this).innerHeight();
+	    }
+	});
 
-        children.innerHeight(maxHeight);
+	children.innerHeight(maxHeight);
 
     });
 
 
-};
+
+}
