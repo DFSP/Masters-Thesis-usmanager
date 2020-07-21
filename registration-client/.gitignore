@@ -3,5 +3,5 @@ coverage.out
 
 vendor
 
-cmd/registration-client/**
-!cmd/registration-client/**.go
+cmd/**
+!cmd/**.go
