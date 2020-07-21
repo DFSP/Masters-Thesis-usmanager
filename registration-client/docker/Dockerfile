@@ -1,8 +1,7 @@
-FROM golang:1.10
+FROM golang:1.14.6-alpine
 
 COPY . /go/src/github.com/usmanager/manager/registration-client
-WORKDIR /go/src/github.com/usmanager/manager/registration-client
+WORKDIR /go/src/github.com/usmanager/manager/registration-client/cmd
 
-RUN go get -u github.com/FiloSottile/gvt
-RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /registration-client github.com/usmanager/manager/registration-client/cmd/registration-client
+RUN go mod vendor
+RUN go build -o registration-client
