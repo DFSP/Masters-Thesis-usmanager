@@ -36,6 +36,7 @@ _testmain.go
 *.test
 *.prof
 ### Java template
+/target/
 *.class
 *.jar
 
@@ -102,6 +103,9 @@ crashlytics-build.properties
 fabric.properties
 # Created by .ignore support plugin (hsz.mobi)
 
+# Maven builds
+*/target
+*/*/target
 
 # AWS ECS install scripts generates an SSH key file
 weave-ecs-demo-key.pem
@@ -111,6 +115,3 @@ weave-ecs-demo-key.pem
 
 # Ignore Vagrant cache files
 *.vagrant/
-
-target/*
-!target/shipping.jar

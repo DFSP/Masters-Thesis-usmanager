@@ -1,21 +1,24 @@
-FROM usmanager/registration-client
-FROM golang:1.10
+FROM usmanager/registration-client AS registration-client
 
-COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue
-WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue
+FROM golang:1.14.6-alpine AS build
+COPY . go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue
+WORKDIR go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue/cmd/cataloguesvc
+RUN go mod vendor
+RUN go build -o catalogue
+RUN mkdir app
+RUN mv go/src/github.com/usmanager/manager/microservices/sock-shop/catalogue/cmd/cataloguesvc/catalogue app/catalogue
 
-RUN go get -u github.com/FiloSottile/gvt
-RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/microservices/sock-shop/catalogue/cmd/cataloguesvc
+FROM usmanager/alpine-glibc AS catalogue
 
-FROM usmanager/alpine-glibc
-WORKDIR /
-COPY --from=0 /registration-client ./registration-client
-COPY --from=1 /app /app
-COPY images/ /images/
-COPY ./scripts/docker-init.sh ./docker-init.sh
+RUN mkdir app
+WORKDIR app
+COPY --from=build /app/catalogue catalogue
+COPY --from=registration-client /app/registration-client registration-client
+
+COPY images images
+COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
-RUN setcap 'cap_net_bind_service=+ep' /app
+RUN setcap 'cap_net_bind_service=+ep' app
 
 ENTRYPOINT ["./docker-init.sh"]
 

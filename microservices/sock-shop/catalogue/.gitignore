@@ -2,4 +2,3 @@ __pycache__/
 coverage.out
 
 vendor/**
-!vendor/manifest

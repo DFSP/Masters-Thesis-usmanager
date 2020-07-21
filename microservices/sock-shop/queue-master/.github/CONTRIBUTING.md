@@ -2,7 +2,7 @@
 
 We'd love to accept your contributions; large or small. Simply submit an issue or pull request via Github and involve one of the active members. Simple! But please read the rest of this document to ensure we're all on the same page.
 
-##  General OldRules
+##  General Rules
 
 - Be kind and polite. Written language often does not convey the sentiment, so make sure you use lots of jokes and emoticons to get the sentiment across.
 - Prefer best practice. Everyone has their preferred style, but try to conform to current best practices. We don't enforce any strict rules.

@@ -1,4 +1,4 @@
-FROM registration-client AS registration-client
+FROM usmanager/registration-client AS registration-client
 
 FROM maven:3.6.0-jdk-11-slim AS build
 WORKDIR /usr/src/app
