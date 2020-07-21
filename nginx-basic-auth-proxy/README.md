@@ -1,8 +1,8 @@
-# Docker image of Nginx Proxy with Basic Auth
+# Nginx Proxy with Basic Auth
 
 [![Docker Repository on Quay](https://quay.io/repository/dtan4/nginx-basic-auth-proxy/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/nginx-basic-auth-proxy)
 
-Simple HTTP Proxy with Basic Authentication
+Simples [*Proxy HTTP*](https://developer.mozilla.org/docs/Web/HTTP/Proxy_servers_and_tunneling) com [*Basic Authentication*](https://developer.mozilla.org/docs/Web/HTTP/Authentication).
 
 ```
        w/ user:pass   +------------------------+      +-------------+
@@ -10,7 +10,7 @@ User ---------------> | nginx-basic-auth-proxy | ---> | HTTP Server |
                       +------------------------+      +-------------+
 ```
 
-## Run
+#### Docker
 
 ```bash
 $ docker run \
@@ -25,12 +25,11 @@ $ docker run \
     quay.io/dtan4/nginx-basic-auth-proxy
 ```
 
-Access to http://localhost:8080 , then browser asks you username and password.
+Aceder a http://localhost:8080 , e introduzir a *password* e *username*.
 
+### Endpoints para monitorização
 
-### Endpoint for monitoring
-
-`:8080/nginx_status` returns the metrics of Nginx.
+`:8080/nginx_status` devolve as métricas do Nginx.
 
 ```sh-session
 $ curl localhost:8080/nginx_status
@@ -40,9 +39,9 @@ server accepts handled requests
 Reading: 0 Writing: 1 Waiting: 0
 ```
 
-## Environment variables
+### Variáveis de ambiente (*Environment variables*)
 
-### Required
+##### Obrigatórias
 
 |Key|Description|
 |---|---|
@@ -50,7 +49,7 @@ Reading: 0 Writing: 1 Waiting: 0
 |`BASIC_AUTH_PASSWORD`|Basic auth password|
 |`PROXY_PASS`|Proxy destination URL|
 
-### Optional
+##### Opcionais
 
 |Key|Description|Default|
 |---|---|---|
@@ -60,10 +59,10 @@ Reading: 0 Writing: 1 Waiting: 0
 |`PROXY_READ_TIMEOUT`|Value for `proxy_read_timeout` directive|`60s`|
 |`WORKER_PROCESSES`|Value for `worker_processes` directive|`auto`|
 
-## Author
+### Autor
 
 Daisuke Fujita ([@dtan4](https://github.com/dtan4))
 
-## License
+### Licença
 
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)

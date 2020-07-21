@@ -4,35 +4,62 @@
 
 Master manager é o módulo principal do sistema de gestão de micro-serviços.
 Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de decisões, etc) e de conhecimento que adquire ao longo da sua execução (métricas obtidas dos containers e hosts, migração/replicação de serviços, etc).  
-Usa o sistema de gestão de regras de negócios Drools para gerir as regras aplicadas. 
-É também um projeto Spring Boot, gerido com maven, que disponibiliza um servidor restful.
+Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/) para gerir as regras aplicadas. 
+É um módulo [Spring Boot](https://spring.io/projects/spring-boot), gerido com [maven](https://maven.apache.org/), que disponibiliza um servidor restful.
 
 ### Requisitos
 
-- #####Maven com java 11  
->`sudo apt install maven`  
->`maven --version` verificar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988))
+#####Maven com java 11  
+```shell script
+sudo apt install maven`  
+maven --version
+```
+Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  
-- #####SSH
->`sudo apt-get install ssh`
+#####SSH
+```shell script
+sudo apt-get install ssh
+```
 
-- #####Docker
->`sh src/main/resources/scripts/docker-install.sh`
+#####Docker
+```shell script
+sh src/main/resources/scripts/docker-install.sh
+```
 
-- #####Node Exporter
->`sh src/main/resources/scripts/node-exporter-install.sh` 
+#####Node Exporter
+```shell script
+sh src/main/resources/scripts/node-exporter-install.sh
+``` 
+
+### Executar
+Com o maven instalado:
+```shell script
+mvn spring-boot:run
+```
+
+Sem o maven instalado:
+```
+./mvnw package
+```
+
+### Docker
+
+```
+docker build -f docker/Dockerfile . -t master-manager
+docker run --rm -p 8080:8088 master-manager
+```
 
 ### Ambiente
 
->`Ubuntu 18.04.4 LTS`
+>Ubuntu 18.04.4 LTS
 
->`Apache Maven 3.6.0`  
- `Maven home: /usr/share/maven`  
- `Java version: 11.0.6, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64`  
- `Default locale: pt_PT, platform encoding: UTF-8`  
- `OS name: "linux", version: "5.3.0-28-generic", arch: "amd64", family: "unix"`
+>Apache Maven 3.6.0  
+ Maven home: /usr/share/maven  
+ Java version: 11.0.6, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64  
+ Default locale: pt_PT, platform encoding: UTF-8  
+ OS name: "linux", version: "5.3.0-28-generic", arch: "amd64", family: "unix"
 
->`Docker version 19.03.5, build 633a0ea838`
+>Docker version 19.03.5, build 633a0ea838
 
 ### Ferramentas usadas
 
@@ -55,16 +82,6 @@ Usa o sistema de gestão de regras de negócios Drools para gerir as regras apli
 
 [<img src="https://i.imgur.com/qFZtEoa.png" alt="" width="48" height="24"> Maven](http://maven.apache.org/guides/getting-started/) - Maven is essentially a project management and comprehension tool and as such provides a way to help with managing: Builds, Documentation, Reporting, Dependencies, SCMs, Release, Distribution and Documentation
 
-### Executar
-
-Com o maven instalado:
-
-> `mvn spring-boot:run -Dspring-boot.run.arguments=--secret=...`
-
-Sem o maven instalado:
-
-> `./mvnw package`
-
 ### Troubleshooting
 
 - Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:
@@ -73,10 +90,13 @@ Configurar  encaminhamento `sudo setfacl --modify user:<user name or ID>:rw /var
 - Se ao estabeler uma ligação com o aws ec2, bloquear, fazer o seguinte:
 https://stackoverflow.com/a/48572280 
 
-- Utilizar computadores pessoais. Normalmente protegidos pelo router (http://192.168.1.254 no caso de meo, http://192.168.1.1 no caso de nos ou vodafone), estão apenas acessíveis na rede local.
-Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, substituindo user pelo username da conta a usar.
-Isto permite executar comandos sudo sem ser pedida a password.
-Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) para atribuir ips dinâmicos às máquinas, é preciso definir um ip estático para o host desejado, através da interface do router.
+- Utilizar computadores pessoais:  
+Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, 
+substituindo user pelo username da conta a usar. Isto permite executar comandos sudo sem ser pedida a password.  
+Normalmente protegidos pelo router (http://192.168.1.254 no caso de *meo*, 
+http://192.168.1.1 no caso de *nos* ou *vodafone*), estão apenas acessíveis na rede local.  
+Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) para atribuir ips dinâmicos 
+às máquinas, é preciso definir um ip estático para o host desejado, através da interface do router.  
 E por fim, configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
     - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
     - Docker Cluster management communications, porta 2377 TCP

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,8 @@ class Breadcrumbs extends React.Component<Props, State> {
       <div className={`${styles.container}`}>
         {this.state.breadcrumbs.map(({title, link}, index) =>
           link && index !== this.state.breadcrumbs.length - 1
-            ? <Link key={index} className={`breadcrumb ${styles.breadcrumb} white-text`} to={link}>{title}</Link>
+            ? <Link key={index} className={`breadcrumb ${styles.breadcrumb} white-text`}
+                    to={link}>{title}</Link>
             : <span key={index} className={`breadcrumb ${styles.breadcrumb} white-text`}>{title}</span>
         )}
       </div>

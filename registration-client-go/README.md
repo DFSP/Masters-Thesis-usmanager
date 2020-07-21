@@ -30,13 +30,3 @@ Class | Method | HTTP request | Description
 
  - [App](docs/App.md)
  - [Msg](docs/Msg.md)
-
-
-## Documentation For Authorization
- Endpoints do not require authorization.
-
-
-## Author
-
-
-

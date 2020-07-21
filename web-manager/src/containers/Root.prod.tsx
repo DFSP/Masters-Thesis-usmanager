@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -176,7 +176,8 @@ class Root extends React.Component<Props, {}> {
               <Route path="/" exact component={Login}/>
               <Route path="/login" exact component={Login}/>
               {Object.entries(routes).map(([path, {title, component}], index) =>
-                <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                <AuthenticatedRoute key={index} exact path={path} title={title}
+                                    component={component}/>)}
             </Switch>
           </div>
         </Provider>

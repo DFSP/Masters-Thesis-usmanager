@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -68,11 +68,12 @@ export default class AddButton extends React.Component<Props, {}> {
             </Link>
           </div>
           : <>
-            <div className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
-                 data-position={tooltip.position}
-                 data-tooltip={tooltip.text}
-                 data-target={`dropdown-${dropdown.id}`}
-                 ref={this.dropdown}>
+            <div
+              className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
+              data-position={tooltip.position}
+              data-tooltip={tooltip.text}
+              data-target={`dropdown-${dropdown.id}`}
+              ref={this.dropdown}>
               <i className="large material-icons">add</i>
             </div>
             <ul id={`dropdown-${dropdown.id}`}

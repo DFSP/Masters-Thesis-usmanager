@@ -1,11 +1,25 @@
 /*
- * Copyright (c) 2020 usmanager
+ * MIT License
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * Copyright (c) 2020 manager
  *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 import BaseComponent from "../../../../components/BaseComponent";
@@ -72,25 +86,26 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
-                           emptyMessage={`Containers list is empty`}
-                           data={this.props.ruleContainers}
-                           dropdown={{
-                             id: 'containers',
-                             title: 'Add container',
-                             empty: 'No more containers to add',
-                             data: this.getSelectableContainerNames()
-                           }}
-                           show={this.container}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
+    return <ControlledList
+      isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
+      error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
+      emptyMessage={`Containers list is empty`}
+      data={this.props.ruleContainers}
+      dropdown={{
+        id: 'containers',
+        title: 'Add container',
+        empty: 'No more containers to add',
+        data: this.getSelectableContainerNames()
+      }}
+      show={this.container}
+      onAdd={this.onAdd}
+      onRemove={this.onRemove}
+      onDelete={{
+        url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
+        successCallback: this.onDeleteSuccess,
+        failureCallback: this.onDeleteFailure
+      }}
+      entitySaved={this.state.entitySaved}/>;
   }
 
   private loadEntities = () => {

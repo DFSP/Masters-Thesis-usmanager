@@ -6,29 +6,30 @@ Este módulo é consistido por um cliente reactjs.
 O qual comunica com o [Master Manager](/usmanager/master-manager) através de REST API para permitir 
 ajustar manualmente e interagir com o sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
  
-<!---
-This module brings a reactjs client to the project. Allowing the manual tweaking of the system, as well as visually 
-seeing the progress and behaviour of the system as a whole.
--->
- 
  ### Instalar
  
- `npm install`
+```shell script
+npm install
+```
  
  ### Iniciar
  
- `npm start`
+```shell script
+npm start
+```
  
- ### Docker
+### Docker
  
- `docker build -f docker/Dockerfile . -t web-manager`  
- `docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true web-manager`
+```shell script
+docker build -f docker/Dockerfile . -t web-manager
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true web-manager
+```
 
- ### Ambiente
+### Ambiente
  
- > Ubuntu 18.04.4 LTS  
+> Ubuntu 18.04.4 LTS  
  
- > Chrome browser 81.0.4044.138
+> Chrome browser 84.0.4147.89
 
 ### Ferramentas usadas
 
@@ -42,7 +43,7 @@ seeing the progress and behaviour of the system as a whole.
 
 [<img src="https://i.imgur.com/lwAbTpS.png" alt="" width="48" height="48"> Typescript](https://www.typescriptlang.org/docs/home.html) - TypeScript is a typed superset of JavaScript that compiles to plain JavaScript
 
-#### Resolução de erros
+### Resolução de erros
 
 Se após a execução de `npm start`, por acaso aparecer o erro:
 
@@ -50,21 +51,18 @@ Se após a execução de `npm start`, por acaso aparecer o erro:
 
 Executar os comandos seguintes deve resolvê-lo:
 
-> `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf`
->
-> `sudo sysctl -p`
+```shell script
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf`
+sudo sysctl -p
+```
 
-### TODO list
+### Lista TO-DO
 
 - O código pode ser fatorizado um pouco mais. 
 Por exemplo, existir um componente genérico Entity que representa as entidades principais,
 como app, service, container, host, etc. E um EntityList para representar as listas das entidades, 
 por exemplo dos serviços da apps, ou das regras de um container.
 Iria permitir a remoção de algum código que parece repetido.
-
-- :heavy_check_mark: Melhorar o modal que aparece ao adicionar um service prediction. 
-O modal ficou demasiado grande, o que implica fazer scrolling para ver os botões de cancelamento/submissão. 
-Talvez substituir temporariamente o ControlledList por um form seria melhor (com uma seta para retrocesso incluído na parte esquerda do form)
 
 - Outro melhoramento seria o uso de listas animadas, trabalho o qual já foi iniciado no componente AnimatedList (ver [react-spring](https://www.react-spring.io/)).
 Por exemplo, ao remover/adicionar novos elementos a uma lista, ou ao mudar de página numa lista paginada.

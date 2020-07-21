@@ -19,9 +19,16 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="carts" target="1.8" />
       <module name="launcher" target="1.5" />
       <module name="local-manager" target="11" />
       <module name="managerLocal" target="11" />
+      <module name="master-manager" target="11" />
+      <module name="orders" target="1.8" />
+      <module name="queue-master" target="1.8" />
+      <module name="registration-client-java" target="1.7" />
+      <module name="registration-server" target="11" />
+      <module name="shipping" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

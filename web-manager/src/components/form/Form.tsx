@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -404,13 +404,15 @@ class Form extends React.Component<Props, State> {
                          useBothWheelAxes: false,
                          suppressScrollX: true
                        }}>
-              <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+              <div
+                className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
                 <FormContext.Provider value={context}>
                   {children}
                 </FormContext.Provider>
               </div>
             </ScrollBar>
-            : <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+            : <div
+              className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
               <FormContext.Provider value={context}>
                 {children}
               </FormContext.Provider>
@@ -425,8 +427,9 @@ class Form extends React.Component<Props, State> {
                         onClick={this.clearValues}>
                   Clear
                 </button>
-                <button className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
-                        type="button">
+                <button
+                  className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
+                  type="button">
                   Cancel
                 </button>
                 <button className={`waves-effect waves-light btn-flat green-text ${styles.formButton}`}

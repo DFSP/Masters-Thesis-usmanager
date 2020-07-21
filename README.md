@@ -8,7 +8,7 @@ através da recolha de várias métricas, como utilização de cpu e ram dos dis
 dependências entre microserviços, e dispositivos cloud e edge disponíveis.  
 Este projeto está enquadrado no contexto de várias dissertações para obtenção do grau mestre em Engenharia Informática na [FCT-UNL](https://www.fct.unl.pt/).
 
-### Organização do projeto
+### Organização do projeto (módulos)
 
 - docker-images
   - [docker-alpine](docker-images/docker-alpine)
@@ -16,11 +16,11 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
   - [docker-java](docker-images/docker-java)
   - [docker-mongo3](docker-images/docker-mongo3)
 
-- [launcher](launcher)
-
 - [master-manager](master-manager)
 
 - [local-manager](local-manager)
+
+- [web-manager](web-manager)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 
@@ -34,7 +34,11 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [registration-client](registration-client)
 
-- microservices
+- [registration-client-java](registration-client-java)
+
+- [registration-client-go](registration-client-go)
+
+- microserviços
   - sock-shop
     - [carts](microservices/sock-shop/carts)
     - [docker-rabbitmq](microservices/sock-shop/docker-rabbitmq)
@@ -53,7 +57,9 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
 > [Master manager](master-manager/README.md#ferramentas-usadas)  
+
 > [Local manager](local-manager/README.md#ferramentas-usadas)  
+
 > [Web manager](web-manager/README.md#ferramentas-usadas)  
 
 ### Configuração
@@ -77,11 +83,11 @@ Executar `chmod 400 file.pem` no ficheiro .pem que foi transferido.
 Image -> Create image. Após criada, adicionar a tag us-manager=true. 
 Substituir o id da ami no application.yaml, propriedade aws.instance.ami.
 
-- [Criar](https://console.aws.amazon.com/iam/home#/users) um utilizador iam para aceder aos recursos aws através, 
+- [Criar](https://console.aws.amazon.com/iam/home#/users) um utilizador *iam* para aceder aos recursos aws através, 
 com tipo de acesso Programmatic access, e política AdministratorAccess. Substituir os valores da access key e secret access key no application.yaml, propriedades aws.access.key e aws.access.secret-key, respetivamente.
 
 
 ### Licença
 
-μsManager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+μsManager está licenciado com a [MIT license](LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
 

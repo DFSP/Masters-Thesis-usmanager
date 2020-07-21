@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import {API_URL, setupAxiosInterceptors} from "./api";
 
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
-export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse<any>> =>
+export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse> =>
   axios.get(`${API_URL}/basicauth`, {
     headers: {
       authorization: createBasicAuthToken(username, password)

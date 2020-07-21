@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 manager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import React, {createRef} from "react";
 import M from "materialize-css";
 import styles from './Tabs.module.css';
@@ -70,19 +94,21 @@ class Tabs extends React.Component<Props, State> {
     return (
       <div>
         {this.state.showScrollLeft &&
-         <button className={`btn-flat btn-small white-text left ${styles.scrollButton} ${styles.leftScrollButton}`}
-                 onTouchStart={this.setLeftScrollTimer}
-                 onMouseDown={this.setLeftScrollTimer}
-                 onTouchEnd={this.stopLeftScrollTimer}
-                 onMouseUp={this.stopLeftScrollTimer}>
+         <button
+             className={`btn-flat btn-small white-text left ${styles.scrollButton} ${styles.leftScrollButton}`}
+             onTouchStart={this.setLeftScrollTimer}
+             onMouseDown={this.setLeftScrollTimer}
+             onTouchEnd={this.stopLeftScrollTimer}
+             onMouseUp={this.stopLeftScrollTimer}>
              <i className="material-icons">arrow_back</i>
          </button>}
         {this.state.showScrollRight &&
-         <button className={`btn-flat btn-small white-text right ${styles.scrollButton} ${styles.rightScrollButton}`}
-                 onTouchStart={this.setRightScrollTimer}
-                 onMouseDown={this.setRightScrollTimer}
-                 onTouchEnd={this.stopRightScrollTimer}
-                 onMouseUp={this.stopRightScrollTimer}>
+         <button
+             className={`btn-flat btn-small white-text right ${styles.scrollButton} ${styles.rightScrollButton}`}
+             onTouchStart={this.setRightScrollTimer}
+             onMouseDown={this.setRightScrollTimer}
+             onTouchEnd={this.stopRightScrollTimer}
+             onMouseUp={this.stopRightScrollTimer}>
              <i className="material-icons">arrow_forward</i>
          </button>}
         <div className="row">

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,9 @@ import (
 
 	"path/filepath"
 
-	"catalogue"
+	"github.com/usmanager/manager/microservices/sock-shop/catalogue"
+	"github.com/usmanager/manager/registration-client-go"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"

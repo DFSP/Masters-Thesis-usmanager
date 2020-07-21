@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -815,7 +815,13 @@ const entities = (state: EntitiesState = {
     case ADD_SERVICE:
       if (data?.services?.length) {
         const services = normalize(data?.services, Schemas.SERVICE_ARRAY).entities.services;
-        return merge({}, state, {services: {data: services, isLoadingServices: false, loadServicesError: null}});
+        return merge({}, state, {
+          services: {
+            data: services,
+            isLoadingServices: false,
+            loadServicesError: null
+          }
+        });
       }
       break;
     case UPDATE_SERVICE:
@@ -1326,9 +1332,23 @@ const entities = (state: EntitiesState = {
       }
       break;
     case CLOUD_HOST_SIMULATED_METRICS_REQUEST:
-      return merge({}, state, {hosts: {cloud: {isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null}}});
+      return merge({}, state, {
+        hosts: {
+          cloud: {
+            isLoadingSimulatedMetrics: true,
+            loadSimulatedMetricsError: null
+          }
+        }
+      });
     case CLOUD_HOST_SIMULATED_METRICS_FAILURE:
-      return merge({}, state, {hosts: {cloud: {isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error}}});
+      return merge({}, state, {
+        hosts: {
+          cloud: {
+            isLoadingSimulatedMetrics: false,
+            loadSimulatedMetricsError: error
+          }
+        }
+      });
     case CLOUD_HOST_SIMULATED_METRICS_SUCCESS: {
       const cloudHost = entity && state.hosts.cloud.data[entity];
       const simulatedMetrics = {hostSimulatedMetrics: data?.simulatedHostMetrics || []};
@@ -1482,9 +1502,23 @@ const entities = (state: EntitiesState = {
       }
       break;
     case EDGE_HOST_SIMULATED_METRICS_REQUEST:
-      return merge({}, state, {hosts: {edge: {isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null}}});
+      return merge({}, state, {
+        hosts: {
+          edge: {
+            isLoadingSimulatedMetrics: true,
+            loadSimulatedMetricsError: null
+          }
+        }
+      });
     case EDGE_HOST_SIMULATED_METRICS_FAILURE:
-      return merge({}, state, {hosts: {edge: {isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error}}});
+      return merge({}, state, {
+        hosts: {
+          edge: {
+            isLoadingSimulatedMetrics: false,
+            loadSimulatedMetricsError: error
+          }
+        }
+      });
     case EDGE_HOST_SIMULATED_METRICS_SUCCESS: {
       const edgeHost = entity && state.hosts.edge.data[entity];
       const simulatedMetrics = {hostSimulatedMetrics: data?.simulatedHostMetrics || []};
@@ -1608,7 +1642,15 @@ const entities = (state: EntitiesState = {
     case ADD_RULE_HOST:
       if (data?.hostRules?.length) {
         const hostRules = normalize(data?.hostRules, Schemas.RULE_HOST_ARRAY).entities.hostRules;
-        return merge({}, state, {rules: {hosts: {data: hostRules, isLoadingRules: false, loadRulesError: null}}});
+        return merge({}, state, {
+          rules: {
+            hosts: {
+              data: hostRules,
+              isLoadingRules: false,
+              loadRulesError: null
+            }
+          }
+        });
       }
       break;
     case UPDATE_RULE_HOST:
@@ -1822,7 +1864,15 @@ const entities = (state: EntitiesState = {
     case ADD_RULE_SERVICE:
       if (data?.serviceRules?.length) {
         const serviceRules = normalize(data?.serviceRules, Schemas.RULE_SERVICE_ARRAY).entities.serviceRules;
-        return merge({}, state, {rules: {services: {data: serviceRules, isLoadingRules: false, loadRulesError: null}}});
+        return merge({}, state, {
+          rules: {
+            services: {
+              data: serviceRules,
+              isLoadingRules: false,
+              loadRulesError: null
+            }
+          }
+        });
       }
       break;
     case UPDATE_RULE_SERVICE:
@@ -2331,9 +2381,23 @@ const entities = (state: EntitiesState = {
       }
       break;
     case SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST:
-      return merge({}, state, {simulatedMetrics: {hosts: {isLoadingCloudHosts: true, loadCloudHostsError: null}}});
+      return merge({}, state, {
+        simulatedMetrics: {
+          hosts: {
+            isLoadingCloudHosts: true,
+            loadCloudHostsError: null
+          }
+        }
+      });
     case SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE:
-      return merge({}, state, {simulatedMetrics: {hosts: {isLoadingCloudHosts: false, loadCloudHostsError: error}}});
+      return merge({}, state, {
+        simulatedMetrics: {
+          hosts: {
+            isLoadingCloudHosts: false,
+            loadCloudHostsError: error
+          }
+        }
+      });
     case SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS: {
       const simulatedHostMetric = entity && state.simulatedMetrics.hosts.data[entity];
       const cloudHosts = {cloudHosts: data?.cloudHosts || []};
@@ -2384,7 +2448,14 @@ const entities = (state: EntitiesState = {
     case SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST:
       return merge({}, state, {simulatedMetrics: {hosts: {isLoadingEdgeHosts: true, loadEdgeHostsError: null}}});
     case SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE:
-      return merge({}, state, {simulatedMetrics: {hosts: {isLoadingEdgeHosts: false, loadEdgeHostsError: error}}});
+      return merge({}, state, {
+        simulatedMetrics: {
+          hosts: {
+            isLoadingEdgeHosts: false,
+            loadEdgeHostsError: error
+          }
+        }
+      });
     case SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS: {
       const simulatedHostMetric = entity && state.simulatedMetrics.hosts.data[entity];
       const edgeHosts = {edgeHosts: data?.edgeHosts || []};
@@ -2515,7 +2586,14 @@ const entities = (state: EntitiesState = {
     case SIMULATED_SERVICE_METRIC_SERVICES_REQUEST:
       return merge({}, state, {simulatedMetrics: {services: {isLoadingServices: true, loadServicesError: null}}});
     case SIMULATED_SERVICE_METRIC_SERVICES_FAILURE:
-      return merge({}, state, {simulatedMetrics: {services: {isLoadingServices: false, loadServicesError: error}}});
+      return merge({}, state, {
+        simulatedMetrics: {
+          services: {
+            isLoadingServices: false,
+            loadServicesError: error
+          }
+        }
+      });
     case SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS: {
       const simulatedServiceMetric = entity && state.simulatedMetrics.services.data[entity];
       const services = {services: data?.services || []};
@@ -2644,7 +2722,14 @@ const entities = (state: EntitiesState = {
       }
       break;
     case SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST:
-      return merge({}, state, {simulatedMetrics: {containers: {isLoadingContainers: true, loadContainersError: null}}});
+      return merge({}, state, {
+        simulatedMetrics: {
+          containers: {
+            isLoadingContainers: true,
+            loadContainersError: null
+          }
+        }
+      });
     case SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE:
       return merge({}, state, {
         simulatedMetrics: {

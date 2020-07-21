@@ -8,13 +8,13 @@ Building the API client library requires [Maven](https://maven.apache.org/) to b
 
 To install the API client library to your local Maven repository, simply execute:
 
-```shell
+```shell script
 mvn install
 ```
 
 To deploy it to a remote Maven repository instead, configure the settings of the repository and execute:
 
-```shell
+```shell script
 mvn deploy
 ```
 
@@ -106,17 +106,6 @@ Class | Method | HTTP request | Description
  - [App](docs/App.md)
  - [Msg](docs/Msg.md)
 
-
-## Documentation for Authorization
-
-All endpoints do not require authorization.
-Authentication schemes defined for the API:
-
 ## Recommendation
 
 It's recommended to create an instance of `ApiClient` per thread in a multithreaded environment to avoid any potential issues.
-
-## Author
-
-
-

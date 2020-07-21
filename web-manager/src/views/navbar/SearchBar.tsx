@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,8 @@ class SearchBar extends React.Component<Props, {}> {
     return (
       <form className="col l2 xl3 hide-on-med-and-down" noValidate autoComplete="off">
         <div className={`input-field ${styles.searchBar}`}>
-          <input id="search" type="search" placeholder="Filter" value={this.props.search} onChange={this.setValue}/>
+          <input id="search" type="search" placeholder="Filter" value={this.props.search}
+                 onChange={this.setValue}/>
           <label className="label-icon" htmlFor="search">
             <i className="material-icons">search</i>
           </label>

@@ -1,11 +1,25 @@
 /*
- * Copyright (c) 2020 usmanager
+ * MIT License
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * Copyright (c) 2020 manager
  *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 import BaseComponent from "../../../components/BaseComponent";
@@ -89,36 +103,37 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList<string> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                                   error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                                   emptyMessage='Apps list is empty'
-                                   data={this.props.serviceApps}
-                                   dataKey={['name']}
-                                   dropdown={{
-                                     id: 'apps',
-                                     title: 'Add app',
-                                     empty: 'No more apps to add',
-                                     data: this.getSelectableAppsNames(),
-                                     onSelect: this.onSelectApp,
-                                     formModal: {
-                                       id: 'serviceApp',
-                                       title: 'Add app',
-                                       fields: this.getModalFields(),
-                                       values: this.getModalValues(),
-                                       content: this.serviceAppModal,
-                                       position: '20%',
-                                       scrollbar: this.scrollbar,
-                                     }
-                                   }}
-                                   show={this.app}
-                                   onAddInput={this.onAdd}
-                                   onRemove={this.onRemove}
-                                   onDelete={{
-                                     url: `services/${this.props.service?.serviceName}/apps`,
-                                     successCallback: this.onDeleteSuccess,
-                                     failureCallback: this.onDeleteFailure
-                                   }}
-                                   entitySaved={this.state.entitySaved}/>;
+    return <ControlledList<string>
+      isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+      error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+      emptyMessage='Apps list is empty'
+      data={this.props.serviceApps}
+      dataKey={['name']}
+      dropdown={{
+        id: 'apps',
+        title: 'Add app',
+        empty: 'No more apps to add',
+        data: this.getSelectableAppsNames(),
+        onSelect: this.onSelectApp,
+        formModal: {
+          id: 'serviceApp',
+          title: 'Add app',
+          fields: this.getModalFields(),
+          values: this.getModalValues(),
+          content: this.serviceAppModal,
+          position: '20%',
+          scrollbar: this.scrollbar,
+        }
+      }}
+      show={this.app}
+      onAddInput={this.onAdd}
+      onRemove={this.onRemove}
+      onDelete={{
+        url: `services/${this.props.service?.serviceName}/apps`,
+        successCallback: this.onDeleteSuccess,
+        failureCallback: this.onDeleteFailure
+      }}
+      entitySaved={this.state.entitySaved}/>;
 
   }
 

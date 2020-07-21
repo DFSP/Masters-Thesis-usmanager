@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 usmanager
+ * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,10 @@ const ActionProgressBar: React.FC<LoadingProgressProps> = (props: LoadingProgres
              style={{backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'}}/>
         :
         <div className="determinate"
-             style={{width: '100%', backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'}}/>}
+             style={{
+               width: '100%',
+               backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'
+             }}/>}
     </div>
   </div>;
 
