@@ -9,24 +9,24 @@ Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/
 
 ### Requisitos
 
-#####Maven com java 11  
+#### Maven com java 11  
 ```shell script
 sudo apt install maven`  
 maven --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  
-#####SSH
+#### SSH
 ```shell script
 sudo apt-get install ssh
 ```
 
-#####Docker
+#### Docker
 ```shell script
 sh src/main/resources/scripts/docker-install.sh
 ```
 
-#####Node Exporter
+#### Node Exporter
 ```shell script
 sh src/main/resources/scripts/node-exporter-install.sh
 ``` 
@@ -108,4 +108,4 @@ De notar que, apenas com esta configuração, não será possível executar cont
 
 ### Licença
 
-Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+Master manager está licenciado com a [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
