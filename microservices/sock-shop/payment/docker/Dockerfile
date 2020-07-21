@@ -1,6 +1,6 @@
 FROM usmanager/registration-client
-
 FROM golang:1.10
+
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
 WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
 

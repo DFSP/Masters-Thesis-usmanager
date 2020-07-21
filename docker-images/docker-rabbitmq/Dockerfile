@@ -1,5 +1,4 @@
 FROM usmanager/registration-client
-
 FROM rabbitmq:alpine
 
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
@@ -21,6 +20,7 @@ RUN set -ex && \
 
 COPY --from=0 /registration-client ./registration-client
 COPY ./docker-init.sh ./docker-init.sh
+
 RUN ["chmod", "+x", "docker-init.sh"]
 
 ENTRYPOINT ["./docker-init.sh"]

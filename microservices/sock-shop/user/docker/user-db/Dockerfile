@@ -1,5 +1,7 @@
 FROM mongo:3
+
 COPY ./docker/user-db/scripts /tmp/scripts
+
 RUN ["chmod", "+x", "/tmp/scripts/mongo_create_insert.sh"]
 
 # Modify child mongo to use /data/db-users as dbpath (because /data/db wont persist the build because it is already a VOLUME)

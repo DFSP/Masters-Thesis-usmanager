@@ -5,4 +5,3 @@ ENV MYSQL_ALLOW_EMPTY_PASSWORD=true
 ENV MYSQL_DATABASE=socksdb
 
 COPY ./docker/catalogue-db/data/dump.sql /docker-entrypoint-initdb.d/
-

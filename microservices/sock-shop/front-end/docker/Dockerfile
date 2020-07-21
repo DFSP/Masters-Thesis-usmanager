@@ -1,6 +1,6 @@
 FROM usmanager/registration-client
-
 FROM node:9-alpine
+
 ENV NODE_ENV "production"
 ENV PORT 8079
 EXPOSE 8079
@@ -21,7 +21,6 @@ RUN set -ex && \
     apk del curl glibc-i18n && \
     rm -rf /tmp/* /var/cache/apk/* && \
     echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
-
 
 # Prepare app directory
 WORKDIR /usr/src/app
