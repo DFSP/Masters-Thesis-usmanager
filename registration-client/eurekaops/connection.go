@@ -28,6 +28,7 @@ package eurekaops
 
 import (
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/usmanager/manager/registration-client/reglog"
@@ -47,6 +48,7 @@ func (e *EurekaConnection) SelectServiceURL() string {
 func choice(options []string) string {
 	if len(options) == 0 {
 		reglog.Logger.Infof("There are no ServiceUrls to choose from, bailing out")
+		os.Exit(0)
 	}
 	return options[rand.Int()%len(options)]
 }
