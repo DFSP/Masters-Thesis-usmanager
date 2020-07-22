@@ -10,3 +10,4 @@ RUN mkdir /app
 RUN mv /go/src/github.com/usmanager/manager/registration-client/cmd/registration-client /app/registration-client
 WORKDIR /app
 RUN ["chmod", "+x", "registration-client"]
+RUN ls /

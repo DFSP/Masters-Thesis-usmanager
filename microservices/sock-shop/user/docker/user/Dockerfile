@@ -1,22 +1,21 @@
-FROM usmanager/registration-client
+FROM acarrusca/register-go
+
 FROM golang:1.10-alpine
-
-COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/user
-WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/user
-
+COPY . /go/src/bitbucket.org/cloudedgemicroserviceteam/user
+WORKDIR /go/src/bitbucket.org/cloudedgemicroserviceteam/user
 RUN apk update
 RUN apk add git
 RUN go get -v github.com/Masterminds/glide 
 RUN glide install && CGO_ENABLED=0 go build -a -installsuffix cgo -o /app main.go
 
-FROM usmanager/alpine-glibc
+FROM acarrusca/alpine-glibc
 
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
 ENV MONGO_HOST user-db:27017
 
 WORKDIR /
-COPY --from=0 /registration-client ./registration-client
+COPY --from=0 /register ./register
 COPY --from=1 /app /app
 COPY ./scripts/docker-init.sh ./docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
