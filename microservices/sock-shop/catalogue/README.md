@@ -37,6 +37,12 @@ go build -o catalogue
 The result is a binary named `catalogue`, in the current directory.
 
 #### Docker
+
+```shell script
+docker build -f docker/catalogue/Dockerfile . -t catalogue
+docker run catalogue
+```
+
 `docker-compose build`
 
 ### To run the service on port 8080

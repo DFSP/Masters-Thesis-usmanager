@@ -111,7 +111,7 @@ func main() {
 		router.HandleFunc("/api/apps/{appName}", GetAppByName).Methods("GET")
 		router.HandleFunc("/api/apps/{appName}/all", GetAllAppsByName).Methods("GET")
 		router.HandleFunc("/api/register", RegisterApp).Methods("GET")
-		router.HandleFunc("/api/metrics", ReceiveCustomLocationData).Methods("POST")
+		router.HandleFunc("/api/metrics", SendLocationData).Methods("POST")
 		reglog.Logger.Infof("Registration-client is listening on port %s. Go to http://127.0.0.1:%s", *serverPort, *serverPort)
 		reglog.Logger.Fatal(http.ListenAndServe(":"+*serverPort, router))
 	}()
@@ -309,8 +309,8 @@ func RegisterApp(w http.ResponseWriter, r *http.Request) {
 	reglog.Logger.Infof("App was registered by request")
 }
 
-// ReceiveCustomLocationData receive custom location data
-func ReceiveCustomLocationData(w http.ResponseWriter, r *http.Request) {
+// SendLocationData send custom location data
+func SendLocationData(w http.ResponseWriter, r *http.Request) {
 	var customLocationData api.LocationMonitoringCustom
 	_ = json.NewDecoder(r.Body).Decode(&customLocationData)
 	go locationutils.AddCustomLocationData(customLocationData.FromContinent, customLocationData.FromCountry, customLocationData.FromCity, customLocationData.ToService)

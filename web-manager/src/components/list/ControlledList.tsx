@@ -217,11 +217,12 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {id: data, checked} = event.target;
     if (this.state[data]) {
-      // @ts-ignore
       this.setState(state => ({
         [data]: {
+          // @ts-ignore
           value: state[data].value,
           isChecked: checked,
+          // @ts-ignore
           isNew: state[data].isNew
         }
       }));

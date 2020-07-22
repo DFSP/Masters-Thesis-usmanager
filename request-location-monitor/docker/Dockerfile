@@ -1,20 +1,27 @@
-FROM golang:1.10
+FROM golang:1.14.6-alpine AS build
 
+# Setup go to be able to get usmanager private repository
+ENV GITHUB_TOKEN 52c6058781e851556a74229c42e819c661a7a49a
+RUN apk add git && \
+git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/usmanager".insteadOf "https://github.com/usmanager" && \
+go env -w GOPRIVATE=github.com/usmanager/*
+
+# Build request-location-monitor binary
 COPY . /go/src/github.com/usmanager/manager/request-location-monitor
-WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor
+WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor/cmd
+RUN go mod vendor && \
+go build -o request-location-monitor && \
+mkdir /app && \
+mv /go/src/github.com/usmanager/manager/request-location-monitor/cmd/request-location-monitor /app/request-location-monitor
 
-RUN go get -u github.com/FiloSottile/gvt
-RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/usmanager/manager/request-location-monitor/cmd
-
+# Build final image
 FROM usmanager/alpine-glibc
-WORKDIR /
-COPY --from=0 /app /app
-COPY ./scripts/docker-init.sh ./docker-init.sh
+RUN mkdir /app
+WORKDIR /app
+COPY --from=build /app/request-location-monitor request-location-monitor
+COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
-RUN setcap 'cap_net_bind_service=+ep' /app
-
+RUN setcap 'cap_net_bind_service=+ep' request-location-monitor
 ENTRYPOINT ["./docker-init.sh"]
-
 # internalPort, interval
 CMD ["1919", "60"]

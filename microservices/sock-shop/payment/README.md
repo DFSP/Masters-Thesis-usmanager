@@ -16,19 +16,21 @@ Checkout the API Spec [here](http://microservices-demo.github.io/api/index?url=h
 
 ## Build
 
+#### Docker
+
+```shell script
+docker build -f docker/Dockerfile . -t payment
+docker run payment
+```
+
 #### Dependencies
 ```
-cd $GOPATH/src/github.com/microservices-demo/payment/
-go get -u github.com/FiloSottile/gvt
-gvt restore
+go mod vendor
 ```
 
 #### Using native Go tools
-In order to build the project locally you need to make sure that the repository directory is located in the correct
-$GOPATH directory: $GOPATH/src/github.com/microservices-demo/payment/. Once that is in place you can build by running:
-
 ```
-cd $GOPATH/src/github.com/microservices-demo/payment/paymentsvc/
+cd cmd/paymentsvc
 go build -o payment
 ```
 

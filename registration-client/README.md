@@ -2,12 +2,21 @@
 
 Regista um serviço no [Servidor Eureka](../registration-server), e obtém o endpoints dos outros serviços, registados no servidor.
 
-#### Executar
+## Executar
+
+#### Local
 
 ```shell script
 cd cmd
 go build -o registration-client
 ./registration-client
+```
+
+#### Docker
+
+```shell script
+docker build -f docker/Dockerfile . -t registration-client
+docker run -p 1906:1906 registration-client
 ```
 
 O resultado é o ficheiro binário `registration-client`, gerado na diretoria `cmd`.

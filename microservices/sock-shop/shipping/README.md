@@ -14,6 +14,11 @@ This build is built, tested and released by travis.
 
 ## Docker
 
+```shell script
+docker build -f docker/catalogue/Dockerfile . -t catalogue
+docker run catalogue
+```
+
 `GROUP=weaveworksdemos COMMIT=test ./scripts/build.sh`
 
 # Test

@@ -1,8 +1,5 @@
 *.iml
-.eslintrc.*
 node_modules
-.gitignore
 build
-.dockerignore
-Dockerfile
-Dockerfile.prod
+gradle*
+README.md

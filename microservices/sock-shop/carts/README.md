@@ -17,6 +17,11 @@ Checkout the API Spec [here](http://microservices-demo.github.io/api/index?url=h
 
 ## Docker
 
+```shell script
+docker build -f docker/carts/Dockerfile . -t carts
+docker run carts
+```
+
 `GROUP=weaveworksdemos COMMIT=test ./scripts/build.sh`
 
 # Test

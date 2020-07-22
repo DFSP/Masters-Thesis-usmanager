@@ -19,6 +19,12 @@ unit.py`
 
 `GROUP=weaveworksdemos COMMIT=test ./scripts/build.sh`
 
+### Docker
+```shell script
+docker build -f docker/Dockerfile . -t queue-master
+docker run queue-master
+```
+
 # Push
 
 `GROUP=weaveworksdemos COMMIT=test ./scripts/push.sh`

@@ -16,6 +16,12 @@ Checkout the API Spec [here](http://microservices-demo.github.io/api/index?url=h
 `mvn -DskipTests package`
 
 ## Docker
+
+```shell script
+docker build -f docker/orders/Dockerfile . -t orders
+docker run orders
+```
+
 `GROUP=weaveworksdemos COMMIT=test ./scripts/build.sh`
 
 # Test

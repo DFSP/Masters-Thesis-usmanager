@@ -1,22 +1,22 @@
 FROM golang:1.14.6-alpine AS build
 
 # Setup go to be able to get usmanager private repository
-RUN apk add git
 ENV GITHUB_TOKEN 52c6058781e851556a74229c42e819c661a7a49a
-RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/usmanager".insteadOf "https://github.com/usmanager"
-RUN go env -w GOPRIVATE=github.com/usmanager/*
+RUN apk add git && \
+git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/usmanager".insteadOf "https://github.com/usmanager" && \
+go env -w GOPRIVATE=github.com/usmanager/*
 
 # Build user binary
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/user
 WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/user
-RUN go mod vendor
-RUN go build -o user
-RUN mkdir /app
-RUN mv /go/src/github.com/usmanager/manager/microservices/sock-shop/user/user /app/user
+RUN go mod vendor && \
+go build -o user && \
+mkdir /app && \
+mv /go/src/github.com/usmanager/manager/microservices/sock-shop/user/user /app/user
 
 # Build final image
 FROM usmanager/registration-client AS registration-client
-FROM usmanager/alpine-glibc AS user
+FROM usmanager/alpine-glibc
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
 ENV MONGO_HOST user-db:27017

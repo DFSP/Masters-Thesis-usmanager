@@ -33,7 +33,6 @@
     </parent>
     <groupId>pt.unl.fct.microservicemanagement.mastermanager</groupId>
     <artifactId>registration-server</artifactId>
-    <version>0.0.1</version>
     <packaging>jar</packaging>
     <name>registration-server</name>
     <description>Eureka Client</description>
@@ -78,6 +77,7 @@
         </dependencies>
     </dependencyManagement>
     <build>
+        <finalName>registration-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

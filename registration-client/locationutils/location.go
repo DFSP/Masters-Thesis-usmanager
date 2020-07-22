@@ -155,7 +155,7 @@ func sendAllMonitoringData(timer time.Time) {
 		}
 	}
 	if count > 0 {
-		reglog.Logger.Infof("Sended all location data. Started at %s and finished at %s", timer.String(), time.Now().String())
+		reglog.Logger.Infof("Sent all location data. Started at %s and finished at %s", timer.String(), time.Now().String())
 	}
 }
 
