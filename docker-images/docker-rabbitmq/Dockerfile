@@ -1,4 +1,4 @@
-FROM usmanager/registration-client
+FROM registration-client as registration-client
 FROM rabbitmq:alpine
 
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
@@ -18,7 +18,7 @@ RUN set -ex && \
     rm -rf /tmp/* /var/cache/apk/* && \
     echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
 
-COPY --from=0 /registration-client ./registration-client
+COPY --from=registration-client /app/registration-client ./registration-client
 COPY ./docker-init.sh ./docker-init.sh
 
 RUN ["chmod", "+x", "docker-init.sh"]

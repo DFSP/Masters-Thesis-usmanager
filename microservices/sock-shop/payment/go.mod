@@ -3,7 +3,6 @@ module github.com/usmanager/manager/microservices/sock-shop/payment
 go 1.14
 
 require (
-	cloud.google.com/go v0.7.1-0.20170321144122-daf945bb8684 // indirect
 	github.com/Shopify/sarama v1.11.0 // indirect
 	github.com/Sirupsen/logrus v0.11.6-0.20170317143214-10f801ebc38b // indirect
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
@@ -23,7 +22,6 @@ require (
 	github.com/gogo/protobuf v0.0.0-20161220170212-84af2615df1b // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/mock v0.0.0-20160127222235-bd3c8e81be01 // indirect
-	github.com/golang/protobuf v0.0.0-20170307001533-c9c7427a2a70 // indirect
 	github.com/golang/snappy v0.0.0-20160529050041-d9eb7a3d35ec // indirect
 	github.com/googleapis/gax-go v0.0.0-20170321005343-9af46dd5a171 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
@@ -48,14 +46,11 @@ require (
 	github.com/stathat/go v1.0.0 // indirect
 	github.com/streadway/handy v0.0.0-20160402200321-f450267a206e
 	github.com/stretchr/testify v1.1.5-0.20161217200445-2402e8e7a02f // indirect
+	github.com/usmanager/manager/registration-client-go v0.0.0-20200722194541-2e19fb9723db
 	github.com/weaveworks/common v0.0.0-20170321114712-f94043b3da14
 	go4.org v0.0.0-20170314152642-169ea6cabe2a // indirect
-	golang.org/x/crypto v0.0.0-20170317163734-459e26527287 // indirect
-	golang.org/x/net v0.0.0-20170308210134-a6577fac2d73
-	golang.org/x/oauth2 v0.0.0-20170321013421-7fdf09982454 // indirect
-	golang.org/x/sys v0.0.0-20170308153327-99f16d856c98 // indirect
+	golang.org/x/net v0.0.0-20200707034311-ab3426394381
 	google.golang.org/api v0.0.0-20170321005416-16ab375f9450 // indirect
-	google.golang.org/appengine v1.0.1-0.20170307235554-b79c28f01977 // indirect
 	google.golang.org/grpc v1.2.0 // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.1 // indirect
