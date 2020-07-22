@@ -9,3 +9,4 @@ test
 gradle*
 LICENSE
 Makefile
+cmd/cataloguesvc/catalogues

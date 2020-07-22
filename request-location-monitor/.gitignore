@@ -1,8 +1,3 @@
-__pycache__/
-coverage.out
-
-vendor/**
-!vendor/manifest
-
-cmd/**
-!cmd/main.go
+vendor
+cmd/request-location-monitor
+*.iml

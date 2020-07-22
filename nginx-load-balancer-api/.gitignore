@@ -1,9 +1,3 @@
-__pycache__/
-coverage.out
-
-vendor/**
-!vendor/manifest
-
-cmd/**
-!cmd/main.go
-generated
+vendor
+cmd/nginx-load-balancer-api
+*.iml

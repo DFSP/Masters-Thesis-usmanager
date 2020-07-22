@@ -1,3 +1,4 @@
 README.md
 *.iml
 vendor
+cmd/nginx-load-balancer-api

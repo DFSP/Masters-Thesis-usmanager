@@ -1,7 +1,3 @@
-__pycache__/
-coverage.out
-
 vendor
-
-cmd/**
-!cmd/**.go
+cmd/registration-client
+*.iml
