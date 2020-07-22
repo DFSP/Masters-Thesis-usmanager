@@ -1,0 +1,11 @@
+README.md
+*.iml
+vendor
+scripts
+!scripts/docker-init*
+test
+*.yaml
+*.yml
+gradle*
+LICENSE
+Makefile
