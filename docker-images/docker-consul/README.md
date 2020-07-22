@@ -1,4 +1,4 @@
-# About this Repo
+# Consul
 
 This is the Git repo of the Docker [official image](https://docs.docker.com/docker-hub/official_repos/) for [consul](https://registry.hub.docker.com/_/consul/). See [the Docker Hub page](https://registry.hub.docker.com/_/consul/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 

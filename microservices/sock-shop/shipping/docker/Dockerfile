@@ -6,9 +6,10 @@ COPY src ./src
 COPY pom.xml .
 RUN mvn -DskipTests -f pom.xml clean package
 
-FROM usmanager/jdk-glibc
+FROM openjdk:8-jdk-alpine
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/target/shipping.jar shipping.jar
+
 
 COPY --from=registration-client /app/registration-client registration-client
 

@@ -16,7 +16,7 @@ mv /go/src/github.com/usmanager/manager/microservices/sock-shop/user/user /app/u
 
 # Build final image
 FROM usmanager/registration-client AS registration-client
-FROM usmanager/alpine-glibc
+FROM alpine:3.12.0
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
 ENV MONGO_HOST user-db:27017

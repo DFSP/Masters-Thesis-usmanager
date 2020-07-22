@@ -15,7 +15,7 @@ mkdir /app && \
 mv /go/src/github.com/usmanager/manager/request-location-monitor/cmd/request-location-monitor /app/request-location-monitor
 
 # Build final image
-FROM usmanager/alpine-glibc
+FROM alpine:3.12.0
 RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/request-location-monitor request-location-monitor

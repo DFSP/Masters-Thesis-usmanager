@@ -13,6 +13,7 @@
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/payment/payment.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/payment/payment.iml" />
       <module fileurl="file://$PROJECT_DIR$/prometheus/prometheus.iml" filepath="$PROJECT_DIR$/prometheus/prometheus.iml" />
       <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/queue-master/queue-master.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/queue-master/queue-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/rabbitmq/rabbitmq.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/rabbitmq/rabbitmq.iml" />
       <module fileurl="file://$PROJECT_DIR$/registration-client/registration-client.iml" filepath="$PROJECT_DIR$/registration-client/registration-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/registration-client-go/registration-client-go.iml" filepath="$PROJECT_DIR$/registration-client-go/registration-client-go.iml" />
       <module fileurl="file://$PROJECT_DIR$/registration-client-java/registration-client-java.iml" filepath="$PROJECT_DIR$/registration-client-java/registration-client-java.iml" />

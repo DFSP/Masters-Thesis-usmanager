@@ -2,7 +2,7 @@
 
 [![js-eslint-style](https://img.shields.io/badge/code%20style-TSLint-blue.svg?style=flat-square)](https://palantir.github.io/tslint/)
 
-Este módulo é consistido por um cliente reactjs.  
+Este módulo é consistido por um cliente web reactjs.  
 O qual comunica com o [Master Manager](/usmanager/master-manager) através de REST API para permitir 
 ajustar manualmente e interagir com o sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
  

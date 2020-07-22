@@ -16,7 +16,7 @@ mv /go/src/github.com/usmanager/manager/microservices/sock-shop/payment/cmd/paym
 
 # Build final image
 FROM usmanager/registration-client AS registration-client
-FROM usmanager/alpine-glibc
+FROM alpine:3.12.0
 RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/payment payment

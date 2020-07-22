@@ -7,7 +7,7 @@ Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de d
 Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/) para gerir as regras aplicadas. 
 É um módulo [Spring Boot](https://spring.io/projects/spring-boot), gerido com [maven](https://maven.apache.org/), que disponibiliza um servidor restful.
 
-### Requisitos
+## Requisitos
 
 #### Maven com java 11  
 ```shell script
@@ -31,25 +31,20 @@ sh src/main/resources/scripts/docker-install.sh
 sh src/main/resources/scripts/node-exporter-install.sh
 ``` 
 
-### Executar
-Com o maven instalado:
+## Executar
+
+#### Local
 ```shell script
 mvn spring-boot:run
 ```
 
-Sem o maven instalado:
-```
-./mvnw package
-```
-
-### Docker
-
-```
+#### Docker
+```shell script
 docker build -f docker/Dockerfile . -t master-manager
 docker run --rm -p 8080:8088 master-manager
 ```
 
-### Ambiente
+## Ambiente
 
 >Ubuntu 18.04.4 LTS
 
@@ -61,7 +56,7 @@ docker run --rm -p 8080:8088 master-manager
 
 >Docker version 19.03.5, build 633a0ea838
 
-### Ferramentas usadas
+## Ferramentas usadas
 
 [<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business OldRules Management System (BRMS) solution
 
@@ -75,14 +70,14 @@ docker run --rm -p 8080:8088 master-manager
 
 [<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/SSH_Communications_Security_logo.svg/1280px-SSH_Communications_Security_logo.svg.png" alt="" alt="" width="128" height="20">](https://www.ssh.com/ssh/command) - Tools for remote access
 
-### Guias úteis
+## Guias úteis
 [<img src="https://i.imgur.com/WDbhA08.png" alt="" width="48" height="42"> Spring Boot](https://spring.io/projects/spring-boot) - Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run" 
 
 <!--[<img src="https://i.imgur.com/ei7nKF5.png" alt="" width="48" height="42"> Spring HATEOAS](https://spring.io/projects/spring-hateoas) - Spring HATEOAS provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC-->
 
 [<img src="https://i.imgur.com/qFZtEoa.png" alt="" width="48" height="24"> Maven](http://maven.apache.org/guides/getting-started/) - Maven is essentially a project management and comprehension tool and as such provides a way to help with managing: Builds, Documentation, Reporting, Dependencies, SCMs, Release, Distribution and Documentation
 
-### Troubleshooting
+## Troubleshooting
 
 - Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:
 Configurar  encaminhamento `sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock` ([solução](https://stackoverflow.com/a/54504083))
@@ -106,6 +101,6 @@ E por fim, configurar os seguintes encaminhamentos de portas no painel de contro
     
 De notar que, apenas com esta configuração, não será possível executar containers aplicacionais nesta máquina.
 
-### Licença
+## Licença
 
 Master manager está licenciado com a [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
