@@ -34,6 +34,7 @@ import (
 
 	"github.com/usmanager/manager/microservices/sock-shop/user/users"
 
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 

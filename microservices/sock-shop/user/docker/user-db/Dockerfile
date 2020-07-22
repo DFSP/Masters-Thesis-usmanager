@@ -1,10 +1,7 @@
-FROM mongo:3
+FROM acarrusca/mongo3
+ADD ./scripts /tmp/scripts
 
-COPY ./docker/user-db/scripts /tmp/scripts
-
-RUN ["chmod", "+x", "/tmp/scripts/mongo_create_insert.sh"]
-
-# Modify child mongo to use /data/db-users as dbpath (because /data/db wont persist the build because it is already a VOLUME)
+# Modify child mongo to use /data/db-accounts as dbpath (because /data/db wont persist the build because it is already a VOLUME)
 RUN mkdir -p /data/db-users \
     && echo "dbpath = /data/db-users" > /etc/mongodb.conf \
     && chown -R mongodb:mongodb /data/db-users
