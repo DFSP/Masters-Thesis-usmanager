@@ -56,7 +56,7 @@ docker run --rm -p 8080:8088 manager-master
 
 >Docker version 19.03.5, build 633a0ea838
 
-## Ferramentas usadas
+## Ferramentas
 
 [<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business OldRules Management System (BRMS) solution
 

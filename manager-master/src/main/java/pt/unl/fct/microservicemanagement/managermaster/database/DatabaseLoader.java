@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.managermaster.database;
 
-import pt.unl.fct.microservicemanagement.managermaster.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.managermaster.ManagerMasterProperties;
 import pt.unl.fct.microservicemanagement.managermaster.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.managermaster.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.managermaster.manager.apps.AppServiceEntity;
@@ -454,10 +454,10 @@ public class DatabaseLoader {
       }
       ServiceEntity masterManager;
       try {
-        masterManager = servicesService.getService(MasterManagerProperties.MASTER_MANAGER);
+        masterManager = servicesService.getService(ManagerMasterProperties.MANAGER_MASTER);
       } catch (EntityNotFoundException ignored) {
         masterManager = ServiceEntity.builder()
-            .serviceName(MasterManagerProperties.MASTER_MANAGER)
+            .serviceName(ManagerMasterProperties.MANAGER_MASTER)
             .dockerRepository("manager-master")
             // TODO
             .defaultExternalPort("1919")

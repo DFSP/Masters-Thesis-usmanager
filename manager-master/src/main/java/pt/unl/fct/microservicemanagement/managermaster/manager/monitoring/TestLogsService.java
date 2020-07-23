@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.managermaster.manager.monitoring;
 
-import pt.unl.fct.microservicemanagement.managermaster.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.managermaster.ManagerMasterProperties;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,9 +41,9 @@ public class TestLogsService {
   private final boolean isTestsLogsEnable;
 
   public TestLogsService(TestsMonitoringRepository testsMonitoringRepository,
-                         MasterManagerProperties masterManagerProperties) {
+                         ManagerMasterProperties managerMasterProperties) {
     this.testsMonitoringRepository = testsMonitoringRepository;
-    this.isTestsLogsEnable = masterManagerProperties.getTests().isTestLogsEnable();
+    this.isTestsLogsEnable = managerMasterProperties.getTests().isTestLogsEnable();
   }
 
   public void saveMonitoringServiceLogTests(String containerId, String serviceName, String field,

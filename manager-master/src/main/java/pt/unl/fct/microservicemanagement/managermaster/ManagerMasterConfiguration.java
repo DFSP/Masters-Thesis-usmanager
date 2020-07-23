@@ -24,17 +24,37 @@
 
 package pt.unl.fct.microservicemanagement.managermaster;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
+import pt.unl.fct.microservicemanagement.managermaster.util.JsonPathArgumentResolver;
 
-@SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
-@EnableCaching
-public class MasterManagerApplication {
+import java.util.List;
 
-  public static void main(String[] args) {
-    SpringApplication.run(MasterManagerApplication.class, args);
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+@EnableAsync
+public class ManagerMasterConfiguration implements WebMvcConfigurer {
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**");
   }
+
+  @Override
+  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    var jsonPathArgumentResolver = new JsonPathArgumentResolver();
+    argumentResolvers.add(jsonPathArgumentResolver);
+  }
+
+  /*@Bean(name = "setupCloudInstanceExecutor")
+  public TaskExecutor getTaskExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(1);
+    threadPoolTaskExecutor.setMaxPoolSize(5);
+    return threadPoolTaskExecutor;
+  }*/
 
 }

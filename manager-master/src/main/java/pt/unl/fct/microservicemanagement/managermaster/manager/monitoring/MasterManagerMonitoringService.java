@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.managermaster.manager.monitoring;
 
-import pt.unl.fct.microservicemanagement.managermaster.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.managermaster.ManagerMasterProperties;
 import pt.unl.fct.microservicemanagement.managermaster.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.managermaster.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.managermaster.manager.containers.ContainerEntity;
@@ -51,11 +51,11 @@ public class MasterManagerMonitoringService {
 
   public MasterManagerMonitoringService(ContainersService containersService,
                                         ContainersMonitoringService containersMonitoringService,
-                                        MasterManagerProperties masterManagerProperties) {
+                                        ManagerMasterProperties managerMasterProperties) {
     this.containersService = containersService;
     this.containersMonitoringService = containersMonitoringService;
-    this.monitorPeriod = masterManagerProperties.getMonitorPeriod();
-    this.isTestLogsEnable = masterManagerProperties.getTests().isTestLogsEnable();
+    this.monitorPeriod = managerMasterProperties.getMonitorPeriod();
+    this.isTestLogsEnable = managerMasterProperties.getTests().isTestLogsEnable();
   }
 
   public void initMasterManagerMonitorTimer() {
@@ -82,7 +82,7 @@ public class MasterManagerMonitoringService {
   private void masterManagerMonitorTask(int secondsFromLastRun) {
     containersService
         .getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME,
-            MasterManagerProperties.MASTER_MANAGER)))
+            ManagerMasterProperties.MANAGER_MASTER)))
         .stream()
         .findFirst()
         .ifPresent(c -> saveMasterManagerContainerFields(c, secondsFromLastRun));
@@ -92,7 +92,7 @@ public class MasterManagerMonitoringService {
     Map<String, Double> newFields = containersMonitoringService.getContainerStats(container, secondsFromLastRun);
     newFields.forEach((field, value) ->
         containersMonitoringService.saveMonitoringServiceLog(container.getContainerId(),
-            MasterManagerProperties.MASTER_MANAGER, field, value)
+            ManagerMasterProperties.MANAGER_MASTER, field, value)
     );
   }
 

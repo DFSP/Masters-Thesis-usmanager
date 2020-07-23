@@ -24,35 +24,17 @@
 
 package pt.unl.fct.microservicemanagement.managermaster;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 
-@Getter
-@Setter
-@Configuration
-@ConfigurationProperties("manager-master")
-public class MasterManagerProperties {
+@SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
+@EnableCaching
+public class ManagerMasterApplication {
 
-  public static final String MASTER_MANAGER = "master-manager";
-  private final Tests tests;
-  private Mode mode;
-  private int monitorPeriod;
-
-  public MasterManagerProperties() {
-    this.tests = new Tests();
-  }
-
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Tests {
-
-    private boolean testLogsEnable;
-
+  public static void main(String[] args) {
+    SpringApplication.run(ManagerMasterApplication.class, args);
   }
 
 }

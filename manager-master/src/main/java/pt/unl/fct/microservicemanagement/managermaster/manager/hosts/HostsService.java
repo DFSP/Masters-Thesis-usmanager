@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.managermaster.manager.hosts;
 
-import pt.unl.fct.microservicemanagement.managermaster.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.managermaster.ManagerMasterProperties;
 import pt.unl.fct.microservicemanagement.managermaster.Mode;
 import pt.unl.fct.microservicemanagement.managermaster.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.managermaster.exceptions.MasterManagerException;
@@ -94,7 +94,7 @@ public class HostsService {
                       HostMetricsService hostMetricsService,
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       RegionsService regionsService, DockerProperties dockerProperties, AwsProperties awsProperties,
-                      MasterManagerProperties masterManagerProperties,
+                      ManagerMasterProperties managerMasterProperties,
                       HostProperties hostProperties) {
     this.nodesService = nodesService;
     this.containersService = containersService;
@@ -110,7 +110,7 @@ public class HostsService {
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
     this.localMachineDns = hostProperties.getLocalMachineDns();
-    this.mode = masterManagerProperties.getMode();
+    this.mode = managerMasterProperties.getMode();
   }
 
   public void setMachineInfo() {

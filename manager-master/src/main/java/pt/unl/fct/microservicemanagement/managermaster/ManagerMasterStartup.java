@@ -38,14 +38,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class MasterManagerStartup implements ApplicationListener<ApplicationReadyEvent> {
+public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
   private final HostsService hostsService;
   private final ContainersMonitoringService containersMonitoringService;
   private final HostsMonitoringService hostsMonitoringService;
   private final MasterManagerMonitoringService masterManagerMonitoringService;
 
-  public MasterManagerStartup(@Lazy HostsService hostsService,
+  public ManagerMasterStartup(@Lazy HostsService hostsService,
                               @Lazy ContainersMonitoringService containersMonitoringService,
                               @Lazy HostsMonitoringService hostsMonitoringService,
                               @Lazy MasterManagerMonitoringService masterManagerMonitoringService) {

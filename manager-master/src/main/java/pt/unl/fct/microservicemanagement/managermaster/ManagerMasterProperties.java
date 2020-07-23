@@ -24,37 +24,35 @@
 
 package pt.unl.fct.microservicemanagement.managermaster;
 
-import pt.unl.fct.microservicemanagement.managermaster.util.JsonPathArgumentResolver;
-
-import java.util.List;
-
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@Getter
+@Setter
 @Configuration
-@EnableAsync
-public class MasterManagerConfiguration implements WebMvcConfigurer {
+@ConfigurationProperties("manager-master")
+public class ManagerMasterProperties {
 
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**");
+  public static final String MANAGER_MASTER = "manager-master";
+  private final Tests tests;
+  private Mode mode;
+  private int monitorPeriod;
+
+  public ManagerMasterProperties() {
+    this.tests = new Tests();
   }
 
-  @Override
-  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-    var jsonPathArgumentResolver = new JsonPathArgumentResolver();
-    argumentResolvers.add(jsonPathArgumentResolver);
-  }
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  public static final class Tests {
 
-  /*@Bean(name = "setupCloudInstanceExecutor")
-  public TaskExecutor getTaskExecutor() {
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    threadPoolTaskExecutor.setCorePoolSize(1);
-    threadPoolTaskExecutor.setMaxPoolSize(5);
-    return threadPoolTaskExecutor;
-  }*/
+    private boolean testLogsEnable;
+
+  }
 
 }
