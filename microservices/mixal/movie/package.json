@@ -1,0 +1,31 @@
+{
+  "name": "movies_application",
+  "version": "1.0.0",
+  "description": "RESTful API using Node.js and MongoDB",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Anshul Jindal",
+  "license": "GNU",
+  "bugs": {
+    "url": ""
+  },
+  "scripts": {
+    "preinstall": "npm install",
+    "start": "node server.js"
+  },
+  "homepage": "",
+  "dependencies": {
+    "body-parser": "^1.12.2",
+    "express": "^4.12.3",
+    "ip": "^1.1.5",
+    "math-sqrt": "^1.0.1",
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.0.0",
+    "morgan": "^1.5.2",
+    "os": "^0.1.1",
+    "os-utils": "0.0.14"
+  }
+}

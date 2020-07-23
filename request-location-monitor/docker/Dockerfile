@@ -21,7 +21,6 @@ WORKDIR /app
 COPY --from=build /app/request-location-monitor request-location-monitor
 COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
-RUN setcap 'cap_net_bind_service=+ep' request-location-monitor
 ENTRYPOINT ["./docker-init.sh"]
 # internalPort, interval
 CMD ["1919", "60"]
