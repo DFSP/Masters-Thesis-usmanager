@@ -31,7 +31,7 @@
         <version>2.3.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>pt.unl.fct.microservicemanagement.mastermanager</groupId>
+    <groupId>pt.unl.fct.microservicemanagement.managermaster</groupId>
     <artifactId>registration-server</artifactId>
     <packaging>jar</packaging>
     <name>registration-server</name>

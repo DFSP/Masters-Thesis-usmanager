@@ -16,11 +16,11 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
   - [docker-java](docker-images/docker-java)
   - [docker-mongo3](docker-images/docker-mongo3)
 
-- [master-manager](master-manager)
+- [manager-master](manager-master)
 
 - [local-manager](local-manager)
 
-- [web-manager](web-manager)
+- [manager-web](manager-web)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 
@@ -56,11 +56,11 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
-> [Master manager](master-manager/README.md#ferramentas-usadas)  
+> [Manager master](manager-master/README.md#ferramentas-usadas)  
 
 > [Local manager](local-manager/README.md#ferramentas-usadas)  
 
-> [Web manager](web-manager/README.md#ferramentas-usadas)  
+> [Web manager](manager-web/README.md#ferramentas-usadas)  
 
 ### Configuração
 
@@ -76,7 +76,7 @@ O sistema usa instâncias aws ec2 para alojar os microserviços. Para configurar
 com nome `us-manager-security-group`, e uma Inbound rule `Custom TCP 22-80 Anywhere`
 
 - [Iniciar uma instância](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:) 
-t2-micro, com base, por exemplo, no Ubuntu Server 20.04 LTS. Guardar o ficheiro .pem na pasta /master-manager/src/main/resources/aws.
+t2-micro, com base, por exemplo, no Ubuntu Server 20.04 LTS. Guardar o ficheiro .pem na pasta /manager-master/src/main/resources/aws.
 Executar `chmod 400 file.pem` no ficheiro .pem que foi transferido.
 
 - Criar uma imagem (ami) a partir da instância iniciada anteriormente, no menu da instancia [aqui](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:),

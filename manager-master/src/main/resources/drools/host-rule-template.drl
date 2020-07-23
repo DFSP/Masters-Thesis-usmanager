@@ -1,0 +1,25 @@
+template header
+
+rule
+ruleId
+eventType
+decision
+priority
+
+package pt.unl.fct.microservicemanagement.managermaster;
+
+import pt.unl.fct.microservicemanagement.managermaster.manager.rulesystem.rules.RuleDecision;
+
+global pt.unl.fct.microservicemanagement.managermaster.manager.rulesystem.rules.RuleDecision hostDecision;
+
+template "host"
+
+rule "rule_host_@{ruleId}" salience @{priority}
+when
+    @{eventType}(@{rule})
+then
+    hostDecision.setDecision(@{decision});
+    hostDecision.setPriority(@{priority});
+end
+
+end template
