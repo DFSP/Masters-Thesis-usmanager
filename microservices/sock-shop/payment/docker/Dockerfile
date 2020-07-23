@@ -21,7 +21,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/payment payment
 COPY --from=registration-client /app/registration-client registration-client
-COPY images images
 COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
 ENTRYPOINT ["./docker-init.sh"]

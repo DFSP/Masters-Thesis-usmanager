@@ -1,4 +1,4 @@
-FROM usmanager/nginx-load-balancer-api
+FROM usmanager/nginx-load-balancer-api as nginx-load-balancer-api
 FROM nginx:alpine
 
 # for htpasswd command
@@ -15,7 +15,7 @@ RUN gunzip /etc/nginx/geoip/city.dat.gz
 ENV SERVER_NAME load-balancer.com
 # ENV ALG round-robin
 
-COPY --from=0 /nginx-load-balancer-api ./nginx-load-balancer-api
+COPY --from=nginx-load-balancer-api app/nginx-load-balancer-api ./nginx-load-balancer-api
 COPY /files/run.sh /
 COPY /files/nginx.conf.tmpl /
 
