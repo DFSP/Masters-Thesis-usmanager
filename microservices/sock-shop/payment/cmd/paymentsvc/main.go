@@ -38,8 +38,8 @@ import (
 	"github.com/go-kit/kit/log"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
-	"github.com/usmanager/manager/registration-client-go"
 	"github.com/usmanager/manager/microservices/sock-shop/payment"
+	"github.com/usmanager/manager/registration-client-go"
 	"golang.org/x/net/context"
 )
 

@@ -31,7 +31,7 @@
     <artifactId>manager-master</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
-    <name>Master Manager</name>
+    <name>Manager Master</name>
     <description>Microservices master manager. Decides to replicate and/or migrate
         docker containered microservices between cloud and edge endpoints, based on
         predefined rules and metrics collected globally

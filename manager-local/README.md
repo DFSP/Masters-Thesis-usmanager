@@ -7,5 +7,13 @@ Usa [kafka](https://kafka.apache.org/) para comunicar com o manager-master.
 
 ## Dependências
 
-- [JCommander](http://jcommander.org/) - Commander is a very small Java framework that makes it trivial to parse command line parameters
+- [Spring boot]()
+- [Mongodb](https://www.mongodb.com/) - MongoDB is a document database, which means it stores data in JSON-like documents
 - [kafka](https://kafka.apache.org/) - Kafka® is used for building real-time data pipelines and streaming apps
+
+## Instalar
+
+Mongodb
+```shell script
+sudo apt install -y mongodb
+```

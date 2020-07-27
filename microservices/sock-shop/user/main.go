@@ -46,7 +46,6 @@ import (
 	"github.com/usmanager/manager/microservices/sock-shop/user/api"
 	"github.com/usmanager/manager/microservices/sock-shop/user/db"
 	"github.com/usmanager/manager/microservices/sock-shop/user/db/mongodb"
-	"github.com/usmanager/manager/registration-client-go"
 	commonMiddleware "github.com/weaveworks/common/middleware"
 )
 

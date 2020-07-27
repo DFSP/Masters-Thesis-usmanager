@@ -33,7 +33,7 @@ services:
     environment:
       - reschedule=on-node-failure
   zipkin:
-    image: openzipkin/zipkin 
+    image: openzipkin/zipkin
     hostname: zipkin
     restart: always
     cap_drop:

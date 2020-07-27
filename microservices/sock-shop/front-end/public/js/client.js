@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 manager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 function login() {
     var username = $('#username-modal').val();
     var password = $('#password-modal').val();
@@ -9,7 +33,7 @@ function login() {
             $("#login-message").html('<div class="alert alert-success">Login successful.</div>');
             console.log('posted: ' + textStatus);
             console.log("logged_in cookie: " + $.cookie('logged_in'));
-            setTimeout(function(){
+            setTimeout(function () {
                 location.reload();
             }, 1500);
         },
@@ -33,23 +57,23 @@ function register() {
     var firstName = $('#register-first-modal').val();
     var lastName = $('#register-last-modal').val();
     var postvals = JSON.stringify({
-		"username": username,
-		"password": password,
-		"email": email,
-		"firstName": firstName,
-		"lastName": lastName
-	});
-	console.log(postvals);
+        "username": username,
+        "password": password,
+        "email": email,
+        "firstName": firstName,
+        "lastName": lastName
+    });
+    console.log(postvals);
     $.ajax({
         url: "register",
         type: "POST",
         async: false,
-	data: postvals,
+        data: postvals,
         success: function (data, textStatus, jqXHR) {
             $("#registration-message").html('<div class="alert alert-success">Registration and login successful.</div>');
             console.log('posted: ' + textStatus);
             console.log("logged_in cookie: " + $.cookie('logged_in'));
-            setTimeout(function(){
+            setTimeout(function () {
                 location.reload();
             }, 1500);
         },
@@ -150,7 +174,7 @@ function addToCart(id) {
 // cart/update request sent to frontend server (index.js - app.post("/cart/update" function...)
 function updateToCart(id, quantity, next) {
 
-	console.log("Sending request to update cart: item: " + id + " quantity: " + quantity);
+    console.log("Sending request to update cart: item: " + id + " quantity: " + quantity);
     $.ajax({
         url: "cart/update",
         type: "POST",

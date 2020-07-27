@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "manager",
+      "type": "pt.unl.fct.miei.microservicesmanagement.manager.database.ManagerDatabaseProperties",
+      "sourceType": "pt.unl.fct.miei.microservicesmanagement.manager.database.ManagerDatabaseProperties"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}
