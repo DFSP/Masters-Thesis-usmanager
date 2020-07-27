@@ -8,6 +8,7 @@ ENV KAFKA_VERSION 2.5.0
 ENV KAFKA_HOME /opt/kafka_"$SCALA_VERSION"-"$KAFKA_VERSION"
 
 # Install Kafka, Zookeeper and other needed things
+
 # jre installation requires man folder to exist
 RUN mkdir -p /usr/share/man/man1 \
     && apt-get update \
