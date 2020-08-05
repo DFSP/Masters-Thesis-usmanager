@@ -3,10 +3,9 @@ spring:
     name: manager-master
   datasource:
     driverClassName: org.h2.Driver
-    #url: jdbc:h2:mem;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    url: jdbc:h2:./manager-master-db
+    url: jdbc:h2:./manager-master-db;AUTO_SERVER=TRUE;
     username: sa
-    password: admin
+    password:
     platform: h2
   h2:
     console:
@@ -97,6 +96,9 @@ location-request:
 rules:
   service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
+symmetricds:
+  setup-filename: file:src/main/resources/sym/sym.sql
+
 #debug: true
 #trace: true
 logging:

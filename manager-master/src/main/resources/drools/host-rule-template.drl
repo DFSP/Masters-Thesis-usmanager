@@ -6,7 +6,7 @@ eventType
 decision
 priority
 
-package pt.unl.fct.microservicemanagement.managermaster;
+packagept.unl.fct.miei.usmanagement.manager.database;
 
 import RuleDecision;
 

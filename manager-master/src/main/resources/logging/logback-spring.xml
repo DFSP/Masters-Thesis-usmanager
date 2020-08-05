@@ -44,7 +44,7 @@
     </appender>
 
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/spring-boot-logger.log</file>
+        <file>${LOGS}/manager-master.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
         </encoder>
@@ -72,7 +72,7 @@
         <appender-ref ref="DB"/>
     </root>
 
-    <logger name="pt.unl.fct.microservicemanagement.managermaster" level="trace" additivity="false">
+    <logger name="pt.unl.fct.usmanagement.manager.master" level="trace" additivity="false">
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
         <appender-ref ref="DB"/>

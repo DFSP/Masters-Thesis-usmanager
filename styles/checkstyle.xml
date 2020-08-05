@@ -214,7 +214,7 @@
         <module name="AvoidStarImport"/>
         <module name="AvoidStaticImport"/>
         <module name="ImportOrder">
-            <property name="groups" value="/^pt.unl.fct.microservicemanagement\./,/^java\./,/^javax\./"/>
+            <property name="groups" value="/^pt.unl.fct.usmanagement\./,/^java\./,/^javax\./"/>
             <property name="separated" value="true"/>
             <property name="option" value="top"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
@@ -305,7 +305,7 @@
         <module name="MethodName"/>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="1"/>
+            <property name="allowedAbbreviationLength" value="4"/>
         </module>
         <module name="AbstractClassName"/>
         <module name="ConstantName"/>
