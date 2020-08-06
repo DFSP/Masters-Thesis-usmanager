@@ -49,7 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMet
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 
-
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -111,12 +110,12 @@ public class EdgeHostEntity {
     rule.getEdgeHosts().remove(this);
   }
 
-  public void addSimulatedHostMetric(HostSimulatedMetricEntity hostMetric) {
+  public void addHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.add(hostMetric);
     hostMetric.getEdgeHosts().add(this);
   }
 
-  public void removeSimulatedHostMetric(HostSimulatedMetricEntity hostMetric) {
+  public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.remove(hostMetric);
     hostMetric.getEdgeHosts().remove(this);
   }

@@ -24,19 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.services;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.dependencies.ServiceDependencyEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.apps.AppServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.services.SimulatedServiceMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.prediction.ServiceEventPredictionRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.services.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.services.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -48,6 +35,21 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.prediction.ServiceEventPredictionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.prediction.ServiceEventPredictionRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.database.services.dependencies.ServiceDependencyEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.services.ServiceSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -56,16 +58,16 @@ public class ServicesService {
   private final ServiceRepository services;
   private final ServiceEventPredictionRepository serviceEventPredictions;
   private final ServiceRulesService serviceRulesService;
-  private final SimulatedServiceMetricsService simulatedServiceMetricsService;
+  private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
   private final AppsService appsService;
 
   public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
                          ServiceRulesService serviceRulesService,
-                         SimulatedServiceMetricsService simulatedServiceMetricsService, @Lazy AppsService appsService) {
+                         ServiceSimulatedMetricsService serviceSimulatedMetricsService, @Lazy AppsService appsService) {
     this.services = services;
     this.serviceEventPredictions = serviceEventPredictions;
     this.serviceRulesService = serviceRulesService;
-    this.simulatedServiceMetricsService = simulatedServiceMetricsService;
+    this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
     this.appsService = appsService;
   }
 
@@ -268,38 +270,38 @@ public class ServicesService {
     ruleNames.forEach(rule -> serviceRulesService.removeService(rule, serviceName));
   }
 
-  public List<SimulatedServiceMetricEntity> getSimulatedMetrics(String serviceName) {
+  public List<ServiceSimulatedMetricEntity> getSimulatedMetrics(String serviceName) {
     assertServiceExists(serviceName);
     return services.getSimulatedMetrics(serviceName);
   }
 
-  public SimulatedServiceMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
+  public ServiceSimulatedMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
     assertServiceExists(serviceName);
     return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(SimulatedServiceMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+        new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
     );
   }
 
   public void addSimulatedMetric(String serviceName, String simulatedMetricName) {
     assertServiceExists(serviceName);
-    simulatedServiceMetricsService.addService(simulatedMetricName, serviceName);
+    serviceSimulatedMetricsService.addService(simulatedMetricName, serviceName);
   }
 
   public void addSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
     assertServiceExists(serviceName);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedServiceMetricsService.addService(simulatedMetric, serviceName));
+        serviceSimulatedMetricsService.addService(simulatedMetric, serviceName));
   }
 
   public void removeSimulatedMetric(String serviceName, String simulatedMetricName) {
     assertServiceExists(serviceName);
-    simulatedServiceMetricsService.removeService(simulatedMetricName, serviceName);
+    serviceSimulatedMetricsService.removeService(simulatedMetricName, serviceName);
   }
 
   public void removeSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
     assertServiceExists(serviceName);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedServiceMetricsService.removeService(simulatedMetric, serviceName));
+        serviceSimulatedMetricsService.removeService(simulatedMetric, serviceName));
   }
 
   public int getMinReplicasByServiceName(String serviceName) {

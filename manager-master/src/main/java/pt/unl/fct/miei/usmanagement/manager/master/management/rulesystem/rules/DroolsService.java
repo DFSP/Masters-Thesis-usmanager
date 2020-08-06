@@ -24,13 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.Decision;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.Event;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.HostEvent;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,6 +53,13 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.Event;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
 
 @Slf4j
 @Service

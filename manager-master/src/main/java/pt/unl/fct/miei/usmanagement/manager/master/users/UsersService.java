@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.users;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -37,6 +35,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.users.UserEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.users.UserRole;
+import pt.unl.fct.miei.usmanagement.manager.database.users.UsersRepository;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 
 @Service
 public class UsersService implements UserDetailsService {

@@ -24,15 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
-@ToString
-@EqualsAndHashCode
+@Data
 class CommandSftpData {
 
   private final String hostname;

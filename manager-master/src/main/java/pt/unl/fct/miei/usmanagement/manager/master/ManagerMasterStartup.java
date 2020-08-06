@@ -24,10 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -49,34 +47,29 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ContainersMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.MasterManagerMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymmetricDSProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
 
 @Slf4j
 @Component
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
   private final HostsService hostsService;
-  private final ContainersMonitoringService containersMonitoringService;
+  private final ServicesMonitoringService servicesMonitoringService;
   private final HostsMonitoringService hostsMonitoringService;
-  private final MasterManagerMonitoringService masterManagerMonitoringService;
   private final ServletContext servletContext;
   private final DataSource dataSource;
   private final ApplicationContext applicationContext;
   private final DataSourceProperties dataSourceProperties;
 
   public ManagerMasterStartup(@Lazy HostsService hostsService,
-                              @Lazy ContainersMonitoringService containersMonitoringService,
+                              @Lazy ServicesMonitoringService servicesMonitoringService,
                               @Lazy HostsMonitoringService hostsMonitoringService,
-                              @Lazy MasterManagerMonitoringService masterManagerMonitoringService,
                               ServletContext servletContext, DataSource dataSource,
                               ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
     this.hostsService = hostsService;
-    this.containersMonitoringService = containersMonitoringService;
+    this.servicesMonitoringService = servicesMonitoringService;
     this.hostsMonitoringService = hostsMonitoringService;
-    this.masterManagerMonitoringService = masterManagerMonitoringService;
     this.servletContext = servletContext;
     this.dataSource = dataSource;
     this.applicationContext = applicationContext;
@@ -92,9 +85,8 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
     } catch (MasterManagerException e) {
       log.error(e.getMessage());
     }
-    containersMonitoringService.initContainerMonitorTimer();
+    servicesMonitoringService.initServiceMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();
-    masterManagerMonitoringService.initMasterManagerMonitorTimer();
     this.startSymmetricDSServer(machineAddress);
   }
 

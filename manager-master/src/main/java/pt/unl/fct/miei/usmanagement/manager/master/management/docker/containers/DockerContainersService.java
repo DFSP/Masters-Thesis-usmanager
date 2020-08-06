@@ -24,24 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerPortMapping;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
-import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,6 +53,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
 
 @Service
 @Slf4j

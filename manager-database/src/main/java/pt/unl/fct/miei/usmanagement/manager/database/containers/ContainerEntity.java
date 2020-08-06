@@ -122,12 +122,12 @@ public class ContainerEntity {
     rule.getContainers().remove(this);
   }
 
-  public void addSimulatedContainerMetric(ContainerSimulatedMetricEntity containerMetric) {
+  public void addContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
     simulatedContainerMetrics.add(containerMetric);
     containerMetric.getContainers().add(this);
   }
 
-  public void removeSimulatedContainerMetric(ContainerSimulatedMetricEntity containerMetric) {
+  public void removeContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
     simulatedContainerMetrics.remove(containerMetric);
     containerMetric.getContainers().remove(this);
   }

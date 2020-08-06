@@ -24,16 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers.DockerContainer;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers.DockerContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.containers.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.containers.ContainerRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +38,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers.DockerContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ContainerRulesService;
 
 @Service
 @Slf4j
@@ -55,19 +56,19 @@ public class ContainersService {
 
   private final DockerContainersService dockerContainersService;
   private final ContainerRulesService containerRulesService;
-  private final SimulatedContainerMetricsService simulatedContainerMetricsService;
+  private final ContainerSimulatedMetricsService ContainerSimulatedMetricsService;
   private final DockerApiProxyService dockerApiProxyService;
 
   private final ContainerRepository containers;
 
   public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
-                           SimulatedContainerMetricsService simulatedContainerMetricsService,
+                           ContainerSimulatedMetricsService ContainerSimulatedMetricsService,
                            DockerApiProxyService dockerApiProxyService,
                            ContainerRepository containers) {
     this.dockerContainersService = dockerContainersService;
     this.containerRulesService = containerRulesService;
-    this.simulatedContainerMetricsService = simulatedContainerMetricsService;
+    this.ContainerSimulatedMetricsService = ContainerSimulatedMetricsService;
     this.dockerApiProxyService = dockerApiProxyService;
     this.containers = containers;
   }
@@ -324,7 +325,6 @@ public class ContainersService {
     return dockerContainersService.getContainerLogs(container);
   }
 
-
   public List<ContainerRuleEntity> getRules(String containerId) {
     assertContainerExists(containerId);
     return containers.getRules(containerId);
@@ -350,38 +350,38 @@ public class ContainersService {
     ruleNames.forEach(rule -> containerRulesService.removeContainer(rule, containerId));
   }
 
-  public List<SimulatedContainerMetricEntity> getSimulatedMetrics(String containerId) {
+  public List<ContainerSimulatedMetricEntity> getSimulatedMetrics(String containerId) {
     assertContainerExists(containerId);
     return containers.getSimulatedMetrics(containerId);
   }
 
-  public SimulatedContainerMetricEntity getSimulatedMetric(String containerId, String simulatedMetricName) {
+  public ContainerSimulatedMetricEntity getSimulatedMetric(String containerId, String simulatedMetricName) {
     assertContainerExists(containerId);
     return containers.getSimulatedMetric(containerId, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(SimulatedContainerMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+        new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
     );
   }
 
   public void addSimulatedMetric(String containerId, String simulatedMetricName) {
     assertContainerExists(containerId);
-    simulatedContainerMetricsService.addContainer(simulatedMetricName, containerId);
+    ContainerSimulatedMetricsService.addContainer(simulatedMetricName, containerId);
   }
 
   public void addSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
     assertContainerExists(containerId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedContainerMetricsService.addContainer(simulatedMetric, containerId));
+        ContainerSimulatedMetricsService.addContainer(simulatedMetric, containerId));
   }
 
   public void removeSimulatedMetric(String containerId, String simulatedMetricName) {
     assertContainerExists(containerId);
-    simulatedContainerMetricsService.removeContainer(simulatedMetricName, containerId);
+    ContainerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
   }
 
   public void removeSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
     assertContainerExists(containerId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedContainerMetricsService.removeContainer(simulatedMetric, containerId));
+        ContainerSimulatedMetricsService.removeContainer(simulatedMetric, containerId));
   }
 
   public String launchDockerApiProxy(String hostname) {

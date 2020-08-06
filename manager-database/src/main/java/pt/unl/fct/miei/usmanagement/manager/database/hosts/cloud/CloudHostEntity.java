@@ -112,12 +112,12 @@ public class CloudHostEntity {
     rule.getCloudHosts().remove(this);
   }
 
-  public void addSimulatedHostMetric(HostSimulatedMetricEntity hostMetric) {
+  public void addHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.add(hostMetric);
     hostMetric.getCloudHosts().add(this);
   }
 
-  public void removeSimulatedHostMetric(HostSimulatedMetricEntity hostMetric) {
+  public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.remove(hostMetric);
     hostMetric.getCloudHosts().remove(this);
   }

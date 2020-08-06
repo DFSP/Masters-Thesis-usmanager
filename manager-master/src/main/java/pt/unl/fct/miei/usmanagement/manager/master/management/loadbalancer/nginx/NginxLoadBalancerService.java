@@ -24,16 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +41,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 
 @Service
 @Slf4j

@@ -24,10 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +39,9 @@ import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
 
 @Service
 @Slf4j

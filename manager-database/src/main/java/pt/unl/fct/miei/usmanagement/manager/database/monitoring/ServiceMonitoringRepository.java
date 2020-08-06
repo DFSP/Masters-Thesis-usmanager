@@ -34,50 +34,43 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ServiceMonitoringRepository extends JpaRepository<ServiceMonitoringEntity, Long> {
 
-  @Query("select COUNT(log) "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId = :containerId and log.field = :field")
-  long getCountServiceField(@Param("containerId") String containerId, @Param("field") String field);
+  List<ServiceMonitoringEntity> getByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
 
-  @Query("select log "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId = :containerId and log.field = :field")
-  ServiceMonitoringEntity getServiceMonitoringByContainerAndField(@Param("containerId") String containerId,
-                                                                  @Param("field") String field);
+  List<ServiceMonitoringEntity> getByContainerId(@Param("containerId") String containerId);
 
-  @Query("select log "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId = :containerId")
-  List<ServiceMonitoringEntity> getMonitoringServiceLogByContainer(@Param("containerId") String containerId);
+  ServiceMonitoringEntity getByContainerIdAndFieldIgnoreCase(@Param("containerId") String containerId,
+                                                             @Param("field") String field);
+
+  long countByContainerIdAndFieldIgnoreCase(@Param("containerId") String containerId, @Param("field") String field);
 
   @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring"
-      + ".ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
-      + "from ServiceMonitoringEntity log "
-      + "where log.serviceName = :serviceName and log.field = :field")
-  ServiceFieldAvg getAvgServiceField(@Param("serviceName") String serviceName, @Param("field") String field);
+      + ".ServiceFieldAvg(m.serviceName, m.field, m.sumValue / m.count, m.count) "
+      + "from ServiceMonitoringEntity m "
+      + "where m.serviceName = :serviceName")
+  List<ServiceFieldAvg> getServiceFieldsAvg(@Param("serviceName") String serviceName);
 
   @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring"
-      + ".ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
-      + "from ServiceMonitoringEntity log "
-      + "where log.serviceName = :serviceName")
-  List<ServiceFieldAvg> getAvgServiceFields(@Param("serviceName") String serviceName);
+      + ".ServiceFieldAvg(m.serviceName, m.field, m.sumValue / m.count, m.count) "
+      + "from ServiceMonitoringEntity m "
+      + "where m.serviceName = :serviceName and m.field = :field")
+  ServiceFieldAvg getServiceFieldAvg(@Param("serviceName") String serviceName, @Param("field") String field);
 
   @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring"
-      + ".ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId = :containerId and log.field = :field")
-  ContainerFieldAvg getAvgContainerField(@Param("containerId") String containerId, @Param("field") String field);
+      + ".ContainerFieldAvg(m.containerId, m.field, m.sumValue / m.count, m.count) "
+      + "from ServiceMonitoringEntity m "
+      + "where m.containerId = :containerId")
+  List<ContainerFieldAvg> getContainerFieldsAvg(@Param("containerId") String containerId);
 
   @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring"
-      + ".ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId = :containerId")
-  List<ContainerFieldAvg> getAvgContainerFields(@Param("containerId") String containerId);
+      + ".ContainerFieldAvg(m.containerId, m.field, m.sumValue / m.count, m.count) "
+      + "from ServiceMonitoringEntity m "
+      + "where m.containerId = :containerId and m.field = :field")
+  ContainerFieldAvg getContainerFieldAvg(@Param("containerId") String containerId, @Param("field") String field);
 
-  @Query("select log "
-      + "from ServiceMonitoringEntity log "
-      + "where log.containerId in :containerIds and log.field = :field "
-      + "order by (log.sumValue / log.count) desc")
+  @Query("select m "
+      + "from ServiceMonitoringEntity m "
+      + "where m.containerId in :containerIds and m.field = :field "
+      + "order by (m.sumValue / m.count) desc")
   List<ServiceMonitoringEntity> getTopContainersByField(@Param("containerIds") List<String> containerIds,
                                                         @Param("field") String field);
 

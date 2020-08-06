@@ -24,16 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.AddEdgeHostRequest;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,6 +35,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.AddEdgeHostRequest;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
 
 @RestController
 @RequestMapping("/hosts")
@@ -121,12 +120,12 @@ public class HostsController {
   }
 
   @GetMapping("/cloud/{instanceId}/simulated-metrics")
-  public List<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
+  public List<HostSimulatedMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
     return cloudHostsService.getSimulatedMetrics(instanceId);
   }
 
   @GetMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
-  public SimulatedHostMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
+  public HostSimulatedMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
                                                                @PathVariable String simulatedMetricName) {
     return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
   }
@@ -199,12 +198,12 @@ public class HostsController {
   }
 
   @GetMapping("/edge/{hostname}/simulated-metrics")
-  public List<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
+  public List<HostSimulatedMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
     return edgeHostsService.getSimulatedMetrics(hostname);
   }
 
   @GetMapping("/edge/{hostname}/simulated-metrics/{simulatedMetricName}")
-  public SimulatedHostMetricEntity getEdgeHostSimulatedMetric(@PathVariable String hostname,
+  public HostSimulatedMetricEntity getEdgeHostSimulatedMetric(@PathVariable String hostname,
                                                               @PathVariable String simulatedMetricName) {
     return edgeHostsService.getSimulatedMetric(hostname, simulatedMetricName);
   }

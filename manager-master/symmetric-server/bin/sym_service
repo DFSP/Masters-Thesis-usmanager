@@ -19,6 +19,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
- 
-. "`dirname "$0"`/setenv"
+
+. "$(dirname "$0")/setenv"
 exec "$SYM_JAVA" -cp "$CLASSPATH" -Djava.io.tmpdir="$SYM_HOME/tmp" org.jumpmind.symmetric.wrapper.Wrapper "$1" "$SYM_HOME/conf/sym_service.conf"

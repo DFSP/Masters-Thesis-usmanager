@@ -57,18 +57,18 @@ public interface ContainerSimulatedMetricsRepository extends JpaRepository<Conta
   @Query("select m "
       + "from ContainerSimulatedMetricEntity m "
       + "where m.generic = true")
-  List<ContainerSimulatedMetricEntity> findGenericSimulatedContainerMetrics();
+  List<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetrics();
 
   @Query("select m "
       + "from ContainerSimulatedMetricEntity m "
       + "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
-  Optional<ContainerSimulatedMetricEntity> findGenericSimulatedContainerMetric(@Param("simulatedMetricName")
+  Optional<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetric(@Param("simulatedMetricName")
                                                                                    String simulatedMetricName);
 
   @Query("select case when count(m) > 0 then true else false end "
       + "from ContainerSimulatedMetricEntity m "
       + "where lower(m.name) = lower(:simulatedMetricName)")
-  boolean hasSimulatedContainerMetric(@Param("simulatedMetricName") String simulatedMetricName);
+  boolean hasContainerSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select c "
       + "from ContainerSimulatedMetricEntity m join m.containers c "

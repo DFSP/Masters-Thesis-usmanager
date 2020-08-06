@@ -2,13 +2,13 @@
 <Configuration name="SYM" status="warn" packages="org.jumpmind.util">
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_ERR">
-            <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY" />
-            <PatternLayout pattern="%m%n" />
+            <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%m%n"/>
         </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
-            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="CONSOLE"/>
         </Root>
     </Loggers>
 </Configuration>

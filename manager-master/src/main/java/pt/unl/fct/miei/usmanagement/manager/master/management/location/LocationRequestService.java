@@ -24,15 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.location;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,6 +42,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
 
 @Slf4j
 @Service

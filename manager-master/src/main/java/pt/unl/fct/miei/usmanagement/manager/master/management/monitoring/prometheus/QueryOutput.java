@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.promet
 import lombok.Data;
 
 @Data
-final class QueryOutput {
+class QueryOutput {
 
   private String status;
   private QueryData data;

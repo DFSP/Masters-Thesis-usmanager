@@ -87,7 +87,7 @@ manager-master:
   mode: LOCAL
   monitor-period: 30000
   tests:
-    test-logs-enable: ${testLogs:true}
+    enabled: ${tests:true}
 nginx-load-balancer:
   api-url: /_/nginx-load-balancer-api/api
 location-request:

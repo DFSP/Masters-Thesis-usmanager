@@ -24,11 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RuleDecision;
-
 import java.util.Map;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
 @Data
 public class DecisionResult implements Comparable<DecisionResult> {
@@ -50,8 +49,7 @@ public class DecisionResult implements Comparable<DecisionResult> {
       }
     } else {
       return this.getDecision() == RuleDecision.START
-          || (this.getDecision() == RuleDecision.STOP
-          && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
+          || (this.getDecision() == RuleDecision.STOP && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
     }
   }
 

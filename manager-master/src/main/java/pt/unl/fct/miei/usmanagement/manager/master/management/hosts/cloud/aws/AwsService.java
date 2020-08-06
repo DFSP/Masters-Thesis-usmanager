@@ -24,10 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Timing;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +52,9 @@ import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Timing;
 
 @Service
 @Slf4j

@@ -24,9 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RuleDecision;
-
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
 @Data
 public final class Decision {

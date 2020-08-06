@@ -24,14 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +35,13 @@ import java.util.stream.Stream;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 
 @Service
 public class EurekaService {

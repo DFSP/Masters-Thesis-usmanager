@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.bash;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,6 +32,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 
 @Slf4j
 @Service

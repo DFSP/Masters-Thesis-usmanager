@@ -29,7 +29,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-final class QueryResult {
+class QueryResult {
 
   private QueryMetric metric;
   private List<String> value;

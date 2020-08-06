@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 import lombok.Data;
 
 @Data
-class ContainerFieldAvg {
+public class ContainerFieldAvg {
 
   private final String containerId;
   private final String field;

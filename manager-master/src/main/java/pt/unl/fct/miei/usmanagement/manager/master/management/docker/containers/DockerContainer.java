@@ -24,13 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerPortMapping;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
 
 @Data
 public final class DockerContainer {

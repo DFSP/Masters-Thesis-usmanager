@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +32,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 
 
 @Service

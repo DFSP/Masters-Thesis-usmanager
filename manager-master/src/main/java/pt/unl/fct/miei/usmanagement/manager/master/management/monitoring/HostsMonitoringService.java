@@ -24,29 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostFieldAvg;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.HostEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +39,33 @@ import java.util.TimerTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogsRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 
 @Slf4j
 @Service
@@ -69,6 +76,7 @@ public class HostsMonitoringService {
   private static final int DELAY_STOP_HOST = 60 * 1000;
 
   private final HostMonitoringRepository hostsMonitoring;
+  private final HostMonitoringLogsRepository hostMonitoringLogs;
 
   private final NodesService nodesService;
   private final ContainersService containersService;
@@ -84,12 +92,17 @@ public class HostsMonitoringService {
   private final int stopHostOnEventsCount;
   private final int maximumHosts;
   private final int minimumHosts;
+  private final boolean isTestEnable;
 
-  public HostsMonitoringService(HostMonitoringRepository hostsMonitoring, NodesService nodesService,
+  public HostsMonitoringService(HostMonitoringRepository hostsMonitoring,
+                                HostMonitoringLogsRepository hostMonitoringLogs, NodesService nodesService,
                                 ContainersService containersService, HostRulesService hostRulesService,
                                 HostsService hostsService, HostMetricsService hostMetricsService,
                                 ServicesService servicesService, HostsEventsService hostsEventsService,
-                                DecisionsService decisionsService, HostProperties hostProperties) {
+                                DecisionsService decisionsService, HostProperties hostProperties,
+                                ManagerMasterProperties managerMasterProperties) {
+    this.hostsMonitoring = hostsMonitoring;
+    this.hostMonitoringLogs = hostMonitoringLogs;
     this.nodesService = nodesService;
     this.containersService = containersService;
     this.hostRulesService = hostRulesService;
@@ -98,43 +111,70 @@ public class HostsMonitoringService {
     this.servicesService = servicesService;
     this.hostsEventsService = hostsEventsService;
     this.decisionsService = decisionsService;
-    this.hostsMonitoring = hostsMonitoring;
     this.monitorInterval = hostProperties.getMonitorPeriod();
     this.startHostOnEventsCount = hostProperties.getStartHostOnEventsCount();
     this.stopHostOnEventsCount = hostProperties.getStopHostOnEventsCount();
     this.maximumHosts = hostProperties.getMaximumHosts();
     this.minimumHosts = hostProperties.getMinimumHosts();
+    this.isTestEnable = managerMasterProperties.getTests().isEnabled();
   }
 
-  public List<HostMonitoringEntity> getMonitoringHostLogs() {
+  public List<HostMonitoringEntity> getHostsMonitoring() {
     return hostsMonitoring.findAll();
   }
 
-  List<HostMonitoringEntity> getMonitoringHostLogsByHostname(String hostname) {
-    return hostsMonitoring.getMonitoringHostLogByHost(hostname);
+  public List<HostMonitoringEntity> getHostMonitoring(String hostname) {
+    return hostsMonitoring.getByHostname(hostname);
   }
 
-  public HostMonitoringEntity saveMonitoringHostLog(String hostname, String field, double value) {
-    List<HostMonitoringEntity> hostMonitoringLogs = hostsMonitoring.getMonitoringHostLogByHostAndField(hostname, field);
-    final HostMonitoringEntity hostMonitoringEntity;
+  public HostMonitoringEntity getHostMonitoring(String hostname, String field) {
+    return hostsMonitoring.getByHostnameAndFieldIgnoreCase(hostname, field);
+  }
+
+  public void saveHostMonitoring(String hostname, String field, double value) {
+    HostMonitoringEntity hostMonitoring = getHostMonitoring(hostname, field);
     Timestamp updateTime = Timestamp.from(Instant.now());
-    if (hostMonitoringLogs.isEmpty()) {
-      hostMonitoringEntity = HostMonitoringEntity.builder()
-          .hostname(hostname).field(field).minValue(value).maxValue(value).sumValue(value).lastValue(value).count(1)
-          .lastUpdate(updateTime).build();
+    if (hostMonitoring == null) {
+      hostMonitoring = HostMonitoringEntity.builder()
+          .hostname(hostname)
+          .field(field)
+          .minValue(value).maxValue(value).sumValue(value).lastValue(value)
+          .count(1)
+          .lastUpdate(updateTime)
+          .build();
     } else {
-      hostMonitoringEntity = hostMonitoringLogs.get(0);
-      hostMonitoringEntity.logValue(value, updateTime);
+      hostMonitoring.logValue(value, updateTime);
     }
-    return hostsMonitoring.save(hostMonitoringEntity);
+    hostsMonitoring.save(hostMonitoring);
+    if (isTestEnable) {
+      saveHostMonitoringLog(hostname, field, value);
+    }
   }
 
-  public List<HostFieldAvg> getAvgHostFields(String hostname) {
-    return hostsMonitoring.getAvgHostFields(hostname);
+  public List<HostFieldAvg> getHostFieldsAvg(String hostname) {
+    return hostsMonitoring.getHostFieldsAvg(hostname);
   }
 
-  public HostFieldAvg getAvgHostField(String hostname, String field) {
-    return hostsMonitoring.getAvgHostField(hostname, field);
+  public HostFieldAvg getHostFieldAvg(String hostname, String field) {
+    return hostsMonitoring.getHostFieldAvg(hostname, field);
+  }
+
+  public void saveHostMonitoringLog(String hostname, String field, double effectiveValue) {
+    HostMonitoringLogEntity hostMonitoringLogEntity = HostMonitoringLogEntity.builder()
+        .hostname(hostname)
+        .field(field)
+        .timestamp(LocalDateTime.now())
+        .effectiveValue(effectiveValue)
+        .build();
+    hostMonitoringLogs.save(hostMonitoringLogEntity);
+  }
+
+  public List<HostMonitoringLogEntity> getHostMonitoringLogs() {
+    return hostMonitoringLogs.findAll();
+  }
+
+  public List<HostMonitoringLogEntity> getHostMonitoringLogsByHostname(String hostname) {
+    return hostMonitoringLogs.findByHostname(hostname);
   }
 
   public void initHostMonitorTimer() {
@@ -157,7 +197,7 @@ public class HostsMonitoringService {
     for (SimpleNode node : nodes) {
       String hostname = node.getHostname();
       Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
-      newFields.forEach((field, value) -> saveMonitoringHostLog(hostname, field, value));
+      newFields.forEach((field, value) -> saveHostMonitoring(hostname, field, value));
       HostDecisionResult hostDecisionResult = runHostRules(hostname, newFields);
       hostDecisions.add(hostDecisionResult);
     }
@@ -169,7 +209,7 @@ public class HostsMonitoringService {
   private HostDecisionResult runHostRules(String hostname, Map<String, Double> newFields) {
     var hostEvent = new HostEvent(hostname);
     Map<String, Double> hostEventFields = hostEvent.getFields();
-    getMonitoringHostLogsByHostname(hostname)
+    getHostMonitoring(hostname)
         .stream()
         .filter(loggedField -> loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT
             && newFields.get(loggedField.getField()) != null)

@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
 
 @RestController
 @RequestMapping("/decisions")

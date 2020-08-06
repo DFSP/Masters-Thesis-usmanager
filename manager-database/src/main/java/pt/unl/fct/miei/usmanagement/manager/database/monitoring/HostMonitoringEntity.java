@@ -70,7 +70,7 @@ public class HostMonitoringEntity {
   @Basic
   private Timestamp lastUpdate;
 
-  void logValue(double value, Timestamp updateTime) {
+  public void logValue(double value, Timestamp updateTime) {
     setMinValue(Math.min(value, getMinValue()));
     setMaxValue(Math.max(value, getMaxValue()));
     setLastValue(value);

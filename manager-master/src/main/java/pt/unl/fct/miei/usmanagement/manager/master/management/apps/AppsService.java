@@ -24,16 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceOrder;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +32,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceOrder;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service

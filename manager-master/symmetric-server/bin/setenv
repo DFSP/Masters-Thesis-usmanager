@@ -20,8 +20,8 @@
 # under the License.
 #
 
-dp0="`dirname "$0"`/.."
-SYM_HOME="`cd "$dp0" && pwd`"
+dp0="$(dirname "$0")/.."
+SYM_HOME="$(cd "$dp0" && pwd)"
 export SYM_HOME
 
 SYM_OPTIONS="-Dfile.encoding=utf-8 \
@@ -45,16 +45,14 @@ SYM_OPTIONS="-Dfile.encoding=utf-8 \
 export SYM_OPTIONS
 
 SYM_JAVA=java
-if [ "$JAVA_HOME" != "" ]
-then
-   SYM_JAVA="$JAVA_HOME/bin/java"
+if [ "$JAVA_HOME" != "" ]; then
+  SYM_JAVA="$JAVA_HOME/bin/java"
 fi
 export SYM_JAVA
 
 SEP=:
-if uname | grep -i cygwin > /dev/null
-then
-   SEP=";"
+if uname | grep -i cygwin >/dev/null; then
+  SEP=";"
 fi
 
 CLASSPATH="${SYM_HOME}/patches${SEP}${SYM_HOME}/patches/*${SEP}${SYM_HOME}/lib/*${SEP}${SYM_HOME}/web/WEB-INF/lib/*"

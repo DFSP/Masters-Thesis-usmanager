@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 import lombok.Data;
 
 @Data
-class ServiceFieldAvg {
+public class ServiceFieldAvg {
 
   private final String serviceName;
   private final String field;

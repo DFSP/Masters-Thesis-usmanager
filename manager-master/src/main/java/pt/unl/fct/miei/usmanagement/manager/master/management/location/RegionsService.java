@@ -24,15 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.location;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
-
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionRepository;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service

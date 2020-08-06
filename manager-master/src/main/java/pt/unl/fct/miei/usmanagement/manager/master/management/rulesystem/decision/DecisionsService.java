@@ -24,15 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.master.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.services.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.services.ServiceRulesService;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -41,6 +32,24 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionValueEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionValueRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionValueEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionValueRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ServiceRulesService;
 
 @Service
 @Slf4j

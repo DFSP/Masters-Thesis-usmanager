@@ -20,20 +20,19 @@
 # under the License.
 #
 
-
 if [[ -z "${INTERBASE_HOME}" ]]; then
-        INTERBASE_HOME=/opt/interbase
+  INTERBASE_HOME=/opt/interbase
 fi
 
 if [[ "${OSTYPE}" == "linux-gnu" ]]; then
-        SHARED_LIB_FILE=sym_udf.so
-        LD_OPTIONS="-G -lm -lc -lib_util"
+  SHARED_LIB_FILE=sym_udf.so
+  LD_OPTIONS="-G -lm -lc -lib_util"
 elif [[ "${OSTYPE}" == "darwin"* ]]; then
-        SHARED_LIB_FILE=sym_udf.dylib
-        LD_OPTIONS="-lm -lc -lib_util -dylib"
+  SHARED_LIB_FILE=sym_udf.dylib
+  LD_OPTIONS="-lm -lc -lib_util -dylib"
 else
-        SHARED_LIB_FILE=sym_udf.so
-        LD_OPTIONS="-G -lm -lc -lib_util"
+  SHARED_LIB_FILE=sym_udf.so
+  LD_OPTIONS="-G -lm -lc -lib_util"
 fi
 
 gcc -I "$INTERBASE_HOME"/include -c -O -fpic sym_udf.c

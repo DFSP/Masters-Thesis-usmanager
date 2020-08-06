@@ -25,18 +25,17 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy;
 
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 
 @Slf4j
 @Service

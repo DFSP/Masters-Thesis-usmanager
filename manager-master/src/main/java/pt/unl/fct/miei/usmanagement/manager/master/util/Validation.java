@@ -24,9 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
-
 import lombok.experimental.UtilityClass;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 
 @UtilityClass
 public class Validation {

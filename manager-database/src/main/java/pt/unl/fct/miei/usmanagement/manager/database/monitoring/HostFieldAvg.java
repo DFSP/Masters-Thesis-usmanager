@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 import lombok.Data;
 
 @Data
-class HostFieldAvg {
+public class HostFieldAvg {
 
   private final String hostname;
   private final String field;

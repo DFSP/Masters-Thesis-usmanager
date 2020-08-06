@@ -24,16 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.operators;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
-
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
+import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorRepository;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service

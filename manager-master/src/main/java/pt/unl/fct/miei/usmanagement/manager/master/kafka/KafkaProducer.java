@@ -37,5 +37,5 @@ public class KafkaProducer {
   public KafkaProducer(KafkaTemplate<String, Object> kafkaTemplate) {
     this.kafkaTemplate = kafkaTemplate;
   }
-  
+
 }

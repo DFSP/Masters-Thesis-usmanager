@@ -24,11 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
-import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
 @RestController
 @RequestMapping("/ssh")

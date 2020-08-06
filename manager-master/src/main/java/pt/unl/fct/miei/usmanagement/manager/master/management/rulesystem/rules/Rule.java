@@ -24,13 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.event.EventType;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.EventType;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.Condition;
 
 @Data
 public final class Rule {

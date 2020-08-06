@@ -24,14 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.DuplicateResponseEntryException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.ResponseEntryNotFoundException;
-
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.DuplicateResponseEntryException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.ResponseEntryNotFoundException;
 
 @Data
 public class Response {

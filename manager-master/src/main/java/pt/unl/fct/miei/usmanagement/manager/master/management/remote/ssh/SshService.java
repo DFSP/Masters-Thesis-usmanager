@@ -24,15 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusProperties;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -53,6 +44,14 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.xfer.FileSystemFile;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusProperties;
 
 @Service
 @Slf4j

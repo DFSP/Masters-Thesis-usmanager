@@ -24,12 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.containers.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +38,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
 @RestController
 @RequestMapping("/containers")
@@ -143,7 +143,7 @@ public class ContainersController {
   }
 
   @GetMapping("/{containerId}/simulated-metrics")
-  public List<SimulatedContainerMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
+  public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
     return containersService.getSimulatedMetrics(containerId);
   }
 

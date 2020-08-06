@@ -24,9 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionEntity;
-
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 
 @Data
 public class LaunchApp {

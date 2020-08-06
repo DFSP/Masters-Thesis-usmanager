@@ -24,9 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServiceEntity;
-
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 
 @Data
 public class AddAppService {

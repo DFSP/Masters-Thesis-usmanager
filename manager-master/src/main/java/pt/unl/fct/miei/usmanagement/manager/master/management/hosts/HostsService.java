@@ -24,35 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 
-import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.Mode;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsInstanceState;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.LocationRequestService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusService;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Text;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,6 +36,34 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.Mode;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsInstanceState;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.location.LocationRequestService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Text;
 
 @Slf4j
 @Service

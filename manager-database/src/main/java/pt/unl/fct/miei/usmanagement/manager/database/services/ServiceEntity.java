@@ -182,12 +182,12 @@ public class ServiceEntity {
     rule.getServices().remove(this);
   }
 
-  public void addSimulatedServiceMetric(ServiceSimulatedMetricEntity serviceMetric) {
+  public void addServiceSimulatedMetric(ServiceSimulatedMetricEntity serviceMetric) {
     simulatedServiceMetrics.add(serviceMetric);
     serviceMetric.getServices().add(this);
   }
 
-  public void removeSimulatedServiceMetric(ServiceSimulatedMetricEntity serviceMetric) {
+  public void removeServiceSimulatedMetric(ServiceSimulatedMetricEntity serviceMetric) {
     simulatedServiceMetrics.remove(serviceMetric);
     serviceMetric.getServices().remove(this);
   }

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import lombok.Data;
 
 @Data
-final class QueryMetric {
+class QueryMetric {
 
   private final String instance;
 

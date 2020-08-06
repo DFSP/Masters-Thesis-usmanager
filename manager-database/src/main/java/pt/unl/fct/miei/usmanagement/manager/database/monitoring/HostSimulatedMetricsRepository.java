@@ -81,18 +81,18 @@ public interface HostSimulatedMetricsRepository extends JpaRepository<HostSimula
   @Query("select m "
       + "from HostSimulatedMetricEntity m "
       + "where m.generic = true")
-  List<HostSimulatedMetricEntity> findGenericSimulatedHostMetrics();
+  List<HostSimulatedMetricEntity> findGenericHostSimulatedMetrics();
 
   @Query("select m "
       + "from HostSimulatedMetricEntity m "
       + "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
-  Optional<HostSimulatedMetricEntity> findGenericSimulatedHostMetric(@Param("simulatedMetricName")
+  Optional<HostSimulatedMetricEntity> findGenericHostSimulatedMetric(@Param("simulatedMetricName")
                                                                          String simulatedMetricName);
 
   @Query("select case when count(m) > 0 then true else false end "
       + "from HostSimulatedMetricEntity m "
       + "where lower(m.name) = lower(:simulatedMetricName)")
-  boolean hasSimulatedHostMetric(@Param("simulatedMetricName") String simulatedMetricName);
+  boolean hasHostSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select h "
       + "from HostSimulatedMetricEntity m join m.cloudHosts h "

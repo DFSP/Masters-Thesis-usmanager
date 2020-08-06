@@ -19,6 +19,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
- 
-. "`dirname "$0"`/setenv"
+
+. "$(dirname "$0")/setenv"
 exec "$SYM_JAVA" $SYM_OPTIONS -cp "$CLASSPATH" org.jumpmind.symmetric.DbExportCommand "$@"

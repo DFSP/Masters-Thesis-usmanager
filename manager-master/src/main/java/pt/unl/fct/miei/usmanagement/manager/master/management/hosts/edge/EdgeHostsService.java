@@ -24,18 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
-
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,13 +31,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service
 public class EdgeHostsService {
 
   private final HostRulesService hostRulesService;
-  private final SimulatedHostMetricsService simulatedHostMetricsService;
+  private final HostSimulatedMetricsService hostSimulatedMetricsService;
   private final SshService sshService;
   private final BashService bashService;
 
@@ -58,12 +59,12 @@ public class EdgeHostsService {
   private final String edgeKeyFilePath;
 
   public EdgeHostsService(@Lazy HostRulesService hostRulesService,
-                          @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
+                          @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
                           @Lazy SshService sshService, BashService bashService,
                           EdgeHostRepository edgeHosts,
                           EdgeHostsProperties edgeHostsProperties) {
     this.hostRulesService = hostRulesService;
-    this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.hostSimulatedMetricsService = hostSimulatedMetricsService;
     this.sshService = sshService;
     this.bashService = bashService;
     this.edgeHosts = edgeHosts;
@@ -186,38 +187,38 @@ public class EdgeHostsService {
     ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
   }
 
-  public List<SimulatedHostMetricEntity> getSimulatedMetrics(String hostname) {
+  public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
     assertHostExists(hostname);
     return edgeHosts.getSimulatedMetrics(hostname);
   }
 
-  public SimulatedHostMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
+  public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
     assertHostExists(hostname);
     return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(SimulatedHostMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+        new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
     );
   }
 
   public void addSimulatedMetric(String hostname, String simulatedMetricName) {
     assertHostExists(hostname);
-    simulatedHostMetricsService.addEdgeHost(simulatedMetricName, hostname);
+    hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
   }
 
   public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
     assertHostExists(hostname);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedHostMetricsService.addEdgeHost(simulatedMetric, hostname));
+        hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
   }
 
   public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
     assertHostExists(hostname);
-    simulatedHostMetricsService.addEdgeHost(simulatedMetricName, hostname);
+    hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
   }
 
   public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
     assertHostExists(hostname);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedHostMetricsService.addEdgeHost(simulatedMetric, hostname));
+        hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
   }
 
   public boolean hasEdgeHost(String hostname) {

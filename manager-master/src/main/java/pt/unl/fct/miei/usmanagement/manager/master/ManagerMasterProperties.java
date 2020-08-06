@@ -51,7 +51,7 @@ public class ManagerMasterProperties {
   @Setter
   public static final class Tests {
 
-    private boolean testLogsEnable;
+    private boolean enabled;
 
   }
 

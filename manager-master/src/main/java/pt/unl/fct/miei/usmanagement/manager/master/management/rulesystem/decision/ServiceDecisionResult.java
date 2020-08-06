@@ -24,14 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RuleDecision;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
 @Getter
 @ToString(callSuper = true)

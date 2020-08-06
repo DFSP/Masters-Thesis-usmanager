@@ -19,7 +19,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
- 
-. "`dirname "$0"`/setenv"
+
+. "$(dirname "$0")/setenv"
 cd "$SYM_HOME"
 exec "$SYM_JAVA" $SYM_OPTIONS -cp "$CLASSPATH" org.jumpmind.symmetric.SymmetricLauncher "$@"

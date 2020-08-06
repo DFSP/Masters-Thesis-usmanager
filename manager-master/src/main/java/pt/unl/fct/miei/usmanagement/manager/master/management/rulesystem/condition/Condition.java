@@ -24,9 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.operators.Operator;
-
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
 
 @Data
 public final class Condition {

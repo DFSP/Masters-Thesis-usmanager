@@ -52,18 +52,18 @@ public interface ServiceSimulatedMetricsRepository extends JpaRepository<Service
   @Query("select m "
       + "from ServiceSimulatedMetricEntity m "
       + "where m.generic = true")
-  List<ServiceSimulatedMetricEntity> findGenericSimulatedServiceMetrics();
+  List<ServiceSimulatedMetricEntity> findGenericServiceSimulatedMetrics();
 
   @Query("select m "
       + "from ServiceSimulatedMetricEntity m "
       + "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
-  Optional<ServiceSimulatedMetricEntity> findGenericSimulatedServiceMetric(@Param("simulatedMetricName")
+  Optional<ServiceSimulatedMetricEntity> findGenericServiceSimulatedMetric(@Param("simulatedMetricName")
                                                                                String simulatedMetricName);
 
   @Query("select case when count(m) > 0 then true else false end "
       + "from ServiceSimulatedMetricEntity m "
       + "where lower(m.name) = lower(:simulatedMetricName)")
-  boolean hasSimulatedServiceMetric(@Param("simulatedMetricName") String simulatedMetricName);
+  boolean hasServiceSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select s "
       + "from ServiceSimulatedMetricEntity m join m.services s "

@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +37,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
 
 @RestController
 @RequestMapping("/apps")

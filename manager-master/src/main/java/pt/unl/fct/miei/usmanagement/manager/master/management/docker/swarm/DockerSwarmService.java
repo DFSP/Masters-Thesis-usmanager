@@ -24,16 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +36,15 @@ import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeConstants;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 
 @Service
 @Slf4j

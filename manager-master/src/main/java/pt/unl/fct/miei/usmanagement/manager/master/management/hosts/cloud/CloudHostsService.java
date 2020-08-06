@@ -24,19 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud;
 
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsInstanceState;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsSimpleInstance;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.hosts.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +35,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsInstanceState;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsSimpleInstance;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
 
 @Slf4j
 @Service
@@ -55,7 +56,7 @@ public class CloudHostsService {
 
   private final AwsService awsService;
   private final HostRulesService hostRulesService;
-  private final SimulatedHostMetricsService simulatedHostMetricsService;
+  private final HostSimulatedMetricsService hostSimulatedMetricsService;
   private final HostsService hostsService;
   private final ContainersService containersService;
 
@@ -63,13 +64,13 @@ public class CloudHostsService {
 
   public CloudHostsService(@Lazy AwsService awsService,
                            @Lazy HostRulesService hostRulesService,
-                           @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
+                           @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
                            @Lazy HostsService hostsService,
                            @Lazy ContainersService containersService,
                            CloudHostRepository cloudHosts) {
     this.awsService = awsService;
     this.hostRulesService = hostRulesService;
-    this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.hostSimulatedMetricsService = hostSimulatedMetricsService;
     this.hostsService = hostsService;
     this.containersService = containersService;
     this.cloudHosts = cloudHosts;
@@ -253,38 +254,38 @@ public class CloudHostsService {
     ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, instanceId));
   }
 
-  public List<SimulatedHostMetricEntity> getSimulatedMetrics(String instanceId) {
+  public List<HostSimulatedMetricEntity> getSimulatedMetrics(String instanceId) {
     assertHostExists(instanceId);
     return cloudHosts.getSimulatedMetrics(instanceId);
   }
 
-  public SimulatedHostMetricEntity getSimulatedMetric(String instanceId, String simulatedMetricName) {
+  public HostSimulatedMetricEntity getSimulatedMetric(String instanceId, String simulatedMetricName) {
     assertHostExists(instanceId);
     return cloudHosts.getSimulatedMetric(instanceId, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(SimulatedHostMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+        new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
     );
   }
 
   public void addSimulatedMetric(String instanceId, String simulatedMetricName) {
     assertHostExists(instanceId);
-    simulatedHostMetricsService.addCloudHost(simulatedMetricName, instanceId);
+    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
   }
 
   public void addSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
     assertHostExists(instanceId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedHostMetricsService.addCloudHost(simulatedMetric, instanceId));
+        hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
   }
 
   public void removeSimulatedMetric(String instanceId, String simulatedMetricName) {
     assertHostExists(instanceId);
-    simulatedHostMetricsService.addCloudHost(simulatedMetricName, instanceId);
+    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
   }
 
   public void removeSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
     assertHostExists(instanceId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        simulatedHostMetricsService.addCloudHost(simulatedMetric, instanceId));
+        hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
   }
 
   public boolean hasCloudHost(String instanceId) {

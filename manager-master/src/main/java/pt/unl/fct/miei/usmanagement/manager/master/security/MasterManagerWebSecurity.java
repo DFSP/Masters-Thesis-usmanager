@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.security;
 
-import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
-
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -39,6 +37,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
 
 @Configuration
 @EnableWebSecurity
