@@ -22,12 +22,13 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.SymNodeGroupEntity;
 
 @Repository
-public interface SymNodesSecurityRepository extends JpaRepository<SymTriggerEntity, String> {
+public interface SymNodeGroupsRepository extends JpaRepository<SymNodeGroupEntity, String> {
 
 }

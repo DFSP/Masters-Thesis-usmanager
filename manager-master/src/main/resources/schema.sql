@@ -22,16 +22,17 @@
  * SOFTWARE.
  */
 
-# Logback: the reliable, generic, fast and flexible logging framework.
-# Copyright (C) 1999-2010, QOS.ch. All rights reserved.
-#
-# See http://logback.qos.ch/license.html for the applicable licensing
-# conditions.
 
-# This SQL
-script creates the required tables by ch.qos.logback.classic.db.DBAppender.
-#
-# It is intended for H2 databases.
+-- Logback: the reliable, generic, fast and flexible logging framework.
+-- Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+--
+-- See http://logback.qos.ch/license.html for the applicable licensing
+-- conditions.
+
+-- This SQL
+-- script creates the required tables by ch.qos.logback.classic.db.DBAppender.
+--
+-- It is intended for H2 databases.
 
 DROP TABLE logging_event_exception IF EXISTS;
 DROP TABLE logging_event_property IF EXISTS;
@@ -76,30 +77,21 @@ CREATE TABLE logging_event_exception
 );
 
 
-# Symmetricds configuration
+-- Symmetricds configuration
 
 ------------------------------------------------------------------------------
 -- Clear and load SymmetricDS Configuration
 ------------------------------------------------------------------------------
 
-delete
-from sym_trigger_router;
-delete
-from sym_trigger;
-delete
-from sym_router;
-delete
-from sym_node_group_link;
-delete
-from sym_node_group;
-delete
-from sym_node_host;
-delete
-from sym_node_identity;
-delete
-from sym_node_security;
-delete
-from sym_node;
+delete from sym_trigger_router;
+delete from sym_trigger;
+delete from sym_router;
+delete from sym_node_group_link;
+delete from sym_node_group;
+delete from sym_node_host;
+delete from sym_node_identity;
+delete from sym_node_security;
+delete from sym_node;
 
 ------------------------------------------------------------------------------
 -- Node Groups

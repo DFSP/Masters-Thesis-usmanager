@@ -1,9 +1,11 @@
 spring:
   application:
     name: manager-master
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:./manager-master-db;AUTO_SERVER=TRUE;
+    url: jdbc:h2:file:./manager-master/db/manager-master-db
     username: sa
     password:
     platform: h2
@@ -101,8 +103,8 @@ symmetricds:
 
 #debug: true
 #trace: true
-logging:
-  config: file:src/main/resources/logging/logback-spring.xml
+#logging:
+#  config: src/main/resources/logback.xml
 #  level:
 #    org:
 #      hibernate:

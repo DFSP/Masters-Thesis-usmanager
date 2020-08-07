@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.security;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -46,39 +47,42 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "sym_node_security")
-public class NodeSecurityEntity {
+public class SymNodeSecurityEntity {
 
-  /*insert into sym_node_security (node_id, node_password, registration_enabled, initial_load_enabled, created_at_node_id)
-  values ('001', 'Gr8hzjQCvQxzwJPhaVQ4cYAJLwaEgC', 1, 1, '000');*/
-
-  @NotNull
   @Id
   private String nodeId;
 
   @NotNull
   private String nodePassword;
 
-  private short registrationEnabled;
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Short registrationEnabled;
 
   private LocalDateTime registrationTime;
 
-  private short initialLoadEnabled;
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Short initialLoadEnabled;
 
   private LocalDateTime initialLoadTime;
 
-  private long initialLoadId;
+  private Long initialLoadId;
 
   private String initialLoadCreateBy;
 
-  private short revInitialLoadEnabled;
+  @Column(columnDefinition = "integer default 0")
+  private Short revInitialLoadEnabled;
 
   private LocalDateTime revInitialLoadTime;
 
-  private long revInitialLoadId;
+  private Long revInitialLoadId;
 
   private String revInitialLoadCreateBy;
 
-  private short failedLogins;
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Short failedLogins;
 
   private String createdAtNodeId;
 
@@ -87,10 +91,10 @@ public class NodeSecurityEntity {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof NodeSecurityEntity)) {
+    if (!(o instanceof SymNodeSecurityEntity)) {
       return false;
     }
-    NodeSecurityEntity other = (NodeSecurityEntity) o;
+    SymNodeSecurityEntity other = (SymNodeSecurityEntity) o;
     return nodeId != null && nodeId.equals(other.getNodeId());
   }
 

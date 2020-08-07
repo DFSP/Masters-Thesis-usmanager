@@ -49,7 +49,7 @@ public class ServiceMonitoringController {
     return servicesMonitoringService.getServicesMonitoring();
   }
 
-  @GetMapping
+  @GetMapping("/{serviceName}")
   public List<ServiceMonitoringEntity> getServiceMonitoring(@PathVariable String serviceName) {
     return servicesMonitoringService.getServiceMonitoring(serviceName);
   }

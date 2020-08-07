@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.host;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -40,6 +40,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.link.SymNodeGroupLinkId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -47,57 +48,78 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@IdClass(TriggerRouterId.class)
-@Table(name = "sym_trigger_router")
-public class SymTriggerRouterEntity {
+@IdClass(SymNodeHostId.class)
+@Table(name = "sym_node_host")
+public class SymNodeHostEntity {
 
   @Id
-  private String triggerId;
+  private String nodeId;
 
   @Id
-  private String routerId;
+  private String hostName;
 
-  @Column(columnDefinition = "integer default 1")
-  private Integer enabled;
+  private String instanceId;
 
-  @Column(columnDefinition = "integer default 1")
-  private Integer initialLoadOrder;
+  private String ipAddress;
 
-  private String initialLoadSelect;
+  private String osUser;
 
-  private String initialLoadDeleteStmt;
+  private String osName;
 
+  private String osArch;
+
+  private String osVersion;
+
+  @NotNull
   @Column(columnDefinition = "integer default 0")
-  private Integer pingBackEnabled;
+  private Integer availableProcessors;
+
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Long freeMemoryBytes;
+
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Long totalMemoryBytes;
+
+  @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Long maxMemoryBytes;
+
+  private String javaVersion;
+
+  private String javaVendor;
+
+  private String jdbcVersion;
+
+  private String symmetricVersion;
+
+  private String timezoneOffset;
+
+  private LocalDateTime heartbeatTime;
+
+  @NotNull
+  private LocalDateTime lastRestartTime;
 
   @NotNull
   private LocalDateTime createTime;
-
-  private String lastUpdateBy;
-
-  @NotNull
-  private LocalDateTime lastUpdateTime;
-
-  private String description;
-
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SymTriggerRouterEntity)) {
+    if (!(o instanceof SymNodeHostEntity)) {
       return false;
     }
-    SymTriggerRouterEntity other = (SymTriggerRouterEntity) o;
-    return triggerId != null && triggerId.equals(other.getTriggerId())
-        && routerId != null && routerId.equals(other.getRouterId());
+    SymNodeHostEntity other = (SymNodeHostEntity) o;
+    return nodeId != null && nodeId.equals(other.getNodeId())
+        && hostName != null && hostName.equals(other.getHostName());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTriggerId(), getRouterId());
+    return Objects.hash(getNodeId(), getHostName());
   }
-
 
 }

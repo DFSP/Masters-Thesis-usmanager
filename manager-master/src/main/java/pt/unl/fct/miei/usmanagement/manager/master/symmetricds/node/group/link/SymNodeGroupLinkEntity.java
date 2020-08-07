@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.link;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -30,6 +30,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -46,112 +47,50 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "sym_trigger")
-public class SymTriggerEntity {
+@IdClass(SymNodeGroupLinkId.class)
+@Table(name = "sym_node_group_link")
+public class SymNodeGroupLinkEntity {
 
   @Id
-  private String triggerId;
+  private String sourceNodeGroupId;
 
-  private String sourceCatalogName;
-
-  @NotNull
-  private String sourceSchemaName;
+  @Id
+  private String targetNodeGroupId;
 
   @NotNull
-  private String channelId;
+  @Column(columnDefinition = "char(1) default 'W'")
+  private String dataEventAction;
 
   @NotNull
-  @Column(columnDefinition = "varchar(128) default 'reload'")
-  private String roadChannelId;
-
   @Column(columnDefinition = "integer default 1")
-  private Integer syncOnUpdate;
-
-  @Column(columnDefinition = "integer default 1")
-  private Integer syncOnInsert;
-
-  @Column(columnDefinition = "integer default 1")
-  private Integer syncOnDelete;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer syncOnIncomingBatch;
-
-  private String nameForUpdateTrigger;
-
-  private String nameForInsertTrigger;
-
-  private String nameForDeleteTrigger;
-
-  private String syncOnUpdateCondition;
-
-  private String syncOnInsertCondition;
-
-  private String syncOnDeleteCondition;
-
-  private String customBeforeUpdateText;
-
-  private String customBeforeInsertText;
-
-  private String customBeforeDeleteText;
-
-  private String customOnUpdateText;
-
-  private String customOnInsertText;
-
-  private String customOnDeleteText;
-
-  private String externalSelect;
-
-  private String txIdExpression;
-
-  private String channelExpression;
-
-  private String excludedColumnNames;
-
-  private String includedColumnNames;
-
-  private String syncKeyNames;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer useStreamLobs;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer useCaptureLobs;
-
-  @Column(columnDefinition = "integer default 1")
-  private Integer useCaptureOldData;
-
-  @Column(columnDefinition = "integer default 1")
-  private Integer useHandleKeyUpdates;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer streamRow;
+  private Short syncConfigEnabled;
 
   @NotNull
+  @Column(columnDefinition = "integer default 0")
+  private Short isReversible;
+
   private LocalDateTime createTime;
 
   private String lastUpdateBy;
 
-  @NotNull
   private LocalDateTime lastUpdateTime;
-
-  private String description;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SymTriggerEntity)) {
+    if (!(o instanceof SymNodeGroupLinkEntity)) {
       return false;
     }
-    SymTriggerEntity other = (SymTriggerEntity) o;
-    return triggerId != null && triggerId.equals(other.getTriggerId());
+    SymNodeGroupLinkEntity other = (SymNodeGroupLinkEntity) o;
+    return sourceNodeGroupId != null && sourceNodeGroupId.equals(other.getSourceNodeGroupId())
+        && targetNodeGroupId != null && targetNodeGroupId.equals(other.getTargetNodeGroupId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getTriggerId());
+    return Objects.hash(getSourceNodeGroupId(), getTargetNodeGroupId());
   }
 
 }

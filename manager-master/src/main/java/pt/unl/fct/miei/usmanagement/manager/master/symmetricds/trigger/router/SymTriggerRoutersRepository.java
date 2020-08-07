@@ -22,11 +22,14 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.SymTriggerEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router.SymTriggerRouterId;
 
 @Repository
-public interface NodesSecurityRepository extends JpaRepository<NodeSecurityEntity, String> {
+public interface SymTriggerRoutersRepository extends JpaRepository<SymTriggerEntity, SymTriggerRouterId> {
+
 }

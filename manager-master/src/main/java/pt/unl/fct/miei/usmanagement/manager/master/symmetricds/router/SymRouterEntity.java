@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.router;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -45,62 +46,71 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "sym_node")
-public class SymNodeEntity {
+@Table(name = "sym_router")
+public class SymRouterEntity {
 
   @Id
-  private String nodeId;
+  private String routerId;
+
+  private String targetCatalogName;
+
+  private String targetSchemaName;
+
+  private String targetTableName;
 
   @NotNull
-  private String nodeGroupId;
+  private String sourceNodeGroupId;
 
   @NotNull
-  private String externalId;
+  private String targetNodeGroupId;
 
-  @Column(columnDefinition = "integer default 0")
-  private Integer symEnabled;
+  @NotNull
+  @Column(columnDefinition = "varchar(50) default 'default'")
+  private String routerType;
 
-  private String syncUrl;
+  private String routerExpression;
 
-  private String schemaVersion;
+  @NotNull
+  @Column(columnDefinition = "integer default 1")
+  private Short synOnUpdate;
 
-  private String symmetricVersion;
+  @NotNull
+  @Column(columnDefinition = "integer default 1")
+  private Short syncOnInsert;
 
-  private String configVersion;
+  @NotNull
+  @Column(columnDefinition = "integer default 1")
+  private Short syncOnDelete;
 
-  private String databaseType;
+  @NotNull
+  @Column(columnDefinition = "integer default 1")
+  private Short useSourceCatalogSchema;
 
-  private String databaseVersion;
+  @NotNull
+  private LocalDateTime createTime;
 
-  private String databaseName;
+  private String lastUpdateBy;
 
-  @Column(columnDefinition = "integer default 0")
-  private Integer batchToSendCount;
+  @NotNull
+  private LocalDateTime lastUpdateTime;
 
-  @Column(columnDefinition = "integer default 0")
-  private Integer batchInErrorCount;
-
-  private String createdAtNodeId;
-
-  private String deploymentType;
-
-  private String deploymentSubType;
+  private String description;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SymNodeEntity)) {
+    if (!(o instanceof SymRouterEntity)) {
       return false;
     }
-    SymNodeEntity other = (SymNodeEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
+    SymRouterEntity other = (SymRouterEntity) o;
+    return routerId != null && routerId.equals(other.getRouterId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getNodeId());
+    return Objects.hashCode(getRouterId());
   }
 
 }

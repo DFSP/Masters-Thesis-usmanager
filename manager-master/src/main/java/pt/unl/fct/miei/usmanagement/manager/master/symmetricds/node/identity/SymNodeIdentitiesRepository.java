@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.identity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NodesRepository extends JpaRepository<NodeEntity, String> {
+public interface SymNodeIdentitiesRepository extends JpaRepository<SymNodeIdentityEntity, String> {
+
 }

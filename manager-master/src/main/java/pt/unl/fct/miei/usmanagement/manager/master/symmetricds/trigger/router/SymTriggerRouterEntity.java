@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -30,6 +30,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -46,58 +47,59 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "sym_node_security")
-public class SymNodeSecurityEntity {
+@IdClass(SymTriggerRouterId.class)
+@Table(name = "sym_trigger_router")
+public class SymTriggerRouterEntity {
 
   @Id
-  private String nodeId;
+  private String triggerId;
+
+  @Id
+  private String routerId;
 
   @NotNull
-  private String nodePassword;
+  @Column(columnDefinition = "integer default 1")
+  private Short enabled;
 
+  @NotNull
+  @Column(columnDefinition = "integer default 1")
+  private Integer initialLoadOrder;
+
+  private String initialLoadSelect;
+
+  private String initialLoadDeleteStmt;
+
+  @NotNull
   @Column(columnDefinition = "integer default 0")
-  private Integer registrationEnabled;
+  private Short pingBackEnabled;
 
-  private LocalDateTime registrationTime;
+  @NotNull
+  private LocalDateTime createTime;
 
-  @Column(columnDefinition = "integer default 0")
-  private Integer initialLoadEnabled;
+  private String lastUpdateBy;
 
-  private LocalDateTime initialLoadTime;
+  @NotNull
+  private LocalDateTime lastUpdateTime;
 
-  private Long initialLoadId;
-
-  private String initialLoadCreateBy;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer revInitialLoadEnabled;
-
-  private LocalDateTime revInitialLoadTime;
-
-  private Long revInitialLoadId;
-
-  private String revInitialLoadCreateBy;
-
-  @Column(columnDefinition = "integer default 0")
-  private Integer failedLogins;
-
-  private String createdAtNodeId;
+  private String description;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SymNodeSecurityEntity)) {
+    if (!(o instanceof SymTriggerRouterEntity)) {
       return false;
     }
-    SymNodeSecurityEntity other = (SymNodeSecurityEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
+    SymTriggerRouterEntity other = (SymTriggerRouterEntity) o;
+    return triggerId != null && triggerId.equals(other.getTriggerId())
+        && routerId != null && routerId.equals(other.getRouterId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getNodeId());
+    return Objects.hash(getTriggerId(), getRouterId());
   }
+
 
 }

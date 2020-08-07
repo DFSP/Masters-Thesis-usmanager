@@ -22,12 +22,23 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.io.Serializable;
 
-@Repository
-public interface SymTriggerRoutersRepository extends JpaRepository<SymTriggerEntity, TriggerRouterId> {
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public class SymTriggerRouterId implements Serializable {
+
+  private final String triggerId;
+
+  private final String routerId;
 
 }

@@ -1,3 +1,0 @@
-08-05 23:44:48 jdbc[5]: exception
-org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "SELECT "; expected "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"; SQL statement:
-show table [42001-176]

@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,61 +44,35 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "sym_node")
-public class NodeEntity {
+@Table(name = "sym_node_group")
+public class SymNodeGroupEntity {
 
-  /*  insert into sym_node (node_id, node_group_id, external_id, sync_enabled, created_at_node_id)
-  values ('001', 'worker-manager', '001', 1, '000');*/
-
-  @NotNull
   @Id
-  private String nodeId;
-
-  @NotNull
   private String nodeGroupId;
 
-  @NotNull
-  private String externalId;
+  private String description;
 
-  private short syncEnabled;
+  private LocalDateTime createTime;
 
-  private String syncUrl;
+  private String lastUpdateBy;
 
-  private String schemaVersion;
-
-  private String symmetricVersion;
-
-  private String configVersion;
-
-  private String databaseType;
-
-  private String databaseVersion;
-
-  private int batchToSendCount;
-
-  private int batchInErrorCount;
-
-  private String createdAtNodeId;
-
-  private String deploymentType;
-
-  private String deploymentSubType;
+  private LocalDateTime lastUpdateTime;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof NodeEntity)) {
+    if (!(o instanceof SymNodeGroupEntity)) {
       return false;
     }
-    NodeEntity other = (NodeEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
+    SymNodeGroupEntity other = (SymNodeGroupEntity) o;
+    return nodeGroupId != null && nodeGroupId.equals(other.getNodeGroupId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getNodeId());
+    return Objects.hashCode(getNodeGroupId());
   }
-
+  
 }

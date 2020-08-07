@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.logging;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.identity;
+
+import java.util.Objects;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -43,43 +43,27 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "logging_event")
-public class LoggingEventEntity {
+@Table(name = "sym_node_identity")
+public class SymNodeIdentityEntity {
 
-  @NotNull
-  private Long timestmp;
-
-  @NotNull
-  private String formattedMessage;
-
-  @NotNull
-  private String loggerName;
-
-  @NotNull
-  private String levelString;
-
-  private String threadName;
-
-  private Short referenceFlag;
-
-  private String arg0;
-
-  private String arg1;
-
-  private String arg2;
-
-  private String arg3;
-
-  private String callerFilename;
-
-  private String callerClass;
-
-  private String callerMethod;
-
-  private String callerLine;
-
-  @GeneratedValue
   @Id
-  private Long eventId;
+  private String nodeId;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SymNodeIdentityEntity)) {
+      return false;
+    }
+    SymNodeIdentityEntity other = (SymNodeIdentityEntity) o;
+    return nodeId != null && nodeId.equals(other.getNodeId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getNodeId());
+  }
 
 }

@@ -22,64 +22,23 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.logging;
+package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.link;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
-@Entity
-@Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor
-@Setter
 @Getter
-@Table(name = "logging_event")
-public class LoggingEventEntity {
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public class SymNodeGroupLinkId implements Serializable {
 
-  @NotNull
-  private Long timestmp;
+  private final String sourceNodeGroupId;
 
-  @NotNull
-  private String formattedMessage;
-
-  @NotNull
-  private String loggerName;
-
-  @NotNull
-  private String levelString;
-
-  private String threadName;
-
-  private Short referenceFlag;
-
-  private String arg0;
-
-  private String arg1;
-
-  private String arg2;
-
-  private String arg3;
-
-  private String callerFilename;
-
-  private String callerClass;
-
-  private String callerMethod;
-
-  private String callerLine;
-
-  @GeneratedValue
-  @Id
-  private Long eventId;
+  private final String targetNodeGroupId;
 
 }
