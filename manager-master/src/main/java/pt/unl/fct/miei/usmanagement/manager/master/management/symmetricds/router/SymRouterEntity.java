@@ -64,27 +64,22 @@ public class SymRouterEntity {
   @NotNull
   private String targetNodeGroupId;
 
-  @NotNull
-  @Column(columnDefinition = "varchar(50) default 'default'")
-  private String routerType;
+  @Builder.Default @Column(columnDefinition = "varchar(50) default 'default'")
+  private String routerType = "default";
 
   private String routerExpression;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short synOnUpdate;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnUpdate = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncOnInsert;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnInsert = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncOnDelete;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnDelete = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short useSourceCatalogSchema;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short useSourceCatalogSchema = 1;
 
   @NotNull
   private LocalDateTime createTime;

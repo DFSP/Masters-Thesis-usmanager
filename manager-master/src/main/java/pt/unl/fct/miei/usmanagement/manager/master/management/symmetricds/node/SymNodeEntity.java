@@ -57,9 +57,8 @@ public class SymNodeEntity {
   @NotNull
   private String externalId;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short symEnabled;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short syncEnabled = 0;
 
   private String syncUrl;
 
@@ -73,15 +72,11 @@ public class SymNodeEntity {
 
   private String databaseVersion;
 
-  private String databaseName;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Integer batchToSendCount = 0;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Integer batchToSendCount;
-
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Integer batchInErrorCount;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Integer batchInErrorCount = 0;
 
   private String createdAtNodeId;
 

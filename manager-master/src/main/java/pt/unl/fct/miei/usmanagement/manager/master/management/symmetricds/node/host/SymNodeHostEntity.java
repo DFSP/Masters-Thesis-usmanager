@@ -69,21 +69,17 @@ public class SymNodeHostEntity {
 
   private String osVersion;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Integer availableProcessors;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Integer availableProcessors = 0;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Long freeMemoryBytes;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Long freeMemoryBytes = 0L;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Long totalMemoryBytes;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Long totalMemoryBytes = 0L;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Long maxMemoryBytes;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Long maxMemoryBytes = 0L;
 
   private String javaVersion;
 

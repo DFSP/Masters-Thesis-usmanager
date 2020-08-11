@@ -33,7 +33,11 @@ interface StateToProps {
   sidenavVisible: boolean;
 }
 
-type Props = StateToProps;
+interface IMainLayout {
+  children?: React.ReactNode;
+}
+
+type Props = IMainLayout & StateToProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
@@ -49,8 +53,7 @@ class MainLayout extends React.Component<Props, {}> {
         <Sidenav/>
         <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
           <div className="row col s12">
-            {/*
-            // @ts-ignore*/}
+            {/* @ts-ignore*/}
             <Breadcrumbs/>
           </div>
           <div className='row col s12 m12'>

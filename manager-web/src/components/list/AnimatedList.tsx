@@ -42,20 +42,20 @@ export default function AnimatedList<T>(props: AnimatedListProps<T>) {
   /*useEffect(() => void setInterval(() => setList(shuffle), 2000), [])*/
 
   let height = 0;
-  const transitions = useTransition(
+ /* const transitions = useTransition(
     rows.map(data => ({data, height: 32.4, y: (height += 32.4) - 32.4})),
-    item => item.data.key,
+    (item: any) => item.data.key,
     {
       from: {height: 0, opacity: 0},
       leave: {height: 0, opacity: 0},
       enter: ({y, height}) => ({y, height, opacity: 1}),
       update: ({y, height}) => ({y, height})
     }
-  );
+  );*/
   //FIXME: currently not being used, has a few bugs
   return (
     <div style={{height: (rows.length * 59)}}>
-      {header && header()}
+      {/*{header && header()}
       {transitions.map(({item, props: {y, ...rest}, key}, index) => (
         <animated.div
           key={key}
@@ -65,7 +65,7 @@ export default function AnimatedList<T>(props: AnimatedListProps<T>) {
           }}>
           {show(item.data.item, index, index === list.length - 1)}
         </animated.div>
-      ))}
+      ))}*/}
     </div>
   )
 }

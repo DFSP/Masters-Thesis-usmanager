@@ -1,0 +1,217 @@
+2020-08-08 13:52:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:54 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:54 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:58 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:58 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:59 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:52:59 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-199]
+2020-08-08 13:53:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYM_NODE_GROUP_LINK_" not found; SQL statement:
+DROP TABLE "SYM_NODE_GROUP_LINK_" [42102-199]
+2020-08-08 13:53:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYM_NODE_SECURITY_" not found; SQL statement:
+DROP TABLE "SYM_NODE_SECURITY_" [42102-199]
+2020-08-08 13:53:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYM_ROUTER_" not found; SQL statement:
+DROP TABLE "SYM_ROUTER_" [42102-199]
+2020-08-08 13:53:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYM_TRIGGER_" not found; SQL statement:
+DROP TABLE "SYM_TRIGGER_" [42102-199]
+2020-08-08 13:53:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYM_TRIGGER_ROUTER_" not found; SQL statement:
+DROP TABLE "SYM_TRIGGER_ROUTER_" [42102-199]
+2020-08-08 13:53:18 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "SYMNODESEC0_.FAILED_LOGINS" not found; SQL statement:
+/* select generatedAlias0 from SymNodeSecurityEntity as generatedAlias0 */ select symnodesec0_.node_id as node_id1_50_, symnodesec0_.created_at_node_id as created_2_50_, symnodesec0_.failed_logins as failed_l3_50_, symnodesec0_.initial_load_create_by as initial_4_50_, symnodesec0_.initial_load_enabled as initial_5_50_, symnodesec0_.initial_load_id as initial_6_50_, symnodesec0_.initial_load_time as initial_7_50_, symnodesec0_.node_password as node_pas8_50_, symnodesec0_.registration_enabled as registra9_50_, symnodesec0_.registration_time as registr10_50_, symnodesec0_.rev_initial_load_create_by as rev_ini11_50_, symnodesec0_.rev_initial_load_enabled as rev_ini12_50_, symnodesec0_.rev_initial_load_id as rev_ini13_50_, symnodesec0_.rev_initial_load_time as rev_ini14_50_ from sym_node_security symnodesec0_ [42122-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:451)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.message.DbException.get(DbException.java:181)
+	at org.h2.expression.ExpressionColumn.getColumnException(ExpressionColumn.java:176)
+	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:158)
+	at org.h2.expression.Alias.optimize(Alias.java:52)
+	at org.h2.command.dml.Select.prepare(Select.java:1245)
+	at org.h2.command.Parser.prepareCommand(Parser.java:689)
+	at org.h2.engine.Session.prepareLocal(Session.java:627)
+	at org.h2.engine.Session.prepareCommand(Session.java:565)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1292)
+	at org.h2.jdbc.JdbcPreparedStatement.<init>(JdbcPreparedStatement.java:77)
+	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:349)
+	at com.zaxxer.hikari.pool.ProxyConnection.prepareStatement(ProxyConnection.java:311)
+	at com.zaxxer.hikari.pool.HikariProxyConnection.prepareStatement(HikariProxyConnection.java)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$5.doPrepare(StatementPreparerImpl.java:146)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$StatementPreparationTemplate.prepareStatement(StatementPreparerImpl.java:172)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl.prepareQueryStatement(StatementPreparerImpl.java:148)
+	at org.hibernate.loader.Loader.prepareQueryStatement(Loader.java:1984)
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1914)
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1892)
+	at org.hibernate.loader.Loader.doQuery(Loader.java:937)
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:340)
+	at org.hibernate.loader.Loader.doList(Loader.java:2689)
+	at org.hibernate.loader.Loader.doList(Loader.java:2672)
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2506)
+	at org.hibernate.loader.Loader.list(Loader.java:2501)
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504)
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:395)
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:220)
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1508)
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1537)
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1505)
+	at org.hibernate.query.Query.getResultList(Query.java:132)
+	at org.hibernate.query.criteria.internal.compile.CriteriaQueryTypeQueryAdapter.getResultList(CriteriaQueryTypeQueryAdapter.java:74)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAll(SimpleJpaRepository.java:324)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.deleteAll(SimpleJpaRepository.java:220)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:359)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:200)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:644)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$QueryExecutorMethodInterceptor.doInvoke(RepositoryFactorySupport.java:608)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$QueryExecutorMethodInterceptor.lambda$invoke$3(RepositoryFactorySupport.java:595)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$QueryExecutorMethodInterceptor.invoke(RepositoryFactorySupport.java:595)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:59)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:295)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:98)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:139)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:93)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.data.repository.core.support.SurroundingTransactionDetectorMethodInterceptor.invoke(SurroundingTransactionDetectorMethodInterceptor.java:61)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212)
+	at com.sun.proxy.$Proxy143.deleteAll(Unknown Source)
+	at pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService.clearSymmetricDS(SymService.java:262)
+	at pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService.loadSymmetricDS(SymService.java:137)
+	at pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService.startSymmetricDSServer(SymService.java:132)
+	at pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:84)
+	at pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:54)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:172)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:165)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:139)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:402)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:359)
+	at org.springframework.boot.context.event.EventPublishingRunListener.running(EventPublishingRunListener.java:102)
+	at org.springframework.boot.SpringApplicationRunListeners.running(SpringApplicationRunListeners.java:77)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:326)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+2020-08-08 13:53:18 jdbc[199]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "'org.springframework.dao.InvalidDataAccessResourceUsageException: could not prepare statement; SQL [/* select generatedAlias0 fr... (1009)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
+2020-08-08 13:53:18 jdbc[199]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "STRINGDECODE('Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Column \""SYMNODESEC0_.FAILED_LOGINS\"" not found; SQL statement... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
+2020-08-08 13:53:18 jdbc[199]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "STRINGDECODE('Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Column \""SYMNODESEC0_.FAILED_LOGINS\"" not found; SQL statement... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1298)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:410)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:821)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:796)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:329)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "STRINGDECODE('Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Column \""SYMNODESEC0_.FAILED_LOGINS\"" not found; SQL statement... (941)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:455)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:441)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:824)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:175)
+	at org.h2.command.dml.Insert.update(Insert.java:132)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:267)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:200)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1280)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:410)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:821)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:796)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:329)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "'org.springframework.dao.InvalidDataAccessResourceUsageException: could not prepare statement; SQL [/* select generatedAlias0 fr... (1009)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]

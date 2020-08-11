@@ -24,6 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -35,6 +37,30 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("symmetricds")
 public class SymmetricDSProperties {
 
-  private String setupFilename;
+  private final Tables tables;
+
+  public SymmetricDSProperties() {
+    this.tables = new Tables();
+  }
+
+  @Getter
+  @Setter
+  public static final class Tables {
+
+    private final Exclude exclude;
+
+    private Tables() {
+      this.exclude = new Exclude();
+    }
+
+    @Getter
+    @Setter
+    public static final class Exclude {
+
+      private List<String> startsWith;
+
+    }
+
+  }
 
 }

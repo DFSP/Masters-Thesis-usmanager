@@ -31,7 +31,7 @@ spring:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:manager-worker-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
     username: sa
-    password:
+    password: admin
     platform: h2
   h2:
     console:
@@ -67,19 +67,12 @@ spring:
         json:
           trusted:
             packages: "*"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, mappings
 manager:
   id: ${id:}
   master-hostname: ${master:}
   hosts: ${hosts:}
-#debug: true
-#trace: true
-logging:
-  config: file:src/main/resources/logging/logback-spring.xml
-#  level:
-#    org:
-#      hibernate:
-#        sql: DEBUG
-#      type:
-#        descriptor:
-#          sql:
-#            BasicBinder: TRACE

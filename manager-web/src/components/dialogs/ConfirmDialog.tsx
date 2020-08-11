@@ -46,6 +46,13 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
     this.initModal();
   }
 
+  private initModal = () =>
+    M.Modal.init(this.modal.current as Element, {
+    startingTop: '38.5%',
+    endingTop: '38.5%',
+    preventScrolling: false
+  });
+
   public render() {
     return (
       <div id={this.props.id} className='modal dialog' ref={this.modal}>
@@ -67,12 +74,5 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
       </div>
     );
   }
-
-  private initModal = () =>
-    M.Modal.init(this.modal.current as Element, {
-      startingTop: '38.5%',
-      endingTop: '38.5%',
-      preventScrolling: false
-    });
 
 }

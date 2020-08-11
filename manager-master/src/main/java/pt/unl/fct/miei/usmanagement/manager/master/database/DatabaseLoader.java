@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.database;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -75,22 +74,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.H
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.SymNodeEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.SymNodesRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.group.SymNodeGroupEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.group.SymNodeGroupsRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.group.link.SymNodeGroupLinkEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.group.link.SymNodeGroupLinksRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.host.SymNodeHostsRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.identity.SymNodeIdentitiesRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.security.SymNodeSecurityEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.node.security.SymNodesSecurityRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.router.SymRouterEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.router.SymRoutersRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.trigger.SymTriggerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.trigger.SymTriggersRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.trigger.router.SymTriggerRouterEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.trigger.router.SymTriggerRoutersRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
 
@@ -99,16 +82,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
 public class DatabaseLoader {
 
   @Bean
-  CommandLineRunner initDatabase(SymTriggerRoutersRepository symTriggerRoutersRepository,
-                                 SymTriggersRepository symTriggersRepository,
-                                 SymRoutersRepository symRoutersRepository,
-                                 SymNodeGroupLinksRepository symNodeGroupLinksRepository,
-                                 SymNodeGroupsRepository symNodeGroupsRepository,
-                                 SymNodeHostsRepository symNodeHostsRepository,
-                                 SymNodeIdentitiesRepository symNodeIdentitiesRepository,
-                                 SymNodesSecurityRepository symNodesSecurityRepository,
-                                 SymNodesRepository symNodesRepository,
-                                 UsersService usersService,
+  CommandLineRunner initDatabase(UsersService usersService,
                                  ServicesService servicesService,
                                  AppsService appsService, AppServiceRepository appsServices,
                                  ServiceDependencyRepository servicesDependencies, RegionsService regionsService,
@@ -121,10 +95,6 @@ public class DatabaseLoader {
                                  ServiceRuleConditionRepository serviceRuleConditions,
                                  DockerProperties dockerProperties) {
     return args -> {
-
-      loadSymmetricDS(symTriggerRoutersRepository, symTriggersRepository, symRoutersRepository,
-          symNodeGroupLinksRepository, symNodeGroupsRepository, symNodeHostsRepository, symNodeIdentitiesRepository,
-          symNodesSecurityRepository, symNodesRepository);
 
       // users
       if (!usersService.hasUser("admin")) {
@@ -1189,148 +1159,6 @@ public class DatabaseLoader {
         serviceRuleConditions.save(rxOver500000Condition);
       }
     };
-  }
-
-  private void loadSymmetricDS(SymTriggerRoutersRepository symTriggerRoutersRepository,
-                               SymTriggersRepository symTriggersRepository,
-                               SymRoutersRepository symRoutersRepository,
-                               SymNodeGroupLinksRepository symNodeGroupLinksRepository,
-                               SymNodeGroupsRepository symNodeGroupsRepository,
-                               SymNodeHostsRepository symNodeHostsRepository,
-                               SymNodeIdentitiesRepository symNodeIdentitiesRepository,
-                               SymNodesSecurityRepository symNodesSecurityRepository,
-                               SymNodesRepository symNodesRepository) {
-
-    /*------------------------------------------------------------------------------
-      -- Clear and load SymmetricDS Configuration
-      ------------------------------------------------------------------------------*/
-    symTriggerRoutersRepository.deleteAll();
-    symTriggersRepository.deleteAll();
-    symRoutersRepository.deleteAll();
-    symNodeGroupLinksRepository.deleteAll();
-    symNodeGroupsRepository.deleteAll();
-    symNodeHostsRepository.deleteAll();
-    symNodeIdentitiesRepository.deleteAll();
-    symNodesSecurityRepository.deleteAll();
-    symNodesRepository.deleteAll();
-
-    /*------------------------------------------------------------------------------
-      -- Node Groups
-      ------------------------------------------------------------------------------*/
-
-    symNodeGroupsRepository.save(SymNodeGroupEntity.builder()
-        .nodeGroupId("master-manager")
-        .description("A master manager node. Available at the cloud.")
-        .build());
-
-    symNodeGroupsRepository.save(SymNodeGroupEntity.builder()
-        .nodeGroupId("worker-manager")
-        .description("A worker manager node. Available at the edge.")
-        .build());
-
-    /*------------------------------------------------------------------------------
-      -- Node Group Links
-      ------------------------------------------------------------------------------*/
-
-    // master-manager sends changes to worker-manager when worker pulls from the master
-    symNodeGroupLinksRepository.save(SymNodeGroupLinkEntity.builder()
-        .sourceNodeGroupId("master-manager")
-        .targetNodeGroupId("worker-manager")
-        .dataEventAction("W")
-        .build());
-
-    // worker-manager sends changes to master-manager when worker pushes to the master
-    symNodeGroupLinksRepository.save(SymNodeGroupLinkEntity.builder()
-        .sourceNodeGroupId("worker-manager")
-        .targetNodeGroupId("master-manager")
-        .dataEventAction("P")
-        .build());
-
-    /*------------------------------------------------------------------------------
-      -- Triggers
-      ------------------------------------------------------------------------------*/
-
-    // TODO do the same for every table that doesnt contain log or sym
-    symTriggersRepository.save(SymTriggerEntity.builder()
-        .triggerId("apps")
-        .sourceTableName("apps")
-        .channelId("default")
-        .lastUpdateTime(LocalDateTime.now())
-        .createTime(LocalDateTime.now())
-        .build());
-
-    /*------------------------------------------------------------------------------
-      -- Routers
-      ------------------------------------------------------------------------------*/
-
-    // Default router sends all data from master to workers
-    symRoutersRepository.save(SymRouterEntity.builder()
-        .routerId("master-to-worker")
-        .sourceNodeGroupId("master-manager")
-        .targetNodeGroupId("worker-manager")
-        .routerType("default")
-        .createTime(LocalDateTime.now())
-        .lastUpdateTime(LocalDateTime.now())
-        .build());
-
-    // Column match router will subset data from master-manager to a specific worker
-    symRoutersRepository.save(SymRouterEntity.builder()
-        .routerId("master-to-one-worker")
-        .sourceNodeGroupId("master-manager")
-        .targetNodeGroupId("worker-manager")
-        .routerType("column")
-        .routerExpression("WORKER_ID=:EXTERNAL_ID or OLD_WORKER_ID=:EXTERNAL_ID")
-        .createTime(LocalDateTime.now())
-        .lastUpdateTime(LocalDateTime.now())
-        .build());
-
-    // Default router sends all data from workers to manager
-    symRoutersRepository.save(SymRouterEntity.builder()
-        .routerId("worker-to-master")
-        .sourceNodeGroupId("worker-manager")
-        .targetNodeGroupId("master-manager")
-        .routerType("'default'")
-        .createTime(LocalDateTime.now())
-        .lastUpdateTime(LocalDateTime.now())
-        .build());
-
-    /*------------------------------------------------------------------------------
-      -- Trigger Routers
-      ------------------------------------------------------------------------------*/
-
-    symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-        .triggerId("apps")
-        .routerId("master-to-worker")
-        .initialLoadOrder(1)
-        .createTime(LocalDateTime.now())
-        .lastUpdateTime(LocalDateTime.now())
-        .build());
-
-    /*insert into sym_trigger_router (trigger_id, router_id, initial_load_order, initial_load_select, create_time,
-        last_update_time)
-    values ('rules', 'master-to-one-worker', 1, 'worker_id=''$(externalId)''', current_timestamp, current_timestamp);*/
-
-    /*insert into sym_trigger_router (trigger_id, router_id, initial_load_order, last_update_time, create_time)
-    values ('apps', 'worker-to-master', 2, current_timestamp, current_timestamp);
-
-    insert into sym_trigger_router (trigger_id, router_id, initial_load_order, last_update_time, create_time)
-    values ('rules', 'worker-to-master', 2, current_timestamp, current_timestamp);*/
-
-    /*------------------------------------------------------------------------------
-      -- Nodes
-      ------------------------------------------------------------------------------*/
-
-    /* TODO before adding a new worker
-    insert into sym_node (node_id, node_group_id, external_id, sync_enabled, created_at_node_id)
-    values ('001', 'worker-manager', '001', 1, '000');
-    insert into sym_node (node_id, node_group_id, external_id, sync_enabled, created_at_node_id)
-    values ('002', 'worker-manager', '002', 1, '000');
-
-    insert into sym_node_security (node_id, node_password, registration_enabled, initial_load_enabled, created_at_node_id)
-    values ('001', 'Gr8hzjQCvQxzwJPhaVQ4cYAJLwaEgC', 1, 1, '000');
-    insert into sym_node_security (node_id, node_password, registration_enabled, initial_load_enabled, created_at_node_id)
-    values ('002', 'Gr8hzjQCvQxzwJPhaVQ4cYAJLwaEgC', 1, 1, '000');*/
-
   }
 
 }

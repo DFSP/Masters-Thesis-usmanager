@@ -287,6 +287,14 @@ import {
   VALUE_MODES_FAILURE,
   VALUE_MODES_REQUEST,
   VALUE_MODES_SUCCESS,
+  WORKER_MANAGER_FAILURE,
+  WORKER_MANAGER_REQUEST,
+  WORKER_MANAGER_SUCCESS,
+  WORKER_MANAGERS_FAILURE,
+  WORKER_MANAGERS_REQUEST,
+  WORKER_MANAGERS_SUCCESS,
+  ADD_WORKER_MANAGER,
+  
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
@@ -312,6 +320,7 @@ import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
 import {ILogs} from "../routes/management/logs/ManagementLogs";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
+import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 
 export type EntitiesState = {
   apps: {
@@ -470,6 +479,11 @@ export type EntitiesState = {
     isLoadingEurekaServers: boolean,
     loadEurekaServersError: string | null,
   },
+  workerManagers: {
+    data: { [key: string]: IWorkerManager },
+    isLoadingWorkerManagers: boolean,
+    loadWorkerManagersError: string | null,
+  },
   logs: {
     data: { [key: number]: ILogs },
     isLoadingLogs: boolean,
@@ -518,6 +532,8 @@ export type EntitiesAction = {
     regions?: IRegion[],
     loadBalancers?: ILoadBalancer[],
     eurekaServers?: ILoadBalancer[],
+    workerManagers?: IWorkerManager[],
+    machines?: string[],
     logs?: ILogs[],
   },
 };
@@ -678,6 +694,11 @@ const entities = (state: EntitiesState = {
                       data: {},
                       isLoadingEurekaServers: false,
                       loadEurekaServersError: null
+                    },
+                    workerManagers: {
+                      data: {},
+                      isLoadingWorkerManagers: false,
+                      loadWorkerManagersError: null
                     },
                     logs: {
                       data: {},
@@ -967,7 +988,7 @@ const entities = (state: EntitiesState = {
         const service = state.services.data[entity];
         if (data?.predictions?.length) {
           //FIXME saved entity has id = 0, might be a problem later if updating the entity
-          const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: {id: 0, ...prediction}}));
+          const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: {...prediction, id: 0 }}));
           service.predictions = merge({}, service.predictions, ...newPredictions);
           return merge({}, state, {services: {data: {[service.serviceName]: {...service}}}});
         }
@@ -2903,6 +2924,43 @@ const entities = (state: EntitiesState = {
             data: eurekaServers,
             isLoadingEurekaServers: false,
             loadEurekaServersError: null
+          }
+        });
+      }
+      break;
+    case WORKER_MANAGERS_REQUEST:
+    case WORKER_MANAGER_REQUEST:
+      return merge({}, state, {workerManagers: {isLoadingWorkerManager: true, loadWorkerManagerError: null}});
+    case WORKER_MANAGERS_FAILURE:
+    case WORKER_MANAGER_FAILURE:
+      return merge({}, state, {workerManagers: {isLoadingWorkerManager: false, loadWorkerManagerError: error}});
+    case WORKER_MANAGERS_SUCCESS:
+      return {
+        ...state,
+        workerManagers: {
+          ...state.workerManagers,
+          data: merge({}, pick(state.workerManagers.data, keys(data?.workerManagers)), data?.workerManagers),
+          isLoadingWorkerManagers: false,
+          loadWorkerManagersError: null,
+        }
+      };
+    case WORKER_MANAGER_SUCCESS:
+      return {
+        ...state,
+        workerManagers: {
+          data: merge({}, state.workerManagers.data, data?.workerManagers),
+          isLoadingWorkerManagers: false,
+          loadWorkerManagersError: null,
+        }
+      };
+    case ADD_WORKER_MANAGER:
+      if (data?.workerManagers?.length) {
+        const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManager;
+        return merge({}, state, {
+          workerManager: {
+            data: workerManager,
+            isLoadingWorkerManager: false,
+            loadWorkerManagerError: null
           }
         });
       }

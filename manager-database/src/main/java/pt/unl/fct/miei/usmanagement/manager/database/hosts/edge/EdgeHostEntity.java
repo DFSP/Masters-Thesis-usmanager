@@ -36,6 +36,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -48,6 +49,7 @@ import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -76,6 +78,21 @@ public class EdgeHostEntity {
   private String country;
 
   private String city;
+
+  //@NotNull
+  private String address;
+
+  //@NotNull
+  private Double latitude;
+
+  //@NotNull
+  private Double longitude;
+
+  @ManyToOne
+  private WorkerManagerEntity worker;
+
+  @ManyToOne
+  private WorkerManagerEntity managedBy;
 
   @Singular
   @JsonIgnore

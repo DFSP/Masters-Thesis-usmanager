@@ -49,6 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService;
 
 @Slf4j
 @Component
@@ -57,23 +58,16 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
   private final HostsService hostsService;
   private final ServicesMonitoringService servicesMonitoringService;
   private final HostsMonitoringService hostsMonitoringService;
-  private final ServletContext servletContext;
-  private final DataSource dataSource;
-  private final ApplicationContext applicationContext;
-  private final DataSourceProperties dataSourceProperties;
+  private final SymService symService;
 
   public ManagerMasterStartup(@Lazy HostsService hostsService,
                               @Lazy ServicesMonitoringService servicesMonitoringService,
                               @Lazy HostsMonitoringService hostsMonitoringService,
-                              ServletContext servletContext, DataSource dataSource,
-                              ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
+                              SymService symService) {
     this.hostsService = hostsService;
     this.servicesMonitoringService = servicesMonitoringService;
     this.hostsMonitoringService = hostsMonitoringService;
-    this.servletContext = servletContext;
-    this.dataSource = dataSource;
-    this.applicationContext = applicationContext;
-    this.dataSourceProperties = dataSourceProperties;
+    this.symService = symService;
   }
 
   @SneakyThrows
@@ -87,36 +81,9 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
     }
     servicesMonitoringService.initServiceMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();
-    this.startSymmetricDSServer(machineAddress);
+    symService.startSymmetricDSServer(machineAddress);
   }
 
-  private void startSymmetricDSServer(MachineAddress machineAddress) {
-    SymmetricEngineHolder holder = new SymmetricEngineHolder();
 
-    Properties properties = new Properties();
-    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    try (InputStream is = classloader.getResourceAsStream("sym/sym-node.properties")) {
-      properties.load(is);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    properties.setProperty(ParameterConstants.SYNC_URL,
-        properties.getProperty(ParameterConstants.SYNC_URL)
-            .replace("${hostname}", machineAddress.getPublicIpAddress()));
-
-    properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
-    properties.setProperty("db.url", dataSourceProperties.getUrl());
-    properties.setProperty("db.user", dataSourceProperties.getUsername());
-    properties.setProperty("db.password", dataSourceProperties.getPassword());
-
-    ServerSymmetricEngine serverEngine =
-        new ServerSymmetricEngine(dataSource, applicationContext, properties, false, holder);
-    holder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverEngine);
-    holder.setAutoStart(false);
-    servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, holder);
-    serverEngine.setup();
-    serverEngine.start();
-  }
 
 }

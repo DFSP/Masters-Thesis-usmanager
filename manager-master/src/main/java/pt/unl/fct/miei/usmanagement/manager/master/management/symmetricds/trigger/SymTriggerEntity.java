@@ -54,33 +54,28 @@ public class SymTriggerEntity {
 
   private String sourceCatalogName;
 
-  @NotNull
   private String sourceSchemaName;
 
+  @NotNull
   private String sourceTableName;
 
   @NotNull
   private String channelId;
 
-  @NotNull
-  @Column(columnDefinition = "varchar(128) default 'reload'")
-  private String roadChannelId;
+  @Builder.Default @Column(columnDefinition = "varchar(128) default 'reload'")
+  private String reloadChannelId = "reload";
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncOnUpdate;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnUpdate = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncOnInsert;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnInsert = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncOnDelete;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short syncOnDelete = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short syncOnIncomingBatch;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short syncOnIncomingBatch = 0;
 
   private String nameForUpdateTrigger;
 
@@ -118,25 +113,20 @@ public class SymTriggerEntity {
 
   private String syncKeyNames;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short useStreamLobs;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short useStreamLobs = 0;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short useCaptureLobs;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short useCaptureLobs = 0;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short useCaptureOldData;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short useCaptureOldData = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short useHandleKeyUpdates;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short useHandleKeyUpdates = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short streamRow;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short streamRow = 1;
 
   @NotNull
   private LocalDateTime createTime;

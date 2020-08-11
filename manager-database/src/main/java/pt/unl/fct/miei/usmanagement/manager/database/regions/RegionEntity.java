@@ -66,8 +66,8 @@ public class RegionEntity {
 
   private String description;
 
-  @Column(columnDefinition = "boolean default true")
-  private boolean active;
+  @Builder.Default @Column(columnDefinition = "boolean default true")
+  private boolean active = true;
 
   @Singular
   @JsonIgnore

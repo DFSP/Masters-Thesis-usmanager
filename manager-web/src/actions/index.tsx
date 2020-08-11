@@ -43,6 +43,7 @@ import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 import {IComponent} from "../containers/Root.dev";
+import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -1604,6 +1605,76 @@ export function addEurekaServer(eurekaServer: IEurekaServer): EntitiesAction {
     data: {eurekaServers: new Array(eurekaServer)}
   }
 }
+
+export const WORKER_MANAGERS_REQUEST = 'WORKER_MANAGERS_REQUEST';
+export const WORKER_MANAGER_REQUEST = 'WORKER_MANAGER_REQUEST';
+export const WORKER_MANAGERS_SUCCESS = 'WORKER_MANAGERS_SUCCESS';
+export const WORKER_MANAGER_SUCCESS = 'WORKER_MANAGER_SUCCESS';
+export const WORKER_MANAGERS_FAILURE = 'WORKER_MANAGERS_FAILURE';
+export const WORKER_MANAGER_FAILURE = 'WORKER_MANAGER_FAILURE';
+export const loadWorkerManagers = () => (dispatch: any) => {
+  return dispatch(fetchWorkerManagers());
+};
+const fetchWorkerManagers = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [WORKER_MANAGERS_REQUEST, WORKER_MANAGERS_SUCCESS, WORKER_MANAGERS_FAILURE],
+        endpoint: `worker-managers`,
+        schema: Schemas.WORKER_MANAGER_ARRAY,
+        entity: 'workerManagers'
+      }
+      : {
+        types: [WORKER_MANAGER_REQUEST, WORKER_MANAGER_SUCCESS, WORKER_MANAGER_FAILURE],
+        endpoint: `worker-managers/${id}`,
+        schema: Schemas.WORKER_MANAGER,
+        entity: 'workerManagers'
+      }
+});
+export const ADD_WORKER_MANAGER = 'ADD_WORKER_MANAGER';
+
+export function addWorkerManager(workerManager: IWorkerManager): EntitiesAction {
+  return {
+    type: ADD_WORKER_MANAGER,
+    data: {workerManagers: new Array(workerManager)}
+  }
+}
+
+export const WORKER_MANAGER_MACHINES_REQUEST = 'WORKER_MANAGER_MACHINES_REQUEST';
+export const WORKER_MANAGER_MACHINES_SUCCESS = 'WORKER_MANAGER_MACHINES_SUCCESS';
+export const WORKER_MANAGER_MACHINES_FAILURE = 'WORKER_MANAGER_MACHINES_FAILURE';
+export const loadWorkerManagerMachines = (id: string) => (dispatch: any) => {
+  return dispatch(fetchAppServices(id));
+};
+const fetchWorkerManagerMachines = (id: string) => ({
+  [CALL_API]: {
+    types: [WORKER_MANAGER_MACHINES_REQUEST, WORKER_MANAGER_MACHINES_SUCCESS, WORKER_MANAGER_MACHINES_FAILURE],
+    endpoint: `worker-managers/${id}/machines`,
+    schema: Schemas.WORKER_MANAGER_MACHINE_ARRAY,
+    entity: id
+  }
+});
+
+export const ASSIGN_WORKER_MANAGER_MACHINES = 'ASSIGN_WORKER_MANAGER_MACHINES';
+
+export function assignWorkerManagerMachines(id: string, machines: string[]): EntitiesAction {
+  return {
+    type: ASSIGN_WORKER_MANAGER_MACHINES,
+    entity: id,
+    data: {machines: machines}
+  }
+}
+
+export const UNASSIGN_WORKER_MANAGER_MACHINES = 'UNASSIGN_WORKER_MANAGER_MACHINES';
+
+export function unassignWorkerManagerMachines(id: string, machines: string[]): EntitiesAction {
+  return {
+    type: UNASSIGN_WORKER_MANAGER_MACHINES,
+    entity: id,
+    data: {machines: machines}
+  }
+}
+
 
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';

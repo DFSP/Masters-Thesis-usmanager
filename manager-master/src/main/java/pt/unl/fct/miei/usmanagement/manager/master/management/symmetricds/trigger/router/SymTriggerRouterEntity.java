@@ -57,21 +57,18 @@ public class SymTriggerRouterEntity {
   @Id
   private String routerId;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short enabled;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Short enabled = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Integer initialLoadOrder;
+  @Builder.Default @Column(columnDefinition = "integer default 1")
+  private Integer initialLoadOrder = 1;
 
   private String initialLoadSelect;
 
   private String initialLoadDeleteStmt;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short pingBackEnabled;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short pingBackEnabled = 0;
 
   @NotNull
   private LocalDateTime createTime;

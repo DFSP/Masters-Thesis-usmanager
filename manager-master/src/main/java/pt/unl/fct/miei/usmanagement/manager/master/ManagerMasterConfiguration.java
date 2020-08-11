@@ -48,12 +48,4 @@ public class ManagerMasterConfiguration implements WebMvcConfigurer {
     argumentResolvers.add(jsonPathArgumentResolver);
   }
 
-  /*@Bean(name = "setupCloudInstanceExecutor")
-  public TaskExecutor getTaskExecutor() {
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    threadPoolTaskExecutor.setCorePoolSize(1);
-    threadPoolTaskExecutor.setMaxPoolSize(5);
-    return threadPoolTaskExecutor;
-  }*/
-
 }

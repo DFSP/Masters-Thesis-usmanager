@@ -79,7 +79,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 
     Properties properties = new Properties();
     ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    try (InputStream is = classloader.getResourceAsStream("sym-node.properties")) {
+    try (InputStream is = classloader.getResourceAsStream("sym/sym-node.properties")) {
       properties.load(is);
     } catch (IOException e) {
       e.printStackTrace();

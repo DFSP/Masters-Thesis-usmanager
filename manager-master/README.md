@@ -1,8 +1,8 @@
-# Manager master   
+# Master manager   
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
 
-Manager master é o módulo principal do sistema de gestão de micro-serviços.
+Master manager é o módulo principal do sistema de gestão de micro-serviços.
 Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de decisões, etc) e de conhecimento que adquire ao longo da sua execução (métricas obtidas dos containers e hosts, migração/replicação de serviços, etc).  
 Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/) para gerir as regras aplicadas. 
 É um módulo [Spring Boot](https://spring.io/projects/spring-boot), gerido com [maven](https://maven.apache.org/), que disponibiliza um servidor restful.
@@ -103,4 +103,4 @@ De notar que, apenas com esta configuração, não será possível executar cont
 
 ## Licença
 
-Manager master está licenciado com a [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+Master manager está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

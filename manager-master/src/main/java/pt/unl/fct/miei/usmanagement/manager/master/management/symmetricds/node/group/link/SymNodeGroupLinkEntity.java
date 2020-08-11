@@ -40,6 +40,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Builder(toBuilder = true)
@@ -57,17 +58,14 @@ public class SymNodeGroupLinkEntity {
   @Id
   private String targetNodeGroupId;
 
-  @NotNull
-  @Column(columnDefinition = "char(1) default 'W'")
-  private String dataEventAction;
+  @Builder.Default @Column(columnDefinition = "char(1) default 'W'")
+  private String dataEventAction = "W";
 
-  @NotNull
-  @Column(columnDefinition = "integer default 1")
-  private Short syncConfigEnabled;
+  @Builder.Default @ColumnDefault("1")
+  private Short syncConfigEnabled = 1;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short isReversible;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short isReversible = 0;
 
   private LocalDateTime createTime;
 

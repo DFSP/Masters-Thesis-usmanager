@@ -29,6 +29,6 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.trigger.SymTriggerEntity;
 
 @Repository
-public interface SymNodesSecurityRepository extends JpaRepository<SymTriggerEntity, String> {
+public interface SymNodesSecurityRepository extends JpaRepository<SymNodeSecurityEntity, String> {
 
 }

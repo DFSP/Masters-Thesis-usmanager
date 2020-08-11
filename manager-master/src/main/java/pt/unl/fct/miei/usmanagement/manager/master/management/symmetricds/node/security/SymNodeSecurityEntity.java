@@ -55,15 +55,13 @@ public class SymNodeSecurityEntity {
   @NotNull
   private String nodePassword;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short registrationEnabled;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short registrationEnabled = 0;
 
   private LocalDateTime registrationTime;
 
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short initialLoadEnabled;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short initialLoadEnabled = 0;
 
   private LocalDateTime initialLoadTime;
 
@@ -71,18 +69,14 @@ public class SymNodeSecurityEntity {
 
   private String initialLoadCreateBy;
 
-  @Column(columnDefinition = "integer default 0")
-  private Short revInitialLoadEnabled;
+  @Builder.Default @Column(columnDefinition = "integer default 0")
+  private Short revInitialLoadEnabled = 0;
 
   private LocalDateTime revInitialLoadTime;
 
   private Long revInitialLoadId;
 
   private String revInitialLoadCreateBy;
-
-  @NotNull
-  @Column(columnDefinition = "integer default 0")
-  private Short failedLogins;
 
   private String createdAtNodeId;
 

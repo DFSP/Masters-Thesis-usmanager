@@ -48,6 +48,7 @@ import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/Simulated
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
+import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
   const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -133,6 +134,9 @@ interface ISchemas {
   LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
   EUREKA_SERVER: schema.Entity<IEurekaServer>;
   EUREKA_SERVER_ARRAY: schema.Entity<IEurekaServer>[];
+  WORKER_MANAGER: schema.Entity<IWorkerManager>;
+  WORKER_MANAGER_ARRAY: schema.Entity<IWorkerManager>[];
+  WORKER_MANAGER_MACHINE_ARRAY: schema.Entity<ICloudHost | IEdgeHost>[];
   LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -254,6 +258,14 @@ const eurekaServer: schema.Entity<IEurekaServer> = new schema.Entity('eurekaServ
   idAttribute: (eurekaServer: IEurekaServer) => eurekaServer.containerId
 });
 
+const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerManagers', undefined, {
+  idAttribute: (workerManager: IWorkerManager) => workerManager.id.toString()
+});
+
+const workerManagerMachine: schema.Entity<ICloudHost | IEdgeHost> = new schema.Entity('workerManagerMachines', undefined, {
+  idAttribute: (machine: ICloudHost | IEdgeHost) => machine.id.toString()
+});
+
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
   idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
@@ -334,6 +346,9 @@ export const Schemas: ISchemas = {
   LOAD_BALANCER_ARRAY: [loadBalancer],
   EUREKA_SERVER: eurekaServer,
   EUREKA_SERVER_ARRAY: [eurekaServer],
+  WORKER_MANAGER: workerManager,
+  WORKER_MANAGER_ARRAY: [workerManager],
+  WORKER_MANAGER_MACHINE_ARRAY: [workerManagerMachine],
   LOGS_ARRAY: [logs],
 };
 

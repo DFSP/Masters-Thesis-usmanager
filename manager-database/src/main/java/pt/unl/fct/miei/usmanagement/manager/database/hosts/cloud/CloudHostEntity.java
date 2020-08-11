@@ -34,6 +34,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -50,6 +53,7 @@ import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -83,6 +87,12 @@ public class CloudHostEntity {
   private String privateIpAddress;
 
   private Placement placement;
+
+  @OneToOne
+  private WorkerManagerEntity worker;
+
+  @ManyToOne
+  private WorkerManagerEntity managedBy;
 
   @Singular
   @JsonIgnore

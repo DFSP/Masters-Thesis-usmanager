@@ -29,16 +29,18 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class SymTriggerRouterId implements Serializable {
 
-  private final String triggerId;
+  private String triggerId;
 
-  private final String routerId;
+  private String routerId;
 
 }

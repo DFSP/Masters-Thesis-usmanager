@@ -67,7 +67,7 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadLoadBalancers: (id: string) => void;
-  addLoadBalancer: (loadBalancer: IContainer) => void;
+  addLoadBalancer: (loadBalancer: ILoadBalancer) => void;
   loadServices: () => void;
   loadRegions: () => void;
 }

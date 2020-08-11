@@ -29,16 +29,18 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class SymNodeHostId implements Serializable {
 
-  private final String nodeId;
+  private String nodeId;
 
-  private final String hostName;
+  private String hostName;
 
 }

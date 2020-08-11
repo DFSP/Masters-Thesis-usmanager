@@ -34,7 +34,7 @@ public class SymmetricDSConfig {
 
   @Bean
   public ServletRegistrationBean<SymmetricServlet> symServlet() {
-    ServletRegistrationBean<SymmetricServlet> bean = new ServletRegistrationBean<>(new SymmetricServlet(), "/sync");
+    ServletRegistrationBean<SymmetricServlet> bean = new ServletRegistrationBean<>(new SymmetricServlet(), "/sync/*");
     bean.setLoadOnStartup(1);
     return bean;
   }

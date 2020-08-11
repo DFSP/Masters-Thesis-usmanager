@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "msmanager/msmanager"
+    "url": "usmanager/manager"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",

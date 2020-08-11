@@ -29,16 +29,18 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class SymNodeGroupLinkId implements Serializable {
 
-  private final String sourceNodeGroupId;
+  private String sourceNodeGroupId;
 
-  private final String targetNodeGroupId;
+  private String targetNodeGroupId;
 
 }

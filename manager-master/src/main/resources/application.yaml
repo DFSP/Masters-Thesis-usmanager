@@ -5,9 +5,10 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:file:./manager-master/db/manager-master-db
+    #url: jdbc:h2:file:./manager-master/db/manager-master-db
+    url: jdbc:h2:mem:manager-master-db
     username: sa
-    password:
+    password: admin
     platform: h2
   h2:
     console:
@@ -25,6 +26,11 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, mappings
 ssh:
   connection-timeout: 10000
 edge:
@@ -99,12 +105,12 @@ rules:
   service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
 symmetricds:
-  setup-filename: file:src/main/resources/sym/sym.sql
+  tables:
+    exclude:
+      startsWith: sym, logging
 
 #debug: true
 #trace: true
-#logging:
-#  config: src/main/resources/logback.xml
 #  level:
 #    org:
 #      hibernate:

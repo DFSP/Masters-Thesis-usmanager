@@ -72,8 +72,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -132,6 +131,13 @@
             <artifactId>symmetric-server</artifactId>
             <version>3.11.10</version>
         </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 &ndash;&gt;
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>2.14.0</version>
+        </dependency>-->
+
     </dependencies>
     <build>
         <finalName>manager-worker</finalName>
@@ -140,8 +146,19 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>pt.unl.fct.miei.usmanagement.manager.ManagerWorker</mainClass>
+                    <mainClass>pt.unl.fct.miei.usmanagement.manager.ManagerWorkerApplication</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-dependency-analyzer</artifactId>
+                        <version>1.11.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

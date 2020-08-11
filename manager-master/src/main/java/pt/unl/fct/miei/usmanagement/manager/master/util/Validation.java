@@ -30,9 +30,21 @@ import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestExceptio
 @UtilityClass
 public class Validation {
 
+  public void validatePostRequest(String requestBodyId) {
+    if (requestBodyId != null && !requestBodyId.isEmpty()) {
+      throw new BadRequestException("Expected empty request body id, instead got %d", requestBodyId);
+    }
+  }
+
   public void validatePostRequest(Long requestBodyId) {
     if (requestBodyId != null && requestBodyId > 0) {
       throw new BadRequestException("Expected non positive request body id, instead got %d", requestBodyId);
+    }
+  }
+
+  public void validatePutRequest(String requestBodyId) {
+    if (requestBodyId == null || requestBodyId.isEmpty()) {
+      throw new BadRequestException("Expected non empty request body id");
     }
   }
 

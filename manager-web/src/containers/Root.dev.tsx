@@ -76,6 +76,8 @@ import {ReduxState} from "../reducers";
 import Settings from "../routes/management/settings/Settings";
 import MonitoringSettings from "../routes/monitoring/settings/Settings";
 import DataManagementSettings from "../routes/dataManagement/settings/Settings";
+import WorkerManager from "../routes/management/workerManagers/WorkerManager";
+import WorkerManagers from "../routes/management/workerManagers/WorkerManagers";
 
 interface RootContainerProps {
   store: any;
@@ -125,6 +127,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
   "/load-balancers/:id": {component: LoadBalancer},
   "/eureka-servers": {component: EurekaServers, search: true},
   "/eureka-servers/:id": {component: EurekaServer},
+  "/worker-managers": {component: WorkerManagers, search: true},
+  "/worker-managers/:id": {component: WorkerManager},
   "/ssh": {component: Ssh},
   "/settings": {component: Settings},
   "/logs": {component: ManagementLogs, search: true},

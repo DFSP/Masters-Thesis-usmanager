@@ -139,12 +139,11 @@ class Ssh extends React.Component<Props, State> {
                   {'output' in command ?
                     <>
                       <div>
-                                                <span
-                                                  className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                        <span className={styles.hostname}>{command.hostname} ></span>
+                        <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
+                        <span className={styles.hostname}>{command.hostname}</span>
                         <span className={styles.command}>{command.command}</span>
-                        {command.exitStatus !== 0 && <span
-                            className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
+                        {command.exitStatus !== 0 &&
+                         <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
                       </div>
                       <div dangerouslySetInnerHTML={{
                         __html:
