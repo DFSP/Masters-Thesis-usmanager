@@ -140,7 +140,7 @@ public class HostsService {
   }
 
   public void clusterHosts() {
-    log.info("Clustering hosts into the swarm...");
+    log.info("Clustering hosts into the swarm on mode {}...", mode);
     setupHost(publicIp, privateIp, NodeRole.MANAGER);
     if (mode == Mode.LOCAL) {
       getLocalWorkerNodes().forEach(edgeHost ->
@@ -195,8 +195,8 @@ public class HostsService {
     SimpleNode node;
     boolean isLeader = Objects.equals(publicIpAddress, this.publicIp)
         && Objects.equals(privateIpAddress, this.privateIp);
-    log.info(isLeader + "");
     if (isLeader) {
+      log.info("Setting up docker swarm leader");
       dockerSwarmService.leaveSwarm(privateIpAddress);
       node = dockerSwarmService.initSwarm();
     } else {

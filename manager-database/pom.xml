@@ -90,6 +90,7 @@
         </dependencies>
     </dependencyManagement>
     <build>
+        <finalName>manager-database</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>

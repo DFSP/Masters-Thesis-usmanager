@@ -390,7 +390,7 @@ public class ContainersService {
 
   public String launchDockerApiProxy(String hostname, boolean insertIntoDatabase) {
     String containerId = dockerApiProxyService.launchDockerApiProxy(hostname);
-    if (!insertIntoDatabase) {
+    if (insertIntoDatabase) {
       addContainer(containerId);
     }
     return containerId;

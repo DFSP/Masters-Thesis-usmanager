@@ -51,6 +51,7 @@ import {isNew} from "../../../../utils/router";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
+import {IWorkerManager} from "../../workerManagers/WorkerManager";
 
 export interface ICloudHost extends IDatabaseData {
   instanceId: string;
@@ -64,6 +65,8 @@ export interface ICloudHost extends IDatabaseData {
   publicIpAddress: string;
   privateIpAddress: string;
   placement: IPlacement;
+  worker: IWorkerManager
+  managedByWorker: IWorkerManager;
   hostRules?: string[];
   hostSimulatedMetrics?: string[];
 }
@@ -384,6 +387,9 @@ class CloudHost extends BaseComponent<Props, State> {
   private cloudHostPlacement = (placement: IPlacement) =>
     placement.availabilityZone;
 
+  private managedByWorker = (worker: IWorkerManager) =>
+    worker.id.toString();
+
   private cloudHost = () => {
     const {isLoading, error} = this.props;
     const cloudHost = this.getCloudHost();
@@ -421,9 +427,14 @@ class CloudHost extends BaseComponent<Props, State> {
                                      id={key}
                                      label={key}
                                      valueToString={this.cloudHostPlacement}/>
-                : <Field key={index}
-                         id={key}
-                         label={key}/>)}
+                : key === 'managedByWorker'
+                  ? <Field<IWorkerManager> key={index}
+                                           id={key}
+                                           label={key}
+                                           valueToString={this.managedByWorker}/>
+                  : <Field key={index}
+                           id={key}
+                           label={key}/>)}
           </Form>
         )}
       </>
@@ -492,6 +503,10 @@ function removeFields(cloudHost: Partial<ICloudHost>) {
   }
   if (!cloudHost.privateIpAddress) {
     delete cloudHost["privateIpAddress"];
+  }
+  delete cloudHost["worker"];
+  if (!cloudHost.managedByWorker) {
+    delete cloudHost["managedByWorker"];
   }
   delete cloudHost["hostRules"];
   delete cloudHost["hostSimulatedMetrics"];

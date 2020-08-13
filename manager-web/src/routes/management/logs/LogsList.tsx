@@ -76,7 +76,7 @@ class LogsList extends React.Component<Props, {}> {
                       automatic/>
         <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
           <LogsList
-            isLoading={isLoading}
+            isLoading={!this.reloadLogs && isLoading}
             error={error}
             emptyMessage={'No logs to show'}
             list={logs}

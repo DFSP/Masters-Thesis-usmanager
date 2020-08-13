@@ -66,6 +66,10 @@ const EdgeHostCard = ({edgeHost}: Props) => (
     <CardItem key={'city'}
               label={'City'}
               value={`${edgeHost.city}`}/>
+    {edgeHost.managedByWorker &&
+     <CardItem key={'managedByWorker'}
+               label={'managedByWorker'}
+               value={`${edgeHost.managedByWorker.id}`}/>}
   </CardEdgeHost>
 );
 

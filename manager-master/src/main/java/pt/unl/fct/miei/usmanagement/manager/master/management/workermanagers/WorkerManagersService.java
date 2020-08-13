@@ -70,13 +70,17 @@ public class WorkerManagersService {
 
   public WorkerManagerEntity addWorkerManager(String hostname) {
     log.debug("Launching worker manager at {}", hostname);
+    WorkerManagerEntity workerManagerEntity;
     try {
       CloudHostEntity cloudHostEntity = cloudHostsService.getCloudHostByHostname(hostname);
-      return workerManagers.save(WorkerManagerEntity.builder().cloudHost(cloudHostEntity).build());
+      workerManagerEntity = workerManagers.save(WorkerManagerEntity.builder().cloudHost(cloudHostEntity).build());
     } catch (EntityNotFoundException ignored) {
       EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
-      return workerManagers.save(WorkerManagerEntity.builder().edgeHost(edgeHostEntity).build());
+      hostname = edgeHostEntity.getPublicIpAddress();
+      workerManagerEntity = workerManagers.save(WorkerManagerEntity.builder().edgeHost(edgeHostEntity).build());
     }
+    this.launchWorkerManager(hostname);
+    return workerManagerEntity;
   }
 
   private ContainerEntity launchWorkerManager(String hostname) {
@@ -105,7 +109,6 @@ public class WorkerManagersService {
     } catch (EntityNotFoundException ignored) {
       edgeHostsService.assignWorkerManager(workerManagerEntity, machine);
     }
-    this.launchWorkerManager(machine);
   }
 
   public void assignMachines(String workerManagerId, List<String> machines) {

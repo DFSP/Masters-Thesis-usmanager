@@ -56,6 +56,7 @@ import {Schemas} from "../../../../middleware/api";
 import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import {IRegion} from "../../region/Region";
+import {IWorkerManager} from "../../workerManagers/WorkerManager";
 
 export interface IEdgeHost extends IDatabaseData {
   username: string;
@@ -65,6 +66,8 @@ export interface IEdgeHost extends IDatabaseData {
   region: IRegion;
   country: string;
   city: string;
+  worker: IWorkerManager;
+  managedByWorker: IWorkerManager;
   hostRules?: string[];
   hostSimulatedMetrics?: string[];
 }
@@ -305,6 +308,9 @@ class EdgeHost extends BaseComponent<Props, State> {
   private regionDropdownOption = (region: IRegion) =>
     region.name;
 
+  private managedByWorker = (worker: IWorkerManager) =>
+    worker.id.toString();
+
   private edgeHost = () => {
     const {isLoading, error} = this.props;
     const edgeHost = this.getEdgeHost();
@@ -363,9 +369,14 @@ class EdgeHost extends BaseComponent<Props, State> {
                            id={key}
                            label={key}
                            hidden={true}/>
-                  : <Field key={index}
-                           id={key}
-                           label={key}/>
+                  : key === 'managedByWorker'
+                    ? <Field<IWorkerManager> key={index}
+                                             id={key}
+                                             label={key}
+                                             valueToString={this.managedByWorker}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>
             )}
           </Form>
         )}
@@ -427,6 +438,10 @@ class EdgeHost extends BaseComponent<Props, State> {
 
 function removeFields(edgeHost: Partial<IEdgeHost>) {
   delete edgeHost["id"];
+  delete edgeHost["worker"];
+  if (!edgeHost.managedByWorker) {
+    delete edgeHost["managedByWorker"];
+  }
   delete edgeHost["hostRules"];
   delete edgeHost["hostSimulatedMetrics"];
 }

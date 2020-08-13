@@ -64,6 +64,10 @@ const CloudHostCard = ({cloudHost}: Props) => (
     <CardItem key={'placement'}
               label={'placement'}
               value={`${cloudHost.placement.availabilityZone}`}/>
+    {cloudHost.managedByWorker &&
+     <CardItem key={'managedByWorker'}
+               label={'managedByWorker'}
+               value={`${cloudHost.managedByWorker.id}`}/>}
   </CardCloudHost>
 );
 

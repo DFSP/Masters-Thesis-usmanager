@@ -122,7 +122,6 @@ public class SymService {
     properties.setProperty(ParameterConstants.SYNC_URL,
         properties.getProperty(ParameterConstants.SYNC_URL)
             .replace("${hostname}", machineAddress.getPublicIpAddress()));
-    log.info(properties.getProperty(ParameterConstants.SYNC_URL));
     properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
     properties.setProperty("db.url", dataSourceProperties.getUrl());
     properties.setProperty("db.user", dataSourceProperties.getUsername());
