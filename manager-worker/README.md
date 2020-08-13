@@ -10,12 +10,10 @@ Usa [kafka](https://kafka.apache.org/) para comunicar com o manager-master.
 
 - [Spring-boot](https://spring.io/projects/spring-boot) - Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run"
 - [JDBC](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/) - The Java Database Connectivity (JDBC) API provides universal data access from the Java programming language. Using the JDBC API, you can access virtually any data source, from relational databases to spreadsheets and flat files
-- [Kafka](https://kafka.apache.org/) - Kafka® is used for building real-time data pipelines and streaming apps
-    - [Kafka Connect](https://kafka.apache.org/documentation.html#connect) - The Connect API allows implementing connectors that continually pull from some source data system into Kafka or push from Kafka into some sink data system.
-        - [Kafka Connect JDBC](https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc) - The JDBC source and sink connectors allow you to exchange data between relational databases and Kafka
 - [Lombok](https://projectlombok.org/) - Project Lombok is a java library that automatically plugs into your editor and build tools, spicing up your java
 - [Spotify docker-client](https://github.com/spotify/docker-client) - Docker client written in Java
 - [sshj](https://github.com/hierynomus/sshj) - SSHv2 library for Java 
+- [SymmetricDS](https://www.symmetricds.org/) - SymmetricDS is open source database replication software that focuses on features and cross platform compatibility
 ## Executar
 
 ##### Argumentos
