@@ -37,8 +37,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
@@ -286,6 +290,21 @@ public class CloudHostsService {
     assertHostExists(instanceId);
     simulatedMetricNames.forEach(simulatedMetric ->
         hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
+  }
+
+  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String cloudHost) {
+    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
+    CloudHostEntity cloudHostEntity = getCloudHostByHostname(cloudHost).toBuilder()
+        .managedByWorker(workerManagerEntity)
+        .build();
+    cloudHosts.save(cloudHostEntity);
+  }
+
+  public void unassignWorkerManager(String cloudHost) {
+    CloudHostEntity cloudHostEntity = getCloudHost(cloudHost).toBuilder()
+        .managedByWorker(null)
+        .build();
+    cloudHosts.save(cloudHostEntity);
   }
 
   public boolean hasCloudHost(String instanceId) {

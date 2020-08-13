@@ -26,8 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,50 +40,50 @@ import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManage
 @RequestMapping("/worker-managers")
 public class WorkerManagersController {
 
-  private final WorkerManagersMachine workerManagersMachine;
+  private final WorkerManagersService workerManagersService;
 
-  public WorkerManagersController(WorkerManagersMachine workerManagersMachine) {
-    this.workerManagersMachine = workerManagersMachine;
+  public WorkerManagersController(WorkerManagersService workerManagersService) {
+    this.workerManagersService = workerManagersService;
   }
 
   @GetMapping
   public List<WorkerManagerEntity> getWorkerManagers() {
-    return workerManagersMachine.getWorkerManagers();
+    return workerManagersService.getWorkerManagers();
   }
 
   @GetMapping("/{workerManagerId}")
   public WorkerManagerEntity getWorkerManager(@PathVariable String workerManagerId) {
-    return workerManagersMachine.getWorkerManager(workerManagerId);
+    return workerManagersService.getWorkerManager(workerManagerId);
   }
 
   @PostMapping
   public WorkerManagerEntity addWorkerManager(@RequestBody AddWorkerManager addWorkerManager) {
-    return workerManagersMachine.addWorkerManager(addWorkerManager.getHost());
+    return workerManagersService.addWorkerManager(addWorkerManager.getHost());
   }
 
   @DeleteMapping("/{workerManagerId}")
   public void deleteWorkerManager(@PathVariable String workerManagerId) {
-    workerManagersMachine.deleteWorkerManager(workerManagerId);
+    workerManagersService.deleteWorkerManager(workerManagerId);
   }
 
-  @GetMapping("/{workerManagerId}/machines")
+  @GetMapping("/{workerManagerId}/assigned-machines")
   public List<String> getMachines(@PathVariable String workerManagerId) {
-    return workerManagersMachine.getMachines(workerManagerId);
+    return workerManagersService.getAssignedMachines(workerManagerId);
   }
 
-  @PostMapping("/{workerManagerId}/machines")
-  public void addMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
-    workerManagersMachine.addMachines(workerManagerId, machines);
+  @PostMapping("/{workerManagerId}/assigned-machines")
+  public void assignMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
+    workerManagersService.assignMachines(workerManagerId, Arrays.asList(machines));
   }
 
-  @DeleteMapping("/{workerManagerId}/machines")
-  public void removeMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
-    workerManagersMachine.removeMachines(workerManagerId, Arrays.asList(machines));
+  @DeleteMapping("/{workerManagerId}/assigned-machines")
+  public void unassignMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
+    workerManagersService.unassignMachines(workerManagerId, Arrays.asList(machines));
   }
 
-  @DeleteMapping("/{workerManagerId}/machines/{hostname}")
+  @DeleteMapping("/{workerManagerId}/assigned-machines/{hostname}")
   public void removeMachine(@PathVariable String workerManagerId, @PathVariable String hostname) {
-    workerManagersMachine.removeMachine(workerManagerId, hostname);
+    workerManagersService.unassignMachine(workerManagerId, hostname);
   }
 
 }

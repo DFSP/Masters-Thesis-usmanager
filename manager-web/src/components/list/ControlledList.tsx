@@ -57,6 +57,7 @@ interface ControlledListProps<T> {
   onAddInput?: (input: IValues) => void;
   onRemove?: (data: string[]) => void;
   onDelete?: RestOperation;
+  removeButtonText?: string;
   entitySaved?: boolean;
   sort?: (a: T, b: T) => number
 }
@@ -112,7 +113,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   }
 
   public render() {
-    const {isLoading, error, emptyMessage, dropdown, formModal, sort} = this.props;
+    const {isLoading, error, emptyMessage, dropdown, formModal, sort, removeButtonText} = this.props;
     // @ts-ignore
     let data: T[] = Object.values(this.state).filter(data => data).map(data => data.value);
     if (sort) {
@@ -181,7 +182,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                     ? {transform: "scale(1)"}
                     : {transform: "scale(0)"}}
                   onClick={this.onRemove}>
-            Remove
+            {removeButtonText || 'Remove'}
           </button>
         </div>
         <DataList
@@ -319,8 +320,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
       return state;
     }, {}));
 
-  private onDeleteFailure = (reason: string): void =>
-    this.props.onDelete?.failureCallback(reason);
+  private onDeleteFailure = (reason: string, args: any): void =>
+    this.props.onDelete?.failureCallback(reason, args);
 
   private inputDialog = (formModal: IFormModal, preSelected?: boolean): JSX.Element => {
     return <InputDialog id={formModal.id}

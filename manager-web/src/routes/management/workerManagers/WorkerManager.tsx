@@ -48,10 +48,13 @@ import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import IDatabaseData from "../../../components/IDatabaseData";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import MachinesList from "./MachinesList";
+import MachinesList from "./AssignedMachinesList";
 
 export interface IWorkerManager extends IDatabaseData {
-  machines?: string[]
+  startedAt: string,
+  cloudHost?: ICloudHost,
+  edgeHost?: IEdgeHost,
+  assignedMachines?: string[],
 }
 
 interface INewWorkerManager {
@@ -139,7 +142,10 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IWorkerManager>): void => {
     const workerManager = reply.data;
-    super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched</span>`);
+    const host = workerManager.cloudHost?.publicIpAddress
+                 || workerManager.edgeHost?.publicDnsName
+                 || workerManager.edgeHost?.publicIpAddress;
+    super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${host}</span>`);
     this.props.addWorkerManager(workerManager);
     this.saveEntities(workerManager);
     if (this.mounted) {
@@ -190,7 +196,7 @@ class WorkerManager extends BaseComponent<Props, State> {
   private saveMachines = (workerManager: IWorkerManager): void => {
     const {unsavedMachines} = this.state;
     if (unsavedMachines.length) {
-      postData(`worker-managers/${workerManager.id}/machines`, unsavedMachines,
+      postData(`worker-managers/${workerManager.id}/assigned-machines`, unsavedMachines,
         () => this.onSaveMachinesSuccess(workerManager),
         (reason) => this.onSaveMachinesFailure(workerManager, reason));
     }
@@ -226,6 +232,12 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   private getSelectableHosts = () =>
     Object.keys(this.props.cloudHosts).concat(Object.keys(this.props.edgeHosts))
+
+  private edgeHostField = (edgeHost: IEdgeHost) =>
+    edgeHost.publicDnsName || edgeHost.publicIpAddress;
+
+  private cloudHostField = (cloudHost: ICloudHost) =>
+    cloudHost.publicIpAddress;
 
   private workerManager = () => {
     const {isLoading, error, newWorkerManager} = this.props;
@@ -267,9 +279,19 @@ class WorkerManager extends BaseComponent<Props, State> {
                              defaultValue: "Select host",
                              values: this.getSelectableHosts()
                            }}/>
-                  : <Field key={index}
-                           id={key}
-                           label={key}/>
+                  : key === 'edgeHost'
+                  ? <Field<IEdgeHost> key={index}
+                                      id={key}
+                                      label={key}
+                                      valueToString={this.edgeHostField}/>
+                  : key === 'cloudHost'
+                    ? <Field<ICloudHost> key={index}
+                                        id={key}
+                                        label={key}
+                                        valueToString={this.cloudHostField}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>
             ))}
           </Form>
         )}
@@ -277,7 +299,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     )
   };
 
-  private machines = (): JSX.Element =>
+  private assignMachines = (): JSX.Element =>
     <MachinesList isLoadingWorkerManager={this.props.isLoading}
                   loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
                   workerManager={this.getWorkerManager()}
@@ -292,9 +314,9 @@ class WorkerManager extends BaseComponent<Props, State> {
       content: () => this.workerManager()
     },
     {
-      title: 'Machines',
-      id: 'machines',
-      content: () => this.machines()
+      title: 'Assigned machines',
+      id: 'assignMachines',
+      content: () => this.assignMachines()
     }
   ];
 
@@ -302,6 +324,13 @@ class WorkerManager extends BaseComponent<Props, State> {
 
 function removeFields(workerManager: Partial<IWorkerManager>) {
   delete workerManager["id"];
+  if (workerManager["cloudHost"] == null) {
+    delete workerManager["cloudHost"];
+  }
+  if (workerManager["edgeHost"] == null) {
+    delete workerManager["edgeHost"];
+  }
+  delete workerManager["assignedMachines"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

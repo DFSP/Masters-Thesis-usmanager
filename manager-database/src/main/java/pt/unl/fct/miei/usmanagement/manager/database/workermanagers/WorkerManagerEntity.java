@@ -24,7 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.workermanagers;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +36,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,7 +47,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
@@ -61,6 +63,11 @@ public class WorkerManagerEntity {
   @Id
   private String id;
 
+  @NotNull
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
+  private LocalDateTime startedAt;
+
   @OneToOne
   private CloudHostEntity cloudHost;
 
@@ -69,17 +76,20 @@ public class WorkerManagerEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "managedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<CloudHostEntity> assignedCloudHosts;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "managedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<EdgeHostEntity> assignedEdgeHosts;
 
   @PrePersist
-  private void ensureId() {
+  private void ensure() {
     this.setId(UUID.randomUUID().toString());
+    if (this.getStartedAt() == null) {
+      this.setStartedAt(LocalDateTime.now());
+    }
   }
 
   @Override

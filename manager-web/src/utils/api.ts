@@ -110,7 +110,7 @@ function sendData<T>(endpoint: string, method: Method, data: any,
 
 export function deleteData(endpoint: string,
                            successCallback: () => void,
-                           failureCallback: (reason: string) => void,
+                           failureCallback: (reason: string, data: any) => void,
                            data?: any): void {
   const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
   console.log(`DELETE ${url}`);
@@ -135,7 +135,7 @@ export function deleteData(endpoint: string,
     } else {
       const reason = buildErrorMessage(error);
       console.error(reason);
-      failureCallback(reason);
+      failureCallback(reason, data);
     }
   })
 }

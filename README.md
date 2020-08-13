@@ -10,17 +10,12 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 ### Organização do projeto (módulos)
 
-- docker-images
-  - [docker-alpine](docker-images/docker-alpine)
-  - [docker-consul](docker-images/docker-consul)
-  - [docker-java](docker-images/docker-java)
-  - [docker-mongo3](docker-images/docker-mongo3)
 
-- [manager-master](manager-master)
+- [master-manager](manager-master)
 
-- [local-manager](local-manager)
+- [worker-manager](manager-worker)
 
-- [manager-web](manager-web)
+- [web-manager](manager-web)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 

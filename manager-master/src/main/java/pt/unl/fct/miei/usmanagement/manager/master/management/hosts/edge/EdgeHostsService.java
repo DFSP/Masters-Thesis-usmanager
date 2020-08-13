@@ -31,11 +31,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
@@ -219,6 +221,21 @@ public class EdgeHostsService {
     assertHostExists(hostname);
     simulatedMetricNames.forEach(simulatedMetric ->
         hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
+  }
+
+  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
+    log.debug("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
+    EdgeHostEntity edgeHostEntity = getEdgeHost(edgeHost).toBuilder()
+        .managedByWorker(workerManagerEntity)
+        .build();
+    edgeHosts.save(edgeHostEntity);
+  }
+
+  public void unassignWorkerManager(String edgeHost) {
+    EdgeHostEntity edgeHostEntity = getEdgeHost(edgeHost).toBuilder()
+        .managedByWorker(null)
+        .build();
+    edgeHosts.save(edgeHostEntity);
   }
 
   public boolean hasEdgeHost(String hostname) {

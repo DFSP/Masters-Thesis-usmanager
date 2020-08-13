@@ -294,7 +294,11 @@ import {
   WORKER_MANAGERS_REQUEST,
   WORKER_MANAGERS_SUCCESS,
   ADD_WORKER_MANAGER,
-  
+  ASSIGN_WORKER_MANAGER_MACHINES,
+  UNASSIGN_WORKER_MANAGER_MACHINES,
+  WORKER_MANAGER_MACHINES_REQUEST,
+  WORKER_MANAGER_MACHINES_SUCCESS, WORKER_MANAGER_MACHINES_FAILURE,
+
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
@@ -483,6 +487,8 @@ export type EntitiesState = {
     data: { [key: string]: IWorkerManager },
     isLoadingWorkerManagers: boolean,
     loadWorkerManagersError: string | null,
+    isLoadingAssignedMachines: boolean,
+    loadAssignedMachinesError: string | null,
   },
   logs: {
     data: { [key: number]: ILogs },
@@ -533,7 +539,7 @@ export type EntitiesAction = {
     loadBalancers?: ILoadBalancer[],
     eurekaServers?: ILoadBalancer[],
     workerManagers?: IWorkerManager[],
-    machines?: string[],
+    assignedMachines?: string[],
     logs?: ILogs[],
   },
 };
@@ -698,7 +704,9 @@ const entities = (state: EntitiesState = {
                     workerManagers: {
                       data: {},
                       isLoadingWorkerManagers: false,
-                      loadWorkerManagersError: null
+                      loadWorkerManagersError: null,
+                      isLoadingAssignedMachines: false,
+                      loadAssignedMachinesError: null,
                     },
                     logs: {
                       data: {},
@@ -2930,10 +2938,10 @@ const entities = (state: EntitiesState = {
       break;
     case WORKER_MANAGERS_REQUEST:
     case WORKER_MANAGER_REQUEST:
-      return merge({}, state, {workerManagers: {isLoadingWorkerManager: true, loadWorkerManagerError: null}});
+      return merge({}, state, {workerManagers: {isLoadingWorkerManagers: true, loadWorkerManagersError: null}});
     case WORKER_MANAGERS_FAILURE:
     case WORKER_MANAGER_FAILURE:
-      return merge({}, state, {workerManagers: {isLoadingWorkerManager: false, loadWorkerManagerError: error}});
+      return merge({}, state, {workerManagers: {isLoadingWorkerManagers: false, loadWorkerManagersError: error}});
     case WORKER_MANAGERS_SUCCESS:
       return {
         ...state,
@@ -2948,6 +2956,7 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         workerManagers: {
+          ...state.workerManagers,
           data: merge({}, state.workerManagers.data, data?.workerManagers),
           isLoadingWorkerManagers: false,
           loadWorkerManagersError: null,
@@ -2955,12 +2964,55 @@ const entities = (state: EntitiesState = {
       };
     case ADD_WORKER_MANAGER:
       if (data?.workerManagers?.length) {
-        const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManager;
+        const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers;
         return merge({}, state, {
-          workerManager: {
+          workerManagers: {
             data: workerManager,
-            isLoadingWorkerManager: false,
-            loadWorkerManagerError: null
+            isLoadingWorkerManagers: false,
+            loadWorkerManagersError: null
+          }
+        });
+      }
+      break;
+    case WORKER_MANAGER_MACHINES_REQUEST:
+      return merge({}, state, {workerManagers: {isLoadingAssignedMachines: true, loadAssignedMachinesError: null}});
+    case WORKER_MANAGER_MACHINES_SUCCESS:
+      const workerManager = entity && state.workerManagers.data[entity];
+      const assignedMachines = {assignedMachines: data?.assignedMachines || []};
+      const workerManagerWithAssignedMachines = Object.assign(workerManager ? workerManager : [entity], assignedMachines);
+      const normalizedWorkerManager = normalize(workerManagerWithAssignedMachines, Schemas.WORKER_MANAGER).entities.workerManagers;
+      return merge({}, state, {
+        workerManagers: {
+          data: normalizedWorkerManager,
+          isLoadingServices: false,
+          loadServicesError: null
+        }
+      });
+    case WORKER_MANAGER_MACHINES_FAILURE:
+      return merge({}, state, {workerManagers: {isLoadingAssignedMachines: false, loadAssignedMachinesError: error}});
+    case ASSIGN_WORKER_MANAGER_MACHINES:
+      if (entity) {
+        if (data?.assignedMachines?.length) {
+          const workerManager = state.workerManagers.data[entity];
+          if (workerManager) {
+            workerManager.assignedMachines = {...workerManager.assignedMachines, ...data?.assignedMachines};
+            return merge({}, state, {workerManagers: {data: {[workerManager.id]: {...workerManager}}}});
+          }
+        }
+      }
+      break;
+    case UNASSIGN_WORKER_MANAGER_MACHINES:
+      if (entity) {
+        const workerManager = state.workerManagers.data[entity];
+        const filteredMachines = (workerManager.assignedMachines &&
+                                  Object.values(workerManager.assignedMachines)
+                                        .filter(machine => !data?.assignedMachines?.includes(machine))) || [];
+        const workerManagerWithAssignedMachines = Object.assign(workerManager, !Object.keys(filteredMachines).length ? {assignedMachines: {}} : filteredMachines);
+        const normalizedWorkerManager = normalize(workerManagerWithAssignedMachines, Schemas.WORKER_MANAGER).entities;
+        return merge({}, state, {
+          workerManagers: {
+            ...state.workerManagers,
+            data: normalizedWorkerManager.workerManagers,
           }
         });
       }

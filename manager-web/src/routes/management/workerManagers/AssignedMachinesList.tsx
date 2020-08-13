@@ -46,14 +46,14 @@ interface StateToProps {
   error?: string | null;
   cloudHosts: { [key: string]: ICloudHost };
   edgeHosts: { [key: string]: IEdgeHost };
-  machines: string[];
+  assignedMachines: string[];
 }
 
 interface DispatchToProps {
   loadCloudHosts: () => void;
   loadEdgeHosts: () => void;
   loadWorkerManagerMachines: (id: string) => void;
-  unassignWorkerManagerMachines: (id: string, machines: string[]) => void;
+  unassignWorkerManagerMachines: (id: string, assignedMachines: string[]) => void;
 }
 
 interface WorkerManagerMachineListProps {
@@ -61,8 +61,8 @@ interface WorkerManagerMachineListProps {
   loadWorkerManagerError?: string | null;
   workerManager: IWorkerManager | Partial<IWorkerManager> | undefined;
   unSavedMachines: string[];
-  onAssignMachine: (machine: string) => void;
-  onUnassignMachines: (machines: string[]) => void;
+  onAssignMachine: (assignedMachine: string) => void;
+  onUnassignMachines: (assignedMachines: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & WorkerManagerMachineListProps;
@@ -72,7 +72,7 @@ interface State {
   entitySaved: boolean;
 }
 
-class MachinesList extends BaseComponent<Props, State> {
+class AssignedMachinesList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
@@ -97,21 +97,22 @@ class MachinesList extends BaseComponent<Props, State> {
       isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
       error={!isNew ? this.props.loadWorkerManagerError || this.props.error : undefined}
       emptyMessage={`Machines list is empty`}
-      data={this.props.machines}
+      data={this.props.assignedMachines}
       dropdown={{
         id: 'workerManagerMachines',
         title: 'Add machine',
         empty: 'No more machines to add',
         data: this.getSelectableMachines(),
       }}
-      show={this.machine}
+      show={this.assignedMachine}
       onAdd={this.onAdd}
       onRemove={this.onRemove}
       onDelete={{
-        url: `worker-managers/${this.props.workerManager?.id}/machines`,
+        url: `worker-managers/${this.props.workerManager?.id}/assigned-machines`,
         successCallback: this.onDeleteSuccess,
         failureCallback: this.onDeleteFailure
       }}
+      removeButtonText={'Unassign'}
       entitySaved={this.state.entitySaved}/>;
   }
 
@@ -125,27 +126,27 @@ class MachinesList extends BaseComponent<Props, State> {
   private isNew = () =>
     this.props.workerManager?.id === undefined;
 
-  private machine = (index: number, machine: string, separate: boolean, checked: boolean,
+  private assignedMachine = (index: number, assignedMachine: string, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const isNew = this.isNew();
-    const unsaved = this.props.unSavedMachines.includes(machine);
+    const unsaved = this.props.unSavedMachines.includes(assignedMachine);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
           <label>
-            <input id={machine}
+            <input id={assignedMachine}
                    type="checkbox"
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {machine}
+                {assignedMachine}
               </div>
             </span>
           </label>
         </div>
         {!isNew && (
-          <Link to={Object.keys(this.props.cloudHosts).includes(machine) ? `/hosts/cloud/${machine}` : `/hosts/edge/${machine}`}
+          <Link to={Object.keys(this.props.cloudHosts).includes(assignedMachine) ? `/hosts/cloud/${assignedMachine}` : `/hosts/edge/${assignedMachine}`}
                 className={`${listItemStyles.link} waves-effect`}>
             <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
           </Link>
@@ -154,28 +155,28 @@ class MachinesList extends BaseComponent<Props, State> {
     );
   };
 
-  private onAdd = (machine: string): void => {
-    this.props.onAssignMachine(machine);
+  private onAdd = (assignedMachine: string): void => {
+    this.props.onAssignMachine(assignedMachine);
   };
 
-  private onRemove = (machines: string[]): void => {
-    this.props.onUnassignMachines(machines);
+  private onRemove = (assignedMachines: string[]): void => {
+    this.props.onUnassignMachines(assignedMachines);
   };
 
-  private onDeleteSuccess = (machines: string[]): void => {
+  private onDeleteSuccess = (assignedMachines: string[]): void => {
     if (this.props.workerManager?.id) {
       const {id} = this.props.workerManager;
-      this.props.unassignWorkerManagerMachines(id.toString(), machines);
+      this.props.unassignWorkerManagerMachines(id.toString(), assignedMachines);
     }
   };
 
-  private onDeleteFailure = (reason: string, machines: string[]): void =>
-    super.toast(`Unable to remove ${machines.length === 1 ? machines[0] : 'machines'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, assignedMachines?: string[]): void =>
+    super.toast(`Unable to unassign ${assignedMachines?.length === 1 ? assignedMachines[0] : 'machines'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
 
   private getSelectableMachines = () => {
-    const {machines, cloudHosts, edgeHosts, unSavedMachines} = this.props;
-    const cloud = Object.keys(cloudHosts).filter(host => !machines.includes(host) && !unSavedMachines.includes(host));
-    const edge = Object.keys(edgeHosts).filter(host => !machines.includes(host) && !unSavedMachines.includes(host));
+    const {assignedMachines, cloudHosts, edgeHosts, unSavedMachines} = this.props;
+    const cloud = Object.keys(cloudHosts).filter(host => !assignedMachines.includes(host) && !unSavedMachines.includes(host));
+    const edge = Object.keys(edgeHosts).filter(host => !assignedMachines.includes(host) && !unSavedMachines.includes(host));
     return cloud.concat(edge);
   };
 
@@ -184,13 +185,13 @@ class MachinesList extends BaseComponent<Props, State> {
 function mapStateToProps(state: ReduxState, ownProps: WorkerManagerMachineListProps): StateToProps {
   const id = ownProps.workerManager?.id;
   const workerManager = id && state.entities.workerManagers.data[id];
-  const machines = workerManager && workerManager.machines;
+  const assignedMachines = workerManager && workerManager.assignedMachines;
   return {
     isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
     error: state.entities.workerManagers.loadWorkerManagersError,
     cloudHosts: state.entities.hosts.cloud.data,
     edgeHosts: state.entities.hosts.edge.data,
-    machines: (machines && Object.values(machines)) || [],
+    assignedMachines: (assignedMachines && Object.values(assignedMachines)) || [],
   }
 }
 
@@ -202,4 +203,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     unassignWorkerManagerMachines,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(MachinesList);
+export default connect(mapStateToProps, mapDispatchToProps)(AssignedMachinesList);

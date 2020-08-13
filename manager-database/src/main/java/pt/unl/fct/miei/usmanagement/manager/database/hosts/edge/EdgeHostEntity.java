@@ -39,6 +39,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -88,11 +89,13 @@ public class EdgeHostEntity {
   //@NotNull
   private Double longitude;
 
+  @JsonIgnoreProperties({"edgeHost", "cloudHost"})
   @ManyToOne
   private WorkerManagerEntity worker;
 
+  @JsonIgnoreProperties({"edgeHost", "cloudHost"})
   @ManyToOne
-  private WorkerManagerEntity managedBy;
+  private WorkerManagerEntity managedByWorker;
 
   @Singular
   @JsonIgnore

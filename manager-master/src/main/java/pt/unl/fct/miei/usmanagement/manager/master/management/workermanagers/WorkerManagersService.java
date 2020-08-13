@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,7 +89,7 @@ public class WorkerManagersService {
     workerManagers.delete(workerManager);
   }
 
-  public List<String> getMachines(String workerManagerId) {
+  public List<String> getAssignedMachines(String workerManagerId) {
     assertWorkerManagerExists(workerManagerId);
     List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
         .map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
@@ -99,25 +98,33 @@ public class WorkerManagersService {
     return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
   }
 
-  public void addMachine(String workerManagerId, String machine) {
-    assertWorkerManagerExists(workerManagerId);
-    // TODO
-    serviceRulesService.addService(ruleName, serviceName);
+  public void assignMachine(String workerManagerId, String machine) {
+    WorkerManagerEntity workerManagerEntity = this.getWorkerManager(workerManagerId);
+    try {
+      cloudHostsService.assignWorkerManager(workerManagerEntity, machine);
+    } catch (EntityNotFoundException ignored) {
+      edgeHostsService.assignWorkerManager(workerManagerEntity, machine);
+    }
+    this.launchWorkerManager(machine);
   }
 
-  public void addMachines(String workerManagerId, List<String> machines) {
-    machines.forEach(machine -> addMachine(workerManagerId, machine));
+  public void assignMachines(String workerManagerId, List<String> machines) {
+    machines.forEach(machine -> assignMachine(workerManagerId, machine));
   }
 
-  public void removeMachine(String workerManagerId, String machine) {
-    removeMachines(workerManagerId, List.of(machine));
+  public void unassignMachine(String workerManagerId, String machine) {
+    unassignMachines(workerManagerId, List.of(machine));
   }
 
-  public void removeMachines(String workerManagerId, List<String> machines) {
+  public void unassignMachines(String workerManagerId, List<String> machines) {
     var workerManager = getWorkerManager(workerManagerId);
     log.info("Removing machines {}", machines);
-    workerManager.getAssignedCloudHosts().removeIf(cloudHost -> machines.contains(cloudHost.getPublicIpAddress()));
-    workerManager.getAssignedEdgeHosts().removeIf(edgeHost -> machines.contains(edgeHost.getHostname()));
+    machines.forEach(machine -> {
+      cloudHostsService.unassignWorkerManager(machine);
+      edgeHostsService.unassignWorkerManager(machine);
+    });
+    /*workerManager.getAssignedCloudHosts().removeIf(cloudHost -> machines.contains(cloudHost.getPublicIpAddress()));
+    workerManager.getAssignedEdgeHosts().removeIf(edgeHost -> machines.contains(edgeHost.getHostname()));*/
     workerManagers.save(workerManager);
   }
 

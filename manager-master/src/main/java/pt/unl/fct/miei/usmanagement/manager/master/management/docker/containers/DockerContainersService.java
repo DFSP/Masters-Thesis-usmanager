@@ -84,14 +84,13 @@ public class DockerContainersService {
   private final EurekaService eurekaService;
   private final HostsService hostsService;
 
-  private final String dockerHubUsername;
   private final int dockerDelayBeforeStopContainer;
 
   public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
                                  NodesService nodesService,
                                  ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
                                  EurekaService eurekaService, HostsService hostsService,
-                                 DockerProperties dockerProperties, ContainerProperties containerProperties) {
+                                 ContainerProperties containerProperties) {
     this.containersService = containersService;
     this.dockerCoreService = dockerCoreService;
     this.nodesService = nodesService;
@@ -99,7 +98,6 @@ public class DockerContainersService {
     this.nginxLoadBalancerService = nginxLoadBalancerService;
     this.eurekaService = eurekaService;
     this.hostsService = hostsService;
-    this.dockerHubUsername = dockerProperties.getHub().getUsername();
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
 
@@ -235,7 +233,7 @@ public class DockerContainersService {
     String externalPort = hostsService.findAvailableExternalPort(hostname, service.getDefaultExternalPort());
     String serviceAddr = String.format("%s:%s", hostname, externalPort);
     String containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
-    String dockerRepository = String.format("%s/%s", dockerHubUsername, service.getDockerRepository());
+    String dockerRepository = service.getDockerRepository();
     MachineLocation machineLocation = hostsService.getHostDetails(hostname).getMachineLocation();
     String continent = machineLocation.getContinent();
     String region = machineLocation.getRegion();

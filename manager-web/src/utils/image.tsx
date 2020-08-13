@@ -107,7 +107,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label.includes('publicip')) {
     return <FaAddressCard/>;
   }
-  if (label.includes('time')) {
+  if (label.includes('time') || label === 'startedat') {
     return "access_time";
   }
   if (label.includes('date')) {

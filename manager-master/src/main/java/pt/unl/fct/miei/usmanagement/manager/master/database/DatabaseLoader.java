@@ -75,6 +75,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.S
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.valuemodes.ValueModesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
 
 @Slf4j
@@ -96,6 +97,8 @@ public class DatabaseLoader {
                                  DockerProperties dockerProperties) {
     return args -> {
 
+      var dockerHubUsername = dockerProperties.getHub().getUsername();
+
       // users
       if (!usersService.hasUser("admin")) {
         var sysAdmin = UserEntity.builder()
@@ -115,7 +118,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         frontend = ServiceEntity.builder()
             .serviceName("front-end")
-            .dockerRepository("front-end")
+            .dockerRepository(dockerHubUsername + "/sock-shop-front-end")
             .defaultExternalPort("8081")
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -134,7 +137,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         user = ServiceEntity.builder()
             .serviceName("user")
-            .dockerRepository("user")
+            .dockerRepository(dockerHubUsername + "/sock-shop-user")
             .defaultExternalPort("8082")
             .defaultInternalPort("80")
             .defaultDb("user-db:27017")
@@ -153,7 +156,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         userDb = ServiceEntity.builder()
             .serviceName("user-db")
-            .dockerRepository("user-db")
+            .dockerRepository(dockerHubUsername + "/sock-shop-user-db")
             .defaultExternalPort("27017")
             .defaultInternalPort("27017")
             .defaultDb("NOT_APPLICABLE")
@@ -172,7 +175,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         catalogue = ServiceEntity.builder()
             .serviceName("catalogue")
-            .dockerRepository("catalogue")
+            .dockerRepository(dockerHubUsername + "/sock-shop-catalogue")
             .defaultExternalPort("8083")
             .defaultInternalPort("80")
             .defaultDb("catalogue-db:3306")
@@ -191,7 +194,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         catalogueDb = ServiceEntity.builder()
             .serviceName("catalogue-db")
-            .dockerRepository("catalogue-db")
+            .dockerRepository(dockerHubUsername + "/sock-shop-catalogue-db")
             .defaultExternalPort("3306")
             .defaultInternalPort("3306")
             .defaultDb("NOT_APPLICABLE")
@@ -210,7 +213,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         payment = ServiceEntity.builder()
             .serviceName("payment")
-            .dockerRepository("payment")
+            .dockerRepository(dockerHubUsername + "/sock-shop-payment")
             .defaultExternalPort("8084")
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -229,7 +232,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         carts = ServiceEntity.builder()
             .serviceName("carts")
-            .dockerRepository("carts")
+            .dockerRepository(dockerHubUsername + "/sock-shop-carts")
             .defaultExternalPort("8085")
             .defaultInternalPort("80")
             .defaultDb("carts-db:27017")
@@ -248,7 +251,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         cartsDb = ServiceEntity.builder()
             .serviceName("carts-db")
-            .dockerRepository("carts-db")
+            .dockerRepository(dockerHubUsername + "/sock-shop-carts-db")
             .defaultExternalPort("27016")
             .defaultInternalPort("27017")
             .defaultDb("NOT_APPLICABLE")
@@ -267,7 +270,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         orders = ServiceEntity.builder()
             .serviceName("orders")
-            .dockerRepository("orders")
+            .dockerRepository(dockerHubUsername + "/sock-shop-orders")
             .defaultExternalPort("8086")
             .defaultInternalPort("80")
             .defaultDb("orders-db:27017")
@@ -286,8 +289,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         ordersDb = ServiceEntity.builder()
             .serviceName("orders-db")
-            //TODO wtf?
-            .dockerRepository("mongo3")
+            .dockerRepository(dockerHubUsername + "/sock-shop-orders-db")
             .defaultExternalPort("27015")
             .defaultInternalPort("27017")
             .defaultDb("NOT_APPLICABLE")
@@ -306,7 +308,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         shipping = ServiceEntity.builder()
             .serviceName("shipping")
-            .dockerRepository("shipping")
+            .dockerRepository(dockerHubUsername + "/sock-shop-shipping")
             .defaultExternalPort("8087")
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -325,7 +327,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         queueMaster = ServiceEntity.builder()
             .serviceName("queue-master")
-            .dockerRepository("queue-master")
+            .dockerRepository(dockerHubUsername + "/sock-shop-queue-master")
             .defaultExternalPort("8088")
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -344,7 +346,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         rabbitmq = ServiceEntity.builder()
             .serviceName("rabbitmq")
-            .dockerRepository("rabbitmq-glibc")
+            .dockerRepository(dockerHubUsername + "/sock-shop-rabbitmq")
             .defaultExternalPort("5672")
             .defaultInternalPort("5672")
             .defaultDb("NOT_APPLICABLE")
@@ -363,7 +365,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         eurekaServer = ServiceEntity.builder()
             .serviceName(EurekaService.EUREKA_SERVER)
-            .dockerRepository("registration-server")
+            .dockerRepository(dockerHubUsername + "/registration-server")
             .defaultExternalPort("8761")
             .defaultInternalPort("8761")
             .defaultDb("NOT_APPLICABLE")
@@ -382,7 +384,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         loadBalancer = ServiceEntity.builder()
             .serviceName(NginxLoadBalancerService.LOAD_BALANCER)
-            .dockerRepository("nginx-load-balancer")
+            .dockerRepository(dockerHubUsername + "/nginx-load-balancer")
             .defaultExternalPort("1906")
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -401,7 +403,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         dockerApiProxy = ServiceEntity.builder()
             .serviceName(DockerApiProxyService.DOCKER_API_PROXY)
-            .dockerRepository("nginx-proxy")
+            .dockerRepository(dockerHubUsername + "/nginx-basic-auth-proxy")
             .defaultExternalPort(String.valueOf(dockerProperties.getApiProxy().getPort()))
             .defaultInternalPort("80")
             .defaultDb("NOT_APPLICABLE")
@@ -420,7 +422,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         prometheus = ServiceEntity.builder()
             .serviceName(PrometheusService.PROMETHEUS)
-            .dockerRepository("prometheus")
+            .dockerRepository(dockerHubUsername + "/prometheus")
             .defaultExternalPort("9090")
             .defaultInternalPort("9090")
             .defaultDb("NOT_APPLICABLE")
@@ -439,7 +441,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         requestLocationMonitor = ServiceEntity.builder()
             .serviceName(LocationRequestService.REQUEST_LOCATION_MONITOR)
-            .dockerRepository("request-location-monitor")
+            .dockerRepository(dockerHubUsername + "/request-location-monitor")
             .defaultExternalPort("1919")
             .defaultInternalPort("1919")
             .defaultDb("NOT_APPLICABLE")
@@ -458,7 +460,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         masterManager = ServiceEntity.builder()
             .serviceName(ManagerMasterProperties.MANAGER_MASTER)
-            .dockerRepository("manager-master")
+            .dockerRepository(dockerHubUsername + "/manager-master")
             // TODO
             .defaultExternalPort("1919")
             // TODO
@@ -477,12 +479,12 @@ public class DatabaseLoader {
       }
       ServiceEntity workerManager;
       try {
-        workerManager = servicesService.getService("worker-manager");
+        workerManager = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER);
       } catch (EntityNotFoundException ignored) {
         workerManager = ServiceEntity.builder()
             //TODO
-            .serviceName("worker-manager")
-            .dockerRepository("worker-manager")
+            .serviceName(WorkerManagerProperties.WORKER_MANAGER)
+            .dockerRepository(dockerHubUsername + "/manager-worker")
             // TODO
             .defaultExternalPort("1919")
             // TODO
@@ -499,52 +501,6 @@ public class DatabaseLoader {
             .expectedMemoryConsumption(0d)
             .build();
         workerManager = servicesService.addService(workerManager);
-      }
-      ServiceEntity consulServer;
-      try {
-        consulServer = servicesService.getService("consul-server");
-      } catch (EntityNotFoundException ignored) {
-        consulServer = ServiceEntity.builder()
-            .serviceName("consul-server")
-            .dockerRepository("docker-consul")
-            // TODO
-            .defaultExternalPort("8500+8600/udp")
-            // TODO
-            .defaultInternalPort("8500+8600/udp")
-            .defaultDb("NOT_APPLICABLE")
-            // TODO
-            .launchCommand("agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0")
-            .minReplicas(1)
-            .maxReplicas(3)
-            .outputLabel("${consulServerHost}")
-            .serviceType(ServiceType.SYSTEM)
-            // TODO
-            .expectedMemoryConsumption(0d)
-            .build();
-        consulServer = servicesService.addService(consulServer);
-      }
-      ServiceEntity consulAgent;
-      try {
-        consulAgent = servicesService.getService("consul-agent");
-      } catch (EntityNotFoundException ignored) {
-        consulAgent = ServiceEntity.builder()
-            .serviceName("consul-agent")
-            .dockerRepository("docker-consul")
-            // TODO
-            .defaultExternalPort("8500+8600/udp")
-            // TODO
-            .defaultInternalPort("8500+8600/udp")
-            .defaultDb("NOT_APPLICABLE")
-            // TODO
-            .launchCommand("")
-            .minReplicas(1)
-            .maxReplicas(1)
-            .outputLabel("${consulClientHost}")
-            .serviceType(ServiceType.SYSTEM)
-            // TODO
-            .expectedMemoryConsumption(0d)
-            .build();
-        consulAgent = servicesService.addService(consulAgent);
       }
       //apps
       AppEntity sockShop;

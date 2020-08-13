@@ -25,6 +25,7 @@
 import React from "react";
 import Card from "../../../components/cards/Card";
 import {IWorkerManager} from "./WorkerManager";
+import CardItem from "../../../components/list/CardItem";
 
 interface WorkerManagerCardProps {
   workerManager: IWorkerManager;
@@ -36,15 +37,15 @@ const CardWorkerManager = Card<IWorkerManager>();
 const WorkerManagerCard = ({workerManager}: Props) => (
   <CardWorkerManager title={workerManager.id.toString()}
                     link={{to: {pathname: `/worker-managers/${workerManager.id}`, state: workerManager}}}
-                    height={'125px'}
+                    height={'90px'}
                     margin={'10px 0'}
                     hoverable>
-    {/*<CardItem key={'hostname'}
-              label={'Hostname'}
-              value={workerManager.hostname}/>
-    <CardItem key={'ports'}
-              label={'Ports'}
-              value={`${workerManager.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>*/}
+    <CardItem key={'startedAt'}
+              label={'Started at'}
+              value={workerManager.startedAt}/>
+    <CardItem key={'host'}
+              label={'Host'}
+              value={`${workerManager.cloudHost?.publicIpAddress || workerManager.edgeHost?.publicDnsName || workerManager.edgeHost?.publicIpAddress}`}/>
   </CardWorkerManager>
 );
 

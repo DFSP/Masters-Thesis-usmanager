@@ -55,6 +55,7 @@
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/rulesystem/rules/ServiceRuleEntity.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/apps/AppRepository.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/rulesystem/rules/RuleDecision.java
+/home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/workermanagers/WorkerManagerEntity.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/monitoring/ServiceEventRepository.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/rulesystem/decision/ServiceDecisionEntity.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/monitoring/HostMonitoringRepository.java
@@ -70,6 +71,7 @@
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/operators/OperatorRepository.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/monitoring/ServiceEventEntity.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/hosts/edge/EdgeHostEntity.java
+/home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/workermanagers/WorkerManagerRepository.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/operators/OperatorEntity.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/rulesystem/rules/ServiceRuleConditionRepository.java
 /home/daniel/master-thesis/usmanager/manager/manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/services/ServiceOrder.java

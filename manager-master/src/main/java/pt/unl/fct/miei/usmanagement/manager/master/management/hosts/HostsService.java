@@ -144,12 +144,10 @@ public class HostsService {
     setupHost(publicIp, privateIp, NodeRole.MANAGER);
     if (mode == Mode.LOCAL) {
       getLocalWorkerNodes().forEach(edgeHost ->
-          setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER)
-      );
+          setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER));
     } else if (mode == Mode.GLOBAL) {
       getCloudWorkerNodes().forEach(cloudHost ->
-          setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER)
-      );
+          setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER));
     }
   }
 

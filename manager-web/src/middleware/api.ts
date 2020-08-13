@@ -136,7 +136,7 @@ interface ISchemas {
   EUREKA_SERVER_ARRAY: schema.Entity<IEurekaServer>[];
   WORKER_MANAGER: schema.Entity<IWorkerManager>;
   WORKER_MANAGER_ARRAY: schema.Entity<IWorkerManager>[];
-  WORKER_MANAGER_MACHINE_ARRAY: schema.Entity<ICloudHost | IEdgeHost>[];
+  WORKER_MANAGER_MACHINE_ARRAY: schema.Entity<string>[];
   LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -262,8 +262,8 @@ const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerMa
   idAttribute: (workerManager: IWorkerManager) => workerManager.id.toString()
 });
 
-const workerManagerMachine: schema.Entity<ICloudHost | IEdgeHost> = new schema.Entity('workerManagerMachines', undefined, {
-  idAttribute: (machine: ICloudHost | IEdgeHost) => machine.id.toString()
+const workerManagerMachine: schema.Entity<string> = new schema.Entity('workerManagerMachines', undefined, {
+  idAttribute: (machine: string) => machine
 });
 
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {

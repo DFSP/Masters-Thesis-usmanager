@@ -1644,12 +1644,12 @@ export const WORKER_MANAGER_MACHINES_REQUEST = 'WORKER_MANAGER_MACHINES_REQUEST'
 export const WORKER_MANAGER_MACHINES_SUCCESS = 'WORKER_MANAGER_MACHINES_SUCCESS';
 export const WORKER_MANAGER_MACHINES_FAILURE = 'WORKER_MANAGER_MACHINES_FAILURE';
 export const loadWorkerManagerMachines = (id: string) => (dispatch: any) => {
-  return dispatch(fetchAppServices(id));
+  return dispatch(fetchWorkerManagerMachines(id));
 };
 const fetchWorkerManagerMachines = (id: string) => ({
   [CALL_API]: {
     types: [WORKER_MANAGER_MACHINES_REQUEST, WORKER_MANAGER_MACHINES_SUCCESS, WORKER_MANAGER_MACHINES_FAILURE],
-    endpoint: `worker-managers/${id}/machines`,
+    endpoint: `worker-managers/${id}/assigned-machines`,
     schema: Schemas.WORKER_MANAGER_MACHINE_ARRAY,
     entity: id
   }
@@ -1661,7 +1661,7 @@ export function assignWorkerManagerMachines(id: string, machines: string[]): Ent
   return {
     type: ASSIGN_WORKER_MANAGER_MACHINES,
     entity: id,
-    data: {machines: machines}
+    data: {assignedMachines: machines}
   }
 }
 
@@ -1671,7 +1671,7 @@ export function unassignWorkerManagerMachines(id: string, machines: string[]): E
   return {
     type: UNASSIGN_WORKER_MANAGER_MACHINES,
     entity: id,
-    data: {machines: machines}
+    data: {assignedMachines: machines}
   }
 }
 

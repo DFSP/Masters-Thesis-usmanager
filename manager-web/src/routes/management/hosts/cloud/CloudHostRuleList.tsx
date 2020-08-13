@@ -159,8 +159,8 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
     }
   };
 
-  private onDeleteFailure = (reason: string, rules: string[]): void =>
-    super.toast(`Unable to remove ${rules.length === 1 ? rules[0] : 'rules'} from <b>${this.props.cloudHost?.instanceId}</b> cloud instance`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, rules?: string[]): void =>
+    super.toast(`Unable to remove ${rules?.length === 1 ? rules[0] : 'rules'} from <b>${this.props.cloudHost?.instanceId}</b> cloud instance`, 10000, reason, true);
 
   private getSelectableRules = () => {
     const {rules, rulesName, unsavedRules} = this.props;

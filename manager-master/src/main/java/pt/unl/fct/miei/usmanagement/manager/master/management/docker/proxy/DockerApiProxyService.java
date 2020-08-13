@@ -49,7 +49,6 @@ public class DockerApiProxyService {
   private final String dockerApiProxyUsername;
   private final String dockerApiProxyPassword;
   private final int dockerApiPort;
-  private final String dockerHubUsername;
 
   public DockerApiProxyService(ServicesService servicesService,
                                @Lazy HostsService hostsService,
@@ -59,7 +58,6 @@ public class DockerApiProxyService {
     this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
     this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
     this.dockerApiPort = dockerProperties.getApi().getPort();
-    this.dockerHubUsername = dockerProperties.getHub().getUsername();
   }
 
   public String launchDockerApiProxy(String hostname) {
@@ -68,7 +66,7 @@ public class DockerApiProxyService {
     ServiceType serviceType = dockerApiProxy.getServiceType();
     String externalPort = dockerApiProxy.getDefaultExternalPort();
     String internalPort = dockerApiProxy.getDefaultInternalPort();
-    var dockerRepository = String.format("%s/%s", dockerHubUsername, dockerApiProxy.getDockerRepository());
+    var dockerRepository = dockerApiProxy.getDockerRepository();
     var command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
             + "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
             + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
