@@ -2,7 +2,6 @@ FROM usmanager/manager-database as database
 
 FROM maven:3.6.0-jdk-11-slim AS build
 COPY --from=database /root/.m2 /root/.m2
-RUN ls /root/.m2
 WORKDIR /usr/src/app
 COPY src ./src
 COPY pom.xml .

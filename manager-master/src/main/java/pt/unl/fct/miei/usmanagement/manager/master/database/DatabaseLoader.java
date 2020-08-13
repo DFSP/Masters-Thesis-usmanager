@@ -461,19 +461,15 @@ public class DatabaseLoader {
         masterManager = ServiceEntity.builder()
             .serviceName(ManagerMasterProperties.MANAGER_MASTER)
             .dockerRepository(dockerHubUsername + "/manager-master")
-            // TODO
-            .defaultExternalPort("1919")
-            // TODO
-            .defaultInternalPort("1919")
-            .defaultDb("NOT_APPLICABLE")
-            // TODO
-            .launchCommand("")
+            .defaultExternalPort("8080")
+            .defaultInternalPort("8080")
+            .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
             .minReplicas(1)
             .maxReplicas(1)
             .outputLabel("${masterManagerHost}")
             .serviceType(ServiceType.SYSTEM)
             // TODO
-            .expectedMemoryConsumption(0d)
+            .expectedMemoryConsumption(256901152d)
             .build();
         masterManager = servicesService.addService(masterManager);
       }
@@ -482,23 +478,16 @@ public class DatabaseLoader {
         workerManager = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER);
       } catch (EntityNotFoundException ignored) {
         workerManager = ServiceEntity.builder()
-            //TODO
             .serviceName(WorkerManagerProperties.WORKER_MANAGER)
             .dockerRepository(dockerHubUsername + "/manager-worker")
-            // TODO
-            .defaultExternalPort("1919")
-            // TODO
-            .defaultInternalPort("1919")
-            .defaultDb("NOT_APPLICABLE")
-            // TODO
-            .launchCommand("")
-            // TODO
+            .defaultExternalPort("8081")
+            .defaultInternalPort("8081")
+            .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
             .minReplicas(1)
-            .maxReplicas(0)
+            .maxReplicas(1)
             .outputLabel("${workerManagerHost}")
             .serviceType(ServiceType.SYSTEM)
-            // TODO
-            .expectedMemoryConsumption(0d)
+            .expectedMemoryConsumption(256901152d)
             .build();
         workerManager = servicesService.addService(workerManager);
       }

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,7 +37,9 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
 
@@ -48,15 +51,18 @@ public class WorkerManagersService {
   private final CloudHostsService cloudHostsService;
   private final EdgeHostsService edgeHostsService;
   private final ContainersService containersService;
+  private final HostsService hostsService;
 
   public WorkerManagersService(WorkerManagerRepository workerManagers,
                                CloudHostsService cloudHostsService,
                                EdgeHostsService edgeHostsService,
-                               ContainersService containersService) {
+                               ContainersService containersService,
+                               HostsService hostsService) {
     this.workerManagers = workerManagers;
     this.cloudHostsService = cloudHostsService;
     this.edgeHostsService = edgeHostsService;
     this.containersService = containersService;
+    this.hostsService = hostsService;
   }
 
   public List<WorkerManagerEntity> getWorkerManagers() {
@@ -79,12 +85,14 @@ public class WorkerManagersService {
       hostname = edgeHostEntity.getPublicIpAddress();
       workerManagerEntity = workerManagers.save(WorkerManagerEntity.builder().edgeHost(edgeHostEntity).build());
     }
-    this.launchWorkerManager(hostname);
+    this.launchWorkerManager(hostname, workerManagerEntity.getId());
     return workerManagerEntity;
   }
 
-  private ContainerEntity launchWorkerManager(String hostname) {
-    List<String> environment = List.of("");
+  private ContainerEntity launchWorkerManager(String hostname, String id) {
+    var environment = new LinkedList<>(List.of(
+        ContainerConstants.Environment.ID + "=" + id,
+        ContainerConstants.Environment.MASTER + "=" + hostsService.getMachineAddress().getPublicIpAddress()));
     return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
   }
 

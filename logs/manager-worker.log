@@ -1,0 +1,1186 @@
+2020-08-13 16:01:19,950 INFO org.springframework.boot.StartupInfoLogger [main] Starting ManagerWorkerApplication on daniel with PID 28403 (/home/daniel/master-thesis/usmanager/manager/manager-worker/target/classes started by daniel in /home/daniel/master-thesis/usmanager/manager)
+2020-08-13 16:01:19,956 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to default profiles: default
+2020-08-13 16:01:21,073 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data JPA repositories in DEFERRED mode.
+2020-08-13 16:01:21,262 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 180ms. Found 70 JPA repository interfaces.
+2020-08-13 16:01:21,718 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8081 (http)
+2020-08-13 16:01:21,726 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8081"]
+2020-08-13 16:01:21,727 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2020-08-13 16:01:21,728 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.36]
+2020-08-13 16:01:27,489 INFO org.springframework.boot.StartupInfoLogger [main] Starting ManagerWorkerApplication on daniel with PID 29478 (/home/daniel/master-thesis/usmanager/manager/manager-worker/target/classes started by daniel in /home/daniel/master-thesis/usmanager/manager)
+2020-08-13 16:01:27,499 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to default profiles: default
+2020-08-13 16:01:28,845 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data JPA repositories in DEFERRED mode.
+2020-08-13 16:01:28,994 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 142ms. Found 70 JPA repository interfaces.
+2020-08-13 16:01:29,397 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8081 (http)
+2020-08-13 16:01:29,404 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8081"]
+2020-08-13 16:01:29,405 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2020-08-13 16:01:29,406 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.36]
+2020-08-13 16:01:29,490 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2020-08-13 16:01:29,491 INFO org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 1945 ms
+2020-08-13 16:01:29,595 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Starting...
+2020-08-13 16:01:29,609 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Start completed.
+2020-08-13 16:01:29,650 INFO org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration [main] H2 console available at '/console'. Database available at 'jdbc:h2:mem:manager-worker-db'
+2020-08-13 16:01:29,782 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [main] Initializing ExecutorService 'applicationTaskExecutor'
+2020-08-13 16:01:29,827 INFO org.hibernate.jpa.internal.util.LogHelper [task-1] HHH000204: Processing PersistenceUnitInfo [name: default]
+2020-08-13 16:01:29,879 INFO org.hibernate.Version [task-1] HHH000412: Hibernate ORM core version 5.4.17.Final
+2020-08-13 16:01:29,887 WARN org.springframework.context.support.AbstractApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'managerWorkerStartup': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'id' in value "${id}"
+2020-08-13 16:01:29,889 INFO org.springframework.orm.jpa.AbstractEntityManagerFactoryBean [main] Closing JPA EntityManagerFactory for persistence unit 'default'
+2020-08-13 16:01:30,009 INFO org.hibernate.annotations.common.reflection.java.JavaReflectionManager [task-1] HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2020-08-13 16:01:30,099 INFO org.hibernate.dialect.Dialect [task-1] HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2020-08-13 16:01:31,197 INFO org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator [task-1] HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2020-08-13 16:01:31,204 INFO org.springframework.orm.jpa.AbstractEntityManagerFactoryBean [task-1] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2020-08-13 16:01:31,205 INFO org.hibernate.tool.schema.internal.SchemaDropperImpl$DelayedDropActionImpl [main] HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2020-08-13 16:01:31,231 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [main] Shutting down ExecutorService 'applicationTaskExecutor'
+2020-08-13 16:01:31,232 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Shutdown initiated...
+2020-08-13 16:01:31,235 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Shutdown completed.
+2020-08-13 16:01:31,237 INFO org.apache.juli.logging.DirectJDKLog [main] Stopping service [Tomcat]
+2020-08-13 16:01:31,252 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener [main] 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2020-08-13 16:01:31,260 ERROR org.springframework.boot.SpringApplication [main] Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'managerWorkerStartup': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'id' in value "${id}"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:405)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1422)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:594)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:517)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:323)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:226)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:893)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:879)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:551)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:758)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:750)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:397)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:315)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerWorkerApplication.main(ManagerWorkerApplication.java:34)
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'id' in value "${id}"
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:178)
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:124)
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:239)
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:210)
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:175)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:912)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1245)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1224)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:640)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:130)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399)
+	... 18 common frames omitted
+2020-08-13 16:02:20,788 INFO org.springframework.boot.StartupInfoLogger [main] Starting ManagerWorkerApplication on daniel with PID 30817 (/home/daniel/master-thesis/usmanager/manager/manager-worker/target/classes started by daniel in /home/daniel/master-thesis/usmanager/manager)
+2020-08-13 16:02:20,798 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to default profiles: default
+2020-08-13 16:02:21,895 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data JPA repositories in DEFERRED mode.
+2020-08-13 16:02:22,144 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 239ms. Found 70 JPA repository interfaces.
+2020-08-13 16:02:22,552 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8081 (http)
+2020-08-13 16:02:22,559 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8081"]
+2020-08-13 16:02:22,560 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2020-08-13 16:02:22,561 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.36]
+2020-08-13 16:02:22,648 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2020-08-13 16:02:22,649 INFO org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 1810 ms
+2020-08-13 16:02:22,770 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Starting...
+2020-08-13 16:02:22,782 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Start completed.
+2020-08-13 16:02:22,822 INFO org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration [main] H2 console available at '/console'. Database available at 'jdbc:h2:mem:manager-worker-db'
+2020-08-13 16:02:22,948 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [main] Initializing ExecutorService 'applicationTaskExecutor'
+2020-08-13 16:02:22,983 INFO org.hibernate.jpa.internal.util.LogHelper [task-1] HHH000204: Processing PersistenceUnitInfo [name: default]
+2020-08-13 16:02:23,016 INFO org.hibernate.Version [task-1] HHH000412: Hibernate ORM core version 5.4.17.Final
+2020-08-13 16:02:23,082 WARN org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration [main] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2020-08-13 16:02:23,093 INFO org.hibernate.annotations.common.reflection.java.JavaReflectionManager [task-1] HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2020-08-13 16:02:23,173 INFO org.hibernate.dialect.Dialect [task-1] HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2020-08-13 16:02:24,162 INFO org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator [task-1] HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2020-08-13 16:02:24,168 INFO org.springframework.orm.jpa.AbstractEntityManagerFactoryBean [task-1] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2020-08-13 16:02:24,266 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 4 endpoint(s) beneath base path '/actuator'
+2020-08-13 16:02:24,299 INFO org.apache.juli.logging.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-8081"]
+2020-08-13 16:02:24,314 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat started on port(s): 8081 (http) with context path ''
+2020-08-13 16:02:24,316 INFO org.springframework.data.repository.config.DeferredRepositoryInitializationListener [main] Triggering deferred initialization of Spring Data repositories…
+2020-08-13 16:02:25,378 INFO org.springframework.data.repository.config.DeferredRepositoryInitializationListener [main] Spring Data repositories initialized!
+2020-08-13 16:02:25,397 INFO org.springframework.boot.StartupInfoLogger [main] Started ManagerWorkerApplication in 5.411 seconds (JVM running for 6.166)
+2020-08-13 16:02:25,431 INFO org.jumpmind.symmetric.ClientSymmetricEngine [main] Initializing connection to database
+2020-08-13 16:02:25,446 INFO org.jumpmind.db.platform.JdbcDatabasePlatformFactory [main] Detected database 'H2', version '1', protocol 'h2'
+2020-08-13 16:02:25,454 INFO org.jumpmind.db.platform.JdbcDatabasePlatformFactory [main] The IDatabasePlatform being used is org.jumpmind.db.platform.h2.H2DatabasePlatform
+2020-08-13 16:02:25,491 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] The DbDialect being used is org.jumpmind.symmetric.db.h2.H2SymmetricDialect
+2020-08-13 16:02:25,505 INFO org.jumpmind.symmetric.service.impl.ClientExtensionService [main] Found 0 extension points from spring that will be registered
+2020-08-13 16:02:25,511 INFO org.jumpmind.symmetric.io.stage.StagingManager [main] The staging directory was initialized at the following location: /tmp/worker-manager
+2020-08-13 16:02:25,593 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [main] Initializing ExecutorService
+2020-08-13 16:02:25,748 INFO org.springframework.data.repository.config.DeferredRepositoryInitializationListener [main] Triggering deferred initialization of Spring Data repositories…
+2020-08-13 16:02:25,749 INFO org.springframework.data.repository.config.DeferredRepositoryInitializationListener [main] Spring Data repositories initialized!
+2020-08-13 16:02:25,755 INFO org.jumpmind.symmetric.service.impl.ClientExtensionService [main] Found 5 extension points from spring that will be registered
+2020-08-13 16:02:25,766 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] Initializing SymmetricDS database
+2020-08-13 16:02:26,000 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] Installing SymmetricDS database object:
+CREATE ALIAS IF NOT EXISTS SYM_BASE64_ENCODE for "org.jumpmind.symmetric.db.EmbeddedDbFunctions.encodeBase64"; 
+2020-08-13 16:02:26,003 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] Just installed SYM_BASE64_ENCODE
+2020-08-13 16:02:26,004 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] Checking if SymmetricDS tables need created or altered
+2020-08-13 16:02:26,232 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] There are SymmetricDS tables that needed altered
+2020-08-13 16:02:26,236 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_CHANNEL"(
+    "CHANNEL_ID" VARCHAR(128) NOT NULL,
+    "PROCESSING_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "MAX_BATCH_SIZE" INTEGER DEFAULT 1000 NOT NULL,
+    "MAX_BATCH_TO_SEND" INTEGER DEFAULT 60 NOT NULL,
+    "MAX_DATA_TO_ROUTE" INTEGER DEFAULT 100000 NOT NULL,
+    "EXTRACT_PERIOD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "USE_OLD_DATA_TO_ROUTE" TINYINT DEFAULT 1 NOT NULL,
+    "USE_ROW_DATA_TO_ROUTE" TINYINT DEFAULT 1 NOT NULL,
+    "USE_PK_DATA_TO_ROUTE" TINYINT DEFAULT 1 NOT NULL,
+    "RELOAD_FLAG" TINYINT DEFAULT 0 NOT NULL,
+    "FILE_SYNC_FLAG" TINYINT DEFAULT 0 NOT NULL,
+    "CONTAINS_BIG_LOB" TINYINT DEFAULT 0 NOT NULL,
+    "BATCH_ALGORITHM" VARCHAR(50) DEFAULT 'default' NOT NULL,
+    "DATA_LOADER_TYPE" VARCHAR(50) DEFAULT 'default' NOT NULL,
+    "DESCRIPTION" VARCHAR(255) NULL,
+    "QUEUE" VARCHAR(25) DEFAULT 'default' NOT NULL,
+    "MAX_NETWORK_KBPS" DECIMAL(10,3) DEFAULT 0.000 NOT NULL,
+    "DATA_EVENT_ACTION" CHAR(1) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("CHANNEL_ID")
+)
+2020-08-13 16:02:26,238 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_CONFLICT"(
+    "CONFLICT_ID" VARCHAR(50) NOT NULL,
+    "SOURCE_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_CHANNEL_ID" VARCHAR(128) NULL,
+    "TARGET_CATALOG_NAME" VARCHAR(255) NULL,
+    "TARGET_SCHEMA_NAME" VARCHAR(255) NULL,
+    "TARGET_TABLE_NAME" VARCHAR(255) NULL,
+    "DETECT_TYPE" VARCHAR(128) NOT NULL,
+    "DETECT_EXPRESSION" VARCHAR(2147483647) NULL,
+    "RESOLVE_TYPE" VARCHAR(128) NOT NULL,
+    "PING_BACK" VARCHAR(128) NOT NULL,
+    "RESOLVE_CHANGES_ONLY" TINYINT DEFAULT 0,
+    "RESOLVE_ROW_ONLY" TINYINT DEFAULT 0,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("CONFLICT_ID")
+)
+2020-08-13 16:02:26,239 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_CONTEXT"(
+    "NAME" VARCHAR(80) NOT NULL,
+    "CONTEXT_VALUE" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("NAME")
+)
+2020-08-13 16:02:26,241 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_DATA"(
+    "DATA_ID" BIGINT NOT NULL AUTO_INCREMENT,
+    "TABLE_NAME" VARCHAR(255) NOT NULL,
+    "EVENT_TYPE" CHAR(1) NOT NULL,
+    "ROW_DATA" VARCHAR(2147483647) NULL,
+    "PK_DATA" VARCHAR(2147483647) NULL,
+    "OLD_DATA" VARCHAR(2147483647) NULL,
+    "TRIGGER_HIST_ID" INTEGER NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NULL,
+    "TRANSACTION_ID" VARCHAR(255) NULL,
+    "SOURCE_NODE_ID" VARCHAR(50) NULL,
+    "EXTERNAL_DATA" VARCHAR(50) NULL,
+    "NODE_LIST" VARCHAR(255) NULL,
+    "IS_PREROUTED" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("DATA_ID")
+)
+2020-08-13 16:02:26,242 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_D_CHANNEL_ID" ON "SYM_DATA" ("DATA_ID", "CHANNEL_ID")
+2020-08-13 16:02:26,243 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_DATA_EVENT"(
+    "DATA_ID" BIGINT NOT NULL,
+    "BATCH_ID" BIGINT NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("DATA_ID", "BATCH_ID")
+)
+2020-08-13 16:02:26,244 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_DE_BATCHID" ON "SYM_DATA_EVENT" ("BATCH_ID")
+2020-08-13 16:02:26,246 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_DATA_GAP"(
+    "START_ID" BIGINT NOT NULL,
+    "END_ID" BIGINT NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_HOSTNAME" VARCHAR(255) NULL,
+    PRIMARY KEY ("START_ID", "END_ID")
+)
+2020-08-13 16:02:26,248 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_EXTENSION"(
+    "EXTENSION_ID" VARCHAR(50) NOT NULL,
+    "EXTENSION_TYPE" VARCHAR(10) NOT NULL,
+    "INTERFACE_NAME" VARCHAR(255) NULL,
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "EXTENSION_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "EXTENSION_TEXT" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("EXTENSION_ID")
+)
+2020-08-13 16:02:26,249 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_EXTRACT_REQUEST"(
+    "REQUEST_ID" BIGINT NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "QUEUE" VARCHAR(128) NULL,
+    "STATUS" CHAR(2) NULL,
+    "START_BATCH_ID" BIGINT NOT NULL,
+    "END_BATCH_ID" BIGINT NOT NULL,
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "LOAD_ID" BIGINT,
+    "TABLE_NAME" VARCHAR(255) NULL,
+    "EXTRACTED_ROWS" BIGINT DEFAULT 0 NOT NULL,
+    "EXTRACTED_MILLIS" BIGINT DEFAULT 0 NOT NULL,
+    "TRANSFERRED_ROWS" BIGINT DEFAULT 0 NOT NULL,
+    "TRANSFERRED_MILLIS" BIGINT DEFAULT 0 NOT NULL,
+    "LAST_TRANSFERRED_BATCH_ID" BIGINT,
+    "LOADED_ROWS" BIGINT DEFAULT 0 NOT NULL,
+    "LOADED_MILLIS" BIGINT DEFAULT 0 NOT NULL,
+    "LAST_LOADED_BATCH_ID" BIGINT,
+    "TOTAL_ROWS" BIGINT,
+    "LOADED_TIME" TIMESTAMP,
+    "PARENT_REQUEST_ID" BIGINT DEFAULT 0 NOT NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    "CREATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("REQUEST_ID")
+)
+2020-08-13 16:02:26,251 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_FILE_INCOMING"(
+    "RELATIVE_DIR" VARCHAR(255) NOT NULL,
+    "FILE_NAME" VARCHAR(128) NOT NULL,
+    "LAST_EVENT_TYPE" CHAR(1) NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "FILE_MODIFIED_TIME" BIGINT,
+    PRIMARY KEY ("RELATIVE_DIR", "FILE_NAME")
+)
+2020-08-13 16:02:26,252 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_FILE_SNAPSHOT"(
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "RELATIVE_DIR" VARCHAR(255) NOT NULL,
+    "FILE_NAME" VARCHAR(128) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) DEFAULT 'filesync' NOT NULL,
+    "RELOAD_CHANNEL_ID" VARCHAR(128) DEFAULT 'filesync_reload' NOT NULL,
+    "LAST_EVENT_TYPE" CHAR(1) NOT NULL,
+    "CRC32_CHECKSUM" BIGINT,
+    "FILE_SIZE" BIGINT,
+    "FILE_MODIFIED_TIME" BIGINT,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("TRIGGER_ID", "ROUTER_ID", "RELATIVE_DIR", "FILE_NAME")
+)
+2020-08-13 16:02:26,253 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_F_SNPSHT_CHID" ON "SYM_FILE_SNAPSHOT" ("RELOAD_CHANNEL_ID")
+2020-08-13 16:02:26,255 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_FILE_TRIGGER"(
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) DEFAULT 'filesync' NOT NULL,
+    "RELOAD_CHANNEL_ID" VARCHAR(128) DEFAULT 'filesync_reload' NOT NULL,
+    "BASE_DIR" VARCHAR(255) NOT NULL,
+    "RECURSE" TINYINT DEFAULT 1 NOT NULL,
+    "INCLUDES_FILES" VARCHAR(255) NULL,
+    "EXCLUDES_FILES" VARCHAR(255) NULL,
+    "SYNC_ON_CREATE" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_MODIFIED" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_DELETE" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_CTL_FILE" TINYINT DEFAULT 0 NOT NULL,
+    "DELETE_AFTER_SYNC" TINYINT DEFAULT 0 NOT NULL,
+    "BEFORE_COPY_SCRIPT" VARCHAR(2147483647) NULL,
+    "AFTER_COPY_SCRIPT" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRIGGER_ID")
+)
+2020-08-13 16:02:26,257 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_FILE_TRIGGER_ROUTER"(
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "INITIAL_LOAD_ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "TARGET_BASE_DIR" VARCHAR(255) NULL,
+    "CONFLICT_STRATEGY" VARCHAR(128) DEFAULT 'source_wins' NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRIGGER_ID", "ROUTER_ID")
+)
+2020-08-13 16:02:26,258 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_GROUPLET"(
+    "GROUPLET_ID" VARCHAR(50) NOT NULL,
+    "GROUPLET_LINK_POLICY" CHAR(1) DEFAULT 'I' NOT NULL,
+    "DESCRIPTION" VARCHAR(255) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("GROUPLET_ID")
+)
+2020-08-13 16:02:26,259 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_GROUPLET_LINK"(
+    "GROUPLET_ID" VARCHAR(50) NOT NULL,
+    "EXTERNAL_ID" VARCHAR(255) NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("GROUPLET_ID", "EXTERNAL_ID")
+)
+2020-08-13 16:02:26,262 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_INCOMING_BATCH"(
+    "BATCH_ID" BIGINT NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NULL,
+    "STATUS" CHAR(2) NULL,
+    "ERROR_FLAG" TINYINT DEFAULT 0,
+    "SQL_STATE" VARCHAR(10) NULL,
+    "SQL_CODE" INTEGER DEFAULT 0 NOT NULL,
+    "SQL_MESSAGE" VARCHAR(2147483647) NULL,
+    "LAST_UPDATE_HOSTNAME" VARCHAR(255) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    "CREATE_TIME" TIMESTAMP,
+    "SUMMARY" VARCHAR(255) NULL,
+    "IGNORE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "BYTE_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "LOAD_FLAG" TINYINT DEFAULT 0,
+    "EXTRACT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SENT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "RELOAD_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "OTHER_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "NETWORK_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "FILTER_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "ROUTER_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "TRANSFORM_EXTRACT_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "TRANSFORM_LOAD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_ID" BIGINT,
+    "COMMON_FLAG" TINYINT DEFAULT 0,
+    "FALLBACK_INSERT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "FALLBACK_UPDATE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "IGNORE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "MISSING_DELETE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SKIP_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "FAILED_ROW_NUMBER" INTEGER DEFAULT 0 NOT NULL,
+    "FAILED_LINE_NUMBER" INTEGER DEFAULT 0 NOT NULL,
+    "FAILED_DATA_ID" BIGINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY ("BATCH_ID", "NODE_ID")
+)
+2020-08-13 16:02:26,263 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_IB_TIME_STATUS" ON "SYM_INCOMING_BATCH" ("CREATE_TIME", "STATUS")
+2020-08-13 16:02:26,264 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_IB_IN_ERROR" ON "SYM_INCOMING_BATCH" ("ERROR_FLAG")
+2020-08-13 16:02:26,266 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_INCOMING_ERROR"(
+    "BATCH_ID" BIGINT NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "FAILED_ROW_NUMBER" BIGINT NOT NULL,
+    "FAILED_LINE_NUMBER" BIGINT DEFAULT 0 NOT NULL,
+    "TARGET_CATALOG_NAME" VARCHAR(255) NULL,
+    "TARGET_SCHEMA_NAME" VARCHAR(255) NULL,
+    "TARGET_TABLE_NAME" VARCHAR(255) NOT NULL,
+    "EVENT_TYPE" CHAR(1) NOT NULL,
+    "BINARY_ENCODING" VARCHAR(10) DEFAULT 'HEX' NOT NULL,
+    "COLUMN_NAMES" VARCHAR(2147483647) NOT NULL,
+    "PK_COLUMN_NAMES" VARCHAR(2147483647) NOT NULL,
+    "ROW_DATA" VARCHAR(2147483647) NULL,
+    "OLD_DATA" VARCHAR(2147483647) NULL,
+    "CUR_DATA" VARCHAR(2147483647) NULL,
+    "RESOLVE_DATA" VARCHAR(2147483647) NULL,
+    "RESOLVE_IGNORE" TINYINT DEFAULT 0,
+    "CONFLICT_ID" VARCHAR(50) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("BATCH_ID", "NODE_ID", "FAILED_ROW_NUMBER")
+)
+2020-08-13 16:02:26,267 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_JOB"(
+    "JOB_NAME" VARCHAR(50) NOT NULL,
+    "JOB_TYPE" VARCHAR(10) NOT NULL,
+    "REQUIRES_REGISTRATION" TINYINT DEFAULT 1 NOT NULL,
+    "JOB_EXPRESSION" VARCHAR(2147483647) NULL,
+    "DESCRIPTION" VARCHAR(255) NULL,
+    "DEFAULT_SCHEDULE" VARCHAR(50) NULL,
+    "DEFAULT_AUTO_START" TINYINT DEFAULT 1 NOT NULL,
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "CREATE_BY" VARCHAR(50) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("JOB_NAME")
+)
+2020-08-13 16:02:26,268 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_LOAD_FILTER"(
+    "LOAD_FILTER_ID" VARCHAR(50) NOT NULL,
+    "LOAD_FILTER_TYPE" VARCHAR(10) NOT NULL,
+    "SOURCE_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_CATALOG_NAME" VARCHAR(255) NULL,
+    "TARGET_SCHEMA_NAME" VARCHAR(255) NULL,
+    "TARGET_TABLE_NAME" VARCHAR(255) NULL,
+    "FILTER_ON_UPDATE" TINYINT DEFAULT 1 NOT NULL,
+    "FILTER_ON_INSERT" TINYINT DEFAULT 1 NOT NULL,
+    "FILTER_ON_DELETE" TINYINT DEFAULT 1 NOT NULL,
+    "BEFORE_WRITE_SCRIPT" VARCHAR(2147483647) NULL,
+    "AFTER_WRITE_SCRIPT" VARCHAR(2147483647) NULL,
+    "BATCH_COMPLETE_SCRIPT" VARCHAR(2147483647) NULL,
+    "BATCH_COMMIT_SCRIPT" VARCHAR(2147483647) NULL,
+    "BATCH_ROLLBACK_SCRIPT" VARCHAR(2147483647) NULL,
+    "HANDLE_ERROR_SCRIPT" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "LOAD_FILTER_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "FAIL_ON_ERROR" TINYINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY ("LOAD_FILTER_ID")
+)
+2020-08-13 16:02:26,270 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_LOCK"(
+    "LOCK_ACTION" VARCHAR(50) NOT NULL,
+    "LOCK_TYPE" VARCHAR(50) NOT NULL,
+    "LOCKING_SERVER_ID" VARCHAR(255) NULL,
+    "LOCK_TIME" TIMESTAMP,
+    "SHARED_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SHARED_ENABLE" INTEGER DEFAULT 0 NOT NULL,
+    "LAST_LOCK_TIME" TIMESTAMP,
+    "LAST_LOCKING_SERVER_ID" VARCHAR(255) NULL,
+    PRIMARY KEY ("LOCK_ACTION")
+)
+2020-08-13 16:02:26,279 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "EXTERNAL_ID" VARCHAR(255) NOT NULL,
+    "SYNC_ENABLED" TINYINT DEFAULT 0,
+    "SYNC_URL" VARCHAR(255) NULL,
+    "SCHEMA_VERSION" VARCHAR(50) NULL,
+    "SYMMETRIC_VERSION" VARCHAR(50) NULL,
+    "CONFIG_VERSION" VARCHAR(50) NULL,
+    "DATABASE_TYPE" VARCHAR(50) NULL,
+    "DATABASE_VERSION" VARCHAR(50) NULL,
+    "BATCH_TO_SEND_COUNT" INTEGER DEFAULT 0,
+    "BATCH_IN_ERROR_COUNT" INTEGER DEFAULT 0,
+    "CREATED_AT_NODE_ID" VARCHAR(50) NULL,
+    "DEPLOYMENT_TYPE" VARCHAR(50) NULL,
+    "DEPLOYMENT_SUB_TYPE" VARCHAR(50) NULL,
+    PRIMARY KEY ("NODE_ID")
+)
+2020-08-13 16:02:26,280 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_COMMUNICATION"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "QUEUE" VARCHAR(25) DEFAULT 'default' NOT NULL,
+    "COMMUNICATION_TYPE" VARCHAR(10) NOT NULL,
+    "LOCK_TIME" TIMESTAMP,
+    "LOCKING_SERVER_ID" VARCHAR(255) NULL,
+    "LAST_LOCK_TIME" TIMESTAMP,
+    "LAST_LOCK_MILLIS" BIGINT DEFAULT 0,
+    "SUCCESS_COUNT" BIGINT DEFAULT 0,
+    "FAIL_COUNT" BIGINT DEFAULT 0,
+    "SKIP_COUNT" BIGINT DEFAULT 0,
+    "TOTAL_SUCCESS_COUNT" BIGINT DEFAULT 0,
+    "TOTAL_FAIL_COUNT" BIGINT DEFAULT 0,
+    "TOTAL_SUCCESS_MILLIS" BIGINT DEFAULT 0,
+    "TOTAL_FAIL_MILLIS" BIGINT DEFAULT 0,
+    "BATCH_TO_SEND_COUNT" BIGINT DEFAULT 0,
+    "NODE_PRIORITY" INTEGER DEFAULT 0,
+    PRIMARY KEY ("NODE_ID", "QUEUE", "COMMUNICATION_TYPE")
+)
+2020-08-13 16:02:26,281 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_CHANNEL_CTL"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NOT NULL,
+    "SUSPEND_ENABLED" TINYINT DEFAULT 0,
+    "IGNORE_ENABLED" TINYINT DEFAULT 0,
+    "LAST_EXTRACT_TIME" TIMESTAMP,
+    PRIMARY KEY ("NODE_ID", "CHANNEL_ID")
+)
+2020-08-13 16:02:26,282 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_GROUP"(
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "DESCRIPTION" VARCHAR(255) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("NODE_GROUP_ID")
+)
+2020-08-13 16:02:26,283 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_GROUP_CHANNEL_WND"(
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NOT NULL,
+    "START_TIME" TIMESTAMP NOT NULL,
+    "END_TIME" TIMESTAMP NOT NULL,
+    "ENABLED" TINYINT DEFAULT 0 NOT NULL,
+    PRIMARY KEY ("NODE_GROUP_ID", "CHANNEL_ID", "START_TIME", "END_TIME")
+)
+2020-08-13 16:02:26,285 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_GROUP_LINK"(
+    "SOURCE_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "DATA_EVENT_ACTION" CHAR(1) DEFAULT 'W' NOT NULL,
+    "SYNC_CONFIG_ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "IS_REVERSIBLE" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID")
+)
+2020-08-13 16:02:26,286 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_HOST"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "HOST_NAME" VARCHAR(60) NOT NULL,
+    "INSTANCE_ID" VARCHAR(60) NULL,
+    "IP_ADDRESS" VARCHAR(50) NULL,
+    "OS_USER" VARCHAR(50) NULL,
+    "OS_NAME" VARCHAR(50) NULL,
+    "OS_ARCH" VARCHAR(50) NULL,
+    "OS_VERSION" VARCHAR(50) NULL,
+    "AVAILABLE_PROCESSORS" INTEGER DEFAULT 0,
+    "FREE_MEMORY_BYTES" BIGINT DEFAULT 0,
+    "TOTAL_MEMORY_BYTES" BIGINT DEFAULT 0,
+    "MAX_MEMORY_BYTES" BIGINT DEFAULT 0,
+    "JAVA_VERSION" VARCHAR(50) NULL,
+    "JAVA_VENDOR" VARCHAR(255) NULL,
+    "JDBC_VERSION" VARCHAR(255) NULL,
+    "SYMMETRIC_VERSION" VARCHAR(50) NULL,
+    "TIMEZONE_OFFSET" VARCHAR(6) NULL,
+    "HEARTBEAT_TIME" TIMESTAMP,
+    "LAST_RESTART_TIME" TIMESTAMP NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("NODE_ID", "HOST_NAME")
+)
+2020-08-13 16:02:26,287 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_HOST_CHANNEL_STATS"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "HOST_NAME" VARCHAR(60) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NOT NULL,
+    "START_TIME" TIMESTAMP NOT NULL,
+    "END_TIME" TIMESTAMP NOT NULL,
+    "DATA_ROUTED" BIGINT DEFAULT 0,
+    "DATA_UNROUTED" BIGINT DEFAULT 0,
+    "DATA_EVENT_INSERTED" BIGINT DEFAULT 0,
+    "DATA_EXTRACTED" BIGINT DEFAULT 0,
+    "DATA_BYTES_EXTRACTED" BIGINT DEFAULT 0,
+    "DATA_EXTRACTED_ERRORS" BIGINT DEFAULT 0,
+    "DATA_BYTES_SENT" BIGINT DEFAULT 0,
+    "DATA_SENT" BIGINT DEFAULT 0,
+    "DATA_SENT_ERRORS" BIGINT DEFAULT 0,
+    "DATA_LOADED" BIGINT DEFAULT 0,
+    "DATA_BYTES_LOADED" BIGINT DEFAULT 0,
+    "DATA_LOADED_ERRORS" BIGINT DEFAULT 0,
+    "DATA_LOADED_OUTGOING" BIGINT DEFAULT 0,
+    "DATA_BYTES_LOADED_OUTGOING" BIGINT DEFAULT 0,
+    "DATA_LOADED_OUTGOING_ERRORS" BIGINT DEFAULT 0,
+    PRIMARY KEY ("NODE_ID", "HOST_NAME", "CHANNEL_ID", "START_TIME", "END_TIME")
+)
+2020-08-13 16:02:26,288 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_ND_HST_CHNL_STS" ON "SYM_NODE_HOST_CHANNEL_STATS" ("NODE_ID", "START_TIME", "END_TIME")
+2020-08-13 16:02:26,289 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_HOST_JOB_STATS"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "HOST_NAME" VARCHAR(60) NOT NULL,
+    "JOB_NAME" VARCHAR(50) NOT NULL,
+    "START_TIME" TIMESTAMP NOT NULL,
+    "END_TIME" TIMESTAMP NOT NULL,
+    "PROCESSED_COUNT" BIGINT DEFAULT 0,
+    "TARGET_NODE_ID" VARCHAR(50) NULL,
+    "TARGET_NODE_COUNT" INTEGER DEFAULT 0,
+    PRIMARY KEY ("NODE_ID", "HOST_NAME", "JOB_NAME", "START_TIME", "END_TIME")
+)
+2020-08-13 16:02:26,290 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_ND_HST_JOB" ON "SYM_NODE_HOST_JOB_STATS" ("NODE_ID", "START_TIME", "END_TIME")
+2020-08-13 16:02:26,291 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_HOST_STATS"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "HOST_NAME" VARCHAR(60) NOT NULL,
+    "START_TIME" TIMESTAMP NOT NULL,
+    "END_TIME" TIMESTAMP NOT NULL,
+    "RESTARTED" BIGINT DEFAULT 0 NOT NULL,
+    "NODES_PULLED" BIGINT DEFAULT 0,
+    "TOTAL_NODES_PULL_TIME" BIGINT DEFAULT 0,
+    "NODES_PUSHED" BIGINT DEFAULT 0,
+    "TOTAL_NODES_PUSH_TIME" BIGINT DEFAULT 0,
+    "NODES_REJECTED" BIGINT DEFAULT 0,
+    "NODES_REGISTERED" BIGINT DEFAULT 0,
+    "NODES_LOADED" BIGINT DEFAULT 0,
+    "NODES_DISABLED" BIGINT DEFAULT 0,
+    "PURGED_DATA_ROWS" BIGINT DEFAULT 0,
+    "PURGED_DATA_EVENT_ROWS" BIGINT DEFAULT 0,
+    "PURGED_BATCH_OUTGOING_ROWS" BIGINT DEFAULT 0,
+    "PURGED_BATCH_INCOMING_ROWS" BIGINT DEFAULT 0,
+    "TRIGGERS_CREATED_COUNT" BIGINT,
+    "TRIGGERS_REBUILT_COUNT" BIGINT,
+    "TRIGGERS_REMOVED_COUNT" BIGINT,
+    PRIMARY KEY ("NODE_ID", "HOST_NAME", "START_TIME", "END_TIME")
+)
+2020-08-13 16:02:26,292 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_ND_HST_STS" ON "SYM_NODE_HOST_STATS" ("NODE_ID", "START_TIME", "END_TIME")
+2020-08-13 16:02:26,293 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_IDENTITY"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    PRIMARY KEY ("NODE_ID")
+)
+2020-08-13 16:02:26,294 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NODE_SECURITY"(
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "NODE_PASSWORD" VARCHAR(50) NOT NULL,
+    "REGISTRATION_ENABLED" TINYINT DEFAULT 0,
+    "REGISTRATION_TIME" TIMESTAMP,
+    "INITIAL_LOAD_ENABLED" TINYINT DEFAULT 0,
+    "INITIAL_LOAD_TIME" TIMESTAMP,
+    "INITIAL_LOAD_ID" BIGINT,
+    "INITIAL_LOAD_CREATE_BY" VARCHAR(255) NULL,
+    "REV_INITIAL_LOAD_ENABLED" TINYINT DEFAULT 0,
+    "REV_INITIAL_LOAD_TIME" TIMESTAMP,
+    "REV_INITIAL_LOAD_ID" BIGINT,
+    "REV_INITIAL_LOAD_CREATE_BY" VARCHAR(255) NULL,
+    "CREATED_AT_NODE_ID" VARCHAR(50) NULL,
+    PRIMARY KEY ("NODE_ID")
+)
+2020-08-13 16:02:26,295 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_MONITOR"(
+    "MONITOR_ID" VARCHAR(128) NOT NULL,
+    "NODE_GROUP_ID" VARCHAR(50) DEFAULT 'ALL' NOT NULL,
+    "EXTERNAL_ID" VARCHAR(255) DEFAULT 'ALL' NOT NULL,
+    "TYPE" VARCHAR(50) NOT NULL,
+    "EXPRESSION" VARCHAR(2147483647) NULL,
+    "THRESHOLD" BIGINT DEFAULT 0 NOT NULL,
+    "RUN_PERIOD" INTEGER DEFAULT 0 NOT NULL,
+    "RUN_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SEVERITY_LEVEL" INTEGER DEFAULT 0 NOT NULL,
+    "ENABLED" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("MONITOR_ID")
+)
+2020-08-13 16:02:26,296 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_MONITOR_EVENT"(
+    "MONITOR_ID" VARCHAR(128) NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "EVENT_TIME" TIMESTAMP NOT NULL,
+    "HOST_NAME" VARCHAR(60) NULL,
+    "TYPE" VARCHAR(50) NOT NULL,
+    "THRESHOLD" BIGINT DEFAULT 0 NOT NULL,
+    "EVENT_VALUE" BIGINT DEFAULT 0 NOT NULL,
+    "EVENT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SEVERITY_LEVEL" INTEGER DEFAULT 0 NOT NULL,
+    "IS_RESOLVED" TINYINT DEFAULT 0 NOT NULL,
+    "IS_NOTIFIED" TINYINT DEFAULT 0 NOT NULL,
+    "DETAILS" VARCHAR(2147483647) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("MONITOR_ID", "NODE_ID", "EVENT_TIME")
+)
+2020-08-13 16:02:26,297 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_NOTIFICATION"(
+    "NOTIFICATION_ID" VARCHAR(128) NOT NULL,
+    "NODE_GROUP_ID" VARCHAR(50) DEFAULT 'ALL' NOT NULL,
+    "EXTERNAL_ID" VARCHAR(255) DEFAULT 'ALL' NOT NULL,
+    "SEVERITY_LEVEL" INTEGER DEFAULT 0 NOT NULL,
+    "TYPE" VARCHAR(50) NOT NULL,
+    "EXPRESSION" VARCHAR(2147483647) NULL,
+    "ENABLED" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("NOTIFICATION_ID")
+)
+2020-08-13 16:02:26,299 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_OUTGOING_BATCH"(
+    "BATCH_ID" BIGINT NOT NULL,
+    "NODE_ID" VARCHAR(50) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NULL,
+    "STATUS" CHAR(2) NULL,
+    "ERROR_FLAG" TINYINT DEFAULT 0,
+    "SQL_STATE" VARCHAR(10) NULL,
+    "SQL_CODE" INTEGER DEFAULT 0 NOT NULL,
+    "SQL_MESSAGE" VARCHAR(2147483647) NULL,
+    "LAST_UPDATE_HOSTNAME" VARCHAR(255) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    "CREATE_TIME" TIMESTAMP,
+    "SUMMARY" VARCHAR(255) NULL,
+    "IGNORE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "BYTE_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "LOAD_FLAG" TINYINT DEFAULT 0,
+    "EXTRACT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SENT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "RELOAD_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "OTHER_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "DATA_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_INSERT_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_UPDATE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_DELETE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "NETWORK_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "FILTER_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "ROUTER_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "TRANSFORM_EXTRACT_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "TRANSFORM_LOAD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "LOAD_ID" BIGINT,
+    "COMMON_FLAG" TINYINT DEFAULT 0,
+    "FALLBACK_INSERT_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "FALLBACK_UPDATE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "IGNORE_ROW_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "MISSING_DELETE_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "SKIP_COUNT" INTEGER DEFAULT 0 NOT NULL,
+    "TOTAL_EXTRACT_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "TOTAL_LOAD_MILLIS" INTEGER DEFAULT 0 NOT NULL,
+    "EXTRACT_JOB_FLAG" TINYINT DEFAULT 0,
+    "EXTRACT_START_TIME" TIMESTAMP,
+    "TRANSFER_START_TIME" TIMESTAMP,
+    "LOAD_START_TIME" TIMESTAMP,
+    "FAILED_DATA_ID" BIGINT DEFAULT 0 NOT NULL,
+    "FAILED_LINE_NUMBER" BIGINT DEFAULT 0 NOT NULL,
+    "CREATE_BY" VARCHAR(255) NULL,
+    PRIMARY KEY ("BATCH_ID", "NODE_ID")
+)
+2020-08-13 16:02:26,300 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_OB_NODE_STATUS" ON "SYM_OUTGOING_BATCH" ("NODE_ID", "STATUS")
+2020-08-13 16:02:26,301 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_OB_STATUS" ON "SYM_OUTGOING_BATCH" ("STATUS")
+2020-08-13 16:02:26,301 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_OB_IN_ERROR" ON "SYM_OUTGOING_BATCH" ("ERROR_FLAG")
+2020-08-13 16:02:26,302 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_PARAMETER"(
+    "EXTERNAL_ID" VARCHAR(255) NOT NULL,
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "PARAM_KEY" VARCHAR(80) NOT NULL,
+    "PARAM_VALUE" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    PRIMARY KEY ("EXTERNAL_ID", "NODE_GROUP_ID", "PARAM_KEY")
+)
+2020-08-13 16:02:26,303 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_REGISTRATION_REDIRECT"(
+    "REGISTRANT_EXTERNAL_ID" VARCHAR(255) NOT NULL,
+    "REGISTRATION_NODE_ID" VARCHAR(50) NOT NULL,
+    PRIMARY KEY ("REGISTRANT_EXTERNAL_ID")
+)
+2020-08-13 16:02:26,304 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_REGISTRATION_REQUEST"(
+    "NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "EXTERNAL_ID" VARCHAR(255) NOT NULL,
+    "STATUS" CHAR(2) NOT NULL,
+    "HOST_NAME" VARCHAR(60) NOT NULL,
+    "IP_ADDRESS" VARCHAR(50) NOT NULL,
+    "ATTEMPT_COUNT" INTEGER DEFAULT 0,
+    "REGISTERED_NODE_ID" VARCHAR(50) NULL,
+    "ERROR_MESSAGE" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("NODE_GROUP_ID", "EXTERNAL_ID", "CREATE_TIME")
+)
+2020-08-13 16:02:26,305 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_REG_REQ_1" ON "SYM_REGISTRATION_REQUEST" ("NODE_GROUP_ID", "EXTERNAL_ID", "STATUS", "HOST_NAME", "IP_ADDRESS")
+2020-08-13 16:02:26,306 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_REG_REQ_2" ON "SYM_REGISTRATION_REQUEST" ("STATUS")
+2020-08-13 16:02:26,307 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_ROUTER"(
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "TARGET_CATALOG_NAME" VARCHAR(255) NULL,
+    "TARGET_SCHEMA_NAME" VARCHAR(255) NULL,
+    "TARGET_TABLE_NAME" VARCHAR(255) NULL,
+    "SOURCE_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "ROUTER_TYPE" VARCHAR(50) NULL,
+    "ROUTER_EXPRESSION" VARCHAR(2147483647) NULL,
+    "SYNC_ON_UPDATE" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_INSERT" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_DELETE" TINYINT DEFAULT 1 NOT NULL,
+    "USE_SOURCE_CATALOG_SCHEMA" TINYINT DEFAULT 1 NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("ROUTER_ID")
+)
+2020-08-13 16:02:26,308 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_SEQUENCE"(
+    "SEQUENCE_NAME" VARCHAR(50) NOT NULL,
+    "CURRENT_VALUE" BIGINT DEFAULT 0 NOT NULL,
+    "INCREMENT_BY" INTEGER DEFAULT 1 NOT NULL,
+    "MIN_VALUE" BIGINT DEFAULT 1 NOT NULL,
+    "MAX_VALUE" BIGINT DEFAULT 9999999999 NOT NULL,
+    "CYCLE_FLAG" TINYINT DEFAULT 0,
+    "CACHE_SIZE" INTEGER DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("SEQUENCE_NAME")
+)
+2020-08-13 16:02:26,309 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TABLE_RELOAD_REQUEST"(
+    "TARGET_NODE_ID" VARCHAR(50) NOT NULL,
+    "SOURCE_NODE_ID" VARCHAR(50) NOT NULL,
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "CREATE_TABLE" TINYINT DEFAULT 0 NOT NULL,
+    "DELETE_FIRST" TINYINT DEFAULT 0 NOT NULL,
+    "RELOAD_SELECT" VARCHAR(2147483647) NULL,
+    "BEFORE_CUSTOM_SQL" VARCHAR(2147483647) NULL,
+    "RELOAD_TIME" TIMESTAMP,
+    "LOAD_ID" BIGINT,
+    "PROCESSED" TINYINT DEFAULT 0 NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("TARGET_NODE_ID", "SOURCE_NODE_ID", "TRIGGER_ID", "ROUTER_ID", "CREATE_TIME")
+)
+2020-08-13 16:02:26,310 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TABLE_RELOAD_STATUS"(
+    "LOAD_ID" BIGINT NOT NULL,
+    "SOURCE_NODE_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_ID" VARCHAR(50) NOT NULL,
+    "START_TIME" TIMESTAMP,
+    "END_TIME" TIMESTAMP,
+    "COMPLETED" TINYINT DEFAULT 0 NOT NULL,
+    "CANCELLED" TINYINT DEFAULT 0 NOT NULL,
+    "START_DATA_BATCH_ID" BIGINT,
+    "END_DATA_BATCH_ID" BIGINT,
+    "SETUP_BATCH_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "DATA_BATCH_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "FINALIZE_BATCH_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "SETUP_BATCH_LOADED" BIGINT DEFAULT 0 NOT NULL,
+    "DATA_BATCH_LOADED" BIGINT DEFAULT 0 NOT NULL,
+    "FINALIZE_BATCH_LOADED" BIGINT DEFAULT 0 NOT NULL,
+    "TABLE_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "ROWS_LOADED" BIGINT DEFAULT 0 NOT NULL,
+    "ROWS_COUNT" BIGINT DEFAULT 0 NOT NULL,
+    "ERROR_FLAG" TINYINT DEFAULT 0 NOT NULL,
+    "SQL_STATE" VARCHAR(10) NULL,
+    "SQL_CODE" INTEGER DEFAULT 0 NOT NULL,
+    "SQL_MESSAGE" VARCHAR(2147483647) NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("LOAD_ID", "SOURCE_NODE_ID")
+)
+2020-08-13 16:02:26,312 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRANSFORM_TABLE"(
+    "TRANSFORM_ID" VARCHAR(50) NOT NULL,
+    "SOURCE_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TARGET_NODE_GROUP_ID" VARCHAR(50) NOT NULL,
+    "TRANSFORM_POINT" VARCHAR(10) NOT NULL,
+    "SOURCE_CATALOG_NAME" VARCHAR(255) NULL,
+    "SOURCE_SCHEMA_NAME" VARCHAR(255) NULL,
+    "SOURCE_TABLE_NAME" VARCHAR(255) NOT NULL,
+    "TARGET_CATALOG_NAME" VARCHAR(255) NULL,
+    "TARGET_SCHEMA_NAME" VARCHAR(255) NULL,
+    "TARGET_TABLE_NAME" VARCHAR(255) NULL,
+    "UPDATE_FIRST" TINYINT DEFAULT 0,
+    "UPDATE_ACTION" VARCHAR(255) DEFAULT 'UPDATE_COL' NOT NULL,
+    "DELETE_ACTION" VARCHAR(10) NOT NULL,
+    "TRANSFORM_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "COLUMN_POLICY" VARCHAR(10) DEFAULT 'SPECIFIED' NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRANSFORM_ID", "SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID")
+)
+2020-08-13 16:02:26,313 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRANSFORM_COLUMN"(
+    "TRANSFORM_ID" VARCHAR(50) NOT NULL,
+    "INCLUDE_ON" CHAR(1) DEFAULT '*' NOT NULL,
+    "TARGET_COLUMN_NAME" VARCHAR(128) NOT NULL,
+    "SOURCE_COLUMN_NAME" VARCHAR(128) NULL,
+    "PK" TINYINT DEFAULT 0,
+    "TRANSFORM_TYPE" VARCHAR(50) DEFAULT 'copy' NULL,
+    "TRANSFORM_EXPRESSION" VARCHAR(2147483647) NULL,
+    "TRANSFORM_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "CREATE_TIME" TIMESTAMP,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRANSFORM_ID", "INCLUDE_ON", "TARGET_COLUMN_NAME")
+)
+2020-08-13 16:02:26,314 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRIGGER"(
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "SOURCE_CATALOG_NAME" VARCHAR(255) NULL,
+    "SOURCE_SCHEMA_NAME" VARCHAR(255) NULL,
+    "SOURCE_TABLE_NAME" VARCHAR(255) NOT NULL,
+    "CHANNEL_ID" VARCHAR(128) NOT NULL,
+    "RELOAD_CHANNEL_ID" VARCHAR(128) DEFAULT 'reload' NOT NULL,
+    "SYNC_ON_UPDATE" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_INSERT" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_DELETE" TINYINT DEFAULT 1 NOT NULL,
+    "SYNC_ON_INCOMING_BATCH" TINYINT DEFAULT 0 NOT NULL,
+    "NAME_FOR_UPDATE_TRIGGER" VARCHAR(255) NULL,
+    "NAME_FOR_INSERT_TRIGGER" VARCHAR(255) NULL,
+    "NAME_FOR_DELETE_TRIGGER" VARCHAR(255) NULL,
+    "SYNC_ON_UPDATE_CONDITION" VARCHAR(2147483647) NULL,
+    "SYNC_ON_INSERT_CONDITION" VARCHAR(2147483647) NULL,
+    "SYNC_ON_DELETE_CONDITION" VARCHAR(2147483647) NULL,
+    "CUSTOM_BEFORE_UPDATE_TEXT" VARCHAR(2147483647) NULL,
+    "CUSTOM_BEFORE_INSERT_TEXT" VARCHAR(2147483647) NULL,
+    "CUSTOM_BEFORE_DELETE_TEXT" VARCHAR(2147483647) NULL,
+    "CUSTOM_ON_UPDATE_TEXT" VARCHAR(2147483647) NULL,
+    "CUSTOM_ON_INSERT_TEXT" VARCHAR(2147483647) NULL,
+    "CUSTOM_ON_DELETE_TEXT" VARCHAR(2147483647) NULL,
+    "EXTERNAL_SELECT" VARCHAR(2147483647) NULL,
+    "TX_ID_EXPRESSION" VARCHAR(2147483647) NULL,
+    "CHANNEL_EXPRESSION" VARCHAR(2147483647) NULL,
+    "EXCLUDED_COLUMN_NAMES" VARCHAR(2147483647) NULL,
+    "INCLUDED_COLUMN_NAMES" VARCHAR(2147483647) NULL,
+    "SYNC_KEY_NAMES" VARCHAR(2147483647) NULL,
+    "USE_STREAM_LOBS" TINYINT DEFAULT 0 NOT NULL,
+    "USE_CAPTURE_LOBS" TINYINT DEFAULT 0 NOT NULL,
+    "USE_CAPTURE_OLD_DATA" TINYINT DEFAULT 1 NOT NULL,
+    "USE_HANDLE_KEY_UPDATES" TINYINT DEFAULT 1 NOT NULL,
+    "STREAM_ROW" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRIGGER_ID")
+)
+2020-08-13 16:02:26,315 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRIGGER_HIST"(
+    "TRIGGER_HIST_ID" INTEGER NOT NULL,
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "SOURCE_TABLE_NAME" VARCHAR(255) NOT NULL,
+    "SOURCE_CATALOG_NAME" VARCHAR(255) NULL,
+    "SOURCE_SCHEMA_NAME" VARCHAR(255) NULL,
+    "NAME_FOR_UPDATE_TRIGGER" VARCHAR(255) NULL,
+    "NAME_FOR_INSERT_TRIGGER" VARCHAR(255) NULL,
+    "NAME_FOR_DELETE_TRIGGER" VARCHAR(255) NULL,
+    "TABLE_HASH" BIGINT DEFAULT 0 NOT NULL,
+    "TRIGGER_ROW_HASH" BIGINT DEFAULT 0 NOT NULL,
+    "TRIGGER_TEMPLATE_HASH" BIGINT DEFAULT 0 NOT NULL,
+    "COLUMN_NAMES" VARCHAR(2147483647) NOT NULL,
+    "PK_COLUMN_NAMES" VARCHAR(2147483647) NOT NULL,
+    "LAST_TRIGGER_BUILD_REASON" CHAR(1) NOT NULL,
+    "ERROR_MESSAGE" VARCHAR(2147483647) NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "INACTIVE_TIME" TIMESTAMP,
+    PRIMARY KEY ("TRIGGER_HIST_ID")
+)
+2020-08-13 16:02:26,316 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE INDEX "SYM_IDX_TRIGG_HIST_1" ON "SYM_TRIGGER_HIST" ("TRIGGER_ID", "INACTIVE_TIME")
+2020-08-13 16:02:26,317 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRIGGER_ROUTER"(
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "ENABLED" TINYINT DEFAULT 1 NOT NULL,
+    "INITIAL_LOAD_ORDER" INTEGER DEFAULT 1 NOT NULL,
+    "INITIAL_LOAD_SELECT" VARCHAR(2147483647) NULL,
+    "INITIAL_LOAD_DELETE_STMT" VARCHAR(2147483647) NULL,
+    "PING_BACK_ENABLED" TINYINT DEFAULT 0 NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    "DESCRIPTION" VARCHAR(2147483647) NULL,
+    PRIMARY KEY ("TRIGGER_ID", "ROUTER_ID")
+)
+2020-08-13 16:02:26,319 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: CREATE TABLE "SYM_TRIGGER_ROUTER_GROUPLET"(
+    "GROUPLET_ID" VARCHAR(50) NOT NULL,
+    "TRIGGER_ID" VARCHAR(128) NOT NULL,
+    "ROUTER_ID" VARCHAR(50) NOT NULL,
+    "APPLIES_WHEN" CHAR(1) NOT NULL,
+    "CREATE_TIME" TIMESTAMP NOT NULL,
+    "LAST_UPDATE_BY" VARCHAR(50) NULL,
+    "LAST_UPDATE_TIME" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("GROUPLET_ID", "TRIGGER_ID", "ROUTER_ID", "APPLIES_WHEN")
+)
+2020-08-13 16:02:26,320 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_CONFLICT"
+    ADD CONSTRAINT "SYM_FK_CF_2_GRP_LNK" FOREIGN KEY ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID") REFERENCES "SYM_NODE_GROUP_LINK" ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID")
+2020-08-13 16:02:26,321 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_FILE_TRIGGER_ROUTER"
+    ADD CONSTRAINT "SYM_FK_FTR_2_FTRG" FOREIGN KEY ("TRIGGER_ID") REFERENCES "SYM_FILE_TRIGGER" ("TRIGGER_ID")
+2020-08-13 16:02:26,322 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_FILE_TRIGGER_ROUTER"
+    ADD CONSTRAINT "SYM_FK_FTR_2_RTR" FOREIGN KEY ("ROUTER_ID") REFERENCES "SYM_ROUTER" ("ROUTER_ID")
+2020-08-13 16:02:26,323 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_GROUPLET_LINK"
+    ADD CONSTRAINT "SYM_FK_GPLTLNK_2_GPLT" FOREIGN KEY ("GROUPLET_ID") REFERENCES "SYM_GROUPLET" ("GROUPLET_ID")
+2020-08-13 16:02:26,324 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_NODE_GROUP_LINK"
+    ADD CONSTRAINT "SYM_FK_LNK_2_GRP_SRC" FOREIGN KEY ("SOURCE_NODE_GROUP_ID") REFERENCES "SYM_NODE_GROUP" ("NODE_GROUP_ID")
+2020-08-13 16:02:26,326 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_NODE_GROUP_LINK"
+    ADD CONSTRAINT "SYM_FK_LNK_2_GRP_TGT" FOREIGN KEY ("TARGET_NODE_GROUP_ID") REFERENCES "SYM_NODE_GROUP" ("NODE_GROUP_ID")
+2020-08-13 16:02:26,326 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_NODE_IDENTITY"
+    ADD CONSTRAINT "SYM_FK_IDENT_2_NODE" FOREIGN KEY ("NODE_ID") REFERENCES "SYM_NODE" ("NODE_ID")
+2020-08-13 16:02:26,327 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_NODE_SECURITY"
+    ADD CONSTRAINT "SYM_FK_SEC_2_NODE" FOREIGN KEY ("NODE_ID") REFERENCES "SYM_NODE" ("NODE_ID")
+2020-08-13 16:02:26,328 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_ROUTER"
+    ADD CONSTRAINT "SYM_FK_RT_2_GRP_LNK" FOREIGN KEY ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID") REFERENCES "SYM_NODE_GROUP_LINK" ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID")
+2020-08-13 16:02:26,330 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRANSFORM_TABLE"
+    ADD CONSTRAINT "SYM_FK_TT_2_GRP_LNK" FOREIGN KEY ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID") REFERENCES "SYM_NODE_GROUP_LINK" ("SOURCE_NODE_GROUP_ID", "TARGET_NODE_GROUP_ID")
+2020-08-13 16:02:26,331 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER"
+    ADD CONSTRAINT "SYM_FK_TRG_2_CHNL" FOREIGN KEY ("CHANNEL_ID") REFERENCES "SYM_CHANNEL" ("CHANNEL_ID")
+2020-08-13 16:02:26,332 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER"
+    ADD CONSTRAINT "SYM_FK_TRG_2_RLD_CHNL" FOREIGN KEY ("RELOAD_CHANNEL_ID") REFERENCES "SYM_CHANNEL" ("CHANNEL_ID")
+2020-08-13 16:02:26,333 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER_ROUTER"
+    ADD CONSTRAINT "SYM_FK_TR_2_TRG" FOREIGN KEY ("TRIGGER_ID") REFERENCES "SYM_TRIGGER" ("TRIGGER_ID")
+2020-08-13 16:02:26,334 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER_ROUTER"
+    ADD CONSTRAINT "SYM_FK_TR_2_RTR" FOREIGN KEY ("ROUTER_ID") REFERENCES "SYM_ROUTER" ("ROUTER_ID")
+2020-08-13 16:02:26,335 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER_ROUTER_GROUPLET"
+    ADD CONSTRAINT "SYM_FK_TRGPLT_2_GPLT" FOREIGN KEY ("GROUPLET_ID") REFERENCES "SYM_GROUPLET" ("GROUPLET_ID")
+2020-08-13 16:02:26,337 INFO org.jumpmind.db.sql.LogSqlResultsListener [main] DDL applied: ALTER TABLE "SYM_TRIGGER_ROUTER_GROUPLET"
+    ADD CONSTRAINT "SYM_FK_TRGPLT_2_TR" FOREIGN KEY ("TRIGGER_ID", "ROUTER_ID") REFERENCES "SYM_TRIGGER_ROUTER" ("TRIGGER_ID", "ROUTER_ID")
+2020-08-13 16:02:26,339 INFO org.jumpmind.symmetric.service.impl.ClusterService [main] This node picked a server id of daniel
+2020-08-13 16:02:26,340 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [main] Synchronizing triggers
+2020-08-13 16:02:26,350 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [main] Done synchronizing triggers
+2020-08-13 16:02:26,352 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [main] Done with auto update of SymmetricDS tables
+2020-08-13 16:02:26,353 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring config channel
+2020-08-13 16:02:26,358 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring reload channel
+2020-08-13 16:02:26,361 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring monitor channel
+2020-08-13 16:02:26,363 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring heartbeat channel
+2020-08-13 16:02:26,365 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring default channel
+2020-08-13 16:02:26,367 INFO org.jumpmind.symmetric.service.impl.ConfigurationService [main] Auto-configuring dynamic channel
+2020-08-13 16:02:26,378 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] Done initializing SymmetricDS database
+2020-08-13 16:02:26,379 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] SymmetricDS database version : null
+2020-08-13 16:02:26,380 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] SymmetricDS software version : 3.11.10
+2020-08-13 16:02:26,405 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] Starting unregistered node [group=worker-manager, externalId=005 --master=localhost]
+2020-08-13 16:02:26,415 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Routing on periodic schedule: every 5000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,418 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Push on periodic schedule: every 10000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,419 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Pull on periodic schedule: every 10000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,420 INFO org.jumpmind.symmetric.job.JobManager [main] Job Offline Push not configured for auto start
+2020-08-13 16:02:26,421 INFO org.jumpmind.symmetric.job.JobManager [main] Job Offline Pull not configured for auto start
+2020-08-13 16:02:26,424 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting job 'Purge Outgoing' with cron expression: '0 0 */4 * * *'
+2020-08-13 16:02:26,425 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting job 'Purge Incoming' with cron expression: '0 0 */4 * * *'
+2020-08-13 16:02:26,426 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting job 'Stat Flush' with cron expression: '0 0/5 * * * *'
+2020-08-13 16:02:26,428 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting job 'SyncTriggers' with cron expression: '0 0 0 * * *'
+2020-08-13 16:02:26,429 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Heartbeat on periodic schedule: every 900000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,430 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Watchdog on periodic schedule: every 3600000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,431 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting job 'Stage Management' with cron expression: '0 0 * * * *'
+2020-08-13 16:02:26,432 INFO org.jumpmind.symmetric.job.JobManager [main] Job Refresh Cache not configured for auto start
+2020-08-13 16:02:26,432 INFO org.jumpmind.symmetric.job.JobManager [main] Job File Sync Tracker not configured for auto start
+2020-08-13 16:02:26,433 INFO org.jumpmind.symmetric.job.JobManager [main] Job File Sync Pull not configured for auto start
+2020-08-13 16:02:26,434 INFO org.jumpmind.symmetric.job.JobManager [main] Job File Sync Push not configured for auto start
+2020-08-13 16:02:26,434 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Initial Load Extract on periodic schedule: every 10000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,435 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Monitor on periodic schedule: every 60000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,436 INFO org.jumpmind.symmetric.job.JobManager [main] Job Report Status not configured for auto start
+2020-08-13 16:02:26,437 INFO org.jumpmind.symmetric.job.JobManager [main] Job Log Miner not configured for auto start
+2020-08-13 16:02:26,437 INFO org.jumpmind.symmetric.job.AbstractJob [main] Starting Initial Load Queue on periodic schedule: every 10000ms with the first run at Thu Aug 13 16:02:35 WEST 2020
+2020-08-13 16:02:26,440 INFO org.jumpmind.symmetric.AbstractSymmetricEngine [main] SymmetricDS Node STARTED:
+	 nodeId=005 --master=localhost
+	 groupId=worker-manager
+	 type=client
+	 subType=null
+	 name=worker-manager
+	 softwareVersion=3.11.10
+	 databaseName=H2
+	 databaseVersion=1.4
+	 driverName=H2 JDBC Driver
+	 driverVersion=1.4.200 (2019-10-14)
+	 uptime=0 sec.
+2020-08-13 16:02:35,104 INFO org.jumpmind.symmetric.job.AbstractJob [worker-manager-job-1] Did not run the 'Routing' job because the engine is not registered.
+2020-08-13 16:02:35,104 INFO org.jumpmind.symmetric.job.AbstractJob [worker-manager-job-2] Did not run the 'Push' job because the engine is not registered.
+2020-08-13 16:02:35,114 INFO org.jumpmind.symmetric.service.impl.RegistrationService [worker-manager-job-3] This node is unregistered.  It will attempt to register using the registration.url
+2020-08-13 16:02:35,121 INFO org.jumpmind.symmetric.job.AbstractJob [worker-manager-job-5] Did not run the 'Initial Load Extract' job because the engine is not registered.
+2020-08-13 16:02:35,121 INFO org.jumpmind.symmetric.job.AbstractJob [worker-manager-job-6] Did not run the 'Monitor' job because the engine is not registered.
+2020-08-13 16:02:35,123 INFO org.jumpmind.symmetric.job.AbstractJob [worker-manager-job-7] Did not run the 'Initial Load Queue' job because the engine is not registered.
+2020-08-13 16:02:35,130 INFO org.jumpmind.symmetric.service.impl.DataLoaderService [worker-manager-job-3] Using registration URL of http://localhost:8080/sync/registration?nodeGroupId=worker-manager&externalId=005+--master%3Dlocalhost&syncURL=http%3A%2F%2Flocalhost%3A8081%2Fsync&schemaVersion=%3F&databaseType=H2&databaseVersion=1.4&symmetricVersion=3.11.10&deploymentType=client&hostName=daniel&ipAddress=192.168.1.68
+2020-08-13 16:02:36,170 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] Grouplets flushed because new grouplet config came through the data loader
+2020-08-13 16:02:36,171 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] Load filters flushed because new filter config came through the data loader
+2020-08-13 16:02:36,172 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] Channels flushed because new channels came through the data loader
+2020-08-13 16:02:36,172 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] About to refresh the cache of conflict settings because new configuration came through the data loader
+2020-08-13 16:02:36,172 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] About to refresh the cache of parameters because new configuration came through the data loader
+2020-08-13 16:02:36,177 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-1] About to refresh the cache of node security because new configuration came through the data loader
+2020-08-13 16:02:36,179 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-job-3] About to refresh the cache of transformation because new configuration came through the data loader
+2020-08-13 16:02:36,179 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-job-3] About to clear the staging area because new transform configuration came through the data loader
+2020-08-13 16:02:36,180 INFO org.jumpmind.symmetric.io.stage.StagingManager [worker-manager-job-3] Cleaning staging...
+2020-08-13 16:02:36,183 INFO org.jumpmind.symmetric.io.stage.StagingManager [worker-manager-job-3] Purged 1 staging files, freed 24 KB of disk space.
+2020-08-13 16:02:36,184 INFO org.jumpmind.symmetric.io.stage.StagingManager [worker-manager-job-3] Finished cleaning staging in 0 seconds.
+2020-08-13 16:02:36,184 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-job-3] About to syncTriggers because new configuration came through the data loader
+2020-08-13 16:02:36,185 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-job-3] Synchronizing triggers
+2020-08-13 16:02:36,203 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-job-3] Trigger creation has been disabled by trigger.create.before.initial.load.enabled because an initial load is in progress or has not yet been requested
+2020-08-13 16:02:36,204 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-job-3] Done synchronizing triggers
+2020-08-13 16:02:36,222 INFO org.jumpmind.symmetric.service.impl.RegistrationService [worker-manager-job-3] Successfully registered node [id=005 --master=localhost]
+2020-08-13 16:02:36,238 INFO org.jumpmind.symmetric.service.impl.ExtensionService [worker-manager-job-3] Found 0 extension points from the database that will be registered
+2020-08-13 16:02:36,239 INFO org.jumpmind.symmetric.service.impl.ClientExtensionService [worker-manager-job-3] Found 5 extension points from spring that will be registered
+2020-08-13 16:02:36,240 INFO org.jumpmind.symmetric.job.PushHeartbeatListener [worker-manager-job-3] Some attribute(s) of node changed.  Recording changes
+2020-08-13 16:02:36,240 INFO org.jumpmind.symmetric.job.PushHeartbeatListener [worker-manager-job-3] Updating my node configuration info according to the symmetric properties
+2020-08-13 16:02:36,250 INFO org.jumpmind.symmetric.service.impl.NodeCommunicationService [worker-manager-job-3] pull will use 10 threads
+2020-08-13 16:02:40,112 INFO org.jumpmind.symmetric.service.impl.DataService [worker-manager-job-8] Inserting missing last data gap: { startId: 1, endId: 50000001, createTime: "Thu Aug 13 16:02:40 WEST 2020" }
+2020-08-13 16:02:40,116 INFO org.jumpmind.symmetric.route.DataGapFastDetector [worker-manager-job-8] Full gap analysis is running
+2020-08-13 16:02:40,118 INFO org.jumpmind.symmetric.route.DataGapFastDetector [worker-manager-job-8] Querying data in gaps from database took 1 ms
+2020-08-13 16:02:40,119 INFO org.jumpmind.symmetric.route.DataGapFastDetector [worker-manager-job-8] Full gap analysis is done after 2 ms
+2020-08-13 16:02:45,114 INFO org.jumpmind.symmetric.service.impl.NodeCommunicationService [worker-manager-job-9] push will use 10 threads
+2020-08-13 16:02:46,356 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-2] Requesting syncTriggers because trigger.create.before.initial.load.enabled is false and sym_node_security changed to indicate that an initial load has completed
+2020-08-13 16:02:46,357 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-2] About to refresh the cache of node security because new configuration came through the data loader
+2020-08-13 16:02:46,360 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-2] About to refresh the cache of nodes because new configuration came through the data loader
+2020-08-13 16:02:46,361 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-pull-default-2] About to syncTriggers because new configuration came through the data loader
+2020-08-13 16:02:46,362 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-pull-default-2] Synchronizing triggers
+2020-08-13 16:02:46,399 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_RTR_WRKRMNGR trigger for SYM_ROUTER
+2020-08-13 16:02:46,416 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_RTR_WRKRMNGR trigger for SYM_ROUTER
+2020-08-13 16:02:46,425 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_RTR_WRKRMNGR trigger for SYM_ROUTER
+2020-08-13 16:02:46,464 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TRNSFRM_TBL_WRKRMNGR trigger for SYM_TRANSFORM_TABLE
+2020-08-13 16:02:46,474 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TRNSFRM_TBL_WRKRMNGR trigger for SYM_TRANSFORM_TABLE
+2020-08-13 16:02:46,484 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TRNSFRM_TBL_WRKRMNGR trigger for SYM_TRANSFORM_TABLE
+2020-08-13 16:02:46,506 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_PRMTR_WRKRMNGR trigger for SYM_PARAMETER
+2020-08-13 16:02:46,513 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_PRMTR_WRKRMNGR trigger for SYM_PARAMETER
+2020-08-13 16:02:46,520 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_PRMTR_WRKRMNGR trigger for SYM_PARAMETER
+2020-08-13 16:02:46,541 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_FL_TRGGR_RTR_WRKRMNGR trigger for SYM_FILE_TRIGGER_ROUTER
+2020-08-13 16:02:46,548 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_FL_TRGGR_RTR_WRKRMNGR trigger for SYM_FILE_TRIGGER_ROUTER
+2020-08-13 16:02:46,556 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_FL_TRGGR_RTR_WRKRMNGR trigger for SYM_FILE_TRIGGER_ROUTER
+2020-08-13 16:02:46,580 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TBL_RLD_RQST_WRKRMNGR trigger for SYM_TABLE_RELOAD_REQUEST
+2020-08-13 16:02:46,593 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TBL_RLD_RQST_WRKRMNGR trigger for SYM_TABLE_RELOAD_REQUEST
+2020-08-13 16:02:46,605 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TBL_RLD_RQST_WRKRMNGR trigger for SYM_TABLE_RELOAD_REQUEST
+2020-08-13 16:02:46,644 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_GRPLT_LNK_WRKRMNGR trigger for SYM_GROUPLET_LINK
+2020-08-13 16:02:46,652 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_GRPLT_LNK_WRKRMNGR trigger for SYM_GROUPLET_LINK
+2020-08-13 16:02:46,659 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_GRPLT_LNK_WRKRMNGR trigger for SYM_GROUPLET_LINK
+2020-08-13 16:02:46,678 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_GRPLT_WRKRMNGR trigger for SYM_GROUPLET
+2020-08-13 16:02:46,685 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_GRPLT_WRKRMNGR trigger for SYM_GROUPLET
+2020-08-13 16:02:46,692 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_GRPLT_WRKRMNGR trigger for SYM_GROUPLET
+2020-08-13 16:02:46,734 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_FL_TRGGR_WRKRMNGR trigger for SYM_FILE_TRIGGER
+2020-08-13 16:02:46,743 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_FL_TRGGR_WRKRMNGR trigger for SYM_FILE_TRIGGER
+2020-08-13 16:02:46,752 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_FL_TRGGR_WRKRMNGR trigger for SYM_FILE_TRIGGER
+2020-08-13 16:02:46,773 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TRNSFRM_CLMN_WRKRMNGR trigger for SYM_TRANSFORM_COLUMN
+2020-08-13 16:02:46,780 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TRNSFRM_CLMN_WRKRMNGR trigger for SYM_TRANSFORM_COLUMN
+2020-08-13 16:02:46,791 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TRNSFRM_CLMN_WRKRMNGR trigger for SYM_TRANSFORM_COLUMN
+2020-08-13 16:02:46,821 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_JB_WRKRMNGR trigger for SYM_JOB
+2020-08-13 16:02:46,828 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_JB_WRKRMNGR trigger for SYM_JOB
+2020-08-13 16:02:46,836 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_JB_WRKRMNGR trigger for SYM_JOB
+2020-08-13 16:02:46,858 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TRGGR_RTR_WRKRMNGR trigger for SYM_TRIGGER_ROUTER
+2020-08-13 16:02:46,866 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TRGGR_RTR_WRKRMNGR trigger for SYM_TRIGGER_ROUTER
+2020-08-13 16:02:46,873 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TRGGR_RTR_WRKRMNGR trigger for SYM_TRIGGER_ROUTER
+2020-08-13 16:02:46,895 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_WRKRMNGR trigger for SYM_NODE
+2020-08-13 16:02:46,909 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_WRKRMNGR trigger for SYM_NODE
+2020-08-13 16:02:46,922 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_WRKRMNGR trigger for SYM_NODE
+2020-08-13 16:02:46,943 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_GRP_CHNNL_WND_WRKRMNGR trigger for SYM_NODE_GROUP_CHANNEL_WND
+2020-08-13 16:02:46,949 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_GRP_CHNNL_WND_WRKRMNGR trigger for SYM_NODE_GROUP_CHANNEL_WND
+2020-08-13 16:02:46,954 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_GRP_CHNNL_WND_WRKRMNGR trigger for SYM_NODE_GROUP_CHANNEL_WND
+2020-08-13 16:02:46,973 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_NTFCTN_WRKRMNGR trigger for SYM_NOTIFICATION
+2020-08-13 16:02:46,979 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_NTFCTN_WRKRMNGR trigger for SYM_NOTIFICATION
+2020-08-13 16:02:46,986 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_NTFCTN_WRKRMNGR trigger for SYM_NOTIFICATION
+2020-08-13 16:02:47,008 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_GRP_LNK_WRKRMNGR trigger for SYM_NODE_GROUP_LINK
+2020-08-13 16:02:47,015 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_GRP_LNK_WRKRMNGR trigger for SYM_NODE_GROUP_LINK
+2020-08-13 16:02:47,022 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_GRP_LNK_WRKRMNGR trigger for SYM_NODE_GROUP_LINK
+2020-08-13 16:02:47,043 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_GRP_WRKRMNGR trigger for SYM_NODE_GROUP
+2020-08-13 16:02:47,049 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_GRP_WRKRMNGR trigger for SYM_NODE_GROUP
+2020-08-13 16:02:47,055 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_GRP_WRKRMNGR trigger for SYM_NODE_GROUP
+2020-08-13 16:02:47,076 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_SCRTY_WRKRMNGR trigger for SYM_NODE_SECURITY
+2020-08-13 16:02:47,085 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_SCRTY_WRKRMNGR trigger for SYM_NODE_SECURITY
+2020-08-13 16:02:47,094 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_SCRTY_WRKRMNGR trigger for SYM_NODE_SECURITY
+2020-08-13 16:02:47,116 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_LD_FLTR_WRKRMNGR trigger for SYM_LOAD_FILTER
+2020-08-13 16:02:47,128 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_LD_FLTR_WRKRMNGR trigger for SYM_LOAD_FILTER
+2020-08-13 16:02:47,139 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_LD_FLTR_WRKRMNGR trigger for SYM_LOAD_FILTER
+2020-08-13 16:02:47,163 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_MNTR_WRKRMNGR trigger for SYM_MONITOR
+2020-08-13 16:02:47,171 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_MNTR_WRKRMNGR trigger for SYM_MONITOR
+2020-08-13 16:02:47,178 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_MNTR_WRKRMNGR trigger for SYM_MONITOR
+2020-08-13 16:02:47,202 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_XTNSN_WRKRMNGR trigger for SYM_EXTENSION
+2020-08-13 16:02:47,208 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_XTNSN_WRKRMNGR trigger for SYM_EXTENSION
+2020-08-13 16:02:47,216 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_XTNSN_WRKRMNGR trigger for SYM_EXTENSION
+2020-08-13 16:02:47,241 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_CNFLCT_WRKRMNGR trigger for SYM_CONFLICT
+2020-08-13 16:02:47,252 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_CNFLCT_WRKRMNGR trigger for SYM_CONFLICT
+2020-08-13 16:02:47,266 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_CNFLCT_WRKRMNGR trigger for SYM_CONFLICT
+2020-08-13 16:02:47,297 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TRGGR_WRKRMNGR trigger for SYM_TRIGGER
+2020-08-13 16:02:47,318 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TRGGR_WRKRMNGR trigger for SYM_TRIGGER
+2020-08-13 16:02:47,335 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TRGGR_WRKRMNGR trigger for SYM_TRIGGER
+2020-08-13 16:02:47,363 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_CHNNL_WRKRMNGR trigger for SYM_CHANNEL
+2020-08-13 16:02:47,374 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_CHNNL_WRKRMNGR trigger for SYM_CHANNEL
+2020-08-13 16:02:47,384 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_CHNNL_WRKRMNGR trigger for SYM_CHANNEL
+2020-08-13 16:02:47,406 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_TRGGR_RTR_GRPLT_WRKRMNGR trigger for SYM_TRIGGER_ROUTER_GROUPLET
+2020-08-13 16:02:47,413 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_TRGGR_RTR_GRPLT_WRKRMNGR trigger for SYM_TRIGGER_ROUTER_GROUPLET
+2020-08-13 16:02:47,420 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_TRGGR_RTR_GRPLT_WRKRMNGR trigger for SYM_TRIGGER_ROUTER_GROUPLET
+2020-08-13 16:02:47,443 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_I_FOR_SYM_ND_HST_WRKRMNGR trigger for SYM_NODE_HOST
+2020-08-13 16:02:47,453 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_U_FOR_SYM_ND_HST_WRKRMNGR trigger for SYM_NODE_HOST
+2020-08-13 16:02:47,464 INFO org.jumpmind.symmetric.db.AbstractSymmetricDialect [worker-manager-sync-triggers-1] Creating SYM_ON_D_FOR_SYM_ND_HST_WRKRMNGR trigger for SYM_NODE_HOST
+2020-08-13 16:02:47,473 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-pull-default-2] Done synchronizing triggers
+2020-08-13 16:02:47,488 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-2] Pull data received from master-manager:000:000 on queue default. 5 rows and 4 batches were processed. (sym_node, sym_table_reload_request, sym_node_security)
+2020-08-13 16:02:56,752 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-3] Requesting syncTriggers because trigger.create.before.initial.load.enabled is false and sym_node_security changed to indicate that an initial load has completed
+2020-08-13 16:02:56,753 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-dataloader-3] About to refresh the cache of node security because new configuration came through the data loader
+2020-08-13 16:02:56,754 INFO org.jumpmind.symmetric.load.ConfigurationChangedDatabaseWriterFilter [worker-manager-pull-default-3] About to syncTriggers because new configuration came through the data loader
+2020-08-13 16:02:56,754 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-pull-default-3] Synchronizing triggers
+2020-08-13 16:02:57,188 INFO org.jumpmind.symmetric.service.impl.TriggerRouterService [worker-manager-pull-default-3] Done synchronizing triggers
+2020-08-13 16:02:57,296 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-3] Pull data received from master-manager:000:000 on queue default. 140 rows and 49 batches were processed. (sym_table_reload_request, containers, component_types, decisions, fields, service_rules, regions, edge_hosts, apps, services, app_services, host_rules, container_entity_names, users, operators, value_modes, conditions, container_entity_labels, container_entity_ports, service_rule_conditions, host_rule_conditions, host_events, service_dependencies, sym_node_security)
+2020-08-13 16:03:00,182 INFO org.jumpmind.symmetric.route.ConfigurationChangedDataRouter [worker-manager-job-17] About to refresh the cache of node security because new configuration came through the data router
+2020-08-13 16:03:00,182 INFO org.jumpmind.symmetric.service.impl.RouterService [worker-manager-job-17] Routed 2 data events in 56 ms
+2020-08-13 16:03:06,372 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-4] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:04:06,431 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-10] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:05:06,291 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-6] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:06:06,360 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-2] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:07:06,371 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-8] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:08:06,382 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-4] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:09:06,402 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-10] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:10:06,419 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-6] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:11:06,566 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-2] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:11:16,411 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-3] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (sym_node_host)
+2020-08-13 16:11:20,256 INFO org.jumpmind.symmetric.service.impl.RouterService [worker-manager-job-8] Routed 1 data events in 3 ms
+2020-08-13 16:12:06,478 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-8] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:13:06,430 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-4] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:14:06,420 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-10] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:15:06,325 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-6] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:16:06,336 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-2] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:17:06,343 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-8] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:17:35,336 INFO org.jumpmind.symmetric.service.impl.RouterService [worker-manager-job-7] Routed 1 data events in 21 ms
+2020-08-13 16:17:45,263 INFO org.jumpmind.symmetric.service.impl.PushService [worker-manager-push-default-1] Push data sent to master-manager:000:000
+2020-08-13 16:17:45,303 INFO org.jumpmind.symmetric.service.impl.PushService [worker-manager-push-default-1] Pushed data to node master-manager:000:000. 1 data and 1 batches were processed. (sym_node_host)
+2020-08-13 16:18:06,350 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-4] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:19:06,357 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-10] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:20:06,359 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-6] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:21:06,374 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-2] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:22:06,351 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-8] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:23:06,377 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-4] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:24:06,368 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-10] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:25:06,388 INFO org.jumpmind.symmetric.service.impl.PullService [worker-manager-pull-default-6] Pull data received from master-manager:000:000 on queue default. 1 rows and 1 batches were processed. (host_events)
+2020-08-13 16:25:07,975 INFO org.springframework.orm.jpa.AbstractEntityManagerFactoryBean [SpringContextShutdownHook] Closing JPA EntityManagerFactory for persistence unit 'default'
+2020-08-13 16:25:07,976 INFO org.hibernate.tool.schema.internal.SchemaDropperImpl$DelayedDropActionImpl [SpringContextShutdownHook] HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2020-08-13 16:25:07,999 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [SpringContextShutdownHook] Shutting down ExecutorService 'applicationTaskExecutor'
+2020-08-13 16:25:08,000 INFO com.zaxxer.hikari.HikariDataSource [SpringContextShutdownHook] HikariPool-1 - Shutdown initiated...
+2020-08-13 16:25:08,004 INFO com.zaxxer.hikari.HikariDataSource [SpringContextShutdownHook] HikariPool-1 - Shutdown completed.

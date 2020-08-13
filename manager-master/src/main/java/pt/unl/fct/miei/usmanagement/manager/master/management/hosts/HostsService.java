@@ -84,8 +84,7 @@ public class HostsService {
   private final int maxWorkers;
   private final int maxInstances;
   private final Mode mode;
-  private String publicIp;
-  private String privateIp;
+  private MachineAddress machineAddress;
 
   public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
@@ -114,8 +113,8 @@ public class HostsService {
 
   public MachineAddress setMachineAddress() {
     String username = bashService.getUsername();
-    this.publicIp = bashService.getPublicIp();
-    this.privateIp = bashService.getPrivateIp();
+    String publicIp = bashService.getPublicIp();
+    String privateIp = bashService.getPrivateIp();
     if (mode == Mode.LOCAL && !edgeHostsService.hasEdgeHost(localMachineDns)) {
       edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
           .username(username)
@@ -126,22 +125,20 @@ public class HostsService {
           .country("pt")
           .city("lisbon")
           .build());
-      return new MachineAddress(localMachineDns, publicIp, privateIp);
+      this.machineAddress = new MachineAddress(localMachineDns, publicIp, privateIp);
+    } else {
+      this.machineAddress = new MachineAddress(null, publicIp, privateIp);
     }
-    return new MachineAddress(null, publicIp, privateIp);
+    return machineAddress;
   }
 
-  public String getPrivateIp() {
-    return this.privateIp;
-  }
-
-  public String getPublicIP() {
-    return this.publicIp;
+  public MachineAddress getMachineAddress() {
+    return this.machineAddress;
   }
 
   public void clusterHosts() {
     log.info("Clustering hosts into the swarm on mode {}...", mode);
-    setupHost(publicIp, privateIp, NodeRole.MANAGER);
+    setupHost(machineAddress.getPublicIpAddress(), machineAddress.getPrivateIpAddress(), NodeRole.MANAGER);
     if (mode == Mode.LOCAL) {
       getLocalWorkerNodes().forEach(edgeHost ->
           setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER));
@@ -164,8 +161,8 @@ public class HostsService {
   private List<EdgeHostEntity> getLocalWorkerNodes() {
     int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
     return edgeHostsService.getEdgeHosts().stream()
-        .filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.publicIp))
-        .filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.privateIp))
+        .filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.machineAddress.getPublicIpAddress()))
+        .filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.machineAddress.getPrivateIpAddress()))
         .filter(this::isEdgeHostRunning)
         .limit(maxWorkers)
         .collect(Collectors.toList());
@@ -193,8 +190,8 @@ public class HostsService {
 
   private SimpleNode setupSwarmManager(String publicIpAddress, String privateIpAddress) {
     SimpleNode node;
-    boolean isLeader = Objects.equals(publicIpAddress, this.publicIp)
-        && Objects.equals(privateIpAddress, this.privateIp);
+    boolean isLeader = Objects.equals(publicIpAddress, this.machineAddress.getPublicIpAddress())
+        && Objects.equals(privateIpAddress, this.machineAddress.getPrivateIpAddress());
     if (isLeader) {
       log.info("Setting up docker swarm leader");
       dockerSwarmService.leaveSwarm(privateIpAddress);
@@ -448,7 +445,8 @@ public class HostsService {
   public List<String> executeCommand(String command, String hostname) {
     List<String> result = null;
     String error = null;
-    if (this.privateIp.equalsIgnoreCase(hostname) || this.publicIp.equalsIgnoreCase(hostname)) {
+    if (this.machineAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
+        || this.machineAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
       BashCommandResult bashCommandResult = bashService.executeCommand(command);
       if (!bashCommandResult.isSuccessful()) {
         error = String.join("\n", bashCommandResult.getError());

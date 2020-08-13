@@ -81,6 +81,8 @@ public class SymService {
   private final DataSourceProperties dataSourceProperties;
   private final SymmetricDSProperties symmetricDSProperties;
 
+  private ServerSymmetricEngine serverSymmetricEngine;
+
   public SymService(SymTriggerRoutersRepository symTriggerRoutersRepository,
                     SymTriggersRepository symTriggersRepository,
                     SymRoutersRepository symRoutersRepository,
@@ -127,15 +129,18 @@ public class SymService {
     properties.setProperty("db.user", dataSourceProperties.getUsername());
     properties.setProperty("db.password", dataSourceProperties.getPassword());
 
-    ServerSymmetricEngine serverEngine =
-        new ServerSymmetricEngine(dataSource, applicationContext, properties, false, holder);
-    serverEngine.setDeploymentType("server");
-    holder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverEngine);
+    serverSymmetricEngine = new ServerSymmetricEngine(dataSource, applicationContext, properties, false, holder);
+    serverSymmetricEngine.setDeploymentType("server");
+    holder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverSymmetricEngine);
     holder.setAutoStart(false);
     servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, holder);
-    serverEngine.setup();
+    serverSymmetricEngine.setup();
     this.loadSymmetricDS();
-    serverEngine.start();
+    serverSymmetricEngine.start();
+  }
+
+  public void stopSymmetricDSServer() {
+    serverSymmetricEngine.stop();
   }
 
   private void loadSymmetricDS() throws SQLException {

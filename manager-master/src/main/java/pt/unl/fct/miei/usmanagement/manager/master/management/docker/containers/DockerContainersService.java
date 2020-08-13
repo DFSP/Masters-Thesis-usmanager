@@ -63,6 +63,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.containers.Contain
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
@@ -340,6 +341,10 @@ public class DockerContainersService {
   }
 
   public void stopContainer(String id, String hostname) {
+    this.stopContainer(id, hostname, null);
+  }
+
+  public void stopContainer(String id, String hostname, Integer delay) {
     ContainerInfo containerInfo = inspectContainer(id, hostname);
     String serviceType = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE);
     if (Objects.equals(serviceType, "frontend")) {
@@ -347,8 +352,10 @@ public class DockerContainersService {
     }
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       //TODO espera duas vezes no caso de migração!?!?
-      dockerClient.stopContainer(id, dockerDelayBeforeStopContainer);
-      log.info("Stopped container '{}' on host '{}'", id, hostname);
+      String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
+      int delayBeforeStop = delay == null ? dockerDelayBeforeStopContainer : delay;
+      dockerClient.stopContainer(id, delayBeforeStop);
+      log.info("Stopped container {} ({}) on host {}", serviceName, id, hostname);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
@@ -356,7 +363,7 @@ public class DockerContainersService {
   }
 
   public Optional<DockerContainer> replicateContainer(ContainerEntity container, String toHostname) {
-    return replicateContainer(container, toHostname);
+    return replicateContainer(container.getContainerId(), container.getHostname(), toHostname);
   }
 
   public Optional<DockerContainer> replicateContainer(String id, String fromHostname, String toHostname) {
@@ -507,6 +514,20 @@ public class DockerContainersService {
       e.printStackTrace();
     }
     return logs;
+  }
+
+  public void stopAll() {
+    this.stopAllExcept(List.of(DockerApiProxyService.DOCKER_API_PROXY));
+  }
+
+  public void stopAllExcept(List<String> services) {
+    List<DockerContainer> containers = getContainers();
+    containers.removeIf(dockerContainer -> {
+      String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
+      return services.contains(serviceName);
+    });
+    log.info(containers.toString());
+    containers.forEach(container -> stopContainer(container.getId(), container.getHostname(), 0));
   }
 
 }

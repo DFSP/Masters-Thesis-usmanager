@@ -25,7 +25,7 @@ Usa [kafka](https://kafka.apache.org/) para comunicar com o manager-master.
 
 #### Local
 ```shell script
-mvn spring-boot:run -Dspring-boot.run.arguments="--id=001 --master=127.0.0.1 --hosts=127.0.0.1,13.100.169.202"
+mvn spring-boot:run -Dspring-boot.run.arguments="--id=001 --master=127.0.0.1"
 ```
 ou
 ```shell script
@@ -34,10 +34,14 @@ mvn spring-boot:run
 ```
 
 #### Docker
+
+##### Local
 ```shell script
 docker build -f docker/Dockerfile . -t manager-worker
-docker run --rm -p 8080:8088 \ 
-  && --env ID=worker-1 \
-  && --env MASTER=127.0.0.1 \
-  && --env HOSTS=127.0.0.1,13.100.169.202 manager-worker
+docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 manager-worker
+```
+
+##### Hub
+```shell script
+docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 usmanager/manager-worker
 ```

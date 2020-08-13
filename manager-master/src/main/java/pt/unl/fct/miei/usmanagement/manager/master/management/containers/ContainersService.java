@@ -396,6 +396,10 @@ public class ContainersService {
     return containerId;
   }
 
+  public void stopAll() {
+    dockerContainersService.stopAll();
+  }
+
   public boolean hasContainer(String containerId) {
     return containers.hasContainer(containerId);
   }

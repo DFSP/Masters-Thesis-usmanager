@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineAddress;
 
 @Service
 @Slf4j
@@ -66,7 +67,8 @@ public class DockerSwarmService {
   }
 
   public DockerClient getSwarmLeader() {
-    return dockerCoreService.getDockerClient(hostsService.getPrivateIp());
+    String privateIp = hostsService.getMachineAddress().getPrivateIpAddress();
+    return dockerCoreService.getDockerClient(privateIp);
   }
 
   public Optional<String> getSwarmManagerNodeId(String hostname) {
@@ -93,8 +95,9 @@ public class DockerSwarmService {
   }
 
   public SimpleNode initSwarm() {
-    String advertiseAddress = hostsService.getPublicIP();
-    String listenAddress = hostsService.getPrivateIp();
+    MachineAddress machineAddress = hostsService.getMachineAddress();
+    String advertiseAddress = machineAddress.getPublicIpAddress();
+    String listenAddress = machineAddress.getPrivateIpAddress();
     log.info("Initializing docker swarm at {}", advertiseAddress);
     String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
         advertiseAddress, listenAddress);
@@ -123,7 +126,7 @@ public class DockerSwarmService {
   }
 
   public SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
-    String leaderAddress = hostsService.getPublicIP();
+    String leaderAddress = hostsService.getMachineAddress().getPublicIpAddress();
     try (DockerClient leaderClient = getSwarmLeader();
          DockerClient nodeClient = dockerCoreService.getDockerClient(publicIpAddress)) {
       leaveSwarm(nodeClient);

@@ -39,7 +39,7 @@ spring:
       path: /console
       settings:
         trace: false
-        web-allow-others: false
+        web-allow-others: true
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:

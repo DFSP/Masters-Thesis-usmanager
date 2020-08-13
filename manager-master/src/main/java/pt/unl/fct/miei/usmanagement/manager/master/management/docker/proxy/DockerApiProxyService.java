@@ -41,7 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesS
 @Service
 public class DockerApiProxyService {
 
-  public static final String DOCKER_API_PROXY = "docker-api-proxy";
+  public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
 
   private final ServicesService servicesService;
   private final HostsService hostsService;

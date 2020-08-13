@@ -42,7 +42,8 @@ public final class ContainerConstants {
     public static final String SERVER1_REGION = "SERVER1_REGION";
     public static final String SERVER1_COUNTRY = "SERVER1_COUNTRY";
     public static final String SERVER1_CITY = "SERVER1_CITY";
-
+    public static final String ID = "ID";
+    public static final String MASTER = "MASTER";
   }
 
   public static final class Label {

@@ -6,7 +6,7 @@ spring:
   datasource:
     driverClassName: org.h2.Driver
     #url: jdbc:h2:file:./manager-master/db/manager-master-db
-    url: jdbc:h2:mem:manager-master-db
+    url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
     username: sa
     password: admin
     platform: h2
@@ -16,7 +16,7 @@ spring:
       path: /console
       settings:
         trace: false
-        web-allow-others: false
+        web-allow-others: true
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:

@@ -26,16 +26,21 @@ package pt.unl.fct.miei.usmanagement.manager.master;
 
 import java.util.List;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.JsonPathArgumentResolver;
 
 @Configuration
 @EnableAsync
 public class ManagerMasterConfiguration implements WebMvcConfigurer {
+
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {

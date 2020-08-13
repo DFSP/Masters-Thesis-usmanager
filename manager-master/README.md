@@ -39,9 +39,17 @@ mvn spring-boot:run
 ```
 
 #### Docker
+
+##### Local
 ```shell script
 docker build -f docker/Dockerfile . -t manager-master
-docker run --rm -p 8080:8088 manager-master
+docker run --rm -p 8080:8080 manager-master
+```
+
+##### Hub
+##### Hub
+```shell script
+docker run --rm -p 8080:8080 usmanager/manager-master
 ```
 
 ## Ambiente
