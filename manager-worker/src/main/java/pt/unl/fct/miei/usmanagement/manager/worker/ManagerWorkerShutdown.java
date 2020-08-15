@@ -27,19 +27,23 @@ package pt.unl.fct.miei.usmanagement.manager.worker;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
+  private final DockerSwarmService dockerSwarmService;
   private final SymService symService;
 
-  public ManagerWorkerShutdown(SymService symService) {
+  public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
+    this.dockerSwarmService = dockerSwarmService;
     this.symService = symService;
   }
 
   @Override
   public void onApplicationEvent(ContextClosedEvent event) {
+    dockerSwarmService.destroy();
     symService.stopSymmetricDSServer();
   }
 

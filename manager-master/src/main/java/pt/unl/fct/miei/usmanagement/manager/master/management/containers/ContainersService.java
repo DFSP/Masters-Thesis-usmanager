@@ -40,6 +40,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
@@ -56,19 +57,19 @@ public class ContainersService {
 
   private final DockerContainersService dockerContainersService;
   private final ContainerRulesService containerRulesService;
-  private final ContainerSimulatedMetricsService ContainerSimulatedMetricsService;
+  private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
   private final DockerApiProxyService dockerApiProxyService;
 
   private final ContainerRepository containers;
 
   public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
-                           ContainerSimulatedMetricsService ContainerSimulatedMetricsService,
+                           ContainerSimulatedMetricsService containerSimulatedMetricsService,
                            DockerApiProxyService dockerApiProxyService,
                            ContainerRepository containers) {
     this.dockerContainersService = dockerContainersService;
     this.containerRulesService = containerRulesService;
-    this.ContainerSimulatedMetricsService = ContainerSimulatedMetricsService;
+    this.containerSimulatedMetricsService = containerSimulatedMetricsService;
     this.dockerApiProxyService = dockerApiProxyService;
     this.containers = containers;
   }
@@ -271,9 +272,8 @@ public class ContainersService {
     return dockerContainer.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
-  public Map<String, List<ContainerEntity>> launchApp(List<ServiceEntity> services,
-                                                      String region, String country, String city) {
-    return dockerContainersService.launchApp(services, region, country, city).entrySet()
+  public Map<String, List<ContainerEntity>> launchApp(List<ServiceEntity> services, Coordinates coordinates) {
+    return dockerContainersService.launchApp(services, coordinates).entrySet()
         .stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
@@ -364,24 +364,24 @@ public class ContainersService {
 
   public void addSimulatedMetric(String containerId, String simulatedMetricName) {
     assertContainerExists(containerId);
-    ContainerSimulatedMetricsService.addContainer(simulatedMetricName, containerId);
+    containerSimulatedMetricsService.addContainer(simulatedMetricName, containerId);
   }
 
   public void addSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
     assertContainerExists(containerId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        ContainerSimulatedMetricsService.addContainer(simulatedMetric, containerId));
+        containerSimulatedMetricsService.addContainer(simulatedMetric, containerId));
   }
 
   public void removeSimulatedMetric(String containerId, String simulatedMetricName) {
     assertContainerExists(containerId);
-    ContainerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
+    containerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
   }
 
   public void removeSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
     assertContainerExists(containerId);
     simulatedMetricNames.forEach(simulatedMetric ->
-        ContainerSimulatedMetricsService.removeContainer(simulatedMetric, containerId));
+        containerSimulatedMetricsService.removeContainer(simulatedMetric, containerId));
   }
 
   public String launchDockerApiProxy(String hostname) {

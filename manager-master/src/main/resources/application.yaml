@@ -56,10 +56,7 @@ container:
   database:
     deploy-delay: 5000
   delay-before-stop: 45000
-  migrate-container-on-event-count: 2
   monitor-period: 60000
-  replicate-container-on-event-count: 2
-  stop-container-on-event-count: 3
 docker:
   install-script: docker-install.sh
   install-script-path: src/main/resources/scripts/docker-install.sh
@@ -82,14 +79,18 @@ prometheus:
   node-exporter:
     install-script: node-exporter-install.sh
     install-script-path: src/main/resources/scripts/node-exporter-install.sh
+decision:
+  start-host-on-events-count: 3
+  stop-host-on-events-count: 3
+    replicate-container-on-event-count: 2
+  migrate-container-on-event-count: 2
+  stop-container-on-event-count: 3
 host:
   maximum-cpu-percentage: 90
   maximum-hosts: 0
   maximum-ram-percentage: 90
   minimum-hosts: 1
   monitor-period: 60000
-  start-host-on-events-count: 3
-  stop-host-on-events-count: 3
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 manager-master:
   mode: LOCAL

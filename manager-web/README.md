@@ -1,4 +1,4 @@
-# Web manager
+# Manager web
 
 [![js-eslint-style](https://img.shields.io/badge/code%20style-TSLint-blue.svg?style=flat-square)](https://palantir.github.io/tslint/)
 

@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -37,6 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -78,6 +80,13 @@ public class HostDecisionEntity {
   @OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<HostDecisionValueEntity> hostDecisions = new HashSet<>();
+
+  @PrePersist
+  public void prePersist() {
+    if (timestamp == null) {
+      timestamp = Timestamp.from(Instant.now());
+    }
+  }
 
   @Override
   public boolean equals(Object o) {

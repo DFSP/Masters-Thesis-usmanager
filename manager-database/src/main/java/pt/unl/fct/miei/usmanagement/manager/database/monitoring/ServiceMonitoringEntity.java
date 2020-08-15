@@ -57,6 +57,8 @@ public class ServiceMonitoringEntity {
 
   private String serviceName;
 
+  private String hostname;
+
   private String field;
 
   private double minValue;

@@ -30,17 +30,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 
 @Service
@@ -49,15 +46,13 @@ public class EurekaService {
   public static final String EUREKA_SERVER = "eureka-server";
 
   private final HostsService hostsService;
-  private final RegionsService regionsService;
   private final ServicesService serviceService;
   private final ContainersService containersService;
   private final int port;
 
-  public EurekaService(HostsService hostsService, ServicesService serviceService, RegionsService regionsService,
+  public EurekaService(HostsService hostsService, ServicesService serviceService,
                        @Lazy ContainersService containersService, EurekaProperties eurekaProperties) {
     this.hostsService = hostsService;
-    this.regionsService = regionsService;
     this.serviceService = serviceService;
     this.containersService = containersService;
     this.port = eurekaProperties.getPort();
@@ -72,14 +67,13 @@ public class EurekaService {
         .findFirst();
   }
 
-  public List<ContainerEntity> launchEurekaServers(String[] regions) {
-    ServiceEntity service =
-        serviceService.getService(EUREKA_SERVER);
-    double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-    List<String> availableHostnames = Stream.of(regions)
-        .map(regionsService::getRegion)
-        .map(region -> hostsService.getAvailableHost(expectedMemoryConsumption, region.getName()))
-        .collect(Collectors.toList());
+  public ContainerEntity launchEurekaServer(String region) {
+    return launchEurekaServers(List.of(region)).get(0);
+  }
+
+  public List<ContainerEntity> launchEurekaServers(List<String> regions) {
+    double expectedMemoryConsumption = serviceService.getService(EUREKA_SERVER).getExpectedMemoryConsumption();
+    List<String> availableHostnames = hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions);
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();
     String eurekaServers = availableHostnames.stream()
@@ -87,8 +81,8 @@ public class EurekaService {
         .collect(Collectors.joining(","));
     Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
     return availableHostnames.stream()
-        .map(hostname -> containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs,
-            customLabels, dynamicLaunchParams))
+        .map(hostname ->
+            containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs, customLabels, dynamicLaunchParams))
         .collect(Collectors.toList());
   }
 

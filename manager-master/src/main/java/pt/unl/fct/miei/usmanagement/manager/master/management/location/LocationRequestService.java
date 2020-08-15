@@ -49,7 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
 
 @Slf4j

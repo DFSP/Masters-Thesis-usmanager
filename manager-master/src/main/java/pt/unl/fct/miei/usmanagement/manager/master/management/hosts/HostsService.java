@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
@@ -125,9 +128,9 @@ public class HostsService {
           .country("pt")
           .city("lisbon")
           .build());
-      this.machineAddress = new MachineAddress(localMachineDns, publicIp, privateIp);
+      this.machineAddress = new MachineAddress(localMachineDns, publicIp, privateIp, username);
     } else {
-      this.machineAddress = new MachineAddress(null, publicIp, privateIp);
+      this.machineAddress = new MachineAddress(publicIp, privateIp, username);
     }
     return machineAddress;
   }
@@ -168,6 +171,12 @@ public class HostsService {
         .collect(Collectors.toList());
   }
 
+  public boolean isLocalhost(String publicIp, String privateIp) {
+    String machinePublicIp = machineAddress.getPublicIpAddress();
+    String machinePrivateIp = machineAddress.getPrivateIpAddress();
+    return Objects.equals(publicIp, machinePublicIp) && Objects.equals(privateIp, machinePrivateIp);
+  }
+
   private SimpleNode setupHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
     log.info("Setting up host {} ({}) with role {}", publicIpAddress, privateIpAddress, role);
     String dockerApiProxyContainerId = containersService.launchDockerApiProxy(publicIpAddress, false);
@@ -190,9 +199,7 @@ public class HostsService {
 
   private SimpleNode setupSwarmManager(String publicIpAddress, String privateIpAddress) {
     SimpleNode node;
-    boolean isLeader = Objects.equals(publicIpAddress, this.machineAddress.getPublicIpAddress())
-        && Objects.equals(privateIpAddress, this.machineAddress.getPrivateIpAddress());
-    if (isLeader) {
+    if (isLocalhost(publicIpAddress, privateIpAddress)) {
       log.info("Setting up docker swarm leader");
       dockerSwarmService.leaveSwarm(privateIpAddress);
       node = dockerSwarmService.initSwarm();
@@ -210,58 +217,46 @@ public class HostsService {
     return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
   }
 
-  public String getAvailableHost(double avgContainerMem, HostDetails hostDetails) {
-    /*if (hostDetails instanceof EdgeHostDetails) {
-      final var edgeHostDetails = (EdgeHostDetails) hostDetails;
-      return getAvailableNodeHostname(avgContainerMem, edgeHostDetails.getRegion(),
-          edgeHostDetails.getCountry(), edgeHostDetails.getCity());
-    }
-    else if (hostDetails instanceof AwsHostDetails) {
-      final var awsHostDetails = (AwsHostDetails) hostDetails;
-      return getAvailableNodeHostname(avgContainerMem, awsHostDetails.getRegion());
-    }
-    else {
-      throw new NotImplementedException();
-    }*/
-    MachineLocation machineLocation = hostDetails.getMachineLocation();
-    return getAvailableHost(avgContainerMem, machineLocation.getRegion(), machineLocation.getCountry(),
-        machineLocation.getCity());
+  public List<String> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
+    return regions.stream()
+        .map(regionsService::getRegion)
+        .map(regionEntity -> new MachineLocation(null, null, regionEntity.getName(), null))
+        .map(location -> getAvailableHost(expectedMemoryConsumption, location))
+        .collect(Collectors.toList());
   }
 
-  public String getAvailableHost(double avgContainerMem, String region) {
-    return getAvailableHost(avgContainerMem, region, "", "");
+  public String getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
+    // TODO implement algorithm to get the closest machine based on coordinates
+    return null;
   }
 
   //FIXME
-  public String getAvailableHost(double expectedMemoryConsumption, String region, String country, String city) {
+  @Deprecated
+  public String getAvailableHost(double expectedMemoryConsumption, MachineLocation machineLocation) {
     //TODO try to improve method
+    String region = machineLocation.getRegion();
+    String country = machineLocation.getCountry();
+    String city = machineLocation.getCity();
     log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
         + "city '{}'", expectedMemoryConsumption, region, country, city);
     var otherRegionsHosts = new LinkedList<String>();
     var sameRegionHosts = new LinkedList<String>();
     var sameCountryHosts = new LinkedList<String>();
     var sameCityHosts = new LinkedList<String>();
-    List<SimpleNode> nodes = nodesService.getActiveNodes();
-    nodes.stream()
+    nodesService.getActiveNodes().stream()
         .map(SimpleNode::getHostname)
         .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
         .forEach(hostname -> {
-          MachineLocation machineLocation = getHostDetails(hostname).getMachineLocation();
-          if (Objects.equals(machineLocation.getRegion(), region)) {
+          MachineLocation nodeLocation = getHostDetails(hostname).getMachineLocation();
+          String nodeRegion = nodeLocation.getRegion();
+          String nodeCountry = nodeLocation.getCountry();
+          String nodeCity = nodeLocation.getCity();
+          if (Objects.equals(nodeRegion, region)) {
             sameRegionHosts.add(hostname);
-            /*if (hostDetails instanceof EdgeHostDetails) {
-              final var edgeHostDetails = (EdgeHostDetails) hostDetails;
-              if (Objects.equals(country, edgeHostDetails.getCountry())) { //TODO confirm that country is never empty
-                sameCountryHosts.add(hostname);
-                if (Objects.equals(city, edgeHostDetails.getCity())) {  //TODO confirm that city is never empty
-                  sameCityHosts.add(hostname);
-                }
-              }
-            }*/
-            if (!Text.isNullOrEmpty(country) && machineLocation.getCountry().equalsIgnoreCase(country)) {
+            if (!Text.isNullOrEmpty(country) && nodeCountry.equalsIgnoreCase(country)) {
               sameCountryHosts.add(hostname);
             }
-            if (!Text.isNullOrEmpty(city) && machineLocation.getCity().equalsIgnoreCase(city)) {
+            if (!Text.isNullOrEmpty(city) && nodeCity.equalsIgnoreCase(city)) {
               sameCityHosts.add(hostname);
             }
           } else {
@@ -291,73 +286,18 @@ public class HostsService {
   }
 
   public HostDetails getHostDetails(String hostname) {
-    /*final var edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
-    if (edgeHost != null) {
-      return new EdgeHostDetails(hostname, getContinent(edgeHost.getRegion()),
-          edgeHost.getRegion(), edgeHost.getCountry(), edgeHost.getCity());
-    }
-    else {
-      final var instance = awsService.getInstanceByPublicIpAddr(hostname);
-      final var zone = instance.getPlacement().getAvailabilityZone();
-      final var region = Character.isDigit(zone.charAt(zone.length() - 1)) ?
-          zone :
-          zone.substring(0, zone.length() - 1);
-      return new AwsHostDetails(hostname, getContinent(region), region);
-    }*/
-    String publicDnsName;
-    String publicIpAddress;
-    String privateIpAddress;
-    String city;
-    String country;
-    String region;
-    String continent;
+    MachineAddress machineAddress;
+    MachineLocation machineLocation;
     try {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-      publicDnsName = edgeHost.getPublicDnsName();
-      publicIpAddress = edgeHost.getPublicIpAddress();
-      privateIpAddress = edgeHost.getPrivateIpAddress();
-      city = edgeHost.getCity();
-      country = edgeHost.getCountry();
-      region = edgeHost.getRegion().getName();
-      continent = getContinent(region);
+      machineAddress = edgeHost.getAddress();
+      machineLocation = edgeHost.getLocation();
     } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
-      publicDnsName = cloudHost.getPublicDnsName();
-      publicIpAddress = cloudHost.getPublicIpAddress();
-      privateIpAddress = cloudHost.getPrivateIpAddress();
-      city = "";
-      country = "";
-      String zone = cloudHost.getPlacement().getAvailabilityZone();
-      region = Character.isDigit(zone.charAt(zone.length() - 1)) ? zone : zone.substring(0, zone.length() - 1);
-      continent = getContinent(zone);
+      machineAddress = cloudHost.getAddress();
+      machineLocation = cloudHost.getLocation();
     }
-    return new HostDetails(new MachineAddress(publicDnsName, publicIpAddress, privateIpAddress),
-        new MachineLocation(null, city, country, region, continent));
-  }
-
-  private String getContinent(String region) {
-    String continent;
-    //TODO remove the "none" region
-    if (Text.isNullOrEmpty(region) || Objects.equals(region, "none")) {
-      continent = "";
-    } else {
-      String zone = region.substring(0, region.indexOf('-'));
-      //TODO convert strings into enum
-      if (zone.startsWith("us") || zone.startsWith("ca")) {
-        continent = "na";
-      } else if (region.startsWith("sa")) {
-        continent = "sa";
-      } else if (region.startsWith("eu")) {
-        continent = "eu";
-      } else if (region.contains("ap-southeast-1")) {
-        continent = "oc";
-      } else if (region.startsWith("ap")) {
-        continent = "as";
-      } else {
-        continent = "";
-      }
-    }
-    return continent;
+    return new HostDetails(machineAddress, machineLocation);
   }
 
   public SimpleNode addHost(RegionEntity region, String country, String city, NodeRole role) {

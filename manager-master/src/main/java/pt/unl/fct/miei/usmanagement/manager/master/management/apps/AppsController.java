@@ -104,10 +104,11 @@ public final class AppsController {
     appsService.removeService(appName, serviceName);
   }
 
+  //TODO fix client
   @PostMapping("/{appName}/launch")
   public Map<String, List<ContainerEntity>> launch(@PathVariable String appName,
-                                                   @RequestBody LaunchApp location) {
-    return appsService.launch(appName, location.getRegion(), location.getCountry(), location.getCity());
+                                                   @RequestBody Coordinates coordinates) {
+    return appsService.launch(appName, coordinates);
   }
 
 }

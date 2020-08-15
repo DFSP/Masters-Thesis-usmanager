@@ -1,5 +1,7 @@
 # Manager database
 
+[![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
+
 Módulo que contém todas as entidades e repositórios que constituem a base de dados dos componentes 
 [master](../manager-master) e [worker](../manager-worker) manager.
 

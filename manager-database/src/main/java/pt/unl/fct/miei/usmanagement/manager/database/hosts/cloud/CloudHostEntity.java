@@ -51,6 +51,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
@@ -132,6 +134,41 @@ public class CloudHostEntity {
   public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.remove(hostMetric);
     hostMetric.getCloudHosts().remove(this);
+  }
+
+  @JsonIgnore
+  public MachineAddress getAddress() {
+    return new MachineAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress);
+  }
+
+  @JsonIgnore
+  public MachineLocation getLocation() {
+    return new MachineLocation("", "", getRegion(), getContinent());
+  }
+
+  @JsonIgnore
+  public String getRegion() {
+    String zone = placement.getAvailabilityZone();
+    return Character.isDigit(zone.charAt(zone.length() - 1)) ? zone : zone.substring(0, zone.length() - 1);
+  }
+
+  @JsonIgnore
+  public String getContinent() {
+    String region = getRegion();
+    String zone = region.substring(0, region.indexOf('-'));
+    if (zone.startsWith("us") || zone.startsWith("ca")) {
+      return "na";
+    }
+    if (region.startsWith("sa") || region.startsWith("eu")) {
+      return region;
+    }
+    if (region.contains("ap-southeast-1")) {
+      return "oc";
+    }
+    if (region.startsWith("ap")) {
+      return "as";
+    }
+    return "";
   }
 
   @Override

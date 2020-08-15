@@ -36,7 +36,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceOrder;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
@@ -128,13 +127,13 @@ public class AppsService {
     apps.save(app);
   }
 
-  public Map<String, List<ContainerEntity>> launch(String appName, RegionEntity region, String country, String city) {
-    log.info("Launching app {} at {}/{}/{}", appName, region.getName(), country, city);
+  public Map<String, List<ContainerEntity>> launch(String appName, Coordinates coordinates) {
+    log.info("Launching app {} at {} lat {} lon", appName, coordinates.getLatitude(), coordinates.getLongitude());
     List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
         .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
         .map(ServiceOrder::getService)
         .collect(Collectors.toList());
-    return containersService.launchApp(services, region.getName(), country, city);
+    return containersService.launchApp(services, coordinates);
   }
 
   private void assertAppExists(String appName) {

@@ -1,4 +1,4 @@
-# Master manager   
+# Manager master   
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
 

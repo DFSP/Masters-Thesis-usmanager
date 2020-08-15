@@ -24,28 +24,31 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master;
 
-import javax.annotation.PreDestroy;
-
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 
 @Component
 public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {
 
   private final ContainersService containersService;
+  private final DockerSwarmService dockerSwarmService;
   private final SymService symService;
 
-  public ManagerMasterShutdown(ContainersService containersService, SymService symService) {
+  public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
+                               SymService symService) {
     this.containersService = containersService;
+    this.dockerSwarmService = dockerSwarmService;
     this.symService = symService;
   }
 
   @Override
   public void onApplicationEvent(ContextClosedEvent event) {
     containersService.stopAll();
+    dockerSwarmService.destroy();
     symService.stopSymmetricDSServer();
   }
 

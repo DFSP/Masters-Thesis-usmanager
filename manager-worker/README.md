@@ -1,5 +1,7 @@
 # Manager worker
 
+[![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
+
 Gestor que faz a conexão entre as máquinas edge e cloud.
 Está desenhado para ser executado em máquinas localizadas entre a edge e a cloud.  
 Gere um conjunto de nós e containers na edge.  

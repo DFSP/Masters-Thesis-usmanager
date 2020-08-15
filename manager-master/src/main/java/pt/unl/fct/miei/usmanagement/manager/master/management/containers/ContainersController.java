@@ -103,13 +103,13 @@ public class ContainersController {
 
   @PostMapping("/load-balancer")
   public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
-    return nginxLoadBalancerService.launchLoadBalancers(service, regions.toArray(new String[0]));
+    return nginxLoadBalancerService.launchLoadBalancers(service, Arrays.asList(regions.toArray(new String[0])));
   }
 
   //TODO
   @PostMapping("/eureka-server")
   public List<ContainerEntity> launchEureka(@Json JSONArray regions) {
-    return eurekaService.launchEurekaServers(regions.toArray(new String[0]));
+    return eurekaService.launchEurekaServers(Arrays.asList(regions.toArray(new String[0])));
   }
 
   @PostMapping("/reload")

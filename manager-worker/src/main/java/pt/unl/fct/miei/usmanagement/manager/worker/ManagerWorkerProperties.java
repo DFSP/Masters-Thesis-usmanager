@@ -24,9 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker;
 
-import java.util.List;
-
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -34,12 +34,27 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("manager")
+@ConfigurationProperties("manager-worker")
 public class ManagerWorkerProperties {
 
   public static final String MANAGER_WORKER = "manager-worker";
   private String id;
   private String masterHostname;
-  private List<String> hosts;
+  private final Tests tests;
+  private int monitorPeriod;
+
+  public ManagerWorkerProperties() {
+    this.tests = new Tests();
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  public static final class Tests {
+
+    private boolean enabled;
+
+  }
+
 
 }

@@ -25,8 +25,10 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -149,15 +151,15 @@ public class ServiceSimulatedMetricsService {
     }
   }
 
-  public Optional<Double> getSimulatedServiceFieldValue(String serviceName, String field) {
-    Optional<ServiceSimulatedMetricEntity> serviceSimulatedMetric = serviceSimulatedMetrics.findByServiceAndField(field,
-        serviceName);
-    return getFieldValue(serviceSimulatedMetric, field);
+  public Map<String, Double> getSimulatedFieldsValues(String serviceName) {
+    List<ServiceSimulatedMetricEntity> metrics = serviceSimulatedMetrics.findByService(serviceName);
+    return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
   }
 
-  private Optional<Double> getFieldValue(Optional<ServiceSimulatedMetricEntity> serviceSimulatedMetric, String field) {
-    Optional<Double> fieldValue = serviceSimulatedMetric.map(this::randomizeFieldValue);
-    if (fieldValue.isPresent() && serviceSimulatedMetric.get().isOverride()) {
+  public Optional<Double> getSimulatedFieldValue(String serviceName, String field) {
+    Optional<ServiceSimulatedMetricEntity> metric = serviceSimulatedMetrics.findByServiceAndField(serviceName, field);
+    Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
+    if (fieldValue.isPresent() && metric.get().isOverride()) {
       return fieldValue;
     }
     Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);

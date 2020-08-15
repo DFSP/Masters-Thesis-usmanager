@@ -36,6 +36,7 @@ import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
@@ -45,7 +46,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineAddress;
 
 @Service
 @Slf4j
@@ -181,6 +181,14 @@ public class DockerSwarmService {
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
+    }
+  }
+
+  public void destroy() {
+    try {
+      getSwarmLeader().listNodes().parallelStream().map(node -> node.status().addr()).forEach(this::leaveSwarm);
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
     }
   }
 

@@ -37,9 +37,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEnti
 @RequestMapping("/events")
 public class EventsController {
 
-  //TODO split into hosts and services?
-  //TODO create a LogsController?
-
   private final HostsEventsService hostsEventsService;
   private final ServicesEventsService servicesEventsService;
 
@@ -49,17 +46,17 @@ public class EventsController {
   }
 
   @GetMapping("/hosts/{hostname}")
-  public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname) {
+  public List<HostEventEntity> getHostEventsByHostname(@PathVariable String hostname) {
     return hostsEventsService.getHostEventsByHostname(hostname);
   }
 
   @GetMapping("/services/{serviceName}")
-  public List<ServiceEventEntity> getServiceEventLogsByServiceName(@PathVariable String serviceName) {
+  public List<ServiceEventEntity> getServiceEventsByServiceName(@PathVariable String serviceName) {
     return servicesEventsService.getServiceEventsByServiceName(serviceName);
   }
 
   @GetMapping("/containers/{containerId}")
-  public List<ServiceEventEntity> getServiceEventLogsByContainerId(@PathVariable String containerId) {
+  public List<ServiceEventEntity> getServiceEventsByContainerId(@PathVariable String containerId) {
     return servicesEventsService.getServiceEventsByContainerId(containerId);
   }
 

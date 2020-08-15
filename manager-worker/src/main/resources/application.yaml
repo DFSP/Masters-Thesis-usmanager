@@ -72,7 +72,14 @@ management:
     web:
       exposure:
         include: info, health, metrics, mappings
-manager:
+manager-worker:
   id: ${id:}
   master-hostname: ${master:}
-  hosts: ${hosts:}
+  monitor-period: 30000
+    tests:
+      enabled: ${tests:true}
+
+
+
+
+

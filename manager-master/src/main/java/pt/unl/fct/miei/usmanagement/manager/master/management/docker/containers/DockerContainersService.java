@@ -55,6 +55,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
@@ -62,11 +64,9 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.containers.Contain
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerCoreService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
@@ -102,12 +102,11 @@ public class DockerContainersService {
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
 
-  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,
-                                                      String region, String country, String city) {
+  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, Coordinates coordinates) {
     var serviceContainers = new HashMap<String, List<DockerContainer>>();
     var dynamicLaunchParams = new HashMap<String, String>();
     services.forEach(service -> {
-      List<DockerContainer> containers = launchMicroservice(service, region, country, city, dynamicLaunchParams);
+      List<DockerContainer> containers = launchMicroservice(service, coordinates, dynamicLaunchParams);
       serviceContainers.put(service.getServiceName(), containers);
       containers.forEach(container -> {
         String hostname = container.getHostname();
@@ -120,15 +119,15 @@ public class DockerContainersService {
     return serviceContainers;
   }
 
-  private List<DockerContainer> launchMicroservice(ServiceEntity service, String region, String country,
-                                                   String city, Map<String, String> dynamicLaunchParams) {
+  private List<DockerContainer> launchMicroservice(ServiceEntity service, Coordinates coordinates,
+                                                   Map<String, String> dynamicLaunchParams) {
     List<String> environment = Collections.emptyList();
     Map<String, String> labels = Collections.emptyMap();
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
     int minReplicas = servicesService.getMinReplicasByServiceName(service.getServiceName());
     var containers = new ArrayList<DockerContainer>(minReplicas);
     for (int i = 0; i < minReplicas; i++) {
-      String hostname = hostsService.getAvailableHost(expectedMemoryConsumption, region, country, city);
+      String hostname = hostsService.getAvailableHost(expectedMemoryConsumption, coordinates);
       Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
           dynamicLaunchParams);
       container.ifPresent(containers::add);
@@ -240,8 +239,6 @@ public class DockerContainersService {
     String region = machineLocation.getRegion();
     String country = machineLocation.getCountry();
     String city = machineLocation.getCity();
-    /*String country = hostDetails instanceof EdgeHostDetails ? ((EdgeHostDetails)hostDetails).getCountry() : "";
-    String city = hostDetails instanceof EdgeHostDetails ? ((EdgeHostDetails)hostDetails).getCity() : "";*/
     String launchCommand = service.getLaunchCommand();
     launchCommand = launchCommand
         .replace("${hostname}", hostname)
@@ -250,13 +247,10 @@ public class DockerContainersService {
     log.info("{}", launchCommand);
     if (servicesService.serviceDependsOn(serviceName, EurekaService.EUREKA_SERVER)) {
       String outputLabel = servicesService.getService(EurekaService.EUREKA_SERVER).getOutputLabel();
-      Optional<String> eurekaAddress = eurekaService.getEurekaServerAddress(region);
-      if (eurekaAddress.isPresent()) {
-        launchCommand = launchCommand.replace(outputLabel, eurekaAddress.get());
-      } else {
-        //TODO apagar depois de ver se não houver erro
-        log.error("eureka address at region '{}' not found", region);
-      }
+      String eurekaAddress = eurekaService
+          .getEurekaServerAddress(region)
+          .orElse(eurekaService.launchEurekaServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+      launchCommand = launchCommand.replace(outputLabel, eurekaAddress);
     }
     for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
       String databaseServiceName = databaseService.getServiceName();
@@ -310,7 +304,7 @@ public class DockerContainersService {
       String containerId = containerCreation.id();
       dockerClient.startContainer(containerId);
       if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
-        nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
+        nginxLoadBalancerService.addServiceToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
             city);
       }
       return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")
@@ -348,7 +342,7 @@ public class DockerContainersService {
     ContainerInfo containerInfo = inspectContainer(id, hostname);
     String serviceType = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE);
     if (Objects.equals(serviceType, "frontend")) {
-      nginxLoadBalancerService.removeFromLoadBalancer(hostname, id);
+      nginxLoadBalancerService.removeContainerFromLoadBalancer(id);
     }
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       //TODO espera duas vezes no caso de migração!?!?

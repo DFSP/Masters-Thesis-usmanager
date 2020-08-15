@@ -30,6 +30,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -68,6 +69,13 @@ public class HostMonitoringLogEntity {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
   private LocalDateTime timestamp;
+
+  @PrePersist
+  public void prePersist() {
+    if (timestamp == null) {
+      timestamp = LocalDateTime.now();
+    }
+  }
 
   @Override
   public boolean equals(Object o) {

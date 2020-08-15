@@ -47,6 +47,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
@@ -76,8 +78,10 @@ public class EdgeHostEntity {
   @ManyToOne
   private RegionEntity region;
 
+  @NotNull
   private String country;
 
+  @NotNull
   private String city;
 
   //@NotNull
@@ -138,6 +142,39 @@ public class EdgeHostEntity {
   public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
     simulatedHostMetrics.remove(hostMetric);
     hostMetric.getEdgeHosts().remove(this);
+  }
+
+  public MachineAddress getAddress() {
+    return new MachineAddress(username, publicDnsName, publicIpAddress, privateIpAddress);
+  }
+
+  public MachineLocation getLocation() {
+    return new MachineLocation(city, country, region.getName(), getContinent());
+  }
+
+  @JsonIgnore
+  public String getContinent() {
+    if (region == null) {
+      return "";
+    }
+    String regionName = region.getName();
+    if (regionName.isEmpty()) {
+      return regionName;
+    }
+    String zone = regionName.substring(0, regionName.indexOf('-'));
+    if (zone.startsWith("us") || zone.startsWith("ca")) {
+      return "na";
+    }
+    if (regionName.startsWith("sa") || regionName.startsWith("eu")) {
+      return regionName;
+    }
+    if (regionName.contains("ap-southeast-1")) {
+      return "oc";
+    }
+    if (regionName.startsWith("ap")) {
+      return "as";
+    }
+    return "";
   }
 
   @Override

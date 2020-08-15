@@ -24,32 +24,18 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.jumpmind.symmetric.common.ParameterConstants;
-import org.jumpmind.symmetric.web.ServerSymmetricEngine;
-import org.jumpmind.symmetric.web.SymmetricEngineHolder;
-import org.jumpmind.symmetric.web.WebConstants;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.MachineAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 
 @Slf4j
 @Component

@@ -40,9 +40,14 @@ public interface ServiceSimulatedMetricsRepository extends JpaRepository<Service
 
   @Query("select m "
       + "from ServiceSimulatedMetricEntity m join m.services s "
+      + "where s.serviceName = :serviceName")
+  List<ServiceSimulatedMetricEntity> findByService(@Param("serviceName") String serviceName);
+  
+  @Query("select m "
+      + "from ServiceSimulatedMetricEntity m join m.services s "
       + "where lower(s.serviceName) = lower(:serviceName) and lower(m.field.name) = lower(:field)")
-  Optional<ServiceSimulatedMetricEntity> findByServiceAndField(@Param("field") String field,
-                                                               @Param("serviceName") String serviceName);
+  Optional<ServiceSimulatedMetricEntity> findByServiceAndField(@Param("serviceName") String serviceName,
+                                                               @Param("field") String field);
 
   @Query("select m "
       + "from ServiceSimulatedMetricEntity m "

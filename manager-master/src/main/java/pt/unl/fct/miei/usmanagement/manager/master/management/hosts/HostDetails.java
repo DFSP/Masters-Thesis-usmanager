@@ -27,13 +27,13 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
 
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
 public class HostDetails {
-
-  //TODO make CloudHostDetails, EdgeHostDetails extends HostDetails
 
   private final MachineAddress machineAddress;
   private final MachineLocation machineLocation;
