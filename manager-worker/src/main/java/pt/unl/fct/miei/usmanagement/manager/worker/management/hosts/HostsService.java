@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.hosts;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -38,12 +37,11 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
@@ -67,7 +65,6 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.metrics
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.util.util.Text;
 
@@ -92,7 +89,7 @@ public class HostsService {
   private final RegionsService regionsService;
   private final ServicesService servicesService;
 
-  private MachineAddress machineAddress;
+  private HostAddress hostAddress;
 
   @Value("${id}")
   private String workerManagerId;
@@ -117,22 +114,22 @@ public class HostsService {
     this.servicesService = servicesService;
   }
 
-  public MachineAddress setMachineAddress() {
+  public HostAddress setMachineAddress() {
     String publicIp = bashService.getPublicIp();
     String privateIp = bashService.getPrivateIp();
     String username = bashService.getUsername();
-    this.machineAddress = new MachineAddress(workerManagerId, publicIp, privateIp, username);
-    return machineAddress;
+    this.hostAddress = new HostAddress(workerManagerId, publicIp, privateIp, username);
+    return hostAddress;
   }
 
-  public MachineAddress getMachineAddress() {
-    return this.machineAddress;
+  public HostAddress getHostAddress() {
+    return this.hostAddress;
   }
 
   public void clusterHosts() {
     log.info("Clustering hosts into the swarm...");
-    String publicIp = machineAddress.getPublicIpAddress();
-    String privateIp = machineAddress.getPrivateIpAddress();
+    String publicIp = hostAddress.getPublicIpAddress();
+    String privateIp = hostAddress.getPrivateIpAddress();
     setupHost(publicIp, privateIp, NodeRole.MANAGER);
     edgeHostsService.getEdgeHosts().stream()
         .filter(edgeHost -> !isLocalhost(edgeHost.getPublicIpAddress(), edgeHost.getPrivateIpAddress()))
@@ -150,13 +147,13 @@ public class HostsService {
 
   // TODO change decisions, rules, etc, to store public and privateIp
   public boolean isLocalhost(String localhost) {
-    String machinePublicIp = machineAddress.getPublicIpAddress();
+    String machinePublicIp = hostAddress.getPublicIpAddress();
     return Objects.equals(localhost, machinePublicIp);
   }
 
   public boolean isLocalhost(String publicIp, String privateIp) {
-    String machinePublicIp = machineAddress.getPublicIpAddress();
-    String machinePrivateIp = machineAddress.getPrivateIpAddress();
+    String machinePublicIp = hostAddress.getPublicIpAddress();
+    String machinePrivateIp = hostAddress.getPrivateIpAddress();
     return Objects.equals(publicIp, machinePublicIp) && Objects.equals(privateIp, machinePrivateIp);
   }
 
@@ -200,20 +197,20 @@ public class HostsService {
     return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
   }
 
-  public List<String> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
+  public List<HostDetails> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
     return regions.stream()
         .map(regionsService::getRegion)
-        .map(regionEntity -> new MachineLocation(null, null, regionEntity.getName(), null))
+        .map(regionEntity -> new HostLocation(null, null, regionEntity.getName(), null))
         .map(location -> getAvailableHost(expectedMemoryConsumption, location))
         .collect(Collectors.toList());
   }
 
   //FIXME
-  public String getAvailableHost(double expectedMemoryConsumption, MachineLocation machineLocation) {
+  public HostDetails getAvailableHost(double expectedMemoryConsumption, HostLocation hostLocation) {
     //TODO try to improve method
-    String region = machineLocation.getRegion();
-    String country = machineLocation.getCountry();
-    String city = machineLocation.getCity();
+    String region = hostLocation.getRegion();
+    String country = hostLocation.getCountry();
+    String city = hostLocation.getCity();
     log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
         + "city '{}'", expectedMemoryConsumption, region, country, city);
     var otherRegionsHosts = new LinkedList<String>();
@@ -224,7 +221,7 @@ public class HostsService {
         .map(SimpleNode::getHostname)
         .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
         .forEach(hostname -> {
-          MachineLocation nodeLocation = getHostDetails(hostname).getMachineLocation();
+          HostLocation nodeLocation = getHostDetails(hostname).getHostLocation();
           String nodeRegion = nodeLocation.getRegion();
           String nodeCountry = nodeLocation.getCountry();
           String nodeCity = nodeLocation.getCity();
@@ -247,34 +244,34 @@ public class HostsService {
     log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
     var random = new Random();
     if (!sameCityHosts.isEmpty()) {
-      return sameCityHosts.get(random.nextInt(sameCityHosts.size()));
+      return getHostDetails(sameCityHosts.get(random.nextInt(sameCityHosts.size())));
     } else if (!sameCountryHosts.isEmpty()) {
-      return sameCountryHosts.get(random.nextInt(sameCountryHosts.size()));
+      return getHostDetails(sameCountryHosts.get(random.nextInt(sameCountryHosts.size())));
     } else if (!sameRegionHosts.isEmpty()) {
-      return sameRegionHosts.get(random.nextInt(sameRegionHosts.size()));
+      return getHostDetails(sameRegionHosts.get(random.nextInt(sameRegionHosts.size())));
     } else if (!otherRegionsHosts.isEmpty() && !"us-east-1".equals(region)) {
       //TODO porquê excluir a região us-east-1?
       // TODO: review otherHostRegion and region us-east-1
-      return otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size()));
+      return getHostDetails(otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size())));
     } else {
       log.info("Didn't find any available node");
-      return addHost(regionsService.getRegion(region), country, city, NodeRole.WORKER).getHostname();
+      return getHostDetails(addHost(regionsService.getRegion(region), country, city, NodeRole.WORKER).getHostname());
     }
   }
 
   public HostDetails getHostDetails(String hostname) {
-    MachineAddress machineAddress;
-    MachineLocation machineLocation;
+    HostAddress hostAddress;
+    HostLocation hostLocation;
     try {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-      machineAddress = edgeHost.getAddress();
-      machineLocation = edgeHost.getLocation();
+      hostAddress = edgeHost.getAddress();
+      hostLocation = edgeHost.getLocation();
     } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
-      machineAddress = cloudHost.getAddress();
-      machineLocation = cloudHost.getLocation();
+      hostAddress = cloudHost.getAddress();
+      hostLocation = cloudHost.getLocation();
     }
-    return new HostDetails(machineAddress, machineLocation);
+    return new HostDetails(hostAddress, hostLocation);
   }
 
   public SimpleNode addHost(Coordinates coordinates, NodeRole role) {
@@ -352,8 +349,8 @@ public class HostsService {
   public List<String> executeCommand(String command, String hostname) {
     List<String> result = null;
     String error = null;
-    if (this.machineAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
-        || this.machineAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
+    if (this.hostAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
+        || this.hostAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
       BashCommandResult bashCommandResult = bashService.executeCommand(command);
       if (!bashCommandResult.isSuccessful()) {
         error = String.join("\n", bashCommandResult.getError());
@@ -393,7 +390,7 @@ public class HostsService {
   }
 
   public void startHostCloseTo(String hostname) {
-    MachineLocation machineLocation = getHostDetails(hostname).getMachineLocation();
+    HostLocation hostLocation = getHostDetails(hostname).getHostLocation();
     // TODO porquê migrar logo um container?
     getRandomContainerToMigrate(hostname)
         .ifPresent(container -> {
@@ -401,20 +398,21 @@ public class HostsService {
           String containerId = container.getContainerId();
           ServiceEntity service = servicesService.getService(serviceName);
           double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-          String toHostname = getAvailableHost(expectedMemoryConsumption, machineLocation);
+          String toHostname = this.getAvailableHost(expectedMemoryConsumption, hostLocation).getHostAddress()
+              .getPublicIpAddress();
           containersService.migrateContainer(containerId, toHostname);
           log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", hostname, containerId);
         });
   }
 
   public void stopHost(String hostname) {
-    double expectedMemoryConsumption =
-        containersService.getHostContainers(hostname).stream()
-            .map(containerEntity ->
-                servicesService.getService(containerEntity.getLabels().get(ContainerConstants.Label.SERVICE_NAME)))
-            .mapToDouble(ServiceEntity::getExpectedMemoryConsumption).sum();
-    MachineLocation machineLocation = this.getHostDetails(hostname).getMachineLocation();
-    String migrateToHostname = this.getAvailableHost(expectedMemoryConsumption, machineLocation);
+    double expectedMemoryConsumption = containersService.getHostContainers(hostname).stream()
+        .map(containerEntity ->
+            servicesService.getService(containerEntity.getLabels().get(ContainerConstants.Label.SERVICE_NAME)))
+        .mapToDouble(ServiceEntity::getExpectedMemoryConsumption).sum();
+    HostLocation hostLocation = this.getHostDetails(hostname).getHostLocation();
+    String migrateToHostname =
+        this.getAvailableHost(expectedMemoryConsumption, hostLocation).getHostAddress().getPublicIpAddress();
     List<ContainerEntity> containers = containersService.migrateAppContainers(hostname, migrateToHostname);
     //TODO garantir que o host é removido dinamicamente só depois de serem migrados todos os containers
     new Timer("RemoveHostFromSwarmTimer").schedule(new TimerTask() {

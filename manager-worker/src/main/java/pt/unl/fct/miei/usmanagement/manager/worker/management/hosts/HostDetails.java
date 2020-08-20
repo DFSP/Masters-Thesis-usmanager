@@ -27,23 +27,23 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.hosts;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
 public class HostDetails {
 
-  private final MachineAddress machineAddress;
-  private final MachineLocation machineLocation;
+  private final HostAddress hostAddress;
+  private final HostLocation hostLocation;
 
-  public HostDetails(MachineAddress machineAddress) {
-    this(machineAddress, null);
+  public HostDetails(HostAddress hostAddress) {
+    this(hostAddress, null);
   }
 
-  public HostDetails(MachineLocation machineLocation) {
-    this(null, machineLocation);
+  public HostDetails(HostLocation hostLocation) {
+    this(null, hostLocation);
   }
 
 }

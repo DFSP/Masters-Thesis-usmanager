@@ -66,7 +66,7 @@ public class DockerSwarmService {
   }
 
   public DockerClient getSwarmLeader() {
-    String privateIp = hostsService.getMachineAddress().getPrivateIpAddress();
+    String privateIp = hostsService.getHostAddress().getPrivateIpAddress();
     return dockerCoreService.getDockerClient(privateIp);
   }
 
@@ -94,7 +94,7 @@ public class DockerSwarmService {
   }
 
   public SimpleNode initSwarm() {
-    MachineAddress machineAddress = hostsService.getMachineAddress();
+    MachineAddress machineAddress = hostsService.getHostAddress();
     String advertiseAddress = machineAddress.getPublicIpAddress();
     String listenAddress = machineAddress.getPrivateIpAddress();
     log.info("Initializing docker swarm at {}", advertiseAddress);
@@ -125,7 +125,7 @@ public class DockerSwarmService {
   }
 
   public SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
-    String leaderAddress = hostsService.getMachineAddress().getPublicIpAddress();
+    String leaderAddress = hostsService.getHostAddress().getPublicIpAddress();
     try (DockerClient leaderClient = getSwarmLeader();
          DockerClient nodeClient = dockerCoreService.getDockerClient(publicIpAddress)) {
       leaveSwarm(nodeClient);

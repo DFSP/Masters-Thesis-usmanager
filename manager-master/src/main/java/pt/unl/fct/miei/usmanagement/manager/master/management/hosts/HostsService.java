@@ -37,8 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
@@ -87,7 +87,7 @@ public class HostsService {
   private final int maxWorkers;
   private final int maxInstances;
   private final Mode mode;
-  private MachineAddress machineAddress;
+  private HostAddress hostAddress;
 
   public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
@@ -114,7 +114,7 @@ public class HostsService {
     this.mode = managerMasterProperties.getMode();
   }
 
-  public MachineAddress setMachineAddress() {
+  public HostAddress setMachineAddress() {
     String username = bashService.getUsername();
     String publicIp = bashService.getPublicIp();
     String privateIp = bashService.getPrivateIp();
@@ -128,20 +128,20 @@ public class HostsService {
           .country("pt")
           .city("lisbon")
           .build());
-      this.machineAddress = new MachineAddress(localMachineDns, publicIp, privateIp, username);
+      this.hostAddress = new HostAddress(localMachineDns, publicIp, privateIp, username);
     } else {
-      this.machineAddress = new MachineAddress(publicIp, privateIp, username);
+      this.hostAddress = new HostAddress(publicIp, privateIp, username);
     }
-    return machineAddress;
+    return hostAddress;
   }
 
-  public MachineAddress getMachineAddress() {
-    return this.machineAddress;
+  public HostAddress getHostAddress() {
+    return this.hostAddress;
   }
 
   public void clusterHosts() {
     log.info("Clustering hosts into the swarm on mode {}...", mode);
-    setupHost(machineAddress.getPublicIpAddress(), machineAddress.getPrivateIpAddress(), NodeRole.MANAGER);
+    setupHost(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), NodeRole.MANAGER);
     if (mode == Mode.LOCAL) {
       getLocalWorkerNodes().forEach(edgeHost ->
           setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER));
@@ -164,16 +164,16 @@ public class HostsService {
   private List<EdgeHostEntity> getLocalWorkerNodes() {
     int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
     return edgeHostsService.getEdgeHosts().stream()
-        .filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.machineAddress.getPublicIpAddress()))
-        .filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.machineAddress.getPrivateIpAddress()))
+        .filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.hostAddress.getPublicIpAddress()))
+        .filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.hostAddress.getPrivateIpAddress()))
         .filter(this::isEdgeHostRunning)
         .limit(maxWorkers)
         .collect(Collectors.toList());
   }
 
   public boolean isLocalhost(String publicIp, String privateIp) {
-    String machinePublicIp = machineAddress.getPublicIpAddress();
-    String machinePrivateIp = machineAddress.getPrivateIpAddress();
+    String machinePublicIp = hostAddress.getPublicIpAddress();
+    String machinePrivateIp = hostAddress.getPrivateIpAddress();
     return Objects.equals(publicIp, machinePublicIp) && Objects.equals(privateIp, machinePrivateIp);
   }
 
@@ -220,7 +220,7 @@ public class HostsService {
   public List<String> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
     return regions.stream()
         .map(regionsService::getRegion)
-        .map(regionEntity -> new MachineLocation(null, null, regionEntity.getName(), null))
+        .map(regionEntity -> new HostLocation(null, null, regionEntity.getName(), null))
         .map(location -> getAvailableHost(expectedMemoryConsumption, location))
         .collect(Collectors.toList());
   }
@@ -232,11 +232,11 @@ public class HostsService {
 
   //FIXME
   @Deprecated
-  public String getAvailableHost(double expectedMemoryConsumption, MachineLocation machineLocation) {
+  public String getAvailableHost(double expectedMemoryConsumption, HostLocation hostLocation) {
     //TODO try to improve method
-    String region = machineLocation.getRegion();
-    String country = machineLocation.getCountry();
-    String city = machineLocation.getCity();
+    String region = hostLocation.getRegion();
+    String country = hostLocation.getCountry();
+    String city = hostLocation.getCity();
     log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
         + "city '{}'", expectedMemoryConsumption, region, country, city);
     var otherRegionsHosts = new LinkedList<String>();
@@ -247,7 +247,7 @@ public class HostsService {
         .map(SimpleNode::getHostname)
         .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
         .forEach(hostname -> {
-          MachineLocation nodeLocation = getHostDetails(hostname).getMachineLocation();
+          HostLocation nodeLocation = getHostDetails(hostname).getHostLocation();
           String nodeRegion = nodeLocation.getRegion();
           String nodeCountry = nodeLocation.getCountry();
           String nodeCity = nodeLocation.getCity();
@@ -286,18 +286,18 @@ public class HostsService {
   }
 
   public HostDetails getHostDetails(String hostname) {
-    MachineAddress machineAddress;
-    MachineLocation machineLocation;
+    HostAddress hostAddress;
+    HostLocation hostLocation;
     try {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-      machineAddress = edgeHost.getAddress();
-      machineLocation = edgeHost.getLocation();
+      hostAddress = edgeHost.getAddress();
+      hostLocation = edgeHost.getLocation();
     } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
-      machineAddress = cloudHost.getAddress();
-      machineLocation = cloudHost.getLocation();
+      hostAddress = cloudHost.getAddress();
+      hostLocation = cloudHost.getLocation();
     }
-    return new HostDetails(machineAddress, machineLocation);
+    return new HostDetails(hostAddress, hostLocation);
   }
 
   public SimpleNode addHost(RegionEntity region, String country, String city, NodeRole role) {
@@ -385,8 +385,8 @@ public class HostsService {
   public List<String> executeCommand(String command, String hostname) {
     List<String> result = null;
     String error = null;
-    if (this.machineAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
-        || this.machineAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
+    if (this.hostAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
+        || this.hostAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
       BashCommandResult bashCommandResult = bashService.executeCommand(command);
       if (!bashCommandResult.isSuccessful()) {
         error = String.join("\n", bashCommandResult.getError());

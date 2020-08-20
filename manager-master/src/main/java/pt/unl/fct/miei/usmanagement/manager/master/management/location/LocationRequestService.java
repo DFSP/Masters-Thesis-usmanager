@@ -180,7 +180,7 @@ public class LocationRequestService {
         HostDetails hostDetails = hostsService.getHostDetails(serviceHostname);
         hostnamesFound.put(serviceHostname, hostDetails);
       }
-      MachineLocation machineLocation = hostnamesFound.get(serviceHostname).getMachineLocation();
+      MachineLocation machineLocation = hostnamesFound.get(serviceHostname).getHostLocation();
       List<String> locationKeys = getLocationsKeys(machineLocation.getCity(), machineLocation.getCountry(),
           machineLocation.getRegion(), machineLocation.getContinent());
       for (String locationKey : locationKeys) {
@@ -201,7 +201,7 @@ public class LocationRequestService {
     for (Entry<String, Integer> locationReqCount : locationMonitoring.entrySet()) {
       double currentPercentage = ((locationReqCount.getValue() * 1.0) / (totalCount * 1.0)) / PERCENT;
       if (currentPercentage >= minimumRequestCountPercentage) {
-        MachineLocation machineLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getMachineLocation();
+        MachineLocation machineLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getHostLocation();
         String region = machineLocation.getRegion();
         String country = machineLocation.getCountry();
         String city = machineLocation.getCity();

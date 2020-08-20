@@ -33,7 +33,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class MachineLocation {
+public class HostLocation {
 
   //TODO get location based on ip?
   // cache information after first lookup
@@ -49,7 +49,7 @@ public class MachineLocation {
   @Deprecated
   private final String continent;
 
-  public MachineLocation(String city, String country, String region, String continent) {
+  public HostLocation(String city, String country, String region, String continent) {
     this.coordinates = null;
     this.city = city;
     this.country = country;

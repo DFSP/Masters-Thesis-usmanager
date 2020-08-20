@@ -51,8 +51,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
@@ -137,13 +137,13 @@ public class CloudHostEntity {
   }
 
   @JsonIgnore
-  public MachineAddress getAddress() {
-    return new MachineAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress);
+  public HostAddress getAddress() {
+    return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress);
   }
 
   @JsonIgnore
-  public MachineLocation getLocation() {
-    return new MachineLocation("", "", getRegion(), getContinent());
+  public HostLocation getLocation() {
+    return new HostLocation("", "", getRegion(), getContinent());
   }
 
   @JsonIgnore

@@ -36,7 +36,7 @@ import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.master.management.bash.BashService;
@@ -67,7 +67,7 @@ public class DockerSwarmService {
   }
 
   public DockerClient getSwarmLeader() {
-    String privateIp = hostsService.getMachineAddress().getPrivateIpAddress();
+    String privateIp = hostsService.getHostAddress().getPrivateIpAddress();
     return dockerCoreService.getDockerClient(privateIp);
   }
 
@@ -95,9 +95,9 @@ public class DockerSwarmService {
   }
 
   public SimpleNode initSwarm() {
-    MachineAddress machineAddress = hostsService.getMachineAddress();
-    String advertiseAddress = machineAddress.getPublicIpAddress();
-    String listenAddress = machineAddress.getPrivateIpAddress();
+    HostAddress hostAddress = hostsService.getHostAddress();
+    String advertiseAddress = hostAddress.getPublicIpAddress();
+    String listenAddress = hostAddress.getPrivateIpAddress();
     log.info("Initializing docker swarm at {}", advertiseAddress);
     String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
         advertiseAddress, listenAddress);
@@ -126,7 +126,7 @@ public class DockerSwarmService {
   }
 
   public SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
-    String leaderAddress = hostsService.getMachineAddress().getPublicIpAddress();
+    String leaderAddress = hostsService.getHostAddress().getPublicIpAddress();
     try (DockerClient leaderClient = getSwarmLeader();
          DockerClient nodeClient = dockerCoreService.getDockerClient(publicIpAddress)) {
       leaveSwarm(nodeClient);

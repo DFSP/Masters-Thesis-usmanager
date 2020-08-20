@@ -28,7 +28,7 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.location;
 import lombok.Data;
 
 @Data
-class LocationMonitoringResp {
+class LocationMonitoringResponse {
 
   private final String toService;
   private final LocationMonitoringSimple locationData;

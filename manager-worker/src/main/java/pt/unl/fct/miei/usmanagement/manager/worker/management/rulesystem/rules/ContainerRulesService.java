@@ -39,7 +39,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerR
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
 @Service

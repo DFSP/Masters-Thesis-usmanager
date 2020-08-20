@@ -33,14 +33,14 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class MachineAddress {
+public class HostAddress {
 
   private final String username;
   private final String publicDnsName;
   private final String publicIpAddress;
   private final String privateIpAddress;
 
-  public MachineAddress(String username, String publicIpAddress, String privateIpAddress) {
+  public HostAddress(String username, String publicIpAddress, String privateIpAddress) {
     this.username = username;
     this.publicDnsName = null;
     this.privateIpAddress = privateIpAddress;

@@ -53,7 +53,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
@@ -194,11 +194,11 @@ public class DockerContainersService {
     String serviceAddr = String.format("%s:%s", hostname, externalPort);
     String containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
     String dockerRepository = service.getDockerRepository();
-    MachineLocation machineLocation = hostsService.getHostDetails(hostname).getMachineLocation();
-    String continent = machineLocation.getContinent();
-    String region = machineLocation.getRegion();
-    String country = machineLocation.getCountry();
-    String city = machineLocation.getCity();
+    HostLocation hostLocation = hostsService.getHostDetails(hostname).getHostLocation();
+    String continent = hostLocation.getContinent();
+    String region = hostLocation.getRegion();
+    String country = hostLocation.getCountry();
+    String city = hostLocation.getCity();
     String launchCommand = service.getLaunchCommand();
     launchCommand = launchCommand
         .replace("${hostname}", hostname)

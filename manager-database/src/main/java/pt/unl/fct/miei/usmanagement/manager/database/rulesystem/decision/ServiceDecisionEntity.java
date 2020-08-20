@@ -67,7 +67,7 @@ public class ServiceDecisionEntity {
 
   private String serviceName;
 
-  private String otherInfo;
+  private String result;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")

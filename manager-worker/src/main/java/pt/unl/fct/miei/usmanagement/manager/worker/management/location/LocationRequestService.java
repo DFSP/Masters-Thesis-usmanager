@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -43,13 +43,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.DecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.ServiceDecisionResult;
 
 @Slf4j
@@ -87,35 +88,36 @@ public class LocationRequestService {
     return containersService.launchContainer(hostname, REQUEST_LOCATION_MONITOR, true);
   }
 
-  public List<LocationMonitoringResp> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {
-    String url = String.format("http://%s:%s/api/monitoringinfo/all/top/%d", requestLocationHostname, defaultPort,
-        seconds);
-    HttpEntity<String> request = new HttpEntity<>(headers);
-    List<LocationMonitoringResp> locationMonitoringResps = new ArrayList<>();
+  public List<LocationMonitoringResponse> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {
+    String url =
+        String.format("http://%s:%s/api/monitoringinfo/all/top/%d", requestLocationHostname, defaultPort, seconds);
+    List<LocationMonitoringResponse> locationMonitoring = new ArrayList<>();
     try {
-      ResponseEntity<LocationMonitoringResp[]> response = restTemplate.exchange(url, HttpMethod.GET, request,
-          LocationMonitoringResp[].class);
-      locationMonitoringResps = Arrays.asList(response.getBody());
+      ResponseEntity<LocationMonitoringResponse[]> response =
+          restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), LocationMonitoringResponse[].class);
+      locationMonitoring = Arrays.asList(response.getBody());
     } catch (RestClientException e) {
       e.printStackTrace();
     }
-    return locationMonitoringResps;
+    return locationMonitoring;
   }
 
   public Map<String, HostDetails> getBestLocationToStartServices(
-      Map<String, List<ServiceDecisionResult>> allServicesDecisions, int secondsFromLastRun) {
-    Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> servicesLocationMonitoring = getLocationMonitoring(
-        secondsFromLastRun);
+      Map<String, List<ServiceDecisionResult>> servicesDecisions, int secondsFromLastRun) {
+    LocationMonitoring locationMonitoring = getLocationMonitoring(secondsFromLastRun);
     Map<String, HostDetails> finalLocations = new HashMap<>();
-    for (Entry<String, List<ServiceDecisionResult>> services : allServicesDecisions.entrySet()) {
+    for (Entry<String, List<ServiceDecisionResult>> services : servicesDecisions.entrySet()) {
       String serviceName = services.getKey();
-      List<ServiceDecisionResult> serviceAllDecisions = services.getValue();
-      if (servicesLocationMonitoring.getSecond().containsKey(serviceName)) {
-        if (!serviceAllDecisions.isEmpty()) {
-          HostDetails location = getBestLocationByService(serviceName,
-              servicesLocationMonitoring.getFirst().get(serviceName),
-              servicesLocationMonitoring.getSecond().get(serviceName),
-              getLocationsByRunningContainers(serviceAllDecisions));
+      List<ServiceDecisionResult> decisions = services.getValue();
+      if (locationMonitoring.containsTotalRequestsCount(serviceName)) {
+        if (!decisions.isEmpty()) {
+          Map<String, Integer> locationsCount = locationMonitoring.getServiceLocationsCount(serviceName);
+          int totalRequestsCount = locationMonitoring.getServiceTotalRequestsCount(serviceName);
+          List<String> containersHostnames =
+              decisions.stream().map(DecisionResult::getHostname).collect(Collectors.toList());
+          Map<String, Integer> containersLocations = getContainersLocations(containersHostnames);
+          HostDetails location = getBestLocationByService(serviceName, locationsCount, totalRequestsCount,
+              containersLocations);
           if (location != null) {
             finalLocations.put(serviceName, location);
           }
@@ -125,107 +127,68 @@ public class LocationRequestService {
     return finalLocations;
   }
 
-  private Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> getLocationMonitoring(int seconds) {
-    List<SimpleNode> nodes = nodesService.getReadyNodes();
-    Map<String, Map<String, Integer>> serviceCountLocations = new HashMap<>();
-    Map<String, Integer> serviceTotalRequestCount = new HashMap<>();
-    List<LocationMonitoringResp> allLocationMonitoringData = new ArrayList<>();
-
-    for (SimpleNode node : nodes) {
-      String hostname = node.getHostname();
-      allLocationMonitoringData.addAll(getAllMonitoringDataTop(hostname, seconds));
-    }
-    for (LocationMonitoringResp locationMonitoringResp : allLocationMonitoringData) {
-      int count = locationMonitoringResp.getLocationData().getCount();
-      String serviceName = locationMonitoringResp.getToService();
-      String fromContinent = locationMonitoringResp.getLocationData().getFromContinent();
-      String fromRegion = locationMonitoringResp.getLocationData().getFromRegion();
-      String fromCountry = locationMonitoringResp.getLocationData().getFromCountry();
-      String fromCity = locationMonitoringResp.getLocationData().getFromCity();
-
+  private LocationMonitoring getLocationMonitoring(int seconds) {
+    List<LocationMonitoringResponse> locationMonitoringData = nodesService.getReadyNodes().stream()
+        .map(SimpleNode::getHostname)
+        .map(hostname -> getAllMonitoringDataTop(hostname, seconds))
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
+    var locationMonitoring = new LocationMonitoring();
+    locationMonitoringData.forEach(locationMonitoringResponse -> {
+      String serviceName = locationMonitoringResponse.getToService();
+      String fromContinent = locationMonitoringResponse.getLocationData().getFromContinent();
+      String fromRegion = locationMonitoringResponse.getLocationData().getFromRegion();
+      String fromCountry = locationMonitoringResponse.getLocationData().getFromCountry();
+      String fromCity = locationMonitoringResponse.getLocationData().getFromCity();
       List<String> locationKeys = getLocationsKeys(fromCity, fromCountry, fromRegion, fromContinent);
-
-      if (serviceCountLocations.containsKey(serviceName)) {
-        int newTotalReqCount = serviceTotalRequestCount.get(serviceName) + count;
-        serviceTotalRequestCount.put(serviceName, newTotalReqCount);
-        Map<String, Integer> countLocations = serviceCountLocations.get(serviceName);
-        for (String locationKey : locationKeys) {
-          if (countLocations.containsKey(locationKey)) {
-            int newCount = countLocations.get(locationKey) + count;
-            countLocations.put(locationKey, newCount);
-          } else {
-            countLocations.put(locationKey, count);
-          }
-        }
-        serviceCountLocations.put(serviceName, countLocations);
-      } else {
-        serviceTotalRequestCount.put(serviceName, count);
-        Map<String, Integer> countLocations = new HashMap<>();
-        for (String locationKey : locationKeys) {
-          countLocations.put(locationKey, count);
-        }
-        serviceCountLocations.put(serviceName, countLocations);
-      }
-    }
-
-    return Pair.of(serviceCountLocations, serviceTotalRequestCount);
+      int count = locationMonitoringResponse.getLocationData().getCount();
+      locationMonitoring.addCount(serviceName, count, locationKeys);
+    });
+    return locationMonitoring;
   }
 
-  private Map<String, Integer> getLocationsByRunningContainers(List<ServiceDecisionResult> allDecisions) {
+  private Map<String, Integer> getContainersLocations(List<String> hostnames) {
     Map<String, Integer> availableLocations = new HashMap<>();
     Map<String, HostDetails> hostnamesFound = new HashMap<>();
-
-    for (ServiceDecisionResult serviceDecisionResult : allDecisions) {
-      String serviceHostname = serviceDecisionResult.getHostname();
-      if (!hostnamesFound.containsKey(serviceHostname)) {
-        HostDetails hostDetails = hostsService.getHostDetails(serviceHostname);
-        hostnamesFound.put(serviceHostname, hostDetails);
+    for (String hostname : hostnames) {
+      if (!hostnamesFound.containsKey(hostname)) {
+        HostDetails hostDetails = hostsService.getHostDetails(hostname);
+        hostnamesFound.put(hostname, hostDetails);
       }
-      MachineLocation machineLocation = hostnamesFound.get(serviceHostname).getMachineLocation();
-      List<String> locationKeys = getLocationsKeys(machineLocation.getCity(), machineLocation.getCountry(),
-          machineLocation.getRegion(), machineLocation.getContinent());
+      HostLocation hostLocation = hostnamesFound.get(hostname).getHostLocation();
+      List<String> locationKeys = getLocationsKeys(hostLocation.getCity(), hostLocation.getCountry(),
+          hostLocation.getRegion(), hostLocation.getContinent());
       for (String locationKey : locationKeys) {
-        if (availableLocations.containsKey(locationKey)) {
-          int newLocationCount = availableLocations.get(locationKey) + 1;
-          availableLocations.put(locationKey, newLocationCount);
-        } else {
-          availableLocations.put(locationKey, 1);
-        }
+        availableLocations.computeIfPresent(locationKey, (key, count) -> count + 1);
+        availableLocations.putIfAbsent(locationKey, 1);
       }
     }
     return availableLocations;
   }
 
   private HostDetails getBestLocationByService(String serviceName, Map<String, Integer> locationMonitoring,
-                                               int totalCount, Map<String, Integer> locationsbyRunningContainers) {
+                                               int totalCount, Map<String, Integer> locationsByRunningContainers) {
     List<LocationCount> locationsWithMinReqPerc = new ArrayList<>();
     for (Entry<String, Integer> locationReqCount : locationMonitoring.entrySet()) {
       double currentPercentage = ((locationReqCount.getValue() * 1.0) / (totalCount * 1.0)) / PERCENT;
       if (currentPercentage >= minimumRequestCountPercentage) {
-        MachineLocation machineLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getMachineLocation();
-        String region = machineLocation.getRegion();
-        String country = machineLocation.getCountry();
-        String city = machineLocation.getCity();
-        /*if (locationDetails instanceof EdgeHostDetails) {
-          final var edgeHostDetails = (EdgeHostDetails)locationDetails;
-          country = edgeHostDetails.getCountry();
-          city = edgeHostDetails.getCity();
-        }*/
-        int runningContainerOnRegion = locationsbyRunningContainers.getOrDefault(region, 0);
-        int runningContainerOnCountry = locationsbyRunningContainers.getOrDefault(region + "_" + country, 0);
-        int runingContainersOnLocal = locationsbyRunningContainers.getOrDefault(locationReqCount.getKey(), 0);
+        HostLocation hostLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getHostLocation();
+        String region = hostLocation.getRegion();
+        String country = hostLocation.getCountry();
+        String city = hostLocation.getCity();
+        int runningContainerOnRegion = locationsByRunningContainers.getOrDefault(region, 0);
+        int runningContainerOnCountry = locationsByRunningContainers.getOrDefault(region + "_" + country, 0);
+        int runingContainersOnLocal = locationsByRunningContainers.getOrDefault(locationReqCount.getKey(), 0);
         LocationCount locCount = new LocationCount(locationReqCount.getKey(), city, country, region, currentPercentage,
             runingContainersOnLocal, runningContainerOnCountry, runningContainerOnRegion);
         locationsWithMinReqPerc.add(locCount);
       }
     }
     Collections.sort(locationsWithMinReqPerc);
-
     if (!locationsWithMinReqPerc.isEmpty()) {
       log.info("Best location for {} : {}", serviceName, locationsWithMinReqPerc.get(0).toString());
       return getHostDetailsByLocationKey(locationsWithMinReqPerc.get(0).getLocationKey());
     }
-
     return null;
   }
 
@@ -243,7 +206,7 @@ public class LocationRequestService {
         city = serviceLocationSplit[i];
       }
     }
-    return new HostDetails(new MachineLocation(city, country, region, ""));
+    return new HostDetails(new HostLocation(city, country, region, ""));
   }
 
   /*public String getRegionByLocationKey(String locationKey) {
@@ -254,7 +217,7 @@ public class LocationRequestService {
     String finalRegion = region;
     List<String> locationKeys = new ArrayList<>();
     if ("none".equals(region)) {
-      finalRegion = getBestRegionByLocationInfo(continent, country, city);
+      finalRegion = getBestRegionByLocationInfo(city, country, continent);
     }
     if (!country.isEmpty()) {
       if (!city.isEmpty()) {
@@ -271,7 +234,7 @@ public class LocationRequestService {
   }
 
   // TODO: improve region choice, using country and city
-  private String getBestRegionByLocationInfo(String continent, String country, String city) {
+  private String getBestRegionByLocationInfo(String city, String country, String continent) {
     switch (country) {
       case "pt":
         return "eu-central-1";

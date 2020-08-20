@@ -321,8 +321,8 @@ public class HostsMonitoringService {
     //TODO e se não existir mais nenhum node na mesma zona?
     return nodes.stream()
         .filter(n -> !n.getHostname().equals(hostToRemove)
-            && Objects.equals(hostsService.getHostDetails(hostToRemove).getMachineLocation().getRegion(),
-            hostsService.getHostDetails(n.getHostname()).getMachineLocation().getRegion()))
+            && Objects.equals(hostsService.getHostDetails(hostToRemove).getHostLocation().getRegion(),
+            hostsService.getHostDetails(n.getHostname()).getHostLocation().getRegion()))
         .map(SimpleNode::getHostname)
         .findFirst()
         .orElseThrow(() -> new MasterManagerException("Can't find new host to migrate containers to"));

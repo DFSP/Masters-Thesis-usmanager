@@ -47,8 +47,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.MachineLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
@@ -144,12 +144,12 @@ public class EdgeHostEntity {
     hostMetric.getEdgeHosts().remove(this);
   }
 
-  public MachineAddress getAddress() {
-    return new MachineAddress(username, publicDnsName, publicIpAddress, privateIpAddress);
+  public HostAddress getAddress() {
+    return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress);
   }
 
-  public MachineLocation getLocation() {
-    return new MachineLocation(city, country, region.getName(), getContinent());
+  public HostLocation getLocation() {
+    return new HostLocation(city, country, region.getName(), getContinent());
   }
 
   @JsonIgnore

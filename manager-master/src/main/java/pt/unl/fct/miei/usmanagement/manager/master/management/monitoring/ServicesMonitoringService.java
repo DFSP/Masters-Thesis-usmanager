@@ -390,11 +390,11 @@ public class ServicesMonitoringService {
     if (servicesLocationsRegions.containsKey(serviceName)) {
       startLocation = servicesLocationsRegions.get(serviceName);
       log.info("Starting service '{}'. Location from request-location-monitor: '{}' ({})",
-          serviceName, hostname, startLocation.getMachineLocation().getRegion());
+          serviceName, hostname, startLocation.getHostLocation().getRegion());
     } else {
       startLocation = hostsService.getHostDetails(hostname);
       log.info("Starting service '{}'. Location: '{}' ({})",
-          serviceName, hostname, startLocation.getMachineLocation().getRegion());
+          serviceName, hostname, startLocation.getHostLocation().getRegion());
     }
     double serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
     String toHostname = hostsService.getAvailableHost(serviceAvgMem, startLocation);
@@ -402,8 +402,8 @@ public class ServicesMonitoringService {
     HostDetails selectedHostDetails = hostsService.getHostDetails(toHostname);
     log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "
             + "on host '{} ({}_{}_{})'", containerId, serviceName, replicatedContainer.getId(), toHostname,
-        selectedHostDetails.getMachineLocation().getRegion(), selectedHostDetails.getMachineLocation().getCountry(),
-        selectedHostDetails.getMachineLocation().getCity());
+        selectedHostDetails.getHostLocation().getRegion(), selectedHostDetails.getHostLocation().getCountry(),
+        selectedHostDetails.getHostLocation().getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
       log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' " +
@@ -426,9 +426,9 @@ public class ServicesMonitoringService {
     containersService.stopContainer(containerId);
     HostDetails selectedHostDetails = hostsService.getHostDetails(hostname);
     log.info("RuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
-        containerId, serviceName, hostname, selectedHostDetails.getMachineLocation().getRegion(),
-        selectedHostDetails.getMachineLocation().getCountry(),
-        selectedHostDetails.getMachineLocation().getCity());
+        containerId, serviceName, hostname, selectedHostDetails.getHostLocation().getRegion(),
+        selectedHostDetails.getHostLocation().getCountry(),
+        selectedHostDetails.getHostLocation().getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
       log.info("RuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
@@ -456,8 +456,8 @@ public class ServicesMonitoringService {
         decisionsService.addServiceDecision(containerDecision.getContainerId(), containerDecision.getServiceName(),
             containerDecision.getDecision().name(), containerDecision.getRuleId(),
             String.format("RuleDecision on host: %s (%s_%s_%s)",
-                hostname, host.getMachineLocation().getRegion(), host.getMachineLocation().getCountry(),
-                host.getMachineLocation().getCity()));
+                hostname, host.getHostLocation().getRegion(), host.getHostLocation().getCountry(),
+                host.getHostLocation().getCity()));
     decisionsService.addServiceDecisionValueFromFields(serviceDecision, containerDecision.getFields());
   }
 

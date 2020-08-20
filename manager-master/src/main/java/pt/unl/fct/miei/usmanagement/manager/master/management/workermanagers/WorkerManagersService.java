@@ -92,7 +92,7 @@ public class WorkerManagersService {
   private ContainerEntity launchWorkerManager(String hostname, String id) {
     var environment = new LinkedList<>(List.of(
         ContainerConstants.Environment.ID + "=" + id,
-        ContainerConstants.Environment.MASTER + "=" + hostsService.getMachineAddress().getPublicIpAddress()));
+        ContainerConstants.Environment.MASTER + "=" + hostsService.getHostAddress().getPublicIpAddress()));
     return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
   }
 
