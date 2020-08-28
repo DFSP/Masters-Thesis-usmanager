@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
@@ -59,7 +60,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
   @SneakyThrows
   @Override
   public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-    MachineAddress machineAddress = hostsService.setMachineAddress();
+    HostAddress hostAddress = hostsService.setHostAddress();
     try {
       hostsService.clusterHosts();
     } catch (MasterManagerException e) {
@@ -67,7 +68,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
     }
     servicesMonitoringService.initServiceMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();
-    symService.startSymmetricDSServer(machineAddress);
+    symService.startSymmetricDSServer(hostAddress);
   }
 
 

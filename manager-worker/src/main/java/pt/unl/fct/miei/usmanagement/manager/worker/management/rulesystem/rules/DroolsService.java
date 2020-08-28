@@ -76,27 +76,26 @@ public class DroolsService {
   }
 
   public boolean shouldCreateNewRuleSession(String key, long lastUpdate) {
-    final long currVal = lastUpdateRules.getOrDefault(key, -1L);
-    if (currVal < lastUpdate) {
+    long currentValue = lastUpdateRules.getOrDefault(key, -1L);
+    if (currentValue < lastUpdate) {
       lastUpdateRules.put(key, lastUpdate);
       return true;
     }
     return false;
   }
 
-  public void createNewServiceRuleSession(String serviceName, Map<Long, String> drls) {
+  public void createNewServiceRuleSession(String serviceName, Map<Long, String> drools) {
     KieServices kieServices = KieServices.Factory.get();
     KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-    for (Map.Entry<Long, String> drl : drls.entrySet()) {
+    for (Map.Entry<Long, String> drl : drools.entrySet()) {
       Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
-      //TODO
-      resource.setTargetPath("rules/rule_container_" + drl.getKey() + ".drl");
+      resource.setTargetPath("rules/rule_service_" + drl.getKey() + ".drl");
       kieFileSystem.write(resource);
     }
     kieServices.newKieBuilder(kieFileSystem).buildAll();
     ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
-    StatelessKieSession serviceRuleSession = kieServices
-        .newKieContainer(releaseId).getKieBase().newStatelessKieSession();
+    StatelessKieSession serviceRuleSession =
+        kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
     var agendaEventListener = new TrackingAgendaEventListener();
     serviceRuleSession.addEventListener(agendaEventListener);
     serviceRuleSessions.put(serviceName, serviceRuleSession);
@@ -107,14 +106,13 @@ public class DroolsService {
     KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
     for (Map.Entry<Long, String> drl : drools.entrySet()) {
       Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
-      //TODO
       resource.setTargetPath("rules/rule_host_" + drl.getKey() + ".drl");
       kieFileSystem.write(resource);
     }
     kieServices.newKieBuilder(kieFileSystem).buildAll();
     ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
-    StatelessKieSession hostRuleSession = kieServices
-        .newKieContainer(releaseId).getKieBase().newStatelessKieSession();
+    StatelessKieSession hostRuleSession =
+        kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
     var agendaEventListener = new TrackingAgendaEventListener();
     hostRuleSession.addEventListener(agendaEventListener);
     hostRuleSessions.put(hostname, hostRuleSession);
@@ -136,7 +134,7 @@ public class DroolsService {
         "eventType", event.getClass().getName(),
         "decision", RuleDecision.class.getSimpleName() + "." + rule.getDecision().toString(),
         "priority", rule.getPriority());
-    final var ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
+    var ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
     return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);
   }
 
@@ -157,15 +155,15 @@ public class DroolsService {
     return result.toString(StandardCharsets.UTF_8);
   }
 
-  public ServiceDecisionResult evaluate(String serviceHostname, ContainerEvent event) {
-    var containerDecision = new Decision();
+  public ServiceDecisionResult evaluate(ContainerEvent event) {
+    var serviceDecision = new Decision();
     String serviceName = event.getServiceName();
     StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
-    serviceRuleSession.getGlobals().set("containerDecision", containerDecision);
+    serviceRuleSession.getGlobals().set("serviceDecision", serviceDecision);
     serviceRuleSession.execute(event);
     long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
-    return new ServiceDecisionResult(serviceHostname, event.getContainerId(), event.getServiceName(),
-        containerDecision.getDecision(), ruleId, event.getFields(), containerDecision.getPriority());
+    return new ServiceDecisionResult(event.getHostname(), event.getContainerId(), event.getServiceName(),
+        serviceDecision.getDecision(), ruleId, event.getFields(), serviceDecision.getPriority());
   }
 
   public HostDecisionResult evaluate(HostEvent event) {

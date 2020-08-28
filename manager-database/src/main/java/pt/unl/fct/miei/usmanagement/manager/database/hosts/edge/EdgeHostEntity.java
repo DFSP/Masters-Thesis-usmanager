@@ -95,10 +95,6 @@ public class EdgeHostEntity {
 
   @JsonIgnoreProperties({"edgeHost", "cloudHost"})
   @ManyToOne
-  private WorkerManagerEntity worker;
-
-  @JsonIgnoreProperties({"edgeHost", "cloudHost"})
-  @ManyToOne
   private WorkerManagerEntity managedByWorker;
 
   @Singular

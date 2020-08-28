@@ -30,20 +30,18 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.HostDecisionsService;
 
 @Service
 public class HostsEventsService {
 
   private final HostEventRepository hostEvents;
-  private final DecisionsService decisionsService;
 
-  public HostsEventsService(HostEventRepository hostEvents, DecisionsService decisionsService) {
+  public HostsEventsService(HostEventRepository hostEvents) {
     this.hostEvents = hostEvents;
-    this.decisionsService = decisionsService;
   }
 
-  public HostEventEntity saveHostEvent(String hostname, String decisionName) {
-    DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
+  public HostEventEntity saveHostEvent(String hostname, DecisionEntity decision) {
     HostEventEntity hostEvent = hostEvents
         .findByHostname(hostname).stream().findFirst()
         .orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());

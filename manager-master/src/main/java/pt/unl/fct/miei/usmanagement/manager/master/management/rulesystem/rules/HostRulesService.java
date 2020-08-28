@@ -291,7 +291,7 @@ public class HostRulesService {
       Operator operator = condition.getOperator().getOperator();
       return new Condition(fieldName, value, operator);
     }).collect(Collectors.toList());
-    RuleDecision decision = hostRule.getDecision().getValue();
+    RuleDecision decision = hostRule.getDecision().getRuleDecision();
     int priority = hostRule.getPriority();
     return new Rule(id, conditions, decision, priority);
   }

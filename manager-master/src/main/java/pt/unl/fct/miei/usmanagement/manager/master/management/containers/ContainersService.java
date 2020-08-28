@@ -50,6 +50,8 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers.
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers.WorkerManagersService;
 
 @Service
 @Slf4j
@@ -61,17 +63,19 @@ public class ContainersService {
   private final DockerApiProxyService dockerApiProxyService;
 
   private final ContainerRepository containers;
+  private final WorkerManagersService workerManagersService;
 
   public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
                            ContainerSimulatedMetricsService containerSimulatedMetricsService,
-                           DockerApiProxyService dockerApiProxyService,
-                           ContainerRepository containers) {
+                           DockerApiProxyService dockerApiProxyService, ContainerRepository containers,
+                           WorkerManagersService workerManagersService) {
     this.dockerContainersService = dockerContainersService;
     this.containerRulesService = containerRulesService;
     this.containerSimulatedMetricsService = containerSimulatedMetricsService;
     this.dockerApiProxyService = dockerApiProxyService;
     this.containers = containers;
+    this.workerManagersService = workerManagersService;
   }
 
   public ContainerEntity addContainerFromDockerContainer(DockerContainer dockerContainer) {
@@ -284,11 +288,14 @@ public class ContainersService {
   public void stopContainer(String id) {
     ContainerEntity container = getContainer(id);
     dockerContainersService.stopContainer(container);
-    containers.delete(container);
+    deleteContainer(id);
   }
 
   public void deleteContainer(String id) {
     ContainerEntity container = getContainer(id);
+    if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
+      workerManagersService.deleteWorkerManagerByContainer(container);
+    }
     containers.delete(container);
   }
 

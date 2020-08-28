@@ -94,10 +94,14 @@ public class HostDecisionsService {
         new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
   }
 
+  public DecisionEntity getDecision(RuleDecision decision) {
+    return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decision", decision.name()));
+  }
+
   public DecisionEntity getDecision(String decisionName) {
     RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-    return decisions.findByDecisionAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
-        new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+    return this.getDecision(decision);
   }
 
   public HostDecisionEntity addDecision(String hostname, String decisionName, long ruleId) {
@@ -129,7 +133,7 @@ public class HostDecisionsService {
     for (Map.Entry<String, Map<String, Double>> hostFields : hostsMonitoring.entrySet()) {
       String hostname = hostFields.getKey();
       Map<String, Double> fields = hostFields.getValue();
-      HostDecisionResult hostDecisionResult = hostRulesService.runHostRules(hostname, fields);
+      HostDecisionResult hostDecisionResult = hostRulesService.executeHostRules(hostname, fields);
       hostsDecisions.add(hostDecisionResult);
     }
     log.info("Processing host decisions...");
@@ -138,7 +142,7 @@ public class HostDecisionsService {
       String hostname = hostDecision.getHostname();
       RuleDecision decision = hostDecision.getDecision();
       log.info("Hostname '{}' had decision '{}'", hostname, decision);
-      HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, decision.toString());
+      HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, this.getDecision(decision.toString()));
       int hostEventCount = hostEvent.getCount();
       if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
           || (decision == RuleDecision.STOP && hostEventCount >= stopHostOnEventsCount)) {

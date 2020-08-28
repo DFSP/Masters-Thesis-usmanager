@@ -47,7 +47,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
@@ -66,7 +66,7 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.prometh
 import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.worker.util.util.Text;
+import pt.unl.fct.miei.usmanagement.manager.worker.util.Text;
 
 @Slf4j
 @Service
@@ -366,7 +366,7 @@ public class HostsService {
       }
     }
     if (error != null) {
-      throw new MasterManagerException("%s", error);
+      throw new WorkerManagerException("%s", error);
     }
     return result;
   }
@@ -383,8 +383,8 @@ public class HostsService {
           return String.valueOf(i);
         }
       }
-    } catch (MasterManagerException e) {
-      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
+    } catch (WorkerManagerException e) {
+      throw new WorkerManagerException("Unable to find currently used external ports at %s: %s ", hostname,
           e.getMessage());
     }
   }

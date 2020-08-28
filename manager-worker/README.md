@@ -21,7 +21,6 @@ Usa [kafka](https://kafka.apache.org/) para comunicar com o manager-master.
 ##### Argumentos
 - id - id do worker-manager, deve ser único, para que seja diferenciado dos outros worker-managers
 - master - hostname do master-manager 
-- hosts - lista de hostnames de máquinas que este worker-manager deve gerir
 
 <sup>Alterar os valores dos argumentos, conforme necessário:</sup>
 
@@ -31,7 +30,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--id=001 --master=127.0.0.1"
 ```
 ou
 ```shell script
-export ID=001 MASTER=127.0.0.1 HOSTS=127.0.0.1,13.100.169.202
+export ID=001 MASTER=127.0.0.1
 mvn spring-boot:run
 ```
 

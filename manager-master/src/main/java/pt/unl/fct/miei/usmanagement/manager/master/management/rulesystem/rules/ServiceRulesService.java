@@ -47,9 +47,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.DroolsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.Rule;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RulesProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
@@ -249,7 +246,7 @@ public class ServiceRulesService {
       Operator operator = condition.getOperator().getOperator();
       return new Condition(fieldName, value, operator);
     }).collect(Collectors.toList());
-    RuleDecision decision = serviceRule.getDecision().getValue();
+    RuleDecision decision = serviceRule.getDecision().getRuleDecision();
     int priority = serviceRule.getPriority();
     return new Rule(id, conditions, decision, priority);
   }

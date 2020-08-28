@@ -36,11 +36,11 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @Repository
 public interface DecisionRepository extends JpaRepository<DecisionEntity, Long> {
 
-  Optional<DecisionEntity> findByDecision(@Param("decision") RuleDecision decision);
+  Optional<DecisionEntity> findByRuleDecision(@Param("decision") RuleDecision decision);
 
   List<DecisionEntity> findByComponentTypeType(@Param("componentType") ComponentType componentType);
 
-  Optional<DecisionEntity> findByDecisionAndComponentTypeType(@Param("decision") RuleDecision decision,
-                                                              @Param("componentType") ComponentType componentType);
+  Optional<DecisionEntity> findByRuleDecisionAndComponentTypeType(@Param("decision") RuleDecision decision,
+                                                                  @Param("componentType") ComponentType componentType);
 
 }

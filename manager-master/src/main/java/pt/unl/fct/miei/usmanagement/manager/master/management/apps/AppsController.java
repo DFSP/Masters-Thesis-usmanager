@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
 
 @RestController

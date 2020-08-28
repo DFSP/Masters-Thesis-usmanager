@@ -52,9 +52,9 @@ import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.worker.util.util.Timing;
+import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
 
 @Service
 @Slf4j
@@ -117,7 +117,7 @@ public class AwsService {
       }
       request.setNextToken(result.getNextToken());
     } while (result.getNextToken() != null);
-    throw new MasterManagerException("Instance with id %s not found", id);
+    throw new WorkerManagerException("Instance with id %s not found", id);
   }
 
   public List<AwsSimpleInstance> getSimpleInstances() {
@@ -172,7 +172,7 @@ public class AwsService {
         new StartInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<StartInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new WorkerManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instanceId);
     ec2.startInstances(request);
@@ -188,7 +188,7 @@ public class AwsService {
         new StopInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<StopInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new WorkerManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     var request = new StopInstancesRequest().withInstanceIds(instanceId);
     ec2.stopInstances(request);
@@ -204,7 +204,7 @@ public class AwsService {
         new TerminateInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<TerminateInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new WorkerManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     var request = new TerminateInstancesRequest().withInstanceIds(instanceId);
     ec2.terminateInstances(request);
@@ -235,12 +235,12 @@ public class AwsService {
         instance = waitInstanceState(instanceId, state);
         log.info("Setting instance {} to {} state", instanceId, state.getState());
         return instance;
-      } catch (MasterManagerException e) {
+      } catch (WorkerManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());
       }
       Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
     }
-    throw new MasterManagerException("Unable to set instance state %d within %d tries",
+    throw new WorkerManagerException("Unable to set instance state %d within %d tries",
         state.getState(), awsMaxRetries);
   }
 
@@ -253,7 +253,7 @@ public class AwsService {
       }, awsConnectionTimeout);
     } catch (TimeoutException e) {
       log.info("Unknown status of instance {} {} operation: Timed out", instanceId, state.getState());
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
     return instance[0];
   }

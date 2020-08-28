@@ -37,7 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostReposi
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
@@ -146,7 +146,7 @@ public class CloudHostsService {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
-    } catch (MasterManagerException e) {
+    } catch (WorkerManagerException e) {
       log.error(e.getMessage());
     }
     InstanceState state = new InstanceState()
@@ -162,7 +162,7 @@ public class CloudHostsService {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
-    } catch (MasterManagerException e) {
+    } catch (WorkerManagerException e) {
       log.error(e.getMessage());
     }
     InstanceState state = new InstanceState()

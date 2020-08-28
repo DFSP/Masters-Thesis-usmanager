@@ -57,7 +57,6 @@ CREATE TABLE logging_event
     event_id          IDENTITY     NOT NULL
 );
 
-
 CREATE TABLE logging_event_property
 (
     event_id     BIGINT       NOT NULL,

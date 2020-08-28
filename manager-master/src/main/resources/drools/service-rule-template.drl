@@ -6,9 +6,9 @@ eventType
 decision
 priority
 
-packagept.unl.fct.miei.usmanagement.manager.database;
+package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem;
 
-import RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.RuleDecision;
 
 global RuleDecision containerDecision;
 

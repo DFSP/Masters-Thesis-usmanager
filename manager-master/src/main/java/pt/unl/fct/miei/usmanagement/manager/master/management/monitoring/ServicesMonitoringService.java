@@ -231,7 +231,7 @@ public class ServicesMonitoringService {
     List<ContainerEntity> containers = containersService.getAppContainers();
     if (isTestEnable) {
       List<ContainerEntity> managerMasterContainers = containersService.getContainersWithLabels(
-          Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, ManagerMasterProperties.MANAGER_MASTER)));
+          Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, ManagerMasterProperties.MASTER_MANAGER)));
       // TODO include MANAGER_WORKERS too
       containers.addAll(managerMasterContainers);
     }
@@ -397,7 +397,7 @@ public class ServicesMonitoringService {
           serviceName, hostname, startLocation.getHostLocation().getRegion());
     }
     double serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
-    String toHostname = hostsService.getAvailableHost(serviceAvgMem, startLocation);
+    String toHostname = hostsService.getAvailableHost(serviceAvgMem, startLocation.getHostLocation());
     ContainerEntity replicatedContainer = containersService.replicateContainer(containerId, toHostname);
     HostDetails selectedHostDetails = hostsService.getHostDetails(toHostname);
     log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "

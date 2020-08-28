@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionRepository;
@@ -104,10 +105,14 @@ public class ServiceDecisionsService {
     return decisions.findByComponentTypeType(ComponentType.SERVICE);
   }
 
+  public DecisionEntity getDecision(RuleDecision decision) {
+    return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decision", decision.name()));
+  }
+
   public DecisionEntity getDecision(String decisionName) {
     RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-    return decisions.findByDecisionAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
-        new EntityNotFoundException(DecisionEntity.class, "decision", decisionName));
+    return this.getDecision(decision);
   }
 
   public DecisionEntity getDecision(Long id) {
@@ -159,7 +164,7 @@ public class ServiceDecisionsService {
       String containerId = container.getContainerId();
       String hostname = container.getHostname();
       Map<String, Double> fields = serviceFields.getValue();
-      ServiceDecisionResult serviceDecisionResult = serviceRulesService.runRules(hostname, containerId, serviceName,
+      ServiceDecisionResult serviceDecisionResult = serviceRulesService.executeRules(hostname, containerId, serviceName,
           fields);
       List<ServiceDecisionResult> serviceDecisions = servicesDecisions.get(serviceName);
       if (serviceDecisions != null) {
@@ -178,7 +183,7 @@ public class ServiceDecisionsService {
         RuleDecision decision = containerDecision.getDecision();
         log.info("Service '{}' on container '{}' had decision '{}'", serviceName, containerId, decision);
         ServiceEventEntity serviceEvent =
-            servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
+            servicesEventsService.saveServiceEvent(containerId, serviceName, this.getDecision(decision.toString()));
         int serviceEventCount = serviceEvent.getCount();
         if (decision == RuleDecision.STOP && serviceEventCount >= stopContainerOnEventCount
             || decision == RuleDecision.REPLICATE && serviceEventCount >= replicateContainerOnEventCount

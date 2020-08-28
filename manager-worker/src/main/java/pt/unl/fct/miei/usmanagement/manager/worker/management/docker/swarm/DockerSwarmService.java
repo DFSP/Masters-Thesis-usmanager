@@ -36,7 +36,8 @@ import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.DockerCoreService;
@@ -89,26 +90,26 @@ public class DockerSwarmService {
           : Optional.empty();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
   public SimpleNode initSwarm() {
-    MachineAddress machineAddress = hostsService.getHostAddress();
-    String advertiseAddress = machineAddress.getPublicIpAddress();
-    String listenAddress = machineAddress.getPrivateIpAddress();
+    HostAddress hostAddress = hostsService.getHostAddress();
+    String advertiseAddress = hostAddress.getPublicIpAddress();
+    String listenAddress = hostAddress.getPrivateIpAddress();
     log.info("Initializing docker swarm at {}", advertiseAddress);
     String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
         advertiseAddress, listenAddress);
     BashCommandResult result = bashService.executeCommand(command);
     if (!result.isSuccessful()) {
-      throw new MasterManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, result.getError());
+      throw new WorkerManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, result.getError());
     }
     String output = String.join("\n", result.getOutput());
     String nodeIdRegex = "(?<=Swarm initialized: current node \\()(.*)(?=\\) is now a manager)";
     Matcher nodeIdRegexExpression = Pattern.compile(nodeIdRegex).matcher(output);
     if (!nodeIdRegexExpression.find()) {
-      throw new MasterManagerException("Unable to get docker swarm node id");
+      throw new WorkerManagerException("Unable to get docker swarm node id");
     }
     String nodeId = nodeIdRegexExpression.group(0);
     nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
@@ -154,7 +155,7 @@ public class DockerSwarmService {
       return nodesService.getNode(nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -179,7 +180,7 @@ public class DockerSwarmService {
       }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 

@@ -27,7 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -36,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceFieldAvg;
@@ -45,12 +43,11 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitorin
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringLogsRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.worker.ManagerWorkerProperties;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.metrics.ContainerMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.ServiceDecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesService;
@@ -63,8 +60,6 @@ public class ServicesMonitoringService {
   private final ServiceMonitoringLogsRepository serviceMonitoringLogs;
 
   private final ContainersService containersService;
-  private final ServicesService servicesService;
-  private final ServiceRulesService serviceRulesService;
   private final ServiceDecisionsService serviceDecisionsService;
   private final ContainerMetricsService containerMetricsService;
 
@@ -74,7 +69,6 @@ public class ServicesMonitoringService {
   public ServicesMonitoringService(ServiceMonitoringRepository servicesMonitoring,
                                    ServiceMonitoringLogsRepository serviceMonitoringLogs,
                                    ContainersService containersService,
-                                   ServicesService servicesService, ServiceRulesService serviceRulesService,
                                    ServiceDecisionsService serviceDecisionsService,
                                    ContainerMetricsService containerMetricsService,
                                    ContainerProperties containerProperties,
@@ -82,8 +76,6 @@ public class ServicesMonitoringService {
     this.serviceMonitoringLogs = serviceMonitoringLogs;
     this.servicesMonitoring = servicesMonitoring;
     this.containersService = containersService;
-    this.servicesService = servicesService;
-    this.serviceRulesService = serviceRulesService;
     this.serviceDecisionsService = serviceDecisionsService;
     this.containerMetricsService = containerMetricsService;
     this.monitorPeriod = containerProperties.getMonitorPeriod();
@@ -167,7 +159,7 @@ public class ServicesMonitoringService {
         lastRun = currRun;
         try {
           monitorServicesTask(diffSeconds);
-        } catch (MasterManagerException e) {
+        } catch (WorkerManagerException e) {
           log.error(e.getMessage());
         }
       }

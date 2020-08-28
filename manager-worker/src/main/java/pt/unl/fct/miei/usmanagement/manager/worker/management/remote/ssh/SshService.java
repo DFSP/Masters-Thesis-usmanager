@@ -46,10 +46,9 @@ import net.schmizz.sshj.xfer.FileSystemFile;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsProperties;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.prometheus.PrometheusProperties;
 
@@ -132,7 +131,7 @@ public class SshService {
       sftpClient.put(new FileSystemFile(file), filename);
     } catch (IOException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 

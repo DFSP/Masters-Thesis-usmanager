@@ -455,7 +455,9 @@ class Container extends BaseComponent<Props, State> {
 
   //TODO get apps' services instead (in case a service is associated to more than 1 app)
   private getSelectableServices = () =>
-    Object.keys(this.props.services);
+    Object.entries(this.props.services)
+          .filter(([_, service]) => service.serviceType.toLowerCase() !== 'system')
+          .map(([serviceName, _]) => serviceName);
 
   private setDefaultPorts = (serviceName: string) => {
     const service = this.props.services[serviceName];

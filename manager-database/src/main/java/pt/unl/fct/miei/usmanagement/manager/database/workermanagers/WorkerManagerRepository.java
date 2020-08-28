@@ -31,6 +31,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
@@ -41,6 +42,8 @@ public interface WorkerManagerRepository extends JpaRepository<WorkerManagerEnti
       + "from WorkerManagerEntity w "
       + "where w.id = :id")
   boolean hasWorkerManager(@Param("id") String id);
+
+  Optional<WorkerManagerEntity> getByContainer(@Param("container") ContainerEntity containerEntity);
 
   @Query("select c "
       + "from WorkerManagerEntity w join w.assignedCloudHosts c "

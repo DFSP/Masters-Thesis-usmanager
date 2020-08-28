@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
@@ -86,19 +87,19 @@ public class LocationRequestService {
     return containersService.launchContainer(hostname, REQUEST_LOCATION_MONITOR, true);
   }
 
-  public List<LocationMonitoringResp> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {
+  public List<LocationMonitoringResponse> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {
     String url = String.format("http://%s:%s/api/monitoringinfo/all/top/%d", requestLocationHostname, defaultPort,
         seconds);
     HttpEntity<String> request = new HttpEntity<>(headers);
-    List<LocationMonitoringResp> locationMonitoringResps = new ArrayList<>();
+    List<LocationMonitoringResponse> locationMonitoringResponses = new ArrayList<>();
     try {
-      ResponseEntity<LocationMonitoringResp[]> response = restTemplate.exchange(url, HttpMethod.GET, request,
-          LocationMonitoringResp[].class);
-      locationMonitoringResps = Arrays.asList(response.getBody());
+      ResponseEntity<LocationMonitoringResponse[]> response = restTemplate.exchange(url, HttpMethod.GET, request,
+          LocationMonitoringResponse[].class);
+      locationMonitoringResponses = Arrays.asList(response.getBody());
     } catch (RestClientException e) {
       e.printStackTrace();
     }
-    return locationMonitoringResps;
+    return locationMonitoringResponses;
   }
 
   public Map<String, HostDetails> getBestLocationToStartServices(
@@ -128,19 +129,19 @@ public class LocationRequestService {
     List<SimpleNode> nodes = nodesService.getReadyNodes();
     Map<String, Map<String, Integer>> serviceCountLocations = new HashMap<>();
     Map<String, Integer> serviceTotalRequestCount = new HashMap<>();
-    List<LocationMonitoringResp> allLocationMonitoringData = new ArrayList<>();
+    List<LocationMonitoringResponse> allLocationMonitoringData = new ArrayList<>();
 
     for (SimpleNode node : nodes) {
       String hostname = node.getHostname();
       allLocationMonitoringData.addAll(getAllMonitoringDataTop(hostname, seconds));
     }
-    for (LocationMonitoringResp locationMonitoringResp : allLocationMonitoringData) {
-      int count = locationMonitoringResp.getLocationData().getCount();
-      String serviceName = locationMonitoringResp.getToService();
-      String fromContinent = locationMonitoringResp.getLocationData().getFromContinent();
-      String fromRegion = locationMonitoringResp.getLocationData().getFromRegion();
-      String fromCountry = locationMonitoringResp.getLocationData().getFromCountry();
-      String fromCity = locationMonitoringResp.getLocationData().getFromCity();
+    for (LocationMonitoringResponse locationMonitoringResponse : allLocationMonitoringData) {
+      int count = locationMonitoringResponse.getLocationData().getCount();
+      String serviceName = locationMonitoringResponse.getToService();
+      String fromContinent = locationMonitoringResponse.getLocationData().getFromContinent();
+      String fromRegion = locationMonitoringResponse.getLocationData().getFromRegion();
+      String fromCountry = locationMonitoringResponse.getLocationData().getFromCountry();
+      String fromCity = locationMonitoringResponse.getLocationData().getFromCity();
 
       List<String> locationKeys = getLocationsKeys(fromCity, fromCountry, fromRegion, fromContinent);
 
@@ -180,9 +181,9 @@ public class LocationRequestService {
         HostDetails hostDetails = hostsService.getHostDetails(serviceHostname);
         hostnamesFound.put(serviceHostname, hostDetails);
       }
-      MachineLocation machineLocation = hostnamesFound.get(serviceHostname).getHostLocation();
-      List<String> locationKeys = getLocationsKeys(machineLocation.getCity(), machineLocation.getCountry(),
-          machineLocation.getRegion(), machineLocation.getContinent());
+      HostLocation hostLocation = hostnamesFound.get(serviceHostname).getHostLocation();
+      List<String> locationKeys = getLocationsKeys(hostLocation.getCity(), hostLocation.getCountry(),
+          hostLocation.getRegion(), hostLocation.getContinent());
       for (String locationKey : locationKeys) {
         if (availableLocations.containsKey(locationKey)) {
           int newLocationCount = availableLocations.get(locationKey) + 1;
@@ -201,10 +202,10 @@ public class LocationRequestService {
     for (Entry<String, Integer> locationReqCount : locationMonitoring.entrySet()) {
       double currentPercentage = ((locationReqCount.getValue() * 1.0) / (totalCount * 1.0)) / PERCENT;
       if (currentPercentage >= minimumRequestCountPercentage) {
-        MachineLocation machineLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getHostLocation();
-        String region = machineLocation.getRegion();
-        String country = machineLocation.getCountry();
-        String city = machineLocation.getCity();
+        HostLocation hostLocation = getHostDetailsByLocationKey(locationReqCount.getKey()).getHostLocation();
+        String region = hostLocation.getRegion();
+        String country = hostLocation.getCountry();
+        String city = hostLocation.getCity();
         /*if (locationDetails instanceof EdgeHostDetails) {
           final var edgeHostDetails = (EdgeHostDetails)locationDetails;
           country = edgeHostDetails.getCountry();
@@ -242,7 +243,7 @@ public class LocationRequestService {
         city = serviceLocationSplit[i];
       }
     }
-    return new HostDetails(new MachineLocation(city, country, region));
+    return new HostDetails(new HostLocation(city, country, region, null));
   }
 
   /*public String getRegionByLocationKey(String locationKey) {

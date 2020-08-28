@@ -38,4 +38,10 @@ public class ContainerEvent extends Event {
   private final String containerId;
   private final String serviceName;
 
+  public ContainerEvent(String hostname, String containerId, String serviceName) {
+    super(hostname);
+    this.containerId = containerId;
+    this.serviceName = serviceName;
+  }
+
 }

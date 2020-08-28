@@ -26,10 +26,12 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
@@ -56,7 +58,7 @@ public class WorkerManagersService {
   public WorkerManagersService(WorkerManagerRepository workerManagers,
                                CloudHostsService cloudHostsService,
                                EdgeHostsService edgeHostsService,
-                               ContainersService containersService,
+                               @Lazy ContainersService containersService,
                                HostsService hostsService) {
     this.workerManagers = workerManagers;
     this.cloudHostsService = cloudHostsService;
@@ -74,19 +76,22 @@ public class WorkerManagersService {
         new EntityNotFoundException(WorkerManagerEntity.class, "id", id));
   }
 
-  public WorkerManagerEntity addWorkerManager(String hostname) {
-    log.debug("Launching worker manager at {}", hostname);
-    WorkerManagerEntity workerManagerEntity;
-    try {
-      CloudHostEntity cloudHostEntity = cloudHostsService.getCloudHostByHostname(hostname);
-      workerManagerEntity = workerManagers.save(WorkerManagerEntity.builder().cloudHost(cloudHostEntity).build());
-    } catch (EntityNotFoundException ignored) {
-      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
-      hostname = edgeHostEntity.getPublicIpAddress();
-      workerManagerEntity = workerManagers.save(WorkerManagerEntity.builder().edgeHost(edgeHostEntity).build());
-    }
-    this.launchWorkerManager(hostname, workerManagerEntity.getId());
-    return workerManagerEntity;
+  public WorkerManagerEntity getWorkerManager(ContainerEntity containerEntity) {
+    return workerManagers.getByContainer(containerEntity).orElseThrow(() ->
+        new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
+  }
+
+  public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
+    return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
+  }
+
+  public WorkerManagerEntity launchWorkerManager(String host) {
+    log.debug("Launching worker manager at {}", host);
+    String hostname = hostsService.isValidIPAddress(host) ? host : hostsService.getPublicIpAddressFromDns(host);
+    String id = UUID.randomUUID().toString();
+    ContainerEntity container = this.launchWorkerManager(hostname, id);
+    WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
+    return workerManagers.save(workerManagerEntity);
   }
 
   private ContainerEntity launchWorkerManager(String hostname, String id) {
@@ -98,6 +103,11 @@ public class WorkerManagersService {
 
   public void deleteWorkerManager(String workerManagerId) {
     var workerManager = getWorkerManager(workerManagerId);
+    containersService.stopContainer(workerManager.getContainer().getContainerId());
+  }
+
+  public void deleteWorkerManagerByContainer(ContainerEntity container) {
+    var workerManager = getWorkerManager(container);
     workerManagers.delete(workerManager);
   }
 

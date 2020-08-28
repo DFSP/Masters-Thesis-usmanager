@@ -56,7 +56,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMap
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
@@ -179,7 +179,7 @@ public class DockerContainersService {
             DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
             DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, hostname)
         );
-      } catch (MasterManagerException e) {
+      } catch (WorkerManagerException e) {
         log.error(e.getMessage());
       }
       if (containers.size() > 0) {
@@ -272,7 +272,7 @@ public class DockerContainersService {
           : getContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -281,7 +281,7 @@ public class DockerContainersService {
         Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
         .stream().findFirst().orElseGet(() -> containersService.launchContainer(hostname, databaseServiceName));
     if (databaseContainer == null) {
-      throw new MasterManagerException("Failed to launch database '{}' on host '{}'", databaseServiceName, hostname);
+      throw new WorkerManagerException("Failed to launch database '{}' on host '{}'", databaseServiceName, hostname);
     }
     String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
     log.info("Found database '{}' on host '{}'", address, hostname);
@@ -312,7 +312,7 @@ public class DockerContainersService {
       log.info("Stopped container {} ({}) on host {}", serviceName, id, hostname);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -377,7 +377,7 @@ public class DockerContainersService {
       return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -428,7 +428,7 @@ public class DockerContainersService {
       return dockerClient.inspectContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -439,7 +439,7 @@ public class DockerContainersService {
       return dockerClient.stats(id);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 

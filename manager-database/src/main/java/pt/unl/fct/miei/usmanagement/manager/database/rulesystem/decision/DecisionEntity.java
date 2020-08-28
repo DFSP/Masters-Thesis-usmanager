@@ -66,7 +66,7 @@ public class DecisionEntity {
   private Long id;
 
   @Enumerated(EnumType.STRING)
-  private RuleDecision decision;
+  private RuleDecision ruleDecision;
 
   @ManyToOne
   @JoinColumn(name = "component_type_id")

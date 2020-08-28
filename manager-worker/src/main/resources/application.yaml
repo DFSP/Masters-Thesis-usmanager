@@ -25,6 +25,8 @@
 server:
   port: 8081
 spring:
+  application:
+    name: manager-master
   main:
     allow-bean-definition-overriding: true
   datasource:
@@ -76,9 +78,97 @@ manager-worker:
   id: ${id:}
   master-hostname: ${master:}
   monitor-period: 30000
-    tests:
-      enabled: ${tests:true}
+  tests:
+    enabled: ${tests:true}
+ssh:
+  connection-timeout: 10000
+edge:
+  access:
+    key-file-path: src/main/resources/edge
+aws:
+  initial-max-instances: 2
+  max-retries: 10
+  delay-between-retries: 5000
+  connection-timeout: 180000
+  access:
+    key: AKIAS5UBHWDI3WO52EV5
+    secret-key: ${secret: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}
+    key-file-path: src/main/resources/aws/ec2.pem
+    username: ubuntu
+  instance:
+    ami: ami-0b30a88613f4a9846
+    security-group: us-worker-security-group
+    key-pair: ec2
+    type: t2.micro
+    tag: us-worker
+container:
+  database:
+    deploy-delay: 5000
+  delay-before-stop: 45000
+  monitor-period: 60000
+docker:
+  install-script: docker-install.sh
+  install-script-path: src/main/resources/scripts/docker-install.sh
+  uninstall-script: docker-uninstall.sh
+  uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
+  api:
+    port: 2376
+  api-proxy:
+    username: username
+    password: password
+    port: 2375
+  hub:
+    username: usmanager
+  swarm:
+    manager: ${dockerManager:daniel@dpimenta.ddns.net}
+    max-workers: 1
+eureka:
+  port: 8761
+prometheus:
+  node-exporter:
+    install-script: node-exporter-install.sh
+    install-script-path: src/main/resources/scripts/node-exporter-install.sh
+decision:
+  start-host-on-events-count: 3
+  stop-host-on-events-count: 3
+  replicate-container-on-event-count: 2
+  migrate-container-on-event-count: 2
+  stop-container-on-event-count: 3
+host:
+  maximum-cpu-percentage: 90
+  maximum-hosts: 0
+  maximum-ram-percentage: 90
+  minimum-hosts: 1
+  monitor-period: 60000
+  local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
+manager-master:
+  mode: LOCAL
+  monitor-period: 30000
+  tests:
+    enabled: ${tests:true}
+nginx-load-balancer:
+  api-url: /_/nginx-load-balancer-api/api
+location-request:
+  port: 1919
+  minimum-request-count-percentage: 15.0
+rules:
+  service-rule-template-file: service-rule-template.drl
+  host-rule-template-file: host-rule-template.drl
+symmetricds:
+  tables:
+    exclude:
+      startsWith: sym, logging
 
+#debug: true
+#trace: true
+#  level:
+#    org:
+#      hibernate:
+#        sql: DEBUG
+#      type:
+#        descriptor:
+#          sql:
+#            BasicBinder: TRACE
 
 
 

@@ -32,7 +32,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 
 @Slf4j
 @Service
@@ -41,7 +41,7 @@ public class BashService {
   public String getUsername() {
     BashCommandResult usernameResult = executeCommand("whoami");
     if (!usernameResult.isSuccessful()) {
-      throw new MasterManagerException("Unable to get username of this machine: %s", usernameResult.getError());
+      throw new WorkerManagerException("Unable to get username of this machine: %s", usernameResult.getError());
     }
     return usernameResult.getOutput().get(0);
   }
@@ -49,7 +49,7 @@ public class BashService {
   public String getPublicIp() {
     BashCommandResult publicIpResult = executeCommand("curl https://ipinfo.io/ip");
     if (!publicIpResult.isSuccessful()) {
-      throw new MasterManagerException("Unable to get public ip: %s", publicIpResult.getError());
+      throw new WorkerManagerException("Unable to get public ip: %s", publicIpResult.getError());
     }
     return publicIpResult.getOutput().get(0);
   }
@@ -57,7 +57,7 @@ public class BashService {
   public String getPrivateIp() {
     BashCommandResult privateIpResult = executeCommand("hostname -I | awk '{print $1}'");
     if (!privateIpResult.isSuccessful()) {
-      throw new MasterManagerException("Unable to get private ip: %s", privateIpResult.getError());
+      throw new WorkerManagerException("Unable to get private ip: %s", privateIpResult.getError());
     }
     return privateIpResult.getOutput().get(0);
   }

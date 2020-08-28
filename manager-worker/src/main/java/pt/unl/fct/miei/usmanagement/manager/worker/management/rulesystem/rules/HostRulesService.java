@@ -31,24 +31,19 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.HostDecisionResult;
 
 @Slf4j
@@ -58,9 +53,6 @@ public class HostRulesService {
   private static final int HOST_MINIMUM_LOGS_COUNT = 1;
   private static final double PERCENTAGE = 0.01;
 
-  private final ConditionsService conditionsService;
-  private final CloudHostsService cloudHostsService;
-  private final EdgeHostsService edgeHostsService;
   private final DroolsService droolsService;
   private final HostsMonitoringService hostsMonitoringService;
 
@@ -69,13 +61,8 @@ public class HostRulesService {
   private final String hostRuleTemplateFile;
   private final AtomicLong lastUpdateHostRules;
 
-  public HostRulesService(ConditionsService conditionsService, CloudHostsService cloudHostsService,
-                          EdgeHostsService edgeHostsService, DroolsService droolsService,
-                          HostsMonitoringService hostsMonitoringService, HostRuleRepository rules,
-                          RulesProperties rulesProperties) {
-    this.conditionsService = conditionsService;
-    this.cloudHostsService = cloudHostsService;
-    this.edgeHostsService = edgeHostsService;
+  public HostRulesService(DroolsService droolsService, @Lazy HostsMonitoringService hostsMonitoringService,
+                          HostRuleRepository rules, RulesProperties rulesProperties) {
     this.droolsService = droolsService;
     this.hostsMonitoringService = hostsMonitoringService;
     this.rules = rules;
@@ -83,6 +70,7 @@ public class HostRulesService {
     this.lastUpdateHostRules = new AtomicLong(0);
   }
 
+  // TODO call this when host rules and generic host rules are updated from symmetricds
   public void setLastUpdateHostRules() {
     long currentTime = System.currentTimeMillis();
     lastUpdateHostRules.getAndSet(currentTime);
@@ -93,8 +81,7 @@ public class HostRulesService {
   }
 
   public List<HostRuleEntity> getRules(String hostname) {
-    //TODO what about cloud
-    return rules.findByEdgeHostname(hostname);
+    return rules.findByHostname(hostname);
   }
 
   public HostRuleEntity getRule(Long id) {
@@ -138,21 +125,6 @@ public class HostRulesService {
     return rules.getCloudHosts(ruleName);
   }
 
-  public void addCloudHost(String ruleName, String instanceId) {
-    addCloudHosts(ruleName, List.of(instanceId));
-  }
-
-  public void addCloudHosts(String ruleName, List<String> instanceIds) {
-    log.debug("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
-    HostRuleEntity rule = getRule(ruleName);
-    instanceIds.forEach(instanceId -> {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
-      cloudHost.addRule(rule);
-    });
-    rules.save(rule);
-    setLastUpdateHostRules();
-  }
-
   public EdgeHostEntity getEdgeHost(String ruleName, String hostname) {
     assertRuleExists(ruleName);
     return rules.getEdgeHost(ruleName, hostname).orElseThrow(() ->
@@ -170,14 +142,14 @@ public class HostRulesService {
     }
   }
 
-  public HostDecisionResult runHostRules(String hostname, Map<String, Double> fields) {
+  public HostDecisionResult executeHostRules(String hostname, Map<String, Double> fields) {
     log.info("Running host rules at {} for fields {}", hostname, fields);
     var hostEvent = new HostEvent(hostname);
     Map<String, Double> hostEventFields = hostEvent.getFields();
     hostsMonitoringService.getHostMonitoring(hostname)
         .stream()
-        .filter(loggedField -> loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT
-            && fields.get(loggedField.getField()) != null)
+        .filter(loggedField ->
+            loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT && fields.get(loggedField.getField()) != null)
         .forEach(loggedField -> {
           long count = loggedField.getCount();
           String field = loggedField.getField();
@@ -206,7 +178,6 @@ public class HostRulesService {
   }
 
   private List<Rule> generateHostRules(String hostname) {
-    //FIXME what about cloud hosts?
     List<HostRuleEntity> hostRules = getRules(hostname);
     var rules = new ArrayList<Rule>(hostRules.size());
     log.info("Generating host rules... (count: {})", rules.size());
@@ -222,7 +193,7 @@ public class HostRulesService {
       Operator operator = condition.getOperator().getOperator();
       return new Condition(fieldName, value, operator);
     }).collect(Collectors.toList());
-    RuleDecision decision = hostRule.getDecision().getValue();
+    RuleDecision decision = hostRule.getDecision().getRuleDecision();
     int priority = hostRule.getPriority();
     return new Rule(id, conditions, decision, priority);
   }

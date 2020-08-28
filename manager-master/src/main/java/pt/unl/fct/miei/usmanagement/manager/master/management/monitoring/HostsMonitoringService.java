@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
@@ -275,14 +276,14 @@ public class HostsMonitoringService {
   }
 
   private void startHost(String hostname) {
-    HostDetails hostDetails = hostsService.getHostDetails(hostname);
+    HostLocation hostLocation = hostsService.getHostDetails(hostname).getHostLocation();
     Pair<String, String> container = getRandomContainerToMigrate(hostname);
     String serviceName = container.getFirst();
     String containerId = container.getSecond();
     if (!containerId.isEmpty()) {
       ServiceEntity serviceConfig = servicesService.getService(serviceName);
       double serviceAvgMem = serviceConfig.getExpectedMemoryConsumption();
-      String toHostname = hostsService.getAvailableHost(serviceAvgMem, hostDetails);
+      String toHostname = hostsService.getAvailableHost(serviceAvgMem, hostLocation);
       // TODO porquê migrar logo um container?
       containersService.migrateContainer(containerId, toHostname);
       log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);

@@ -36,6 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceOrder;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;

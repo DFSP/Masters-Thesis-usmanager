@@ -82,7 +82,7 @@ prometheus:
 decision:
   start-host-on-events-count: 3
   stop-host-on-events-count: 3
-    replicate-container-on-event-count: 2
+  replicate-container-on-event-count: 2
   migrate-container-on-event-count: 2
   stop-container-on-event-count: 3
 host:

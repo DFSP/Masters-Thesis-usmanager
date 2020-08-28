@@ -194,13 +194,22 @@ public class DockerContainersService {
     return launchContainer(hostname, serviceName, false, internalPort, externalPort);
   }
 
+  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, String internalPort,
+                                                   String externalPort, List<String> environment) {
+    return launchContainer(hostname, serviceName, false, internalPort, externalPort, environment);
+  }
+
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
                                                    String internalPort, String externalPort) {
+    return launchContainer(hostname, serviceName, global, internalPort, externalPort, Collections.emptyList());
+  }
+
+  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
+                                                   String internalPort, String externalPort, List<String> environment) {
     ServiceEntity service = servicesService.getService(serviceName).toBuilder()
         .defaultInternalPort(internalPort)
         .defaultExternalPort(externalPort)
         .build();
-    List<String> environment = Collections.emptyList();
     Map<String, String> labels = Collections.emptyMap();
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
     return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
@@ -210,14 +219,17 @@ public class DockerContainersService {
                                                     boolean global, List<String> environment,
                                                     Map<String, String> labels,
                                                     Map<String, String> dynamicLaunchParams) {
+    String ipAddress = hostsService.isValidIPAddress(hostname)
+        ? hostname
+        : hostsService.getPublicIpAddressFromDns(hostname);
     String serviceName = service.getServiceName();
-    log.info("Launching container with service '{}' at '{}'...", serviceName, hostname);
+    log.info("Launching container with service '{}' at '{}'...", serviceName, ipAddress);
     if (global) {
       List<DockerContainer> containers = List.of();
       try {
         containers = getContainers(
             DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
-            DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, hostname)
+            DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, ipAddress)
         );
       } catch (MasterManagerException e) {
         log.error(e.getMessage());
@@ -230,18 +242,18 @@ public class DockerContainersService {
     }
     String serviceType = service.getServiceType().name();
     String internalPort = service.getDefaultInternalPort();
-    String externalPort = hostsService.findAvailableExternalPort(hostname, service.getDefaultExternalPort());
-    String serviceAddr = String.format("%s:%s", hostname, externalPort);
-    String containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
+    String externalPort = hostsService.findAvailableExternalPort(ipAddress, service.getDefaultExternalPort());
+    String serviceAddr = String.format("%s:%s", ipAddress, externalPort);
+    String containerName = String.format("%s_%s_%s", serviceName, ipAddress, externalPort);
     String dockerRepository = service.getDockerRepository();
-    HostLocation hostLocation = hostsService.getHostDetails(hostname).getHostLocation();
+    HostLocation hostLocation = hostsService.getHostDetails(ipAddress).getHostLocation();
     String continent = hostLocation.getContinent();
     String region = hostLocation.getRegion();
     String country = hostLocation.getCountry();
     String city = hostLocation.getCity();
     String launchCommand = service.getLaunchCommand();
     launchCommand = launchCommand
-        .replace("${hostname}", hostname)
+        .replace("${hostname}", ipAddress)
         .replace("${externalPort}", externalPort)
         .replace("${internalPort}", internalPort);
     log.info("{}", launchCommand);
@@ -254,7 +266,7 @@ public class DockerContainersService {
     }
     for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
       String databaseServiceName = databaseService.getServiceName();
-      String databaseHost = getDatabaseHostForService(hostname, databaseServiceName);
+      String databaseHost = getDatabaseHostForService(ipAddress, databaseServiceName);
       String outputLabel = databaseService.getOutputLabel();
       launchCommand = launchCommand.replace(outputLabel, databaseHost);
     }
@@ -271,7 +283,7 @@ public class DockerContainersService {
         ContainerConstants.Label.SERVICE_NAME, serviceName,
         ContainerConstants.Label.SERVICE_TYPE, serviceType,
         ContainerConstants.Label.SERVICE_ADDRESS, serviceAddr,
-        ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
+        ContainerConstants.Label.SERVICE_HOSTNAME, ipAddress,
         ContainerConstants.Label.SERVICE_CONTINENT, continent,
         ContainerConstants.Label.SERVICE_REGION, region,
         ContainerConstants.Label.SERVICE_COUNTRY, country,
@@ -283,7 +295,7 @@ public class DockerContainersService {
     }
     log.info("hostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
             + "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
-        hostname, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
+        ipAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
         containerLabels);
     HostConfig hostConfig = HostConfig.builder()
         .autoRemove(true)
@@ -298,13 +310,13 @@ public class DockerContainersService {
     ContainerConfig containerConfig = launchCommand.isEmpty()
         ? containerBuilder.build()
         : containerBuilder.cmd(launchCommand.split(" ")).build();
-    try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
+    try (var dockerClient = dockerCoreService.getDockerClient(ipAddress)) {
       dockerClient.pull(dockerRepository);
       ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
       String containerId = containerCreation.id();
       dockerClient.startContainer(containerId);
       if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
-        nginxLoadBalancerService.addServiceToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
+        nginxLoadBalancerService.addServiceToLoadBalancer(ipAddress, serviceName, serviceAddr, continent, region, country,
             city);
       }
       return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")

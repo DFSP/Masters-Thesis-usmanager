@@ -207,6 +207,9 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label === 'maximumvalue') {
     return <FaLessThanEqual/>;
   }
+  if (label === 'container') {
+    return <FaDocker/>;
+  }
   if (label === 'state') {
     const state = value as IState;
     switch (state.name) {

@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.DockerSwarmService;
 
 @Service
@@ -70,7 +70,7 @@ public class NodesService {
               n.status().state()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -133,7 +133,7 @@ public class NodesService {
       log.info("Deleted node '{}'", nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -147,7 +147,7 @@ public class NodesService {
       return nodeInfo.managerStatus() != null;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -157,7 +157,7 @@ public class NodesService {
       return nodeInfo.managerStatus() == null;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 
@@ -222,7 +222,7 @@ public class NodesService {
       return getNode(nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new MasterManagerException(e.getMessage());
+      throw new WorkerManagerException(e.getMessage());
     }
   }
 

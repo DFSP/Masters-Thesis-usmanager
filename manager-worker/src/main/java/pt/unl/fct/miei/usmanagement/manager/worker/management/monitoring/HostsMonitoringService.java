@@ -40,7 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLo
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogsRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.worker.ManagerWorkerProperties;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostProperties;
@@ -126,7 +126,7 @@ public class HostsMonitoringService {
       public void run() {
         try {
           monitorHostsTask();
-        } catch (MasterManagerException e) {
+        } catch (WorkerManagerException e) {
           log.error(e.getMessage());
         }
       }

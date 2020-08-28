@@ -36,26 +36,21 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 public class ServicesEventsService {
 
   private final ServiceEventRepository serviceEvents;
-  private final DecisionsService decisionsService;
 
-  public ServicesEventsService(ServiceEventRepository serviceEvents, DecisionsService decisionsService) {
+  public ServicesEventsService(ServiceEventRepository serviceEvents) {
     this.serviceEvents = serviceEvents;
-    this.decisionsService = decisionsService;
   }
-
 
   public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
     return serviceEvents.findByContainerId(containerId);
   }
 
-  public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
-    DecisionEntity decision = decisionsService.getServicePossibleDecision(decisionName);
-    ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst()
-        .orElse(
-            ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision)
-            .count(0).build()
-        );
-    if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
+  public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, DecisionEntity decision) {
+    ServiceEventEntity event =
+        getServiceEventsByContainerId(containerId).stream().findFirst().orElse(
+            ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0)
+                .build());
+    if (event.getDecision() == null || !Objects.equals(event.getDecision().getId(), decision.getId())) {
       event.setDecision(decision);
       event.setCount(1);
     } else {
@@ -67,9 +62,8 @@ public class ServicesEventsService {
 
   //TODO ?
   public void resetServiceEvent(String serviceName) {
-    DecisionEntity decision = decisionsService.getServicePossibleDecision("none");
     serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
-      serviceEvent.setDecision(decision);
+      serviceEvent.setDecision(null);
       serviceEvent.setCount(1);
       serviceEvents.save(serviceEvent);
     });

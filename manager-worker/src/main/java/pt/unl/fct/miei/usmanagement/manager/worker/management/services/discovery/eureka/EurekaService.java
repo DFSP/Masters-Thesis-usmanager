@@ -37,8 +37,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.location.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesService;
 
 @Service
@@ -74,14 +74,16 @@ public class EurekaService {
 
   public List<ContainerEntity> launchEurekaServers(List<String> regions) {
     double expectedMemoryConsumption = serviceService.getService(EUREKA_SERVER).getExpectedMemoryConsumption();
-    List<String> availableHostnames = hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions);
+    List<HostDetails> availableHosts = hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions);
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();
-    String eurekaServers = availableHostnames.stream()
+    String eurekaServers = availableHosts.stream()
+        .map(host -> host.getHostAddress().getPublicIpAddress())
         .map(hostname -> String.format("http://%s:%s/eureka/", hostname, port))
         .collect(Collectors.joining(","));
     Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
-    return availableHostnames.stream()
+    return availableHosts.stream()
+        .map(host -> host.getHostAddress().getPublicIpAddress())
         .map(hostname ->
             containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs, customLabels, dynamicLaunchParams))
         .collect(Collectors.toList());

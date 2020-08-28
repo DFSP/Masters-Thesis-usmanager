@@ -114,10 +114,10 @@ public class DatabaseLoader {
       // services
       ServiceEntity frontend;
       try {
-        frontend = servicesService.getService("front-end");
+        frontend = servicesService.getService("sock-shop-front-end");
       } catch (EntityNotFoundException ignored) {
         frontend = ServiceEntity.builder()
-            .serviceName("front-end")
+            .serviceName("sock-shop-front-end")
             .dockerRepository(dockerHubUsername + "/sock-shop-front-end")
             .defaultExternalPort("8081")
             .defaultInternalPort("80")
@@ -133,10 +133,10 @@ public class DatabaseLoader {
       }
       ServiceEntity user;
       try {
-        user = servicesService.getService("user");
+        user = servicesService.getService("sock-shop-user");
       } catch (EntityNotFoundException ignored) {
         user = ServiceEntity.builder()
-            .serviceName("user")
+            .serviceName("sock-shop-user")
             .dockerRepository(dockerHubUsername + "/sock-shop-user")
             .defaultExternalPort("8082")
             .defaultInternalPort("80")
@@ -152,10 +152,10 @@ public class DatabaseLoader {
       }
       ServiceEntity userDb;
       try {
-        userDb = servicesService.getService("user-db");
+        userDb = servicesService.getService("sock-shop-user-db");
       } catch (EntityNotFoundException ignored) {
         userDb = ServiceEntity.builder()
-            .serviceName("user-db")
+            .serviceName("sock-shop-user-db")
             .dockerRepository(dockerHubUsername + "/sock-shop-user-db")
             .defaultExternalPort("27017")
             .defaultInternalPort("27017")
@@ -171,10 +171,10 @@ public class DatabaseLoader {
       }
       ServiceEntity catalogue;
       try {
-        catalogue = servicesService.getService("catalogue");
+        catalogue = servicesService.getService("sock-shop-catalogue");
       } catch (EntityNotFoundException ignored) {
         catalogue = ServiceEntity.builder()
-            .serviceName("catalogue")
+            .serviceName("sock-shop-catalogue")
             .dockerRepository(dockerHubUsername + "/sock-shop-catalogue")
             .defaultExternalPort("8083")
             .defaultInternalPort("80")
@@ -190,10 +190,10 @@ public class DatabaseLoader {
       }
       ServiceEntity catalogueDb;
       try {
-        catalogueDb = servicesService.getService("catalogue-db");
+        catalogueDb = servicesService.getService("sock-shop-catalogue-db");
       } catch (EntityNotFoundException ignored) {
         catalogueDb = ServiceEntity.builder()
-            .serviceName("catalogue-db")
+            .serviceName("sock-shop-catalogue-db")
             .dockerRepository(dockerHubUsername + "/sock-shop-catalogue-db")
             .defaultExternalPort("3306")
             .defaultInternalPort("3306")
@@ -209,10 +209,10 @@ public class DatabaseLoader {
       }
       ServiceEntity payment;
       try {
-        payment = servicesService.getService("payment");
+        payment = servicesService.getService("sock-shop-payment");
       } catch (EntityNotFoundException ignored) {
         payment = ServiceEntity.builder()
-            .serviceName("payment")
+            .serviceName("sock-shop-payment")
             .dockerRepository(dockerHubUsername + "/sock-shop-payment")
             .defaultExternalPort("8084")
             .defaultInternalPort("80")
@@ -228,10 +228,10 @@ public class DatabaseLoader {
       }
       ServiceEntity carts;
       try {
-        carts = servicesService.getService("carts");
+        carts = servicesService.getService("sock-shop-carts");
       } catch (EntityNotFoundException ignored) {
         carts = ServiceEntity.builder()
-            .serviceName("carts")
+            .serviceName("sock-shop-carts")
             .dockerRepository(dockerHubUsername + "/sock-shop-carts")
             .defaultExternalPort("8085")
             .defaultInternalPort("80")
@@ -247,10 +247,10 @@ public class DatabaseLoader {
       }
       ServiceEntity cartsDb;
       try {
-        cartsDb = servicesService.getService("carts-db");
+        cartsDb = servicesService.getService("sock-shop-carts-db");
       } catch (EntityNotFoundException ignored) {
         cartsDb = ServiceEntity.builder()
-            .serviceName("carts-db")
+            .serviceName("sock-shop-carts-db")
             .dockerRepository(dockerHubUsername + "/sock-shop-carts-db")
             .defaultExternalPort("27016")
             .defaultInternalPort("27017")
@@ -266,10 +266,10 @@ public class DatabaseLoader {
       }
       ServiceEntity orders;
       try {
-        orders = servicesService.getService("orders");
+        orders = servicesService.getService("sock-shop-orders");
       } catch (EntityNotFoundException ignored) {
         orders = ServiceEntity.builder()
-            .serviceName("orders")
+            .serviceName("sock-shop-orders")
             .dockerRepository(dockerHubUsername + "/sock-shop-orders")
             .defaultExternalPort("8086")
             .defaultInternalPort("80")
@@ -285,10 +285,10 @@ public class DatabaseLoader {
       }
       ServiceEntity ordersDb;
       try {
-        ordersDb = servicesService.getService("orders-db");
+        ordersDb = servicesService.getService("sock-shop-orders-db");
       } catch (EntityNotFoundException ignored) {
         ordersDb = ServiceEntity.builder()
-            .serviceName("orders-db")
+            .serviceName("sock-shop-orders-db")
             .dockerRepository(dockerHubUsername + "/sock-shop-orders-db")
             .defaultExternalPort("27015")
             .defaultInternalPort("27017")
@@ -304,10 +304,10 @@ public class DatabaseLoader {
       }
       ServiceEntity shipping;
       try {
-        shipping = servicesService.getService("shipping");
+        shipping = servicesService.getService("sock-shop-shipping");
       } catch (EntityNotFoundException ignored) {
         shipping = ServiceEntity.builder()
-            .serviceName("shipping")
+            .serviceName("sock-shop-shipping")
             .dockerRepository(dockerHubUsername + "/sock-shop-shipping")
             .defaultExternalPort("8087")
             .defaultInternalPort("80")
@@ -323,10 +323,10 @@ public class DatabaseLoader {
       }
       ServiceEntity queueMaster;
       try {
-        queueMaster = servicesService.getService("queue-master");
+        queueMaster = servicesService.getService("sock-shop-queue-master");
       } catch (EntityNotFoundException ignored) {
         queueMaster = ServiceEntity.builder()
-            .serviceName("queue-master")
+            .serviceName("sock-shop-queue-master")
             .dockerRepository(dockerHubUsername + "/sock-shop-queue-master")
             .defaultExternalPort("8088")
             .defaultInternalPort("80")
@@ -342,10 +342,10 @@ public class DatabaseLoader {
       }
       ServiceEntity rabbitmq;
       try {
-        rabbitmq = servicesService.getService("rabbitmq");
+        rabbitmq = servicesService.getService("sock-shop-rabbitmq");
       } catch (EntityNotFoundException ignored) {
         rabbitmq = ServiceEntity.builder()
-            .serviceName("rabbitmq")
+            .serviceName("sock-shop-rabbitmq")
             .dockerRepository(dockerHubUsername + "/sock-shop-rabbitmq")
             .defaultExternalPort("5672")
             .defaultInternalPort("5672")
@@ -456,10 +456,10 @@ public class DatabaseLoader {
       }
       ServiceEntity masterManager;
       try {
-        masterManager = servicesService.getService(ManagerMasterProperties.MANAGER_MASTER);
+        masterManager = servicesService.getService(ManagerMasterProperties.MASTER_MANAGER);
       } catch (EntityNotFoundException ignored) {
         masterManager = ServiceEntity.builder()
-            .serviceName(ManagerMasterProperties.MANAGER_MASTER)
+            .serviceName(ManagerMasterProperties.MASTER_MANAGER)
             .dockerRepository(dockerHubUsername + "/manager-master")
             .defaultExternalPort("8080")
             .defaultInternalPort("8080")
@@ -810,7 +810,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         serviceDecisionNone = DecisionEntity.builder()
             .componentType(service)
-            .value(RuleDecision.NONE)
+            .ruleDecision(RuleDecision.NONE)
             .build();
         serviceDecisionNone = decisionsService.addDecision(serviceDecisionNone);
       }
@@ -820,7 +820,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         serviceDecisionReplicate = DecisionEntity.builder()
             .componentType(service)
-            .value(RuleDecision.REPLICATE)
+            .ruleDecision(RuleDecision.REPLICATE)
             .build();
         serviceDecisionReplicate = decisionsService.addDecision(serviceDecisionReplicate);
       }
@@ -830,7 +830,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         serviceDecisionMigrate = DecisionEntity.builder()
             .componentType(service)
-            .value(RuleDecision.MIGRATE)
+            .ruleDecision(RuleDecision.MIGRATE)
             .build();
         serviceDecisionMigrate = decisionsService.addDecision(serviceDecisionMigrate);
       }
@@ -840,7 +840,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         serviceDecisionStop = DecisionEntity.builder()
             .componentType(service)
-            .value(RuleDecision.STOP)
+            .ruleDecision(RuleDecision.STOP)
             .build();
         serviceDecisionStop = decisionsService.addDecision(serviceDecisionStop);
       }
@@ -851,7 +851,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         hostDecisionNone = DecisionEntity.builder()
             .componentType(host)
-            .value(RuleDecision.NONE)
+            .ruleDecision(RuleDecision.NONE)
             .build();
         hostDecisionNone = decisionsService.addDecision(hostDecisionNone);
       }
@@ -861,7 +861,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         hostDecisionStart = DecisionEntity.builder()
             .componentType(host)
-            .value(RuleDecision.START)
+            .ruleDecision(RuleDecision.START)
             .build();
         hostDecisionStart = decisionsService.addDecision(hostDecisionStart);
       }
@@ -871,7 +871,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         hostDecisionStop = DecisionEntity.builder()
             .componentType(host)
-            .value(RuleDecision.STOP)
+            .ruleDecision(RuleDecision.STOP)
             .build();
         hostDecisionStop = decisionsService.addDecision(hostDecisionStop);
       }

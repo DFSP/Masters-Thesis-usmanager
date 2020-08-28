@@ -37,9 +37,16 @@ import lombok.ToString;
 public class Event {
 
   private final Map<String, Double> fields;
+  private final String hostname;
 
   public Event() {
     this.fields = new HashMap<>();
+    this.hostname = null;
+  }
+
+  public Event(String hostname) {
+    this.fields = new HashMap<>();
+    this.hostname = hostname;
   }
 
 }

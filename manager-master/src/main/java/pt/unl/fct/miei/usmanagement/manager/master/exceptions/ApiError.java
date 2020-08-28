@@ -44,6 +44,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import pt.unl.fct.miei.usmanagement.manager.master.config.LowerCaseClassNameResolver;
 
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)

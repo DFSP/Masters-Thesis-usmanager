@@ -31,6 +31,7 @@ import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.CpuStats;
 import com.spotify.docker.client.messages.MemoryStats;
 import com.spotify.docker.client.messages.NetworkStats;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringEntity;
@@ -48,7 +49,7 @@ public class ContainerMetricsService {
 
   public ContainerMetricsService(ContainersService containersService,
                                  ContainerSimulatedMetricsService containerSimulatedMetricsService,
-                                 ServicesMonitoringService servicesMonitoringService) {
+                                 @Lazy ServicesMonitoringService servicesMonitoringService) {
     this.containersService = containersService;
     this.containerSimulatedMetricsService = containerSimulatedMetricsService;
     this.servicesMonitoringService = servicesMonitoringService;
@@ -84,7 +85,6 @@ public class ContainerMetricsService {
       fields.putAll(simulatedFields);
     }
     // Calculated metrics
-    //TODO use monitoring previous update to calculate interval, instead of passing through argument
     Map.of("rx-bytes", rxBytes, "tx-bytes", txBytes).forEach((field, value) -> {
       ServiceMonitoringEntity monitoring = servicesMonitoringService.getContainerMonitoring(containerId, field);
       double lastValue = monitoring == null ? 0 : monitoring.getLastValue();

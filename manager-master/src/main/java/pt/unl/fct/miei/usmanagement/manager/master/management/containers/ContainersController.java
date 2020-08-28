@@ -41,26 +41,16 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {
 
-  //TODO substituir os reqs por objetos, ou @JsonValue annotation
-
   private final ContainersService containersService;
-  private final EurekaService eurekaService;
-  private final NginxLoadBalancerService nginxLoadBalancerService;
 
-  public ContainersController(ContainersService containersService,
-                              EurekaService eurekaService,
-                              NginxLoadBalancerService nginxLoadBalancerService) {
+  public ContainersController(ContainersService containersService) {
     this.containersService = containersService;
-    this.eurekaService = eurekaService;
-    this.nginxLoadBalancerService = nginxLoadBalancerService;
   }
 
   @GetMapping
@@ -99,17 +89,6 @@ public class ContainersController {
   @PostMapping("/{id}/migrate")
   public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
     return containersService.migrateContainer(id, hostname);
-  }
-
-  @PostMapping("/load-balancer")
-  public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
-    return nginxLoadBalancerService.launchLoadBalancers(service, Arrays.asList(regions.toArray(new String[0])));
-  }
-
-  //TODO
-  @PostMapping("/eureka-server")
-  public List<ContainerEntity> launchEureka(@Json JSONArray regions) {
-    return eurekaService.launchEurekaServers(Arrays.asList(regions.toArray(new String[0])));
   }
 
   @PostMapping("/reload")

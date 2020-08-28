@@ -32,6 +32,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -48,6 +49,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.springframework.format.annotation.DateTimeFormat;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
@@ -68,11 +70,8 @@ public class WorkerManagerEntity {
   @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
   private LocalDateTime startedAt;
 
-  @OneToOne
-  private CloudHostEntity cloudHost;
-
-  @OneToOne
-  private EdgeHostEntity edgeHost;
+  @OneToOne(cascade = CascadeType.REMOVE)
+  private ContainerEntity container;
 
   @Singular
   @JsonIgnore

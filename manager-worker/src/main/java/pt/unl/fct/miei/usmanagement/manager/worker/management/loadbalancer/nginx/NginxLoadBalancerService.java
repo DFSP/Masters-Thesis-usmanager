@@ -40,7 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.MasterManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.DockerProperties;
@@ -114,12 +114,12 @@ public class NginxLoadBalancerService {
       ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.POST, request, Message.class);
       Message responseBody = response.getBody();
       if (responseBody == null) {
-        throw new MasterManagerException("Failed to add server %s to loadBalancer %s: responseBody is null",
+        throw new WorkerManagerException("Failed to add server %s to loadBalancer %s: responseBody is null",
             nginxServer, loadBalancerUrl);
       }
       String responseMessage = responseBody.getMessage();
       if (!Objects.equals(responseMessage, "success")) {
-        throw new MasterManagerException("Failed to add server %s to loadBalancer %s: %s", nginxServer, loadBalancerUrl,
+        throw new WorkerManagerException("Failed to add server %s to loadBalancer %s: %s", nginxServer, loadBalancerUrl,
             responseMessage);
       }
     });
@@ -132,12 +132,12 @@ public class NginxLoadBalancerService {
     String serviceName = labels.get(ContainerConstants.Label.SERVICE_NAME);
     String serverAddress = labels.get(ContainerConstants.Label.SERVICE_ADDRESS);
     if (serviceType == null || serviceName == null | serverAddress == null) {
-      throw new MasterManagerException("Failed to remove container %s from load balancer: labels %s, %s and %s are "
+      throw new WorkerManagerException("Failed to remove container %s from load balancer: labels %s, %s and %s are "
           + "required. Current container labels = %s", containerId, ContainerConstants.Label.SERVICE_NAME,
           ContainerConstants.Label.SERVICE_TYPE, ContainerConstants.Label.SERVICE_ADDRESS, labels);
     }
     if (!Objects.equals(serviceType, "frontend")) {
-      throw new MasterManagerException("Failed to remove container %s from load balancer: %s doesn't support load "
+      throw new WorkerManagerException("Failed to remove container %s from load balancer: %s doesn't support load "
           + "balancer", containerId, serviceType);
     }
     List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
@@ -149,12 +149,12 @@ public class NginxLoadBalancerService {
       ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.DELETE, request, Message.class);
       Message responseBody = response.getBody();
       if (responseBody == null) {
-        throw new MasterManagerException("Failed to remove container %s from load balancer: responseBody is null",
+        throw new WorkerManagerException("Failed to remove container %s from load balancer: responseBody is null",
             containerId);
       }
       String responseMessage = responseBody.getMessage();
       if (!Objects.equals(responseMessage, "success")) {
-        throw new MasterManagerException("Failed to delete server %s from load balancer %s: %s", serverAddress, url,
+        throw new WorkerManagerException("Failed to delete server %s from load balancer %s: %s", serverAddress, url,
             responseMessage);
       }
     });

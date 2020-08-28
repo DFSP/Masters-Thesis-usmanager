@@ -49,11 +49,11 @@ import {ICloudHost} from "../hosts/cloud/CloudHost";
 import IDatabaseData from "../../../components/IDatabaseData";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import MachinesList from "./AssignedMachinesList";
+import {IContainer} from "../containers/Container";
 
 export interface IWorkerManager extends IDatabaseData {
   startedAt: string,
-  cloudHost?: ICloudHost,
-  edgeHost?: IEdgeHost,
+  container: IContainer,
   assignedMachines?: string[],
 }
 
@@ -142,10 +142,8 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IWorkerManager>): void => {
     const workerManager = reply.data;
-    const host = workerManager.cloudHost?.publicIpAddress
-                 || workerManager.edgeHost?.publicDnsName
-                 || workerManager.edgeHost?.publicIpAddress;
-    super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${host}</span>`);
+    const hostname = workerManager.container.hostname;
+    super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${hostname}</span>`);
     this.props.addWorkerManager(workerManager);
     this.saveEntities(workerManager);
     if (this.mounted) {
@@ -233,8 +231,8 @@ class WorkerManager extends BaseComponent<Props, State> {
   private getSelectableHosts = () =>
     Object.keys(this.props.cloudHosts).concat(Object.keys(this.props.edgeHosts))
 
-  private edgeHostField = (edgeHost: IEdgeHost) =>
-    edgeHost.publicDnsName || edgeHost.publicIpAddress;
+  private containerField = (container: IContainer) =>
+    container.hostname;
 
   private cloudHostField = (cloudHost: ICloudHost) =>
     cloudHost.publicIpAddress;
@@ -279,19 +277,14 @@ class WorkerManager extends BaseComponent<Props, State> {
                              defaultValue: "Select host",
                              values: this.getSelectableHosts()
                            }}/>
-                  : key === 'edgeHost'
-                  ? <Field<IEdgeHost> key={index}
-                                      id={key}
-                                      label={key}
-                                      valueToString={this.edgeHostField}/>
-                  : key === 'cloudHost'
-                    ? <Field<ICloudHost> key={index}
-                                        id={key}
-                                        label={key}
-                                        valueToString={this.cloudHostField}/>
-                    : <Field key={index}
-                             id={key}
-                             label={key}/>
+                  : key === 'container'
+                  ? <Field<IContainer> key={index}
+                                       id={key}
+                                       label={key}
+                                       valueToString={this.containerField}/>
+                  : <Field key={index}
+                           id={key}
+                           label={key}/>
             ))}
           </Form>
         )}
@@ -324,12 +317,6 @@ class WorkerManager extends BaseComponent<Props, State> {
 
 function removeFields(workerManager: Partial<IWorkerManager>) {
   delete workerManager["id"];
-  if (workerManager["cloudHost"] == null) {
-    delete workerManager["cloudHost"];
-  }
-  if (workerManager["edgeHost"] == null) {
-    delete workerManager["edgeHost"];
-  }
   delete workerManager["assignedMachines"];
 }
 

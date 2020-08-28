@@ -203,7 +203,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 isNew={isNew(this.props.location.search)}
                 post={{
                   textButton: 'launch',
-                  url: 'containers/load-balancer',
+                  url: 'load-balancer',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
                 }}

@@ -45,6 +45,7 @@ import org.jumpmind.symmetric.web.WebConstants;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.SymNodesRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.SymNodeGroupEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.SymNodeGroupsRepository;
@@ -109,7 +110,7 @@ public class SymService {
     this.symmetricDSProperties = symmetricDSProperties;
   }
 
-  public void startSymmetricDSServer(MachineAddress machineAddress) throws SQLException {
+  public void startSymmetricDSServer(HostAddress hostAddress) throws SQLException {
     SymmetricEngineHolder holder = new SymmetricEngineHolder();
 
     Properties properties = new Properties();
@@ -122,7 +123,7 @@ public class SymService {
 
     properties.setProperty(ParameterConstants.SYNC_URL,
         properties.getProperty(ParameterConstants.SYNC_URL)
-            .replace("${hostname}", machineAddress.getPublicIpAddress()));
+            .replace("${hostname}", hostAddress.getPublicIpAddress()));
     properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
     properties.setProperty("db.url", dataSourceProperties.getUrl());
     properties.setProperty("db.user", dataSourceProperties.getUsername());

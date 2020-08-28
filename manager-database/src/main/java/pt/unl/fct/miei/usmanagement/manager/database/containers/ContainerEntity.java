@@ -38,6 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -54,6 +55,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 
 @Entity
 @Builder(toBuilder = true)

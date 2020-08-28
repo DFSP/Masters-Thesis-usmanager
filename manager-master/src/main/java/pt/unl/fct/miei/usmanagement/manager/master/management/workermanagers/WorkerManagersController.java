@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
 @RestController
 @RequestMapping("/worker-managers")
@@ -57,8 +58,8 @@ public class WorkerManagersController {
   }
 
   @PostMapping
-  public WorkerManagerEntity addWorkerManager(@RequestBody AddWorkerManager addWorkerManager) {
-    return workerManagersService.addWorkerManager(addWorkerManager.getHost());
+  public WorkerManagerEntity launchWorkerManager(@Json String host) {
+    return workerManagersService.launchWorkerManager(host);
   }
 
   @DeleteMapping("/{workerManagerId}")

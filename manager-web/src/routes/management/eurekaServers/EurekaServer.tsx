@@ -192,7 +192,7 @@ class EurekaServer extends BaseComponent<Props, State> {
                 isNew={isNew(this.props.location.search)}
                 post={{
                   textButton: 'launch',
-                  url: 'containers/eureka-server',
+                  url: 'eureka-server',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
                 }}
