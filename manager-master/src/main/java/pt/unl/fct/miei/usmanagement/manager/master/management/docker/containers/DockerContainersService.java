@@ -516,6 +516,8 @@ public class DockerContainersService {
     try (var docker = dockerCoreService.getDockerClient(hostname);
          var stream = docker.logs(containerId, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {
       logs = stream.readFully();
+      // remove ANSI escape codes
+      logs = logs.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "");
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
     }

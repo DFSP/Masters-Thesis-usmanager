@@ -22,28 +22,28 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.logging;
+package pt.unl.fct.miei.usmanagement.manager.master.logging;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventRepository;
 
-@Slf4j
-@Service
-public class LoggingEventService {
+@RestController
+@RequestMapping("/logs")
+public class LoggingEventController {
 
-  private final LoggingEventRepository loggingEvents;
+  private final LoggingEventService loggingEvents;
 
-  public LoggingEventService(LoggingEventRepository loggingEvents) {
+  public LoggingEventController(LoggingEventService loggingEvents) {
     this.loggingEvents = loggingEvents;
   }
 
+  @GetMapping
   public List<LoggingEventEntity> getLogs() {
-    return loggingEvents.findAll();
+    return loggingEvents.getLogs();
   }
-
 
 }

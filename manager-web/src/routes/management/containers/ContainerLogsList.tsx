@@ -84,7 +84,11 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
                     emptyMessage={`No logs available`}
                     list={logs}
                     show={this.log}
-                    paginate={{pagesize: {initial: 50}, position: 'top-bottom'}}/>
+                    paginate={{
+                      pagesize: {initial: 50},
+                      page: {last: true},
+                      position: 'top-bottom',
+                    }}/>
         </div>
       </>
 
