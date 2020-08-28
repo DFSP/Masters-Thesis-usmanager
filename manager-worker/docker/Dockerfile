@@ -11,4 +11,5 @@ FROM openjdk:11-jre-slim
 COPY --from=build /usr/src/app/target/*.jar ./manager-worker.jar
 EXPOSE 8081
 ENV master 127.0.0.1
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","./manager-worker.jar","--id=${id}", "--master=${master}"]
+
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","./manager-worker.jar","--external-id=${id}", "--master-hostname=${master}"]

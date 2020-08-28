@@ -50,10 +50,10 @@ public class SymService {
   private final ApplicationContext applicationContext;
   private final DataSourceProperties dataSourceProperties;
 
-  @Value("${id}")
+  @Value("${external-id}")
   private String id;
 
-  @Value("${master:localhost}")
+  @Value("${master:127.0.0.1}")
   private String master;
 
   private ServerSymmetricEngine serverSymmetricEngine;
@@ -80,7 +80,7 @@ public class SymService {
     properties.setProperty(ParameterConstants.REGISTRATION_URL,
         properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", master));
     properties.setProperty(ParameterConstants.EXTERNAL_ID,
-        properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${id}", id));
+        properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${external-id}", id));
 
     properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
     properties.setProperty("db.url", dataSourceProperties.getUrl());

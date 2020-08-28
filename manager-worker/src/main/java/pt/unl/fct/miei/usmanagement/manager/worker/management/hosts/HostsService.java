@@ -91,7 +91,7 @@ public class HostsService {
 
   private HostAddress hostAddress;
 
-  @Value("${id}")
+  @Value("${external-id}")
   private String workerManagerId;
 
   public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,

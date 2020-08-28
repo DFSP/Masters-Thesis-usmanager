@@ -76,7 +76,7 @@ management:
         include: info, health, metrics, mappings
 manager-worker:
   id: ${id:}
-  master-hostname: ${master:}
+  master-hostname: ${master-hostname:}
   monitor-period: 30000
   tests:
     enabled: ${tests:true}
