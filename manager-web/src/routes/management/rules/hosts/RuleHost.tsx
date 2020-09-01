@@ -321,7 +321,7 @@ class RuleHost extends BaseComponent<Props, State> {
     }, {});
 
   private decisionDropdownOption = (decision: IDecision) =>
-    decision.value;
+    decision.ruleDecision;
 
   private isGenericSelected = (generic: boolean) =>
     this.setState({isGeneric: generic});

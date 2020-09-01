@@ -24,9 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

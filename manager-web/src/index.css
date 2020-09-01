@@ -512,6 +512,7 @@ textarea.materialize-textarea[readonly="readonly"] {
     color: white;
     border: 1px solid black;
     margin: 0 !important;
+    word-wrap: break-word;
 }
 
 .card .card-content {

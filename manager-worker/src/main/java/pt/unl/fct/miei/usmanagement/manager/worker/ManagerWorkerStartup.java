@@ -24,26 +24,49 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 
+@Slf4j
 @Component
 public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
   private final SymService symService;
+  private final HostsService hostsService;
+  private final ServicesMonitoringService servicesMonitoringService;
+  private final HostsMonitoringService hostsMonitoringService;
 
-  public ManagerWorkerStartup(SymService symService) {
+  public ManagerWorkerStartup(SymService symService, HostsService hostsService,
+                              ServicesMonitoringService servicesMonitoringService,
+                              HostsMonitoringService hostsMonitoringService) {
     this.symService = symService;
+    this.hostsService = hostsService;
+    this.servicesMonitoringService = servicesMonitoringService;
+    this.hostsMonitoringService = hostsMonitoringService;
   }
 
   @Override
   public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
     // 1. start zookeeper process
     // 2. start kafka process
+    hostsService.setHostAddress();
     symService.startSymmetricDSServer();
+   /* try {
+      hostsService.clusterHosts();
+    } catch (WorkerManagerException e) {
+      log.error(e.getMessage());
+    }
+    servicesMonitoringService.initServiceMonitorTimer();
+    hostsMonitoringService.initHostMonitorTimer();*/
   }
 
 }

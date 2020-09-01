@@ -33,7 +33,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Timing {
 
-  public void sleep(long time, TimeUnit timeUnit) {
+  public void wait(long time, TimeUnit timeUnit) {
     try {
       timeUnit.sleep(time);
     } catch (InterruptedException e) {
@@ -53,7 +53,7 @@ public class Timing {
       if (System.currentTimeMillis() - start > timeout) {
         throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
       }
-      Timing.sleep(backoff, TimeUnit.MILLISECONDS);
+      Timing.wait(backoff, TimeUnit.MILLISECONDS);
       backoff = backoff << 2;
       if (backoff > maxBackoff) {
         backoff = maxBackoff;

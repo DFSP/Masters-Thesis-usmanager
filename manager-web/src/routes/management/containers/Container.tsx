@@ -70,6 +70,7 @@ import ContainerSimulatedMetricList from "./ContainerSimulatedMetricList";
 import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetricList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import formStyles from "../../../components/form/Form.module.css";
+import {INode} from "../nodes/Node";
 
 export interface IContainer extends IDatabaseData {
   containerId: string;
@@ -116,8 +117,7 @@ interface StateToProps {
   newContainer?: INewContainer;
   container?: IContainer;
   formContainer?: Partial<IContainer> | INewContainer;
-  cloudHosts: { [key: string]: ICloudHost };
-  edgeHosts: { [key: string]: IEdgeHost };
+  nodes: { [key: string]: INode };
   services: { [key: string]: IService };
 }
 
@@ -402,18 +402,10 @@ class Container extends BaseComponent<Props, State> {
       <PerfectScrollbar ref={(ref) => {
         this.scrollbar = ref;
       }}>
-        {Object.values(this.props.cloudHosts).map((data, index) =>
-          data.publicIpAddress &&
-          <li key={index} onClick={onClick}>
-              <a>
-                {data.publicIpAddress}
-              </a>
-          </li>
-        )}
-        {Object.values(this.props.edgeHosts).map((data, index) =>
+        {Object.values(this.props.nodes).filter(node => node.state === 'ready').map((node, index) =>
           <li key={index} onClick={onClick}>
             <a>
-              {data.publicDnsName || data.publicIpAddress}
+              {node.hostname}
             </a>
           </li>
         )}
@@ -445,13 +437,10 @@ class Container extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(instance => instance.state.code === awsInstanceStates.RUNNING.code)
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
+  private getSelectableHosts = () =>
+    Object.entries(this.props.nodes)
+          .filter(([_, node]) => node.state === 'ready')
+          .map(([_, node]) => node.hostname)
 
   //TODO get apps' services instead (in case a service is associated to more than 1 app)
   private getSelectableServices = () =>
@@ -668,8 +657,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formContainer = {...container};
     removeFields(formContainer);
   }
-  const cloudHosts = state.entities.hosts.cloud.data;
-  const edgeHosts = state.entities.hosts.edge.data;
+  const nodes = state.entities.nodes.data;
   const services = state.entities.services.data;
   return {
     isLoading,
@@ -677,8 +665,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     newContainer,
     container,
     formContainer,
-    cloudHosts,
-    edgeHosts,
+    nodes,
     services
   }
 }

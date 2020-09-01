@@ -40,10 +40,10 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsSimpleInstance;
 
 @Slf4j
 @Service
@@ -54,30 +54,52 @@ public class CloudHostsService {
   private final ContainersService containersService;
 
   private final CloudHostRepository cloudHosts;
+  private final NodesService nodesService;
 
   public CloudHostsService(@Lazy AwsService awsService,
                            @Lazy HostsService hostsService,
                            @Lazy ContainersService containersService,
-                           CloudHostRepository cloudHosts) {
+                           CloudHostRepository cloudHosts, NodesService nodesService) {
     this.awsService = awsService;
     this.hostsService = hostsService;
     this.containersService = containersService;
     this.cloudHosts = cloudHosts;
+    this.nodesService = nodesService;
   }
 
   public List<CloudHostEntity> getCloudHosts() {
     return cloudHosts.findAll();
   }
 
-  public CloudHostEntity getCloudHost(String id) {
-    return cloudHosts.findByInstanceIdOrPublicIpAddress(id, id).orElseThrow(() ->
-        new EntityNotFoundException(CloudHostEntity.class, "id", id));
+  public CloudHostEntity getCloudHostById(Long id) {
+    try {
+      return cloudHosts.getOne(id);
+    } catch (javax.persistence.EntityNotFoundException e) {
+      throw new EntityNotFoundException(CloudHostEntity.class, "id", id.toString());
+    }
   }
 
-  public CloudHostEntity getCloudHostByHostname(String hostname) {
-    return cloudHosts.findByPublicIpAddress(hostname).orElseThrow(() ->
-        new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname));
+  public CloudHostEntity getCloudHostByInstanceId(String instanceId) {
+    return cloudHosts.findByInstanceId(instanceId).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
   }
+
+  public CloudHostEntity getCloudHostByInstanceIdOrPublicIpAddress(String value) {
+    return cloudHosts.findByInstanceIdOrPublicIpAddress(value, value).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "value", value));
+  }
+
+  public CloudHostEntity getCloudHostByPublicIpAddress(String ipAddress) {
+    return cloudHosts.findByPublicIpAddress(ipAddress).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "ipAddress", ipAddress));
+  }
+
+/*  public void updateCloudHost(String instanceId) {
+    CloudHostEntity cloudHost = getCloudHostByInstanceId(instanceId);
+    if (nodesService.isPartOfSwarm(cloudHost.getPublicIpAddress())) {
+
+    }
+  }*/
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
     log.debug("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
@@ -103,20 +125,6 @@ public class CloudHostsService {
     return saveCloudHost(cloudHost);
   }
 
-  private CloudHostEntity addCloudHostFromSimpleInstance(AwsSimpleInstance simpleInstance) {
-    CloudHostEntity cloudHost = CloudHostEntity.builder()
-        .instanceId(simpleInstance.getInstanceId())
-        .instanceType(simpleInstance.getInstanceType())
-        .state(simpleInstance.getState())
-        .imageId(simpleInstance.getImageId())
-        .publicDnsName(simpleInstance.getPublicDnsName())
-        .publicIpAddress(simpleInstance.getPublicIpAddress())
-        .privateIpAddress(simpleInstance.getPrivateIpAddress())
-        .placement(simpleInstance.getPlacement())
-        .build();
-    return saveCloudHost(cloudHost);
-  }
-
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
     containersService.launchDockerApiProxy(instance.getPublicIpAddress());
@@ -128,7 +136,7 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity startCloudHost(String instanceId, boolean addToSwarm) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByInstanceIdOrPublicIpAddress(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.PENDING.getCode())
         .withName(AwsInstanceState.PENDING.getState());
@@ -143,7 +151,7 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity stopCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByInstanceIdOrPublicIpAddress(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (WorkerManagerException e) {
@@ -159,7 +167,7 @@ public class CloudHostsService {
   }
 
   public void terminateCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByInstanceIdOrPublicIpAddress(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (WorkerManagerException e) {

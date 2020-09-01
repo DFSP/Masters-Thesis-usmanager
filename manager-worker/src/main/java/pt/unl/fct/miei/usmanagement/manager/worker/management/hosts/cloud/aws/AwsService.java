@@ -238,7 +238,7 @@ public class AwsService {
       } catch (WorkerManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());
       }
-      Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
+      Timing.wait(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
     }
     throw new WorkerManagerException("Unable to set instance state %d within %d tries",
         state.getState(), awsMaxRetries);

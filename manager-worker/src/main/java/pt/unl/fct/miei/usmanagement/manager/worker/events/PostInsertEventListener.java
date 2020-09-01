@@ -22,21 +22,33 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes;
+package pt.unl.fct.miei.usmanagement.manager.worker.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.persister.entity.EntityPersister;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
-@AllArgsConstructor
-@Getter
-final class AddNode {
+@Slf4j
+public class PostInsertEventListener implements org.hibernate.event.spi.PostInsertEventListener {
 
-  private final String host;
-  private final int quantity;
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
-  private final NodeRole role;
+  @Override
+  public void onPostInsert(PostInsertEvent event) {
+    log.debug("{}", event.getEntity());
+    if (event.getEntity() instanceof EdgeHostEntity) {
+      EdgeHostEntity edgeHost = (EdgeHostEntity) event.getEntity();
+      log.info(edgeHost.getHostname());
+    }
+  }
+
+  @Override
+  public boolean requiresPostCommitHanding(EntityPersister persister) {
+    return false;
+  }
+
+  @Override
+  public boolean requiresPostCommitHandling(EntityPersister persister) {
+    return false;
+  }
 
 }

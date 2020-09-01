@@ -31,7 +31,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -84,9 +83,14 @@ public class EdgeHostsService {
     return edgeHosts.findAll();
   }
 
-  public EdgeHostEntity getEdgeHost(String hostname) {
-    return edgeHosts.findEdgeHost(hostname).orElseThrow(() ->
-        new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
+  public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
+    return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
+        new EntityNotFoundException(EdgeHostEntity.class, "host", host));
+  }
+
+  public EdgeHostEntity getEdgeHostByDns(String dns) {
+    return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
+        new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
   }
 
   public EdgeHostEntity addEdgeHost(AddEdgeHostRequest addEdgeHostRequest) {
@@ -131,7 +135,7 @@ public class EdgeHostsService {
   }
 
   public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
-    EdgeHostEntity edgeHost = getEdgeHost(hostname);
+    EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
     log.debug("Updating edgeHost {} with {}",
         ToStringBuilder.reflectionToString(edgeHost),
         ToStringBuilder.reflectionToString(newEdgeHost));
@@ -140,7 +144,7 @@ public class EdgeHostsService {
   }
 
   public void deleteEdgeHost(String hostname) {
-    var edgeHost = getEdgeHost(hostname);
+    var edgeHost = getEdgeHostByDnsOrIp(hostname);
     edgeHosts.delete(edgeHost);
     deleteEdgeHostConfig(edgeHost);
   }
@@ -225,14 +229,14 @@ public class EdgeHostsService {
 
   public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
     log.debug("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
-    EdgeHostEntity edgeHostEntity = getEdgeHost(edgeHost).toBuilder()
+    EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();
     edgeHosts.save(edgeHostEntity);
   }
 
   public void unassignWorkerManager(String edgeHost) {
-    EdgeHostEntity edgeHostEntity = getEdgeHost(edgeHost).toBuilder()
+    EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
         .managedByWorker(null)
         .build();
     edgeHosts.save(edgeHostEntity);

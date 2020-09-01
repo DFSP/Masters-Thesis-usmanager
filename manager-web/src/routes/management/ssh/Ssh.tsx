@@ -228,7 +228,7 @@ class Ssh extends React.Component<Props, State> {
   private timestampToString = (timestamp: number): string => {
     const date = new Date(timestamp);
     let millis = Ssh.pad(date.getMilliseconds(), 3);
-    return `${date.toLocaleTimeString()}:${millis}`
+    return `${date.toLocaleTimeString()}.${millis}`
   }
 }
 

@@ -87,9 +87,8 @@ public class WorkerManagersService {
 
   public WorkerManagerEntity launchWorkerManager(String host) {
     log.debug("Launching worker manager at {}", host);
-    String hostname = hostsService.isValidIPAddress(host) ? host : hostsService.getPublicIpAddressFromDns(host);
     String id = UUID.randomUUID().toString();
-    ContainerEntity container = this.launchWorkerManager(hostname, id);
+    ContainerEntity container = this.launchWorkerManager(host, id);
     WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
     return workerManagers.save(workerManagerEntity);
   }
@@ -120,6 +119,7 @@ public class WorkerManagersService {
     return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
   }
 
+  // machine is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
   public void assignMachine(String workerManagerId, String machine) {
     WorkerManagerEntity workerManagerEntity = this.getWorkerManager(workerManagerId);
     try {
@@ -144,8 +144,6 @@ public class WorkerManagersService {
       cloudHostsService.unassignWorkerManager(machine);
       edgeHostsService.unassignWorkerManager(machine);
     });
-    /*workerManager.getAssignedCloudHosts().removeIf(cloudHost -> machines.contains(cloudHost.getPublicIpAddress()));
-    workerManager.getAssignedEdgeHosts().removeIf(edgeHost -> machines.contains(edgeHost.getHostname()));*/
     workerManagers.save(workerManager);
   }
 

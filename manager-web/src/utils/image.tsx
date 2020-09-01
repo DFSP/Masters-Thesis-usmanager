@@ -207,21 +207,23 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label === 'maximumvalue') {
     return <FaLessThanEqual/>;
   }
-  if (label === 'container') {
+  if (label.includes('container')) {
     return <FaDocker/>;
   }
   if (label === 'state') {
     const state = value as IState;
-    switch (state.name) {
-      case 'running':
-        return 'check';
-      case 'pending':
-      case 'stopping':
-        return <FaHourglassHalf/>;
-      case 'stopped':
-        return <FaBan/>;
-      case 'shutting_down':
-        return '';
+    if (state) {
+      switch (state.name) {
+        case 'running':
+          return 'check';
+        case 'pending':
+        case 'stopping':
+          return <FaHourglassHalf/>;
+        case 'stopped':
+          return <FaBan/>;
+        case 'shutting-down':
+          return 'clear';
+      }
     }
   }
   if (value === true) {

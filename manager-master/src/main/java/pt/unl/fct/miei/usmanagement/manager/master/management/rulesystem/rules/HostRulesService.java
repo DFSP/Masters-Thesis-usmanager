@@ -49,9 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.DroolsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.Rule;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.RulesProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
 @Slf4j
@@ -195,7 +192,7 @@ public class HostRulesService {
     log.debug("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
     HostRuleEntity rule = getRule(ruleName);
     instanceIds.forEach(instanceId -> {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
       cloudHost.addRule(rule);
     });
     rules.save(rule);
@@ -209,7 +206,7 @@ public class HostRulesService {
   public void removeCloudHosts(String ruleName, List<String> instanceIds) {
     log.info("Removing cloud hosts {} from rule {}", instanceIds, ruleName);
     HostRuleEntity rule = getRule(ruleName);
-    instanceIds.forEach(instanceId -> cloudHostsService.getCloudHost(instanceId).removeRule(rule));
+    instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeRule(rule));
     rules.save(rule);
     setLastUpdateHostRules();
   }
@@ -233,7 +230,7 @@ public class HostRulesService {
     log.debug("Adding edge hosts {} to rule {}", hostnames, ruleName);
     HostRuleEntity rule = getRule(ruleName);
     hostnames.forEach(hostname -> {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
       edgeHost.addRule(rule);
     });
     rules.save(rule);
@@ -247,7 +244,7 @@ public class HostRulesService {
   public void removeEdgeHosts(String ruleName, List<String> hostnames) {
     log.info("Removing edge hosts {} from rule {}", hostnames, ruleName);
     HostRuleEntity rule = getRule(ruleName);
-    hostnames.forEach(hostname -> edgeHostsService.getEdgeHost(hostname).removeRule(rule));
+    hostnames.forEach(hostname -> edgeHostsService.getEdgeHostByDnsOrIp(hostname).removeRule(rule));
     rules.save(rule);
     setLastUpdateHostRules();
   }

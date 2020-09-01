@@ -47,7 +47,7 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-0b30a88613f4a9846
+    ami: ami-093ec0e715ae0adc3
     security-group: us-manager-security-group
     key-pair: ec2
     type: t2.micro
@@ -109,6 +109,7 @@ symmetricds:
   tables:
     exclude:
       startsWith: sym, logging
+      endsWith: events
 
 #debug: true
 #trace: true

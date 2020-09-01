@@ -203,7 +203,7 @@ public class SymService {
         .routerId("worker-to-master")
         .sourceNodeGroupId("worker-manager")
         .targetNodeGroupId("master-manager")
-        .routerType("'default'")
+        .routerType("default")
         .createTime(LocalDateTime.now())
         .lastUpdateTime(LocalDateTime.now())
         .build());
@@ -264,10 +264,14 @@ public class SymService {
     metaData = dataSource.getConnection().getMetaData();
     ResultSet tables = metaData.getTables(null, null, null, new String[] {"TABLE"});
     List<String> tablesNames = new LinkedList<>();
-    List<String> excluding = symmetricDSProperties.getTables().getExclude().getStartsWith();
+    List<String> excludingStartsWith = symmetricDSProperties.getTables().getExclude().getStartsWith();
+    List<String> excludingEndsWith = symmetricDSProperties.getTables().getExclude().getEndsWith();
+    List<String> excludingContains = symmetricDSProperties.getTables().getExclude().getContains();
     while (tables.next()) {
       String tableName = tables.getString("TABLE_NAME").toLowerCase();
-      if (excluding.stream().noneMatch(tableName::startsWith)) {
+      if ((excludingStartsWith == null || excludingStartsWith.stream().noneMatch(tableName::startsWith))
+          && (excludingEndsWith == null || excludingEndsWith.stream().noneMatch(tableName::endsWith))
+          && (excludingContains == null || excludingContains.stream().noneMatch(tableName::contains))) {
         tablesNames.add(tableName);
       }
     }

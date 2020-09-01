@@ -35,9 +35,7 @@ import {ReduxState} from "../../../reducers";
 import {
   addWorkerManager,
   loadWorkerManagers,
-  loadCloudHosts,
-  loadEdgeHosts,
-  assignWorkerManagerMachines
+  assignWorkerManagerMachines, loadNodes
 } from "../../../actions";
 import {connect} from "react-redux";
 import {IReply, postData} from "../../../utils/api";
@@ -50,6 +48,7 @@ import IDatabaseData from "../../../components/IDatabaseData";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import MachinesList from "./AssignedMachinesList";
 import {IContainer} from "../containers/Container";
+import {INode} from "../nodes/Node";
 
 export interface IWorkerManager extends IDatabaseData {
   startedAt: string,
@@ -71,15 +70,13 @@ interface StateToProps {
   newWorkerManager?: INewWorkerManager;
   workerManager?: IWorkerManager;
   formWorkerManager?: Partial<IWorkerManager> | INewWorkerManager;
-  edgeHosts: { [key: string]: IEdgeHost };
-  cloudHosts: { [key: string]: ICloudHost };
+  nodes: { [key: string]: INode };
 }
 
 interface DispatchToProps {
   loadWorkerManagers: (id: string) => void;
   addWorkerManager: (workerManager: IWorkerManager) => void;
-  loadCloudHosts: () => void;
-  loadEdgeHosts: () => void;
+  loadNodes: () => void;
   assignWorkerManagerMachines: (id: string, machines: string[]) => void;
 }
 
@@ -104,8 +101,7 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   public componentDidMount(): void {
     this.loadWorkerManager();
-    this.props.loadCloudHosts();
-    this.props.loadEdgeHosts();
+    this.props.loadNodes();
     this.mounted = true;
   }
 
@@ -229,13 +225,15 @@ class WorkerManager extends BaseComponent<Props, State> {
     }, {});
 
   private getSelectableHosts = () =>
-    Object.keys(this.props.cloudHosts).concat(Object.keys(this.props.edgeHosts))
+    Object.entries(this.props.nodes)
+          .filter(([_, node]) => node.state === 'ready')
+          .map(([_, node]) => node.hostname)
 
-  private containerField = (container: IContainer) =>
+  private containerIdField = (container: IContainer) =>
+    container.containerId;
+
+  private containerHostnameField = (container: IContainer) =>
     container.hostname;
-
-  private cloudHostField = (cloudHost: ICloudHost) =>
-    cloudHost.publicIpAddress;
 
   private workerManager = () => {
     const {isLoading, error, newWorkerManager} = this.props;
@@ -278,10 +276,16 @@ class WorkerManager extends BaseComponent<Props, State> {
                              values: this.getSelectableHosts()
                            }}/>
                   : key === 'container'
-                  ? <Field<IContainer> key={index}
+                  ? <>
+                    <Field<IContainer> key={index}
                                        id={key}
-                                       label={key}
-                                       valueToString={this.containerField}/>
+                                       label={key + " id"}
+                                       valueToString={this.containerIdField}/>
+                    <Field<IContainer> key={index}
+                                       id={key}
+                                       label={"hostname"}
+                                       valueToString={this.containerHostnameField}/>
+                  </>
                   : <Field key={index}
                            id={key}
                            label={key}/>
@@ -334,24 +338,21 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formWorkerManager = {...workerManager};
     removeFields(formWorkerManager);
   }
-  const cloudHosts = state.entities.hosts.cloud.data;
-  const edgeHosts = state.entities.hosts.edge.data;
+  const nodes = state.entities.nodes.data;
   return {
     isLoading,
     error,
     newWorkerManager,
     workerManager,
     formWorkerManager,
-    cloudHosts,
-    edgeHosts
+    nodes
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadWorkerManagers,
   addWorkerManager,
-  loadCloudHosts,
-  loadEdgeHosts,
+  loadNodes,
   assignWorkerManagerMachines
 };
 

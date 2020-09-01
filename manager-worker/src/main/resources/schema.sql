@@ -32,7 +32,6 @@
 --
 -- It is intended for H2 databases.
 
-
 DROP TABLE logging_event_exception IF EXISTS;
 DROP TABLE logging_event_property IF EXISTS;
 DROP TABLE logging_event IF EXISTS;

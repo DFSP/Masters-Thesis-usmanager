@@ -30,4 +30,8 @@ public class WorkerManagerException extends RuntimeException {
     super(args.length > 0 ? String.format(s, args) : s);
   }
 
+  public WorkerManagerException(Exception e) {
+    e.printStackTrace();
+  }
+
 }

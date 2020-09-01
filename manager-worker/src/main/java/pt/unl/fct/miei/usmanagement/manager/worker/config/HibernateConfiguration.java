@@ -22,34 +22,23 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {IRuleContainer} from "./RuleContainer";
-import Card from "../../../../components/cards/Card";
-import CardItem from "../../../../components/list/CardItem";
+package pt.unl.fct.miei.usmanagement.manager.worker.config;
 
-interface ContainerRuleCardProps {
-  rule: IRuleContainer;
+import java.util.Collections;
+import java.util.Map;
+
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
+import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.worker.events.DatabaseIntegrator;
+
+@Component
+public class HibernateConfiguration implements HibernatePropertiesCustomizer {
+
+  @Override
+  public void customize(Map<String, Object> hibernateProperties) {
+    hibernateProperties.put("hibernate.integrator_provider",
+        (IntegratorProvider) () -> Collections.singletonList(DatabaseIntegrator.INSTANCE));
+  }
+
 }
-
-type Props = ContainerRuleCardProps;
-
-const CardRuleContainer = Card<IRuleContainer>();
-const RuleContainerCard = ({rule}: Props) => (
-  <CardRuleContainer title={rule.name}
-                     link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
-                     height={'125px'}
-                     margin={'10px 0'}
-                     hoverable>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.ruleDecision}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
-  </CardRuleContainer>
-);
-
-export default RuleContainerCard;

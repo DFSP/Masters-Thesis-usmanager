@@ -34,6 +34,7 @@ import java.util.TimerTask;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -89,6 +90,7 @@ public class HostsService {
   private final RegionsService regionsService;
   private final ServicesService servicesService;
 
+  @Getter
   private HostAddress hostAddress;
 
   @Value("${external-id}")
@@ -114,16 +116,12 @@ public class HostsService {
     this.servicesService = servicesService;
   }
 
-  public HostAddress setMachineAddress() {
+  public HostAddress setHostAddress() {
     String publicIp = bashService.getPublicIp();
     String privateIp = bashService.getPrivateIp();
     String username = bashService.getUsername();
     this.hostAddress = new HostAddress(workerManagerId, publicIp, privateIp, username);
     return hostAddress;
-  }
-
-  public HostAddress getHostAddress() {
-    return this.hostAddress;
   }
 
   public void clusterHosts() {
@@ -134,13 +132,15 @@ public class HostsService {
     edgeHostsService.getEdgeHosts().stream()
         .filter(edgeHost -> !isLocalhost(edgeHost.getPublicIpAddress(), edgeHost.getPrivateIpAddress()))
         // TODO remove filter after each worker receiving only the assigned hosts
-        .filter(edgeHost -> edgeHost.getManagedByWorker().getId().equals(workerManagerId))
+        .filter(edgeHost -> edgeHost.getManagedByWorker() != null
+            && edgeHost.getManagedByWorker().getId().equals(workerManagerId))
         .forEach(edgeHost ->
             setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER));
     cloudHostsService.getCloudHosts().stream()
         .filter(cloudHost -> !isLocalhost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress()))
         // TODO remove filter after each worker receiving only the assigned hosts
-        .filter(cloudHost -> cloudHost.getManagedByWorker().getId().equals(workerManagerId))
+        .filter(cloudHost -> cloudHost.getManagedByWorker() != null
+            && cloudHost.getManagedByWorker().getId().equals(workerManagerId))
         .forEach(cloudHost ->
             setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER));
   }
@@ -155,6 +155,16 @@ public class HostsService {
     String machinePublicIp = hostAddress.getPublicIpAddress();
     String machinePrivateIp = hostAddress.getPrivateIpAddress();
     return Objects.equals(publicIp, machinePublicIp) && Objects.equals(privateIp, machinePrivateIp);
+  }
+
+  public SimpleNode setupHostEntity(Long id) {
+    try {
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostById(id);
+      return setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER);
+    } catch (EntityNotFoundException ignored) {
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostById(id);
+      return setupHost(edgeHost.getPublicIpAddress(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER);
+    }
   }
 
   public SimpleNode setupHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
@@ -263,11 +273,11 @@ public class HostsService {
     HostAddress hostAddress;
     HostLocation hostLocation;
     try {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
       hostAddress = edgeHost.getAddress();
       hostLocation = edgeHost.getLocation();
     } catch (EntityNotFoundException e) {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByPublicIpAddress(hostname);
       hostAddress = cloudHost.getAddress();
       hostLocation = cloudHost.getLocation();
     }
@@ -298,12 +308,8 @@ public class HostsService {
   }
 
   public void removeHost(String hostname) {
-    containersService.getSystemContainers(hostname).forEach(c -> containersService.stopContainer(c.getContainerId()));
+    containersService.getHostContainers(hostname).forEach(c -> containersService.stopContainer(c.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
-    if (isCloudHost(hostname)) {
-      CloudHostEntity cloudHostEntity = cloudHostsService.getCloudHostByHostname(hostname);
-      cloudHostsService.stopCloudHost(cloudHostEntity.getInstanceId());
-    }
   }
 
   private boolean isCloudHost(String hostname) {

@@ -45,7 +45,7 @@ const RuleServiceCard = ({rule}: Props) => (
               value={`${rule.priority}`}/>
     <CardItem key={'decision'}
               label={'Decision'}
-              value={`${rule.decision.value}`}/>
+              value={`${rule.decision.ruleDecision}`}/>
     <CardItem key={'generic'}
               label={'Generic'}
               value={`${rule.generic}`}/>

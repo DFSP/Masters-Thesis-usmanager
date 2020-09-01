@@ -31,19 +31,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogsRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.ManagerWorkerProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decision.HostDecisionsService;
 
@@ -135,6 +143,7 @@ public class HostsMonitoringService {
 
   private void monitorHostsTask() {
     log.info("Starting host monitoring task...");
+    nodesService.updateNodes();
     List<SimpleNode> nodes = nodesService.getReadyNodes();
     Map<String, Map<String, Double>> hostsMonitoring = new HashMap<>();
     for (SimpleNode node : nodes) {

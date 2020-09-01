@@ -37,12 +37,15 @@ const CardWorkerManager = Card<IWorkerManager>();
 const WorkerManagerCard = ({workerManager}: Props) => (
   <CardWorkerManager title={workerManager.id.toString()}
                     link={{to: {pathname: `/worker-managers/${workerManager.id}`, state: workerManager}}}
-                    height={'90px'}
+                    height={'175px'}
                     margin={'10px 0'}
                     hoverable>
     <CardItem key={'startedAt'}
               label={'Started at'}
               value={workerManager.startedAt}/>
+    <CardItem key={'container'}
+              label={'Container'}
+              value={workerManager.container.containerId}/>
     <CardItem key={'host'}
               label={'Host'}
               value={workerManager.container.hostname}/>

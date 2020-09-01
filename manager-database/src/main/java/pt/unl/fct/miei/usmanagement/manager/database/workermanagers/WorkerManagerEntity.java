@@ -70,6 +70,7 @@ public class WorkerManagerEntity {
   @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
   private LocalDateTime startedAt;
 
+  @NotNull
   @OneToOne(cascade = CascadeType.REMOVE)
   private ContainerEntity container;
 

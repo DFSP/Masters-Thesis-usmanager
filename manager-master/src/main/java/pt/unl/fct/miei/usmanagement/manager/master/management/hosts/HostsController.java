@@ -74,7 +74,7 @@ public class HostsController {
 
   @GetMapping("/cloud/{id}")
   public CloudHostEntity getCloudHost(@PathVariable String id) {
-    return cloudHostsService.getCloudHost(id);
+    return cloudHostsService.getCloudHostByIdOrIp(id);
   }
 
   @PostMapping("/cloud/{instanceId}/state")
@@ -153,7 +153,7 @@ public class HostsController {
 
   @GetMapping("/edge/{hostname}")
   public EdgeHostEntity getEdgeHost(@PathVariable String hostname) {
-    return edgeHostsService.getEdgeHost(hostname);
+    return edgeHostsService.getEdgeHostByDnsOrIp(hostname);
   }
 
   @PostMapping("/edge")

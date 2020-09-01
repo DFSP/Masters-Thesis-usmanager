@@ -130,10 +130,8 @@ class SshFile extends BaseComponent<Props, {}> {
     return cloudHosts.concat(edgeHosts);
   };
 
-  private getSelectableFiles = () => {
-    //TODO get available scripts from the server instead
-    return ['docker-install.sh', 'docker-api-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
-  };
+  //TODO get available scripts from the server instead
+  private getSelectableFiles = () => ['docker-install.sh', 'docker-install2.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
 
 }
 

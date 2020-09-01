@@ -34,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.Mode;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
@@ -89,6 +89,7 @@ public class HostsService {
   private final int maxWorkers;
   private final int maxInstances;
   private final Mode mode;
+  @Getter
   private HostAddress hostAddress;
 
   public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
@@ -135,10 +136,6 @@ public class HostsService {
       this.hostAddress = new HostAddress(username, publicIp, privateIp);
     }
     return hostAddress;
-  }
-
-  public HostAddress getHostAddress() {
-    return this.hostAddress;
   }
 
   public void clusterHosts() {
@@ -291,11 +288,11 @@ public class HostsService {
     HostAddress hostAddress;
     HostLocation hostLocation;
     try {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
       hostAddress = edgeHost.getAddress();
       hostLocation = edgeHost.getLocation();
     } catch (EntityNotFoundException e) {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIp(hostname);
       hostAddress = cloudHost.getAddress();
       hostLocation = cloudHost.getLocation();
     }
@@ -323,11 +320,11 @@ public class HostsService {
     String publicIpAddress;
     String privateIpAddress;
     try {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(host);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
       publicIpAddress = edgeHost.getPublicIpAddress();
       privateIpAddress = edgeHost.getPrivateIpAddress();
     } catch (EntityNotFoundException e) {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(host);
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
       if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
         cloudHost = cloudHostsService.startCloudHost(host, false);
       }
@@ -465,11 +462,11 @@ public class HostsService {
     return m.matches();
   }
 
-  public String getPublicIpAddressFromDns(String dns) {
+  public String getPublicIpAddressFromHost(String host) {
     try {
-      return cloudHostsService.getCloudHostByHostname(dns).getPublicIpAddress();
+      return cloudHostsService.getCloudHostByIdOrDns(host).getPublicIpAddress();
     } catch (EntityNotFoundException ignored) {
-      return edgeHostsService.getEdgeHost(dns).getPublicIpAddress();
+      return edgeHostsService.getEdgeHostByDns(host).getPublicIpAddress();
     }
   }
 

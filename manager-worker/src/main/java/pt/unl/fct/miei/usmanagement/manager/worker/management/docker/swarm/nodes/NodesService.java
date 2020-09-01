@@ -38,19 +38,36 @@ import com.spotify.docker.client.messages.swarm.NodeInfo;
 import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
 
 @Service
 @Slf4j
 public class NodesService {
 
   private final DockerSwarmService dockerSwarmService;
+  private final CloudHostsService cloudHostsService;
+  private final EdgeHostsService edgeHostsService;
+  private final HostsService hostsService;
 
-  public NodesService(DockerSwarmService dockerSwarmService) {
+  @Value("${external-id}")
+  private String workerManagerId;
+
+  public NodesService(DockerSwarmService dockerSwarmService, CloudHostsService cloudHostsService,
+                      EdgeHostsService edgeHostsService, HostsService hostsService) {
     this.dockerSwarmService = dockerSwarmService;
+    this.cloudHostsService = cloudHostsService;
+    this.edgeHostsService = edgeHostsService;
+    this.hostsService = hostsService;
   }
 
   public List<SimpleNode> getNodes() {
@@ -226,4 +243,38 @@ public class NodesService {
     }
   }
 
+  /*public void updateNodes() {
+    // public ip -> private ip
+    Map<String, String> edgeHosts =
+        edgeHostsService.getEdgeHosts().stream()
+            // TODO remove filter after only hosts assigned to this worker are sent here
+            .filter(edgeHost -> {
+              WorkerManagerEntity workerManagerEntity = edgeHost.getManagedByWorker();
+              return workerManagerEntity != null && workerManagerEntity.getId().equalsIgnoreCase(this.workerManagerId);
+            })
+            .collect(Collectors.toMap(EdgeHostEntity::getPublicIpAddress, EdgeHostEntity::getPrivateIpAddress));
+    Map<String, String> hosts = new HashMap<>(edgeHosts);
+    Map<String, String> cloudHosts =
+        cloudHostsService.getCloudHosts().stream()
+            // TODO remove filter after only hosts assigned to this worker are sent here
+            .filter(cloudHost -> {
+              WorkerManagerEntity workerManagerEntity = cloudHost.getManagedByWorker();
+              return workerManagerEntity != null && workerManagerEntity.getId().equalsIgnoreCase(this.workerManagerId);
+            })
+            .collect(Collectors.toMap(CloudHostEntity::getPublicIpAddress, CloudHostEntity::getPrivateIpAddress));
+    hosts.putAll(cloudHosts);
+    // remove all missing hosts
+    List<String> nodesHostnames = getNodes().stream().map(SimpleNode::getHostname).collect(Collectors.toList());
+    nodesHostnames.forEach(hostname -> {
+      if (!hosts.containsKey(hostname)) {
+        hostsService.removeHost(hostname);
+      }
+    });
+    // add all new hosts
+    hosts.forEach((hostname, privateIpAddress) -> {
+      if (!nodesHostnames.contains(hostname)) {
+        hostsService.setupHost(hostname, privateIpAddress, NodeRole.WORKER);
+      }
+    });
+  }*/
 }

@@ -37,12 +37,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 @Repository
 public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long> {
 
-  Optional<CloudHostEntity> findByInstanceIdOrPublicIpAddress(@Param("instanceId") String instanceId,
-                                                              @Param("publicIpAddress") String publicIpAddress);
-
   Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 
   Optional<CloudHostEntity> findByPublicIpAddress(@Param("publicIpAddress") String publicIpAddress);
+
+  Optional<CloudHostEntity> findByInstanceIdOrPublicDnsName(@Param("instanceId") String instanceId,
+                                                            @Param("publicDnsName") String publicDnsName);
+
+  Optional<CloudHostEntity> findByInstanceIdOrPublicIpAddress(@Param("instanceId") String instanceId,
+                                                              @Param("publicIpAddress") String publicIpAddress);
 
   @Query("select r "
       + "from CloudHostEntity h join h.hostRules r "

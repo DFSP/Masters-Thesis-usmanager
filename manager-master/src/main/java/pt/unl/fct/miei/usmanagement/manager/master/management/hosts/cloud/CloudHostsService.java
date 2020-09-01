@@ -37,11 +37,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
@@ -84,14 +81,24 @@ public class CloudHostsService {
     return cloudHosts.findAll();
   }
 
-  public CloudHostEntity getCloudHost(String id) {
-    return cloudHosts.findByInstanceIdOrPublicIpAddress(id, id).orElseThrow(() ->
+  public CloudHostEntity getCloudHostById(String id) {
+    return cloudHosts.findByInstanceId(id).orElseThrow(() ->
         new EntityNotFoundException(CloudHostEntity.class, "id", id));
   }
 
-  public CloudHostEntity getCloudHostByHostname(String hostname) {
-    return cloudHosts.findByPublicIpAddress(hostname).orElseThrow(() ->
-        new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname));
+  public CloudHostEntity getCloudHostByIdOrDns(String value) {
+    return cloudHosts.findByInstanceIdOrPublicDnsName(value, value).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "value", value));
+  }
+
+  public CloudHostEntity getCloudHostByIp(String ipAddress) {
+    return cloudHosts.findByPublicIpAddress(ipAddress).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "hostname", ipAddress));
+  }
+
+  public CloudHostEntity getCloudHostByIdOrIp(String value) {
+    return cloudHosts.findByInstanceIdOrPublicIpAddress(value, value).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "value", value));
   }
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
@@ -134,8 +141,9 @@ public class CloudHostsService {
 
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
-    containersService.launchDockerApiProxy(instance.getPublicIpAddress());
-    return saveCloudHostFromInstance(instance);
+    CloudHostEntity cloudHost = saveCloudHostFromInstance(instance);
+    hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
+    return cloudHost;
   }
 
   public CloudHostEntity startCloudHost(CloudHostEntity cloudHost, boolean addToSwarm) {
@@ -143,7 +151,7 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity startCloudHost(String instanceId, boolean addToSwarm) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.PENDING.getCode())
         .withName(AwsInstanceState.PENDING.getState());
@@ -158,7 +166,7 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity stopCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (MasterManagerException e) {
@@ -174,7 +182,7 @@ public class CloudHostsService {
   }
 
   public void terminateCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (MasterManagerException e) {
@@ -292,16 +300,16 @@ public class CloudHostsService {
         hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
   }
 
-  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String cloudHost) {
-    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
-    CloudHostEntity cloudHostEntity = getCloudHostByHostname(cloudHost).toBuilder()
+  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String instanceId) {
+    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), instanceId);
+    CloudHostEntity cloudHostEntity = getCloudHostById(instanceId).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();
     cloudHosts.save(cloudHostEntity);
   }
 
   public void unassignWorkerManager(String cloudHost) {
-    CloudHostEntity cloudHostEntity = getCloudHost(cloudHost).toBuilder()
+    CloudHostEntity cloudHostEntity = getCloudHostByIdOrIp(cloudHost).toBuilder()
         .managedByWorker(null)
         .build();
     cloudHosts.save(cloudHostEntity);

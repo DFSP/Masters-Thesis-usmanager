@@ -22,34 +22,27 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {IRuleContainer} from "./RuleContainer";
-import Card from "../../../../components/cards/Card";
-import CardItem from "../../../../components/list/CardItem";
+package pt.unl.fct.miei.usmanagement.manager.worker.config;
 
-interface ContainerRuleCardProps {
-  rule: IRuleContainer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
+
+@Slf4j
+@Component
+public class DatabaseLoader {
+
+  @Bean
+  CommandLineRunner initDatabase(EdgeHostRepository edgeHostRepository) {
+    return args -> {
+      EdgeHostEntity edgeHostEntity =
+          EdgeHostEntity.builder().publicDnsName("localhost").country("test").city("test").build();
+      log.warn("inserting hosts");
+      edgeHostRepository.save(edgeHostEntity);
+    };
+  }
+
 }
-
-type Props = ContainerRuleCardProps;
-
-const CardRuleContainer = Card<IRuleContainer>();
-const RuleContainerCard = ({rule}: Props) => (
-  <CardRuleContainer title={rule.name}
-                     link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
-                     height={'125px'}
-                     margin={'10px 0'}
-                     hoverable>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.ruleDecision}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
-  </CardRuleContainer>
-);
-
-export default RuleContainerCard;

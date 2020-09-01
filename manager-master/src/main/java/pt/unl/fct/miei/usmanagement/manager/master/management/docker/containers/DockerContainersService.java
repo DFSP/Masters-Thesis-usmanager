@@ -215,13 +215,13 @@ public class DockerContainersService {
     return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
   }
 
-  private Optional<DockerContainer> launchContainer(String hostname, ServiceEntity service,
+  private Optional<DockerContainer> launchContainer(String host, ServiceEntity service,
                                                     boolean global, List<String> environment,
                                                     Map<String, String> labels,
                                                     Map<String, String> dynamicLaunchParams) {
-    String ipAddress = hostsService.isValidIPAddress(hostname)
-        ? hostname
-        : hostsService.getPublicIpAddressFromDns(hostname);
+    String ipAddress = hostsService.isValidIPAddress(host)
+        ? host
+        : hostsService.getPublicIpAddressFromHost(host);
     String serviceName = service.getServiceName();
     log.info("Launching container with service '{}' at '{}'...", serviceName, ipAddress);
     if (global) {

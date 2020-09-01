@@ -85,7 +85,7 @@ public class SshService {
     String username;
     String publicKeyFile;
     try {
-      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
+      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
       username = edgeHostEntity.getUsername();
       publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
     } catch (EntityNotFoundException e) {

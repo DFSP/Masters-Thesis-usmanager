@@ -28,6 +28,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -59,10 +60,24 @@ public class EdgeHostsService {
     return edgeHosts.findAll();
   }
 
-  public EdgeHostEntity getEdgeHost(String hostname) {
-    return edgeHosts.findEdgeHost(hostname).orElseThrow(() ->
-        new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
+  public EdgeHostEntity getEdgeHostById(Long id) {
+    try {
+      return edgeHosts.getOne(id);
+    } catch (javax.persistence.EntityNotFoundException e) {
+      throw new EntityNotFoundException(EdgeHostEntity.class, "id", id.toString());
+    }
   }
+
+  public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
+    return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
+        new EntityNotFoundException(EdgeHostEntity.class, "host", host));
+  }
+
+  public EdgeHostEntity getEdgeHostByDns(String dns) {
+    return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
+        new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
+  }
+
 
   public List<EdgeHostEntity> getHostsByRegion(RegionEntity region) {
     return edgeHosts.findByRegion(region);

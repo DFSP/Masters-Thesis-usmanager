@@ -283,7 +283,7 @@ class RuleService extends BaseComponent<Props, State> {
     }, {});
 
   private decisionDropdownOption = (decision: IDecision): string =>
-    decision.value;
+    decision.ruleDecision;
 
   private isGenericSelected = (generic: boolean) =>
     this.setState({isGeneric: generic});

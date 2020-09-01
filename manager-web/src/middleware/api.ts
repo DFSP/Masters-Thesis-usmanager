@@ -228,7 +228,7 @@ const condition: schema.Entity<IRuleCondition> = new schema.Entity('conditions',
 const conditions = new schema.Array(condition);
 
 const decision: schema.Entity<IDecision> = new schema.Entity('decisions', undefined, {
-  idAttribute: (decision: IDecision) => decision.value + "_" + decision.componentType.type.toUpperCase()
+  idAttribute: (decision: IDecision) => decision.ruleDecision + "_" + decision.componentType.type.toUpperCase()
 });
 
 const simulatedHostMetric: schema.Entity<ISimulatedHostMetric> = new schema.Entity('simulatedHostMetrics', undefined, {

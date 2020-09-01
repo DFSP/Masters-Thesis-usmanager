@@ -49,7 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundExce
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws.AwsProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusProperties;
 
@@ -62,18 +61,15 @@ public class SshService {
   private final EdgeHostsService edgeHostsService;
 
   private final int connectionTimeout;
-  private final String edgeKeyFilePath;
   private final String awsKeyFilePath;
   private final String awsUser;
   private final Map<String, String> scriptPaths;
 
   public SshService(EdgeHostsService edgeHostsService, SshProperties sshProperties,
-                    EdgeHostsProperties edgeHostsProperties,
                     AwsProperties awsProperties, DockerProperties dockerProperties,
                     PrometheusProperties prometheusProperties) {
     this.edgeHostsService = edgeHostsService;
     this.connectionTimeout = sshProperties.getConnectionTimeout();
-    this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
     this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
     this.awsUser = awsProperties.getAccess().getUsername();
     PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
@@ -89,7 +85,7 @@ public class SshService {
     String username;
     String publicKeyFile;
     try {
-      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
+      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
       username = edgeHostEntity.getUsername();
       publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
     } catch (EntityNotFoundException e) {

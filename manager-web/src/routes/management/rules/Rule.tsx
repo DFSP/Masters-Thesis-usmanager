@@ -34,7 +34,7 @@ export interface IRule extends IDatabaseData {
 }
 
 export interface IDecision extends IDatabaseData {
-  value: string;
+  ruleDecision: string;
   componentType: IComponentType;
 }
 

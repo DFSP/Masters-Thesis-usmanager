@@ -200,6 +200,7 @@ semverParse() {
 do_install() {
   echo "# Executing docker install script, commit: $SCRIPT_COMMIT_SHA"
 
+<<HIDE_SLEEP
   if command_exists docker; then
     docker_version="$(docker -v | cut -d ' ' -f3 | cut -d ',' -f1)"
     MAJOR_W=1
@@ -249,6 +250,7 @@ do_install() {
       sleep 20
     )
   fi
+HIDE_SLEEP
 
   user="$(id -un 2>/dev/null || true)"
 

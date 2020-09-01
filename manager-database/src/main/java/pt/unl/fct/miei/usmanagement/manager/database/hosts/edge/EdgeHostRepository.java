@@ -38,10 +38,10 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 @Repository
 public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> {
 
-  @Query("select h "
-      + "from EdgeHostEntity h "
-      + "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
-  Optional<EdgeHostEntity> findEdgeHost(@Param("hostname") String hostname);
+  Optional<EdgeHostEntity> findByPublicDnsName(@Param("publicDnsName") String publicDnsName);
+
+  Optional<EdgeHostEntity> findByPublicDnsNameOrPublicIpAddress(@Param("publicDnsName") String publicDnsName,
+                                                                @Param("publicIpAddress") String publicIpAddress);
 
   List<EdgeHostEntity> findByRegion(@Param("region") RegionEntity region);
 

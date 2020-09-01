@@ -58,6 +58,8 @@ public class SymmetricDSProperties {
     public static final class Exclude {
 
       private List<String> startsWith;
+      private List<String> endsWith;
+      private List<String> contains;
 
     }
 
