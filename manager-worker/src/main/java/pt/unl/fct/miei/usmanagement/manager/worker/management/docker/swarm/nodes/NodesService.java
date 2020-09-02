@@ -243,38 +243,4 @@ public class NodesService {
     }
   }
 
-  /*public void updateNodes() {
-    // public ip -> private ip
-    Map<String, String> edgeHosts =
-        edgeHostsService.getEdgeHosts().stream()
-            // TODO remove filter after only hosts assigned to this worker are sent here
-            .filter(edgeHost -> {
-              WorkerManagerEntity workerManagerEntity = edgeHost.getManagedByWorker();
-              return workerManagerEntity != null && workerManagerEntity.getId().equalsIgnoreCase(this.workerManagerId);
-            })
-            .collect(Collectors.toMap(EdgeHostEntity::getPublicIpAddress, EdgeHostEntity::getPrivateIpAddress));
-    Map<String, String> hosts = new HashMap<>(edgeHosts);
-    Map<String, String> cloudHosts =
-        cloudHostsService.getCloudHosts().stream()
-            // TODO remove filter after only hosts assigned to this worker are sent here
-            .filter(cloudHost -> {
-              WorkerManagerEntity workerManagerEntity = cloudHost.getManagedByWorker();
-              return workerManagerEntity != null && workerManagerEntity.getId().equalsIgnoreCase(this.workerManagerId);
-            })
-            .collect(Collectors.toMap(CloudHostEntity::getPublicIpAddress, CloudHostEntity::getPrivateIpAddress));
-    hosts.putAll(cloudHosts);
-    // remove all missing hosts
-    List<String> nodesHostnames = getNodes().stream().map(SimpleNode::getHostname).collect(Collectors.toList());
-    nodesHostnames.forEach(hostname -> {
-      if (!hosts.containsKey(hostname)) {
-        hostsService.removeHost(hostname);
-      }
-    });
-    // add all new hosts
-    hosts.forEach((hostname, privateIpAddress) -> {
-      if (!nodesHostnames.contains(hostname)) {
-        hostsService.setupHost(hostname, privateIpAddress, NodeRole.WORKER);
-      }
-    });
-  }*/
 }

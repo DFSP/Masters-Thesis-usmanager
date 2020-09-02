@@ -534,7 +534,6 @@ public class DockerContainersService {
       String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
       return services.contains(serviceName);
     });
-    log.info(containers.toString());
     containers.forEach(container -> stopContainer(container.getId(), container.getHostname(), 0));
   }
 

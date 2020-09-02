@@ -53,6 +53,7 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashCommandRe
 import pt.unl.fct.miei.usmanagement.manager.worker.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
@@ -308,7 +309,9 @@ public class HostsService {
   }
 
   public void removeHost(String hostname) {
-    containersService.getHostContainers(hostname).forEach(c -> containersService.stopContainer(c.getContainerId()));
+    containersService.getHostContainers(hostname).stream()
+        .filter(container -> !container.getNames().get(0).equalsIgnoreCase(DockerApiProxyService.DOCKER_API_PROXY))
+        .forEach(container -> containersService.stopContainer(container.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
   }
 

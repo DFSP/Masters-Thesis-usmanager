@@ -143,7 +143,6 @@ public class HostsMonitoringService {
 
   private void monitorHostsTask() {
     log.info("Starting host monitoring task...");
-    nodesService.updateNodes();
     List<SimpleNode> nodes = nodesService.getReadyNodes();
     Map<String, Map<String, Double>> hostsMonitoring = new HashMap<>();
     for (SimpleNode node : nodes) {
