@@ -24,6 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -329,7 +333,18 @@ public class ContainersService {
 
   public String getLogs(String containerId) {
     ContainerEntity container = getContainer(containerId);
-    return dockerContainersService.getContainerLogs(container);
+    String logs = dockerContainersService.getContainerLogs(container);
+    if (logs != null) {
+      String path = String.format("./logs/containers/%s%s.log", container.getHostname(), container.getNames().get(0));
+      Path logsPath = Paths.get(path);
+      try {
+        Files.createDirectories(logsPath.getParent());
+        Files.write(logsPath, logs.getBytes());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return logs;
   }
 
   public List<ContainerRuleEntity> getRules(String containerId) {

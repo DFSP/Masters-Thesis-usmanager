@@ -127,7 +127,7 @@ class AssignedMachinesList extends BaseComponent<Props, State> {
     this.props.workerManager?.id === undefined;
 
   private assignedMachine = (index: number, assignedMachine: string, separate: boolean, checked: boolean,
-                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+                             handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const isNew = this.isNew();
     const unsaved = this.props.unSavedMachines.includes(assignedMachine);
     return (
@@ -175,7 +175,11 @@ class AssignedMachinesList extends BaseComponent<Props, State> {
 
   private getSelectableMachines = () => {
     const {assignedMachines, cloudHosts, edgeHosts, unSavedMachines} = this.props;
-    const cloud = Object.keys(cloudHosts).filter(host => !assignedMachines.includes(host) && !unSavedMachines.includes(host));
+    const cloud = Object.values(cloudHosts)
+                        .map(cloudHost => cloudHost.publicIpAddress)
+                        .filter(hostname => !assignedMachines.includes(hostname)
+                                            && !unSavedMachines.includes(hostname)
+                                            && this.props.workerManager?.container?.hostname !== hostname);
     const edge = Object.keys(edgeHosts).filter(host => !assignedMachines.includes(host) && !unSavedMachines.includes(host));
     return cloud.concat(edge);
   };

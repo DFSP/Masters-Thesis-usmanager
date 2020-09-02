@@ -24,6 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -244,7 +250,6 @@ public class DockerContainersService {
     String internalPort = service.getDefaultInternalPort();
     String externalPort = hostsService.findAvailableExternalPort(ipAddress, service.getDefaultExternalPort());
     String serviceAddr = String.format("%s:%s", ipAddress, externalPort);
-    String containerName = String.format("%s_%s_%s", serviceName, ipAddress, externalPort);
     String dockerRepository = service.getDockerRepository();
     HostLocation hostLocation = hostsService.getHostDetails(ipAddress).getHostLocation();
     String continent = hostLocation.getContinent();
@@ -295,7 +300,7 @@ public class DockerContainersService {
     }
     log.info("hostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
             + "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
-        ipAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
+        ipAddress, internalPort, externalPort, serviceName, dockerRepository, launchCommand, containerEnvironment,
         containerLabels);
     HostConfig hostConfig = HostConfig.builder()
         .autoRemove(true)
@@ -312,12 +317,12 @@ public class DockerContainersService {
         : containerBuilder.cmd(launchCommand.split(" ")).build();
     try (var dockerClient = dockerCoreService.getDockerClient(ipAddress)) {
       dockerClient.pull(dockerRepository);
-      ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
+      ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, serviceName);
       String containerId = containerCreation.id();
       dockerClient.startContainer(containerId);
       if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
-        nginxLoadBalancerService.addServiceToLoadBalancer(ipAddress, serviceName, serviceAddr, continent, region, country,
-            city);
+        nginxLoadBalancerService.addServiceToLoadBalancer(ipAddress, serviceName, serviceAddr, continent, region,
+            country, city);
       }
       return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")
           ? Optional.empty()
@@ -510,8 +515,8 @@ public class DockerContainersService {
   }
 
   public String getContainerLogs(ContainerEntity container) {
-    String hostname = container.getHostname();
-    String containerId = container.getContainerId();
+    final String hostname = container.getHostname();
+    final String containerId = container.getContainerId();
     String logs = null;
     try (var docker = dockerCoreService.getDockerClient(hostname);
          var stream = docker.logs(containerId, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {

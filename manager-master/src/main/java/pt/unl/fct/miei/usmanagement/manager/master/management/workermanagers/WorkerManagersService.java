@@ -120,12 +120,12 @@ public class WorkerManagersService {
   }
 
   // machine is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
-  public void assignMachine(String workerManagerId, String machine) {
+  public void assignMachine(String workerManagerId, String hostname) {
     WorkerManagerEntity workerManagerEntity = this.getWorkerManager(workerManagerId);
     try {
-      cloudHostsService.assignWorkerManager(workerManagerEntity, machine);
+      cloudHostsService.assignWorkerManager(workerManagerEntity, hostname);
     } catch (EntityNotFoundException ignored) {
-      edgeHostsService.assignWorkerManager(workerManagerEntity, machine);
+      edgeHostsService.assignWorkerManager(workerManagerEntity, hostname);
     }
   }
 

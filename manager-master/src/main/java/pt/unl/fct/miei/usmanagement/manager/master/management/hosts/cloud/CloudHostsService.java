@@ -300,9 +300,9 @@ public class CloudHostsService {
         hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
   }
 
-  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String instanceId) {
-    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), instanceId);
-    CloudHostEntity cloudHostEntity = getCloudHostById(instanceId).toBuilder()
+  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String cloudHost) {
+    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
+    CloudHostEntity cloudHostEntity = getCloudHostByIp(cloudHost).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();
     cloudHosts.save(cloudHostEntity);
