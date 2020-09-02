@@ -40,7 +40,6 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.aws.AwsService;
@@ -54,17 +53,15 @@ public class CloudHostsService {
   private final ContainersService containersService;
 
   private final CloudHostRepository cloudHosts;
-  private final NodesService nodesService;
 
   public CloudHostsService(@Lazy AwsService awsService,
                            @Lazy HostsService hostsService,
                            @Lazy ContainersService containersService,
-                           CloudHostRepository cloudHosts, NodesService nodesService) {
+                           CloudHostRepository cloudHosts) {
     this.awsService = awsService;
     this.hostsService = hostsService;
     this.containersService = containersService;
     this.cloudHosts = cloudHosts;
-    this.nodesService = nodesService;
   }
 
   public List<CloudHostEntity> getCloudHosts() {
@@ -93,13 +90,6 @@ public class CloudHostsService {
     return cloudHosts.findByPublicIpAddress(ipAddress).orElseThrow(() ->
         new EntityNotFoundException(CloudHostEntity.class, "ipAddress", ipAddress));
   }
-
-/*  public void updateCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHostByInstanceId(instanceId);
-    if (nodesService.isPartOfSwarm(cloudHost.getPublicIpAddress())) {
-
-    }
-  }*/
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
     log.debug("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));

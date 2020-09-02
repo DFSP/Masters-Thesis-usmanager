@@ -75,8 +75,6 @@ import pt.unl.fct.miei.usmanagement.manager.worker.util.Text;
 public class HostsService {
 
   private static final int DELAY_STOP_HOST = 60 * 1000;
-  // TODO como adicionar o novo host após de ser atribuído ao worker?
-  //e remover?
 
   private final NodesService nodesService;
   private final ContainersService containersService;
