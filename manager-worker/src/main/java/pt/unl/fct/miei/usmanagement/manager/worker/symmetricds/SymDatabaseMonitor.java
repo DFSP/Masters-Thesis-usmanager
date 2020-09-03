@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jumpmind.db.model.Table;
@@ -34,17 +35,19 @@ import org.jumpmind.symmetric.io.data.DataContext;
 import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
 import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
 
 @Slf4j
+@Service
 class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
 
   private final HostsService hostsService;
 
   @Value("${external-id}")
-  private String workerManagerId;
+  private String id;
 
   SymDatabaseMonitor(HostsService hostsService) {
     this.hostsService = hostsService;
@@ -62,14 +65,14 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
         String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
         if (publicIpAddress != null) {
           // cloud host is running
-          if (workerManagerId.equalsIgnoreCase(newWorkerId)) {
+          if (Objects.equals(id, newWorkerId)) {
             // is a cloud host managed by this worker
-            if (!workerManagerId.equalsIgnoreCase(oldWorkerId)) {
+            if (!Objects.equals(id, oldWorkerId)) {
               // is a newly added cloud host
               String privateIpAddress = newCloudHost.get("PRIVATE_IP_ADDRESS");
               hostsService.setupHost(publicIpAddress, privateIpAddress, NodeRole.WORKER);
             }
-          } else if (workerManagerId.equalsIgnoreCase(oldWorkerId)) {
+          } else if (Objects.equals(id, oldWorkerId)) {
             // is not a cloud host managed by this worker, but used to be
             hostsService.removeHost(publicIpAddress);
           }

@@ -88,7 +88,7 @@ public class WorkerManagersService {
   public WorkerManagerEntity launchWorkerManager(String host) {
     log.debug("Launching worker manager at {}", host);
     String id = UUID.randomUUID().toString();
-    ContainerEntity container = this.launchWorkerManager(host, id);
+    ContainerEntity container = launchWorkerManager(host, id);
     WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
     return workerManagers.save(workerManagerEntity);
   }

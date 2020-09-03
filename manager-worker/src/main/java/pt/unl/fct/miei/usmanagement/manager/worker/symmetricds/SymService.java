@@ -56,14 +56,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
 
 @Slf4j
 @Service
 public class SymService {
 
-  private final HostsService hostsService;
+  private final SymDatabaseMonitor symDatabaseMonitor;
 
   private final ServletContext servletContext;
   private final DataSource dataSource;
@@ -80,9 +79,9 @@ public class SymService {
 
   private ServerSymmetricEngine serverSymmetricEngine;
 
-  public SymService(HostsService hostsService, ServletContext servletContext, DataSource dataSource,
+  public SymService(SymDatabaseMonitor symDatabaseMonitor, ServletContext servletContext, DataSource dataSource,
                     ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
-    this.hostsService = hostsService;
+    this.symDatabaseMonitor = symDatabaseMonitor;
     this.servletContext = servletContext;
     this.dataSource = dataSource;
     this.applicationContext = applicationContext;
@@ -120,8 +119,7 @@ public class SymService {
     /*final MonitorFilter monitor = new MonitorFilter();
     serverSymmetricEngine.getExtensionService().addExtensionPoint(monitor);*/
 
-    final SymDatabaseMonitor databaseMonitor = new SymDatabaseMonitor(hostsService);
-    serverSymmetricEngine.getExtensionService().addExtensionPoint(databaseMonitor);
+    serverSymmetricEngine.getExtensionService().addExtensionPoint(symDatabaseMonitor);
 
     serverSymmetricEngine.start();
 
