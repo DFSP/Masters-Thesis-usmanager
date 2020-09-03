@@ -61,7 +61,7 @@ public class ConditionsService {
 
   public ConditionEntity addCondition(ConditionEntity condition) {
     assertConditionDoesntExist(condition);
-    log.debug("Saving condition {}", ToStringBuilder.reflectionToString(condition));
+    log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
     return conditions.save(condition);
   }
 

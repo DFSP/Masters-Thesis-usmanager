@@ -94,7 +94,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
       dropdown={{
         id: 'containers',
         title: 'Add container',
-        empty: 'No more containers to add',
+        empty: 'No containers to add',
         data: this.getSelectableContainerNames()
       }}
       show={this.container}

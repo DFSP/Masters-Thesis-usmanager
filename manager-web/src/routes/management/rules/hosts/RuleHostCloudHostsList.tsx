@@ -93,7 +93,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'cloudHosts',
                              title: 'Add cloud instance',
-                             empty: 'No more cloud instances to add',
+                             empty: 'No cloud instances to add',
                              data: this.getSelectableCloudHostNames()
                            }}
                            show={this.cloudHost}

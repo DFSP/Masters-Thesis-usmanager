@@ -61,18 +61,18 @@ public class ValueModesService {
 
   public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
     assertValueModeDoesntExist(valueMode);
-    log.debug("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
+    log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
     return valueModes.save(valueMode);
   }
 
   public ValueModeEntity updateValueMode(String valueModeName, ValueModeEntity newValueMode) {
     var valueMode = getValueMode(valueModeName);
-    log.debug("Updating valueMode {} with {}",
+    log.info("Updating valueMode {} with {}",
         ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
-    log.debug("valueMode before copying properties: {}",
+    log.info("valueMode before copying properties: {}",
         ToStringBuilder.reflectionToString(valueMode));
     ObjectUtils.copyValidProperties(newValueMode, valueMode);
-    log.debug("valueMode after copying properties: {}",
+    log.info("valueMode after copying properties: {}",
         ToStringBuilder.reflectionToString(valueMode));
     valueMode = valueModes.save(valueMode);
     return valueMode;

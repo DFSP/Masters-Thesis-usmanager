@@ -63,18 +63,18 @@ public class ComponentTypesService {
 
   public ComponentTypeEntity addComponentType(ComponentTypeEntity componentType) {
     assertComponentTypeDoesntExist(componentType);
-    log.debug("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
+    log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
     return componentTypes.save(componentType);
   }
 
   public ComponentTypeEntity updateComponentType(String componentTypeName, ComponentTypeEntity newComponentType) {
     var componentType = getComponentType(componentTypeName);
-    log.debug("Updating componentType {} with {}",
+    log.info("Updating componentType {} with {}",
         ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
-    log.debug("ComponentType before copying properties: {}",
+    log.info("ComponentType before copying properties: {}",
         ToStringBuilder.reflectionToString(componentType));
     ObjectUtils.copyValidProperties(newComponentType, componentType);
-    log.debug("ComponentType after copying properties: {}",
+    log.info("ComponentType after copying properties: {}",
         ToStringBuilder.reflectionToString(componentType));
     componentType = componentTypes.save(componentType);
     return componentType;

@@ -73,13 +73,13 @@ public class ContainerSimulatedMetricsService {
   public ContainerSimulatedMetricEntity addContainerSimulatedMetric(
       ContainerSimulatedMetricEntity containerSimulatedMetric) {
     assertContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
-    log.debug("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
+    log.info("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
     return containerSimulatedMetrics.save(containerSimulatedMetric);
   }
 
   public ContainerSimulatedMetricEntity updateContainerSimulatedMetric(
       String simulatedMetricName, ContainerSimulatedMetricEntity newContainerSimulatedMetric) {
-    log.debug("Updating simulated container metric {} with {}", simulatedMetricName,
+    log.info("Updating simulated container metric {} with {}", simulatedMetricName,
         ToStringBuilder.reflectionToString(newContainerSimulatedMetric));
     ContainerSimulatedMetricEntity containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
     ObjectUtils.copyValidProperties(newContainerSimulatedMetric, containerSimulatedMetric);
@@ -87,7 +87,7 @@ public class ContainerSimulatedMetricsService {
   }
 
   public void deleteContainerSimulatedMetric(String simulatedMetricName) {
-    log.debug("Deleting simulated container metric {}", simulatedMetricName);
+    log.info("Deleting simulated container metric {}", simulatedMetricName);
     ContainerSimulatedMetricEntity containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
     containerSimulatedMetric.removeAssociations();
     containerSimulatedMetrics.delete(containerSimulatedMetric);
@@ -118,7 +118,7 @@ public class ContainerSimulatedMetricsService {
   }
 
   public void addContainers(String simulatedMetricName, List<String> containerIds) {
-    log.debug("Adding containers {} to simulated metric {}", containerIds, simulatedMetricName);
+    log.info("Adding containers {} to simulated metric {}", containerIds, simulatedMetricName);
     ContainerSimulatedMetricEntity containerMetric = getContainerSimulatedMetric(simulatedMetricName);
     containerIds.forEach(containerId -> {
       ContainerEntity container = containersService.getContainer(containerId);

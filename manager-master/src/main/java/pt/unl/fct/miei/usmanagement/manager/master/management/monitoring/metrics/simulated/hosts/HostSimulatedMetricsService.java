@@ -75,13 +75,13 @@ public class HostSimulatedMetricsService {
 
   public HostSimulatedMetricEntity addHostSimulatedMetric(HostSimulatedMetricEntity simulatedHostMetric) {
     assertHostSimulatedMetricDoesntExist(simulatedHostMetric);
-    log.debug("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
+    log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
     return hostSimulatedMetrics.save(simulatedHostMetric);
   }
 
   public HostSimulatedMetricEntity updateHostSimulatedMetric(String simulatedMetricName,
                                                              HostSimulatedMetricEntity newHostSimulatedMetric) {
-    log.debug("Updating simulated host metric {} with {}", simulatedMetricName,
+    log.info("Updating simulated host metric {} with {}", simulatedMetricName,
         ToStringBuilder.reflectionToString(newHostSimulatedMetric));
     HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
     ObjectUtils.copyValidProperties(newHostSimulatedMetric, simulatedHostMetric);
@@ -89,7 +89,7 @@ public class HostSimulatedMetricsService {
   }
 
   public void deleteHostSimulatedMetric(String simulatedMetricName) {
-    log.debug("Deleting simulated host metric {}", simulatedMetricName);
+    log.info("Deleting simulated host metric {}", simulatedMetricName);
     HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
     simulatedHostMetric.removeAssociations();
     hostSimulatedMetrics.delete(simulatedHostMetric);
@@ -120,7 +120,7 @@ public class HostSimulatedMetricsService {
   }
 
   public void addCloudHosts(String simulatedMetricName, List<String> instanceIds) {
-    log.debug("Adding cloud hosts {} to simulated metric {}", instanceIds, simulatedMetricName);
+    log.info("Adding cloud hosts {} to simulated metric {}", instanceIds, simulatedMetricName);
     HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
     instanceIds.forEach(instanceId -> {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
@@ -156,7 +156,7 @@ public class HostSimulatedMetricsService {
   }
 
   public void addEdgeHosts(String simulatedMetricName, List<String> hostnames) {
-    log.debug("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
+    log.info("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
     HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
     hostnames.forEach(hostname -> {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);

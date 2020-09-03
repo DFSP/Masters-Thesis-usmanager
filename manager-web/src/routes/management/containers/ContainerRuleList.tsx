@@ -93,7 +93,7 @@ class ContainerRuleList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'rules',
                              title: 'Add rule',
-                             empty: 'No more rules to add',
+                             empty: 'No rules to add',
                              data: this.getSelectableRules()
                            }}
                            show={this.rule}

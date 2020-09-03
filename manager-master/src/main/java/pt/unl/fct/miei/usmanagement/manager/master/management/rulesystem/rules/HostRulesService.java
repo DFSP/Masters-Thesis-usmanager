@@ -103,13 +103,13 @@ public class HostRulesService {
 
   public HostRuleEntity addRule(HostRuleEntity rule) {
     assertRuleDoesntExist(rule);
-    log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
+    log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
     setLastUpdateHostRules();
     return rules.save(rule);
   }
 
   public HostRuleEntity updateRule(String ruleName, HostRuleEntity newRule) {
-    log.debug("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
+    log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
     HostRuleEntity rule = getRule(ruleName);
     ObjectUtils.copyValidProperties(newRule, rule);
     rule = rules.save(rule);
@@ -118,7 +118,7 @@ public class HostRulesService {
   }
 
   public void deleteRule(String ruleName) {
-    log.debug("Deleting rule {}", ruleName);
+    log.info("Deleting rule {}", ruleName);
     HostRuleEntity rule = getRule(ruleName);
     rule.removeAssociations();
     rules.delete(rule);
@@ -146,7 +146,7 @@ public class HostRulesService {
   }
 
   public void addCondition(String ruleName, String conditionName) {
-    log.debug("Adding condition {} to rule {}", conditionName, ruleName);
+    log.info("Adding condition {} to rule {}", conditionName, ruleName);
     ConditionEntity condition = conditionsService.getCondition(conditionName);
     HostRuleEntity rule = getRule(ruleName);
     HostRuleConditionEntity hostRuleCondition =
@@ -189,7 +189,7 @@ public class HostRulesService {
   }
 
   public void addCloudHosts(String ruleName, List<String> instanceIds) {
-    log.debug("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
+    log.info("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
     HostRuleEntity rule = getRule(ruleName);
     instanceIds.forEach(instanceId -> {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
@@ -227,7 +227,7 @@ public class HostRulesService {
   }
 
   public void addEdgeHosts(String ruleName, List<String> hostnames) {
-    log.debug("Adding edge hosts {} to rule {}", hostnames, ruleName);
+    log.info("Adding edge hosts {} to rule {}", hostnames, ruleName);
     HostRuleEntity rule = getRule(ruleName);
     hostnames.forEach(hostname -> {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);

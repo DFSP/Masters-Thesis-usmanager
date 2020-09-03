@@ -139,7 +139,7 @@ public class ServicesService {
   public int getMinReplicasByServiceName(String serviceName) {
     Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
     if (customMinReplicas != null) {
-      log.debug("Found event prediction with {} replicas", customMinReplicas);
+      log.info("Found event prediction with {} replicas", customMinReplicas);
       return customMinReplicas;
     }
     return services.getMinReplicas(serviceName);

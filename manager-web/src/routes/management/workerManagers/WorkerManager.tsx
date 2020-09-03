@@ -35,7 +35,7 @@ import {ReduxState} from "../../../reducers";
 import {
   addWorkerManager,
   loadWorkerManagers,
-  assignWorkerManagerMachines, loadNodes
+  assignWorkerManagerHosts, loadNodes
 } from "../../../actions";
 import {connect} from "react-redux";
 import {IReply, postData} from "../../../utils/api";
@@ -46,14 +46,14 @@ import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import IDatabaseData from "../../../components/IDatabaseData";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import MachinesList from "./AssignedMachinesList";
 import {IContainer} from "../containers/Container";
 import {INode} from "../nodes/Node";
+import AssignedHostsList from "./AssignedHostsList";
 
 export interface IWorkerManager extends IDatabaseData {
   startedAt: string,
   container: IContainer,
-  assignedMachines?: string[],
+  assignedHosts?: string[],
 }
 
 interface INewWorkerManager {
@@ -77,7 +77,7 @@ interface DispatchToProps {
   loadWorkerManagers: (id: string) => void;
   addWorkerManager: (workerManager: IWorkerManager) => void;
   loadNodes: () => void;
-  assignWorkerManagerMachines: (id: string, machines: string[]) => void;
+  assignWorkerManagerHosts: (id: string, Hosts: string[]) => void;
 }
 
 interface MatchParams {
@@ -89,13 +89,13 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 interface State {
   workerManager?: IWorkerManager,
   formWorkerManager?: IWorkerManager,
-  unsavedMachines: string[],
+  unsavedHosts: string[],
 }
 
 class WorkerManager extends BaseComponent<Props, State> {
 
   state: State = {
-    unsavedMachines: [],
+    unsavedHosts: [],
   };
   private mounted = false;
 
@@ -169,42 +169,42 @@ class WorkerManager extends BaseComponent<Props, State> {
   };
 
   private shouldShowSaveButton = () =>
-    !!this.state.unsavedMachines.length;
+    !!this.state.unsavedHosts.length;
 
   private saveEntities = (workerManager: IWorkerManager) => {
-    this.saveMachines(workerManager);
+    this.saveHosts(workerManager);
   };
 
-  private assignMachine = (machine: string): void => {
+  private assignHost = (Host: string): void => {
     this.setState({
-      unsavedMachines: this.state.unsavedMachines.concat(machine)
+      unsavedHosts: this.state.unsavedHosts.concat(Host)
     });
   };
 
-  private unassignMachines = (machines: string[]): void => {
+  private unassignHosts = (hosts: string[]): void => {
     this.setState({
-      unsavedMachines: this.state.unsavedMachines.filter(machine => !machines.includes(machine))
+      unsavedHosts: this.state.unsavedHosts.filter(Host => !hosts.includes(Host))
     });
   };
 
-  private saveMachines = (workerManager: IWorkerManager): void => {
-    const {unsavedMachines} = this.state;
-    if (unsavedMachines.length) {
-      postData(`worker-managers/${workerManager.id}/assigned-machines`, unsavedMachines,
-        () => this.onSaveMachinesSuccess(workerManager),
-        (reason) => this.onSaveMachinesFailure(workerManager, reason));
+  private saveHosts = (workerManager: IWorkerManager): void => {
+    const {unsavedHosts} = this.state;
+    if (unsavedHosts.length) {
+      postData(`worker-managers/${workerManager.id}/assigned-hosts`, unsavedHosts,
+        () => this.onSaveHostsSuccess(workerManager),
+        (reason) => this.onSaveHostsFailure(workerManager, reason));
     }
   };
 
-  private onSaveMachinesSuccess = (workerManager: IWorkerManager): void => {
-    this.props.assignWorkerManagerMachines(workerManager.id.toString(), this.state.unsavedMachines);
+  private onSaveHostsSuccess = (workerManager: IWorkerManager): void => {
+    this.props.assignWorkerManagerHosts(workerManager.id.toString(), this.state.unsavedHosts);
     if (this.mounted) {
-      this.setState({unsavedMachines: []});
+      this.setState({unsavedHosts: []});
     }
   };
 
-  private onSaveMachinesFailure = (workerManager: IWorkerManager, reason: string): void =>
-    super.toast(`Unable to save assigned machines of ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} worker-manager`, 10000, reason, true);
+  private onSaveHostsFailure = (workerManager: IWorkerManager, reason: string): void =>
+    super.toast(`Unable to save assigned hosts of ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} worker-manager`, 10000, reason, true);
 
   private getFields = (workerManager: Partial<IWorkerManager> | INewWorkerManager): IFields =>
     Object.entries(workerManager).map(([key, value]) => {
@@ -281,7 +281,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                                        id={key}
                                        label={key + " id"}
                                        valueToString={this.containerIdField}/>
-                    <Field<IContainer> key={index}
+                    <Field<IContainer> key={index + 1} // index + 1 is ok unless there are more fields after this one
                                        id={key}
                                        label={"hostname"}
                                        valueToString={this.containerHostnameField}/>
@@ -296,13 +296,13 @@ class WorkerManager extends BaseComponent<Props, State> {
     )
   };
 
-  private assignMachines = (): JSX.Element =>
-    <MachinesList isLoadingWorkerManager={this.props.isLoading}
-                  loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
-                  workerManager={this.getWorkerManager()}
-                  unSavedMachines={this.state.unsavedMachines}
-                  onAssignMachine={this.assignMachine}
-                  onUnassignMachines={this.unassignMachines}/>;
+  private assignHosts = (): JSX.Element =>
+    <AssignedHostsList isLoadingWorkerManager={this.props.isLoading}
+                          loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
+                          workerManager={this.getWorkerManager()}
+                          unSavedHosts={this.state.unsavedHosts}
+                          onAssignHost={this.assignHost}
+                          onUnassignHosts={this.unassignHosts}/>;
 
   private tabs = (): Tab[] => [
     {
@@ -311,9 +311,9 @@ class WorkerManager extends BaseComponent<Props, State> {
       content: () => this.workerManager()
     },
     {
-      title: 'Assigned machines',
-      id: 'assignMachines',
-      content: () => this.assignMachines()
+      title: 'Assigned hosts',
+      id: 'assignHosts',
+      content: () => this.assignHosts()
     }
   ];
 
@@ -321,7 +321,7 @@ class WorkerManager extends BaseComponent<Props, State> {
 
 function removeFields(workerManager: Partial<IWorkerManager>) {
   delete workerManager["id"];
-  delete workerManager["assignedMachines"];
+  delete workerManager["assignedHosts"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -353,7 +353,7 @@ const mapDispatchToProps: DispatchToProps = {
   loadWorkerManagers,
   addWorkerManager,
   loadNodes,
-  assignWorkerManagerMachines
+  assignWorkerManagerHosts
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WorkerManager);

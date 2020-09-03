@@ -133,7 +133,7 @@ public class ContainersService {
 
   public ContainerEntity addContainer(ContainerEntity container) {
     assertContainerDoesntExist(container);
-    log.debug("Saving container {}", ToStringBuilder.reflectionToString(container));
+    log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
     return containers.save(container);
   }
 

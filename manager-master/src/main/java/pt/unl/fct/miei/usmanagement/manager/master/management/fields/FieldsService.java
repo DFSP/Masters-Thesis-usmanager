@@ -61,18 +61,18 @@ public class FieldsService {
 
   public FieldEntity addField(FieldEntity field) {
     assertFieldDoesntExist(field);
-    log.debug("Saving field {}", ToStringBuilder.reflectionToString(field));
+    log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
     return fields.save(field);
   }
 
   public FieldEntity updateField(String fieldName, FieldEntity newField) {
     var field = getField(fieldName);
-    log.debug("Updating field {} with {}",
+    log.info("Updating field {} with {}",
         ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
-    log.debug("Field before copying properties: {}",
+    log.info("Field before copying properties: {}",
         ToStringBuilder.reflectionToString(field));
     ObjectUtils.copyValidProperties(newField, field);
-    log.debug("Field after copying properties: {}",
+    log.info("Field after copying properties: {}",
         ToStringBuilder.reflectionToString(field));
     field = fields.save(field);
     return field;

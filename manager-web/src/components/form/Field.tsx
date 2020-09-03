@@ -77,6 +77,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
 
   public render() {
     const {id, type, label, dropdown, number, includeIcon, icon, disabled, hidden, valueToString} = this.props;
+    let elementId = `${id}_${label}`;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -92,14 +93,14 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
       <FormContext.Consumer>
         {(formContext: IFormContext | null) => (
           formContext && (
-            <div key={id}
+            <div key={elementId}
                  className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
                  style={includeIcon !== undefined && !includeIcon ? {marginLeft: '10px'} : undefined}>
               {label && type !== "list" && (
                 <>
                   {(includeIcon === undefined || includeIcon) &&
                    <i className="material-icons prefix">{icon ? icon : mapLabelToMaterialIcon(label, formContext.values[id])}</i>}
-                  <label className="active" htmlFor={id}>
+                  <label className="active" htmlFor={elementId}>
                     {camelCaseToSentenceCase(label)}
                   </label>
                 </>
@@ -107,7 +108,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {(!type || type.toLowerCase() === "text") && (
                 <TextBox<T>
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   disabled={disabled || !formContext.isEditing}
@@ -119,7 +120,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {type && type.toLowerCase() === "number" && (
                 <NumberBox
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   min={number && number.min}
@@ -131,7 +132,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {type && type.toLowerCase() === "date" && (
                 <TextBox
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={this.getDateStringFromTimestamp(formContext.values[id])}
                   disabled={disabled || !formContext.isEditing}
@@ -141,7 +142,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {(type && type.toLowerCase() === "datepicker") && (
                 <Datepicker
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   disabled={disabled || !formContext.isEditing}
@@ -151,7 +152,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {(type && type.toLowerCase() === "timepicker") && (
                 <Timepicker
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   disabled={disabled || !formContext?.isEditing}
@@ -161,7 +162,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {type && type.toLowerCase() === "multilinetext" && (
                 <MultilineTextBox
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   disabled={disabled || !formContext.isEditing}
@@ -171,7 +172,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {type && type.toLowerCase() === "dropdown" && dropdown && (
                 <Dropdown
                   className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={id}
+                  id={elementId}
                   name={id}
                   value={formContext.values[id]}
                   disabled={disabled || !formContext.isEditing}
@@ -180,7 +181,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                   dropdown={dropdown}/>
               )}
               {(type && type.toLowerCase() === "list") && (
-                <CheckboxList id={id}
+                <CheckboxList id={elementId}
                               name={id}
                               values={this.props.value}
                               disabled={disabled || !formContext?.isEditing}

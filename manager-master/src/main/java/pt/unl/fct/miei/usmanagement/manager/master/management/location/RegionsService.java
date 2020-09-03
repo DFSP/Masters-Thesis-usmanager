@@ -61,18 +61,18 @@ public class RegionsService {
 
   public RegionEntity addRegion(RegionEntity region) {
     assertRegionDoesntExist(region);
-    log.debug("Saving region {}", ToStringBuilder.reflectionToString(region));
+    log.info("Saving region {}", ToStringBuilder.reflectionToString(region));
     return regions.save(region);
   }
 
   public RegionEntity updateRegion(String name, RegionEntity newRegion) {
     var region = getRegion(name);
-    log.debug("Updating region {} with {}",
+    log.info("Updating region {} with {}",
         ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
-    log.debug("Region before copying properties: {}",
+    log.info("Region before copying properties: {}",
         ToStringBuilder.reflectionToString(region));
     ObjectUtils.copyValidProperties(newRegion, region);
-    log.debug("Region after copying properties: {}",
+    log.info("Region after copying properties: {}",
         ToStringBuilder.reflectionToString(region));
     return regions.save(region);
   }

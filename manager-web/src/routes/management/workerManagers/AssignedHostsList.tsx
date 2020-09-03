@@ -33,46 +33,46 @@ import {bindActionCreators} from "redux";
 import {
   loadCloudHosts,
   loadEdgeHosts,
-  loadWorkerManagerMachines,
-  unassignWorkerManagerMachines,
+  loadWorkerManagerHosts,
+  unassignWorkerManagerHosts,
 } from "../../../actions";
 import {connect} from "react-redux";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IWorkerManager} from "./WorkerManager";
+import {INode} from "../nodes/Node";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  cloudHosts: { [key: string]: ICloudHost };
-  edgeHosts: { [key: string]: IEdgeHost };
-  assignedMachines: string[];
+  nodes: { [key: string]: INode };
+  assignedHosts: string[];
 }
 
 interface DispatchToProps {
   loadCloudHosts: () => void;
   loadEdgeHosts: () => void;
-  loadWorkerManagerMachines: (id: string) => void;
-  unassignWorkerManagerMachines: (id: string, assignedMachines: string[]) => void;
+  loadWorkerManagerHosts: (id: string) => void;
+  unassignWorkerManagerHosts: (id: string, assignedHosts: string[]) => void;
 }
 
-interface WorkerManagerMachineListProps {
+interface WorkerManagerHostListProps {
   isLoadingWorkerManager: boolean;
   loadWorkerManagerError?: string | null;
   workerManager: IWorkerManager | Partial<IWorkerManager> | undefined;
-  unSavedMachines: string[];
-  onAssignMachine: (assignedMachine: string) => void;
-  onUnassignMachines: (assignedMachines: string[]) => void;
+  unSavedHosts: string[];
+  onAssignHost: (assignedHost: string) => void;
+  onUnassignHosts: (assignedHosts: string[]) => void;
 }
 
-type Props = StateToProps & DispatchToProps & WorkerManagerMachineListProps;
+type Props = StateToProps & DispatchToProps & WorkerManagerHostListProps;
 
 interface State {
-  selectedMachine?: string;
+  selectedHost?: string;
   entitySaved: boolean;
 }
 
-class AssignedMachinesList extends BaseComponent<Props, State> {
+class AssignedHostsList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
@@ -96,19 +96,19 @@ class AssignedMachinesList extends BaseComponent<Props, State> {
     return <ControlledList<string>
       isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
       error={!isNew ? this.props.loadWorkerManagerError || this.props.error : undefined}
-      emptyMessage={`Machines list is empty`}
-      data={this.props.assignedMachines}
+      emptyMessage={`Assigned hosts list is empty`}
+      data={this.props.assignedHosts}
       dropdown={{
-        id: 'workerManagerMachines',
-        title: 'Add machine',
-        empty: 'No more machines to add',
-        data: this.getSelectableMachines(),
+        id: 'workerManagerHosts',
+        title: 'Add host',
+        empty: 'No hosts to add',
+        data: this.getSelectableHosts(),
       }}
-      show={this.assignedMachine}
+      show={this.assignedHost}
       onAdd={this.onAdd}
       onRemove={this.onRemove}
       onDelete={{
-        url: `worker-managers/${this.props.workerManager?.id}/assigned-machines`,
+        url: `worker-managers/${this.props.workerManager?.id}/assigned-hosts`,
         successCallback: this.onDeleteSuccess,
         failureCallback: this.onDeleteFailure
       }}
@@ -119,34 +119,34 @@ class AssignedMachinesList extends BaseComponent<Props, State> {
   private loadEntities = () => {
     if (this.props.workerManager?.id) {
       const {id} = this.props.workerManager;
-      this.props.loadWorkerManagerMachines(id.toString());
+      this.props.loadWorkerManagerHosts(id.toString());
     }
   };
 
   private isNew = () =>
     this.props.workerManager?.id === undefined;
 
-  private assignedMachine = (index: number, assignedMachine: string, separate: boolean, checked: boolean,
-                             handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+  private assignedHost = (index: number, assignedHost: string, separate: boolean, checked: boolean,
+                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const isNew = this.isNew();
-    const unsaved = this.props.unSavedMachines.includes(assignedMachine);
+    const unsaved = this.props.unSavedHosts.includes(assignedHost);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
           <label>
-            <input id={assignedMachine}
+            <input id={assignedHost}
                    type="checkbox"
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {assignedMachine}
+                {assignedHost}
               </div>
             </span>
           </label>
         </div>
         {!isNew && (
-          <Link to={Object.keys(this.props.cloudHosts).includes(assignedMachine) ? `/hosts/cloud/${assignedMachine}` : `/hosts/edge/${assignedMachine}`}
+          <Link to={`/nodes/${assignedHost}`}
                 className={`${listItemStyles.link} waves-effect`}>
             <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
           </Link>
@@ -155,47 +155,45 @@ class AssignedMachinesList extends BaseComponent<Props, State> {
     );
   };
 
-  private onAdd = (assignedMachine: string): void => {
-    this.props.onAssignMachine(assignedMachine);
+  private onAdd = (assignedHost: string): void => {
+    this.props.onAssignHost(assignedHost);
   };
 
-  private onRemove = (assignedMachines: string[]): void => {
-    this.props.onUnassignMachines(assignedMachines);
+  private onRemove = (assignedHosts: string[]): void => {
+    this.props.onUnassignHosts(assignedHosts);
   };
 
-  private onDeleteSuccess = (assignedMachines: string[]): void => {
+  private onDeleteSuccess = (assignedHosts: string[]): void => {
     if (this.props.workerManager?.id) {
       const {id} = this.props.workerManager;
-      this.props.unassignWorkerManagerMachines(id.toString(), assignedMachines);
+      this.props.unassignWorkerManagerHosts(id.toString(), assignedHosts);
     }
   };
 
-  private onDeleteFailure = (reason: string, assignedMachines?: string[]): void =>
-    super.toast(`Unable to unassign ${assignedMachines?.length === 1 ? assignedMachines[0] : 'machines'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, assignedHosts?: string[]): void =>
+    super.toast(`Unable to unassign ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
 
-  private getSelectableMachines = () => {
-    const {assignedMachines, cloudHosts, edgeHosts, unSavedMachines} = this.props;
-    const cloud = Object.values(cloudHosts)
-                        .map(cloudHost => cloudHost.publicIpAddress)
-                        .filter(hostname => !assignedMachines.includes(hostname)
-                                            && !unSavedMachines.includes(hostname)
-                                            && this.props.workerManager?.container?.hostname !== hostname);
-    const edge = Object.keys(edgeHosts).filter(host => !assignedMachines.includes(host) && !unSavedMachines.includes(host));
-    return cloud.concat(edge);
+  private getSelectableHosts = () => {
+    const {assignedHosts, nodes, unSavedHosts} = this.props;
+    return Object.entries(nodes)
+          .filter(([_, node]) => node.state === 'ready'
+                                 && !assignedHosts.includes(node.hostname)
+                                 && !unSavedHosts.includes(node.hostname)
+                                 && this.props.workerManager?.container?.hostname !== node.hostname)
+          .map(([_, node]) => node.hostname)
   };
 
 }
 
-function mapStateToProps(state: ReduxState, ownProps: WorkerManagerMachineListProps): StateToProps {
+function mapStateToProps(state: ReduxState, ownProps: WorkerManagerHostListProps): StateToProps {
   const id = ownProps.workerManager?.id;
   const workerManager = id && state.entities.workerManagers.data[id];
-  const assignedMachines = workerManager && workerManager.assignedMachines;
+  const assignedHosts = workerManager && workerManager.assignedHosts;
   return {
     isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
     error: state.entities.workerManagers.loadWorkerManagersError,
-    cloudHosts: state.entities.hosts.cloud.data,
-    edgeHosts: state.entities.hosts.edge.data,
-    assignedMachines: (assignedMachines && Object.values(assignedMachines)) || [],
+    nodes: state.entities.nodes.data,
+    assignedHosts: (assignedHosts && Object.values(assignedHosts)) || [],
   }
 }
 
@@ -203,8 +201,8 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadCloudHosts,
     loadEdgeHosts,
-    loadWorkerManagerMachines,
-    unassignWorkerManagerMachines,
+    loadWorkerManagerHosts,
+    unassignWorkerManagerHosts,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AssignedMachinesList);
+export default connect(mapStateToProps, mapDispatchToProps)(AssignedHostsList);

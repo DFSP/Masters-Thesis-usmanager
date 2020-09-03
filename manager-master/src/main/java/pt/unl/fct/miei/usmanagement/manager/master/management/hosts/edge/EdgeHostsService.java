@@ -115,7 +115,7 @@ public class EdgeHostsService {
     if (password != null) {
       setupEdgeHost(edgeHost, password);
     }
-    log.debug("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
+    log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
     return edgeHosts.save(edgeHost);
   }
 
@@ -136,7 +136,7 @@ public class EdgeHostsService {
 
   public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
     EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
-    log.debug("Updating edgeHost {} with {}",
+    log.info("Updating edgeHost {} with {}",
         ToStringBuilder.reflectionToString(edgeHost),
         ToStringBuilder.reflectionToString(newEdgeHost));
     ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
@@ -228,7 +228,7 @@ public class EdgeHostsService {
   }
 
   public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
-    log.debug("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
+    log.info("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
     EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();

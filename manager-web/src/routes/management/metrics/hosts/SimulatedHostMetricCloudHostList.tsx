@@ -97,7 +97,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
       dropdown={{
         id: 'cloudHosts',
         title: 'Add cloud host',
-        empty: 'No more cloud hosts to add',
+        empty: 'No cloud hosts to add',
         data: this.getSelectableCloudHosts()
       }}
       show={this.cloudHost}

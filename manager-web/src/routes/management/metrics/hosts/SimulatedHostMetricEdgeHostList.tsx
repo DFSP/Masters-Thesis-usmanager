@@ -97,7 +97,7 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
       dropdown={{
         id: 'edgeHosts',
         title: 'Add edge host',
-        empty: 'No more edge hosts to add',
+        empty: 'No edge hosts to add',
         data: this.getSelectableEdgeHosts()
       }}
       show={this.edgeHost}

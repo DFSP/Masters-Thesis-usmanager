@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.master.exceptions.NotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
@@ -86,7 +87,7 @@ public class WorkerManagersService {
   }
 
   public WorkerManagerEntity launchWorkerManager(String host) {
-    log.debug("Launching worker manager at {}", host);
+    log.info("Launching worker manager at {}", host);
     String id = UUID.randomUUID().toString();
     ContainerEntity container = launchWorkerManager(host, id);
     WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
@@ -110,7 +111,7 @@ public class WorkerManagersService {
     workerManagers.delete(workerManager);
   }
 
-  public List<String> getAssignedMachines(String workerManagerId) {
+  public List<String> getAssignedHosts(String workerManagerId) {
     assertWorkerManagerExists(workerManagerId);
     List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
         .map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
@@ -119,9 +120,9 @@ public class WorkerManagersService {
     return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
   }
 
-  // machine is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
-  public void assignMachine(String workerManagerId, String hostname) {
-    WorkerManagerEntity workerManagerEntity = this.getWorkerManager(workerManagerId);
+  // host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
+  public void assignHost(String workerManagerId, String hostname) {
+    WorkerManagerEntity workerManagerEntity = getWorkerManager(workerManagerId);
     try {
       cloudHostsService.assignWorkerManager(workerManagerEntity, hostname);
     } catch (EntityNotFoundException ignored) {
@@ -129,20 +130,23 @@ public class WorkerManagersService {
     }
   }
 
-  public void assignMachines(String workerManagerId, List<String> machines) {
-    machines.forEach(machine -> assignMachine(workerManagerId, machine));
+  public void assignHosts(String workerManagerId, List<String> hosts) {
+    hosts.forEach(host -> assignHost(workerManagerId, host));
   }
 
-  public void unassignMachine(String workerManagerId, String machine) {
-    unassignMachines(workerManagerId, List.of(machine));
+  public void unassignHost(String workerManagerId, String host) {
+    unassignHosts(workerManagerId, List.of(host));
   }
 
-  public void unassignMachines(String workerManagerId, List<String> machines) {
+  public void unassignHosts(String workerManagerId, List<String> hosts) {
     var workerManager = getWorkerManager(workerManagerId);
-    log.info("Removing machines {}", machines);
-    machines.forEach(machine -> {
-      cloudHostsService.unassignWorkerManager(machine);
-      edgeHostsService.unassignWorkerManager(machine);
+    log.info("Removing hosts {}", hosts);
+    hosts.forEach(host -> {
+      try {
+        cloudHostsService.unassignWorkerManager(host);
+      } catch (NotFoundException ignored) {
+        edgeHostsService.unassignWorkerManager(host);
+      }
     });
     workerManagers.save(workerManager);
   }

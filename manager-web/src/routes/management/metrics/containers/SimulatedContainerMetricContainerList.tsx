@@ -98,7 +98,7 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
       dropdown={{
         id: 'containers',
         title: 'Add container',
-        empty: 'No more containers to add',
+        empty: 'No containers to add',
         data: this.getSelectableContainers()
       }}
       show={this.container}

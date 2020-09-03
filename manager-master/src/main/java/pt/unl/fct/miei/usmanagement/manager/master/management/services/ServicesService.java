@@ -91,18 +91,18 @@ public class ServicesService {
 
   public ServiceEntity addService(ServiceEntity service) {
     assertServiceDoesntExist(service);
-    log.debug("Saving service {}", ToStringBuilder.reflectionToString(service));
+    log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
     return services.save(service);
   }
 
   public ServiceEntity updateService(String serviceName, ServiceEntity newService) {
     var service = getService(serviceName);
-    log.debug("Updating service {} with {}",
+    log.info("Updating service {} with {}",
         ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
-    log.debug("Service before copying properties: {}",
+    log.info("Service before copying properties: {}",
         ToStringBuilder.reflectionToString(service));
     ObjectUtils.copyValidProperties(newService, service);
-    log.debug("Service after copying properties: {}",
+    log.info("Service after copying properties: {}",
         ToStringBuilder.reflectionToString(service));
     return services.save(service);
   }
@@ -307,7 +307,7 @@ public class ServicesService {
   public int getMinReplicasByServiceName(String serviceName) {
     Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
     if (customMinReplicas != null) {
-      log.debug("Found event prediction with {} replicas", customMinReplicas);
+      log.info("Found event prediction with {} replicas", customMinReplicas);
       return customMinReplicas;
     }
     return services.getMinReplicas(serviceName);

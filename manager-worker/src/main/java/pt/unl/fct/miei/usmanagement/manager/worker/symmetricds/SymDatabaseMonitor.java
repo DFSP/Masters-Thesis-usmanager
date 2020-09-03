@@ -63,6 +63,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
         Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
         String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
         String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
+        log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
         if (publicIpAddress != null) {
           // cloud host is running
           if (Objects.equals(id, newWorkerId)) {

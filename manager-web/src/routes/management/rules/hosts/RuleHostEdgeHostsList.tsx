@@ -93,7 +93,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'edgeHosts',
                              title: 'Add edge host',
-                             empty: 'No more edge hosts to add',
+                             empty: 'No edge hosts to add',
                              data: this.getSelectableEdgeHostNames()
                            }}
                            show={this.edgeHost}

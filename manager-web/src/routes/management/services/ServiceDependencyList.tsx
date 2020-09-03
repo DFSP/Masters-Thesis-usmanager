@@ -97,7 +97,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'dependencies',
                              title: 'Add dependency',
-                             empty: 'No more dependencies to add',
+                             empty: 'No dependencies to add',
                              data: this.getSelectableServicesNames()
                            }}
                            show={this.dependency}

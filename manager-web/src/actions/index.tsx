@@ -1640,38 +1640,37 @@ export function addWorkerManager(workerManager: IWorkerManager): EntitiesAction 
   }
 }
 
-export const WORKER_MANAGER_MACHINES_REQUEST = 'WORKER_MANAGER_MACHINES_REQUEST';
-export const WORKER_MANAGER_MACHINES_SUCCESS = 'WORKER_MANAGER_MACHINES_SUCCESS';
-export const WORKER_MANAGER_MACHINES_FAILURE = 'WORKER_MANAGER_MACHINES_FAILURE';
-export const loadWorkerManagerMachines = (id: string) => (dispatch: any) => {
-  return dispatch(fetchWorkerManagerMachines(id));
+export const WORKER_MANAGER_HOSTS_REQUEST = 'WORKER_MANAGER_HOSTS_REQUEST';
+export const WORKER_MANAGER_HOSTS_SUCCESS = 'WORKER_MANAGER_HOSTS_SUCCESS';
+export const WORKER_MANAGER_HOSTS_FAILURE = 'WORKER_MANAGER_HOSTS_FAILURE';
+export const loadWorkerManagerHosts = (id: string) => (dispatch: any) => {
+  return dispatch(fetchWorkerManagerHosts(id));
 };
-const fetchWorkerManagerMachines = (id: string) => ({
+const fetchWorkerManagerHosts = (id: string) => ({
   [CALL_API]: {
-    types: [WORKER_MANAGER_MACHINES_REQUEST, WORKER_MANAGER_MACHINES_SUCCESS, WORKER_MANAGER_MACHINES_FAILURE],
-    endpoint: `worker-managers/${id}/assigned-machines`,
-    schema: Schemas.WORKER_MANAGER_MACHINE_ARRAY,
+    types: [WORKER_MANAGER_HOSTS_REQUEST, WORKER_MANAGER_HOSTS_SUCCESS, WORKER_MANAGER_HOSTS_FAILURE],
+    endpoint: `worker-managers/${id}/assigned-hosts`,
     entity: id
   }
 });
 
 export const ASSIGN_WORKER_MANAGER_MACHINES = 'ASSIGN_WORKER_MANAGER_MACHINES';
 
-export function assignWorkerManagerMachines(id: string, machines: string[]): EntitiesAction {
+export function assignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
   return {
     type: ASSIGN_WORKER_MANAGER_MACHINES,
     entity: id,
-    data: {assignedMachines: machines}
+    data: {assignedHosts: hosts}
   }
 }
 
 export const UNASSIGN_WORKER_MANAGER_MACHINES = 'UNASSIGN_WORKER_MANAGER_MACHINES';
 
-export function unassignWorkerManagerMachines(id: string, machines: string[]): EntitiesAction {
+export function unassignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
   return {
     type: UNASSIGN_WORKER_MANAGER_MACHINES,
     entity: id,
-    data: {assignedMachines: machines}
+    data: {assignedHosts: hosts}
   }
 }
 

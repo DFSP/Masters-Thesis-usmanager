@@ -63,18 +63,18 @@ public class OperatorsService {
 
   public OperatorEntity addOperator(OperatorEntity operator) {
     assertOperatorDoesntExist(operator);
-    log.debug("Saving operator {}", ToStringBuilder.reflectionToString(operator));
+    log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
     return operators.save(operator);
   }
 
   public OperatorEntity updateOperator(String operatorName, OperatorEntity newOperator) {
     var operator = getOperator(operatorName);
-    log.debug("Updating operator {} with {}",
+    log.info("Updating operator {} with {}",
         ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
-    log.debug("operator before copying properties: {}",
+    log.info("operator before copying properties: {}",
         ToStringBuilder.reflectionToString(operator));
     ObjectUtils.copyValidProperties(newOperator, operator);
-    log.debug("operator after copying properties: {}",
+    log.info("operator after copying properties: {}",
         ToStringBuilder.reflectionToString(operator));
     operator = operators.save(operator);
     return operator;

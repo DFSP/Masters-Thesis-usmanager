@@ -72,13 +72,13 @@ public class ServiceSimulatedMetricsService {
 
   public ServiceSimulatedMetricEntity addServiceSimulatedMetric(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
     assertServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
-    log.debug("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
+    log.info("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
     return serviceSimulatedMetrics.save(serviceSimulatedMetric);
   }
 
   public ServiceSimulatedMetricEntity updateServiceSimulatedMetric(
       String simulatedMetricName, ServiceSimulatedMetricEntity newServiceSimulatedMetric) {
-    log.debug("Updating simulated service metric {} with {}", simulatedMetricName,
+    log.info("Updating simulated service metric {} with {}", simulatedMetricName,
         ToStringBuilder.reflectionToString(newServiceSimulatedMetric));
     ServiceSimulatedMetricEntity serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
     ObjectUtils.copyValidProperties(newServiceSimulatedMetric, serviceSimulatedMetric);
@@ -86,7 +86,7 @@ public class ServiceSimulatedMetricsService {
   }
 
   public void deleteServiceSimulatedMetric(String simulatedMetricName) {
-    log.debug("Deleting simulated service metric {}", simulatedMetricName);
+    log.info("Deleting simulated service metric {}", simulatedMetricName);
     ServiceSimulatedMetricEntity serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
     serviceSimulatedMetric.removeAssociations();
     serviceSimulatedMetrics.delete(serviceSimulatedMetric);
@@ -117,7 +117,7 @@ public class ServiceSimulatedMetricsService {
   }
 
   public void addServices(String simulatedMetricName, List<String> serviceNames) {
-    log.debug("Adding services {} to simulated metric {}", serviceNames, simulatedMetricName);
+    log.info("Adding services {} to simulated metric {}", serviceNames, simulatedMetricName);
     ServiceSimulatedMetricEntity serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
     serviceNames.forEach(serviceName -> {
       ServiceEntity service = servicesService.getService(serviceName);

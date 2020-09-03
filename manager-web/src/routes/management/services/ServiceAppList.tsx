@@ -112,7 +112,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
       dropdown={{
         id: 'apps',
         title: 'Add app',
-        empty: 'No more apps to add',
+        empty: 'No apps to add',
         data: this.getSelectableAppsNames(),
         onSelect: this.onSelectApp,
         formModal: {

@@ -88,13 +88,13 @@ public class ContainerRulesService {
 
   public ContainerRuleEntity addRule(ContainerRuleEntity rule) {
     assertRuleDoesntExist(rule);
-    log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
+    log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
     //setLastUpdateContainerRules();
     return rules.save(rule);
   }
 
   public ContainerRuleEntity updateRule(String ruleName, ContainerRuleEntity newRule) {
-    log.debug("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
+    log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
     ContainerRuleEntity rule = getRule(ruleName);
     ObjectUtils.copyValidProperties(newRule, rule);
     rule = rules.save(rule);
@@ -103,7 +103,7 @@ public class ContainerRulesService {
   }
 
   public void deleteRule(String ruleName) {
-    log.debug("Deleting rule {}", ruleName);
+    log.info("Deleting rule {}", ruleName);
     ContainerRuleEntity rule = getRule(ruleName);
     rule.removeAssociations();
     rules.delete(rule);
@@ -131,7 +131,7 @@ public class ContainerRulesService {
   }
 
   public void addCondition(String ruleName, String conditionName) {
-    log.debug("Adding condition {} to rule {}", conditionName, ruleName);
+    log.info("Adding condition {} to rule {}", conditionName, ruleName);
     ConditionEntity condition = conditionsService.getCondition(conditionName);
     ContainerRuleEntity rule = getRule(ruleName);
     ContainerRuleConditionEntity containerRuleCondition =
@@ -174,7 +174,7 @@ public class ContainerRulesService {
   }
 
   public void addContainers(String ruleName, List<String> containerIds) {
-    log.debug("Adding containers {} to rule {}", containerIds, ruleName);
+    log.info("Adding containers {} to rule {}", containerIds, ruleName);
     ContainerRuleEntity rule = getRule(ruleName);
     containerIds.forEach(containerId -> {
       ContainerEntity container = containersService.getContainer(containerId);

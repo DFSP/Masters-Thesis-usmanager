@@ -106,7 +106,7 @@ public class ContainersService {
 
   public ContainerEntity addContainer(ContainerEntity container) {
     assertContainerDoesntExist(container);
-    log.debug("Saving container {}", ToStringBuilder.reflectionToString(container));
+    log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
     return containers.save(container);
   }
 
@@ -164,7 +164,7 @@ public class ContainersService {
       if (!dockerContainerIds.contains(containerId)) {
         deleteContainer(containerId);
         containerIterator.remove();
-        log.debug("Removed invalid container {}", containerId);
+        log.info("Removed invalid container {}", containerId);
       }
     }
     // Add missing container entities
@@ -175,7 +175,7 @@ public class ContainersService {
         if (!hasContainer(containerId)) {
           ContainerEntity containerEntity = addContainerFromDockerContainer(dockerContainer);
           containers.add(containerEntity);
-          log.debug("Added missing container {}", containerId);
+          log.info("Added missing container {}", containerId);
         }
       }
     });

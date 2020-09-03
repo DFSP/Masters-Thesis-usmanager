@@ -75,18 +75,18 @@ public class AppsService {
 
   public AppEntity addApp(AppEntity app) {
     assertAppDoesntExist(app);
-    log.debug("Saving app {}", ToStringBuilder.reflectionToString(app));
+    log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
     return apps.save(app);
   }
 
   public AppEntity updateApp(String appName, AppEntity newApp) {
     var app = getApp(appName);
-    log.debug("Updating app {} with {}",
+    log.info("Updating app {} with {}",
         ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
-    log.debug("Service before copying properties: {}",
+    log.info("Service before copying properties: {}",
         ToStringBuilder.reflectionToString(app));
     ObjectUtils.copyValidProperties(newApp, app);
-    log.debug("Service after copying properties: {}",
+    log.info("Service after copying properties: {}",
         ToStringBuilder.reflectionToString(app));
     return apps.save(app);
   }

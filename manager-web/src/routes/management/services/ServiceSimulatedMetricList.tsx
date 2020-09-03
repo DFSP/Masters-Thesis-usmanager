@@ -94,7 +94,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'simulatedMetrics',
                              title: 'Add simulated metric',
-                             empty: 'No more simulated metrics to add',
+                             empty: 'No simulated metrics to add',
                              data: this.getSelectableSimulatedMetrics()
                            }}
                            show={this.simulatedMetric}

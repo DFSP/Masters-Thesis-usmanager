@@ -67,24 +67,24 @@ public class WorkerManagersController {
     workerManagersService.deleteWorkerManager(workerManagerId);
   }
 
-  @GetMapping("/{workerManagerId}/assigned-machines")
-  public List<String> getMachines(@PathVariable String workerManagerId) {
-    return workerManagersService.getAssignedMachines(workerManagerId);
+  @GetMapping("/{workerManagerId}/assigned-hosts")
+  public List<String> getHosts(@PathVariable String workerManagerId) {
+    return workerManagersService.getAssignedHosts(workerManagerId);
   }
 
-  @PostMapping("/{workerManagerId}/assigned-machines")
-  public void assignMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
-    workerManagersService.assignMachines(workerManagerId, Arrays.asList(machines));
+  @PostMapping("/{workerManagerId}/assigned-hosts")
+  public void assignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
+    workerManagersService.assignHosts(workerManagerId, Arrays.asList(hosts));
   }
 
-  @DeleteMapping("/{workerManagerId}/assigned-machines")
-  public void unassignMachines(@PathVariable String workerManagerId, @RequestBody String[] machines) {
-    workerManagersService.unassignMachines(workerManagerId, Arrays.asList(machines));
+  @DeleteMapping("/{workerManagerId}/assigned-hosts")
+  public void unassignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
+    workerManagersService.unassignHosts(workerManagerId, Arrays.asList(hosts));
   }
 
-  @DeleteMapping("/{workerManagerId}/assigned-machines/{hostname}")
-  public void removeMachine(@PathVariable String workerManagerId, @PathVariable String hostname) {
-    workerManagersService.unassignMachine(workerManagerId, hostname);
+  @DeleteMapping("/{workerManagerId}/assigned-hosts/{hostname}")
+  public void removeHost(@PathVariable String workerManagerId, @PathVariable String hostname) {
+    workerManagersService.unassignHost(workerManagerId, hostname);
   }
 
 }

@@ -93,7 +93,7 @@ public class CloudHostsService {
 
   public CloudHostEntity getCloudHostByIp(String ipAddress) {
     return cloudHosts.findByPublicIpAddress(ipAddress).orElseThrow(() ->
-        new EntityNotFoundException(CloudHostEntity.class, "hostname", ipAddress));
+        new EntityNotFoundException(CloudHostEntity.class, "ipAddress", ipAddress));
   }
 
   public CloudHostEntity getCloudHostByIdOrIp(String value) {
@@ -102,7 +102,7 @@ public class CloudHostsService {
   }
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
-    log.debug("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
+    log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
     return cloudHosts.save(cloudHost);
   }
 
@@ -210,14 +210,14 @@ public class CloudHostsService {
       if (!awsInstancesIds.containsKey(instanceId)) {
         this.cloudHosts.delete(cloudHost);
         cloudHostsIterator.remove();
-        log.debug("Removing invalid cloud host {}", instanceId);
+        log.info("Removing invalid cloud host {}", instanceId);
       } else {
         Instance instance = awsInstancesIds.get(instanceId);
         InstanceState currentState = instance.getState();
         InstanceState savedState = cloudHost.getState();
         if (currentState != savedState) {
           CloudHostEntity newCloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
-          log.debug("Updating cloud host {} from {} to {}", instanceId, ToStringBuilder.reflectionToString(cloudHost),
+          log.info("Updating cloud host {} from {} to {}", instanceId, ToStringBuilder.reflectionToString(cloudHost),
               ToStringBuilder.reflectionToString(newCloudHost));
         }
       }
@@ -228,7 +228,7 @@ public class CloudHostsService {
       if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode() && !hasCloudHost(instanceId)) {
         CloudHostEntity cloudHost = addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
         cloudHosts.add(cloudHost);
-        log.debug("Added missing cloud host {}", instanceId);
+        log.info("Added missing cloud host {}", instanceId);
       }
     });
     return cloudHosts;
@@ -301,7 +301,7 @@ public class CloudHostsService {
   }
 
   public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String cloudHost) {
-    log.debug("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
+    log.info("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
     CloudHostEntity cloudHostEntity = getCloudHostByIp(cloudHost).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();
@@ -309,7 +309,7 @@ public class CloudHostsService {
   }
 
   public void unassignWorkerManager(String cloudHost) {
-    CloudHostEntity cloudHostEntity = getCloudHostByIdOrIp(cloudHost).toBuilder()
+    CloudHostEntity cloudHostEntity = getCloudHostByIp(cloudHost).toBuilder()
         .managedByWorker(null)
         .build();
     cloudHosts.save(cloudHostEntity);

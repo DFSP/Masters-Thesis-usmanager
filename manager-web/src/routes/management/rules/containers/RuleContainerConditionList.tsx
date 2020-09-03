@@ -94,7 +94,7 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
       dropdown={{
         id: 'conditions',
         title: 'Add condition',
-        empty: 'No more conditions to add',
+        empty: 'No conditions to add',
         data: this.getSelectableConditionNames()
       }}
       show={this.condition}

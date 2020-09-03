@@ -93,7 +93,7 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
                            dropdown={{
                              id: 'services',
                              title: 'Add service',
-                             empty: 'No more services to add',
+                             empty: 'No services to add',
                              data: this.getSelectableServiceNames()
                            }}
                            show={this.service}

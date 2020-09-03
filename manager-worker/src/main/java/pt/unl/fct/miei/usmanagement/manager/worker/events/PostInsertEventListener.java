@@ -34,7 +34,7 @@ public class PostInsertEventListener implements org.hibernate.event.spi.PostInse
 
   @Override
   public void onPostInsert(PostInsertEvent event) {
-    log.debug("{}", event.getEntity());
+    log.info("{}", event.getEntity());
     if (event.getEntity() instanceof EdgeHostEntity) {
       EdgeHostEntity edgeHost = (EdgeHostEntity) event.getEntity();
       log.info(edgeHost.getHostname());

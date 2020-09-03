@@ -479,6 +479,7 @@ public class DatabaseLoader {
       } catch (EntityNotFoundException ignored) {
         workerManager = ServiceEntity.builder()
             .serviceName(WorkerManagerProperties.WORKER_MANAGER)
+            //TODO .dockerRepository(dockerHubUsername + "/manager-worker")
             .dockerRepository(dockerHubUsername + "/manager-worker")
             .defaultExternalPort("8081")
             .defaultInternalPort("8081")

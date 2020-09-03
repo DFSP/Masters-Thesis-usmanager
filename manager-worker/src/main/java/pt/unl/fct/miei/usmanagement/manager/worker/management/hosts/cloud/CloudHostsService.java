@@ -92,7 +92,7 @@ public class CloudHostsService {
   }
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
-    log.debug("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
+    log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
     return cloudHosts.save(cloudHost);
   }
 

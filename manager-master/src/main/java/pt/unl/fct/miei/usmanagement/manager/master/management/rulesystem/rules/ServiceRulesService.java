@@ -95,13 +95,13 @@ public class ServiceRulesService {
 
   public ServiceRuleEntity addRule(ServiceRuleEntity rule) {
     assertRuleDoesntExist(rule);
-    log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
+    log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
     setLastUpdateServiceRules();
     return rules.save(rule);
   }
 
   public ServiceRuleEntity updateRule(String ruleName, ServiceRuleEntity newRule) {
-    log.debug("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
+    log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
     ServiceRuleEntity rule = getRule(ruleName);
     ObjectUtils.copyValidProperties(newRule, rule);
     rule = rules.save(rule);
@@ -110,7 +110,7 @@ public class ServiceRulesService {
   }
 
   public void deleteRule(String ruleName) {
-    log.debug("Deleting rule {}", ruleName);
+    log.info("Deleting rule {}", ruleName);
     ServiceRuleEntity rule = getRule(ruleName);
     rule.removeAssociations();
     rules.delete(rule);
@@ -137,7 +137,7 @@ public class ServiceRulesService {
   }
 
   public void addCondition(String ruleName, String conditionName) {
-    log.debug("Adding condition {} to rule {}", conditionName, ruleName);
+    log.info("Adding condition {} to rule {}", conditionName, ruleName);
     ConditionEntity condition = conditionsService.getCondition(conditionName);
     ServiceRuleEntity rule = getRule(ruleName);
     ServiceRuleConditionEntity serviceRuleCondition =
@@ -180,7 +180,7 @@ public class ServiceRulesService {
   }
 
   public void addServices(String ruleName, List<String> serviceNames) {
-    log.debug("Adding services {} to rule {}", serviceNames, ruleName);
+    log.info("Adding services {} to rule {}", serviceNames, ruleName);
     ServiceRuleEntity rule = getRule(ruleName);
     serviceNames.forEach(serviceName -> {
       ServiceEntity service = servicesService.getService(serviceName);
