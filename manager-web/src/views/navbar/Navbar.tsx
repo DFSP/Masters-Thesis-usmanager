@@ -141,7 +141,7 @@ class Navbar extends React.Component<Props, State> {
                 </li>
                 <li>
                   <a className="tooltipped" data-tooltip="GitHub" data-position="bottom"
-                     href="https://github.com/usmanager/us-manager">
+                     href="https://github.com/usmanager/">
                     <i className="material-icons"><GoMarkGithub/></i>
                   </a>
                 </li>

@@ -55,14 +55,19 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 
   @Override
   public void afterWrite(DataContext context, Table table, CsvData data) {
-    if (context.getBatch().getChannelId().equals(Constants.CHANNEL_RELOAD)) {
+    final String channelId = context.getBatch().getChannelId();
+    if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
       String tableName = table.getName();
       if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-        Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
-        String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
-        Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
-        String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
-        String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
+        final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
+        System.out.println("Old values:");
+        oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
+        final String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
+        final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
+        System.out.println("New values:");
+        newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
+        final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
+        final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
         log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
         if (publicIpAddress != null) {
           // cloud host is running

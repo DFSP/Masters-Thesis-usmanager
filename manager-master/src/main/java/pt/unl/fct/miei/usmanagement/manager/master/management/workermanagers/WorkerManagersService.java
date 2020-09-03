@@ -116,7 +116,7 @@ public class WorkerManagersService {
     List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
         .map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
     List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
-        .map(EdgeHostEntity::getHostname).collect(Collectors.toList());
+        .map(EdgeHostEntity::getPublicIpAddress).collect(Collectors.toList());
     return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
   }
 
@@ -144,7 +144,7 @@ public class WorkerManagersService {
     hosts.forEach(host -> {
       try {
         cloudHostsService.unassignWorkerManager(host);
-      } catch (NotFoundException ignored) {
+      } catch (EntityNotFoundException ignored) {
         edgeHostsService.unassignWorkerManager(host);
       }
     });

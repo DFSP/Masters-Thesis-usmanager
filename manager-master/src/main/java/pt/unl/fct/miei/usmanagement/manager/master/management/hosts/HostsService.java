@@ -121,7 +121,7 @@ public class HostsService {
     String username = bashService.getUsername();
     String publicIp = bashService.getPublicIp();
     String privateIp = bashService.getPrivateIp();
-    if (mode == Mode.LOCAL && !edgeHostsService.hasEdgeHost(localMachineDns)) {
+    if ((mode == null || mode == Mode.LOCAL) && !edgeHostsService.hasEdgeHost(localMachineDns)) {
       edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
           .username(username)
           .publicDnsName(localMachineDns)
@@ -141,10 +141,11 @@ public class HostsService {
   public void clusterHosts() {
     log.info("Clustering hosts into the swarm on mode {}...", mode);
     setupHost(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), NodeRole.MANAGER);
-    if (mode == Mode.LOCAL) {
+    if (mode == null || mode == Mode.LOCAL) {
       getLocalWorkerNodes().forEach(edgeHost ->
           setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER));
-    } else if (mode == Mode.GLOBAL) {
+    }
+    if (mode == null || mode == Mode.GLOBAL) {
       getCloudWorkerNodes().forEach(cloudHost ->
           setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER));
     }
