@@ -7,7 +7,7 @@ COPY src ./src
 COPY pom.xml .
 RUN mvn -DskipTests -f pom.xml clean package
 
-COPY target/*.jar ./manager-worker.jar
+COPY ./target/*.jar ./manager-worker.jar
 EXPOSE 8081
 ENV master 127.0.0.1
 
