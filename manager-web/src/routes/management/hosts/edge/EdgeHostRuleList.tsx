@@ -76,8 +76,8 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    const previousHostname = prevProps.edgeHost?.publicDnsName || prevProps.edgeHost?.publicIpAddress;
-    const currentHostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    const previousHostname = prevProps.edgeHost?.publicIpAddress;
+    const currentHostname = this.props.edgeHost?.publicIpAddress;
     if (previousHostname !== currentHostname) {
       this.loadEntities();
     }
@@ -102,7 +102,7 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `hosts/edge/${this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress}/rules`,
+                             url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}
@@ -110,7 +110,7 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
   }
 
   private loadEntities = () => {
-    const hostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    const hostname = this.props.edgeHost?.publicIpAddress;
     if (hostname) {
       this.props.loadEdgeHostRules(hostname);
     }
@@ -155,7 +155,7 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
     this.props.onRemoveHostRules(rules);
 
   private onDeleteSuccess = (rules: string[]): void => {
-    const hostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    const hostname = this.props.edgeHost?.publicIpAddress;
     if (hostname) {
       this.props.removeEdgeHostRules(hostname, rules);
     }
@@ -175,7 +175,7 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
-  const hostname = ownProps.edgeHost?.publicDnsName || ownProps.edgeHost?.publicIpAddress;
+  const hostname = ownProps.edgeHost?.publicIpAddress;
   const host = hostname && state.entities.hosts.edge.data[hostname];
   const rulesNames = host && host.hostRules;
   return {

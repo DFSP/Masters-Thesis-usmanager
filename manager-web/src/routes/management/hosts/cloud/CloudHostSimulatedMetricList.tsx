@@ -48,8 +48,8 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadSimulatedHostMetrics: (name?: string) => any;
-  loadCloudHostSimulatedMetrics: (instanceId: string) => void;
-  removeCloudHostSimulatedMetrics: (instanceId: string, simulatedMetrics: string[]) => void;
+  loadCloudHostSimulatedMetrics: (cloudHost: string) => void;
+  removeCloudHostSimulatedMetrics: (cloudHost: string, simulatedMetrics: string[]) => void;
 }
 
 interface HostSimulatedMetricListProps {
@@ -112,9 +112,9 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
   }
 
   private loadEntities = () => {
-    if (this.props.cloudHost?.instanceId) {
-      const {instanceId} = this.props.cloudHost;
-      this.props.loadCloudHostSimulatedMetrics(instanceId);
+    const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
+    if (hostname) {
+      this.props.loadCloudHostSimulatedMetrics(hostname);
     }
   };
 
@@ -157,9 +157,9 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
     this.props.onRemoveSimulatedHostMetrics(simulatedMetrics);
 
   private onDeleteSuccess = (simulatedMetrics: string[]): void => {
-    if (this.props.cloudHost?.instanceId) {
-      const {instanceId} = this.props.cloudHost;
-      this.props.removeCloudHostSimulatedMetrics(instanceId, simulatedMetrics);
+    const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
+    if (hostname) {
+      this.props.removeCloudHostSimulatedMetrics(hostname, simulatedMetrics);
     }
   };
 
@@ -174,8 +174,8 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostSimulatedMetricListProps): StateToProps {
-  const instanceId = ownProps.cloudHost?.instanceId;
-  const host = instanceId && state.entities.hosts.cloud.data[instanceId];
+  const hostname =  ownProps.cloudHost?.publicIpAddress || ownProps.cloudHost?.instanceId;
+  const host = hostname && state.entities.hosts.cloud.data[hostname];
   const simulatedMetricsName = host && host.hostSimulatedMetrics;
   return {
     isLoading: state.entities.hosts.cloud.isLoadingSimulatedMetrics,

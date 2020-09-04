@@ -280,7 +280,8 @@ class WorkerManager extends BaseComponent<Props, State> {
                     <Field<IContainer> key={index}
                                        id={key}
                                        label={key + " id"}
-                                       valueToString={this.containerIdField}/>
+                                       valueToString={this.containerIdField}
+                                       icon={{linkedTo: `/containers`}}/>
                     <Field<IContainer> key={index + 1} // index + 1 is ok unless there are more fields after this one
                                        id={key}
                                        label={"hostname"}
@@ -298,11 +299,11 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   private assignHosts = (): JSX.Element =>
     <AssignedHostsList isLoadingWorkerManager={this.props.isLoading}
-                          loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
-                          workerManager={this.getWorkerManager()}
-                          unSavedHosts={this.state.unsavedHosts}
-                          onAssignHost={this.assignHost}
-                          onUnassignHosts={this.unassignHosts}/>;
+                       loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
+                       workerManager={this.getWorkerManager()}
+                       unSavedHosts={this.state.unsavedHosts}
+                       onAssignHost={this.assignHost}
+                       onUnassignHosts={this.unassignHosts}/>;
 
   private tabs = (): Tab[] => [
     {

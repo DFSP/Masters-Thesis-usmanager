@@ -35,10 +35,10 @@ type Props = EdgeHostCardProps;
 
 const CardEdgeHost = Card<IEdgeHost>();
 const EdgeHostCard = ({edgeHost}: Props) => (
-  <CardEdgeHost title={edgeHost.publicDnsName || edgeHost.publicIpAddress}
+  <CardEdgeHost title={edgeHost.publicIpAddress}
                 link={{
                   to: {
-                    pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`,
+                    pathname: `/hosts/edge/${edgeHost.publicIpAddress}`,
                     state: edgeHost
                   }
                 }}

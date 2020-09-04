@@ -111,7 +111,7 @@ public class HostsService {
     this.prometheusService = prometheusService;
     this.locationRequestService = locationRequestService;
     this.regionsService = regionsService;
-    this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
+    this.maxWorkers = dockerProperties.getSwarm().getInitialMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
     this.localMachineDns = hostProperties.getLocalMachineDns();
     this.mode = managerMasterProperties.getMode();
@@ -153,7 +153,7 @@ public class HostsService {
 
   private List<CloudHostEntity> getCloudWorkerNodes() {
     int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
-    int maxInstances = Math.max(this.maxInstances, maxWorkers);
+    int maxInstances = Math.min(this.maxInstances, maxWorkers);
     List<CloudHostEntity> cloudHosts = new ArrayList<>(maxInstances);
     for (var i = 0; i < maxInstances; i++) {
       cloudHosts.add(chooseCloudHost());
@@ -214,7 +214,18 @@ public class HostsService {
   }
 
   private SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
-    return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
+    try {
+      return nodesService.getHostNode(publicIpAddress);
+      /*if (node.getRole() == role) {
+        return dockerSwarmService.rejoinSwarm(node.getId());
+      } else {
+        dockerSwarmService.leaveSwarm(publicIpAddress);
+        //nodesService.removeNode(node.getId());
+        return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
+      }*/
+    } catch (EntityNotFoundException nodeNotFound) {
+      return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
+    }
   }
 
   public List<String> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
@@ -321,16 +332,16 @@ public class HostsService {
     String publicIpAddress;
     String privateIpAddress;
     try {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
-      publicIpAddress = edgeHost.getPublicIpAddress();
-      privateIpAddress = edgeHost.getPrivateIpAddress();
-    } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
       if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
         cloudHost = cloudHostsService.startCloudHost(host, false);
       }
       publicIpAddress = cloudHost.getPublicIpAddress();
       privateIpAddress = cloudHost.getPrivateIpAddress();
+    } catch (EntityNotFoundException e) {
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
+      publicIpAddress = edgeHost.getPublicIpAddress();
+      privateIpAddress = edgeHost.getPrivateIpAddress();
     }
     return setupHost(publicIpAddress, privateIpAddress, role);
   }
@@ -341,10 +352,6 @@ public class HostsService {
             DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> containersService.stopContainer(c.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
-  }
-
-  private boolean isCloudHost(String hostname) {
-    return cloudHostsService.hasCloudHostByHostname(hostname);
   }
 
   private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {

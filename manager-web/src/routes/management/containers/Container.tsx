@@ -119,6 +119,8 @@ interface StateToProps {
   formContainer?: Partial<IContainer> | INewContainer;
   nodes: { [key: string]: INode };
   services: { [key: string]: IService };
+  cloudHosts: { [key: string]: ICloudHost };
+  edgeHosts: { [key: string]: IEdgeHost };
 }
 
 interface DispatchToProps {
@@ -456,6 +458,16 @@ class Container extends BaseComponent<Props, State> {
     });
   };
 
+  private hostnameLink = (hostname: string) => {
+    if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
+      return '/hosts/cloud';
+    }
+    if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname))  {
+      return '/hosts/edge';
+    }
+    return null;
+  }
+
   private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element =>
     isNew ?
       <>
@@ -487,16 +499,21 @@ class Container extends BaseComponent<Props, State> {
       </>
       :
       <>
-        {Object.entries(formContainer).map(([key, value], index) => {
-          return key === 'created'
+        {Object.entries(formContainer).map(([key, value], index) =>
+          key === 'created'
             ? <Field key={index}
                      id={key}
                      label={key}
                      type={"date"}/>
+            : key === 'hostname'
+            ? <Field key={index}
+                     id={key}
+                     label={key}
+                     icon={{linkedTo: this.hostnameLink}}/>
             : <Field key={index}
                      id={key}
                      label={key}/>
-        })}
+        )}
       </>;
 
   private container = () => {
@@ -659,6 +676,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   }
   const nodes = state.entities.nodes.data;
   const services = state.entities.services.data;
+  const cloudHosts = state.entities.hosts.cloud.data;
+  const edgeHosts = state.entities.hosts.edge.data;
   return {
     isLoading,
     error,
@@ -666,7 +685,9 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     container,
     formContainer,
     nodes,
-    services
+    services,
+    cloudHosts,
+    edgeHosts
   }
 }
 

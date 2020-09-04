@@ -530,30 +530,30 @@ export const CLOUD_HOST_RULES_FAILURE = 'CLOUD_HOST_RULES_FAILURE';
 export const loadCloudHostRules = (instanceId: string) => (dispatch: any) => {
   return dispatch(fetchCloudHostRules(instanceId));
 };
-const fetchCloudHostRules = (instanceId: string) => ({
+const fetchCloudHostRules = (cloudHost: string) => ({
   [CALL_API]: {
     types: [CLOUD_HOST_RULES_REQUEST, CLOUD_HOST_RULES_SUCCESS, CLOUD_HOST_RULES_FAILURE],
-    endpoint: `hosts/cloud/${instanceId}/rules`,
+    endpoint: `hosts/cloud/${cloudHost}/rules`,
     schema: Schemas.CLOUD_HOST_RULE_ARRAY,
-    entity: instanceId
+    entity: cloudHost
   }
 });
 export const ADD_CLOUD_HOST_RULE = 'ADD_CLOUD_HOST_RULE';
 
-export function addCloudHostRule(instanceId: string, rule: string): EntitiesAction {
+export function addCloudHostRule(cloudHost: string, rule: string): EntitiesAction {
   return {
     type: ADD_CLOUD_HOST_RULE,
-    entity: instanceId,
+    entity: cloudHost,
     data: {rulesNames: new Array(rule)}
   }
 }
 
 export const REMOVE_CLOUD_HOST_RULES = 'REMOVE_CLOUD_HOST_RULES';
 
-export function removeCloudHostRules(instanceId: string, rules: string[]): EntitiesAction {
+export function removeCloudHostRules(cloudHost: string, rules: string[]): EntitiesAction {
   return {
     type: REMOVE_CLOUD_HOST_RULES,
-    entity: instanceId,
+    entity: cloudHost,
     data: {rulesNames: rules}
   }
 }
@@ -561,33 +561,33 @@ export function removeCloudHostRules(instanceId: string, rules: string[]): Entit
 export const CLOUD_HOST_SIMULATED_METRICS_REQUEST = 'CLOUD_HOST_SIMULATED_METRICS_REQUEST';
 export const CLOUD_HOST_SIMULATED_METRICS_SUCCESS = 'CLOUD_HOST_SIMULATED_METRICS_SUCCESS';
 export const CLOUD_HOST_SIMULATED_METRICS_FAILURE = 'CLOUD_HOST_SIMULATED_METRICS_FAILURE';
-export const loadCloudHostSimulatedMetrics = (instanceId: string) => (dispatch: any) => {
-  return dispatch(fetchCloudHostSimulatedMetrics(instanceId));
+export const loadCloudHostSimulatedMetrics = (cloudHost: string) => (dispatch: any) => {
+  return dispatch(fetchCloudHostSimulatedMetrics(cloudHost));
 };
-const fetchCloudHostSimulatedMetrics = (instanceId: string) => ({
+const fetchCloudHostSimulatedMetrics = (cloudHost: string) => ({
   [CALL_API]: {
     types: [CLOUD_HOST_SIMULATED_METRICS_REQUEST, CLOUD_HOST_SIMULATED_METRICS_SUCCESS, CLOUD_HOST_SIMULATED_METRICS_FAILURE],
-    endpoint: `hosts/cloud/${instanceId}/simulated-metrics`,
+    endpoint: `hosts/cloud/${cloudHost}/simulated-metrics`,
     schema: Schemas.CLOUD_HOST_SIMULATED_METRIC_ARRAY,
-    entity: instanceId
+    entity: cloudHost
   }
 });
 export const ADD_CLOUD_HOST_SIMULATED_METRICS = 'ADD_CLOUD_HOST_SIMULATED_METRICS';
 
-export function addCloudHostSimulatedMetrics(instanceId: string, simulatedMetrics: string[]): EntitiesAction {
+export function addCloudHostSimulatedMetrics(cloudHost: string, simulatedMetrics: string[]): EntitiesAction {
   return {
     type: ADD_CLOUD_HOST_SIMULATED_METRICS,
-    entity: instanceId,
+    entity: cloudHost,
     data: {simulatedMetricNames: simulatedMetrics}
   }
 }
 
 export const REMOVE_CLOUD_HOST_SIMULATED_METRICS = 'REMOVE_CLOUD_HOST_SIMULATED_METRICS';
 
-export function removeCloudHostSimulatedMetrics(instanceId: string, simulatedMetrics: string[]): EntitiesAction {
+export function removeCloudHostSimulatedMetrics(cloudHost: string, simulatedMetrics: string[]): EntitiesAction {
   return {
     type: REMOVE_CLOUD_HOST_SIMULATED_METRICS,
-    entity: instanceId,
+    entity: cloudHost,
     data: {simulatedMetricNames: simulatedMetrics}
   }
 }

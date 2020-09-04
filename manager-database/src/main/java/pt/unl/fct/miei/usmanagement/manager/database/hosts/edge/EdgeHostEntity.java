@@ -85,12 +85,15 @@ public class EdgeHostEntity {
   private String city;
 
   //@NotNull
+  @JsonIgnore
   private String address;
 
   //@NotNull
+  @JsonIgnore
   private Double latitude;
 
   //@NotNull
+  @JsonIgnore
   private Double longitude;
 
   @JsonIgnoreProperties({"edgeHost", "cloudHost"})
@@ -140,10 +143,12 @@ public class EdgeHostEntity {
     hostMetric.getEdgeHosts().remove(this);
   }
 
+  @JsonIgnore
   public HostAddress getAddress() {
     return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress);
   }
 
+  @JsonIgnore
   public HostLocation getLocation() {
     return new HostLocation(city, country, region.getName(), getContinent());
   }

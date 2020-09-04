@@ -66,6 +66,7 @@ export interface IEdgeHost extends IDatabaseData {
   region: IRegion;
   country: string;
   city: string;
+
   worker: IWorkerManager;
   managedByWorker: IWorkerManager;
   hostRules?: string[];
@@ -164,7 +165,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
     const edgeHost = reply.data;
-    const hostname = edgeHost.publicDnsName || edgeHost.publicIpAddress;
+    const hostname = edgeHost.publicIpAddress;
     super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} saved</span>`);
     this.props.addEdgeHost(edgeHost);
     this.saveEntities(edgeHost);
@@ -175,11 +176,11 @@ class EdgeHost extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to save <b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
+    super.toast(`Unable to save <b>${edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
     const edgeHost = reply.data;
-    const hostname = edgeHost.publicDnsName || edgeHost.publicIpAddress;
+    const hostname = edgeHost.publicIpAddress;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
     this.saveEntities(edgeHost);
     const previousEdgeHost = this.getEdgeHost();
@@ -188,22 +189,22 @@ class EdgeHost extends BaseComponent<Props, State> {
     }
     if (this.mounted) {
       this.updateEdgeHost(edgeHost);
-      this.props.history.replace(edgeHost.publicDnsName || edgeHost.publicIpAddress);
+      this.props.history.replace(edgeHost.publicIpAddress);
     }
   };
 
   private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+    super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
 
   private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-    super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b> successfully removed</span>`);
+    super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/hosts/edge`)
     }
   };
 
   private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
     !!this.state.unsavedRules.length
@@ -229,21 +230,21 @@ class EdgeHost extends BaseComponent<Props, State> {
   private saveEdgeHostRules = (edgeHost: IEdgeHost): void => {
     const {unsavedRules} = this.state;
     if (unsavedRules.length) {
-      postData(`hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}/rules`, unsavedRules,
+      postData(`hosts/edge/${edgeHost.publicIpAddress}/rules`, unsavedRules,
         () => this.onSaveRulesSuccess(edgeHost),
         (reason) => this.onSaveRulesFailure(edgeHost, reason));
     }
   };
 
   private onSaveRulesSuccess = (edgeHost: IEdgeHost): void => {
-    this.props.addEdgeHostRules(edgeHost.publicDnsName || edgeHost.publicIpAddress, this.state.unsavedRules);
+    this.props.addEdgeHostRules(edgeHost.publicIpAddress, this.state.unsavedRules);
     if (this.mounted) {
       this.setState({unsavedRules: []});
     }
   };
 
   private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
-    super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+    super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
 
   private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
     this.setState({
@@ -260,21 +261,21 @@ class EdgeHost extends BaseComponent<Props, State> {
   private saveEdgeHostSimulatedMetrics = (edgeHost: IEdgeHost): void => {
     const {unsavedSimulatedMetrics} = this.state;
     if (unsavedSimulatedMetrics.length) {
-      postData(`hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}/simulated-metrics`, unsavedSimulatedMetrics,
+      postData(`hosts/edge/${edgeHost.publicIpAddress}/simulated-metrics`, unsavedSimulatedMetrics,
         () => this.onSaveSimulatedMetricsSuccess(edgeHost),
         (reason) => this.onSaveSimulatedMetricsFailure(edgeHost, reason));
     }
   };
 
   private onSaveSimulatedMetricsSuccess = (edgeHost: IEdgeHost): void => {
-    this.props.addEdgeHostSimulatedMetrics(edgeHost.publicDnsName || edgeHost.publicIpAddress, this.state.unsavedSimulatedMetrics);
+    this.props.addEdgeHostSimulatedMetrics(edgeHost.publicIpAddress, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
       this.setState({unsavedSimulatedMetrics: []});
     }
   };
 
   private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
-    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
@@ -334,12 +335,12 @@ class EdgeHost extends BaseComponent<Props, State> {
                   failureCallback: this.onPostFailure
                 }}
                 put={{
-                  url: `hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`,
+                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
                   successCallback: this.onPutSuccess,
                   failureCallback: this.onPutFailure
                 }}
                 delete={{
-                  url: `hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`,
+                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure
                 }}
@@ -414,12 +415,12 @@ class EdgeHost extends BaseComponent<Props, State> {
     },
     {
       title: 'Rules',
-      id: 'edgeRules',
+      id: 'rules',
       content: () => this.rules()
     },
     {
       title: 'Generic rules',
-      id: 'genericEdgeRules',
+      id: 'genericRules',
       content: () => this.genericRules()
     },
     {

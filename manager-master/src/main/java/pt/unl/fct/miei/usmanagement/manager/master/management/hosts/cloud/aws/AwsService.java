@@ -210,33 +210,33 @@ public class AwsService {
     ec2.terminateInstances(request);
   }
 
-  private Instance setInstanceState(String instanceId, AwsInstanceState state) {
+  private Instance setInstanceState(String hostname, AwsInstanceState state) {
     for (var tries = 0; tries < awsMaxRetries; tries++) {
-      Instance instance = getInstance(instanceId);
+      Instance instance = getInstance(hostname);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
-        log.info("Instance {} is already on state {}", instanceId, state.getState());
+        log.info("Instance {} is already on state {}", hostname, state.getState());
         return instance;
       }
       try {
         switch (state) {
           case RUNNING:
-            startInstanceById(instanceId);
+            startInstanceById(hostname);
             break;
           case STOPPED:
-            stopInstanceById(instanceId);
+            stopInstanceById(hostname);
             break;
           case TERMINATED:
-            terminateInstanceById(instanceId);
+            terminateInstanceById(hostname);
             break;
           default:
             throw new UnsupportedOperationException();
         }
-        instance = waitInstanceState(instanceId, state);
-        log.info("Setting instance {} to {} state", instanceId, state.getState());
+        instance = waitInstanceState(hostname, state);
+        log.info("Setting instance {} to {} state", hostname, state.getState());
         return instance;
       } catch (MasterManagerException e) {
-        log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());
+        log.info("Failed to set instance {} to {} state: {}", hostname, state.getState(), e.getMessage());
       }
       Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
     }

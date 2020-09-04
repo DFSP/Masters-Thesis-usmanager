@@ -227,7 +227,7 @@ class Node extends BaseComponent<Props, State> {
     super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
   private onDeleteSuccess = (node: INode): void => {
-    super.toast(`<span class="green-text">Host <b class="white-text">${node.hostname}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes some seconds to update.'}</span>`);
+    super.toast(`<span class="green-text">Host <b class="white-text">${node.hostname}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
     if (this.mounted) {
       this.props.history.push(`/nodes`);
     }
@@ -315,6 +315,16 @@ class Node extends BaseComponent<Props, State> {
   private regionDropdownOption = (region: IRegion) =>
     region.name;
 
+  private hostnameLink = (hostname: string) => {
+    if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
+      return '/hosts/cloud';
+    }
+    if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname))  {
+      return '/hosts/edge';
+    }
+    return null;
+  }
+
   private formFields = (isNew: boolean) => {
     const formNode = this.getFormNode();
     const {currentForm} = this.state;
@@ -390,10 +400,15 @@ class Node extends BaseComponent<Props, State> {
                                 defaultValue: "Select role",
                                 values: ['MANAGER', 'WORKER']
                               }}/>
-                     : <Field key={index}
-                              id={key}
-                              label={key}
-                              disabled={true}/>)
+                     : key === 'hostname'
+                       ? <Field key={index}
+                                id={key}
+                                label={key}
+                                icon={{linkedTo: this.hostnameLink}}/>
+                       : <Field key={index}
+                               id={key}
+                               label={key}
+                               disabled={true}/>)
     );
   };
 

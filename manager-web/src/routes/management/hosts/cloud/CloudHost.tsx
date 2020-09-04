@@ -107,8 +107,8 @@ interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => void;
   addCloudHost: (cloudHost: ICloudHost) => void;
   updateCloudHost: (previousCloudHost: ICloudHost, currentCloudHost: ICloudHost) => void;
-  addCloudHostRule: (instanceId: string, ruleName: string) => void;
-  addCloudHostSimulatedMetrics: (instanceId: string, simulatedMetrics: string[]) => void;
+  addCloudHostRule: (cloudHost: string, ruleName: string) => void;
+  addCloudHostSimulatedMetrics: (cloudHost: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -215,7 +215,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onSaveRulesSuccess = (cloudHost: ICloudHost): void => {
-    this.state.unsavedRules.forEach(rule => this.props.addCloudHostRule(cloudHost.instanceId, rule));
+    this.state.unsavedRules.forEach(rule => this.props.addCloudHostRule(cloudHost.publicIpAddress || cloudHost.instanceId, rule));
     if (this.mounted) {
       this.setState({unsavedRules: []});
     }
@@ -246,7 +246,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onSaveSimulatedMetricsSuccess = (cloudHost: ICloudHost): void => {
-    this.props.addCloudHostSimulatedMetrics(cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
+    this.props.addCloudHostSimulatedMetrics(cloudHost.publicIpAddress || cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
     if (this.mounted) {
       this.setState({unsavedSimulatedMetrics: []});
     }
@@ -471,12 +471,12 @@ class CloudHost extends BaseComponent<Props, State> {
     },
     {
       title: 'Rules',
-      id: 'cloudRules',
+      id: 'rules',
       content: () => this.rules()
     },
     {
       title: 'Generic rules',
-      id: 'genericEdgeRules',
+      id: 'genericRules',
       content: () => this.genericRules()
     },
     {

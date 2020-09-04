@@ -150,23 +150,23 @@ public class CloudHostsService {
     return startCloudHost(cloudHost.getInstanceId(), addToSwarm);
   }
 
-  public CloudHostEntity startCloudHost(String instanceId, boolean addToSwarm) {
-    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
+  public CloudHostEntity startCloudHost(String hostname, boolean addToSwarm) {
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.PENDING.getCode())
         .withName(AwsInstanceState.PENDING.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
-    Instance instance = awsService.startInstance(instanceId);
+    Instance instance = awsService.startInstance(cloudHost.getInstanceId());
     cloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
     if (addToSwarm) {
-      hostsService.addHost(instanceId, NodeRole.WORKER);
+      hostsService.addHost(hostname, NodeRole.WORKER);
     }
     return cloudHost;
   }
 
-  public CloudHostEntity stopCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
+  public CloudHostEntity stopCloudHost(String hostname) {
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (MasterManagerException e) {
@@ -177,12 +177,12 @@ public class CloudHostsService {
         .withName(AwsInstanceState.STOPPING.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
-    Instance instance = awsService.stopInstance(instanceId);
+    Instance instance = awsService.stopInstance(cloudHost.getInstanceId());
     return saveCloudHostFromInstance(cloudHost.getId(), instance);
   }
 
-  public void terminateCloudHost(String instanceId) {
-    CloudHostEntity cloudHost = getCloudHostByIdOrIp(instanceId);
+  public void terminateCloudHost(String hostname) {
+    CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
     try {
       hostsService.removeHost(cloudHost.getPublicIpAddress());
     } catch (MasterManagerException e) {
@@ -193,7 +193,7 @@ public class CloudHostsService {
         .withName(AwsInstanceState.SHUTTING_DOWN.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
-    awsService.terminateInstance(instanceId);
+    awsService.terminateInstance(cloudHost.getInstanceId());
     cloudHosts.delete(cloudHost);
   }
 
@@ -234,98 +234,94 @@ public class CloudHostsService {
     return cloudHosts;
   }
 
-  public List<HostRuleEntity> getRules(String instanceId) {
-    assertHostExists(instanceId);
-    return cloudHosts.getRules(instanceId);
+  public List<HostRuleEntity> getRules(String hostname) {
+    assertHostExists(hostname);
+    return cloudHosts.getRules(hostname);
   }
 
-  public HostRuleEntity getRule(String instanceId, String ruleName) {
-    assertHostExists(instanceId);
-    return cloudHosts.getRule(instanceId, ruleName).orElseThrow(() ->
+  public HostRuleEntity getRule(String hostname, String ruleName) {
+    assertHostExists(hostname);
+    return cloudHosts.getRule(hostname, ruleName).orElseThrow(() ->
         new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
     );
   }
 
-  public void addRule(String instanceId, String ruleName) {
-    assertHostExists(instanceId);
-    hostRulesService.addCloudHost(ruleName, instanceId);
+  public void addRule(String hostname, String ruleName) {
+    assertHostExists(hostname);
+    hostRulesService.addCloudHost(ruleName, hostname);
   }
 
-  public void addRules(String instanceId, List<String> ruleNames) {
-    assertHostExists(instanceId);
-    ruleNames.forEach(rule -> hostRulesService.addCloudHost(rule, instanceId));
+  public void addRules(String hostname, List<String> ruleNames) {
+    assertHostExists(hostname);
+    ruleNames.forEach(rule -> hostRulesService.addCloudHost(rule, hostname));
   }
 
-  public void removeRule(String instanceId, String ruleName) {
-    assertHostExists(instanceId);
-    hostRulesService.removeCloudHost(ruleName, instanceId);
+  public void removeRule(String hostname, String ruleName) {
+    assertHostExists(hostname);
+    hostRulesService.removeCloudHost(ruleName, hostname);
   }
 
-  public void removeRules(String instanceId, List<String> ruleNames) {
-    assertHostExists(instanceId);
-    ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, instanceId));
+  public void removeRules(String hostname, List<String> ruleNames) {
+    assertHostExists(hostname);
+    ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, hostname));
   }
 
-  public List<HostSimulatedMetricEntity> getSimulatedMetrics(String instanceId) {
-    assertHostExists(instanceId);
-    return cloudHosts.getSimulatedMetrics(instanceId);
+  public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
+    assertHostExists(hostname);
+    return cloudHosts.getSimulatedMetrics(hostname);
   }
 
-  public HostSimulatedMetricEntity getSimulatedMetric(String instanceId, String simulatedMetricName) {
-    assertHostExists(instanceId);
-    return cloudHosts.getSimulatedMetric(instanceId, simulatedMetricName).orElseThrow(() ->
+  public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    return cloudHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
         new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
     );
   }
 
-  public void addSimulatedMetric(String instanceId, String simulatedMetricName) {
-    assertHostExists(instanceId);
-    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
+  public void addSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, hostname);
   }
 
-  public void addSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
-    assertHostExists(instanceId);
+  public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+    assertHostExists(hostname);
     simulatedMetricNames.forEach(simulatedMetric ->
-        hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
+        hostSimulatedMetricsService.addCloudHost(simulatedMetric, hostname));
   }
 
-  public void removeSimulatedMetric(String instanceId, String simulatedMetricName) {
-    assertHostExists(instanceId);
-    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
+  public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    hostSimulatedMetricsService.addCloudHost(simulatedMetricName, hostname);
   }
 
-  public void removeSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
-    assertHostExists(instanceId);
+  public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+    assertHostExists(hostname);
     simulatedMetricNames.forEach(simulatedMetric ->
-        hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
+        hostSimulatedMetricsService.addCloudHost(simulatedMetric, hostname));
   }
 
-  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String cloudHost) {
-    log.info("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), cloudHost);
-    CloudHostEntity cloudHostEntity = getCloudHostByIp(cloudHost).toBuilder()
+  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String hostname) {
+    log.info("Assigning worker manager {} to cloud host {}", workerManagerEntity.getId(), hostname);
+    CloudHostEntity cloudHostEntity = getCloudHostByIp(hostname).toBuilder()
         .managedByWorker(workerManagerEntity)
         .build();
     cloudHosts.save(cloudHostEntity);
   }
 
-  public void unassignWorkerManager(String cloudHost) {
-    CloudHostEntity cloudHostEntity = getCloudHostByIp(cloudHost).toBuilder()
+  public void unassignWorkerManager(String hostname) {
+    CloudHostEntity cloudHostEntity = getCloudHostByIp(hostname).toBuilder()
         .managedByWorker(null)
         .build();
     cloudHosts.save(cloudHostEntity);
   }
 
-  public boolean hasCloudHost(String instanceId) {
-    return cloudHosts.hasCloudHost(instanceId);
+  public boolean hasCloudHost(String hostname) {
+    return cloudHosts.hasCloudHost(hostname);
   }
 
-  public boolean hasCloudHostByHostname(String hostname) {
-    return cloudHosts.hasCloudHostByHostname(hostname);
-  }
-
-  private void assertHostExists(String instanceId) {
-    if (!hasCloudHost(instanceId)) {
-      throw new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId);
+  private void assertHostExists(String hostname) {
+    if (!hasCloudHost(hostname)) {
+      throw new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname);
     }
   }
 }

@@ -201,7 +201,7 @@ public class CloudHostsService {
   }
 
   public boolean hasCloudHostByHostname(String hostname) {
-    return cloudHosts.hasCloudHostByHostname(hostname);
+    return cloudHosts.hasCloudHostByPublicIpAddress(hostname);
   }
 
   private void assertHostExists(String instanceId) {

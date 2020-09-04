@@ -90,7 +90,7 @@ public class DockerProperties {
   public static final class Swarm {
 
     private String manager;
-    private int maxWorkers;
+    private int initialMaxWorkers;
 
   }
 

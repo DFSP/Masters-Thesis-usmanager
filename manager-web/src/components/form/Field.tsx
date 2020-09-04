@@ -35,6 +35,7 @@ import {NumberBox} from "./NumberBox";
 import {Dropdown} from "./Dropdown";
 import {CheckboxList} from "./CheckboxList";
 import checkboxListStyles from "./CheckboxList.module.css";
+import {Link} from "react-router-dom";
 
 export interface IValidation {
   rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -46,12 +47,11 @@ export interface FieldProps<T = string> {
   type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
   label?: string;
   value?: any;
-  valueToString?: (v: T) => string
+  valueToString?: (v: T) => string;
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
   validation?: IValidation;
-  includeIcon?: boolean;
-  icon?: string;
+  icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
   disabled?: boolean;
   hidden?: boolean;
 }
@@ -75,8 +75,21 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     this.updateField();
   }
 
+  private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any, valueToString: ((v: T) => string) | undefined): JSX.Element => {
+    const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
+    let link;
+    if (typeof linkedTo === 'string') {
+      link = linkedTo;
+    } else if (linkedTo(value) !== null) {
+      link = `${linkedTo(value)}/${valueToString ? valueToString(value) : value}`;
+    } else {
+      return icon;
+    }
+    return <Link to={link}>{icon}</Link>;
+  }
+
   public render() {
-    const {id, type, label, dropdown, number, includeIcon, icon, disabled, hidden, valueToString} = this.props;
+    const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString} = this.props;
     let elementId = `${id}_${label}`;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
@@ -95,11 +108,15 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
           formContext && (
             <div key={elementId}
                  className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
-                 style={includeIcon !== undefined && !includeIcon ? {marginLeft: '10px'} : undefined}>
+                 style={icon?.include !== undefined && !icon?.include ? {marginLeft: '10px'} : undefined}>
               {label && type !== "list" && (
                 <>
-                  {(includeIcon === undefined || includeIcon) &&
-                   <i className="material-icons prefix">{icon ? icon : mapLabelToMaterialIcon(label, formContext.values[id])}</i>}
+                  {(icon?.include === undefined || icon?.include) &&
+                   <i className="material-icons prefix">
+                     {icon?.linkedTo
+                       ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id], valueToString)
+                       : icon?.name ? icon.name : mapLabelToMaterialIcon(label, formContext.values[id])}
+                   </i>}
                   <label className="active" htmlFor={elementId}>
                     {camelCaseToSentenceCase(label)}
                   </label>

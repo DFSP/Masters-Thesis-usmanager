@@ -217,13 +217,13 @@ class ServicePredictionList extends BaseComponent<Props, State> {
         <Field key='startDate' id={'startDate'} label='startDate' type='datepicker'/>
       </div>
       <div className={'col s6 inline-field'}>
-        <Field key='startTime' id={'startTime'} label='startTime' type='timepicker' includeIcon={false}/>
+        <Field key='startTime' id={'startTime'} label='startTime' type='timepicker' icon={{include: false}}/>
       </div>
       <div className={'col s6 inline-field'}>
         <Field key='endDate' id={'endDate'} label='endDate' type='datepicker'/>
       </div>
       <div className={'col s6 inline-field'}>
-        <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' includeIcon={false}/>
+        <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' icon={{include: false}}/>
       </div>
       <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
     </div>;

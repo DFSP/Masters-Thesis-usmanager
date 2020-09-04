@@ -72,7 +72,7 @@ docker:
     username: usmanager
   swarm:
     manager: ${dockerManager:daniel@dpimenta.ddns.net}
-    max-workers: 1
+    initial-max-workers: 1
 eureka:
   port: 8761
 prometheus:

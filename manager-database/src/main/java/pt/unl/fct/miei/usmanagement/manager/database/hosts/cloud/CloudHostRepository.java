@@ -49,33 +49,29 @@ public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long
 
   @Query("select r "
       + "from CloudHostEntity h join h.hostRules r "
-      + "where r.generic = false and h.instanceId = :instanceId")
-  List<HostRuleEntity> getRules(@Param("instanceId") String instanceId);
+      + "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname)")
+  List<HostRuleEntity> getRules(@Param("hostname") String hostname);
 
   @Query("select r "
       + "from CloudHostEntity h join h.hostRules r "
-      + "where r.generic = false and h.instanceId = :instanceId and r.name = :ruleName")
-  Optional<HostRuleEntity> getRule(@Param("instanceId") String instanceId, @Param("ruleName") String ruleName);
+      + "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname) "
+      + "and r.name = :ruleName")
+  Optional<HostRuleEntity> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
 
   @Query("select m "
       + "from CloudHostEntity h join h.simulatedHostMetrics m "
-      + "where h.instanceId = :instanceId")
-  List<HostSimulatedMetricEntity> getSimulatedMetrics(@Param("instanceId") String instanceId);
+      + "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
+  List<HostSimulatedMetricEntity> getSimulatedMetrics(@Param("hostname") String hostname);
 
   @Query("select m "
       + "from CloudHostEntity h join h.simulatedHostMetrics m "
-      + "where h.instanceId = :instanceId and m.name = :simulatedMetricName")
-  Optional<HostSimulatedMetricEntity> getSimulatedMetric(@Param("instanceId") String instanceId,
+      + "where (h.publicIpAddress = :hostname or h.instanceId = :hostname) and m.name = :simulatedMetricName")
+  Optional<HostSimulatedMetricEntity> getSimulatedMetric(@Param("hostname") String hostname,
                                                          @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from CloudHostEntity h "
-      + "where h.instanceId = :instanceId")
-  boolean hasCloudHost(@Param("instanceId") String instanceId);
-
-  @Query("select case when count(h) > 0 then true else false end "
-      + "from CloudHostEntity h "
-      + "where h.publicIpAddress = :hostname")
-  boolean hasCloudHostByHostname(@Param("hostname") String hostname);
+      + "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
+  boolean hasCloudHost(@Param("hostname") String hostname);
 
 }
