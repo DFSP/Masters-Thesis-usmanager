@@ -56,6 +56,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
   @Override
   public void afterWrite(DataContext context, Table table, CsvData data) {
     final String channelId = context.getBatch().getChannelId();
+    System.out.println(channelId);
     if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
       String tableName = table.getName();
       if ("cloud_hosts".equalsIgnoreCase(tableName)) {

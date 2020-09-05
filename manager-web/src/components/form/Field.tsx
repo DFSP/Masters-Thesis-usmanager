@@ -77,11 +77,12 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
 
   private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any, valueToString: ((v: T) => string) | undefined): JSX.Element => {
     const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
+    const valueString = value == undefined ? '' : (valueToString ? valueToString(value) : value);
     let link;
     if (typeof linkedTo === 'string') {
-      link = linkedTo;
+      link = `${linkedTo}/${valueString}`;
     } else if (linkedTo(value) !== null) {
-      link = `${linkedTo(value)}/${valueToString ? valueToString(value) : value}`;
+      link = `${linkedTo(value)}/${valueString}`;
     } else {
       return icon;
     }

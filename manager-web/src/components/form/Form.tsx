@@ -488,7 +488,6 @@ class Form extends React.Component<Props, State> {
   private onClickDelete = (): void => {
     if (this.props.delete) {
       const args = this.state.values;
-      console.log(args)
       deleteData(this.props.delete.url,
         () => {
           this.props.delete?.successCallback(args);

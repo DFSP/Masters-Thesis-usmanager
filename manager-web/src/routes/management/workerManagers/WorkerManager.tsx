@@ -144,7 +144,6 @@ class WorkerManager extends BaseComponent<Props, State> {
     this.saveEntities(workerManager);
     if (this.mounted) {
       this.updateWorkerManager(workerManager);
-      this.props.history.replace(workerManager.id.toString())
     }
   };
 
@@ -165,7 +164,8 @@ class WorkerManager extends BaseComponent<Props, State> {
     workerManager = Object.values(normalize(workerManager, Schemas.WORKER_MANAGER).entities.workerManagers || {})[0];
     const formWorkerManager = {...workerManager};
     removeFields(formWorkerManager);
-    this.setState({workerManager: workerManager, formWorkerManager: formWorkerManager});
+    this.setState({workerManager: workerManager, formWorkerManager: formWorkerManager},
+      () => this.props.history.replace(workerManager.id.toString()));
   };
 
   private shouldShowSaveButton = () =>
