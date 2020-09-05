@@ -55,7 +55,8 @@
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.3.0",
     "resize-observer-polyfill": "^1.5.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "universal-cookie": "^4.0.3"
   },
   "devDependencies": {
     "@types/humps": "^1.1.3",

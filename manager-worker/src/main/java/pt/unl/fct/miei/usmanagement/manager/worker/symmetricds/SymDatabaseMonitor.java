@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,6 +61,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
     if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
       String tableName = table.getName();
       if ("cloud_hosts".equalsIgnoreCase(tableName)) {
+        System.out.println(Arrays.toString(data.getParsedData(CsvData.OLD_DATA)));
         final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
         System.out.println("Old values:");
         oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));

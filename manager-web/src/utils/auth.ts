@@ -24,6 +24,7 @@
 
 import axios, {AxiosResponse} from "axios";
 import {API_URL, setupAxiosInterceptors} from "./api";
+import Cookies from 'universal-cookie';
 
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
@@ -37,15 +38,19 @@ export const basicAuthenticate = (username: string, password: string): Promise<A
 export const createBasicAuthToken = (username: string, password: string): string =>
   `Basic ` + window.btoa(username + ":" + password);
 
-export const isAuthenticated = (): boolean => !!sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+export const isAuthenticated = (): boolean =>
+  !!getLoggedInUser();
 
 export const registerSuccessfulLogin = (username: string, password: string): void => {
-  sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username);
-  setupAxiosInterceptors(createBasicAuthToken(username, password))
+  // 1 year expire date
+  let expires = new Date();
+  expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
+  new Cookies().set(USER_NAME_SESSION_ATTRIBUTE_NAME, username, { path: '/', expires });
+  setupAxiosInterceptors(createBasicAuthToken(username, password));
 };
 
 export const getLoggedInUser = () =>
-  sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+  new Cookies().get(USER_NAME_SESSION_ATTRIBUTE_NAME);
 
 export const logout = () =>
-  sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+  new Cookies().remove(USER_NAME_SESSION_ATTRIBUTE_NAME);
