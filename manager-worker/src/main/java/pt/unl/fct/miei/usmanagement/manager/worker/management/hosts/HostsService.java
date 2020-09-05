@@ -313,10 +313,6 @@ public class HostsService {
     dockerSwarmService.leaveSwarm(hostname);
   }
 
-  private boolean isCloudHost(String hostname) {
-    return cloudHostsService.hasCloudHostByHostname(hostname);
-  }
-
   private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {
     return sshService.hasConnection(edgeHost.getHostname());
   }

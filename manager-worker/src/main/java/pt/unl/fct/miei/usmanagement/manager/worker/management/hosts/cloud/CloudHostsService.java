@@ -200,10 +200,6 @@ public class CloudHostsService {
     return cloudHosts.hasCloudHost(instanceId);
   }
 
-  public boolean hasCloudHostByHostname(String hostname) {
-    return cloudHosts.hasCloudHostByPublicIpAddress(hostname);
-  }
-
   private void assertHostExists(String instanceId) {
     if (!hasCloudHost(instanceId)) {
       throw new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId);
