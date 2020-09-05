@@ -57,11 +57,12 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
   @Override
   public void afterWrite(DataContext context, Table table, CsvData data) {
     final String channelId = context.getBatch().getChannelId();
-    System.out.println(channelId);
     if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
-      String tableName = table.getName();
+      final String tableName = table.getName();
       if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-        System.out.println(Arrays.toString(data.getParsedData(CsvData.OLD_DATA)));
+        StringBuilder stringBuilder = new StringBuilder();
+        data.writeCsvDataDetails(stringBuilder);
+        System.out.println(stringBuilder.toString());
         final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
         System.out.println("Old values:");
         oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
