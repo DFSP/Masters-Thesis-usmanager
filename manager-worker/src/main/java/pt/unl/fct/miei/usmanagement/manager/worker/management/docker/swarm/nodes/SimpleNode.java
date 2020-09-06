@@ -34,17 +34,17 @@ import lombok.Data;
 @AllArgsConstructor
 public final class SimpleNode {
 
-  private final String id;
-  private final String hostname;
-  private final NodeAvailability availability;
-  private final NodeRole role;
-  private final long version;
-  private final Map<String, String> labels;
-  private String state;
+	private final String id;
+	private final String hostname;
+	private final NodeAvailability availability;
+	private final NodeRole role;
+	private final long version;
+	private final Map<String, String> labels;
+	private String state;
 
-  @JsonIgnore
-  public String getPrivateIpAddress() {
-    return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
-  }
+	@JsonIgnore
+	public String getPrivateIpAddress() {
+		return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+	}
 
 }

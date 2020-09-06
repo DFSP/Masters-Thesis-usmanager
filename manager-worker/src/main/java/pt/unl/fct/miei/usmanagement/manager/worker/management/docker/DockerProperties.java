@@ -38,60 +38,60 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("docker")
 public class DockerProperties {
 
-  private final Api api;
-  private final ApiProxy apiProxy;
-  private final Hub hub;
-  private final Swarm swarm;
-  private String installScript;
-  private String installScriptPath;
-  private String uninstallScript;
-  private String uninstallScriptPath;
-  private String repository;
+	private final Api api;
+	private final ApiProxy apiProxy;
+	private final Hub hub;
+	private final Swarm swarm;
+	private String installScript;
+	private String installScriptPath;
+	private String uninstallScript;
+	private String uninstallScriptPath;
+	private String repository;
 
-  public DockerProperties() {
-    this.api = new Api();
-    this.apiProxy = new ApiProxy();
-    this.hub = new Hub();
-    this.swarm = new Swarm();
-  }
+	public DockerProperties() {
+		this.api = new Api();
+		this.apiProxy = new ApiProxy();
+		this.hub = new Hub();
+		this.swarm = new Swarm();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Api {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Api {
 
-    private int port;
+		private int port;
 
-  }
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class ApiProxy {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class ApiProxy {
 
-    private String username;
-    private String password;
-    private int port;
+		private String username;
+		private String password;
+		private int port;
 
-  }
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Hub {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Hub {
 
-    private String username;
+		private String username;
 
-  }
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Swarm {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Swarm {
 
-    private String manager;
-    private int maxWorkers;
+		private String manager;
+		private int maxWorkers;
 
-  }
+	}
 
 }

@@ -24,89 +24,83 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/nodes")
 public class NodesController {
 
-  private final NodesService nodesService;
-  private final HostsService hostsService;
-  private final DockerSwarmService dockerSwarmService;
+	private final NodesService nodesService;
+	private final HostsService hostsService;
+	private final DockerSwarmService dockerSwarmService;
 
-  public NodesController(NodesService nodesService, HostsService hostsService, DockerSwarmService dockerSwarmService) {
-    this.nodesService = nodesService;
-    this.hostsService = hostsService;
-    this.dockerSwarmService = dockerSwarmService;
-  }
+	public NodesController(NodesService nodesService, HostsService hostsService, DockerSwarmService dockerSwarmService) {
+		this.nodesService = nodesService;
+		this.hostsService = hostsService;
+		this.dockerSwarmService = dockerSwarmService;
+	}
 
-  @GetMapping
-  public List<SimpleNode> getNodes() {
-    return nodesService.getNodes();
-  }
+	@GetMapping
+	public List<SimpleNode> getNodes() {
+		return nodesService.getNodes();
+	}
 
-  @GetMapping("/{id}")
-  public SimpleNode getNode(@PathVariable("id") String id) {
-    return nodesService.getNode(id);
-  }
+	@GetMapping("/{id}")
+	public SimpleNode getNode(@PathVariable("id") String id) {
+		return nodesService.getNode(id);
+	}
 
-  @PostMapping
-  public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
-    NodeRole role = addNode.getRole();
-    int quantity = addNode.getQuantity();
-    String host = addNode.getHost();
-    List<SimpleNode> nodes = new ArrayList<>(addNode.getQuantity());
-    if (host != null) {
-      SimpleNode node = hostsService.addHost(host, role);
-      nodes.add(node);
-    } else {
-      RegionEntity region = addNode.getRegion();
-      String country = addNode.getCountry();
-      String city = addNode.getCity();
-      for (var i = 0; i < quantity; i++) {
-        SimpleNode node = hostsService.addHost(region, country, city, role);
-        nodes.add(node);
-      }
-    }
-    return nodes;
-  }
+	@PostMapping
+	public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
+		NodeRole role = addNode.getRole();
+		int quantity = addNode.getQuantity();
+		String host = addNode.getHost();
+		List<SimpleNode> nodes = new ArrayList<>(addNode.getQuantity());
+		if (host != null) {
+			SimpleNode node = hostsService.addHost(host, role);
+			nodes.add(node);
+		}
+		else {
+			RegionEntity region = addNode.getRegion();
+			String country = addNode.getCountry();
+			String city = addNode.getCity();
+			for (var i = 0; i < quantity; i++) {
+				SimpleNode node = hostsService.addHost(region, country, city, role);
+				nodes.add(node);
+			}
+		}
+		return nodes;
+	}
 
-  @PutMapping("/{id}")
-  public SimpleNode updateNode(@PathVariable String id, @RequestBody SimpleNode node) {
-    if (!Objects.equals(id, node.getId())) {
-      throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
-    }
-    return nodesService.updateNode(id, node);
-  }
+	@PutMapping("/{id}")
+	public SimpleNode updateNode(@PathVariable String id, @RequestBody SimpleNode node) {
+		if (!Objects.equals(id, node.getId())) {
+			throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
+		}
+		return nodesService.updateNode(id, node);
+	}
 
-  @DeleteMapping("/{id}")
-  public void removeNode(@PathVariable("id") String id) {
-    nodesService.removeNode(id);
-  }
+	@DeleteMapping("/{id}")
+	public void removeNode(@PathVariable("id") String id) {
+		nodesService.removeNode(id);
+	}
 
-  @PostMapping("/{id}/join")
-  public SimpleNode rejoinSwarm(@PathVariable("id") String id) {
-    return dockerSwarmService.rejoinSwarm(id);
-  }
+	@PostMapping("/{id}/join")
+	public SimpleNode rejoinSwarm(@PathVariable("id") String id) {
+		return dockerSwarmService.rejoinSwarm(id);
+	}
 
-  @DeleteMapping("/{hostname}/leave")
-  public void leaveSwarm(@PathVariable("hostname") String hostname) {
-    dockerSwarmService.leaveSwarm(hostname);
-  }
+	@DeleteMapping("/{hostname}/leave")
+	public void leaveSwarm(@PathVariable("hostname") String hostname) {
+		dockerSwarmService.leaveSwarm(hostname);
+	}
 
 }

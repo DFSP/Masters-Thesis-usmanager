@@ -35,25 +35,25 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.conditi
 @Data
 public final class Rule {
 
-  private final long id;
-  private final List<Condition> conditions;
-  private final RuleDecision decision;
-  private final int priority;
-  private final EventType eventType;
+	private final long id;
+	private final List<Condition> conditions;
+	private final RuleDecision decision;
+	private final int priority;
+	private final EventType eventType;
 
-  public Rule(long id, List<Condition> conditions, RuleDecision decision, int priority) {
-    this.id = id;
-    this.conditions = conditions;
-    this.decision = decision;
-    this.priority = priority;
-    this.eventType = null;
-  }
+	public Rule(long id, List<Condition> conditions, RuleDecision decision, int priority) {
+		this.id = id;
+		this.conditions = conditions;
+		this.decision = decision;
+		this.priority = priority;
+		this.eventType = null;
+	}
 
-  @Override
-  public String toString() {
-    return conditions.stream().map(c ->
-        "fields[\"" + c.getFieldName() + "\"] " + c.getOperator() + " " + c.getValue())
-        .collect(Collectors.joining(" && "));
-  }
+	@Override
+	public String toString() {
+		return conditions.stream().map(c ->
+			"fields[\"" + c.getFieldName() + "\"] " + c.getOperator() + " " + c.getValue())
+			.collect(Collectors.joining(" && "));
+	}
 
 }

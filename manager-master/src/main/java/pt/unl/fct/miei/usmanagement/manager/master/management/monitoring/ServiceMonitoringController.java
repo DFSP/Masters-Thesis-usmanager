@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,49 +32,51 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringLogEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/monitoring/services")
 public class ServiceMonitoringController {
 
-  private final ServicesMonitoringService servicesMonitoringService;
+	private final ServicesMonitoringService servicesMonitoringService;
 
-  public ServiceMonitoringController(ServicesMonitoringService servicesMonitoringService) {
-    this.servicesMonitoringService = servicesMonitoringService;
-  }
+	public ServiceMonitoringController(ServicesMonitoringService servicesMonitoringService) {
+		this.servicesMonitoringService = servicesMonitoringService;
+	}
 
-  @GetMapping
-  public List<ServiceMonitoringEntity> getServicesMonitoring() {
-    return servicesMonitoringService.getServicesMonitoring();
-  }
+	@GetMapping
+	public List<ServiceMonitoringEntity> getServicesMonitoring() {
+		return servicesMonitoringService.getServicesMonitoring();
+	}
 
-  @GetMapping("/{serviceName}")
-  public List<ServiceMonitoringEntity> getServiceMonitoring(@PathVariable String serviceName) {
-    return servicesMonitoringService.getServiceMonitoring(serviceName);
-  }
+	@GetMapping("/{serviceName}")
+	public List<ServiceMonitoringEntity> getServiceMonitoring(@PathVariable String serviceName) {
+		return servicesMonitoringService.getServiceMonitoring(serviceName);
+	}
 
-  @GetMapping("/{serviceName}/avg")
-  public List<ServiceFieldAvg> getServiceFieldsAvg(@PathVariable String serviceName) {
-    return servicesMonitoringService.getServiceFieldsAvg(serviceName);
-  }
+	@GetMapping("/{serviceName}/avg")
+	public List<ServiceFieldAvg> getServiceFieldsAvg(@PathVariable String serviceName) {
+		return servicesMonitoringService.getServiceFieldsAvg(serviceName);
+	}
 
-  @GetMapping("/{serviceName}/fields/{field}/avg")
-  public ServiceFieldAvg getServiceFieldAvg(@PathVariable String serviceName, @PathVariable String field) {
-    return servicesMonitoringService.getServiceFieldAvg(serviceName, field);
-  }
+	@GetMapping("/{serviceName}/fields/{field}/avg")
+	public ServiceFieldAvg getServiceFieldAvg(@PathVariable String serviceName, @PathVariable String field) {
+		return servicesMonitoringService.getServiceFieldAvg(serviceName, field);
+	}
 
-  @GetMapping("/logs")
-  public List<ServiceMonitoringLogEntity> getServiceMonitoringLogs() {
-    return servicesMonitoringService.getServiceMonitoringLogs();
-  }
+	@GetMapping("/logs")
+	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogs() {
+		return servicesMonitoringService.getServiceMonitoringLogs();
+	}
 
-  @GetMapping("/logs/{serviceName}")
-  public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByServiceName(@PathVariable String serviceName) {
-    return servicesMonitoringService.getServiceMonitoringLogsByServiceName(serviceName);
-  }
+	@GetMapping("/logs/{serviceName}")
+	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByServiceName(@PathVariable String serviceName) {
+		return servicesMonitoringService.getServiceMonitoringLogsByServiceName(serviceName);
+	}
 
-  @GetMapping("/logs/containers/{containerId}")
-  public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByContainerId(@PathVariable String containerId) {
-    return servicesMonitoringService.getServiceMonitoringLogsByContainerId(containerId);
-  }
+	@GetMapping("/logs/containers/{containerId}")
+	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByContainerId(@PathVariable String containerId) {
+		return servicesMonitoringService.getServiceMonitoringLogsByContainerId(containerId);
+	}
 
 }

@@ -24,35 +24,20 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -63,58 +48,58 @@ import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 @Table(name = "conditions")
 public class ConditionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "value_mode_id")
-  private ValueModeEntity valueMode;
+	@ManyToOne
+	@JoinColumn(name = "value_mode_id")
+	private ValueModeEntity valueMode;
 
-  @ManyToOne
-  @JoinColumn(name = "field_id")
-  private FieldEntity field;
+	@ManyToOne
+	@JoinColumn(name = "field_id")
+	private FieldEntity field;
 
-  @ManyToOne
-  @JoinColumn(name = "operator_id")
-  private OperatorEntity operator;
+	@ManyToOne
+	@JoinColumn(name = "operator_id")
+	private OperatorEntity operator;
 
-  private double value;
+	private double value;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ContainerRuleConditionEntity> containerConditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ContainerRuleConditionEntity> containerConditions = new HashSet<>();
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ConditionEntity)) {
-      return false;
-    }
-    ConditionEntity other = (ConditionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ConditionEntity)) {
+			return false;
+		}
+		ConditionEntity other = (ConditionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

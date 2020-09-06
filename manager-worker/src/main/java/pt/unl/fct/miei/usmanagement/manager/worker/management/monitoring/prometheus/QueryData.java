@@ -31,7 +31,7 @@ import lombok.Data;
 @Data
 class QueryData {
 
-  private String resultType;
-  private List<QueryResult> result;
+	private String resultType;
+	private List<QueryResult> result;
 
 }

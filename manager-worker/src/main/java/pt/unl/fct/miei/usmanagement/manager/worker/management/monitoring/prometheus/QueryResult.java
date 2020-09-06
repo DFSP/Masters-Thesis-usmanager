@@ -31,7 +31,7 @@ import lombok.Data;
 @Data
 class QueryResult {
 
-  private QueryMetric metric;
-  private List<String> value;
+	private QueryMetric metric;
+	private List<String> value;
 
 }

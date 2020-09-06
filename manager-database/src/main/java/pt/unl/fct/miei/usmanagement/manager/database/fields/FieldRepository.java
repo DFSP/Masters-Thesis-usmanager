@@ -24,21 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.fields;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
 
-  Optional<FieldEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<FieldEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select case when count(f) > 0 then true else false end "
-      + "from FieldEntity f "
-      + "where lower(f.name) = lower(:name)")
-  boolean hasField(@Param("name") String name);
+	@Query("select case when count(f) > 0 then true else false end "
+		+ "from FieldEntity f "
+		+ "where lower(f.name) = lower(:name)")
+	boolean hasField(@Param("name") String name);
 
 }

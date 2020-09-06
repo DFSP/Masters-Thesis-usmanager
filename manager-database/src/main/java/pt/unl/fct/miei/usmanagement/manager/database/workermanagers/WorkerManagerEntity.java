@@ -24,34 +24,20 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.workermanagers;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Builder(toBuilder = true)
@@ -62,51 +48,51 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 @Table(name = "worker_managers")
 public class WorkerManagerEntity {
 
-  @Id
-  private String id;
+	@Id
+	private String id;
 
-  @NotNull
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
-  private LocalDateTime startedAt;
+	@NotNull
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
+	private LocalDateTime startedAt;
 
-  @NotNull
-  @OneToOne(cascade = CascadeType.REMOVE)
-  private ContainerEntity container;
+	@NotNull
+	@OneToOne(cascade = CascadeType.REMOVE)
+	private ContainerEntity container;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<CloudHostEntity> assignedCloudHosts;
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<CloudHostEntity> assignedCloudHosts;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<EdgeHostEntity> assignedEdgeHosts;
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<EdgeHostEntity> assignedEdgeHosts;
 
-  @PrePersist
-  private void ensure() {
-    this.setId(UUID.randomUUID().toString());
-    if (this.getStartedAt() == null) {
-      this.setStartedAt(LocalDateTime.now());
-    }
-  }
+	@PrePersist
+	private void ensure() {
+		this.setId(UUID.randomUUID().toString());
+		if (this.getStartedAt() == null) {
+			this.setStartedAt(LocalDateTime.now());
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof WorkerManagerEntity)) {
-      return false;
-    }
-    WorkerManagerEntity other = (WorkerManagerEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof WorkerManagerEntity)) {
+			return false;
+		}
+		WorkerManagerEntity other = (WorkerManagerEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

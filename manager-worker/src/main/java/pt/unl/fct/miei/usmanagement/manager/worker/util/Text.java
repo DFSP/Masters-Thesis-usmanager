@@ -31,12 +31,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Text {
 
-  public boolean notEmptyEquals(String string1, String string2) {
-    return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
-  }
+	public boolean notEmptyEquals(String string1, String string2) {
+		return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
+	}
 
-  public boolean isNullOrEmpty(String string) {
-    return string == null || string.isEmpty();
-  }
+	public boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
 
 }

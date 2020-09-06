@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.workermanagers;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,24 +32,27 @@ import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface WorkerManagerRepository extends JpaRepository<WorkerManagerEntity, String> {
 
-  @Query("select case when count(w) > 0 then true else false end "
-      + "from WorkerManagerEntity w "
-      + "where w.id = :id")
-  boolean hasWorkerManager(@Param("id") String id);
+	@Query("select case when count(w) > 0 then true else false end "
+		+ "from WorkerManagerEntity w "
+		+ "where w.id = :id")
+	boolean hasWorkerManager(@Param("id") String id);
 
-  Optional<WorkerManagerEntity> getByContainer(@Param("container") ContainerEntity containerEntity);
+	Optional<WorkerManagerEntity> getByContainer(@Param("container") ContainerEntity containerEntity);
 
-  @Query("select c "
-      + "from WorkerManagerEntity w join w.assignedCloudHosts c "
-      + "where w.id = :id")
-  List<CloudHostEntity> getCloudHosts(@Param("id") String id);
+	@Query("select c "
+		+ "from WorkerManagerEntity w join w.assignedCloudHosts c "
+		+ "where w.id = :id")
+	List<CloudHostEntity> getCloudHosts(@Param("id") String id);
 
-  @Query("select e "
-      + "from WorkerManagerEntity w join w.assignedEdgeHosts e "
-      + "where w.id = :id")
-  List<EdgeHostEntity> getEdgeHosts(@Param("id") String id);
+	@Query("select e "
+		+ "from WorkerManagerEntity w join w.assignedEdgeHosts e "
+		+ "where w.id = :id")
+	List<EdgeHostEntity> getEdgeHosts(@Param("id") String id);
 
 }

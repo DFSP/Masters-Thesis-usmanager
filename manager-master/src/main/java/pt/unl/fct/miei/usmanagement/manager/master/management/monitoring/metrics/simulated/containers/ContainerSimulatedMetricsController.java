@@ -24,81 +24,74 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/simulated-metrics/containers")
 public class ContainerSimulatedMetricsController {
 
-  private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
+	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 
-  public ContainerSimulatedMetricsController(ContainerSimulatedMetricsService containerSimulatedMetricsService) {
-    this.containerSimulatedMetricsService = containerSimulatedMetricsService;
-  }
+	public ContainerSimulatedMetricsController(ContainerSimulatedMetricsService containerSimulatedMetricsService) {
+		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
+	}
 
-  @GetMapping
-  public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
-    return containerSimulatedMetricsService.getContainerSimulatedMetrics();
-  }
+	@GetMapping
+	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
+		return containerSimulatedMetricsService.getContainerSimulatedMetrics();
+	}
 
-  @GetMapping("/{simulatedMetricName}")
-  public ContainerSimulatedMetricEntity getContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
-    return containerSimulatedMetricsService.getContainerSimulatedMetric(simulatedMetricName);
-  }
+	@GetMapping("/{simulatedMetricName}")
+	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
+		return containerSimulatedMetricsService.getContainerSimulatedMetric(simulatedMetricName);
+	}
 
-  @PostMapping
-  public ContainerSimulatedMetricEntity addContainerSimulatedMetric(
-      @RequestBody ContainerSimulatedMetricEntity containerSimulatedMetric) {
-    Validation.validatePostRequest(containerSimulatedMetric.getId());
-    return containerSimulatedMetricsService.addContainerSimulatedMetric(containerSimulatedMetric);
-  }
+	@PostMapping
+	public ContainerSimulatedMetricEntity addContainerSimulatedMetric(
+		@RequestBody ContainerSimulatedMetricEntity containerSimulatedMetric) {
+		Validation.validatePostRequest(containerSimulatedMetric.getId());
+		return containerSimulatedMetricsService.addContainerSimulatedMetric(containerSimulatedMetric);
+	}
 
-  @PutMapping("/{simulatedMetricName}")
-  public ContainerSimulatedMetricEntity updateContainerSimulatedMetric(
-      @PathVariable String simulatedMetricName,
-      @RequestBody ContainerSimulatedMetricEntity simulatedMetric) {
-    Validation.validatePutRequest(simulatedMetric.getId());
-    return containerSimulatedMetricsService.updateContainerSimulatedMetric(simulatedMetricName, simulatedMetric);
-  }
+	@PutMapping("/{simulatedMetricName}")
+	public ContainerSimulatedMetricEntity updateContainerSimulatedMetric(
+		@PathVariable String simulatedMetricName,
+		@RequestBody ContainerSimulatedMetricEntity simulatedMetric) {
+		Validation.validatePutRequest(simulatedMetric.getId());
+		return containerSimulatedMetricsService.updateContainerSimulatedMetric(simulatedMetricName, simulatedMetric);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}")
-  public void deleteContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
-    containerSimulatedMetricsService.deleteContainerSimulatedMetric(simulatedMetricName);
-  }
+	@DeleteMapping("/{simulatedMetricName}")
+	public void deleteContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
+		containerSimulatedMetricsService.deleteContainerSimulatedMetric(simulatedMetricName);
+	}
 
-  @GetMapping("/{simulatedMetricName}/containers")
-  public List<ContainerEntity> getContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName) {
-    return containerSimulatedMetricsService.getContainers(simulatedMetricName);
-  }
+	@GetMapping("/{simulatedMetricName}/containers")
+	public List<ContainerEntity> getContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName) {
+		return containerSimulatedMetricsService.getContainers(simulatedMetricName);
+	}
 
-  @PostMapping("/{simulatedMetricName}/containers")
-  public void addContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName,
-                                                    @RequestBody List<String> containers) {
-    containerSimulatedMetricsService.addContainers(simulatedMetricName, containers);
-  }
+	@PostMapping("/{simulatedMetricName}/containers")
+	public void addContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName,
+													  @RequestBody List<String> containers) {
+		containerSimulatedMetricsService.addContainers(simulatedMetricName, containers);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}/containers")
-  public void removeContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName,
-                                                       @RequestBody List<String> containers) {
-    containerSimulatedMetricsService.removeContainers(simulatedMetricName, containers);
-  }
+	@DeleteMapping("/{simulatedMetricName}/containers")
+	public void removeContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName,
+														 @RequestBody List<String> containers) {
+		containerSimulatedMetricsService.removeContainers(simulatedMetricName, containers);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}/containers/{containerId}")
-  public void removeContainerSimulatedMetricContainer(@PathVariable String simulatedMetricName,
-                                                      @PathVariable String containerId) {
-    containerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
-  }
+	@DeleteMapping("/{simulatedMetricName}/containers/{containerId}")
+	public void removeContainerSimulatedMetricContainer(@PathVariable String simulatedMetricName,
+														@PathVariable String containerId) {
+		containerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
+	}
 
 }

@@ -35,8 +35,8 @@ import lombok.ToString;
 @ToString
 public class Coordinates {
 
-  private final String address;
-  private final float latitude;
-  private final float longitude;
+	private final String address;
+	private final float latitude;
+	private final float longitude;
 
 }

@@ -34,49 +34,50 @@ import lombok.Singular;
 @Data
 public class LocationMonitoring {
 
-  @Singular
-  private final Map<String, Map<String, Integer>> serviceLocationsCount; // Service name -> (location key, count)
-  @Singular
-  private final Map<String, Integer> serviceTotalRequestsCount; // Service name -> requests count
+	@Singular
+	private final Map<String, Map<String, Integer>> serviceLocationsCount; // Service name -> (location key, count)
+	@Singular
+	private final Map<String, Integer> serviceTotalRequestsCount; // Service name -> requests count
 
-  public LocationMonitoring() {
-    this.serviceLocationsCount = new HashMap<>();
-    this.serviceTotalRequestsCount = new HashMap<>();
-  }
+	public LocationMonitoring() {
+		this.serviceLocationsCount = new HashMap<>();
+		this.serviceTotalRequestsCount = new HashMap<>();
+	}
 
-  public void addCount(String service, int count, List<String> locationKeys) {
-    Map<String, Integer> locationsCount;
-    if (serviceLocationsCount.containsKey(service)) {
-      locationsCount = serviceLocationsCount.get(service);
-      for (String locationKey : locationKeys) {
-        locationsCount.computeIfPresent(locationKey, (key, previousCount) -> previousCount + count);
-        locationsCount.putIfAbsent(locationKey, count);
-      }
-      serviceTotalRequestsCount.put(service, serviceTotalRequestsCount.get(service) + count);
-    } else {
-      locationsCount = new HashMap<>();
-      for (String locationKey : locationKeys) {
-        locationsCount.put(locationKey, count);
-      }
-      serviceTotalRequestsCount.put(service, count);
-    }
-    serviceLocationsCount.put(service, locationsCount);
-  }
+	public void addCount(String service, int count, List<String> locationKeys) {
+		Map<String, Integer> locationsCount;
+		if (serviceLocationsCount.containsKey(service)) {
+			locationsCount = serviceLocationsCount.get(service);
+			for (String locationKey : locationKeys) {
+				locationsCount.computeIfPresent(locationKey, (key, previousCount) -> previousCount + count);
+				locationsCount.putIfAbsent(locationKey, count);
+			}
+			serviceTotalRequestsCount.put(service, serviceTotalRequestsCount.get(service) + count);
+		}
+		else {
+			locationsCount = new HashMap<>();
+			for (String locationKey : locationKeys) {
+				locationsCount.put(locationKey, count);
+			}
+			serviceTotalRequestsCount.put(service, count);
+		}
+		serviceLocationsCount.put(service, locationsCount);
+	}
 
-  public Map<String, Integer> getServiceLocationsCount(String service) {
-    return serviceLocationsCount.get(service);
-  }
+	public Map<String, Integer> getServiceLocationsCount(String service) {
+		return serviceLocationsCount.get(service);
+	}
 
-  public boolean containsServiceLocationsCount(String service) {
-    return serviceLocationsCount.containsKey(service);
-  }
+	public boolean containsServiceLocationsCount(String service) {
+		return serviceLocationsCount.containsKey(service);
+	}
 
-  public int getServiceTotalRequestsCount(String service) {
-    return serviceTotalRequestsCount.get(service);
-  }
+	public int getServiceTotalRequestsCount(String service) {
+		return serviceTotalRequestsCount.get(service);
+	}
 
-  public boolean containsTotalRequestsCount(String service) {
-    return serviceTotalRequestsCount.containsKey(service);
-  }
+	public boolean containsTotalRequestsCount(String service) {
+		return serviceTotalRequestsCount.containsKey(service);
+	}
 
 }

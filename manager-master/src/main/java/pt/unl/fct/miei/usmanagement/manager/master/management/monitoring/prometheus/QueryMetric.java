@@ -24,17 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import lombok.Data;
+
+import java.util.Map;
 
 @Data
 class QueryMetric {
 
-  private final String instance;
+	private final String instance;
 
-  @JsonAnySetter
-  private final Map<String, String> properties;
+	@JsonAnySetter
+	private final Map<String, String> properties;
 
 }

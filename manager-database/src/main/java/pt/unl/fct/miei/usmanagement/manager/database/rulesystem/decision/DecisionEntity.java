@@ -24,33 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -61,47 +45,47 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @Table(name = "decisions")
 public class DecisionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @Enumerated(EnumType.STRING)
-  private RuleDecision ruleDecision;
+	@Enumerated(EnumType.STRING)
+	private RuleDecision ruleDecision;
 
-  @ManyToOne
-  @JoinColumn(name = "component_type_id")
-  private ComponentTypeEntity componentType;
+	@ManyToOne
+	@JoinColumn(name = "component_type_id")
+	private ComponentTypeEntity componentType;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceEventEntity> serviceEvents = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ServiceEventEntity> serviceEvents = new HashSet<>();
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostEventEntity> hostEvents = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostEventEntity> hostEvents = new HashSet<>();
 
   /*@Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceDecisionEntity> componentDecisionLogs = new HashSet<>();*/
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof DecisionEntity)) {
-      return false;
-    }
-    DecisionEntity other = (DecisionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof DecisionEntity)) {
+			return false;
+		}
+		DecisionEntity other = (DecisionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

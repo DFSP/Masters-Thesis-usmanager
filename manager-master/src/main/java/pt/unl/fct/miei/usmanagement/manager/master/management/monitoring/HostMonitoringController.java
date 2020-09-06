@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,44 +32,46 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/monitoring/hosts")
 public class HostMonitoringController {
 
-  private final HostsMonitoringService hostsMonitoringService;
+	private final HostsMonitoringService hostsMonitoringService;
 
-  public HostMonitoringController(HostsMonitoringService hostsMonitoringService) {
-    this.hostsMonitoringService = hostsMonitoringService;
-  }
+	public HostMonitoringController(HostsMonitoringService hostsMonitoringService) {
+		this.hostsMonitoringService = hostsMonitoringService;
+	}
 
-  @GetMapping
-  public List<HostMonitoringEntity> getHostsMonitoring() {
-    return hostsMonitoringService.getHostsMonitoring();
-  }
+	@GetMapping
+	public List<HostMonitoringEntity> getHostsMonitoring() {
+		return hostsMonitoringService.getHostsMonitoring();
+	}
 
-  @GetMapping("/{hostname}")
-  public List<HostMonitoringEntity> getHostMonitoring(@PathVariable String hostname) {
-    return hostsMonitoringService.getHostMonitoring(hostname);
-  }
+	@GetMapping("/{hostname}")
+	public List<HostMonitoringEntity> getHostMonitoring(@PathVariable String hostname) {
+		return hostsMonitoringService.getHostMonitoring(hostname);
+	}
 
-  @GetMapping("/{hostname}/avg")
-  public List<HostFieldAvg> getHostMonitoringAvg(@PathVariable String hostname) {
-    return hostsMonitoringService.getHostFieldsAvg(hostname);
-  }
+	@GetMapping("/{hostname}/avg")
+	public List<HostFieldAvg> getHostMonitoringAvg(@PathVariable String hostname) {
+		return hostsMonitoringService.getHostFieldsAvg(hostname);
+	}
 
-  @GetMapping("/{hostname}/fields/{field}/avg")
-  public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field) {
-    return hostsMonitoringService.getHostFieldAvg(hostname, field);
-  }
+	@GetMapping("/{hostname}/fields/{field}/avg")
+	public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field) {
+		return hostsMonitoringService.getHostFieldAvg(hostname, field);
+	}
 
-  @GetMapping("/logs")
-  public List<HostMonitoringLogEntity> getHostMonitoringLogs() {
-    return hostsMonitoringService.getHostMonitoringLogs();
-  }
+	@GetMapping("/logs")
+	public List<HostMonitoringLogEntity> getHostMonitoringLogs() {
+		return hostsMonitoringService.getHostMonitoringLogs();
+	}
 
-  @GetMapping("/logs/hosts/{hostname}")
-  public List<HostMonitoringLogEntity> getHostMonitoringLogsByHostname(@PathVariable String hostname) {
-    return hostsMonitoringService.getHostMonitoringLogsByHostname(hostname);
-  }
+	@GetMapping("/logs/hosts/{hostname}")
+	public List<HostMonitoringLogEntity> getHostMonitoringLogsByHostname(@PathVariable String hostname) {
+		return hostsMonitoringService.getHostMonitoringLogsByHostname(hostname);
+	}
 
 }

@@ -24,21 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.logging;
 
-import java.util.Objects;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,63 +39,63 @@ import lombok.Setter;
 @Table(name = "logging_event")
 public class LoggingEventEntity {
 
-  @NotNull
-  private Long timestmp;
+	@NotNull
+	private Long timestmp;
 
-  @NotNull
-  private String formattedMessage;
+	@NotNull
+	private String formattedMessage;
 
-  @NotNull
-  private String loggerName;
+	@NotNull
+	private String loggerName;
 
-  @NotNull
-  private String levelString;
+	@NotNull
+	private String levelString;
 
-  private String threadName;
+	private String threadName;
 
-  private Short referenceFlag;
+	private Short referenceFlag;
 
-  private String arg0;
+	private String arg0;
 
-  private String arg1;
+	private String arg1;
 
-  private String arg2;
+	private String arg2;
 
-  private String arg3;
+	private String arg3;
 
-  private String callerFilename;
+	private String callerFilename;
 
-  private String callerClass;
+	private String callerClass;
 
-  private String callerMethod;
+	private String callerMethod;
 
-  private String callerLine;
+	private String callerLine;
 
-  @GeneratedValue
-  @Id
-  private Long eventId;
+	@GeneratedValue
+	@Id
+	private Long eventId;
 
-  @OneToOne
-  private LoggingEventPropertyEntity loggingEventProperty;
+	@OneToOne
+	private LoggingEventPropertyEntity loggingEventProperty;
 
-  @OneToOne
-  private LoggingEventExceptionEntity loggingEventException;
+	@OneToOne
+	private LoggingEventExceptionEntity loggingEventException;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof LoggingEventEntity)) {
-      return false;
-    }
-    LoggingEventEntity other = (LoggingEventEntity) o;
-    return eventId != null && eventId.equals(other.getEventId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getEventId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getEventId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof LoggingEventEntity)) {
+			return false;
+		}
+		LoggingEventEntity other = (LoggingEventEntity) o;
+		return eventId != null && eventId.equals(other.getEventId());
+	}
 
 }

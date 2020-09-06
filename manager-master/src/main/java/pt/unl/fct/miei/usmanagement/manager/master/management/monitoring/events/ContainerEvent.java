@@ -35,7 +35,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ContainerEvent extends Event {
 
-  private final String containerId;
-  private final String serviceName;
+	private final String containerId;
+	private final String serviceName;
 
 }

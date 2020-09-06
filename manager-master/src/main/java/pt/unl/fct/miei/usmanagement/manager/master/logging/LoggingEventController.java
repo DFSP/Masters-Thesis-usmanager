@@ -24,26 +24,26 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.logging;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/logs")
 public class LoggingEventController {
 
-  private final LoggingEventService loggingEvents;
+	private final LoggingEventService loggingEvents;
 
-  public LoggingEventController(LoggingEventService loggingEvents) {
-    this.loggingEvents = loggingEvents;
-  }
+	public LoggingEventController(LoggingEventService loggingEvents) {
+		this.loggingEvents = loggingEvents;
+	}
 
-  @GetMapping
-  public List<LoggingEventEntity> getLogs() {
-    return loggingEvents.getLogs();
-  }
+	@GetMapping
+	public List<LoggingEventEntity> getLogs() {
+		return loggingEvents.getLogs();
+	}
 
 }

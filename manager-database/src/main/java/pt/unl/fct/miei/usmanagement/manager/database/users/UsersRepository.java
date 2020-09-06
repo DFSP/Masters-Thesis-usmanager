@@ -24,24 +24,24 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.users;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UsersRepository extends JpaRepository<UserEntity, Long> {
 
-  UserEntity findByUsername(String username);
+	UserEntity findByUsername(String username);
 
-  @Query("select u "
-      + "from UserEntity u "
-      + "where u.username like concat('%',:search,'%')")
-  List<UserEntity> searchUsers(@Param(value = "search") String search);
+	@Query("select u "
+		+ "from UserEntity u "
+		+ "where u.username like concat('%',:search,'%')")
+	List<UserEntity> searchUsers(@Param(value = "search") String search);
 
-  @Query("select case when count(u) > 0 then true else false end "
-      + "from UserEntity u "
-      + "where u.username = :username")
-  boolean hasUser(@Param("username") String username);
+	@Query("select case when count(u) > 0 then true else false end "
+		+ "from UserEntity u "
+		+ "where u.username = :username")
+	boolean hasUser(@Param("username") String username);
 
 }

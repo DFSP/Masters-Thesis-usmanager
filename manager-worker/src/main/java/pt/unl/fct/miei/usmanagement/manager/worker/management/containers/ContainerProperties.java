@@ -37,24 +37,24 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("container")
 public class ContainerProperties {
 
-  private final Database database;
-  private int monitorPeriod;
-  private int replicateContainerOnEventCount;
-  private int migrateContainerOnEventCount;
-  private int stopContainerOnEventCount;
-  private int delayBeforeStop;
+	private final Database database;
+	private int monitorPeriod;
+	private int replicateContainerOnEventCount;
+	private int migrateContainerOnEventCount;
+	private int stopContainerOnEventCount;
+	private int delayBeforeStop;
 
-  public ContainerProperties() {
-    this.database = new Database();
-  }
+	public ContainerProperties() {
+		this.database = new Database();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Database {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Database {
 
-    private int deployDelay;
+		private int deployDelay;
 
-  }
+	}
 
 }

@@ -25,35 +25,35 @@
 package pt.unl.fct.miei.usmanagement.manager.database.apps;
 
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceOrder;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface AppRepository extends JpaRepository<AppEntity, Long> {
 
-  @Query("select case when count(a) > 0 then true else false end "
-      + "from AppEntity a "
-      + "where lower(a.name) = lower(:appName)")
-  boolean hasApp(@Param("appName") String appName);
+	@Query("select case when count(a) > 0 then true else false end "
+		+ "from AppEntity a "
+		+ "where lower(a.name) = lower(:appName)")
+	boolean hasApp(@Param("appName") String appName);
 
-  @Query("select new pt.unl.fct.miei.usmanagement.manager.database.services"
-      + ".ServiceOrder(s.service, s.launchOrder) "
-      + "from AppEntity a join a.appServices s "
-      + "where lower(a.name) = lower(:appName) order by s.launchOrder")
-  List<ServiceOrder> getServicesOrder(@Param("appName") String appName);
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.services"
+		+ ".ServiceOrder(s.service, s.launchOrder) "
+		+ "from AppEntity a join a.appServices s "
+		+ "where lower(a.name) = lower(:appName) order by s.launchOrder")
+	List<ServiceOrder> getServicesOrder(@Param("appName") String appName);
 
-  Optional<AppEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<AppEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select s "
-      + "from AppEntity a join a.appServices s "
-      + "where lower(a.name) = lower(:appName)")
-  List<AppServiceEntity> getServices(@Param("appName") String appName);
+	@Query("select s "
+		+ "from AppEntity a join a.appServices s "
+		+ "where lower(a.name) = lower(:appName)")
+	List<AppServiceEntity> getServices(@Param("appName") String appName);
 
 }
 

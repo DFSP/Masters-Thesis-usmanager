@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.operators;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,60 +34,62 @@ import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorRepositor
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class OperatorsService {
 
-  private final OperatorRepository operators;
+	private final OperatorRepository operators;
 
-  public OperatorsService(OperatorRepository operators) {
-    this.operators = operators;
-  }
+	public OperatorsService(OperatorRepository operators) {
+		this.operators = operators;
+	}
 
-  public List<OperatorEntity> getOperators() {
-    return operators.findAll();
-  }
+	public List<OperatorEntity> getOperators() {
+		return operators.findAll();
+	}
 
-  public OperatorEntity getOperator(Long id) {
-    return operators.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(OperatorEntity.class, "id", id.toString()));
-  }
+	public OperatorEntity getOperator(Long id) {
+		return operators.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(OperatorEntity.class, "id", id.toString()));
+	}
 
-  public OperatorEntity getOperator(String operatorName) {
-    Operator operator = Operator.valueOf(operatorName.toUpperCase());
-    return operators.findByOperator(operator).orElseThrow(() ->
-        new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
-  }
+	public OperatorEntity getOperator(String operatorName) {
+		Operator operator = Operator.valueOf(operatorName.toUpperCase());
+		return operators.findByOperator(operator).orElseThrow(() ->
+			new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
+	}
 
-  public OperatorEntity addOperator(OperatorEntity operator) {
-    assertOperatorDoesntExist(operator);
-    log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
-    return operators.save(operator);
-  }
+	public OperatorEntity addOperator(OperatorEntity operator) {
+		assertOperatorDoesntExist(operator);
+		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
+		return operators.save(operator);
+	}
 
-  public OperatorEntity updateOperator(String operatorName, OperatorEntity newOperator) {
-    var operator = getOperator(operatorName);
-    log.info("Updating operator {} with {}",
-        ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
-    log.info("operator before copying properties: {}",
-        ToStringBuilder.reflectionToString(operator));
-    ObjectUtils.copyValidProperties(newOperator, operator);
-    log.info("operator after copying properties: {}",
-        ToStringBuilder.reflectionToString(operator));
-    operator = operators.save(operator);
-    return operator;
-  }
+	public OperatorEntity updateOperator(String operatorName, OperatorEntity newOperator) {
+		var operator = getOperator(operatorName);
+		log.info("Updating operator {} with {}",
+			ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
+		log.info("operator before copying properties: {}",
+			ToStringBuilder.reflectionToString(operator));
+		ObjectUtils.copyValidProperties(newOperator, operator);
+		log.info("operator after copying properties: {}",
+			ToStringBuilder.reflectionToString(operator));
+		operator = operators.save(operator);
+		return operator;
+	}
 
-  public void deleteOperator(String operatorName) {
-    var operator = getOperator(operatorName);
-    operators.delete(operator);
-  }
+	public void deleteOperator(String operatorName) {
+		var operator = getOperator(operatorName);
+		operators.delete(operator);
+	}
 
-  private void assertOperatorDoesntExist(OperatorEntity operator) {
-    var op = operator.getOperator();
-    if (operators.hasOperator(op)) {
-      throw new DataIntegrityViolationException("Operator '" + op + "' already exists");
-    }
-  }
+	private void assertOperatorDoesntExist(OperatorEntity operator) {
+		var op = operator.getOperator();
+		if (operators.hasOperator(op)) {
+			throw new DataIntegrityViolationException("Operator '" + op + "' already exists");
+		}
+	}
 
 }

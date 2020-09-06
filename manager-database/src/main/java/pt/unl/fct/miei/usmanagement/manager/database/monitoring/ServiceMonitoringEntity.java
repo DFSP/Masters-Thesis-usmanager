@@ -24,21 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
-
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,55 +39,55 @@ import lombok.Setter;
 @Table(name = "service_monitoring")
 public class ServiceMonitoringEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  private String containerId;
+	private String containerId;
 
-  private String serviceName;
+	private String serviceName;
 
-  private String hostname;
+	private String hostname;
 
-  private String field;
+	private String field;
 
-  private double minValue;
+	private double minValue;
 
-  private double maxValue;
+	private double maxValue;
 
-  private double sumValue;
+	private double sumValue;
 
-  private double lastValue;
+	private double lastValue;
 
-  private long count;
+	private long count;
 
-  @Basic
-  private Timestamp lastUpdate;
+	@Basic
+	private Timestamp lastUpdate;
 
-  public void logValue(double value, Timestamp updateTime) {
-    setMinValue(Math.min(value, getMinValue()));
-    setMaxValue(Math.max(value, getMaxValue()));
-    setLastValue(value);
-    setSumValue(getSumValue() + value);
-    setCount(getCount() + 1);
-    setLastUpdate(updateTime);
-  }
+	public void logValue(double value, Timestamp updateTime) {
+		setMinValue(Math.min(value, getMinValue()));
+		setMaxValue(Math.max(value, getMaxValue()));
+		setLastValue(value);
+		setSumValue(getSumValue() + value);
+		setCount(getCount() + 1);
+		setLastUpdate(updateTime);
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceMonitoringEntity)) {
-      return false;
-    }
-    ServiceMonitoringEntity other = (ServiceMonitoringEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceMonitoringEntity)) {
+			return false;
+		}
+		ServiceMonitoringEntity other = (ServiceMonitoringEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

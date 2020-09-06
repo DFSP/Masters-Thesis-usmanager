@@ -33,9 +33,9 @@ import org.springframework.kafka.listener.LoggingErrorHandler;
 @EnableKafka
 public class KafkaConfiguration {
 
-  @Bean
-  public LoggingErrorHandler errorHandler() {
-    return new LoggingErrorHandler();
-  }
+	@Bean
+	public LoggingErrorHandler errorHandler() {
+		return new LoggingErrorHandler();
+	}
 
 }

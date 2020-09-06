@@ -24,12 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -43,180 +37,186 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudH
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class HostSimulatedMetricsService {
 
-  private final CloudHostsService cloudHostsService;
-  private final EdgeHostsService edgeHostsService;
+	private final CloudHostsService cloudHostsService;
+	private final EdgeHostsService edgeHostsService;
 
-  private final HostSimulatedMetricsRepository hostSimulatedMetrics;
+	private final HostSimulatedMetricsRepository hostSimulatedMetrics;
 
-  public HostSimulatedMetricsService(CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService,
-                                     HostSimulatedMetricsRepository hostSimulatedMetrics) {
-    this.cloudHostsService = cloudHostsService;
-    this.edgeHostsService = edgeHostsService;
-    this.hostSimulatedMetrics = hostSimulatedMetrics;
-  }
+	public HostSimulatedMetricsService(CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService,
+									   HostSimulatedMetricsRepository hostSimulatedMetrics) {
+		this.cloudHostsService = cloudHostsService;
+		this.edgeHostsService = edgeHostsService;
+		this.hostSimulatedMetrics = hostSimulatedMetrics;
+	}
 
-  public List<HostSimulatedMetricEntity> getHostSimulatedMetrics() {
-    return hostSimulatedMetrics.findAll();
-  }
+	public List<HostSimulatedMetricEntity> getHostSimulatedMetrics() {
+		return hostSimulatedMetrics.findAll();
+	}
 
-  public HostSimulatedMetricEntity getHostSimulatedMetric(Long id) {
-    return hostSimulatedMetrics.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(HostSimulatedMetricEntity.class, "id", id.toString()));
-  }
+	public HostSimulatedMetricEntity getHostSimulatedMetric(Long id) {
+		return hostSimulatedMetrics.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(HostSimulatedMetricEntity.class, "id", id.toString()));
+	}
 
-  public HostSimulatedMetricEntity getHostSimulatedMetric(String simulatedMetricName) {
-    return hostSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public HostSimulatedMetricEntity getHostSimulatedMetric(String simulatedMetricName) {
+		return hostSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public HostSimulatedMetricEntity addHostSimulatedMetric(HostSimulatedMetricEntity simulatedHostMetric) {
-    assertHostSimulatedMetricDoesntExist(simulatedHostMetric);
-    log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
-    return hostSimulatedMetrics.save(simulatedHostMetric);
-  }
+	public HostSimulatedMetricEntity addHostSimulatedMetric(HostSimulatedMetricEntity simulatedHostMetric) {
+		assertHostSimulatedMetricDoesntExist(simulatedHostMetric);
+		log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
+		return hostSimulatedMetrics.save(simulatedHostMetric);
+	}
 
-  public HostSimulatedMetricEntity updateHostSimulatedMetric(String simulatedMetricName,
-                                                             HostSimulatedMetricEntity newHostSimulatedMetric) {
-    log.info("Updating simulated host metric {} with {}", simulatedMetricName,
-        ToStringBuilder.reflectionToString(newHostSimulatedMetric));
-    HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
-    ObjectUtils.copyValidProperties(newHostSimulatedMetric, simulatedHostMetric);
-    return hostSimulatedMetrics.save(simulatedHostMetric);
-  }
+	public HostSimulatedMetricEntity updateHostSimulatedMetric(String simulatedMetricName,
+															   HostSimulatedMetricEntity newHostSimulatedMetric) {
+		log.info("Updating simulated host metric {} with {}", simulatedMetricName,
+			ToStringBuilder.reflectionToString(newHostSimulatedMetric));
+		HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
+		ObjectUtils.copyValidProperties(newHostSimulatedMetric, simulatedHostMetric);
+		return hostSimulatedMetrics.save(simulatedHostMetric);
+	}
 
-  public void deleteHostSimulatedMetric(String simulatedMetricName) {
-    log.info("Deleting simulated host metric {}", simulatedMetricName);
-    HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
-    simulatedHostMetric.removeAssociations();
-    hostSimulatedMetrics.delete(simulatedHostMetric);
-  }
+	public void deleteHostSimulatedMetric(String simulatedMetricName) {
+		log.info("Deleting simulated host metric {}", simulatedMetricName);
+		HostSimulatedMetricEntity simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
+		simulatedHostMetric.removeAssociations();
+		hostSimulatedMetrics.delete(simulatedHostMetric);
+	}
 
-  public List<HostSimulatedMetricEntity> getGenericHostSimulatedMetrics() {
-    return hostSimulatedMetrics.findGenericHostSimulatedMetrics();
-  }
+	public List<HostSimulatedMetricEntity> getGenericHostSimulatedMetrics() {
+		return hostSimulatedMetrics.findGenericHostSimulatedMetrics();
+	}
 
-  public HostSimulatedMetricEntity getGenericHostSimulatedMetric(String simulatedMetricName) {
-    return hostSimulatedMetrics.findGenericHostSimulatedMetric(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public HostSimulatedMetricEntity getGenericHostSimulatedMetric(String simulatedMetricName) {
+		return hostSimulatedMetrics.findGenericHostSimulatedMetric(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public List<CloudHostEntity> getCloudHosts(String simulatedMetricName) {
-    assertHostSimulatedMetricExists(simulatedMetricName);
-    return hostSimulatedMetrics.getCloudHosts(simulatedMetricName);
-  }
+	public List<CloudHostEntity> getCloudHosts(String simulatedMetricName) {
+		assertHostSimulatedMetricExists(simulatedMetricName);
+		return hostSimulatedMetrics.getCloudHosts(simulatedMetricName);
+	}
 
-  public CloudHostEntity getCloudHost(String simulatedMetricName, String instanceId) {
-    assertHostSimulatedMetricExists(simulatedMetricName);
-    return hostSimulatedMetrics.getCloudHost(simulatedMetricName, instanceId).orElseThrow(() ->
-        new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
-  }
+	public CloudHostEntity getCloudHost(String simulatedMetricName, String instanceId) {
+		assertHostSimulatedMetricExists(simulatedMetricName);
+		return hostSimulatedMetrics.getCloudHost(simulatedMetricName, instanceId).orElseThrow(() ->
+			new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
+	}
 
-  public void addCloudHost(String simulatedMetricName, String instanceId) {
-    addCloudHosts(simulatedMetricName, List.of(instanceId));
-  }
+	public void addCloudHost(String simulatedMetricName, String instanceId) {
+		addCloudHosts(simulatedMetricName, List.of(instanceId));
+	}
 
-  public void addCloudHosts(String simulatedMetricName, List<String> instanceIds) {
-    log.info("Adding cloud hosts {} to simulated metric {}", instanceIds, simulatedMetricName);
-    HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
-    instanceIds.forEach(instanceId -> {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
-      cloudHost.addHostSimulatedMetric(hostMetric);
-    });
-    hostSimulatedMetrics.save(hostMetric);
-  }
+	public void addCloudHosts(String simulatedMetricName, List<String> instanceIds) {
+		log.info("Adding cloud hosts {} to simulated metric {}", instanceIds, simulatedMetricName);
+		HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
+		instanceIds.forEach(instanceId -> {
+			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
+			cloudHost.addHostSimulatedMetric(hostMetric);
+		});
+		hostSimulatedMetrics.save(hostMetric);
+	}
 
-  public void removeCloudHost(String simulatedMetricName, String instanceId) {
-    removeCloudHosts(simulatedMetricName, List.of(instanceId));
-  }
+	public void removeCloudHost(String simulatedMetricName, String instanceId) {
+		removeCloudHosts(simulatedMetricName, List.of(instanceId));
+	}
 
-  public void removeCloudHosts(String simulatedMetricName, List<String> instanceIds) {
-    log.info("Removing cloud hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
-    HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
-    instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeHostSimulatedMetric(hostMetric));
-    hostSimulatedMetrics.save(hostMetric);
-  }
+	public void removeCloudHosts(String simulatedMetricName, List<String> instanceIds) {
+		log.info("Removing cloud hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
+		HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
+		instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeHostSimulatedMetric(hostMetric));
+		hostSimulatedMetrics.save(hostMetric);
+	}
 
-  public List<EdgeHostEntity> getEdgeHosts(String simulatedMetricName) {
-    assertHostSimulatedMetricExists(simulatedMetricName);
-    return hostSimulatedMetrics.getEdgeHosts(simulatedMetricName);
-  }
+	public List<EdgeHostEntity> getEdgeHosts(String simulatedMetricName) {
+		assertHostSimulatedMetricExists(simulatedMetricName);
+		return hostSimulatedMetrics.getEdgeHosts(simulatedMetricName);
+	}
 
-  public EdgeHostEntity getEdgeHost(String simulatedMetricName, String hostname) {
-    assertHostSimulatedMetricExists(simulatedMetricName);
-    return hostSimulatedMetrics.getEdgeHost(simulatedMetricName, hostname).orElseThrow(() ->
-        new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
-  }
+	public EdgeHostEntity getEdgeHost(String simulatedMetricName, String hostname) {
+		assertHostSimulatedMetricExists(simulatedMetricName);
+		return hostSimulatedMetrics.getEdgeHost(simulatedMetricName, hostname).orElseThrow(() ->
+			new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
+	}
 
-  public void addEdgeHost(String simulatedMetricName, String hostname) {
-    addEdgeHosts(simulatedMetricName, List.of(hostname));
-  }
+	public void addEdgeHost(String simulatedMetricName, String hostname) {
+		addEdgeHosts(simulatedMetricName, List.of(hostname));
+	}
 
-  public void addEdgeHosts(String simulatedMetricName, List<String> hostnames) {
-    log.info("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
-    HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
-    hostnames.forEach(hostname -> {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
-      edgeHost.addHostSimulatedMetric(hostMetric);
-    });
-    hostSimulatedMetrics.save(hostMetric);
-  }
+	public void addEdgeHosts(String simulatedMetricName, List<String> hostnames) {
+		log.info("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
+		HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
+		hostnames.forEach(hostname -> {
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
+			edgeHost.addHostSimulatedMetric(hostMetric);
+		});
+		hostSimulatedMetrics.save(hostMetric);
+	}
 
-  public void removeEdgeHost(String simulatedMetricName, String instanceId) {
-    removeEdgeHosts(simulatedMetricName, List.of(instanceId));
-  }
+	public void removeEdgeHost(String simulatedMetricName, String instanceId) {
+		removeEdgeHosts(simulatedMetricName, List.of(instanceId));
+	}
 
-  public void removeEdgeHosts(String simulatedMetricName, List<String> instanceIds) {
-    log.info("Removing edge hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
-    HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
-    instanceIds.forEach(instanceId -> edgeHostsService.getEdgeHostByDnsOrIp(instanceId).removeHostSimulatedMetric(hostMetric));
-    hostSimulatedMetrics.save(hostMetric);
-  }
+	public void removeEdgeHosts(String simulatedMetricName, List<String> instanceIds) {
+		log.info("Removing edge hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
+		HostSimulatedMetricEntity hostMetric = getHostSimulatedMetric(simulatedMetricName);
+		instanceIds.forEach(instanceId -> edgeHostsService.getEdgeHostByDnsOrIp(instanceId).removeHostSimulatedMetric(hostMetric));
+		hostSimulatedMetrics.save(hostMetric);
+	}
 
-  private void assertHostSimulatedMetricExists(String simulatedMetricName) {
-    if (!hostSimulatedMetrics.hasHostSimulatedMetric(simulatedMetricName)) {
-      throw new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
-    }
-  }
+	private void assertHostSimulatedMetricExists(String simulatedMetricName) {
+		if (!hostSimulatedMetrics.hasHostSimulatedMetric(simulatedMetricName)) {
+			throw new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
+		}
+	}
 
-  private void assertHostSimulatedMetricDoesntExist(HostSimulatedMetricEntity simulatedHostMetric) {
-    var name = simulatedHostMetric.getName();
-    if (hostSimulatedMetrics.hasHostSimulatedMetric(name)) {
-      throw new DataIntegrityViolationException("Simulated host metric '" + name + "' already exists");
-    }
-  }
+	private void assertHostSimulatedMetricDoesntExist(HostSimulatedMetricEntity simulatedHostMetric) {
+		var name = simulatedHostMetric.getName();
+		if (hostSimulatedMetrics.hasHostSimulatedMetric(name)) {
+			throw new DataIntegrityViolationException("Simulated host metric '" + name + "' already exists");
+		}
+	}
 
-  public Map<String, Double> getSimulatedFieldsValues(String hostname) {
-    List<HostSimulatedMetricEntity> metrics = hostSimulatedMetrics.findByHost(hostname);
-    return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
-  }
+	public Map<String, Double> getSimulatedFieldsValues(String hostname) {
+		List<HostSimulatedMetricEntity> metrics = hostSimulatedMetrics.findByHost(hostname);
+		return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
+	}
 
-  public Optional<Double> getSimulatedFieldValue(String hostname, String field) {
-    Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findByHostAndField(hostname, field);
-    Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
-    if (fieldValue.isPresent() && metric.get().isOverride()) {
-      return fieldValue;
-    }
-    Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
-    if (genericFieldValue.isPresent()) {
-      return genericFieldValue;
-    }
-    return fieldValue;
-  }
+	public Optional<Double> getSimulatedFieldValue(String hostname, String field) {
+		Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findByHostAndField(hostname, field);
+		Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
+		if (fieldValue.isPresent() && metric.get().isOverride()) {
+			return fieldValue;
+		}
+		Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
+		if (genericFieldValue.isPresent()) {
+			return genericFieldValue;
+		}
+		return fieldValue;
+	}
 
-  private Double randomizeFieldValue(HostSimulatedMetricEntity metric) {
-    var random = new Random();
-    double minValue = metric.getMinimumValue();
-    double maxValue = metric.getMaximumValue();
-    return minValue + (maxValue - minValue) * random.nextDouble();
-  }
+	private Double randomizeFieldValue(HostSimulatedMetricEntity metric) {
+		var random = new Random();
+		double minValue = metric.getMinimumValue();
+		double maxValue = metric.getMaximumValue();
+		return minValue + (maxValue - minValue) * random.nextDouble();
+	}
 
-  private Optional<Double> randomizeGenericFieldValue(String field) {
-    Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findGenericByField(field);
-    return metric.map(this::randomizeFieldValue);
-  }
+	private Optional<Double> randomizeGenericFieldValue(String field) {
+		Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findGenericByField(field);
+		return metric.map(this::randomizeFieldValue);
+	}
 
 }

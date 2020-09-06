@@ -30,12 +30,12 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @Data
 public final class Decision {
 
-  private final RuleDecision decision;
-  private final int priority;
+	private final RuleDecision decision;
+	private final int priority;
 
-  public Decision() {
-    this.decision = RuleDecision.NONE;
-    this.priority = 0;
-  }
+	public Decision() {
+		this.decision = RuleDecision.NONE;
+		this.priority = 0;
+	}
 
 }

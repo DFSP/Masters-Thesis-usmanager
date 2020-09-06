@@ -35,15 +35,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventEntity;
 @RequestMapping("/logs")
 public class LoggingEventController {
 
-  private final LoggingEventService loggingEvents;
+	private final LoggingEventService loggingEvents;
 
-  public LoggingEventController(LoggingEventService loggingEvents) {
-    this.loggingEvents = loggingEvents;
-  }
+	public LoggingEventController(LoggingEventService loggingEvents) {
+		this.loggingEvents = loggingEvents;
+	}
 
-  @GetMapping
-  public List<LoggingEventEntity> getLogs() {
-    return loggingEvents.getLogs();
-  }
+	@GetMapping
+	public List<LoggingEventEntity> getLogs() {
+		return loggingEvents.getLogs();
+	}
 
 }

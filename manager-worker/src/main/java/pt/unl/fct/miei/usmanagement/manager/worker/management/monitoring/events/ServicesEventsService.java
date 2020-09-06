@@ -35,38 +35,39 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 @Service
 public class ServicesEventsService {
 
-  private final ServiceEventRepository serviceEvents;
+	private final ServiceEventRepository serviceEvents;
 
-  public ServicesEventsService(ServiceEventRepository serviceEvents) {
-    this.serviceEvents = serviceEvents;
-  }
+	public ServicesEventsService(ServiceEventRepository serviceEvents) {
+		this.serviceEvents = serviceEvents;
+	}
 
-  public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
-    return serviceEvents.findByContainerId(containerId);
-  }
+	public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
+		return serviceEvents.findByContainerId(containerId);
+	}
 
-  public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, DecisionEntity decision) {
-    ServiceEventEntity event =
-        getServiceEventsByContainerId(containerId).stream().findFirst().orElse(
-            ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0)
-                .build());
-    if (event.getDecision() == null || !Objects.equals(event.getDecision().getId(), decision.getId())) {
-      event.setDecision(decision);
-      event.setCount(1);
-    } else {
-      event.setCount(event.getCount() + 1);
-    }
-    event = serviceEvents.save(event);
-    return event;
-  }
+	public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, DecisionEntity decision) {
+		ServiceEventEntity event =
+			getServiceEventsByContainerId(containerId).stream().findFirst().orElse(
+				ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0)
+					.build());
+		if (event.getDecision() == null || !Objects.equals(event.getDecision().getId(), decision.getId())) {
+			event.setDecision(decision);
+			event.setCount(1);
+		}
+		else {
+			event.setCount(event.getCount() + 1);
+		}
+		event = serviceEvents.save(event);
+		return event;
+	}
 
-  //TODO ?
-  public void resetServiceEvent(String serviceName) {
-    serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
-      serviceEvent.setDecision(null);
-      serviceEvent.setCount(1);
-      serviceEvents.save(serviceEvent);
-    });
-  }
+	//TODO ?
+	public void resetServiceEvent(String serviceName) {
+		serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
+			serviceEvent.setDecision(null);
+			serviceEvent.setCount(1);
+			serviceEvents.save(serviceEvent);
+		});
+	}
 
 }

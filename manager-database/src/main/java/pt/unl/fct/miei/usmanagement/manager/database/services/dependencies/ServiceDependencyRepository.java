@@ -32,9 +32,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ServiceDependencyRepository extends JpaRepository<ServiceDependencyEntity, Long> {
 
-  @Query("select case when count(d) > 0 then true else false end "
-      + "from ServiceDependencyEntity d "
-      + "where d.service.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
-  boolean hasDependency(@Param("serviceName") String serviceName, @Param("dependencyName") String dependencyName);
+	@Query("select case when count(d) > 0 then true else false end "
+		+ "from ServiceDependencyEntity d "
+		+ "where d.service.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
+	boolean hasDependency(@Param("serviceName") String serviceName, @Param("dependencyName") String dependencyName);
 
 }

@@ -24,25 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Builder(toBuilder = true)
@@ -53,49 +42,49 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "service_monitoring_logs")
 public class ServiceMonitoringLogEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  private String containerId;
+	@NotNull
+	private String containerId;
 
-  @NotNull
-  private String serviceName;
+	@NotNull
+	private String serviceName;
 
-  @NotNull
-  private String field;
+	@NotNull
+	private String field;
 
-  @NotNull
-  private double effectiveValue;
+	@NotNull
+	private double effectiveValue;
 
-  @NotNull
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
-  private LocalDateTime timestamp;
+	@NotNull
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss.SSS")
+	private LocalDateTime timestamp;
 
-  @PrePersist
-  public void prePersist() {
-    if (timestamp == null) {
-      timestamp = LocalDateTime.now();
-    }
-  }
+	@PrePersist
+	public void prePersist() {
+		if (timestamp == null) {
+			timestamp = LocalDateTime.now();
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceMonitoringLogEntity)) {
-      return false;
-    }
-    ServiceMonitoringLogEntity other = (ServiceMonitoringLogEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceMonitoringLogEntity)) {
+			return false;
+		}
+		ServiceMonitoringLogEntity other = (ServiceMonitoringLogEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

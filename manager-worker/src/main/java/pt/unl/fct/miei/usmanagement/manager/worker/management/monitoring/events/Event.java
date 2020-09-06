@@ -36,17 +36,17 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class Event {
 
-  private final Map<String, Double> fields;
-  private final String hostname;
+	private final Map<String, Double> fields;
+	private final String hostname;
 
-  public Event() {
-    this.fields = new HashMap<>();
-    this.hostname = null;
-  }
+	public Event() {
+		this.fields = new HashMap<>();
+		this.hostname = null;
+	}
 
-  public Event(String hostname) {
-    this.fields = new HashMap<>();
-    this.hostname = hostname;
-  }
+	public Event(String hostname) {
+		this.fields = new HashMap<>();
+		this.hostname = hostname;
+	}
 
 }

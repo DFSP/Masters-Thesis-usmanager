@@ -43,85 +43,85 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.conditi
 @Service
 public class ContainerRulesService {
 
-  private final ContainerRuleRepository rules;
+	private final ContainerRuleRepository rules;
 
-  public ContainerRulesService(ContainerRuleRepository rules) {
-    this.rules = rules;
-  }
+	public ContainerRulesService(ContainerRuleRepository rules) {
+		this.rules = rules;
+	}
 
-  public List<ContainerRuleEntity> getRules() {
-    return rules.findAll();
-  }
+	public List<ContainerRuleEntity> getRules() {
+		return rules.findAll();
+	}
 
-  public ContainerRuleEntity getRule(Long id) {
-    return rules.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ContainerRuleEntity.class, "id", id.toString()));
-  }
+	public ContainerRuleEntity getRule(Long id) {
+		return rules.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ContainerRuleEntity.class, "id", id.toString()));
+	}
 
-  public ContainerRuleEntity getRule(String name) {
-    return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(ContainerRuleEntity.class, "name", name));
-  }
+	public ContainerRuleEntity getRule(String name) {
+		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
+			new EntityNotFoundException(ContainerRuleEntity.class, "name", name));
+	}
 
-  public List<ContainerRuleEntity> getContainerRules(String containerId) {
-    return rules.findByContainerId(containerId);
-  }
-  
-  public List<ContainerRuleEntity> getGenericContainerRules() {
-    return rules.findGenericContainerRules();
-  }
+	public List<ContainerRuleEntity> getContainerRules(String containerId) {
+		return rules.findByContainerId(containerId);
+	}
 
-  public ConditionEntity getCondition(String ruleName, String conditionName) {
-    assertRuleExists(ruleName);
-    return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
-        new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
-  }
+	public List<ContainerRuleEntity> getGenericContainerRules() {
+		return rules.findGenericContainerRules();
+	}
 
-  public List<ConditionEntity> getConditions(String ruleName) {
-    assertRuleExists(ruleName);
-    return rules.getConditions(ruleName);
-  }
-  
-  public ContainerEntity getContainer(String ruleName, String containerId) {
-    assertRuleExists(ruleName);
-    return rules.getContainer(ruleName, containerId).orElseThrow(() ->
-        new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
-  }
+	public ConditionEntity getCondition(String ruleName, String conditionName) {
+		assertRuleExists(ruleName);
+		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
+			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+	}
 
-  public List<ContainerEntity> getContainers(String ruleName) {
-    assertRuleExists(ruleName);
-    return rules.getContainers(ruleName);
-  }
+	public List<ConditionEntity> getConditions(String ruleName) {
+		assertRuleExists(ruleName);
+		return rules.getConditions(ruleName);
+	}
 
- 
-  private void assertRuleExists(String ruleName) {
-    if (!rules.hasRule(ruleName)) {
-      throw new EntityNotFoundException(ContainerRuleEntity.class, "ruleName", ruleName);
-    }
-  }
+	public ContainerEntity getContainer(String ruleName, String containerId) {
+		assertRuleExists(ruleName);
+		return rules.getContainer(ruleName, containerId).orElseThrow(() ->
+			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
+	}
 
-  public List<Rule> generateContainerRules(String containerId) {
-    List<ContainerRuleEntity> genericContainerRules = getGenericContainerRules();
-    List<ContainerRuleEntity> containerRules = getContainerRules(containerId);
-    var rules = new ArrayList<Rule>(genericContainerRules.size() + containerRules.size());
-    genericContainerRules.forEach(genericContainerRule -> rules.add(generateContainerRule(genericContainerRule)));
-    log.info("Generated generic container rules (count: {})", genericContainerRules.size());
-    containerRules.forEach(containerRule -> rules.add(generateContainerRule(containerRule)));
-    log.info("Generated container rules (count: {})", containerRules.size());
-    return rules;
-  }
+	public List<ContainerEntity> getContainers(String ruleName) {
+		assertRuleExists(ruleName);
+		return rules.getContainers(ruleName);
+	}
 
-  private Rule generateContainerRule(ContainerRuleEntity containerRule) {
-    Long id = containerRule.getId();
-    List<Condition> conditions = getConditions(containerRule.getName()).stream().map(condition -> {
-      String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName());
-      double value = condition.getValue();
-      Operator operator = condition.getOperator().getOperator();
-      return new Condition(fieldName, value, operator);
-    }).collect(Collectors.toList());
-    RuleDecision decision = containerRule.getDecision().getRuleDecision();
-    int priority = containerRule.getPriority();
-    return new Rule(id, conditions, decision, priority);
-  }
+
+	private void assertRuleExists(String ruleName) {
+		if (!rules.hasRule(ruleName)) {
+			throw new EntityNotFoundException(ContainerRuleEntity.class, "ruleName", ruleName);
+		}
+	}
+
+	public List<Rule> generateContainerRules(String containerId) {
+		List<ContainerRuleEntity> genericContainerRules = getGenericContainerRules();
+		List<ContainerRuleEntity> containerRules = getContainerRules(containerId);
+		var rules = new ArrayList<Rule>(genericContainerRules.size() + containerRules.size());
+		genericContainerRules.forEach(genericContainerRule -> rules.add(generateContainerRule(genericContainerRule)));
+		log.info("Generated generic container rules (count: {})", genericContainerRules.size());
+		containerRules.forEach(containerRule -> rules.add(generateContainerRule(containerRule)));
+		log.info("Generated container rules (count: {})", containerRules.size());
+		return rules;
+	}
+
+	private Rule generateContainerRule(ContainerRuleEntity containerRule) {
+		Long id = containerRule.getId();
+		List<Condition> conditions = getConditions(containerRule.getName()).stream().map(condition -> {
+			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName());
+			double value = condition.getValue();
+			Operator operator = condition.getOperator().getOperator();
+			return new Condition(fieldName, value, operator);
+		}).collect(Collectors.toList());
+		RuleDecision decision = containerRule.getDecision().getRuleDecision();
+		int priority = containerRule.getPriority();
+		return new Rule(id, conditions, decision, priority);
+	}
 
 }

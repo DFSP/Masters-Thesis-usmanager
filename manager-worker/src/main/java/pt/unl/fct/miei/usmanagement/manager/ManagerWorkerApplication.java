@@ -30,8 +30,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ManagerWorkerApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ManagerWorkerApplication.class, args);
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(ManagerWorkerApplication.class, args);
+	}
 
 }

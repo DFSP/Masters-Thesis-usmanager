@@ -24,22 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,33 +39,33 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.Condit
 @Table(name = "host_rule_conditions")
 public class HostRuleConditionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "host_rule_id")
-  private HostRuleEntity hostRule;
+	@ManyToOne
+	@JoinColumn(name = "host_rule_id")
+	private HostRuleEntity hostRule;
 
-  @ManyToOne
-  @JoinColumn(name = "condition_id")
-  private ConditionEntity hostCondition;
+	@ManyToOne
+	@JoinColumn(name = "condition_id")
+	private ConditionEntity hostCondition;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof HostRuleConditionEntity)) {
-      return false;
-    }
-    HostRuleConditionEntity other = (HostRuleConditionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostRuleConditionEntity)) {
+			return false;
+		}
+		HostRuleConditionEntity other = (HostRuleConditionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

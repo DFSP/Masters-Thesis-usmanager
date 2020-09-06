@@ -37,19 +37,19 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("edge")
 public class EdgeHostsProperties {
 
-  private final Access access;
+	private final Access access;
 
-  public EdgeHostsProperties() {
-    this.access = new Access();
-  }
+	public EdgeHostsProperties() {
+		this.access = new Access();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Access {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Access {
 
-    private String keyFilePath;
+		private String keyFilePath;
 
-  }
+	}
 
 }

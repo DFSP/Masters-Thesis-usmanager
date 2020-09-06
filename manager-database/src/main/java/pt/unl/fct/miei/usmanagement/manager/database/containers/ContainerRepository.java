@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.containers;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,40 +31,43 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ContainerRepository extends JpaRepository<ContainerEntity, Long> {
 
-  Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
+	Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
 
-  List<ContainerEntity> findByHostname(String hostname);
+	List<ContainerEntity> findByHostname(String hostname);
 
-  @Query("select r "
-      + "from ContainerEntity c join c.containerRules r "
-      + "where r.generic = false and c.containerId = :containerId")
-  List<ContainerRuleEntity> getRules(@Param("containerId") String containerId);
-
-
-  @Query("select r "
-      + "from ContainerEntity c join c.containerRules r "
-      + "where r.generic = false and c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
-  List<ContainerRuleEntity> getRule(@Param("containerId") String containerId,
-                                    @Param("ruleName") String ruleName);
-
-  @Query("select m "
-      + "from ContainerEntity c join c.simulatedContainerMetrics m "
-      + "where c.containerId = :containerId")
-  List<ContainerSimulatedMetricEntity> getSimulatedMetrics(@Param("containerId") String containerId);
-
-  @Query("select m "
-      + "from ContainerEntity c join c.simulatedContainerMetrics m "
-      + "where c.containerId = :containerId and lower(m.name) = lower(:simulatedMetricName)")
-  Optional<ContainerSimulatedMetricEntity> getSimulatedMetric(@Param("containerId") String containerId,
-                                                              @Param("simulatedMetricName") String simulatedMetricName);
+	@Query("select r "
+		+ "from ContainerEntity c join c.containerRules r "
+		+ "where r.generic = false and c.containerId = :containerId")
+	List<ContainerRuleEntity> getRules(@Param("containerId") String containerId);
 
 
-  @Query("select case when count(c) > 0 then true else false end "
-      + "from ContainerEntity c "
-      + "where c.containerId = :containerId")
-  boolean hasContainer(@Param("containerId") String containerId);
+	@Query("select r "
+		+ "from ContainerEntity c join c.containerRules r "
+		+ "where r.generic = false and c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
+	List<ContainerRuleEntity> getRule(@Param("containerId") String containerId,
+									  @Param("ruleName") String ruleName);
+
+	@Query("select m "
+		+ "from ContainerEntity c join c.simulatedContainerMetrics m "
+		+ "where c.containerId = :containerId")
+	List<ContainerSimulatedMetricEntity> getSimulatedMetrics(@Param("containerId") String containerId);
+
+	@Query("select m "
+		+ "from ContainerEntity c join c.simulatedContainerMetrics m "
+		+ "where c.containerId = :containerId and lower(m.name) = lower(:simulatedMetricName)")
+	Optional<ContainerSimulatedMetricEntity> getSimulatedMetric(@Param("containerId") String containerId,
+																@Param("simulatedMetricName") String simulatedMetricName);
+
+
+	@Query("select case when count(c) > 0 then true else false end "
+		+ "from ContainerEntity c "
+		+ "where c.containerId = :containerId")
+	boolean hasContainer(@Param("containerId") String containerId);
 
 }

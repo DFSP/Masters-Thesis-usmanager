@@ -30,7 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 @Data
 public class AddAppService {
 
-  private final ServiceEntity service;
-  private final int launchOrder;
+	private final ServiceEntity service;
+	private final int launchOrder;
 
 }

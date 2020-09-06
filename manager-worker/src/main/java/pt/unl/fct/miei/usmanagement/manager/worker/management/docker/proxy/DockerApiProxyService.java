@@ -40,52 +40,52 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesS
 @Service
 public class DockerApiProxyService {
 
-  public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
+	public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
 
-  private final ServicesService servicesService;
-  private final HostsService hostsService;
+	private final ServicesService servicesService;
+	private final HostsService hostsService;
 
-  private final String dockerApiProxyUsername;
-  private final String dockerApiProxyPassword;
-  private final int dockerApiPort;
+	private final String dockerApiProxyUsername;
+	private final String dockerApiProxyPassword;
+	private final int dockerApiPort;
 
-  public DockerApiProxyService(ServicesService servicesService,
-                               @Lazy HostsService hostsService,
-                               DockerProperties dockerProperties) {
-    this.servicesService = servicesService;
-    this.hostsService = hostsService;
-    this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
-    this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
-    this.dockerApiPort = dockerProperties.getApi().getPort();
-  }
+	public DockerApiProxyService(ServicesService servicesService,
+								 @Lazy HostsService hostsService,
+								 DockerProperties dockerProperties) {
+		this.servicesService = servicesService;
+		this.hostsService = hostsService;
+		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
+		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
+		this.dockerApiPort = dockerProperties.getApi().getPort();
+	}
 
-  public String launchDockerApiProxy(String hostname) {
-    ServiceEntity dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
-    String serviceName = dockerApiProxy.getServiceName();
-    ServiceType serviceType = dockerApiProxy.getServiceType();
-    String externalPort = dockerApiProxy.getDefaultExternalPort();
-    String internalPort = dockerApiProxy.getDefaultInternalPort();
-    var dockerRepository = dockerApiProxy.getDockerRepository();
-    var command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
-            + "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
-            + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
-            + "docker pull %s && "
-            + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
-            + "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-            + "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%b -l %s=%b %s; fi",
-        serviceName, dockerRepository, externalPort, internalPort,
-        ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
-        ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
-        ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
-        ContainerConstants.Label.SERVICE_NAME, serviceName,
-        ContainerConstants.Label.SERVICE_TYPE, serviceType,
-        ContainerConstants.Label.SERVICE_ADDRESS, hostname, externalPort,
-        ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
-        ContainerConstants.Label.IS_STOPPABLE, false,
-        ContainerConstants.Label.IS_REPLICABLE, false,
-        dockerRepository);
-    List<String> output = hostsService.executeCommand(command, hostname);
-    return output.get(output.size() - 1);
-  }
+	public String launchDockerApiProxy(String hostname) {
+		ServiceEntity dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
+		String serviceName = dockerApiProxy.getServiceName();
+		ServiceType serviceType = dockerApiProxy.getServiceType();
+		String externalPort = dockerApiProxy.getDefaultExternalPort();
+		String internalPort = dockerApiProxy.getDefaultInternalPort();
+		var dockerRepository = dockerApiProxy.getDockerRepository();
+		var command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
+				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
+				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
+				+ "docker pull %s && "
+				+ "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
+				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
+				+ "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%b -l %s=%b %s; fi",
+			serviceName, dockerRepository, externalPort, internalPort,
+			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
+			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
+			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
+			ContainerConstants.Label.SERVICE_NAME, serviceName,
+			ContainerConstants.Label.SERVICE_TYPE, serviceType,
+			ContainerConstants.Label.SERVICE_ADDRESS, hostname, externalPort,
+			ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
+			ContainerConstants.Label.IS_STOPPABLE, false,
+			ContainerConstants.Label.IS_REPLICABLE, false,
+			dockerRepository);
+		List<String> output = hostsService.executeCommand(command, hostname);
+		return output.get(output.size() - 1);
+	}
 
 }

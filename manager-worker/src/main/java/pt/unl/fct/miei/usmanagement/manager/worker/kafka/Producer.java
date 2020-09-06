@@ -32,25 +32,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class Producer {
 
-  private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public Producer(KafkaTemplate<String, Object> kafkaTemplate) {
-    this.kafkaTemplate = kafkaTemplate;
-  }
+	public Producer(KafkaTemplate<String, Object> kafkaTemplate) {
+		this.kafkaTemplate = kafkaTemplate;
+	}
 
   /*public void sendCustomer(Customer customer) {
     log.info("Producing customer -> {}", customer);
     this.kafkaTemplate.send("customers", customer);
   }*/
 
-  public void sendUser(User user) {
-    log.info("Producing user -> {}", user);
-    this.kafkaTemplate.send("users", user);
-  }
+	public void sendUser(User user) {
+		log.info("Producing user -> {}", user);
+		this.kafkaTemplate.send("users", user);
+	}
 
   /*public void sendMessage(String message) {
     log.info("Producing message -> {}", message);
     this.kafkaTemplate.send("messages", message);
   }*/
-  
+
 }

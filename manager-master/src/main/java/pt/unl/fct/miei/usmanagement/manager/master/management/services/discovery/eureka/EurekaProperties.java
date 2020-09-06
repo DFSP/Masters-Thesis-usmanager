@@ -37,6 +37,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("eureka")
 public class EurekaProperties {
 
-  private int port;
+	private int port;
 
 }

@@ -24,23 +24,23 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Builder
 @Data
 public class SshCommandResult {
 
-  private final String hostname;
-  private final String command;
-  private final int exitStatus;
-  private final List<String> output;
-  private final List<String> error;
+	private final String hostname;
+	private final String command;
+	private final int exitStatus;
+	private final List<String> output;
+	private final List<String> error;
 
-  public boolean isSuccessful() {
-    return exitStatus == 0;
-  }
+	public boolean isSuccessful() {
+		return exitStatus == 0;
+	}
 
 }

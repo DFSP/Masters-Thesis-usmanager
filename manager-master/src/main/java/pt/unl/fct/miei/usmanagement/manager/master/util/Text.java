@@ -28,12 +28,12 @@ import java.util.Objects;
 
 public class Text {
 
-  public static boolean notEmptyEquals(String string1, String string2) {
-    return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
-  }
+	public static boolean notEmptyEquals(String string1, String string2) {
+		return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
+	}
 
-  public static boolean isNullOrEmpty(String string) {
-    return string == null || string.isEmpty();
-  }
+	public static boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
 
 }

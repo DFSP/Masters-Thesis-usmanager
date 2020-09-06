@@ -24,19 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -47,32 +41,32 @@ import lombok.Setter;
 @Table(name = "sym_node_group")
 public class SymNodeGroupEntity {
 
-  @Id
-  private String nodeGroupId;
+	@Id
+	private String nodeGroupId;
 
-  private String description;
+	private String description;
 
-  private LocalDateTime createTime;
+	private LocalDateTime createTime;
 
-  private String lastUpdateBy;
+	private String lastUpdateBy;
 
-  private LocalDateTime lastUpdateTime;
+	private LocalDateTime lastUpdateTime;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeGroupEntity)) {
-      return false;
-    }
-    SymNodeGroupEntity other = (SymNodeGroupEntity) o;
-    return nodeGroupId != null && nodeGroupId.equals(other.getNodeGroupId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getNodeGroupId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getNodeGroupId());
-  }
-  
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeGroupEntity)) {
+			return false;
+		}
+		SymNodeGroupEntity other = (SymNodeGroupEntity) o;
+		return nodeGroupId != null && nodeGroupId.equals(other.getNodeGroupId());
+	}
+
 }

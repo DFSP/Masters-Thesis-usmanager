@@ -24,22 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.group.link;
 
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,43 +41,46 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "sym_node_group_link")
 public class SymNodeGroupLinkEntity {
 
-  @Id
-  private String sourceNodeGroupId;
+	@Id
+	private String sourceNodeGroupId;
 
-  @Id
-  private String targetNodeGroupId;
+	@Id
+	private String targetNodeGroupId;
 
-  @Builder.Default @Column(columnDefinition = "char(1) default 'W'")
-  private String dataEventAction = "W";
+	@Builder.Default
+	@Column(columnDefinition = "char(1) default 'W'")
+	private String dataEventAction = "W";
 
-  @Builder.Default @ColumnDefault("1")
-  private Short syncConfigEnabled = 1;
+	@Builder.Default
+	@ColumnDefault("1")
+	private Short syncConfigEnabled = 1;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short isReversible = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short isReversible = 0;
 
-  private LocalDateTime createTime;
+	private LocalDateTime createTime;
 
-  private String lastUpdateBy;
+	private String lastUpdateBy;
 
-  private LocalDateTime lastUpdateTime;
+	private LocalDateTime lastUpdateTime;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeGroupLinkEntity)) {
-      return false;
-    }
-    SymNodeGroupLinkEntity other = (SymNodeGroupLinkEntity) o;
-    return sourceNodeGroupId != null && sourceNodeGroupId.equals(other.getSourceNodeGroupId())
-        && targetNodeGroupId != null && targetNodeGroupId.equals(other.getTargetNodeGroupId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSourceNodeGroupId(), getTargetNodeGroupId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(getSourceNodeGroupId(), getTargetNodeGroupId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeGroupLinkEntity)) {
+			return false;
+		}
+		SymNodeGroupLinkEntity other = (SymNodeGroupLinkEntity) o;
+		return sourceNodeGroupId != null && sourceNodeGroupId.equals(other.getSourceNodeGroupId())
+			&& targetNodeGroupId != null && targetNodeGroupId.equals(other.getTargetNodeGroupId());
+	}
 
 }

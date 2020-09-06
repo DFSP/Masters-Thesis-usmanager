@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public final class NotFoundException extends RuntimeException {
 
-  public NotFoundException() {
-  }
+	public NotFoundException() {
+	}
 
-  public NotFoundException(String s, Object... args) {
-    super(String.format(s, args));
-  }
+	public NotFoundException(String s, Object... args) {
+		super(String.format(s, args));
+	}
 
 }

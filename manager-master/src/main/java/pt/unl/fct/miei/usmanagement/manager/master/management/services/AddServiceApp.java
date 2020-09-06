@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 public class AddServiceApp {
 
-  private final String name;
-  private final int launchOrder;
+	private final String name;
+	private final int launchOrder;
 
 }

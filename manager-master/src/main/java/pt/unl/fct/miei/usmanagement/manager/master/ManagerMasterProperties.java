@@ -37,22 +37,22 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("manager-master")
 public class ManagerMasterProperties {
 
-  public static final String MASTER_MANAGER = "master-manager";
-  private final Tests tests;
-  private Mode mode;
-  private int monitorPeriod;
+	public static final String MASTER_MANAGER = "master-manager";
+	private final Tests tests;
+	private Mode mode;
+	private int monitorPeriod;
 
-  public ManagerMasterProperties() {
-    this.tests = new Tests();
-  }
+	public ManagerMasterProperties() {
+		this.tests = new Tests();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Tests {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Tests {
 
-    private boolean enabled;
+		private boolean enabled;
 
-  }
+	}
 
 }

@@ -24,18 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.identity;
 
-import java.util.Objects;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,24 +40,24 @@ import lombok.Setter;
 @Table(name = "sym_node_identity")
 public class SymNodeIdentityEntity {
 
-  @Id
-  private String nodeId;
+	@Id
+	private String nodeId;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeIdentityEntity)) {
-      return false;
-    }
-    SymNodeIdentityEntity other = (SymNodeIdentityEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getNodeId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getNodeId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeIdentityEntity)) {
+			return false;
+		}
+		SymNodeIdentityEntity other = (SymNodeIdentityEntity) o;
+		return nodeId != null && nodeId.equals(other.getNodeId());
+	}
 
 }

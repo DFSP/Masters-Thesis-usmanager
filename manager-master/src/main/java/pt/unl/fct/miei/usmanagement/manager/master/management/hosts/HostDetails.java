@@ -35,15 +35,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 @EqualsAndHashCode
 public class HostDetails {
 
-  private final HostAddress hostAddress;
-  private final HostLocation hostLocation;
+	private final HostAddress hostAddress;
+	private final HostLocation hostLocation;
 
-  public HostDetails(HostAddress hostAddress) {
-    this(hostAddress, null);
-  }
+	public HostDetails(HostAddress hostAddress) {
+		this(hostAddress, null);
+	}
 
-  public HostDetails(HostLocation hostLocation) {
-    this(null, hostLocation);
-  }
+	public HostDetails(HostLocation hostLocation) {
+		this(null, hostLocation);
+	}
 
 }

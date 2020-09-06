@@ -39,15 +39,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @EqualsAndHashCode(callSuper = true)
 public class HostDecisionResult extends DecisionResult {
 
-  public HostDecisionResult(String hostname) {
-    this(hostname, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
-  }
+	public HostDecisionResult(String hostname) {
+		this(hostname, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
+	}
 
-  public HostDecisionResult(String hostname, RuleDecision decision, long ruleId,
-                            Map<String, Double> fields, int priority) {
-    super(hostname, decision, ruleId, fields, priority,
-        fields.values().stream().mapToDouble(Double::doubleValue).sum());
-  }
+	public HostDecisionResult(String hostname, RuleDecision decision, long ruleId,
+							  Map<String, Double> fields, int priority) {
+		super(hostname, decision, ruleId, fields, priority,
+			fields.values().stream().mapToDouble(Double::doubleValue).sum());
+	}
 
 }
 

@@ -37,11 +37,11 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("host")
 public class HostProperties {
 
-  private long monitorPeriod;
-  private int minimumHosts;
-  private int maximumHosts;
-  private double maximumRamPercentage;
-  private double maximumCpuPercentage;
-  private String localMachineDns;
+	private long monitorPeriod;
+	private int minimumHosts;
+	private int maximumHosts;
+	private double maximumRamPercentage;
+	private double maximumCpuPercentage;
+	private String localMachineDns;
 
 }

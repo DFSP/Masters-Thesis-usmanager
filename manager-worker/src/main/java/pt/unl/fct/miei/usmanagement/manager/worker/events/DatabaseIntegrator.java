@@ -35,19 +35,19 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 @Slf4j
 public class DatabaseIntegrator implements Integrator {
 
-  public static final DatabaseIntegrator INSTANCE = new DatabaseIntegrator();
-  public static final PostInsertEventListener POST_INSERT_INSTANCE = new PostInsertEventListener();
+	public static final DatabaseIntegrator INSTANCE = new DatabaseIntegrator();
+	public static final PostInsertEventListener POST_INSERT_INSTANCE = new PostInsertEventListener();
 
-  @Override
-  public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
-                        SessionFactoryServiceRegistry serviceRegistry) {
-    final EventListenerRegistry eventListenerRegistry = serviceRegistry.getService(EventListenerRegistry.class);
-    eventListenerRegistry.appendListeners(EventType.POST_INSERT, POST_INSERT_INSTANCE);
-  }
+	@Override
+	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+						  SessionFactoryServiceRegistry serviceRegistry) {
+		final EventListenerRegistry eventListenerRegistry = serviceRegistry.getService(EventListenerRegistry.class);
+		eventListenerRegistry.appendListeners(EventType.POST_INSERT, POST_INSERT_INSTANCE);
+	}
 
-  @Override
-  public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-    // empty
-  }
+	@Override
+	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		// empty
+	}
 
 }

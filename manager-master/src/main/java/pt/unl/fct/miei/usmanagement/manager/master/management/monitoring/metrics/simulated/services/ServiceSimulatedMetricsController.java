@@ -24,82 +24,75 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.services;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/simulated-metrics/services")
 public class ServiceSimulatedMetricsController {
 
-  private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
+	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 
-  public ServiceSimulatedMetricsController(ServiceSimulatedMetricsService serviceSimulatedMetricsService) {
-    this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
-  }
+	public ServiceSimulatedMetricsController(ServiceSimulatedMetricsService serviceSimulatedMetricsService) {
+		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
+	}
 
-  @GetMapping
-  public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
-    return serviceSimulatedMetricsService.getServiceSimulatedMetrics();
-  }
+	@GetMapping
+	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
+		return serviceSimulatedMetricsService.getServiceSimulatedMetrics();
+	}
 
-  @GetMapping("/{simulatedMetricName}")
-  public ServiceSimulatedMetricEntity getServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
-    return serviceSimulatedMetricsService.getServiceSimulatedMetric(simulatedMetricName);
-  }
+	@GetMapping("/{simulatedMetricName}")
+	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
+		return serviceSimulatedMetricsService.getServiceSimulatedMetric(simulatedMetricName);
+	}
 
-  @PostMapping
-  public ServiceSimulatedMetricEntity addServiceSimulatedMetric(
-      @RequestBody ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-    Validation.validatePostRequest(serviceSimulatedMetric.getId());
-    return serviceSimulatedMetricsService.addServiceSimulatedMetric(serviceSimulatedMetric);
-  }
+	@PostMapping
+	public ServiceSimulatedMetricEntity addServiceSimulatedMetric(
+		@RequestBody ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+		Validation.validatePostRequest(serviceSimulatedMetric.getId());
+		return serviceSimulatedMetricsService.addServiceSimulatedMetric(serviceSimulatedMetric);
+	}
 
-  @PutMapping("/{simulatedMetricName}")
-  public ServiceSimulatedMetricEntity updateServiceSimulatedMetric(
-      @PathVariable String simulatedMetricName,
-      @RequestBody ServiceSimulatedMetricEntity simulatedMetric) {
-    Validation.validatePutRequest(simulatedMetric.getId());
-    return serviceSimulatedMetricsService.updateServiceSimulatedMetric(simulatedMetricName, simulatedMetric);
-  }
+	@PutMapping("/{simulatedMetricName}")
+	public ServiceSimulatedMetricEntity updateServiceSimulatedMetric(
+		@PathVariable String simulatedMetricName,
+		@RequestBody ServiceSimulatedMetricEntity simulatedMetric) {
+		Validation.validatePutRequest(simulatedMetric.getId());
+		return serviceSimulatedMetricsService.updateServiceSimulatedMetric(simulatedMetricName, simulatedMetric);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}")
-  public void deleteServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
-    serviceSimulatedMetricsService.deleteServiceSimulatedMetric(simulatedMetricName);
-  }
+	@DeleteMapping("/{simulatedMetricName}")
+	public void deleteServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
+		serviceSimulatedMetricsService.deleteServiceSimulatedMetric(simulatedMetricName);
+	}
 
 
-  @GetMapping("/{simulatedMetricName}/services")
-  public List<ServiceEntity> getServiceSimulatedMetricServices(@PathVariable String simulatedMetricName) {
-    return serviceSimulatedMetricsService.getServices(simulatedMetricName);
-  }
+	@GetMapping("/{simulatedMetricName}/services")
+	public List<ServiceEntity> getServiceSimulatedMetricServices(@PathVariable String simulatedMetricName) {
+		return serviceSimulatedMetricsService.getServices(simulatedMetricName);
+	}
 
-  @PostMapping("/{simulatedMetricName}/services")
-  public void addServiceSimulatedMetricServices(@PathVariable String simulatedMetricName,
-                                                @RequestBody List<String> services) {
-    serviceSimulatedMetricsService.addServices(simulatedMetricName, services);
-  }
+	@PostMapping("/{simulatedMetricName}/services")
+	public void addServiceSimulatedMetricServices(@PathVariable String simulatedMetricName,
+												  @RequestBody List<String> services) {
+		serviceSimulatedMetricsService.addServices(simulatedMetricName, services);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}/services")
-  public void removeServiceSimulatedMetricServices(@PathVariable String simulatedMetricName,
-                                                   @RequestBody List<String> services) {
-    serviceSimulatedMetricsService.removeServices(simulatedMetricName, services);
-  }
+	@DeleteMapping("/{simulatedMetricName}/services")
+	public void removeServiceSimulatedMetricServices(@PathVariable String simulatedMetricName,
+													 @RequestBody List<String> services) {
+		serviceSimulatedMetricsService.removeServices(simulatedMetricName, services);
+	}
 
-  @DeleteMapping("/{simulatedMetricName}/services/{serviceName}")
-  public void removeServiceSimulatedMetricService(@PathVariable String simulatedMetricName,
-                                                  @PathVariable String serviceName) {
-    serviceSimulatedMetricsService.removeService(simulatedMetricName, serviceName);
-  }
+	@DeleteMapping("/{simulatedMetricName}/services/{serviceName}")
+	public void removeServiceSimulatedMetricService(@PathVariable String simulatedMetricName,
+													@PathVariable String serviceName) {
+		serviceSimulatedMetricsService.removeService(simulatedMetricName, serviceName);
+	}
 
 }

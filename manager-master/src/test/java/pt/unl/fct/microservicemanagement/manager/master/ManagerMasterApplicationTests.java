@@ -33,8 +33,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class ManagerMasterApplicationTests {
 
-  @Test
-  public void contextLoads() {
-  }
+	@Test
+	public void contextLoads() {
+	}
 
 }

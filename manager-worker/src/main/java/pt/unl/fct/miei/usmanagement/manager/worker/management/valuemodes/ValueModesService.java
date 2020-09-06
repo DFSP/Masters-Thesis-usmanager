@@ -36,24 +36,24 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ValueModesService {
 
-  private final ValueModeRepository valueModes;
+	private final ValueModeRepository valueModes;
 
-  public ValueModesService(ValueModeRepository valueModes) {
-    this.valueModes = valueModes;
-  }
+	public ValueModesService(ValueModeRepository valueModes) {
+		this.valueModes = valueModes;
+	}
 
-  public List<ValueModeEntity> getValueModes() {
-    return valueModes.findAll();
-  }
+	public List<ValueModeEntity> getValueModes() {
+		return valueModes.findAll();
+	}
 
-  public ValueModeEntity getValueMode(Long id) {
-    return valueModes.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ValueModeEntity.class, "id", id.toString()));
-  }
+	public ValueModeEntity getValueMode(Long id) {
+		return valueModes.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ValueModeEntity.class, "id", id.toString()));
+	}
 
-  public ValueModeEntity getValueMode(String valueModeName) {
-    return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
-        new EntityNotFoundException(ValueModeEntity.class, "name", valueModeName));
-  }
+	public ValueModeEntity getValueMode(String valueModeName) {
+		return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
+			new EntityNotFoundException(ValueModeEntity.class, "name", valueModeName));
+	}
 
 }

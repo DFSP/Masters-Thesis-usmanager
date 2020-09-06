@@ -24,21 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.regions;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RegionRepository extends JpaRepository<RegionEntity, Long> {
 
-  @Query("select case when count(r) > 0 then true else false end "
-      + "from RegionEntity r "
-      + "where lower(r.name) = lower(:regionName)")
-  boolean hasRegion(@Param("regionName") String regionName);
+	@Query("select case when count(r) > 0 then true else false end "
+		+ "from RegionEntity r "
+		+ "where lower(r.name) = lower(:regionName)")
+	boolean hasRegion(@Param("regionName") String regionName);
 
-  Optional<RegionEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<RegionEntity> findByNameIgnoreCase(@Param("name") String name);
 
 }

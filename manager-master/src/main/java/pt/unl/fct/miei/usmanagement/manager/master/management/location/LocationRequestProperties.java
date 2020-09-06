@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("location-request")
 public class LocationRequestProperties {
 
-  private int port;
-  private double minimumRequestCountPercentage;
+	private int port;
+	private double minimumRequestCountPercentage;
 
 }

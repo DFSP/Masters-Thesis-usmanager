@@ -35,10 +35,10 @@ import pt.unl.fct.miei.usmanagement.manager.worker.events.DatabaseIntegrator;
 @Component
 public class HibernateConfiguration implements HibernatePropertiesCustomizer {
 
-  @Override
-  public void customize(Map<String, Object> hibernateProperties) {
-    hibernateProperties.put("hibernate.integrator_provider",
-        (IntegratorProvider) () -> Collections.singletonList(DatabaseIntegrator.INSTANCE));
-  }
+	@Override
+	public void customize(Map<String, Object> hibernateProperties) {
+		hibernateProperties.put("hibernate.integrator_provider",
+			(IntegratorProvider) () -> Collections.singletonList(DatabaseIntegrator.INSTANCE));
+	}
 
 }

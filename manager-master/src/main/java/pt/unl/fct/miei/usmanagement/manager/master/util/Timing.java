@@ -24,39 +24,41 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
 
-import lombok.experimental.UtilityClass;
-
 @UtilityClass
 public class Timing {
 
-  public void sleep(long time, TimeUnit timeUnit) {
-    try {
-      timeUnit.sleep(time);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+	public void sleep(long time, TimeUnit timeUnit) {
+		try {
+			timeUnit.sleep(time);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-  public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
-    wait(condition, 50, timeout);
-  }
+	public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
+		wait(condition, 50, timeout);
+	}
 
-  public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
-    long start = System.currentTimeMillis();
-    while (!condition.getAsBoolean()) {
-      if (System.currentTimeMillis() - start > timeout) {
-        throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
-      }
-      try {
-        Thread.sleep(sleep);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-  }
+	public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
+		long start = System.currentTimeMillis();
+		while (!condition.getAsBoolean()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
+			}
+			try {
+				Thread.sleep(sleep);
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 }

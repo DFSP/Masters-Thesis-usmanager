@@ -26,10 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.master.exceptions;
 
 public final class NotImplementedException extends RuntimeException {
 
-  private static final String MESSAGE = "Code not implemented";
+	private static final String MESSAGE = "Code not implemented";
 
-  public NotImplementedException() {
-    super(MESSAGE);
-  }
+	public NotImplementedException() {
+		super(MESSAGE);
+	}
 
 }

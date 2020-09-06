@@ -37,35 +37,35 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class AppsService {
 
-  private final AppRepository apps;
+	private final AppRepository apps;
 
-  public AppsService(AppRepository apps) {
-    this.apps = apps;
-  }
+	public AppsService(AppRepository apps) {
+		this.apps = apps;
+	}
 
-  public List<AppEntity> getApps() {
-    return apps.findAll();
-  }
+	public List<AppEntity> getApps() {
+		return apps.findAll();
+	}
 
-  public AppEntity getApp(Long id) {
-    return apps.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(AppEntity.class, "id", id.toString()));
-  }
+	public AppEntity getApp(Long id) {
+		return apps.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(AppEntity.class, "id", id.toString()));
+	}
 
-  public AppEntity getApp(String appName) {
-    return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
-        new EntityNotFoundException(AppEntity.class, "name", appName));
-  }
+	public AppEntity getApp(String appName) {
+		return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
+			new EntityNotFoundException(AppEntity.class, "name", appName));
+	}
 
-  public List<AppServiceEntity> getServices(String appName) {
-    assertAppExists(appName);
-    return apps.getServices(appName);
-  }
+	public List<AppServiceEntity> getServices(String appName) {
+		assertAppExists(appName);
+		return apps.getServices(appName);
+	}
 
-  private void assertAppExists(String appName) {
-    if (!apps.hasApp(appName)) {
-      throw new EntityNotFoundException(AppEntity.class, "name", appName);
-    }
-  }
+	private void assertAppExists(String appName) {
+		if (!apps.hasApp(appName)) {
+			throw new EntityNotFoundException(AppEntity.class, "name", appName);
+		}
+	}
 
 }

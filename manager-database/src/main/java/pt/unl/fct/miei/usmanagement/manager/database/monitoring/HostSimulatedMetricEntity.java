@@ -25,32 +25,17 @@
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -61,66 +46,66 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 @Table(name = "simulated_host_metrics")
 public class HostSimulatedMetricEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "field_id")
-  private FieldEntity field;
+	@ManyToOne
+	@JoinColumn(name = "field_id")
+	private FieldEntity field;
 
-  private double minimumValue;
+	private double minimumValue;
 
-  private double maximumValue;
+	private double maximumValue;
 
-  private boolean override;
+	private boolean override;
 
-  private boolean generic;
+	private boolean generic;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<CloudHostEntity> cloudHosts;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<CloudHostEntity> cloudHosts;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<EdgeHostEntity> edgeHosts;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "simulatedHostMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<EdgeHostEntity> edgeHosts;
 
-  public void removeAssociations() {
-    Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
-    while (cloudHostsIterator.hasNext()) {
-      CloudHostEntity cloudHost = cloudHostsIterator.next();
-      cloudHostsIterator.remove();
-      cloudHost.getSimulatedHostMetrics().remove(this);
-    }
-    Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
-    while (edgeHostsIterator.hasNext()) {
-      EdgeHostEntity edgeHost = edgeHostsIterator.next();
-      edgeHostsIterator.remove();
-      edgeHost.getSimulatedHostMetrics().remove(this);
-    }
-  }
+	public void removeAssociations() {
+		Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
+		while (cloudHostsIterator.hasNext()) {
+			CloudHostEntity cloudHost = cloudHostsIterator.next();
+			cloudHostsIterator.remove();
+			cloudHost.getSimulatedHostMetrics().remove(this);
+		}
+		Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
+		while (edgeHostsIterator.hasNext()) {
+			EdgeHostEntity edgeHost = edgeHostsIterator.next();
+			edgeHostsIterator.remove();
+			edgeHost.getSimulatedHostMetrics().remove(this);
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof HostSimulatedMetricEntity)) {
-      return false;
-    }
-    HostSimulatedMetricEntity other = (HostSimulatedMetricEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostSimulatedMetricEntity)) {
+			return false;
+		}
+		HostSimulatedMetricEntity other = (HostSimulatedMetricEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

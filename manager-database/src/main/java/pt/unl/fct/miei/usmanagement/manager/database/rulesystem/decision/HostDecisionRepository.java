@@ -24,14 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface HostDecisionRepository extends JpaRepository<HostDecisionEntity, Long> {
 
-  List<HostDecisionEntity> findByHostname(String hostname);
+	List<HostDecisionEntity> findByHostname(String hostname);
 
 }

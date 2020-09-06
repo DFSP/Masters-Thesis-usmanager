@@ -30,7 +30,7 @@ import lombok.Data;
 @Data
 class LocationMonitoringResponse {
 
-  private final String toService;
-  private final LocationMonitoringSimple locationData;
+	private final String toService;
+	private final LocationMonitoringSimple locationData;
 
 }

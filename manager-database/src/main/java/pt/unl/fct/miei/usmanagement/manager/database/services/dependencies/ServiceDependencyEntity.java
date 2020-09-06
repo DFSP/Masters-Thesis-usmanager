@@ -24,22 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.services.dependencies;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,33 +39,33 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 @Table(name = "service_dependencies")
 public class ServiceDependencyEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @JoinColumn(name = "service_id")
-  @ManyToOne
-  private ServiceEntity service;
+	@JoinColumn(name = "service_id")
+	@ManyToOne
+	private ServiceEntity service;
 
-  @JoinColumn(name = "dependency_id")
-  @ManyToOne
-  private ServiceEntity dependency;
+	@JoinColumn(name = "dependency_id")
+	@ManyToOne
+	private ServiceEntity dependency;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceDependencyEntity)) {
-      return false;
-    }
-    ServiceDependencyEntity other = (ServiceDependencyEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceDependencyEntity)) {
+			return false;
+		}
+		ServiceDependencyEntity other = (ServiceDependencyEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

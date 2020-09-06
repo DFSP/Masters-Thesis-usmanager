@@ -35,16 +35,16 @@ import lombok.ToString;
 @ToString
 public class HostAddress {
 
-  private final String username;
-  private final String publicDnsName;
-  private final String publicIpAddress;
-  private final String privateIpAddress;
+	private final String username;
+	private final String publicDnsName;
+	private final String publicIpAddress;
+	private final String privateIpAddress;
 
-  public HostAddress(String username, String publicIpAddress, String privateIpAddress) {
-    this.username = username;
-    this.publicDnsName = null;
-    this.privateIpAddress = privateIpAddress;
-    this.publicIpAddress = publicIpAddress;
-  }
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress) {
+		this.username = username;
+		this.publicDnsName = null;
+		this.privateIpAddress = privateIpAddress;
+		this.publicIpAddress = publicIpAddress;
+	}
 
 }

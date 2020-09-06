@@ -53,128 +53,129 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.rules.H
 @Service
 public class HostDecisionsService {
 
-  private final HostRulesService hostRulesService;
-  private final HostsEventsService hostsEventsService;
-  private final HostsService hostsService;
-  private final FieldsService fieldsService;
+	private final HostRulesService hostRulesService;
+	private final HostsEventsService hostsEventsService;
+	private final HostsService hostsService;
+	private final FieldsService fieldsService;
 
-  private final DecisionRepository decisions;
-  private final HostDecisionRepository hostDecisions;
-  private final HostDecisionValueRepository hostDecisionValues;
+	private final DecisionRepository decisions;
+	private final HostDecisionRepository hostDecisions;
+	private final HostDecisionValueRepository hostDecisionValues;
 
-  private final int startHostOnEventsCount;
-  private final int stopHostOnEventsCount;
-  private final int maximumHosts;
-  private final int minimumHosts;
+	private final int startHostOnEventsCount;
+	private final int stopHostOnEventsCount;
+	private final int maximumHosts;
+	private final int minimumHosts;
 
-  public HostDecisionsService(HostRulesService hostRulesService, HostsEventsService hostsEventsService,
-                              HostsService hostsService, FieldsService fieldsService, DecisionRepository decisions,
-                              HostDecisionRepository hostDecisions, HostDecisionValueRepository hostDecisionValues,
-                              DecisionProperties decisionProperties, HostProperties hostProperties) {
-    this.hostRulesService = hostRulesService;
-    this.hostsEventsService = hostsEventsService;
-    this.hostsService = hostsService;
-    this.fieldsService = fieldsService;
-    this.decisions = decisions;
-    this.hostDecisions = hostDecisions;
-    this.hostDecisionValues = hostDecisionValues;
-    this.startHostOnEventsCount = decisionProperties.getStartHostOnEventsCount();
-    this.stopHostOnEventsCount = decisionProperties.getStopHostOnEventsCount();
-    this.maximumHosts = hostProperties.getMaximumHosts();
-    this.minimumHosts = hostProperties.getMinimumHosts();
-  }
-
-
-  public List<DecisionEntity> getDecisions() {
-    return decisions.findByComponentTypeType(ComponentType.HOST);
-  }
-
-  public DecisionEntity getDecision(Long id) {
-    return decisions.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
-  }
-
-  public DecisionEntity getDecision(RuleDecision decision) {
-    return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
-        new EntityNotFoundException(DecisionEntity.class, "decision", decision.name()));
-  }
-
-  public DecisionEntity getDecision(String decisionName) {
-    RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-    return this.getDecision(decision);
-  }
-
-  public HostDecisionEntity addDecision(String hostname, String decisionName, long ruleId) {
-    HostRuleEntity rule = hostRulesService.getRule(ruleId);
-    DecisionEntity decision = getDecision(decisionName);
-    HostDecisionEntity hostDecision = HostDecisionEntity.builder().hostname(hostname).rule(rule).decision(decision)
-        .build();
-    return hostDecisions.save(hostDecision);
-  }
-
-  public void addDecisionForFields(HostDecisionEntity hostDecision, Map<String, Double> fields) {
-    hostDecisionValues.saveAll(
-        fields.entrySet().stream()
-            .filter(field -> field.getKey().contains("effective-val"))
-            .map(field ->
-                HostDecisionValueEntity.builder().hostDecision(hostDecision)
-                    .field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
-                    .value(field.getValue()).build())
-            .collect(Collectors.toList()));
-  }
+	public HostDecisionsService(HostRulesService hostRulesService, HostsEventsService hostsEventsService,
+								HostsService hostsService, FieldsService fieldsService, DecisionRepository decisions,
+								HostDecisionRepository hostDecisions, HostDecisionValueRepository hostDecisionValues,
+								DecisionProperties decisionProperties, HostProperties hostProperties) {
+		this.hostRulesService = hostRulesService;
+		this.hostsEventsService = hostsEventsService;
+		this.hostsService = hostsService;
+		this.fieldsService = fieldsService;
+		this.decisions = decisions;
+		this.hostDecisions = hostDecisions;
+		this.hostDecisionValues = hostDecisionValues;
+		this.startHostOnEventsCount = decisionProperties.getStartHostOnEventsCount();
+		this.stopHostOnEventsCount = decisionProperties.getStopHostOnEventsCount();
+		this.maximumHosts = hostProperties.getMaximumHosts();
+		this.minimumHosts = hostProperties.getMinimumHosts();
+	}
 
 
-  public List<HostDecisionEntity> getDecisionsByHost(String hostname) {
-    return hostDecisions.findByHostname(hostname);
-  }
+	public List<DecisionEntity> getDecisions() {
+		return decisions.findByComponentTypeType(ComponentType.HOST);
+	}
 
-  public void processDecisions(Map<String, Map<String, Double>> hostsMonitoring) {
-    var hostsDecisions = new LinkedList<HostDecisionResult>();
-    for (Map.Entry<String, Map<String, Double>> hostFields : hostsMonitoring.entrySet()) {
-      String hostname = hostFields.getKey();
-      Map<String, Double> fields = hostFields.getValue();
-      HostDecisionResult hostDecisionResult = hostRulesService.executeHostRules(hostname, fields);
-      hostsDecisions.add(hostDecisionResult);
-    }
-    log.info("Processing host decisions...");
-    var relevantHostDecisions = new LinkedList<HostDecisionResult>();
-    for (HostDecisionResult hostDecision : hostsDecisions) {
-      String hostname = hostDecision.getHostname();
-      RuleDecision decision = hostDecision.getDecision();
-      log.info("Hostname '{}' had decision '{}'", hostname, decision);
-      HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, this.getDecision(decision.toString()));
-      int hostEventCount = hostEvent.getCount();
-      if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
-          || (decision == RuleDecision.STOP && hostEventCount >= stopHostOnEventsCount)) {
-        relevantHostDecisions.add(hostDecision);
-        HostDecisionEntity hostDecisionEntity = addDecision(hostDecision.getHostname(),
-            hostDecision.getDecision().name(), hostDecision.getRuleId());
-        this.addDecisionForFields(hostDecisionEntity, hostDecision.getFields());
-      }
-    }
-    if (!relevantHostDecisions.isEmpty()) {
-      processRelevantDecisions(relevantHostDecisions, hostsMonitoring.size());
-    }
-  }
+	public DecisionEntity getDecision(Long id) {
+		return decisions.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
+	}
 
-  private void processRelevantDecisions(List<HostDecisionResult> relevantHostDecisions, int hostsNumber) {
-    Collections.sort(relevantHostDecisions);
-    HostDecisionResult topPriorityHostDecision = relevantHostDecisions.get(0);
-    RuleDecision decision = topPriorityHostDecision.getDecision();
-    if (decision == RuleDecision.START) {
-      if (maximumHosts <= 0 || hostsNumber < maximumHosts) {
-        String hostname = topPriorityHostDecision.getHostname();
-        hostsService.startHostCloseTo(hostname);
-      }
-    } else if (decision == RuleDecision.STOP) {
-      if (hostsNumber > minimumHosts) {
-        // reduce skips all elements but the last, so we get the host with least priority
-        relevantHostDecisions.stream()
-            .filter(d -> !hostsService.isLocalhost(d.getHostname())).reduce((first, second) -> second)
-            .map(DecisionResult::getHostname).ifPresent(hostsService::stopHost);
-      }
-    }
-  }
+	public DecisionEntity getDecision(RuleDecision decision) {
+		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
+			new EntityNotFoundException(DecisionEntity.class, "decision", decision.name()));
+	}
+
+	public DecisionEntity getDecision(String decisionName) {
+		RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
+		return this.getDecision(decision);
+	}
+
+	public HostDecisionEntity addDecision(String hostname, String decisionName, long ruleId) {
+		HostRuleEntity rule = hostRulesService.getRule(ruleId);
+		DecisionEntity decision = getDecision(decisionName);
+		HostDecisionEntity hostDecision = HostDecisionEntity.builder().hostname(hostname).rule(rule).decision(decision)
+			.build();
+		return hostDecisions.save(hostDecision);
+	}
+
+	public void addDecisionForFields(HostDecisionEntity hostDecision, Map<String, Double> fields) {
+		hostDecisionValues.saveAll(
+			fields.entrySet().stream()
+				.filter(field -> field.getKey().contains("effective-val"))
+				.map(field ->
+					HostDecisionValueEntity.builder().hostDecision(hostDecision)
+						.field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
+						.value(field.getValue()).build())
+				.collect(Collectors.toList()));
+	}
+
+
+	public List<HostDecisionEntity> getDecisionsByHost(String hostname) {
+		return hostDecisions.findByHostname(hostname);
+	}
+
+	public void processDecisions(Map<String, Map<String, Double>> hostsMonitoring) {
+		var hostsDecisions = new LinkedList<HostDecisionResult>();
+		for (Map.Entry<String, Map<String, Double>> hostFields : hostsMonitoring.entrySet()) {
+			String hostname = hostFields.getKey();
+			Map<String, Double> fields = hostFields.getValue();
+			HostDecisionResult hostDecisionResult = hostRulesService.executeHostRules(hostname, fields);
+			hostsDecisions.add(hostDecisionResult);
+		}
+		log.info("Processing host decisions...");
+		var relevantHostDecisions = new LinkedList<HostDecisionResult>();
+		for (HostDecisionResult hostDecision : hostsDecisions) {
+			String hostname = hostDecision.getHostname();
+			RuleDecision decision = hostDecision.getDecision();
+			log.info("Hostname '{}' had decision '{}'", hostname, decision);
+			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, this.getDecision(decision.toString()));
+			int hostEventCount = hostEvent.getCount();
+			if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
+				|| (decision == RuleDecision.STOP && hostEventCount >= stopHostOnEventsCount)) {
+				relevantHostDecisions.add(hostDecision);
+				HostDecisionEntity hostDecisionEntity = addDecision(hostDecision.getHostname(),
+					hostDecision.getDecision().name(), hostDecision.getRuleId());
+				this.addDecisionForFields(hostDecisionEntity, hostDecision.getFields());
+			}
+		}
+		if (!relevantHostDecisions.isEmpty()) {
+			processRelevantDecisions(relevantHostDecisions, hostsMonitoring.size());
+		}
+	}
+
+	private void processRelevantDecisions(List<HostDecisionResult> relevantHostDecisions, int hostsNumber) {
+		Collections.sort(relevantHostDecisions);
+		HostDecisionResult topPriorityHostDecision = relevantHostDecisions.get(0);
+		RuleDecision decision = topPriorityHostDecision.getDecision();
+		if (decision == RuleDecision.START) {
+			if (maximumHosts <= 0 || hostsNumber < maximumHosts) {
+				String hostname = topPriorityHostDecision.getHostname();
+				hostsService.startHostCloseTo(hostname);
+			}
+		}
+		else if (decision == RuleDecision.STOP) {
+			if (hostsNumber > minimumHosts) {
+				// reduce skips all elements but the last, so we get the host with least priority
+				relevantHostDecisions.stream()
+					.filter(d -> !hostsService.isLocalhost(d.getHostname())).reduce((first, second) -> second)
+					.map(DecisionResult::getHostname).ifPresent(hostsService::stopHost);
+			}
+		}
+	}
 
 }
 

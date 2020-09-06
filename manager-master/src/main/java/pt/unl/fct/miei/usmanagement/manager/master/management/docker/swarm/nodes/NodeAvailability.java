@@ -26,6 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.node
 
 public enum NodeAvailability {
 
-  ACTIVE, PAUSE, DRAIN
+	ACTIVE, PAUSE, DRAIN
 
 }

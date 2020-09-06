@@ -32,11 +32,11 @@ import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 @Getter
 final class AddNode {
 
-  private final String host;
-  private final int quantity;
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
-  private final NodeRole role;
+	private final String host;
+	private final int quantity;
+	private final RegionEntity region;
+	private final String country;
+	private final String city;
+	private final NodeRole role;
 
 }

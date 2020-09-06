@@ -24,22 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,52 +41,55 @@ import lombok.Setter;
 @Table(name = "sym_trigger_router")
 public class SymTriggerRouterEntity {
 
-  @Id
-  private String triggerId;
+	@Id
+	private String triggerId;
 
-  @Id
-  private String routerId;
+	@Id
+	private String routerId;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Short enabled = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Short enabled = 1;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Integer initialLoadOrder = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Integer initialLoadOrder = 1;
 
-  private String initialLoadSelect;
+	private String initialLoadSelect;
 
-  private String initialLoadDeleteStmt;
+	private String initialLoadDeleteStmt;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short pingBackEnabled = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short pingBackEnabled = 0;
 
-  @NotNull
-  private LocalDateTime createTime;
+	@NotNull
+	private LocalDateTime createTime;
 
-  private String lastUpdateBy;
+	private String lastUpdateBy;
 
-  @NotNull
-  private LocalDateTime lastUpdateTime;
+	@NotNull
+	private LocalDateTime lastUpdateTime;
 
-  private String description;
+	private String description;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymTriggerRouterEntity)) {
-      return false;
-    }
-    SymTriggerRouterEntity other = (SymTriggerRouterEntity) o;
-    return triggerId != null && triggerId.equals(other.getTriggerId())
-        && routerId != null && routerId.equals(other.getRouterId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(getTriggerId(), getRouterId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(getTriggerId(), getRouterId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymTriggerRouterEntity)) {
+			return false;
+		}
+		SymTriggerRouterEntity other = (SymTriggerRouterEntity) o;
+		return triggerId != null && triggerId.equals(other.getTriggerId())
+			&& routerId != null && routerId.equals(other.getRouterId());
+	}
 
 
 }

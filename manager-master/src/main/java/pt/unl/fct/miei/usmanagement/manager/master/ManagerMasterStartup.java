@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
@@ -43,35 +42,35 @@ import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 @Component
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-  private final HostsService hostsService;
-  private final ServicesMonitoringService servicesMonitoringService;
-  private final HostsMonitoringService hostsMonitoringService;
-  private final SymService symService;
+	private final HostsService hostsService;
+	private final ServicesMonitoringService servicesMonitoringService;
+	private final HostsMonitoringService hostsMonitoringService;
+	private final SymService symService;
 
-  public ManagerMasterStartup(@Lazy HostsService hostsService,
-                              @Lazy ServicesMonitoringService servicesMonitoringService,
-                              @Lazy HostsMonitoringService hostsMonitoringService,
-                              SymService symService) {
-    this.hostsService = hostsService;
-    this.servicesMonitoringService = servicesMonitoringService;
-    this.hostsMonitoringService = hostsMonitoringService;
-    this.symService = symService;
-  }
+	public ManagerMasterStartup(@Lazy HostsService hostsService,
+								@Lazy ServicesMonitoringService servicesMonitoringService,
+								@Lazy HostsMonitoringService hostsMonitoringService,
+								SymService symService) {
+		this.hostsService = hostsService;
+		this.servicesMonitoringService = servicesMonitoringService;
+		this.hostsMonitoringService = hostsMonitoringService;
+		this.symService = symService;
+	}
 
-  @SneakyThrows
-  @Override
-  public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-    HostAddress hostAddress = hostsService.setHostAddress();
-    try {
-      hostsService.clusterHosts();
-    } catch (MasterManagerException e) {
-      log.error(e.getMessage());
-    }
-    servicesMonitoringService.initServiceMonitorTimer();
-    hostsMonitoringService.initHostMonitorTimer();
-    symService.startSymmetricDSServer(hostAddress);
-  }
-
+	@SneakyThrows
+	@Override
+	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		HostAddress hostAddress = hostsService.setHostAddress();
+		try {
+			hostsService.clusterHosts();
+		}
+		catch (MasterManagerException e) {
+			log.error(e.getMessage());
+		}
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
+		symService.startSymmetricDSServer(hostAddress);
+	}
 
 
 }

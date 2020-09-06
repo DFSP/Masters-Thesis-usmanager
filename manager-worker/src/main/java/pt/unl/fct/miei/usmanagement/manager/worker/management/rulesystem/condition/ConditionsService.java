@@ -36,24 +36,24 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ConditionsService {
 
-  private final ConditionRepository conditions;
+	private final ConditionRepository conditions;
 
-  public ConditionsService(ConditionRepository conditions) {
-    this.conditions = conditions;
-  }
+	public ConditionsService(ConditionRepository conditions) {
+		this.conditions = conditions;
+	}
 
-  public List<ConditionEntity> getConditions() {
-    return conditions.findAll();
-  }
+	public List<ConditionEntity> getConditions() {
+		return conditions.findAll();
+	}
 
-  public ConditionEntity getCondition(Long id) {
-    return conditions.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ConditionEntity.class, "id", id.toString()));
-  }
+	public ConditionEntity getCondition(Long id) {
+		return conditions.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ConditionEntity.class, "id", id.toString()));
+	}
 
-  public ConditionEntity getCondition(String conditionName) {
-    return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
-        new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
-  }
+	public ConditionEntity getCondition(String conditionName) {
+		return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
+			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+	}
 
 }

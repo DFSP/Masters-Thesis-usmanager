@@ -38,15 +38,15 @@ import org.springframework.data.annotation.Id;
 @ToString
 public class Customer implements Serializable {
 
-  @Id
-  private String id;
+	@Id
+	private String id;
 
-  private String firstName;
-  private String lastName;
+	private String firstName;
+	private String lastName;
 
-  public Customer(String firstName, String lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-  }
+	public Customer(String firstName, String lastName) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
 
 }

@@ -24,21 +24,15 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.security;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,52 +43,55 @@ import lombok.Setter;
 @Table(name = "sym_node_security")
 public class SymNodeSecurityEntity {
 
-  @Id
-  private String nodeId;
+	@Id
+	private String nodeId;
 
-  @NotNull
-  private String nodePassword;
+	@NotNull
+	private String nodePassword;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short registrationEnabled = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short registrationEnabled = 0;
 
-  private LocalDateTime registrationTime;
+	private LocalDateTime registrationTime;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short initialLoadEnabled = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short initialLoadEnabled = 0;
 
-  private LocalDateTime initialLoadTime;
+	private LocalDateTime initialLoadTime;
 
-  private Long initialLoadId;
+	private Long initialLoadId;
 
-  private String initialLoadCreateBy;
+	private String initialLoadCreateBy;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short revInitialLoadEnabled = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short revInitialLoadEnabled = 0;
 
-  private LocalDateTime revInitialLoadTime;
+	private LocalDateTime revInitialLoadTime;
 
-  private Long revInitialLoadId;
+	private Long revInitialLoadId;
 
-  private String revInitialLoadCreateBy;
+	private String revInitialLoadCreateBy;
 
-  private String createdAtNodeId;
+	private String createdAtNodeId;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeSecurityEntity)) {
-      return false;
-    }
-    SymNodeSecurityEntity other = (SymNodeSecurityEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getNodeId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getNodeId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeSecurityEntity)) {
+			return false;
+		}
+		SymNodeSecurityEntity other = (SymNodeSecurityEntity) o;
+		return nodeId != null && nodeId.equals(other.getNodeId());
+	}
 
 }

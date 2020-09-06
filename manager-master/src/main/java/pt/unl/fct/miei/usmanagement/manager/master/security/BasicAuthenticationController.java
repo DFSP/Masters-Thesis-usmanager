@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BasicAuthenticationController {
 
-  @GetMapping(path = "/basicauth")
-  public String authenticate() {
-    return "You are authenticated";
-  }
+	@GetMapping(path = "/basicauth")
+	public String authenticate() {
+		return "You are authenticated";
+	}
 
 }

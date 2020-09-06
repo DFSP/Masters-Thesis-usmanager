@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,31 +31,33 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/events")
 public class EventsController {
 
-  private final HostsEventsService hostsEventsService;
-  private final ServicesEventsService servicesEventsService;
+	private final HostsEventsService hostsEventsService;
+	private final ServicesEventsService servicesEventsService;
 
-  public EventsController(HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService) {
-    this.hostsEventsService = hostsEventsService;
-    this.servicesEventsService = servicesEventsService;
-  }
+	public EventsController(HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService) {
+		this.hostsEventsService = hostsEventsService;
+		this.servicesEventsService = servicesEventsService;
+	}
 
-  @GetMapping("/hosts/{hostname}")
-  public List<HostEventEntity> getHostEventsByHostname(@PathVariable String hostname) {
-    return hostsEventsService.getHostEventsByHostname(hostname);
-  }
+	@GetMapping("/hosts/{hostname}")
+	public List<HostEventEntity> getHostEventsByHostname(@PathVariable String hostname) {
+		return hostsEventsService.getHostEventsByHostname(hostname);
+	}
 
-  @GetMapping("/services/{serviceName}")
-  public List<ServiceEventEntity> getServiceEventsByServiceName(@PathVariable String serviceName) {
-    return servicesEventsService.getServiceEventsByServiceName(serviceName);
-  }
+	@GetMapping("/services/{serviceName}")
+	public List<ServiceEventEntity> getServiceEventsByServiceName(@PathVariable String serviceName) {
+		return servicesEventsService.getServiceEventsByServiceName(serviceName);
+	}
 
-  @GetMapping("/containers/{containerId}")
-  public List<ServiceEventEntity> getServiceEventsByContainerId(@PathVariable String containerId) {
-    return servicesEventsService.getServiceEventsByContainerId(containerId);
-  }
+	@GetMapping("/containers/{containerId}")
+	public List<ServiceEventEntity> getServiceEventsByContainerId(@PathVariable String containerId) {
+		return servicesEventsService.getServiceEventsByContainerId(containerId);
+	}
 
 }

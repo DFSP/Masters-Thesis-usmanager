@@ -26,9 +26,9 @@ package pt.unl.fct.miei.usmanagement.manager.database.componenttypes;
 
 public enum ComponentType {
 
-  HOST,
-  SERVICE,
-  CONTAINER,
-  TEST
+	HOST,
+	SERVICE,
+	CONTAINER,
+	TEST
 
 }

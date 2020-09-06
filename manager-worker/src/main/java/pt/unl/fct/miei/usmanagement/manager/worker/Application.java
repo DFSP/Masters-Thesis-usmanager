@@ -35,20 +35,20 @@ import pt.unl.fct.miei.usmanagement.manager.worker.kafka.User;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-  private final Producer producer;
+	private final Producer producer;
 
-  public Application(Producer producer) {
-    this.producer = producer;
-  }
+	public Application(Producer producer) {
+		this.producer = producer;
+	}
 
-  public static void main(String[] args) {
-    SpringApplication.run(Application.class, args).close();
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args).close();
+	}
 
-  @Override
-  public void run(String... args) throws Exception {
-    /*Thread.sleep(2000);
-    *//*Customer customer = new Customer("daniel", "pimenta");
+	@Override
+	public void run(String... args) throws Exception {
+		/*Thread.sleep(2000);
+		 *//*Customer customer = new Customer("daniel", "pimenta");
     producer.sendCustomer(customer);*//*
     Thread.sleep(2000);
     User user = new User("daniel");
@@ -56,6 +56,6 @@ public class Application implements CommandLineRunner {
    *//* Thread.sleep(2000);
     producer.sendMessage("fail");*//*
     Thread.sleep(1000000000);*/
-  }
+	}
 
 }

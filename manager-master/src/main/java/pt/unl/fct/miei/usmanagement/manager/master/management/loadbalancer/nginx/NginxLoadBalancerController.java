@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.minidev.json.JSONArray;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,19 +31,22 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequestMapping("/load-balancer")
 public class NginxLoadBalancerController {
 
-  private final NginxLoadBalancerService nginxLoadBalancerService;
+	private final NginxLoadBalancerService nginxLoadBalancerService;
 
-  public NginxLoadBalancerController(NginxLoadBalancerService nginxLoadBalancerService) {
-    this.nginxLoadBalancerService = nginxLoadBalancerService;
-  }
+	public NginxLoadBalancerController(NginxLoadBalancerService nginxLoadBalancerService) {
+		this.nginxLoadBalancerService = nginxLoadBalancerService;
+	}
 
-  @PostMapping
-  public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
-    return nginxLoadBalancerService.launchLoadBalancers(service, Arrays.asList(regions.toArray(new String[0])));
-  }
+	@PostMapping
+	public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
+		return nginxLoadBalancerService.launchLoadBalancers(service, Arrays.asList(regions.toArray(new String[0])));
+	}
 
 }

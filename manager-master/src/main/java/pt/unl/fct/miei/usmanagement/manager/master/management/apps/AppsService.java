@@ -24,10 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -45,109 +41,113 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.containers.Contain
 import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class AppsService {
 
-  private final ServicesService servicesService;
-  private final ContainersService containersService;
-  private final AppRepository apps;
+	private final ServicesService servicesService;
+	private final ContainersService containersService;
+	private final AppRepository apps;
 
-  public AppsService(ServicesService servicesService, ContainersService containersService, AppRepository apps) {
-    this.servicesService = servicesService;
-    this.containersService = containersService;
-    this.apps = apps;
-  }
+	public AppsService(ServicesService servicesService, ContainersService containersService, AppRepository apps) {
+		this.servicesService = servicesService;
+		this.containersService = containersService;
+		this.apps = apps;
+	}
 
-  public List<AppEntity> getApps() {
-    return apps.findAll();
-  }
+	public List<AppEntity> getApps() {
+		return apps.findAll();
+	}
 
-  public AppEntity getApp(Long id) {
-    return apps.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(AppEntity.class, "id", id.toString()));
-  }
+	public AppEntity getApp(Long id) {
+		return apps.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(AppEntity.class, "id", id.toString()));
+	}
 
-  public AppEntity getApp(String appName) {
-    return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
-        new EntityNotFoundException(AppEntity.class, "name", appName));
-  }
+	public AppEntity getApp(String appName) {
+		return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
+			new EntityNotFoundException(AppEntity.class, "name", appName));
+	}
 
-  public AppEntity addApp(AppEntity app) {
-    assertAppDoesntExist(app);
-    log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
-    return apps.save(app);
-  }
+	public AppEntity addApp(AppEntity app) {
+		assertAppDoesntExist(app);
+		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
+		return apps.save(app);
+	}
 
-  public AppEntity updateApp(String appName, AppEntity newApp) {
-    var app = getApp(appName);
-    log.info("Updating app {} with {}",
-        ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
-    log.info("Service before copying properties: {}",
-        ToStringBuilder.reflectionToString(app));
-    ObjectUtils.copyValidProperties(newApp, app);
-    log.info("Service after copying properties: {}",
-        ToStringBuilder.reflectionToString(app));
-    return apps.save(app);
-  }
+	public AppEntity updateApp(String appName, AppEntity newApp) {
+		var app = getApp(appName);
+		log.info("Updating app {} with {}",
+			ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
+		log.info("Service before copying properties: {}",
+			ToStringBuilder.reflectionToString(app));
+		ObjectUtils.copyValidProperties(newApp, app);
+		log.info("Service after copying properties: {}",
+			ToStringBuilder.reflectionToString(app));
+		return apps.save(app);
+	}
 
-  public void deleteApp(String name) {
-    var app = getApp(name);
-    apps.delete(app);
-  }
+	public void deleteApp(String name) {
+		var app = getApp(name);
+		apps.delete(app);
+	}
 
-  public List<AppServiceEntity> getServices(String appName) {
-    assertAppExists(appName);
-    return apps.getServices(appName);
-  }
+	public List<AppServiceEntity> getServices(String appName) {
+		assertAppExists(appName);
+		return apps.getServices(appName);
+	}
 
-  public void addService(String appName, String serviceName, int order) {
-    var app = getApp(appName);
-    var service = servicesService.getService(serviceName);
-    var appService = AppServiceEntity.builder()
-        .app(app)
-        .service(service)
-        .launchOrder(order)
-        .build();
-    app = app.toBuilder().appService(appService).build();
-    apps.save(app);
-  }
+	public void addService(String appName, String serviceName, int order) {
+		var app = getApp(appName);
+		var service = servicesService.getService(serviceName);
+		var appService = AppServiceEntity.builder()
+			.app(app)
+			.service(service)
+			.launchOrder(order)
+			.build();
+		app = app.toBuilder().appService(appService).build();
+		apps.save(app);
+	}
 
-  public void addServices(String appName, Map<String, Integer> services) {
-    services.forEach((service, launchOrder) -> addService(appName, service, launchOrder));
-  }
+	public void addServices(String appName, Map<String, Integer> services) {
+		services.forEach((service, launchOrder) -> addService(appName, service, launchOrder));
+	}
 
-  public void removeService(String appName, String service) {
-    removeServices(appName, List.of(service));
-  }
+	public void removeService(String appName, String service) {
+		removeServices(appName, List.of(service));
+	}
 
-  public void removeServices(String appName, List<String> services) {
-    var app = getApp(appName);
-    log.info("Removing services {}", services);
-    app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
-    apps.save(app);
-  }
+	public void removeServices(String appName, List<String> services) {
+		var app = getApp(appName);
+		log.info("Removing services {}", services);
+		app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
+		apps.save(app);
+	}
 
-  public Map<String, List<ContainerEntity>> launch(String appName, Coordinates coordinates) {
-    log.info("Launching app {} at {} lat {} lon", appName, coordinates.getLatitude(), coordinates.getLongitude());
-    List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
-        .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
-        .map(ServiceOrder::getService)
-        .collect(Collectors.toList());
-    return containersService.launchApp(services, coordinates);
-  }
+	public Map<String, List<ContainerEntity>> launch(String appName, Coordinates coordinates) {
+		log.info("Launching app {} at {} lat {} lon", appName, coordinates.getLatitude(), coordinates.getLongitude());
+		List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
+			.filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
+			.map(ServiceOrder::getService)
+			.collect(Collectors.toList());
+		return containersService.launchApp(services, coordinates);
+	}
 
-  private void assertAppExists(String appName) {
-    if (!apps.hasApp(appName)) {
-      throw new EntityNotFoundException(AppEntity.class, "name", appName);
-    }
-  }
+	private void assertAppExists(String appName) {
+		if (!apps.hasApp(appName)) {
+			throw new EntityNotFoundException(AppEntity.class, "name", appName);
+		}
+	}
 
-  private void assertAppDoesntExist(AppEntity app) {
-    var name = app.getName();
-    if (apps.hasApp(name)) {
-      throw new DataIntegrityViolationException("App '" + name + "' already exists");
-    }
-  }
+	private void assertAppDoesntExist(AppEntity app) {
+		var name = app.getName();
+		if (apps.hasApp(name)) {
+			throw new DataIntegrityViolationException("App '" + name + "' already exists");
+		}
+	}
 
 }

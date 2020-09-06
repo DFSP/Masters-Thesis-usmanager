@@ -24,33 +24,33 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface HostMonitoringRepository extends JpaRepository<HostMonitoringEntity, Long> {
 
-  List<HostMonitoringEntity> getByHostname(@Param("hostname") String hostname);
+	List<HostMonitoringEntity> getByHostname(@Param("hostname") String hostname);
 
-  HostMonitoringEntity getByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname,
-                                                             @Param("field") String field);
+	HostMonitoringEntity getByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname,
+														 @Param("field") String field);
 
-  long countByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname, @Param("field") String field);
+	long countByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname, @Param("field") String field);
 
-  @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
-      + "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
-      + "from HostMonitoringEntity m "
-      + "where m.hostname = :hostname")
-  List<HostFieldAvg> getHostFieldsAvg(@Param("hostname") String serviceName);
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
+		+ "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
+		+ "from HostMonitoringEntity m "
+		+ "where m.hostname = :hostname")
+	List<HostFieldAvg> getHostFieldsAvg(@Param("hostname") String serviceName);
 
-  @Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
-      + "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
-      + "from HostMonitoringEntity m "
-      + "where m.hostname = :hostname and m.field = :field")
-  HostFieldAvg getHostFieldAvg(@Param("hostname") String hostname, @Param("field") String field);
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
+		+ "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
+		+ "from HostMonitoringEntity m "
+		+ "where m.hostname = :hostname and m.field = :field")
+	HostFieldAvg getHostFieldAvg(@Param("hostname") String hostname, @Param("field") String field);
 
 }

@@ -24,15 +24,15 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface HostMonitoringLogsRepository extends JpaRepository<HostMonitoringLogEntity, Long> {
 
-  List<HostMonitoringLogEntity> findByHostname(@Param("hostname") String hostname);
+	List<HostMonitoringLogEntity> findByHostname(@Param("hostname") String hostname);
 
 }

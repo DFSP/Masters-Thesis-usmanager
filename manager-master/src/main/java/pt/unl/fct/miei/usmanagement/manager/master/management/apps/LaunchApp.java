@@ -30,8 +30,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 @Data
 public class LaunchApp {
 
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
+	private final RegionEntity region;
+	private final String country;
+	private final String city;
 
 }

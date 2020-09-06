@@ -33,20 +33,20 @@ import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 @RequestMapping("/ssh")
 public class SshController {
 
-  private final SshService sshService;
+	private final SshService sshService;
 
-  public SshController(SshService sshService) {
-    this.sshService = sshService;
-  }
+	public SshController(SshService sshService) {
+		this.sshService = sshService;
+	}
 
-  @PostMapping("/execute")
-  public SshCommandResult execute(@Json String hostname, @Json String command) {
-    return sshService.executeCommand(hostname, command);
-  }
+	@PostMapping("/execute")
+	public SshCommandResult execute(@Json String hostname, @Json String command) {
+		return sshService.executeCommand(hostname, command);
+	}
 
-  @PostMapping("/upload")
-  public void upload(@Json String hostname, @Json String filename) {
-    sshService.uploadFile(hostname, filename);
-  }
+	@PostMapping("/upload")
+	public void upload(@Json String hostname, @Json String filename) {
+		sshService.uploadFile(hostname, filename);
+	}
 
 }

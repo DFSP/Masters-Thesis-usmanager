@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.users;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,52 +38,54 @@ import pt.unl.fct.miei.usmanagement.manager.database.users.UserRole;
 import pt.unl.fct.miei.usmanagement.manager.database.users.UsersRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 
+import java.util.List;
+
 @Service
 public class UsersService implements UserDetailsService {
 
-  private final UsersRepository users;
-  private final PasswordEncoder encoder;
+	private final UsersRepository users;
+	private final PasswordEncoder encoder;
 
-  public UsersService(UsersRepository users, @Lazy PasswordEncoder encoder) {
-    this.users = users;
-    this.encoder = encoder;
-  }
+	public UsersService(UsersRepository users, @Lazy PasswordEncoder encoder) {
+		this.users = users;
+		this.encoder = encoder;
+	}
 
-  public UserEntity addUser(UserEntity userEntity) {
-    userEntity.setPassword(encoder.encode(userEntity.getPassword()));
-    return users.save(userEntity);
-  }
+	public UserEntity addUser(UserEntity userEntity) {
+		userEntity.setPassword(encoder.encode(userEntity.getPassword()));
+		return users.save(userEntity);
+	}
 
-  public UserEntity addUser(String firstName, String lastName, String username, String password, String email,
-                            UserRole role) {
-    UserEntity user = UserEntity.builder()
-        .firstName(firstName)
-        .lastName(lastName)
-        .username(username)
-        .password(encoder.encode(password))
-        .email(email)
-        .role(role)
-        .build();
-    return users.save(user);
-  }
+	public UserEntity addUser(String firstName, String lastName, String username, String password, String email,
+							  UserRole role) {
+		UserEntity user = UserEntity.builder()
+			.firstName(firstName)
+			.lastName(lastName)
+			.username(username)
+			.password(encoder.encode(password))
+			.email(email)
+			.role(role)
+			.build();
+		return users.save(user);
+	}
 
-  @Override
-  public UserDetails loadUserByUsername(String username) {
-    UserEntity user = users.findByUsername(username);
-    if (user == null) {
-      throw new EntityNotFoundException(UserEntity.class, "username", username);
-    }
-    return new User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
-  }
+	@Override
+	public UserDetails loadUserByUsername(String username) {
+		UserEntity user = users.findByUsername(username);
+		if (user == null) {
+			throw new EntityNotFoundException(UserEntity.class, "username", username);
+		}
+		return new User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
+	}
 
-  public boolean hasUser(String username) {
-    return users.hasUser(username);
-  }
+	public boolean hasUser(String username) {
+		return users.hasUser(username);
+	}
 
 
-  @Bean
-  public PasswordEncoder encoder() {
-    return new BCryptPasswordEncoder();
-  }
+	@Bean
+	public PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 }

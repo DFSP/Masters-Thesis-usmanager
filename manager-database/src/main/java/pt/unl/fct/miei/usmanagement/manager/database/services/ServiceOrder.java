@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 public class ServiceOrder {
 
-  private final ServiceEntity service;
-  private final int launchOrder;
+	private final ServiceEntity service;
+	private final int launchOrder;
 
 }

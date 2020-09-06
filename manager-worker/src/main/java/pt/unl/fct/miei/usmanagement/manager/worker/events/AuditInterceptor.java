@@ -34,24 +34,24 @@ import org.hibernate.Transaction;
 @Slf4j
 public class AuditInterceptor extends EmptyInterceptor {
 
-  private int updates;
-  private int creates;
-  private int loads;
+	private int updates;
+	private int creates;
+	private int loads;
 
-  public void onDelete(Object entity,
-                       Serializable id,
-                       Object[] state,
-                       String[] propertyNames,
-                       Type[] types) {
-    // do nothing
-  }
+	public void onDelete(Object entity,
+						 Serializable id,
+						 Object[] state,
+						 String[] propertyNames,
+						 Type[] types) {
+		// do nothing
+	}
 
-  public boolean onFlushDirty(Object entity,
-                              Serializable id,
-                              Object[] currentState,
-                              Object[] previousState,
-                              String[] propertyNames,
-                              Type[] types) {
+	public boolean onFlushDirty(Object entity,
+								Serializable id,
+								Object[] currentState,
+								Object[] previousState,
+								String[] propertyNames,
+								Type[] types) {
     /*if ( entity instanceof Auditable ) {
       updates++;
       for ( int i=0; i < propertyNames.length; i++ ) {
@@ -61,27 +61,27 @@ public class AuditInterceptor extends EmptyInterceptor {
         }
       }
     }*/
-    log.info("{}", entity);
-    return false;
-  }
+		log.info("{}", entity);
+		return false;
+	}
 
-  public boolean onLoad(Object entity,
-                        Serializable id,
-                        Object[] state,
-                        String[] propertyNames,
-                        Type[] types) {
+	public boolean onLoad(Object entity,
+						  Serializable id,
+						  Object[] state,
+						  String[] propertyNames,
+						  Type[] types) {
     /*if ( entity instanceof Auditable ) {
       loads++;
     }*/
-    log.info("{}", entity);
-    return false;
-  }
+		log.info("{}", entity);
+		return false;
+	}
 
-  public boolean onSave(Object entity,
-                        Serializable id,
-                        Object[] state,
-                        String[] propertyNames,
-                        Type[] types) {
+	public boolean onSave(Object entity,
+						  Serializable id,
+						  Object[] state,
+						  String[] propertyNames,
+						  Type[] types) {
 
     /*if ( entity instanceof Auditable ) {
       creates++;
@@ -92,17 +92,17 @@ public class AuditInterceptor extends EmptyInterceptor {
         }
       }
     }*/
-    log.info("{}", entity);
-    return false;
-  }
+		log.info("{}", entity);
+		return false;
+	}
 
-  public void afterTransactionCompletion(Transaction tx) {
+	public void afterTransactionCompletion(Transaction tx) {
     /*if ( tx.wasCommitted() ) {
       System.out.println("Creations: " + creates + ", Updates: " + updates, "Loads: " + loads);
     }
     updates=0;
     creates=0;
     loads=0;*/
-  }
+	}
 
 }

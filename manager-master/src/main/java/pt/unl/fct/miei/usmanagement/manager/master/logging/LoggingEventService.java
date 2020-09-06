@@ -24,26 +24,26 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.logging;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventRepository;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class LoggingEventService {
 
-  private final LoggingEventRepository loggingEvents;
+	private final LoggingEventRepository loggingEvents;
 
-  public LoggingEventService(LoggingEventRepository loggingEvents) {
-    this.loggingEvents = loggingEvents;
-  }
+	public LoggingEventService(LoggingEventRepository loggingEvents) {
+		this.loggingEvents = loggingEvents;
+	}
 
-  public List<LoggingEventEntity> getLogs() {
-    return loggingEvents.findAll();
-  }
+	public List<LoggingEventEntity> getLogs() {
+		return loggingEvents.findAll();
+	}
 
 
 }

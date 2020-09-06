@@ -29,6 +29,6 @@ import lombok.Data;
 @Data
 class NginxSimpleServer {
 
-  private final String hostname;
+	private final String hostname;
 
 }

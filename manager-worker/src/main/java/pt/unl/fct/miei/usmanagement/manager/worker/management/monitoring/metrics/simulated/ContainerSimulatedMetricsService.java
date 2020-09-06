@@ -41,82 +41,82 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ContainerSimulatedMetricsService {
 
-  private final ContainerSimulatedMetricsRepository containerSimulatedMetrics;
+	private final ContainerSimulatedMetricsRepository containerSimulatedMetrics;
 
-  public ContainerSimulatedMetricsService(ContainerSimulatedMetricsRepository containerSimulatedMetrics) {
-    this.containerSimulatedMetrics = containerSimulatedMetrics;
-  }
+	public ContainerSimulatedMetricsService(ContainerSimulatedMetricsRepository containerSimulatedMetrics) {
+		this.containerSimulatedMetrics = containerSimulatedMetrics;
+	}
 
-  public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
-    return containerSimulatedMetrics.findAll();
-  }
+	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
+		return containerSimulatedMetrics.findAll();
+	}
 
-  public ContainerSimulatedMetricEntity getContainerSimulatedMetric(Long id) {
-    return containerSimulatedMetrics.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "id", id.toString()));
-  }
+	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(Long id) {
+		return containerSimulatedMetrics.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "id", id.toString()));
+	}
 
-  public ContainerSimulatedMetricEntity getContainerSimulatedMetric(String simulatedMetricName) {
-    return containerSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(String simulatedMetricName) {
+		return containerSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public List<ContainerSimulatedMetricEntity> getGenericContainerSimulatedMetrics() {
-    return containerSimulatedMetrics.findGenericContainerSimulatedMetrics();
-  }
+	public List<ContainerSimulatedMetricEntity> getGenericContainerSimulatedMetrics() {
+		return containerSimulatedMetrics.findGenericContainerSimulatedMetrics();
+	}
 
-  public ContainerSimulatedMetricEntity getGenericContainerSimulatedMetric(String simulatedMetricName) {
-    return containerSimulatedMetrics.findGenericContainerSimulatedMetric(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public ContainerSimulatedMetricEntity getGenericContainerSimulatedMetric(String simulatedMetricName) {
+		return containerSimulatedMetrics.findGenericContainerSimulatedMetric(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public List<ContainerEntity> getContainers(String simulatedMetricName) {
-    assertContainerSimulatedMetricExists(simulatedMetricName);
-    return containerSimulatedMetrics.getContainers(simulatedMetricName);
-  }
+	public List<ContainerEntity> getContainers(String simulatedMetricName) {
+		assertContainerSimulatedMetricExists(simulatedMetricName);
+		return containerSimulatedMetrics.getContainers(simulatedMetricName);
+	}
 
-  public ContainerEntity getContainer(String simulatedMetricName, String containerId) {
-    assertContainerSimulatedMetricExists(simulatedMetricName);
-    return containerSimulatedMetrics.getContainer(simulatedMetricName, containerId).orElseThrow(() ->
-        new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
-  }
+	public ContainerEntity getContainer(String simulatedMetricName, String containerId) {
+		assertContainerSimulatedMetricExists(simulatedMetricName);
+		return containerSimulatedMetrics.getContainer(simulatedMetricName, containerId).orElseThrow(() ->
+			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
+	}
 
-  private void assertContainerSimulatedMetricExists(String name) {
-    if (!containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
-      throw new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "name", name);
-    }
-  }
+	private void assertContainerSimulatedMetricExists(String name) {
+		if (!containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
+			throw new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "name", name);
+		}
+	}
 
-  public Map<String, Double> getSimulatedFieldsValues(String containerId) {
-    List<ContainerSimulatedMetricEntity> metrics = containerSimulatedMetrics.findByContainer(containerId);
-    return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
-  }
+	public Map<String, Double> getSimulatedFieldsValues(String containerId) {
+		List<ContainerSimulatedMetricEntity> metrics = containerSimulatedMetrics.findByContainer(containerId);
+		return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
+	}
 
-  public Optional<Double> getSimulatedFieldValue(String containerId, String field) {
-    Optional<ContainerSimulatedMetricEntity> containerSimulatedMetric =
-        containerSimulatedMetrics.findByContainerAndField(containerId, field);
-    Optional<Double> fieldValue = containerSimulatedMetric.map(this::randomizeFieldValue);
-    if (fieldValue.isPresent() && containerSimulatedMetric.get().isOverride()) {
-      return fieldValue;
-    }
-    Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
-    if (genericFieldValue.isPresent()) {
-      return genericFieldValue;
-    }
-    return fieldValue;
-  }
+	public Optional<Double> getSimulatedFieldValue(String containerId, String field) {
+		Optional<ContainerSimulatedMetricEntity> containerSimulatedMetric =
+			containerSimulatedMetrics.findByContainerAndField(containerId, field);
+		Optional<Double> fieldValue = containerSimulatedMetric.map(this::randomizeFieldValue);
+		if (fieldValue.isPresent() && containerSimulatedMetric.get().isOverride()) {
+			return fieldValue;
+		}
+		Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
+		if (genericFieldValue.isPresent()) {
+			return genericFieldValue;
+		}
+		return fieldValue;
+	}
 
-  private Double randomizeFieldValue(ContainerSimulatedMetricEntity metric) {
-    var random = new Random();
-    double minValue = metric.getMinimumValue();
-    double maxValue = metric.getMaximumValue();
-    return minValue + (maxValue - minValue) * random.nextDouble();
-  }
+	private Double randomizeFieldValue(ContainerSimulatedMetricEntity metric) {
+		var random = new Random();
+		double minValue = metric.getMinimumValue();
+		double maxValue = metric.getMaximumValue();
+		return minValue + (maxValue - minValue) * random.nextDouble();
+	}
 
-  private Optional<Double> randomizeGenericFieldValue(String field) {
-    Optional<ContainerSimulatedMetricEntity> containerSimulatedMetric =
-        containerSimulatedMetrics.findGenericByField(field);
-    return containerSimulatedMetric.map(this::randomizeFieldValue);
-  }
+	private Optional<Double> randomizeGenericFieldValue(String field) {
+		Optional<ContainerSimulatedMetricEntity> containerSimulatedMetric =
+			containerSimulatedMetrics.findGenericByField(field);
+		return containerSimulatedMetric.map(this::randomizeFieldValue);
+	}
 
 }

@@ -30,11 +30,11 @@ import lombok.Data;
 @Data
 class LocationMonitoringSimple {
 
-  private final String fromContinent;
-  private final String fromRegion;
-  private final String fromCountry;
-  private final String fromCity;
-  private final String toService;
-  private final int count;
+	private final String fromContinent;
+	private final String fromRegion;
+	private final String fromCountry;
+	private final String fromCity;
+	private final String toService;
+	private final int count;
 
 }

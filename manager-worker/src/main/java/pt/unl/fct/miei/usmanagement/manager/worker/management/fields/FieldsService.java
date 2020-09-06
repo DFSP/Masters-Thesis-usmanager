@@ -36,24 +36,24 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class FieldsService {
 
-  private final FieldRepository fields;
+	private final FieldRepository fields;
 
-  public FieldsService(FieldRepository fields) {
-    this.fields = fields;
-  }
+	public FieldsService(FieldRepository fields) {
+		this.fields = fields;
+	}
 
-  public List<FieldEntity> getFields() {
-    return fields.findAll();
-  }
+	public List<FieldEntity> getFields() {
+		return fields.findAll();
+	}
 
-  public FieldEntity getField(Long id) {
-    return fields.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(FieldEntity.class, "id", id.toString()));
-  }
+	public FieldEntity getField(Long id) {
+		return fields.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(FieldEntity.class, "id", id.toString()));
+	}
 
-  public FieldEntity getField(String name) {
-    return fields.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(FieldEntity.class, "name", name));
-  }
+	public FieldEntity getField(String name) {
+		return fields.findByNameIgnoreCase(name).orElseThrow(() ->
+			new EntityNotFoundException(FieldEntity.class, "name", name));
+	}
 
 }

@@ -24,42 +24,43 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
 
+import java.util.List;
+import java.util.Objects;
+
 @Service
 public class HostsEventsService {
 
-  private final HostEventRepository hostEvents;
-  private final DecisionsService decisionsService;
+	private final HostEventRepository hostEvents;
+	private final DecisionsService decisionsService;
 
-  public HostsEventsService(HostEventRepository hostEvents, DecisionsService decisionsService) {
-    this.hostEvents = hostEvents;
-    this.decisionsService = decisionsService;
-  }
+	public HostsEventsService(HostEventRepository hostEvents, DecisionsService decisionsService) {
+		this.hostEvents = hostEvents;
+		this.decisionsService = decisionsService;
+	}
 
-  public List<HostEventEntity> getHostEventsByHostname(String hostname) {
-    return hostEvents.findByHostname(hostname);
-  }
+	public List<HostEventEntity> getHostEventsByHostname(String hostname) {
+		return hostEvents.findByHostname(hostname);
+	}
 
-  public HostEventEntity saveHostEvent(String hostname, String decisionName) {
-    DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
-    HostEventEntity hostEvent = hostEvents
-        .findByHostname(hostname).stream().findFirst()
-        .orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
-    if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
-      hostEvent.setDecision(decision);
-      hostEvent.setCount(1);
-    } else {
-      hostEvent.setCount(hostEvent.getCount() + 1);
-    }
-    return this.hostEvents.save(hostEvent);
-  }
+	public HostEventEntity saveHostEvent(String hostname, String decisionName) {
+		DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
+		HostEventEntity hostEvent = hostEvents
+			.findByHostname(hostname).stream().findFirst()
+			.orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
+		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
+			hostEvent.setDecision(decision);
+			hostEvent.setCount(1);
+		}
+		else {
+			hostEvent.setCount(hostEvent.getCount() + 1);
+		}
+		return this.hostEvents.save(hostEvent);
+	}
 
 }

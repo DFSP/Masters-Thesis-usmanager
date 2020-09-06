@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 public class GenericResponse {
 
-  private final String key;
-  private final String value;
+	private final String key;
+	private final String value;
 
 }

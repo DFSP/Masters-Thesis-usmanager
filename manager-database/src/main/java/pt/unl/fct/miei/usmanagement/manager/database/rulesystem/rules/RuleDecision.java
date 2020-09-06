@@ -26,10 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
 public enum RuleDecision {
 
-  NONE,
-  REPLICATE,
-  MIGRATE,
-  START,
-  STOP
+	NONE,
+	REPLICATE,
+	MIGRATE,
+	START,
+	STOP
 
 }

@@ -24,30 +24,18 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.prediction;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -58,57 +46,57 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 @Table(name = "service_event_predictions")
 public class ServiceEventPredictionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  private String description;
+	private String description;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  @JsonFormat(pattern = "dd/MM/yyyy")
-  private LocalDate startDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private LocalDate startDate;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-  @JsonFormat(pattern = "HH:mm")
-  private LocalTime startTime;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+	@JsonFormat(pattern = "HH:mm")
+	private LocalTime startTime;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  @JsonFormat(pattern = "dd/MM/yyyy")
-  private LocalDate endDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private LocalDate endDate;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-  @JsonFormat(pattern = "HH:mm")
-  private LocalTime endTime;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+	@JsonFormat(pattern = "HH:mm")
+	private LocalTime endTime;
 
-  private int minimumReplicas;
+	private int minimumReplicas;
 
-  @JsonIgnore
-  @JoinColumn(name = "service_id")
-  @ManyToOne
-  private ServiceEntity service;
+	@JsonIgnore
+	@JoinColumn(name = "service_id")
+	@ManyToOne
+	private ServiceEntity service;
 
-  @JsonIgnore
-  private Timestamp lastUpdate;
+	@JsonIgnore
+	private Timestamp lastUpdate;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceEventPredictionEntity)) {
-      return false;
-    }
-    ServiceEventPredictionEntity other = (ServiceEventPredictionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceEventPredictionEntity)) {
+			return false;
+		}
+		ServiceEventPredictionEntity other = (ServiceEventPredictionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

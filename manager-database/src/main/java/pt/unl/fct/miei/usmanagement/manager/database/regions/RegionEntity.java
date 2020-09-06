@@ -24,28 +24,15 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.regions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -56,39 +43,40 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 @Table(name = "regions")
 public class RegionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  private String description;
+	private String description;
 
-  @Builder.Default @Column(columnDefinition = "boolean default true")
-  private boolean active = true;
+	@Builder.Default
+	@Column(columnDefinition = "boolean default true")
+	private boolean active = true;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<EdgeHostEntity> edgeHosts = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<EdgeHostEntity> edgeHosts = new HashSet<>();
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof RegionEntity)) {
-      return false;
-    }
-    RegionEntity other = (RegionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof RegionEntity)) {
+			return false;
+		}
+		RegionEntity other = (RegionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,53 +33,55 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.Condit
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ConditionsService {
 
-  private final ConditionRepository conditions;
+	private final ConditionRepository conditions;
 
-  public ConditionsService(ConditionRepository conditions) {
-    this.conditions = conditions;
-  }
+	public ConditionsService(ConditionRepository conditions) {
+		this.conditions = conditions;
+	}
 
-  public List<ConditionEntity> getConditions() {
-    return conditions.findAll();
-  }
+	public List<ConditionEntity> getConditions() {
+		return conditions.findAll();
+	}
 
-  public ConditionEntity getCondition(Long id) {
-    return conditions.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ConditionEntity.class, "id", id.toString()));
-  }
+	public ConditionEntity getCondition(Long id) {
+		return conditions.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ConditionEntity.class, "id", id.toString()));
+	}
 
-  public ConditionEntity getCondition(String conditionName) {
-    return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
-        new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
-  }
+	public ConditionEntity getCondition(String conditionName) {
+		return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
+			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+	}
 
-  public ConditionEntity addCondition(ConditionEntity condition) {
-    assertConditionDoesntExist(condition);
-    log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
-    return conditions.save(condition);
-  }
+	public ConditionEntity addCondition(ConditionEntity condition) {
+		assertConditionDoesntExist(condition);
+		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
+		return conditions.save(condition);
+	}
 
-  public ConditionEntity updateCondition(String conditionName, ConditionEntity newCondition) {
-    var condition = getCondition(conditionName);
-    ObjectUtils.copyValidProperties(newCondition, condition);
-    condition = conditions.save(condition);
-    return condition;
-  }
+	public ConditionEntity updateCondition(String conditionName, ConditionEntity newCondition) {
+		var condition = getCondition(conditionName);
+		ObjectUtils.copyValidProperties(newCondition, condition);
+		condition = conditions.save(condition);
+		return condition;
+	}
 
-  public void deleteCondition(String conditionName) {
-    var condition = getCondition(conditionName);
-    conditions.delete(condition);
-  }
+	public void deleteCondition(String conditionName) {
+		var condition = getCondition(conditionName);
+		conditions.delete(condition);
+	}
 
-  private void assertConditionDoesntExist(ConditionEntity condition) {
-    var name = condition.getName();
-    if (conditions.hasCondition(name)) {
-      throw new DataIntegrityViolationException("Condition '" + name + "' already exists");
-    }
-  }
+	private void assertConditionDoesntExist(ConditionEntity condition) {
+		var name = condition.getName();
+		if (conditions.hasCondition(name)) {
+			throw new DataIntegrityViolationException("Condition '" + name + "' already exists");
+		}
+	}
 
 }

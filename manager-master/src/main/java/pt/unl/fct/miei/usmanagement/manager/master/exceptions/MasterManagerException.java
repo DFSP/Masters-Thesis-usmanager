@@ -26,8 +26,8 @@ package pt.unl.fct.miei.usmanagement.manager.master.exceptions;
 
 public class MasterManagerException extends RuntimeException {
 
-  public MasterManagerException(String s, Object... args) {
-    super(args.length > 0 ? String.format(s, args) : s);
-  }
+	public MasterManagerException(String s, Object... args) {
+		super(args.length > 0 ? String.format(s, args) : s);
+	}
 
 }

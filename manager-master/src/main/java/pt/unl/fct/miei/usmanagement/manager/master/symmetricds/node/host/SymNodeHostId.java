@@ -24,13 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.host;
 
-import java.io.Serializable;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
@@ -39,8 +35,8 @@ import lombok.ToString;
 @ToString
 public class SymNodeHostId implements Serializable {
 
-  private String nodeId;
+	private String nodeId;
 
-  private String hostName;
+	private String hostName;
 
 }

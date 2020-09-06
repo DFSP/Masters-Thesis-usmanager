@@ -26,12 +26,12 @@ package pt.unl.fct.miei.usmanagement.manager.worker.exceptions;
 
 public class WorkerManagerException extends RuntimeException {
 
-  public WorkerManagerException(String s, Object... args) {
-    super(args.length > 0 ? String.format(s, args) : s);
-  }
+	public WorkerManagerException(String s, Object... args) {
+		super(args.length > 0 ? String.format(s, args) : s);
+	}
 
-  public WorkerManagerException(Exception e) {
-    e.printStackTrace();
-  }
+	public WorkerManagerException(Exception e) {
+		e.printStackTrace();
+	}
 
 }

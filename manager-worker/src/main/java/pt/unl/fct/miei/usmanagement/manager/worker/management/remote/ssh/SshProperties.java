@@ -35,6 +35,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("ssh")
 public class SshProperties {
 
-  private int connectionTimeout;
+	private int connectionTimeout;
 
 }

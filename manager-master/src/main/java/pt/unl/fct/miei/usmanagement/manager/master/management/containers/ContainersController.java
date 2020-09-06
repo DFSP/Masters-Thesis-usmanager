@@ -24,123 +24,116 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import net.minidev.json.JSONArray;
 import org.springframework.data.util.Pair;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {
 
-  private final ContainersService containersService;
+	private final ContainersService containersService;
 
-  public ContainersController(ContainersService containersService) {
-    this.containersService = containersService;
-  }
+	public ContainersController(ContainersService containersService) {
+		this.containersService = containersService;
+	}
 
-  @GetMapping
-  public List<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
-    List<ContainerEntity> containers;
-    if (serviceName != null) {
-      containers = containersService.getContainersWithLabels(
-          Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
-    } else {
-      containers = containersService.getContainers();
-    }
-    return containers;
-  }
+	@GetMapping
+	public List<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
+		List<ContainerEntity> containers;
+		if (serviceName != null) {
+			containers = containersService.getContainersWithLabels(
+				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
+		}
+		else {
+			containers = containersService.getContainers();
+		}
+		return containers;
+	}
 
-  @GetMapping("/{id}")
-  public ContainerEntity getContainer(@PathVariable String id) {
-    return containersService.getContainer(id);
-  }
+	@GetMapping("/{id}")
+	public ContainerEntity getContainer(@PathVariable String id) {
+		return containersService.getContainer(id);
+	}
 
-  @PostMapping
-  public ContainerEntity launchContainer(@Json String hostname, @Json String service,
-                                         @Json String internalPort, @Json String externalPort) {
-    return containersService.launchContainer(hostname, service, internalPort, externalPort);
-  }
+	@PostMapping
+	public ContainerEntity launchContainer(@Json String hostname, @Json String service,
+										   @Json String internalPort, @Json String externalPort) {
+		return containersService.launchContainer(hostname, service, internalPort, externalPort);
+	}
 
-  @DeleteMapping("/{id}")
-  public void deleteContainer(@PathVariable String id) {
-    containersService.stopContainer(id);
-  }
+	@DeleteMapping("/{id}")
+	public void deleteContainer(@PathVariable String id) {
+		containersService.stopContainer(id);
+	}
 
-  @PostMapping("/{id}/replicate")
-  public ContainerEntity replicateContainer(@PathVariable String id, @Json String hostname) {
-    return containersService.replicateContainer(id, hostname);
-  }
+	@PostMapping("/{id}/replicate")
+	public ContainerEntity replicateContainer(@PathVariable String id, @Json String hostname) {
+		return containersService.replicateContainer(id, hostname);
+	}
 
-  @PostMapping("/{id}/migrate")
-  public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
-    return containersService.migrateContainer(id, hostname);
-  }
+	@PostMapping("/{id}/migrate")
+	public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
+		return containersService.migrateContainer(id, hostname);
+	}
 
-  @PostMapping("/reload")
-  public List<ContainerEntity> reloadContainers() {
-    return containersService.reloadContainers();
-  }
+	@PostMapping("/reload")
+	public List<ContainerEntity> reloadContainers() {
+		return containersService.reloadContainers();
+	}
 
-  @GetMapping("/{containerId}/logs")
-  public String getContainerLogs(@PathVariable String containerId) {
-    return containersService.getLogs(containerId);
-  }
+	@GetMapping("/{containerId}/logs")
+	public String getContainerLogs(@PathVariable String containerId) {
+		return containersService.getLogs(containerId);
+	}
 
-  @GetMapping("/{containerId}/rules")
-  public List<ContainerRuleEntity> addContainerRule(@PathVariable String containerId) {
-    return containersService.getRules(containerId);
-  }
+	@GetMapping("/{containerId}/rules")
+	public List<ContainerRuleEntity> addContainerRule(@PathVariable String containerId) {
+		return containersService.getRules(containerId);
+	}
 
-  @PostMapping("/{containerId}/rules")
-  public void addContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
-    containersService.addRules(containerId, Arrays.asList(rules));
-  }
+	@PostMapping("/{containerId}/rules")
+	public void addContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
+		containersService.addRules(containerId, Arrays.asList(rules));
+	}
 
-  @DeleteMapping("/{containerId}/rules")
-  public void removeContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
-    containersService.removeRules(containerId, Arrays.asList(rules));
-  }
+	@DeleteMapping("/{containerId}/rules")
+	public void removeContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
+		containersService.removeRules(containerId, Arrays.asList(rules));
+	}
 
-  @DeleteMapping("/{containerId}/rules/{ruleName}")
-  public void removeContainerRule(@PathVariable String containerId, @PathVariable String ruleName) {
-    containersService.removeRule(containerId, ruleName);
-  }
+	@DeleteMapping("/{containerId}/rules/{ruleName}")
+	public void removeContainerRule(@PathVariable String containerId, @PathVariable String ruleName) {
+		containersService.removeRule(containerId, ruleName);
+	}
 
-  @GetMapping("/{containerId}/simulated-metrics")
-  public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
-    return containersService.getSimulatedMetrics(containerId);
-  }
+	@GetMapping("/{containerId}/simulated-metrics")
+	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
+		return containersService.getSimulatedMetrics(containerId);
+	}
 
-  @PostMapping("/{containerId}/simulated-metrics")
-  public void addContainerSimulatedMetrics(@PathVariable String containerId, @RequestBody String[] simulatedMetrics) {
-    containersService.addSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
-  }
+	@PostMapping("/{containerId}/simulated-metrics")
+	public void addContainerSimulatedMetrics(@PathVariable String containerId, @RequestBody String[] simulatedMetrics) {
+		containersService.addSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
+	}
 
-  @DeleteMapping("/{containerId}/simulated-metrics")
-  public void removeContainerSimulatedMetrics(@PathVariable String containerId,
-                                              @RequestBody String[] simulatedMetrics) {
-    containersService.removeSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
-  }
+	@DeleteMapping("/{containerId}/simulated-metrics")
+	public void removeContainerSimulatedMetrics(@PathVariable String containerId,
+												@RequestBody String[] simulatedMetrics) {
+		containersService.removeSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
+	}
 
-  @DeleteMapping("/{containerId}/simulated-metrics/{simulatedMetricName}")
-  public void removeContainerSimulatedMetric(@PathVariable String containerId,
-                                             @PathVariable String simulatedMetricName) {
-    containersService.removeSimulatedMetric(containerId, simulatedMetricName);
-  }
+	@DeleteMapping("/{containerId}/simulated-metrics/{simulatedMetricName}")
+	public void removeContainerSimulatedMetric(@PathVariable String containerId,
+											   @PathVariable String simulatedMetricName) {
+		containersService.removeSimulatedMetric(containerId, simulatedMetricName);
+	}
 
 }

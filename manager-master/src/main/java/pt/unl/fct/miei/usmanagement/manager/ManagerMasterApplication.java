@@ -33,8 +33,8 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class ManagerMasterApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ManagerMasterApplication.class, args);
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(ManagerMasterApplication.class, args);
+	}
 
 }

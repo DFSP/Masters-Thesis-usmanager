@@ -26,6 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.database.users;
 
 public enum UserRole {
 
-  ROLE_SYS_ADMIN
+	ROLE_SYS_ADMIN
 
 }

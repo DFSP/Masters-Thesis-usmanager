@@ -26,9 +26,9 @@ package pt.unl.fct.miei.usmanagement.manager.database.services;
 
 public enum ServiceType {
 
-  FRONTEND,
-  BACKEND,
-  DATABASE,
-  SYSTEM;
+	FRONTEND,
+	BACKEND,
+	DATABASE,
+	SYSTEM;
 
 }

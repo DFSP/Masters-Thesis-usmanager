@@ -35,23 +35,24 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decisio
 @Service
 public class HostsEventsService {
 
-  private final HostEventRepository hostEvents;
+	private final HostEventRepository hostEvents;
 
-  public HostsEventsService(HostEventRepository hostEvents) {
-    this.hostEvents = hostEvents;
-  }
+	public HostsEventsService(HostEventRepository hostEvents) {
+		this.hostEvents = hostEvents;
+	}
 
-  public HostEventEntity saveHostEvent(String hostname, DecisionEntity decision) {
-    HostEventEntity hostEvent = hostEvents
-        .findByHostname(hostname).stream().findFirst()
-        .orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
-    if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
-      hostEvent.setDecision(decision);
-      hostEvent.setCount(1);
-    } else {
-      hostEvent.setCount(hostEvent.getCount() + 1);
-    }
-    return hostEvents.save(hostEvent);
-  }
+	public HostEventEntity saveHostEvent(String hostname, DecisionEntity decision) {
+		HostEventEntity hostEvent = hostEvents
+			.findByHostname(hostname).stream().findFirst()
+			.orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
+		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
+			hostEvent.setDecision(decision);
+			hostEvent.setCount(1);
+		}
+		else {
+			hostEvent.setCount(hostEvent.getCount() + 1);
+		}
+		return hostEvents.save(hostEvent);
+	}
 
 }

@@ -24,33 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -61,56 +45,56 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 @Table(name = "service_rules")
 public class ServiceRuleEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  private int priority;
+	private int priority;
 
-  private boolean generic;
+	private boolean generic;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<ServiceEntity> services;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<ServiceEntity> services;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private DecisionEntity decision;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceRuleConditionEntity> conditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ServiceRuleConditionEntity> conditions = new HashSet<>();
 
-  public void removeAssociations() {
-    Iterator<ServiceEntity> servicesIterator = services.iterator();
-    while (servicesIterator.hasNext()) {
-      ServiceEntity service = servicesIterator.next();
-      servicesIterator.remove();
-      service.getServiceRules().remove(this);
-    }
-  }
+	public void removeAssociations() {
+		Iterator<ServiceEntity> servicesIterator = services.iterator();
+		while (servicesIterator.hasNext()) {
+			ServiceEntity service = servicesIterator.next();
+			servicesIterator.remove();
+			service.getServiceRules().remove(this);
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceRuleEntity)) {
-      return false;
-    }
-    ServiceRuleEntity other = (ServiceRuleEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceRuleEntity)) {
+			return false;
+		}
+		ServiceRuleEntity other = (ServiceRuleEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

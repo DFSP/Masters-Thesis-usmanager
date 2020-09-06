@@ -24,12 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -39,122 +33,129 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.NotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Slf4j
 @Service
 public class WorkerManagersService {
 
-  private final WorkerManagerRepository workerManagers;
-  private final CloudHostsService cloudHostsService;
-  private final EdgeHostsService edgeHostsService;
-  private final ContainersService containersService;
-  private final HostsService hostsService;
+	private final WorkerManagerRepository workerManagers;
+	private final CloudHostsService cloudHostsService;
+	private final EdgeHostsService edgeHostsService;
+	private final ContainersService containersService;
+	private final HostsService hostsService;
 
-  public WorkerManagersService(WorkerManagerRepository workerManagers,
-                               CloudHostsService cloudHostsService,
-                               EdgeHostsService edgeHostsService,
-                               @Lazy ContainersService containersService,
-                               HostsService hostsService) {
-    this.workerManagers = workerManagers;
-    this.cloudHostsService = cloudHostsService;
-    this.edgeHostsService = edgeHostsService;
-    this.containersService = containersService;
-    this.hostsService = hostsService;
-  }
+	public WorkerManagersService(WorkerManagerRepository workerManagers,
+								 CloudHostsService cloudHostsService,
+								 EdgeHostsService edgeHostsService,
+								 @Lazy ContainersService containersService,
+								 HostsService hostsService) {
+		this.workerManagers = workerManagers;
+		this.cloudHostsService = cloudHostsService;
+		this.edgeHostsService = edgeHostsService;
+		this.containersService = containersService;
+		this.hostsService = hostsService;
+	}
 
-  public List<WorkerManagerEntity> getWorkerManagers() {
-    return workerManagers.findAll();
-  }
+	public List<WorkerManagerEntity> getWorkerManagers() {
+		return workerManagers.findAll();
+	}
 
-  public WorkerManagerEntity getWorkerManager(String id) {
-    return workerManagers.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(WorkerManagerEntity.class, "id", id));
-  }
+	public WorkerManagerEntity getWorkerManager(String id) {
+		return workerManagers.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(WorkerManagerEntity.class, "id", id));
+	}
 
-  public WorkerManagerEntity getWorkerManager(ContainerEntity containerEntity) {
-    return workerManagers.getByContainer(containerEntity).orElseThrow(() ->
-        new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
-  }
+	public WorkerManagerEntity getWorkerManager(ContainerEntity containerEntity) {
+		return workerManagers.getByContainer(containerEntity).orElseThrow(() ->
+			new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
+	}
 
-  public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
-    return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
-  }
+	public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
+		return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
+	}
 
-  public WorkerManagerEntity launchWorkerManager(String host) {
-    log.info("Launching worker manager at {}", host);
-    String id = UUID.randomUUID().toString();
-    ContainerEntity container = launchWorkerManager(host, id);
-    WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
-    return workerManagers.save(workerManagerEntity);
-  }
+	public WorkerManagerEntity launchWorkerManager(String host) {
+		log.info("Launching worker manager at {}", host);
+		String id = UUID.randomUUID().toString();
+		ContainerEntity container = launchWorkerManager(host, id);
+		WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
+		return workerManagers.save(workerManagerEntity);
+	}
 
-  private ContainerEntity launchWorkerManager(String hostname, String id) {
-    var environment = new LinkedList<>(List.of(
-        ContainerConstants.Environment.ID + "=" + id,
-        ContainerConstants.Environment.MASTER + "=" + hostsService.getHostAddress().getPublicIpAddress()));
-    return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
-  }
+	private ContainerEntity launchWorkerManager(String hostname, String id) {
+		var environment = new LinkedList<>(List.of(
+			ContainerConstants.Environment.ID + "=" + id,
+			ContainerConstants.Environment.MASTER + "=" + hostsService.getHostAddress().getPublicIpAddress()));
+		return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
+	}
 
-  public void deleteWorkerManager(String workerManagerId) {
-    var workerManager = getWorkerManager(workerManagerId);
-    containersService.stopContainer(workerManager.getContainer().getContainerId());
-  }
+	public void deleteWorkerManager(String workerManagerId) {
+		var workerManager = getWorkerManager(workerManagerId);
+		containersService.stopContainer(workerManager.getContainer().getContainerId());
+	}
 
-  public void deleteWorkerManagerByContainer(ContainerEntity container) {
-    var workerManager = getWorkerManager(container);
-    workerManagers.delete(workerManager);
-  }
+	public void deleteWorkerManagerByContainer(ContainerEntity container) {
+		var workerManager = getWorkerManager(container);
+		workerManagers.delete(workerManager);
+	}
 
-  public List<String> getAssignedHosts(String workerManagerId) {
-    assertWorkerManagerExists(workerManagerId);
-    List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
-        .map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
-    List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
-        .map(EdgeHostEntity::getPublicIpAddress).collect(Collectors.toList());
-    return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
-  }
+	public List<String> getAssignedHosts(String workerManagerId) {
+		assertWorkerManagerExists(workerManagerId);
+		List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
+			.map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
+		List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
+			.map(EdgeHostEntity::getPublicIpAddress).collect(Collectors.toList());
+		return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
+	}
 
-  // host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
-  public void assignHost(String workerManagerId, String hostname) {
-    WorkerManagerEntity workerManagerEntity = getWorkerManager(workerManagerId);
-    try {
-      cloudHostsService.assignWorkerManager(workerManagerEntity, hostname);
-    } catch (EntityNotFoundException ignored) {
-      edgeHostsService.assignWorkerManager(workerManagerEntity, hostname);
-    }
-  }
+	// host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
+	public void assignHost(String workerManagerId, String hostname) {
+		WorkerManagerEntity workerManagerEntity = getWorkerManager(workerManagerId);
+		try {
+			cloudHostsService.assignWorkerManager(workerManagerEntity, hostname);
+		}
+		catch (EntityNotFoundException ignored) {
+			edgeHostsService.assignWorkerManager(workerManagerEntity, hostname);
+		}
+	}
 
-  public void assignHosts(String workerManagerId, List<String> hosts) {
-    hosts.forEach(host -> assignHost(workerManagerId, host));
-  }
+	public void assignHosts(String workerManagerId, List<String> hosts) {
+		hosts.forEach(host -> assignHost(workerManagerId, host));
+	}
 
-  public void unassignHost(String workerManagerId, String host) {
-    unassignHosts(workerManagerId, List.of(host));
-  }
+	public void unassignHost(String workerManagerId, String host) {
+		unassignHosts(workerManagerId, List.of(host));
+	}
 
-  public void unassignHosts(String workerManagerId, List<String> hosts) {
-    var workerManager = getWorkerManager(workerManagerId);
-    log.info("Removing hosts {}", hosts);
-    hosts.forEach(host -> {
-      try {
-        cloudHostsService.unassignWorkerManager(host);
-      } catch (EntityNotFoundException ignored) {
-        edgeHostsService.unassignWorkerManager(host);
-      }
-    });
-    workerManagers.save(workerManager);
-  }
+	public void unassignHosts(String workerManagerId, List<String> hosts) {
+		var workerManager = getWorkerManager(workerManagerId);
+		log.info("Removing hosts {}", hosts);
+		hosts.forEach(host -> {
+			try {
+				cloudHostsService.unassignWorkerManager(host);
+			}
+			catch (EntityNotFoundException ignored) {
+				edgeHostsService.unassignWorkerManager(host);
+			}
+		});
+		workerManagers.save(workerManager);
+	}
 
-  private void assertWorkerManagerExists(String id) {
-    if (!workerManagers.hasWorkerManager(id)) {
-      throw new EntityNotFoundException(WorkerManagerEntity.class, "id", id);
-    }
-  }
+	private void assertWorkerManagerExists(String id) {
+		if (!workerManagers.hasWorkerManager(id)) {
+			throw new EntityNotFoundException(WorkerManagerEntity.class, "id", id);
+		}
+	}
 
 }

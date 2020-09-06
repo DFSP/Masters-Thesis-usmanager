@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("rules")
 public class RulesProperties {
 
-  private String serviceRuleTemplateFile;
-  private String hostRuleTemplateFile;
+	private String serviceRuleTemplateFile;
+	private String hostRuleTemplateFile;
 
 }

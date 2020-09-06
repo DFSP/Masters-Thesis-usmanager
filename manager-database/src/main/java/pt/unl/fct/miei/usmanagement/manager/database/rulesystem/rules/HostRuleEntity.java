@@ -24,34 +24,18 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -62,67 +46,67 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 @Table(name = "host_rules")
 public class HostRuleEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  private int priority;
+	private int priority;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private DecisionEntity decision;
 
-  private boolean generic;
+	private boolean generic;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<CloudHostEntity> cloudHosts;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<CloudHostEntity> cloudHosts;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<EdgeHostEntity> edgeHosts;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<EdgeHostEntity> edgeHosts;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostRuleConditionEntity> conditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostRuleConditionEntity> conditions = new HashSet<>();
 
-  public void removeAssociations() {
-    Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
-    while (cloudHostsIterator.hasNext()) {
-      CloudHostEntity cloudHost = cloudHostsIterator.next();
-      cloudHostsIterator.remove();
-      cloudHost.getHostRules().remove(this);
-    }
-    Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
-    while (edgeHostsIterator.hasNext()) {
-      EdgeHostEntity edgeHost = edgeHostsIterator.next();
-      edgeHostsIterator.remove();
-      edgeHost.getHostRules().remove(this);
-    }
-  }
+	public void removeAssociations() {
+		Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
+		while (cloudHostsIterator.hasNext()) {
+			CloudHostEntity cloudHost = cloudHostsIterator.next();
+			cloudHostsIterator.remove();
+			cloudHost.getHostRules().remove(this);
+		}
+		Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
+		while (edgeHostsIterator.hasNext()) {
+			EdgeHostEntity edgeHost = edgeHostsIterator.next();
+			edgeHostsIterator.remove();
+			edgeHost.getHostRules().remove(this);
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof HostRuleEntity)) {
-      return false;
-    }
-    HostRuleEntity other = (HostRuleEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostRuleEntity)) {
+			return false;
+		}
+		HostRuleEntity other = (HostRuleEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

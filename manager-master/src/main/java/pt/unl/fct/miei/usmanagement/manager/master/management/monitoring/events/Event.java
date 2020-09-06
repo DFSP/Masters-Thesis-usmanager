@@ -24,22 +24,22 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 public class Event {
 
-  private final Map<String, Double> fields;
+	private final Map<String, Double> fields;
 
-  public Event() {
-    this.fields = new HashMap<>();
-  }
+	public Event() {
+		this.fields = new HashMap<>();
+	}
 
 }

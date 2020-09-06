@@ -24,38 +24,20 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.containers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -66,89 +48,89 @@ import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManage
 @Table(name = "containers")
 public class ContainerEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NaturalId
-  private String containerId;
+	@NaturalId
+	private String containerId;
 
-  @NotNull
-  private long created;
+	@NotNull
+	private long created;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<String> names;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> names;
 
-  @NotNull
-  private String image;
+	@NotNull
+	private String image;
 
-  private String command;
+	private String command;
 
-  @NotNull
-  private String hostname;
+	@NotNull
+	private String hostname;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<ContainerPortMapping> ports;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ContainerPortMapping> ports;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private Map<String, String> labels;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private Map<String, String> labels;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinTable(name = "container_rule",
-      joinColumns = @JoinColumn(name = "container_id"),
-      inverseJoinColumns = @JoinColumn(name = "rule_id")
-  )
-  private Set<ContainerRuleEntity> containerRules;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "container_rule",
+		joinColumns = @JoinColumn(name = "container_id"),
+		inverseJoinColumns = @JoinColumn(name = "rule_id")
+	)
+	private Set<ContainerRuleEntity> containerRules;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinTable(name = "container_simulated_metric",
-      joinColumns = @JoinColumn(name = "container_id"),
-      inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
-  )
-  private Set<ContainerSimulatedMetricEntity> simulatedContainerMetrics;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "container_simulated_metric",
+		joinColumns = @JoinColumn(name = "container_id"),
+		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+	)
+	private Set<ContainerSimulatedMetricEntity> simulatedContainerMetrics;
 
-  public void addRule(ContainerRuleEntity rule) {
-    containerRules.add(rule);
-    rule.getContainers().add(this);
-  }
+	public void addRule(ContainerRuleEntity rule) {
+		containerRules.add(rule);
+		rule.getContainers().add(this);
+	}
 
-  public void removeRule(ContainerRuleEntity rule) {
-    containerRules.remove(rule);
-    rule.getContainers().remove(this);
-  }
+	public void removeRule(ContainerRuleEntity rule) {
+		containerRules.remove(rule);
+		rule.getContainers().remove(this);
+	}
 
-  public void addContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
-    simulatedContainerMetrics.add(containerMetric);
-    containerMetric.getContainers().add(this);
-  }
+	public void addContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
+		simulatedContainerMetrics.add(containerMetric);
+		containerMetric.getContainers().add(this);
+	}
 
-  public void removeContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
-    simulatedContainerMetrics.remove(containerMetric);
-    containerMetric.getContainers().remove(this);
-  }
+	public void removeContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
+		simulatedContainerMetrics.remove(containerMetric);
+		containerMetric.getContainers().remove(this);
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ContainerEntity)) {
-      return false;
-    }
-    ContainerEntity other = (ContainerEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ContainerEntity)) {
+			return false;
+		}
+		ContainerEntity other = (ContainerEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

@@ -38,17 +38,17 @@ import org.springframework.data.annotation.Id;
 @ToString
 public class User implements Serializable {
 
-  @Id
-  private String id;
+	@Id
+	private String id;
 
-  private String name;
+	private String name;
 
-  private String country;
+	private String country;
 
-  private long updated;
+	private long updated;
 
-  public User(String name) {
-    this.name = name;
-  }
+	public User(String name) {
+		this.name = name;
+	}
 
 }

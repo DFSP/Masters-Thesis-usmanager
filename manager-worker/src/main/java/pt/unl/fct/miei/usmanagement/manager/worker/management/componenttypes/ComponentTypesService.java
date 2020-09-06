@@ -37,26 +37,26 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ComponentTypesService {
 
-  private final ComponentTypeRepository componentTypes;
+	private final ComponentTypeRepository componentTypes;
 
-  public ComponentTypesService(ComponentTypeRepository componentTypes) {
-    this.componentTypes = componentTypes;
-  }
+	public ComponentTypesService(ComponentTypeRepository componentTypes) {
+		this.componentTypes = componentTypes;
+	}
 
-  public List<ComponentTypeEntity> getComponentTypes() {
-    return componentTypes.findAll();
-  }
+	public List<ComponentTypeEntity> getComponentTypes() {
+		return componentTypes.findAll();
+	}
 
-  public ComponentTypeEntity getComponentType(Long id) {
-    return componentTypes.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ComponentTypeEntity.class, "id", id.toString()));
-  }
+	public ComponentTypeEntity getComponentType(Long id) {
+		return componentTypes.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ComponentTypeEntity.class, "id", id.toString()));
+	}
 
-  public ComponentTypeEntity getComponentType(String type) {
-    ComponentType componentType = ComponentType.valueOf(type.toUpperCase());
-    return componentTypes.findByType(componentType).orElseThrow(() ->
-        new EntityNotFoundException(ComponentTypeEntity.class, "type", type));
-  }
+	public ComponentTypeEntity getComponentType(String type) {
+		ComponentType componentType = ComponentType.valueOf(type.toUpperCase());
+		return componentTypes.findByType(componentType).orElseThrow(() ->
+			new EntityNotFoundException(ComponentTypeEntity.class, "type", type));
+	}
 
 
 }

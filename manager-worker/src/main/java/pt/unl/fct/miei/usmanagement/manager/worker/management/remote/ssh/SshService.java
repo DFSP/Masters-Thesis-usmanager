@@ -56,130 +56,136 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.prometh
 @Slf4j
 public class SshService {
 
-  private static final int EXECUTE_COMMAND_TIMEOUT = 120000;
+	private static final int EXECUTE_COMMAND_TIMEOUT = 120000;
 
-  private final EdgeHostsService edgeHostsService;
+	private final EdgeHostsService edgeHostsService;
 
-  private final int connectionTimeout;
-  private final String awsKeyFilePath;
-  private final String awsUser;
-  private final Map<String, String> scriptPaths;
+	private final int connectionTimeout;
+	private final String awsKeyFilePath;
+	private final String awsUser;
+	private final Map<String, String> scriptPaths;
 
-  public SshService(EdgeHostsService edgeHostsService, SshProperties sshProperties,
-                    AwsProperties awsProperties, DockerProperties dockerProperties,
-                    PrometheusProperties prometheusProperties) {
-    this.edgeHostsService = edgeHostsService;
-    this.connectionTimeout = sshProperties.getConnectionTimeout();
-    this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
-    this.awsUser = awsProperties.getAccess().getUsername();
-    PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
-    this.scriptPaths = Map.of(
-        dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
-        dockerProperties.getUninstallScript(), dockerProperties.getUninstallScriptPath(),
-        nodeExporterProperties.getInstallScript(), nodeExporterProperties.getInstallScriptPath()
-    );
-    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-  }
+	public SshService(EdgeHostsService edgeHostsService, SshProperties sshProperties,
+					  AwsProperties awsProperties, DockerProperties dockerProperties,
+					  PrometheusProperties prometheusProperties) {
+		this.edgeHostsService = edgeHostsService;
+		this.connectionTimeout = sshProperties.getConnectionTimeout();
+		this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
+		this.awsUser = awsProperties.getAccess().getUsername();
+		PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
+		this.scriptPaths = Map.of(
+			dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
+			dockerProperties.getUninstallScript(), dockerProperties.getUninstallScriptPath(),
+			nodeExporterProperties.getInstallScript(), nodeExporterProperties.getInstallScriptPath()
+		);
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+	}
 
-  private SSHClient initClient(String hostname) throws IOException {
-    String username;
-    String publicKeyFile;
-    try {
-      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
-      username = edgeHostEntity.getUsername();
-      publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
-    } catch (EntityNotFoundException e) {
-      username = awsUser;
-      publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
-    }
-    return initClient(username, hostname, new File(publicKeyFile));
-  }
+	private SSHClient initClient(String hostname) throws IOException {
+		String username;
+		String publicKeyFile;
+		try {
+			EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
+			username = edgeHostEntity.getUsername();
+			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
+		}
+		catch (EntityNotFoundException e) {
+			username = awsUser;
+			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
+		}
+		return initClient(username, hostname, new File(publicKeyFile));
+	}
 
-  private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
-    var sshClient = new SSHClient();
-    sshClient.setConnectTimeout(connectionTimeout);
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-    log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
-    sshClient.connect(hostname);
-    var keyFile = new PKCS8KeyFile();
-    keyFile.init(publicKeyFile);
-    sshClient.authPublickey(username, keyFile);
-    log.info("Logged in to host '{}@{}'", username, hostname);
-    return sshClient;
-  }
+	private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
+		var sshClient = new SSHClient();
+		sshClient.setConnectTimeout(connectionTimeout);
+		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+		log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
+		sshClient.connect(hostname);
+		var keyFile = new PKCS8KeyFile();
+		keyFile.init(publicKeyFile);
+		sshClient.authPublickey(username, keyFile);
+		log.info("Logged in to host '{}@{}'", username, hostname);
+		return sshClient;
+	}
 
-  private SSHClient initClient(String hostname, String username, String password) throws IOException {
-    var sshClient = new SSHClient();
-    sshClient.setConnectTimeout(connectionTimeout);
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-    log.info("Logging in to host '{}@{}' using password", username, hostname);
-    sshClient.connect(hostname);
-    sshClient.authPassword(username, password);
-    log.info("Logged in to host '{}@{}'", username, hostname);
-    return sshClient;
-  }
+	private SSHClient initClient(String hostname, String username, String password) throws IOException {
+		var sshClient = new SSHClient();
+		sshClient.setConnectTimeout(connectionTimeout);
+		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+		log.info("Logging in to host '{}@{}' using password", username, hostname);
+		sshClient.connect(hostname);
+		sshClient.authPassword(username, password);
+		log.info("Logged in to host '{}@{}'", username, hostname);
+		return sshClient;
+	}
 
-  public void uploadFile(String hostname, String filename) {
-    try (SSHClient sshClient = initClient(hostname);
-         SFTPClient sftpClient = sshClient.newSFTPClient()) {
-      String scriptPath = scriptPaths.get(filename);
-      if (scriptPath == null) {
-        throw new EntityNotFoundException(File.class, "name", filename);
-      }
-      var file = new File(scriptPath);
-      log.info("Transferring file {} to host {}", filename, hostname);
-      sftpClient.put(new FileSystemFile(file), filename);
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new WorkerManagerException(e.getMessage());
-    }
-  }
+	public void uploadFile(String hostname, String filename) {
+		try (SSHClient sshClient = initClient(hostname);
+			 SFTPClient sftpClient = sshClient.newSFTPClient()) {
+			String scriptPath = scriptPaths.get(filename);
+			if (scriptPath == null) {
+				throw new EntityNotFoundException(File.class, "name", filename);
+			}
+			var file = new File(scriptPath);
+			log.info("Transferring file {} to host {}", filename, hostname);
+			sftpClient.put(new FileSystemFile(file), filename);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new WorkerManagerException(e.getMessage());
+		}
+	}
 
-  public SshCommandResult executeCommand(String hostname, String command) {
-    try (SSHClient sshClient = initClient(hostname);
-         Session session = sshClient.startSession()) {
-      return executeCommand(session, hostname, command);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
-    }
-  }
+	public SshCommandResult executeCommand(String hostname, String command) {
+		try (SSHClient sshClient = initClient(hostname);
+			 Session session = sshClient.startSession()) {
+			return executeCommand(session, hostname, command);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
+		}
+	}
 
-  public SshCommandResult executeCommand(String hostname, String username, String password, String command) {
-    try (SSHClient sshClient = initClient(hostname, username, password);
-         Session session = sshClient.startSession()) {
-      return executeCommand(session, hostname, command);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
-    }
-  }
+	public SshCommandResult executeCommand(String hostname, String username, String password, String command) {
+		try (SSHClient sshClient = initClient(hostname, username, password);
+			 Session session = sshClient.startSession()) {
+			return executeCommand(session, hostname, command);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
+		}
+	}
 
-  private SshCommandResult executeCommand(Session session, String hostname, String command) throws IOException {
-    log.info("Executing: {}, at host {}", command, hostname);
-    Session.Command cmd = session.exec(command);
-    cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
-    int exitStatus = cmd.getExitStatus();
-    List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
-    List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));
-    log.info("Command exited with\nstatus: {}\noutput: {}\nerror: {}", exitStatus, output, error);
-    return new SshCommandResult(hostname, command, exitStatus, output, error);
-  }
+	private SshCommandResult executeCommand(Session session, String hostname, String command) throws IOException {
+		log.info("Executing: {}, at host {}", command, hostname);
+		Session.Command cmd = session.exec(command);
+		cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
+		int exitStatus = cmd.getExitStatus();
+		List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
+		List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));
+		log.info("Command exited with\nstatus: {}\noutput: {}\nerror: {}", exitStatus, output, error);
+		return new SshCommandResult(hostname, command, exitStatus, output, error);
+	}
 
-  public boolean hasConnection(String hostname) {
-    log.info("Checking connectivity to {}", hostname);
-    try (SSHClient client = initClient(hostname);
-         Session ignored = client.startSession()) {
-      log.info("Successfully connected to {}", hostname);
-      return true;
-    } catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
-      // ignored
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    log.info("Failed to connect to {}", hostname);
-    return false;
-  }
+	public boolean hasConnection(String hostname) {
+		log.info("Checking connectivity to {}", hostname);
+		try (SSHClient client = initClient(hostname);
+			 Session ignored = client.startSession()) {
+			log.info("Successfully connected to {}", hostname);
+			return true;
+		}
+		catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
+			// ignored
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		log.info("Failed to connect to {}", hostname);
+		return false;
+	}
 
 
 }

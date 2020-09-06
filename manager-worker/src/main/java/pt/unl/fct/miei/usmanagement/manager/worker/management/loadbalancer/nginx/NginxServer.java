@@ -29,17 +29,17 @@ import lombok.Getter;
 @Getter
 class NginxServer extends NginxSimpleServer {
 
-  private final String continent;
-  private final String region;
-  private final String country;
-  private final String city;
+	private final String continent;
+	private final String region;
+	private final String country;
+	private final String city;
 
-  NginxServer(String hostname, String continent, String region, String country, String city) {
-    super(hostname);
-    this.continent = continent;
-    this.region = region;
-    this.country = country;
-    this.city = city;
-  }
+	NginxServer(String hostname, String continent, String region, String country, String city) {
+		super(hostname);
+		this.continent = continent;
+		this.region = region;
+		this.country = country;
+		this.city = city;
+	}
 
 }

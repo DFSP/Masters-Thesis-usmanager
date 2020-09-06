@@ -24,21 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.valuemodes;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ValueModeRepository extends JpaRepository<ValueModeEntity, Long> {
 
-  Optional<ValueModeEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<ValueModeEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select case when count(m) > 0 then true else false end "
-      + "from ValueModeEntity m "
-      + "where lower(m.name) = lower(:name)")
-  boolean hasValueMode(@Param("name") String name);
+	@Query("select case when count(m) > 0 then true else false end "
+		+ "from ValueModeEntity m "
+		+ "where lower(m.name) = lower(:name)")
+	boolean hasValueMode(@Param("name") String name);
 
 }

@@ -24,23 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.logging;
 
-import java.util.Objects;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -52,35 +40,35 @@ import lombok.Setter;
 @Table(name = "logging_event_exception")
 public class LoggingEventExceptionEntity {
 
-  @Id
-  private Long eventId;
+	@Id
+	private Long eventId;
 
-  @Id
-  private Short i;
+	@Id
+	private Short i;
 
-  @NotNull
-  private String traceLine;
+	@NotNull
+	private String traceLine;
 
-  @OneToOne
-  @MapsId
-  @JoinColumn(name = "eventId")
-  private LoggingEventEntity loggingEvent;
+	@OneToOne
+	@MapsId
+	@JoinColumn(name = "eventId")
+	private LoggingEventEntity loggingEvent;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof LoggingEventExceptionEntity)) {
-      return false;
-    }
-    LoggingEventExceptionEntity other = (LoggingEventExceptionEntity) o;
-    return eventId != null && eventId.equals(other.getEventId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getEventId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getEventId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof LoggingEventExceptionEntity)) {
+			return false;
+		}
+		LoggingEventExceptionEntity other = (LoggingEventExceptionEntity) o;
+		return eventId != null && eventId.equals(other.getEventId());
+	}
 
 }

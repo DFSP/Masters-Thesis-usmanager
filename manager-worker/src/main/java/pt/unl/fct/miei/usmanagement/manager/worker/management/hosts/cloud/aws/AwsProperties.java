@@ -37,41 +37,41 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("aws")
 public class AwsProperties {
 
-  private final Access access;
-  private final Instance instance;
-  private int initialMaxInstances;
-  private int maxRetries;
-  private int delayBetweenRetries;
-  private int connectionTimeout;
+	private final Access access;
+	private final Instance instance;
+	private int initialMaxInstances;
+	private int maxRetries;
+	private int delayBetweenRetries;
+	private int connectionTimeout;
 
-  public AwsProperties() {
-    this.access = new Access();
-    this.instance = new Instance();
-  }
+	public AwsProperties() {
+		this.access = new Access();
+		this.instance = new Instance();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Access {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Access {
 
-    private String keyFilePath;
-    private String username;
-    private String key;
-    private String secretKey;
+		private String keyFilePath;
+		private String username;
+		private String key;
+		private String secretKey;
 
-  }
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Instance {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Instance {
 
-    private String ami;
-    private String securityGroup;
-    private String keyPair;
-    private String type;
-    private String tag;
+		private String ami;
+		private String securityGroup;
+		private String keyPair;
+		private String type;
+		private String tag;
 
-  }
+	}
 
 }

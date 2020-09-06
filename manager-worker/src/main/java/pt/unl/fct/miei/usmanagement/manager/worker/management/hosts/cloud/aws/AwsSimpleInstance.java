@@ -32,24 +32,24 @@ import lombok.Data;
 @Data
 public final class AwsSimpleInstance {
 
-  private final String instanceId;
-  private final String imageId;
-  private final String instanceType;
-  private final InstanceState state;
-  private final String publicDnsName;
-  private final String publicIpAddress;
-  private final String privateIpAddress;
-  private final Placement placement;
+	private final String instanceId;
+	private final String imageId;
+	private final String instanceType;
+	private final InstanceState state;
+	private final String publicDnsName;
+	private final String publicIpAddress;
+	private final String privateIpAddress;
+	private final Placement placement;
 
-  public AwsSimpleInstance(Instance instance) {
-    this.instanceId = instance.getInstanceId();
-    this.imageId = instance.getImageId();
-    this.instanceType = instance.getInstanceType();
-    this.state = instance.getState();
-    this.publicDnsName = instance.getPublicDnsName();
-    this.publicIpAddress = instance.getPublicIpAddress();
-    this.privateIpAddress = instance.getPrivateIpAddress();
-    this.placement = instance.getPlacement();
-  }
+	public AwsSimpleInstance(Instance instance) {
+		this.instanceId = instance.getInstanceId();
+		this.imageId = instance.getImageId();
+		this.instanceType = instance.getInstanceType();
+		this.state = instance.getState();
+		this.publicDnsName = instance.getPublicDnsName();
+		this.publicIpAddress = instance.getPublicIpAddress();
+		this.privateIpAddress = instance.getPrivateIpAddress();
+		this.placement = instance.getPlacement();
+	}
 
 }

@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -37,24 +37,24 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("manager-worker")
 public class ManagerWorkerProperties {
 
-  public static final String MANAGER_WORKER = "manager-worker";
-  private String id;
-  private String masterHostname;
-  private final Tests tests;
-  private int monitorPeriod;
+	public static final String MANAGER_WORKER = "manager-worker";
+	private final Tests tests;
+	private String id;
+	private String masterHostname;
+	private int monitorPeriod;
 
-  public ManagerWorkerProperties() {
-    this.tests = new Tests();
-  }
+	public ManagerWorkerProperties() {
+		this.tests = new Tests();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Tests {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Tests {
 
-    private boolean enabled;
+		private boolean enabled;
 
-  }
+	}
 
 
 }

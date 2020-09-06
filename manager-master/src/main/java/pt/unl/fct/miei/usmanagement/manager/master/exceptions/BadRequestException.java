@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public final class BadRequestException extends RuntimeException {
 
-  public BadRequestException(String s, Object... args) {
-    super(String.format(s, args));
-  }
+	public BadRequestException(String s, Object... args) {
+		super(String.format(s, args));
+	}
 
 }

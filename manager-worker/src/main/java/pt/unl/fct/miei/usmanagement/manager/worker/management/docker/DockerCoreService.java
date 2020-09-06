@@ -35,39 +35,39 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh.SshServ
 @Service
 public class DockerCoreService {
 
-  private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
-  private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(120);
+	private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+	private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(120);
 
-  private final SshService sshService;
+	private final SshService sshService;
 
-  private final String dockerAuthorization;
-  private final int dockerApiPort;
-  private final String dockerScriptFile;
+	private final String dockerAuthorization;
+	private final int dockerApiPort;
+	private final String dockerScriptFile;
 
-  public DockerCoreService(SshService sshService, DockerProperties dockerProperties) {
-    this.sshService = sshService;
-    String dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
-    String dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
-    var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
-    this.dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
-    this.dockerApiPort = dockerProperties.getApiProxy().getPort();
-    this.dockerScriptFile = dockerProperties.getInstallScript();
-  }
+	public DockerCoreService(SshService sshService, DockerProperties dockerProperties) {
+		this.sshService = sshService;
+		String dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
+		String dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
+		var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
+		this.dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
+		this.dockerApiPort = dockerProperties.getApiProxy().getPort();
+		this.dockerScriptFile = dockerProperties.getInstallScript();
+	}
 
-  public DockerClient getDockerClient(String hostname) {
-    String uri = String.format("http://%s:%d", hostname, dockerApiPort);
-    return DefaultDockerClient.builder()
-        .uri(uri)
-        .header("Authorization", dockerAuthorization)
-        .connectTimeoutMillis(CONNECTION_TIMEOUT)
-        .readTimeoutMillis(READ_TIMEOUT)
-        .build();
-  }
+	public DockerClient getDockerClient(String hostname) {
+		String uri = String.format("http://%s:%d", hostname, dockerApiPort);
+		return DefaultDockerClient.builder()
+			.uri(uri)
+			.header("Authorization", dockerAuthorization)
+			.connectTimeoutMillis(CONNECTION_TIMEOUT)
+			.readTimeoutMillis(READ_TIMEOUT)
+			.build();
+	}
 
-  public void installDocker(String hostname) {
-    sshService.uploadFile(hostname, dockerScriptFile);
-    String installDockerCommand = String.format("sh %s", dockerScriptFile);
-    sshService.executeCommand(hostname, installDockerCommand);
-  }
+	public void installDocker(String hostname) {
+		sshService.uploadFile(hostname, dockerScriptFile);
+		String installDockerCommand = String.format("sh %s", dockerScriptFile);
+		sshService.executeCommand(hostname, installDockerCommand);
+	}
 
 }

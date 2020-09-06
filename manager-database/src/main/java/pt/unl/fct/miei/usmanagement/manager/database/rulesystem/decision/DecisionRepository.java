@@ -24,23 +24,23 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface DecisionRepository extends JpaRepository<DecisionEntity, Long> {
 
-  Optional<DecisionEntity> findByRuleDecision(@Param("decision") RuleDecision decision);
+	Optional<DecisionEntity> findByRuleDecision(@Param("decision") RuleDecision decision);
 
-  List<DecisionEntity> findByComponentTypeType(@Param("componentType") ComponentType componentType);
+	List<DecisionEntity> findByComponentTypeType(@Param("componentType") ComponentType componentType);
 
-  Optional<DecisionEntity> findByRuleDecisionAndComponentTypeType(@Param("decision") RuleDecision decision,
-                                                                  @Param("componentType") ComponentType componentType);
+	Optional<DecisionEntity> findByRuleDecisionAndComponentTypeType(@Param("decision") RuleDecision decision,
+																	@Param("componentType") ComponentType componentType);
 
 }

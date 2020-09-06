@@ -26,10 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.master.exceptions;
 
 public final class DuplicateResponseEntryException extends RuntimeException {
 
-  private static final String MESSAGE = "Response has duplicated entries";
+	private static final String MESSAGE = "Response has duplicated entries";
 
-  public DuplicateResponseEntryException() {
-    super(MESSAGE);
-  }
+	public DuplicateResponseEntryException() {
+		super(MESSAGE);
+	}
 
 }

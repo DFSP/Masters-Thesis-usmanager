@@ -26,13 +26,13 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.node
 
 public final class NodeConstants {
 
-  private NodeConstants() {
-  }
+	private NodeConstants() {
+	}
 
-  public static final class Label {
+	public static final class Label {
 
-    public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
+		public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
 
-  }
+	}
 
 }

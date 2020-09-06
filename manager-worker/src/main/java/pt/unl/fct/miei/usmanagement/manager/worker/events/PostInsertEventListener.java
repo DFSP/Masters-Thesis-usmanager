@@ -32,23 +32,23 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 @Slf4j
 public class PostInsertEventListener implements org.hibernate.event.spi.PostInsertEventListener {
 
-  @Override
-  public void onPostInsert(PostInsertEvent event) {
-    log.info("{}", event.getEntity());
-    if (event.getEntity() instanceof EdgeHostEntity) {
-      EdgeHostEntity edgeHost = (EdgeHostEntity) event.getEntity();
-      log.info(edgeHost.getHostname());
-    }
-  }
+	@Override
+	public void onPostInsert(PostInsertEvent event) {
+		log.info("{}", event.getEntity());
+		if (event.getEntity() instanceof EdgeHostEntity) {
+			EdgeHostEntity edgeHost = (EdgeHostEntity) event.getEntity();
+			log.info(edgeHost.getHostname());
+		}
+	}
 
-  @Override
-  public boolean requiresPostCommitHanding(EntityPersister persister) {
-    return false;
-  }
+	@Override
+	public boolean requiresPostCommitHanding(EntityPersister persister) {
+		return false;
+	}
 
-  @Override
-  public boolean requiresPostCommitHandling(EntityPersister persister) {
-    return false;
-  }
+	@Override
+	public boolean requiresPostCommitHandling(EntityPersister persister) {
+		return false;
+	}
 
 }

@@ -30,13 +30,13 @@ import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 @Data
 public class AddEdgeHostRequest {
 
-  private final String username;
-  private final String password;
-  private final String publicDnsName;
-  private final String privateIpAddress;
-  private final String publicIpAddress;
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
+	private final String username;
+	private final String password;
+	private final String publicDnsName;
+	private final String privateIpAddress;
+	private final String publicIpAddress;
+	private final RegionEntity region;
+	private final String country;
+	private final String city;
 
 }

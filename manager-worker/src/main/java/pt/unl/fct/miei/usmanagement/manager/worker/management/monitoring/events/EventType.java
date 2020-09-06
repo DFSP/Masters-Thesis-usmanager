@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.events
 
 public enum EventType {
 
-  CONTAINER,
-  HOST
+	CONTAINER,
+	HOST
 
 }

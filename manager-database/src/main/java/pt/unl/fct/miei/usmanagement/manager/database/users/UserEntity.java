@@ -24,22 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.users;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,27 +40,27 @@ import org.hibernate.annotations.NaturalId;
 @Table(name = "users")
 public class UserEntity {
 
-  @Id
-  @GeneratedValue
-  private long id;
+	@Id
+	@GeneratedValue
+	private long id;
 
-  @NotEmpty
-  private String firstName;
+	@NotEmpty
+	private String firstName;
 
-  @NotEmpty
-  private String lastName;
+	@NotEmpty
+	private String lastName;
 
-  @NaturalId
-  private String username;
+	@NaturalId
+	private String username;
 
-  @NotEmpty
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String password;
+	@NotEmpty
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	private String password;
 
-  @NaturalId
-  private String email;
+	@NaturalId
+	private String email;
 
-  @Enumerated(EnumType.STRING)
-  private UserRole role;
+	@Enumerated(EnumType.STRING)
+	private UserRole role;
 
 }

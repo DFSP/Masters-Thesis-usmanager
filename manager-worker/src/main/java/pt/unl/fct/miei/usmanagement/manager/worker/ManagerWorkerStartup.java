@@ -40,26 +40,26 @@ import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 @Component
 public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-  private final SymService symService;
-  private final HostsService hostsService;
-  private final ServicesMonitoringService servicesMonitoringService;
-  private final HostsMonitoringService hostsMonitoringService;
+	private final SymService symService;
+	private final HostsService hostsService;
+	private final ServicesMonitoringService servicesMonitoringService;
+	private final HostsMonitoringService hostsMonitoringService;
 
-  public ManagerWorkerStartup(SymService symService, HostsService hostsService,
-                              ServicesMonitoringService servicesMonitoringService,
-                              HostsMonitoringService hostsMonitoringService) {
-    this.symService = symService;
-    this.hostsService = hostsService;
-    this.servicesMonitoringService = servicesMonitoringService;
-    this.hostsMonitoringService = hostsMonitoringService;
-  }
+	public ManagerWorkerStartup(SymService symService, HostsService hostsService,
+								ServicesMonitoringService servicesMonitoringService,
+								HostsMonitoringService hostsMonitoringService) {
+		this.symService = symService;
+		this.hostsService = hostsService;
+		this.servicesMonitoringService = servicesMonitoringService;
+		this.hostsMonitoringService = hostsMonitoringService;
+	}
 
-  @Override
-  public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-    // 1. start zookeeper process
-    // 2. start kafka process
-    hostsService.setHostAddress();
-    symService.startSymmetricDSServer();
+	@Override
+	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		// 1. start zookeeper process
+		// 2. start kafka process
+		hostsService.setHostAddress();
+		symService.startSymmetricDSServer();
    /* try {
       hostsService.clusterHosts();
     } catch (WorkerManagerException e) {
@@ -67,6 +67,6 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
     }
     servicesMonitoringService.initServiceMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();*/
-  }
+	}
 
 }

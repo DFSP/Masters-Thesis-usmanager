@@ -24,62 +24,62 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ContainerSimulatedMetricsRepository extends JpaRepository<ContainerSimulatedMetricEntity, Long> {
 
-  Optional<ContainerSimulatedMetricEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<ContainerSimulatedMetricEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select m "
-      + "from ContainerSimulatedMetricEntity m join m.containers c "
-      + "where c.containerId = :containerId")
-  List<ContainerSimulatedMetricEntity> findByContainer(@Param("containerId") String containerId);
+	@Query("select m "
+		+ "from ContainerSimulatedMetricEntity m join m.containers c "
+		+ "where c.containerId = :containerId")
+	List<ContainerSimulatedMetricEntity> findByContainer(@Param("containerId") String containerId);
 
-  @Query("select m "
-      + "from ContainerSimulatedMetricEntity m join m.containers c "
-      + "where c.containerId = :containerId and lower(m.field.name) = lower(:field)")
-  Optional<ContainerSimulatedMetricEntity> findByContainerAndField(@Param("containerId") String containerId,
-                                                                   @Param("field") String field);
+	@Query("select m "
+		+ "from ContainerSimulatedMetricEntity m join m.containers c "
+		+ "where c.containerId = :containerId and lower(m.field.name) = lower(:field)")
+	Optional<ContainerSimulatedMetricEntity> findByContainerAndField(@Param("containerId") String containerId,
+																	 @Param("field") String field);
 
-  @Query("select m "
-      + "from ContainerSimulatedMetricEntity m "
-      + "where m.generic = true and lower(m.field.name) = lower(:field)")
-  Optional<ContainerSimulatedMetricEntity> findGenericByField(@Param("field") String field);
+	@Query("select m "
+		+ "from ContainerSimulatedMetricEntity m "
+		+ "where m.generic = true and lower(m.field.name) = lower(:field)")
+	Optional<ContainerSimulatedMetricEntity> findGenericByField(@Param("field") String field);
 
-  @Query("select m "
-      + "from ContainerSimulatedMetricEntity m "
-      + "where m.generic = true")
-  List<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetrics();
+	@Query("select m "
+		+ "from ContainerSimulatedMetricEntity m "
+		+ "where m.generic = true")
+	List<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetrics();
 
-  @Query("select m "
-      + "from ContainerSimulatedMetricEntity m "
-      + "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
-  Optional<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetric(@Param("simulatedMetricName")
-                                                                                   String simulatedMetricName);
+	@Query("select m "
+		+ "from ContainerSimulatedMetricEntity m "
+		+ "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
+	Optional<ContainerSimulatedMetricEntity> findGenericContainerSimulatedMetric(@Param("simulatedMetricName")
+																					 String simulatedMetricName);
 
-  @Query("select case when count(m) > 0 then true else false end "
-      + "from ContainerSimulatedMetricEntity m "
-      + "where lower(m.name) = lower(:simulatedMetricName)")
-  boolean hasContainerSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
+	@Query("select case when count(m) > 0 then true else false end "
+		+ "from ContainerSimulatedMetricEntity m "
+		+ "where lower(m.name) = lower(:simulatedMetricName)")
+	boolean hasContainerSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
-  @Query("select c "
-      + "from ContainerSimulatedMetricEntity m join m.containers c "
-      + "where lower(m.name) = lower(:simulatedMetricName)")
-  List<ContainerEntity> getContainers(@Param("simulatedMetricName") String simulatedMetricName);
+	@Query("select c "
+		+ "from ContainerSimulatedMetricEntity m join m.containers c "
+		+ "where lower(m.name) = lower(:simulatedMetricName)")
+	List<ContainerEntity> getContainers(@Param("simulatedMetricName") String simulatedMetricName);
 
-  @Query("select c "
-      + "from ContainerSimulatedMetricEntity m join m.containers c "
-      + "where lower(m.name) = lower(:simulatedMetricName) and c.containerId = :containerId")
-  Optional<ContainerEntity> getContainer(@Param("simulatedMetricName") String simulatedMetricName,
-                                         @Param("containerId") String containerId);
+	@Query("select c "
+		+ "from ContainerSimulatedMetricEntity m join m.containers c "
+		+ "where lower(m.name) = lower(:simulatedMetricName) and c.containerId = :containerId")
+	Optional<ContainerEntity> getContainer(@Param("simulatedMetricName") String simulatedMetricName,
+										   @Param("containerId") String containerId);
 
 
 }

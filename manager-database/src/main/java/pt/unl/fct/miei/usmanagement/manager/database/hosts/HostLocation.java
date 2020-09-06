@@ -35,26 +35,26 @@ import lombok.ToString;
 @ToString
 public class HostLocation {
 
-  //TODO get location based on ip?
-  // cache information after first lookup
+	//TODO get location based on ip?
+	// cache information after first lookup
 
-  // https://developers.google.com/maps/documentation/geocoding/overview
-  private final Coordinates coordinates;
-  @Deprecated
-  private final String city;
-  @Deprecated
-  private final String country;
-  @Deprecated
-  private final String region;
-  @Deprecated
-  private final String continent;
+	// https://developers.google.com/maps/documentation/geocoding/overview
+	private final Coordinates coordinates;
+	@Deprecated
+	private final String city;
+	@Deprecated
+	private final String country;
+	@Deprecated
+	private final String region;
+	@Deprecated
+	private final String continent;
 
-  public HostLocation(String city, String country, String region, String continent) {
-    this.coordinates = null;
-    this.city = city;
-    this.country = country;
-    this.region = region;
-    this.continent = continent;
-  }
+	public HostLocation(String city, String country, String region, String continent) {
+		this.coordinates = null;
+		this.city = city;
+		this.country = country;
+		this.region = region;
+		this.continent = continent;
+	}
 
 }

@@ -24,31 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -59,50 +44,50 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 @Table(name = "host_decisions")
 public class HostDecisionEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private DecisionEntity decision;
 
-  @ManyToOne
-  @JoinColumn(name = "rule_id")
-  private HostRuleEntity rule;
+	@ManyToOne
+	@JoinColumn(name = "rule_id")
+	private HostRuleEntity rule;
 
-  private String hostname;
+	private String hostname;
 
-  @Basic
-  private Timestamp timestamp;
+	@Basic
+	private Timestamp timestamp;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<HostDecisionValueEntity> hostDecisions = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<HostDecisionValueEntity> hostDecisions = new HashSet<>();
 
-  @PrePersist
-  public void prePersist() {
-    if (timestamp == null) {
-      timestamp = Timestamp.from(Instant.now());
-    }
-  }
+	@PrePersist
+	public void prePersist() {
+		if (timestamp == null) {
+			timestamp = Timestamp.from(Instant.now());
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceDecisionEntity)) {
-      return false;
-    }
-    ServiceDecisionEntity other = (ServiceDecisionEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceDecisionEntity)) {
+			return false;
+		}
+		ServiceDecisionEntity other = (ServiceDecisionEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

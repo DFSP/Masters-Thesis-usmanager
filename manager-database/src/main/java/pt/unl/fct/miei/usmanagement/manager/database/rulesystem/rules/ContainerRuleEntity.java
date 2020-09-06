@@ -24,33 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -61,56 +45,56 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 @Table(name = "container_rules")
 public class ContainerRuleEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  private int priority;
+	private int priority;
 
-  private boolean generic;
+	private boolean generic;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private DecisionEntity decision;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private Set<ContainerEntity> containers;
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<ContainerEntity> containers;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ContainerRuleConditionEntity> conditions = new HashSet<>();
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ContainerRuleConditionEntity> conditions = new HashSet<>();
 
-  public void removeAssociations() {
-    Iterator<ContainerEntity> containersIterator = containers.iterator();
-    while (containersIterator.hasNext()) {
-      ContainerEntity container = containersIterator.next();
-      containersIterator.remove();
-      container.getContainerRules().remove(this);
-    }
-  }
+	public void removeAssociations() {
+		Iterator<ContainerEntity> containersIterator = containers.iterator();
+		while (containersIterator.hasNext()) {
+			ContainerEntity container = containersIterator.next();
+			containersIterator.remove();
+			container.getContainerRules().remove(this);
+		}
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ContainerRuleEntity)) {
-      return false;
-    }
-    ContainerRuleEntity other = (ContainerRuleEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ContainerRuleEntity)) {
+			return false;
+		}
+		ContainerRuleEntity other = (ContainerRuleEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

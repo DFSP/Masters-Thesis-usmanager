@@ -24,17 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ServiceDecisionRepository extends JpaRepository<ServiceDecisionEntity, Long> {
 
 
-  List<ServiceDecisionEntity> findByServiceName(String serviceName);
+	List<ServiceDecisionEntity> findByServiceName(String serviceName);
 
-  List<ServiceDecisionEntity> findByContainerId(String containerId);
+	List<ServiceDecisionEntity> findByContainerId(String containerId);
 
 }

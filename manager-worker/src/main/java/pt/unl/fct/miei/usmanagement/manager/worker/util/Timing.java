@@ -33,32 +33,33 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Timing {
 
-  public void wait(long time, TimeUnit timeUnit) {
-    try {
-      timeUnit.sleep(time);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+	public void wait(long time, TimeUnit timeUnit) {
+		try {
+			timeUnit.sleep(time);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-  public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
-    Timing.wait(condition, 50, timeout);
-  }
+	public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
+		Timing.wait(condition, 50, timeout);
+	}
 
-  public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
-    long start = System.currentTimeMillis();
-    long backoff = sleep;
-    long maxBackoff = backoff * 5;
-    while (!condition.getAsBoolean()) {
-      if (System.currentTimeMillis() - start > timeout) {
-        throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
-      }
-      Timing.wait(backoff, TimeUnit.MILLISECONDS);
-      backoff = backoff << 2;
-      if (backoff > maxBackoff) {
-        backoff = maxBackoff;
-      }
-    }
-  }
+	public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
+		long start = System.currentTimeMillis();
+		long backoff = sleep;
+		long maxBackoff = backoff * 5;
+		while (!condition.getAsBoolean()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
+			}
+			Timing.wait(backoff, TimeUnit.MILLISECONDS);
+			backoff = backoff << 2;
+			if (backoff > maxBackoff) {
+				backoff = maxBackoff;
+			}
+		}
+	}
 
 }

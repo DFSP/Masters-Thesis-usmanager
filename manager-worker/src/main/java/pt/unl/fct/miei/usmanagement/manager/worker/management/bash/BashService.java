@@ -38,56 +38,57 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerExcep
 @Service
 public class BashService {
 
-  public String getUsername() {
-    BashCommandResult usernameResult = executeCommand("whoami");
-    if (!usernameResult.isSuccessful()) {
-      throw new WorkerManagerException("Unable to get username of this machine: %s", usernameResult.getError());
-    }
-    return usernameResult.getOutput().get(0);
-  }
+	public String getUsername() {
+		BashCommandResult usernameResult = executeCommand("whoami");
+		if (!usernameResult.isSuccessful()) {
+			throw new WorkerManagerException("Unable to get username of this machine: %s", usernameResult.getError());
+		}
+		return usernameResult.getOutput().get(0);
+	}
 
-  public String getPublicIp() {
-    BashCommandResult publicIpResult = executeCommand("curl https://ipinfo.io/ip");
-    if (!publicIpResult.isSuccessful()) {
-      throw new WorkerManagerException("Unable to get public ip: %s", publicIpResult.getError());
-    }
-    return publicIpResult.getOutput().get(0);
-  }
+	public String getPublicIp() {
+		BashCommandResult publicIpResult = executeCommand("curl https://ipinfo.io/ip");
+		if (!publicIpResult.isSuccessful()) {
+			throw new WorkerManagerException("Unable to get public ip: %s", publicIpResult.getError());
+		}
+		return publicIpResult.getOutput().get(0);
+	}
 
-  public String getPrivateIp() {
-    BashCommandResult privateIpResult = executeCommand("hostname -I | awk '{print $1}'");
-    if (!privateIpResult.isSuccessful()) {
-      throw new WorkerManagerException("Unable to get private ip: %s", privateIpResult.getError());
-    }
-    return privateIpResult.getOutput().get(0);
-  }
+	public String getPrivateIp() {
+		BashCommandResult privateIpResult = executeCommand("hostname -I | awk '{print $1}'");
+		if (!privateIpResult.isSuccessful()) {
+			throw new WorkerManagerException("Unable to get private ip: %s", privateIpResult.getError());
+		}
+		return privateIpResult.getOutput().get(0);
+	}
 
-  public BashCommandResult executeCommand(String command) {
-    Runtime r = Runtime.getRuntime();
-    String[] commands = {"bash", "-c", command};
-    try {
-      Process p = r.exec(commands);
-      p.waitFor();
-      int exitStatus = p.exitValue();
-      BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-      List<String> output = new LinkedList<>();
-      String s;
-      while ((s = stdInput.readLine()) != null) {
-        output.add(s);
-      }
-      stdInput.close();
-      BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-      List<String> error = new LinkedList<>();
-      while ((s = stdError.readLine()) != null) {
-        error.add(s);
-      }
-      stdError.close();
-      log.info("Command: {}\nResult: {}\nError: {}", command, String.join("\n", output), String.join("\n", error));
-      return new BashCommandResult(command, exitStatus, output, error);
-    } catch (InterruptedException | IOException e) {
-      e.printStackTrace();
-      return new BashCommandResult(command, -1, null, List.of(e.getMessage()));
-    }
-  }
+	public BashCommandResult executeCommand(String command) {
+		Runtime r = Runtime.getRuntime();
+		String[] commands = {"bash", "-c", command};
+		try {
+			Process p = r.exec(commands);
+			p.waitFor();
+			int exitStatus = p.exitValue();
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			List<String> output = new LinkedList<>();
+			String s;
+			while ((s = stdInput.readLine()) != null) {
+				output.add(s);
+			}
+			stdInput.close();
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			List<String> error = new LinkedList<>();
+			while ((s = stdError.readLine()) != null) {
+				error.add(s);
+			}
+			stdError.close();
+			log.info("Command: {}\nResult: {}\nError: {}", command, String.join("\n", output), String.join("\n", error));
+			return new BashCommandResult(command, exitStatus, output, error);
+		}
+		catch (InterruptedException | IOException e) {
+			e.printStackTrace();
+			return new BashCommandResult(command, -1, null, List.of(e.getMessage()));
+		}
+	}
 
 }

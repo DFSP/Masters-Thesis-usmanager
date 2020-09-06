@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,44 +32,46 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/decisions")
 public class DecisionsController {
 
-  private final DecisionsService decisionsService;
+	private final DecisionsService decisionsService;
 
-  public DecisionsController(DecisionsService decisionsService) {
-    this.decisionsService = decisionsService;
-  }
+	public DecisionsController(DecisionsService decisionsService) {
+		this.decisionsService = decisionsService;
+	}
 
-  @GetMapping
-  public List<DecisionEntity> getDecisions() {
-    return decisionsService.getDecisions();
-  }
+	@GetMapping
+	public List<DecisionEntity> getDecisions() {
+		return decisionsService.getDecisions();
+	}
 
-  @GetMapping("/services")
-  public List<DecisionEntity> getServicesPossibleDecisions() {
-    return decisionsService.getServicesPossibleDecisions();
-  }
+	@GetMapping("/services")
+	public List<DecisionEntity> getServicesPossibleDecisions() {
+		return decisionsService.getServicesPossibleDecisions();
+	}
 
-  @GetMapping("/services/{serviceName}")
-  public List<ServiceDecisionEntity> getServiceDecisions(@PathVariable String serviceName) {
-    return decisionsService.getServiceDecisions(serviceName);
-  }
+	@GetMapping("/services/{serviceName}")
+	public List<ServiceDecisionEntity> getServiceDecisions(@PathVariable String serviceName) {
+		return decisionsService.getServiceDecisions(serviceName);
+	}
 
-  @GetMapping("/containers/{containerId}")
-  public List<ServiceDecisionEntity> getContainerDecisions(@PathVariable String containerId) {
-    return decisionsService.getContainerDecisions(containerId);
-  }
+	@GetMapping("/containers/{containerId}")
+	public List<ServiceDecisionEntity> getContainerDecisions(@PathVariable String containerId) {
+		return decisionsService.getContainerDecisions(containerId);
+	}
 
-  @GetMapping("/hosts")
-  public List<DecisionEntity> getHostsPossibleDecisions() {
-    return decisionsService.getHostsPossibleDecisions();
-  }
+	@GetMapping("/hosts")
+	public List<DecisionEntity> getHostsPossibleDecisions() {
+		return decisionsService.getHostsPossibleDecisions();
+	}
 
-  @GetMapping("/hosts/{hostname}")
-  public List<HostDecisionEntity> getHostDecisions(@PathVariable String hostname) {
-    return decisionsService.getHostDecisions(hostname);
-  }
+	@GetMapping("/hosts/{hostname}")
+	public List<HostDecisionEntity> getHostDecisions(@PathVariable String hostname) {
+		return decisionsService.getHostDecisions(hostname);
+	}
 
 }

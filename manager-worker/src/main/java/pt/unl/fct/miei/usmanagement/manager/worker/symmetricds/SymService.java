@@ -62,155 +62,156 @@ import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
 @Service
 public class SymService {
 
-  private final SymDatabaseMonitor symDatabaseMonitor;
+	private final SymDatabaseMonitor symDatabaseMonitor;
 
-  private final ServletContext servletContext;
-  private final DataSource dataSource;
-  private final ApplicationContext applicationContext;
-  private final DataSourceProperties dataSourceProperties;
+	private final ServletContext servletContext;
+	private final DataSource dataSource;
+	private final ApplicationContext applicationContext;
+	private final DataSourceProperties dataSourceProperties;
 
-  @Value("${external-id}")
-  private String id;
+	@Value("${external-id}")
+	private String id;
 
-  @Value("${master:127.0.0.1}")
-  private String master;
+	@Value("${master:127.0.0.1}")
+	private String master;
 
-  private int tableCount;
+	private int tableCount;
 
-  private ServerSymmetricEngine serverSymmetricEngine;
+	private ServerSymmetricEngine serverSymmetricEngine;
 
-  public SymService(SymDatabaseMonitor symDatabaseMonitor, ServletContext servletContext, DataSource dataSource,
-                    ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
-    this.symDatabaseMonitor = symDatabaseMonitor;
-    this.servletContext = servletContext;
-    this.dataSource = dataSource;
-    this.applicationContext = applicationContext;
-    this.dataSourceProperties = dataSourceProperties;
-  }
+	public SymService(SymDatabaseMonitor symDatabaseMonitor, ServletContext servletContext, DataSource dataSource,
+					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
+		this.symDatabaseMonitor = symDatabaseMonitor;
+		this.servletContext = servletContext;
+		this.dataSource = dataSource;
+		this.applicationContext = applicationContext;
+		this.dataSourceProperties = dataSourceProperties;
+	}
 
-  public void startSymmetricDSServer() {
-    final SymmetricEngineHolder engineHolder = new SymmetricEngineHolder();
+	public void startSymmetricDSServer() {
+		final SymmetricEngineHolder engineHolder = new SymmetricEngineHolder();
 
-    final Properties properties = new Properties();
-    final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    try (InputStream is = classloader.getResourceAsStream("sym/sym-node.properties")) {
-      properties.load(is);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+		final Properties properties = new Properties();
+		final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		try (InputStream is = classloader.getResourceAsStream("sym/sym-node.properties")) {
+			properties.load(is);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 
-    properties.setProperty(ParameterConstants.REGISTRATION_URL,
-        properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", master));
-    properties.setProperty(ParameterConstants.EXTERNAL_ID,
-        properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${external-id}", id));
+		properties.setProperty(ParameterConstants.REGISTRATION_URL,
+			properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", master));
+		properties.setProperty(ParameterConstants.EXTERNAL_ID,
+			properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${external-id}", id));
 
-    properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
-    properties.setProperty("db.url", dataSourceProperties.getUrl());
-    properties.setProperty("db.user", dataSourceProperties.getUsername());
-    properties.setProperty("db.password", dataSourceProperties.getPassword());
+		properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
+		properties.setProperty("db.url", dataSourceProperties.getUrl());
+		properties.setProperty("db.user", dataSourceProperties.getUsername());
+		properties.setProperty("db.password", dataSourceProperties.getPassword());
 
-    serverSymmetricEngine = new ServerSymmetricEngine(dataSource, applicationContext, properties, false, engineHolder);
-    engineHolder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverSymmetricEngine);
-    engineHolder.setAutoStart(false);
-    servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, engineHolder);
+		serverSymmetricEngine = new ServerSymmetricEngine(dataSource, applicationContext, properties, false, engineHolder);
+		engineHolder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverSymmetricEngine);
+		engineHolder.setAutoStart(false);
+		servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, engineHolder);
 
-    serverSymmetricEngine.setup();
+		serverSymmetricEngine.setup();
 
     /*final MonitorFilter monitor = new MonitorFilter();
     serverSymmetricEngine.getExtensionService().addExtensionPoint(monitor);*/
 
-    serverSymmetricEngine.getExtensionService().addExtensionPoint(symDatabaseMonitor);
+		serverSymmetricEngine.getExtensionService().addExtensionPoint(symDatabaseMonitor);
 
-    serverSymmetricEngine.start();
+		serverSymmetricEngine.start();
 
-    //waitForInitialLoad(monitor);
+		//waitForInitialLoad(monitor);
 
 
-  }
+	}
 
-  private void waitForInitialLoad(MonitorFilter monitor) {
+	private void waitForInitialLoad(MonitorFilter monitor) {
 
-    while (!serverSymmetricEngine.isRegistered()) {
-      System.err.println("Waiting for engine to register");
-      Timing.wait(2, TimeUnit.SECONDS);
-    }
+		while (!serverSymmetricEngine.isRegistered()) {
+			System.err.println("Waiting for engine to register");
+			Timing.wait(2, TimeUnit.SECONDS);
+		}
 
-    INodeService nodeService = serverSymmetricEngine.getNodeService();
-    while (!nodeService.isDataLoadStarted()) {
-      System.err.println("Waiting for data load to start");
-      Timing.wait(1, TimeUnit.SECONDS);
-    }
+		INodeService nodeService = serverSymmetricEngine.getNodeService();
+		while (!nodeService.isDataLoadStarted()) {
+			System.err.println("Waiting for data load to start");
+			Timing.wait(1, TimeUnit.SECONDS);
+		}
 
-    long ts = System.currentTimeMillis();
-    DateFormat dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM);
-    if (!nodeService.isDataLoadCompleted()) {
-      System.err.println(String.format("Data load started at %s", dateFormat.format(new Date())));
-    }
+		long ts = System.currentTimeMillis();
+		DateFormat dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM);
+		if (!nodeService.isDataLoadCompleted()) {
+			System.err.println(String.format("Data load started at %s", dateFormat.format(new Date())));
+		}
 
-    Exception error = null;
-    while (!nodeService.isDataLoadCompleted()) {
-      printTables(monitor.tableQueue);
-      if ((error == null && monitor.error != null)
-          || (error != null && monitor.error != null && !error.equals(monitor.error))) {
-        error = monitor.error;
-        System.err.println("Error occurred");
-      }
+		Exception error = null;
+		while (!nodeService.isDataLoadCompleted()) {
+			printTables(monitor.tableQueue);
+			if ((error == null && monitor.error != null)
+				|| (error != null && monitor.error != null && !error.equals(monitor.error))) {
+				error = monitor.error;
+				System.err.println("Error occurred");
+			}
 
-      Timing.wait(500, TimeUnit.MILLISECONDS);
-    }
+			Timing.wait(500, TimeUnit.MILLISECONDS);
+		}
 
-    printTables(monitor.tableQueue);
+		printTables(monitor.tableQueue);
 
-    System.err.println("******************************************");
-    System.err.println(
-        String.format("Data load complete at %s in %s seconds",
-            dateFormat.format(new Date()), (System.currentTimeMillis() - ts) / 1000));
-    System.err.println("******************************************");
-  }
+		System.err.println("******************************************");
+		System.err.println(
+			String.format("Data load complete at %s in %s seconds",
+				dateFormat.format(new Date()), (System.currentTimeMillis() - ts) / 1000));
+		System.err.println("******************************************");
+	}
 
-  private void printTables(List<String> tableQueue) {
-    while (tableQueue.size() > 0) {
-      String table = tableQueue.remove(0);
-      System.err.println("******************************************");
-      System.err.println("Loading " + table + ".  Current table count=" + ++tableCount);
-      System.err.println("******************************************");
-    }
-  }
+	private void printTables(List<String> tableQueue) {
+		while (tableQueue.size() > 0) {
+			String table = tableQueue.remove(0);
+			System.err.println("******************************************");
+			System.err.println("Loading " + table + ".  Current table count=" + ++tableCount);
+			System.err.println("******************************************");
+		}
+	}
 
-  public void stopSymmetricDSServer() {
-    serverSymmetricEngine.stop();
-  }
+	public void stopSymmetricDSServer() {
+		serverSymmetricEngine.stop();
+	}
 
-  static class MonitorFilter extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
+	static class MonitorFilter extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
 
-    private final Set<String> tablesEncountered = new HashSet<>();
+		private final Set<String> tablesEncountered = new HashSet<>();
 
-    private final List<String> tableQueue = Collections.synchronizedList(new ArrayList<>());
+		private final List<String> tableQueue = Collections.synchronizedList(new ArrayList<>());
 
-    private Exception error;
+		private Exception error;
 
-    @Override
-    public boolean beforeWrite(DataContext context, Table table, CsvData data) {
-      error = null;
-      if (context.getBatch().getChannelId().equals(Constants.CHANNEL_RELOAD)) {
-        if (!tablesEncountered.contains(table.getName())) {
-          tablesEncountered.add(table.getName());
-          tableQueue.add(table.getName());
-        }
-      }
-      return true;
-    }
+		@Override
+		public boolean beforeWrite(DataContext context, Table table, CsvData data) {
+			error = null;
+			if (context.getBatch().getChannelId().equals(Constants.CHANNEL_RELOAD)) {
+				if (!tablesEncountered.contains(table.getName())) {
+					tablesEncountered.add(table.getName());
+					tableQueue.add(table.getName());
+				}
+			}
+			return true;
+		}
 
-    @Override
-    public void afterWrite(DataContext context, Table table, CsvData data) {
+		@Override
+		public void afterWrite(DataContext context, Table table, CsvData data) {
 
-    }
+		}
 
-    @Override
-    public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
-      error = ex;
-      return false;
-    }
-  }
+		@Override
+		public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
+			error = ex;
+			return false;
+		}
+	}
 
 }

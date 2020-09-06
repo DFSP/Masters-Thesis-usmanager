@@ -24,14 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 class QueryData {
 
-  private String resultType;
-  private List<QueryResult> result;
+	private String resultType;
+	private List<QueryResult> result;
 
 }

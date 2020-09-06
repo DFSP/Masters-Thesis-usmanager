@@ -29,6 +29,6 @@ import lombok.Data;
 @Data
 class Message {
 
-  private final String message;
+	private final String message;
 
 }

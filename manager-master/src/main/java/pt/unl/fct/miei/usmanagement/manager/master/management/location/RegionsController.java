@@ -24,54 +24,47 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.location;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/regions")
 public class RegionsController {
 
-  private final RegionsService regionsService;
+	private final RegionsService regionsService;
 
-  public RegionsController(RegionsService regionsService) {
-    this.regionsService = regionsService;
-  }
+	public RegionsController(RegionsService regionsService) {
+		this.regionsService = regionsService;
+	}
 
-  @GetMapping
-  public List<RegionEntity> getRegions() {
-    return regionsService.getRegions();
-  }
+	@GetMapping
+	public List<RegionEntity> getRegions() {
+		return regionsService.getRegions();
+	}
 
-  @GetMapping("/{regionName}")
-  public RegionEntity getRegion(@PathVariable String regionName) {
-    return regionsService.getRegion(regionName);
-  }
+	@GetMapping("/{regionName}")
+	public RegionEntity getRegion(@PathVariable String regionName) {
+		return regionsService.getRegion(regionName);
+	}
 
-  @PostMapping
-  public RegionEntity addRegion(@RequestBody RegionEntity region) {
-    Validation.validatePostRequest(region.getId());
-    return regionsService.addRegion(region);
-  }
+	@PostMapping
+	public RegionEntity addRegion(@RequestBody RegionEntity region) {
+		Validation.validatePostRequest(region.getId());
+		return regionsService.addRegion(region);
+	}
 
-  @PutMapping(value = "/{name}")
-  public RegionEntity updateRegion(@PathVariable String name, @RequestBody RegionEntity region) {
-    Validation.validatePutRequest(region.getId());
-    return regionsService.updateRegion(name, region);
-  }
+	@PutMapping(value = "/{name}")
+	public RegionEntity updateRegion(@PathVariable String name, @RequestBody RegionEntity region) {
+		Validation.validatePutRequest(region.getId());
+		return regionsService.updateRegion(name, region);
+	}
 
-  @DeleteMapping("/{name}")
-  public void deleteRegion(@PathVariable String name) {
-    regionsService.deleteRegion(name);
-  }
+	@DeleteMapping("/{name}")
+	public void deleteRegion(@PathVariable String name) {
+		regionsService.deleteRegion(name);
+	}
 
 }

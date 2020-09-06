@@ -30,8 +30,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
 @Data
 public final class Condition {
 
-  private final String fieldName;
-  private final Double value;
-  private final Operator operator;
+	private final String fieldName;
+	private final Double value;
+	private final Operator operator;
 
 }

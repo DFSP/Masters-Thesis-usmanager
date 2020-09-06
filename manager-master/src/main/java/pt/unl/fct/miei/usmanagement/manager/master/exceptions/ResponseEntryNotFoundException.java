@@ -26,10 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.master.exceptions;
 
 public final class ResponseEntryNotFoundException extends RuntimeException {
 
-  private static final String MESSAGE = "Response entry not found";
+	private static final String MESSAGE = "Response entry not found";
 
-  public ResponseEntryNotFoundException() {
-    super(MESSAGE);
-  }
+	public ResponseEntryNotFoundException() {
+		super(MESSAGE);
+	}
 
 }

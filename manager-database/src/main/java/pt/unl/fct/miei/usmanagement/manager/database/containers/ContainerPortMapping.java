@@ -24,16 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.containers;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public final class ContainerPortMapping implements Serializable {
 
-  private final int privatePort;
-  private final int publicPort;
-  private final String type;
-  private final String ip;
+	private final int privatePort;
+	private final int publicPort;
+	private final String type;
+	private final String ip;
 
 }

@@ -35,15 +35,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventReposit
 @Service
 public class LoggingEventService {
 
-  private final LoggingEventRepository loggingEvents;
+	private final LoggingEventRepository loggingEvents;
 
-  public LoggingEventService(LoggingEventRepository loggingEvents) {
-    this.loggingEvents = loggingEvents;
-  }
+	public LoggingEventService(LoggingEventRepository loggingEvents) {
+		this.loggingEvents = loggingEvents;
+	}
 
-  public List<LoggingEventEntity> getLogs() {
-    return loggingEvents.findAll();
-  }
+	public List<LoggingEventEntity> getLogs() {
+		return loggingEvents.findAll();
+	}
 
 
 }

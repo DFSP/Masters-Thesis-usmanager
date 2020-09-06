@@ -35,6 +35,6 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public final class HostEvent extends Event {
 
-  private final String hostname;
+	private final String hostname;
 
 }

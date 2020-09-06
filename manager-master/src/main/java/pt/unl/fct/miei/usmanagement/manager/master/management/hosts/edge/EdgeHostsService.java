@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
@@ -46,224 +44,226 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshServ
 import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class EdgeHostsService {
 
-  private final HostRulesService hostRulesService;
-  private final HostSimulatedMetricsService hostSimulatedMetricsService;
-  private final SshService sshService;
-  private final BashService bashService;
+	private final HostRulesService hostRulesService;
+	private final HostSimulatedMetricsService hostSimulatedMetricsService;
+	private final SshService sshService;
+	private final BashService bashService;
 
-  private final EdgeHostRepository edgeHosts;
+	private final EdgeHostRepository edgeHosts;
 
-  private final String edgeKeyFilePath;
+	private final String edgeKeyFilePath;
 
-  public EdgeHostsService(@Lazy HostRulesService hostRulesService,
-                          @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
-                          @Lazy SshService sshService, BashService bashService,
-                          EdgeHostRepository edgeHosts,
-                          EdgeHostsProperties edgeHostsProperties) {
-    this.hostRulesService = hostRulesService;
-    this.hostSimulatedMetricsService = hostSimulatedMetricsService;
-    this.sshService = sshService;
-    this.bashService = bashService;
-    this.edgeHosts = edgeHosts;
-    this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
-  }
+	public EdgeHostsService(@Lazy HostRulesService hostRulesService,
+							@Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
+							@Lazy SshService sshService, BashService bashService,
+							EdgeHostRepository edgeHosts,
+							EdgeHostsProperties edgeHostsProperties) {
+		this.hostRulesService = hostRulesService;
+		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
+		this.sshService = sshService;
+		this.bashService = bashService;
+		this.edgeHosts = edgeHosts;
+		this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
+	}
 
-  public String getKeyFilePath(EdgeHostEntity edgeHostEntity) {
-    String username = edgeHostEntity.getUsername();
-    String hostname = edgeHostEntity.getHostname();
-    return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
-        hostname.replace(".", "_"));
-  }
+	public String getKeyFilePath(EdgeHostEntity edgeHostEntity) {
+		String username = edgeHostEntity.getUsername();
+		String hostname = edgeHostEntity.getHostname();
+		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
+			hostname.replace(".", "_"));
+	}
 
-  public List<EdgeHostEntity> getEdgeHosts() {
-    return edgeHosts.findAll();
-  }
+	public List<EdgeHostEntity> getEdgeHosts() {
+		return edgeHosts.findAll();
+	}
 
-  public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
-    return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
-        new EntityNotFoundException(EdgeHostEntity.class, "host", host));
-  }
+	public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
+		return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
+			new EntityNotFoundException(EdgeHostEntity.class, "host", host));
+	}
 
-  public EdgeHostEntity getEdgeHostByDns(String dns) {
-    return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
-        new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
-  }
+	public EdgeHostEntity getEdgeHostByDns(String dns) {
+		return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
+			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
+	}
 
-  public EdgeHostEntity addEdgeHost(AddEdgeHostRequest addEdgeHostRequest) {
-    EdgeHostEntity edgeHost = EdgeHostEntity.builder()
-        .username(addEdgeHostRequest.getUsername())
-        .publicDnsName(addEdgeHostRequest.getPublicDnsName())
-        .publicIpAddress(addEdgeHostRequest.getPublicIpAddress())
-        .privateIpAddress(addEdgeHostRequest.getPrivateIpAddress())
-        .region(addEdgeHostRequest.getRegion())
-        .country(addEdgeHostRequest.getCountry())
-        .city(addEdgeHostRequest.getCity())
-        .build();
-    return addEdgeHost(edgeHost, addEdgeHostRequest.getPassword());
-  }
+	public EdgeHostEntity addEdgeHost(AddEdgeHostRequest addEdgeHostRequest) {
+		EdgeHostEntity edgeHost = EdgeHostEntity.builder()
+			.username(addEdgeHostRequest.getUsername())
+			.publicDnsName(addEdgeHostRequest.getPublicDnsName())
+			.publicIpAddress(addEdgeHostRequest.getPublicIpAddress())
+			.privateIpAddress(addEdgeHostRequest.getPrivateIpAddress())
+			.region(addEdgeHostRequest.getRegion())
+			.country(addEdgeHostRequest.getCountry())
+			.city(addEdgeHostRequest.getCity())
+			.build();
+		return addEdgeHost(edgeHost, addEdgeHostRequest.getPassword());
+	}
 
-  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHostEntity) {
-    return addEdgeHost(edgeHostEntity, null);
-  }
+	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHostEntity) {
+		return addEdgeHost(edgeHostEntity, null);
+	}
 
-  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, String password) {
-    assertHostDoesntExist(edgeHost);
-    if (password != null) {
-      setupEdgeHost(edgeHost, password);
-    }
-    log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-    return edgeHosts.save(edgeHost);
-  }
+	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, String password) {
+		assertHostDoesntExist(edgeHost);
+		if (password != null) {
+			setupEdgeHost(edgeHost, password);
+		}
+		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
+		return edgeHosts.save(edgeHost);
+	}
 
-  private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
-    String hostname = edgeHost.getHostname();
-    String username = edgeHost.getUsername();
-    String keyFilePath = getKeyFilePath(edgeHost);
-    log.info("Generating keys for edge host {}@{}", username, hostname);
-    String generateKeysCommand = String.format("echo y | ssh-keygen -b 2048 -t rsa -f '%s' -q -N \"\" &&"
-        + " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostname);
-    SshCommandResult generateKeysResult = sshService.executeCommand(hostname, username, password, generateKeysCommand);
-    if (!generateKeysResult.isSuccessful()) {
-      deleteEdgeHostConfig(edgeHost);
-      throw new MasterManagerException("Unable to generate public/private key pair for '%s': %s", hostname,
-          generateKeysResult.getError().get(0));
-    }
-  }
+	private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
+		String hostname = edgeHost.getHostname();
+		String username = edgeHost.getUsername();
+		String keyFilePath = getKeyFilePath(edgeHost);
+		log.info("Generating keys for edge host {}@{}", username, hostname);
+		String generateKeysCommand = String.format("echo y | ssh-keygen -b 2048 -t rsa -f '%s' -q -N \"\" &&"
+			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostname);
+		SshCommandResult generateKeysResult = sshService.executeCommand(hostname, username, password, generateKeysCommand);
+		if (!generateKeysResult.isSuccessful()) {
+			deleteEdgeHostConfig(edgeHost);
+			throw new MasterManagerException("Unable to generate public/private key pair for '%s': %s", hostname,
+				generateKeysResult.getError().get(0));
+		}
+	}
 
-  public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
-    EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
-    log.info("Updating edgeHost {} with {}",
-        ToStringBuilder.reflectionToString(edgeHost),
-        ToStringBuilder.reflectionToString(newEdgeHost));
-    ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
-    return edgeHosts.save(edgeHost);
-  }
+	public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
+		EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
+		log.info("Updating edgeHost {} with {}",
+			ToStringBuilder.reflectionToString(edgeHost),
+			ToStringBuilder.reflectionToString(newEdgeHost));
+		ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
+		return edgeHosts.save(edgeHost);
+	}
 
-  public void deleteEdgeHost(String hostname) {
-    var edgeHost = getEdgeHostByDnsOrIp(hostname);
-    edgeHosts.delete(edgeHost);
-    deleteEdgeHostConfig(edgeHost);
-  }
+	public void deleteEdgeHost(String hostname) {
+		var edgeHost = getEdgeHostByDnsOrIp(hostname);
+		edgeHosts.delete(edgeHost);
+		deleteEdgeHostConfig(edgeHost);
+	}
 
-  public List<EdgeHostEntity> getHostsByRegion(RegionEntity region) {
-    return edgeHosts.findByRegion(region);
-  }
+	public List<EdgeHostEntity> getHostsByRegion(RegionEntity region) {
+		return edgeHosts.findByRegion(region);
+	}
 
-  public List<EdgeHostEntity> getHostsByCountry(String country) {
-    return edgeHosts.findByCountry(country);
-  }
+	public List<EdgeHostEntity> getHostsByCountry(String country) {
+		return edgeHosts.findByCountry(country);
+	}
 
-  public List<EdgeHostEntity> getHostsByCity(String city) {
-    return edgeHosts.findByCity(city);
-  }
+	public List<EdgeHostEntity> getHostsByCity(String city) {
+		return edgeHosts.findByCity(city);
+	}
 
-  public List<HostRuleEntity> getRules(String hostname) {
-    assertHostExists(hostname);
-    return edgeHosts.getRules(hostname);
-  }
+	public List<HostRuleEntity> getRules(String hostname) {
+		assertHostExists(hostname);
+		return edgeHosts.getRules(hostname);
+	}
 
-  public HostRuleEntity getRule(String hostname, String ruleName) {
-    assertHostExists(hostname);
-    return edgeHosts.getRule(hostname, ruleName).orElseThrow(() ->
-        new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
-    );
-  }
+	public HostRuleEntity getRule(String hostname, String ruleName) {
+		assertHostExists(hostname);
+		return edgeHosts.getRule(hostname, ruleName).orElseThrow(() ->
+			new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
+		);
+	}
 
-  public void addRule(String hostname, String ruleName) {
-    assertHostExists(hostname);
-    hostRulesService.addEdgeHost(ruleName, hostname);
-  }
+	public void addRule(String hostname, String ruleName) {
+		assertHostExists(hostname);
+		hostRulesService.addEdgeHost(ruleName, hostname);
+	}
 
-  public void addRules(String hostname, List<String> ruleNames) {
-    assertHostExists(hostname);
-    ruleNames.forEach(rule -> hostRulesService.addEdgeHost(rule, hostname));
-  }
+	public void addRules(String hostname, List<String> ruleNames) {
+		assertHostExists(hostname);
+		ruleNames.forEach(rule -> hostRulesService.addEdgeHost(rule, hostname));
+	}
 
-  public void removeRule(String hostname, String ruleName) {
-    assertHostExists(hostname);
-    hostRulesService.removeEdgeHost(ruleName, hostname);
-  }
+	public void removeRule(String hostname, String ruleName) {
+		assertHostExists(hostname);
+		hostRulesService.removeEdgeHost(ruleName, hostname);
+	}
 
-  public void removeRules(String hostname, List<String> ruleNames) {
-    assertHostExists(hostname);
-    ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
-  }
+	public void removeRules(String hostname, List<String> ruleNames) {
+		assertHostExists(hostname);
+		ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
+	}
 
-  public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
-    assertHostExists(hostname);
-    return edgeHosts.getSimulatedMetrics(hostname);
-  }
+	public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
+		assertHostExists(hostname);
+		return edgeHosts.getSimulatedMetrics(hostname);
+	}
 
-  public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
-    assertHostExists(hostname);
-    return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
-    );
-  }
+	public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
+		assertHostExists(hostname);
+		return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+		);
+	}
 
-  public void addSimulatedMetric(String hostname, String simulatedMetricName) {
-    assertHostExists(hostname);
-    hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
-  }
+	public void addSimulatedMetric(String hostname, String simulatedMetricName) {
+		assertHostExists(hostname);
+		hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
+	}
 
-  public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-    assertHostExists(hostname);
-    simulatedMetricNames.forEach(simulatedMetric ->
-        hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
-  }
+	public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+		assertHostExists(hostname);
+		simulatedMetricNames.forEach(simulatedMetric ->
+			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
+	}
 
-  public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
-    assertHostExists(hostname);
-    hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
-  }
+	public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
+		assertHostExists(hostname);
+		hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
+	}
 
-  public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-    assertHostExists(hostname);
-    simulatedMetricNames.forEach(simulatedMetric ->
-        hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
-  }
+	public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+		assertHostExists(hostname);
+		simulatedMetricNames.forEach(simulatedMetric ->
+			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
+	}
 
-  public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
-    log.info("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
-    EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
-        .managedByWorker(workerManagerEntity)
-        .build();
-    edgeHosts.save(edgeHostEntity);
-  }
+	public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
+		log.info("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
+		EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
+			.managedByWorker(workerManagerEntity)
+			.build();
+		edgeHosts.save(edgeHostEntity);
+	}
 
-  public void unassignWorkerManager(String edgeHost) {
-    EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
-        .managedByWorker(null)
-        .build();
-    edgeHosts.save(edgeHostEntity);
-  }
+	public void unassignWorkerManager(String edgeHost) {
+		EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
+			.managedByWorker(null)
+			.build();
+		edgeHosts.save(edgeHostEntity);
+	}
 
-  public boolean hasEdgeHost(String hostname) {
-    return edgeHosts.hasEdgeHost(hostname);
-  }
+	public boolean hasEdgeHost(String hostname) {
+		return edgeHosts.hasEdgeHost(hostname);
+	}
 
-  private void assertHostExists(String hostname) {
-    if (!hasEdgeHost(hostname)) {
-      throw new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname);
-    }
-  }
+	private void assertHostExists(String hostname) {
+		if (!hasEdgeHost(hostname)) {
+			throw new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname);
+		}
+	}
 
-  private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
-    var hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
-    if (edgeHosts.hasEdgeHost(hostname)) {
-      throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
-    }
-  }
+	private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
+		var hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
+		if (edgeHosts.hasEdgeHost(hostname)) {
+			throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
+		}
+	}
 
-  private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
-    String privateKeyFilePath = getKeyFilePath(edgeHost);
-    String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
-    String cleanupCommand = String.format("rm -f %s %s", privateKeyFilePath, publicKeyFilePath);
-    bashService.executeCommand(cleanupCommand);
-  }
+	private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
+		String privateKeyFilePath = getKeyFilePath(edgeHost);
+		String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
+		String cleanupCommand = String.format("rm -f %s %s", privateKeyFilePath, publicKeyFilePath);
+		bashService.executeCommand(cleanupCommand);
+	}
 
 }

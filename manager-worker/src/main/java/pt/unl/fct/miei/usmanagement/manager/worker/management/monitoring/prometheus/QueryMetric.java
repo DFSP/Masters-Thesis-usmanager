@@ -32,9 +32,9 @@ import lombok.Data;
 @Data
 class QueryMetric {
 
-  private final String instance;
+	private final String instance;
 
-  @JsonAnySetter
-  private final Map<String, String> properties;
+	@JsonAnySetter
+	private final Map<String, String> properties;
 
 }

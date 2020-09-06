@@ -65,165 +65,166 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem.decisio
 @Service
 public class DroolsService {
 
-  private final Map<String, Long> lastUpdateRules;
-  private final Map<String, StatelessKieSession> serviceRuleSessions;
-  private final Map<String, StatelessKieSession> hostRuleSessions;
+	private final Map<String, Long> lastUpdateRules;
+	private final Map<String, StatelessKieSession> serviceRuleSessions;
+	private final Map<String, StatelessKieSession> hostRuleSessions;
 
-  public DroolsService() {
-    this.lastUpdateRules = new HashMap<>();
-    this.serviceRuleSessions = new HashMap<>();
-    this.hostRuleSessions = new HashMap<>();
-  }
+	public DroolsService() {
+		this.lastUpdateRules = new HashMap<>();
+		this.serviceRuleSessions = new HashMap<>();
+		this.hostRuleSessions = new HashMap<>();
+	}
 
-  public boolean shouldCreateNewRuleSession(String key, long lastUpdate) {
-    long currentValue = lastUpdateRules.getOrDefault(key, -1L);
-    if (currentValue < lastUpdate) {
-      lastUpdateRules.put(key, lastUpdate);
-      return true;
-    }
-    return false;
-  }
+	public boolean shouldCreateNewRuleSession(String key, long lastUpdate) {
+		long currentValue = lastUpdateRules.getOrDefault(key, -1L);
+		if (currentValue < lastUpdate) {
+			lastUpdateRules.put(key, lastUpdate);
+			return true;
+		}
+		return false;
+	}
 
-  public void createNewServiceRuleSession(String serviceName, Map<Long, String> drools) {
-    KieServices kieServices = KieServices.Factory.get();
-    KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-    for (Map.Entry<Long, String> drl : drools.entrySet()) {
-      Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
-      resource.setTargetPath("rules/rule_service_" + drl.getKey() + ".drl");
-      kieFileSystem.write(resource);
-    }
-    kieServices.newKieBuilder(kieFileSystem).buildAll();
-    ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
-    StatelessKieSession serviceRuleSession =
-        kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
-    var agendaEventListener = new TrackingAgendaEventListener();
-    serviceRuleSession.addEventListener(agendaEventListener);
-    serviceRuleSessions.put(serviceName, serviceRuleSession);
-  }
+	public void createNewServiceRuleSession(String serviceName, Map<Long, String> drools) {
+		KieServices kieServices = KieServices.Factory.get();
+		KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
+		for (Map.Entry<Long, String> drl : drools.entrySet()) {
+			Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
+			resource.setTargetPath("rules/rule_service_" + drl.getKey() + ".drl");
+			kieFileSystem.write(resource);
+		}
+		kieServices.newKieBuilder(kieFileSystem).buildAll();
+		ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
+		StatelessKieSession serviceRuleSession =
+			kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
+		var agendaEventListener = new TrackingAgendaEventListener();
+		serviceRuleSession.addEventListener(agendaEventListener);
+		serviceRuleSessions.put(serviceName, serviceRuleSession);
+	}
 
-  public void createNewHostRuleSession(String hostname, Map<Long, String> drools) {
-    KieServices kieServices = KieServices.Factory.get();
-    KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-    for (Map.Entry<Long, String> drl : drools.entrySet()) {
-      Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
-      resource.setTargetPath("rules/rule_host_" + drl.getKey() + ".drl");
-      kieFileSystem.write(resource);
-    }
-    kieServices.newKieBuilder(kieFileSystem).buildAll();
-    ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
-    StatelessKieSession hostRuleSession =
-        kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
-    var agendaEventListener = new TrackingAgendaEventListener();
-    hostRuleSession.addEventListener(agendaEventListener);
-    hostRuleSessions.put(hostname, hostRuleSession);
-  }
+	public void createNewHostRuleSession(String hostname, Map<Long, String> drools) {
+		KieServices kieServices = KieServices.Factory.get();
+		KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
+		for (Map.Entry<Long, String> drl : drools.entrySet()) {
+			Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
+			resource.setTargetPath("rules/rule_host_" + drl.getKey() + ".drl");
+			kieFileSystem.write(resource);
+		}
+		kieServices.newKieBuilder(kieFileSystem).buildAll();
+		ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
+		StatelessKieSession hostRuleSession =
+			kieServices.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
+		var agendaEventListener = new TrackingAgendaEventListener();
+		hostRuleSession.addEventListener(agendaEventListener);
+		hostRuleSessions.put(hostname, hostRuleSession);
+	}
 
-  public Map<Long, String> executeDroolsRules(Event event, List<Rule> rules, String templateFile) {
-    var droolsRules = new HashMap<Long, String>();
-    for (Rule rule : rules) {
-      String droolsRule = applyRuleTemplate(event, rule, templateFile);
-      droolsRules.put(rule.getId(), droolsRule);
-    }
-    return droolsRules;
-  }
+	public Map<Long, String> executeDroolsRules(Event event, List<Rule> rules, String templateFile) {
+		var droolsRules = new HashMap<Long, String>();
+		for (Rule rule : rules) {
+			String droolsRule = applyRuleTemplate(event, rule, templateFile);
+			droolsRules.put(rule.getId(), droolsRule);
+		}
+		return droolsRules;
+	}
 
-  private String applyRuleTemplate(Event event, Rule rule, String templateFile) {
-    var data = Map.of(
-        "ruleId", rule.getId(),
-        "rule", rule,
-        "eventType", event.getClass().getName(),
-        "decision", RuleDecision.class.getSimpleName() + "." + rule.getDecision().toString(),
-        "priority", rule.getPriority());
-    var ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
-    return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);
-  }
+	private String applyRuleTemplate(Event event, Rule rule, String templateFile) {
+		var data = Map.of(
+			"ruleId", rule.getId(),
+			"rule", rule,
+			"eventType", event.getClass().getName(),
+			"decision", RuleDecision.class.getSimpleName() + "." + rule.getDecision().toString(),
+			"priority", rule.getPriority());
+		var ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
+		return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);
+	}
 
-  @Cacheable(cacheNames = "ruleTemplateCache", key = "#templateFile")
-  public String getRuleTemplate(String templateFile) {
-    log.info("Getting rule template...");
-    InputStream ruleTemplate = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFile);
-    var result = new ByteArrayOutputStream();
-    var buffer = new byte[1024];
-    try {
-      int length;
-      while ((length = ruleTemplate.read(buffer)) != -1) {
-        result.write(buffer, 0, length);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return result.toString(StandardCharsets.UTF_8);
-  }
+	@Cacheable(cacheNames = "ruleTemplateCache", key = "#templateFile")
+	public String getRuleTemplate(String templateFile) {
+		log.info("Getting rule template...");
+		InputStream ruleTemplate = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFile);
+		var result = new ByteArrayOutputStream();
+		var buffer = new byte[1024];
+		try {
+			int length;
+			while ((length = ruleTemplate.read(buffer)) != -1) {
+				result.write(buffer, 0, length);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result.toString(StandardCharsets.UTF_8);
+	}
 
-  public ServiceDecisionResult evaluate(ContainerEvent event) {
-    var serviceDecision = new Decision();
-    String serviceName = event.getServiceName();
-    StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
-    serviceRuleSession.getGlobals().set("serviceDecision", serviceDecision);
-    serviceRuleSession.execute(event);
-    long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
-    return new ServiceDecisionResult(event.getHostname(), event.getContainerId(), event.getServiceName(),
-        serviceDecision.getDecision(), ruleId, event.getFields(), serviceDecision.getPriority());
-  }
+	public ServiceDecisionResult evaluate(ContainerEvent event) {
+		var serviceDecision = new Decision();
+		String serviceName = event.getServiceName();
+		StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
+		serviceRuleSession.getGlobals().set("serviceDecision", serviceDecision);
+		serviceRuleSession.execute(event);
+		long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
+		return new ServiceDecisionResult(event.getHostname(), event.getContainerId(), event.getServiceName(),
+			serviceDecision.getDecision(), ruleId, event.getFields(), serviceDecision.getPriority());
+	}
 
-  public HostDecisionResult evaluate(HostEvent event) {
-    var hostDecision = new Decision();
-    String hostname = event.getHostname();
-    StatelessKieSession hostRuleSession = hostRuleSessions.get(hostname);
-    hostRuleSession.getGlobals().set("hostDecision", hostDecision);
-    hostRuleSession.execute(event);
-    long ruleId = getRuleFired(hostRuleSession.getAgendaEventListeners());
-    return new HostDecisionResult(hostname, hostDecision.getDecision(), ruleId, event.getFields(),
-        hostDecision.getPriority());
-  }
+	public HostDecisionResult evaluate(HostEvent event) {
+		var hostDecision = new Decision();
+		String hostname = event.getHostname();
+		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostname);
+		hostRuleSession.getGlobals().set("hostDecision", hostDecision);
+		hostRuleSession.execute(event);
+		long ruleId = getRuleFired(hostRuleSession.getAgendaEventListeners());
+		return new HostDecisionResult(hostname, hostDecision.getDecision(), ruleId, event.getFields(),
+			hostDecision.getPriority());
+	}
 
-  private long getRuleFired(Collection<AgendaEventListener> agendaEvents) {
-    Optional<AgendaEventListener> agendaEvent = agendaEvents.stream().findFirst();
-    if (agendaEvent.isEmpty()) {
-      return 0;
-    }
-    TrackingAgendaEventListener trackingAgendaEvent = (TrackingAgendaEventListener) agendaEvent.get();
-    List<Match> matchList = trackingAgendaEvent.getMatchList();
-    if (matchList.isEmpty()) {
-      return 0;
-    }
-    String[] ruleNameSplit = matchList.get(0).getRule().getName().split("_");
-    trackingAgendaEvent.reset();
-    return Long.parseLong(ruleNameSplit[2]);
-  }
+	private long getRuleFired(Collection<AgendaEventListener> agendaEvents) {
+		Optional<AgendaEventListener> agendaEvent = agendaEvents.stream().findFirst();
+		if (agendaEvent.isEmpty()) {
+			return 0;
+		}
+		TrackingAgendaEventListener trackingAgendaEvent = (TrackingAgendaEventListener) agendaEvent.get();
+		List<Match> matchList = trackingAgendaEvent.getMatchList();
+		if (matchList.isEmpty()) {
+			return 0;
+		}
+		String[] ruleNameSplit = matchList.get(0).getRule().getName().split("_");
+		trackingAgendaEvent.reset();
+		return Long.parseLong(ruleNameSplit[2]);
+	}
 
-  @Getter
-  static final class TrackingAgendaEventListener extends DefaultAgendaEventListener {
+	@Getter
+	static final class TrackingAgendaEventListener extends DefaultAgendaEventListener {
 
-    private final List<Match> matchList;
+		private final List<Match> matchList;
 
-    TrackingAgendaEventListener() {
-      matchList = new LinkedList<>();
-    }
+		TrackingAgendaEventListener() {
+			matchList = new LinkedList<>();
+		}
 
-    @Override
-    public void afterMatchFired(AfterMatchFiredEvent event) {
-      matchList.add(event.getMatch());
-    }
+		@Override
+		public void afterMatchFired(AfterMatchFiredEvent event) {
+			matchList.add(event.getMatch());
+		}
 
-    public boolean isRuleFired(String ruleName) {
-      return matchList.stream()
-          .map(Match::getRule).map(org.kie.api.definition.rule.Rule::getName)
-          .anyMatch(n -> Objects.equals(n, ruleName));
-    }
+		public boolean isRuleFired(String ruleName) {
+			return matchList.stream()
+				.map(Match::getRule).map(org.kie.api.definition.rule.Rule::getName)
+				.anyMatch(n -> Objects.equals(n, ruleName));
+		}
 
-    public void reset() {
-      matchList.clear();
-    }
+		public void reset() {
+			matchList.clear();
+		}
 
-    @Override
-    public String toString() {
-      return matchList.isEmpty()
-          ? "No matches occurred."
-          : "Matches: " + matchList.stream()
-          .map(m -> "\n  rule: " + m.getRule().getName()).collect(Collectors.joining());
-    }
+		@Override
+		public String toString() {
+			return matchList.isEmpty()
+				? "No matches occurred."
+				: "Matches: " + matchList.stream()
+				.map(m -> "\n  rule: " + m.getRule().getName()).collect(Collectors.joining());
+		}
 
-  }
+	}
 
 }

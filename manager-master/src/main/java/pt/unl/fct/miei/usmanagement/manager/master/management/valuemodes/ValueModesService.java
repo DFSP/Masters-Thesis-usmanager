@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.valuemodes;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,59 +33,61 @@ import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeReposit
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ValueModesService {
 
-  private final ValueModeRepository valueModes;
+	private final ValueModeRepository valueModes;
 
-  public ValueModesService(ValueModeRepository valueModes) {
-    this.valueModes = valueModes;
-  }
+	public ValueModesService(ValueModeRepository valueModes) {
+		this.valueModes = valueModes;
+	}
 
-  public List<ValueModeEntity> getValueModes() {
-    return valueModes.findAll();
-  }
+	public List<ValueModeEntity> getValueModes() {
+		return valueModes.findAll();
+	}
 
-  public ValueModeEntity getValueMode(Long id) {
-    return valueModes.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ValueModeEntity.class, "id", id.toString()));
-  }
+	public ValueModeEntity getValueMode(Long id) {
+		return valueModes.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ValueModeEntity.class, "id", id.toString()));
+	}
 
-  public ValueModeEntity getValueMode(String valueModeName) {
-    return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
-        new EntityNotFoundException(ValueModeEntity.class, "name", valueModeName));
-  }
+	public ValueModeEntity getValueMode(String valueModeName) {
+		return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
+			new EntityNotFoundException(ValueModeEntity.class, "name", valueModeName));
+	}
 
-  public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
-    assertValueModeDoesntExist(valueMode);
-    log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
-    return valueModes.save(valueMode);
-  }
+	public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
+		assertValueModeDoesntExist(valueMode);
+		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
+		return valueModes.save(valueMode);
+	}
 
-  public ValueModeEntity updateValueMode(String valueModeName, ValueModeEntity newValueMode) {
-    var valueMode = getValueMode(valueModeName);
-    log.info("Updating valueMode {} with {}",
-        ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
-    log.info("valueMode before copying properties: {}",
-        ToStringBuilder.reflectionToString(valueMode));
-    ObjectUtils.copyValidProperties(newValueMode, valueMode);
-    log.info("valueMode after copying properties: {}",
-        ToStringBuilder.reflectionToString(valueMode));
-    valueMode = valueModes.save(valueMode);
-    return valueMode;
-  }
+	public ValueModeEntity updateValueMode(String valueModeName, ValueModeEntity newValueMode) {
+		var valueMode = getValueMode(valueModeName);
+		log.info("Updating valueMode {} with {}",
+			ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
+		log.info("valueMode before copying properties: {}",
+			ToStringBuilder.reflectionToString(valueMode));
+		ObjectUtils.copyValidProperties(newValueMode, valueMode);
+		log.info("valueMode after copying properties: {}",
+			ToStringBuilder.reflectionToString(valueMode));
+		valueMode = valueModes.save(valueMode);
+		return valueMode;
+	}
 
-  public void deleteValueMode(String valueModeName) {
-    var valueMode = getValueMode(valueModeName);
-    valueModes.delete(valueMode);
-  }
+	public void deleteValueMode(String valueModeName) {
+		var valueMode = getValueMode(valueModeName);
+		valueModes.delete(valueMode);
+	}
 
-  private void assertValueModeDoesntExist(ValueModeEntity valueMode) {
-    var valueModeName = valueMode.getName();
-    if (valueModes.hasValueMode(valueModeName)) {
-      throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");
-    }
-  }
+	private void assertValueModeDoesntExist(ValueModeEntity valueMode) {
+		var valueModeName = valueMode.getName();
+		if (valueModes.hasValueMode(valueModeName)) {
+			throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");
+		}
+	}
 
 }

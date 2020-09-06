@@ -24,20 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node;
 
-import java.util.Objects;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -48,57 +42,60 @@ import lombok.Setter;
 @Table(name = "sym_node")
 public class SymNodeEntity {
 
-  @Id
-  private String nodeId;
+	@Id
+	private String nodeId;
 
-  @NotNull
-  private String nodeGroupId;
+	@NotNull
+	private String nodeGroupId;
 
-  @NotNull
-  private String externalId;
+	@NotNull
+	private String externalId;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Short syncEnabled = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Short syncEnabled = 0;
 
-  private String syncUrl;
+	private String syncUrl;
 
-  private String schemaVersion;
+	private String schemaVersion;
 
-  private String symmetricVersion;
+	private String symmetricVersion;
 
-  private String configVersion;
+	private String configVersion;
 
-  private String databaseType;
+	private String databaseType;
 
-  private String databaseVersion;
+	private String databaseVersion;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Integer batchToSendCount = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Integer batchToSendCount = 0;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Integer batchInErrorCount = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Integer batchInErrorCount = 0;
 
-  private String createdAtNodeId;
+	private String createdAtNodeId;
 
-  private String deploymentType;
+	private String deploymentType;
 
-  private String deploymentSubType;
+	private String deploymentSubType;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeEntity)) {
-      return false;
-    }
-    SymNodeEntity other = (SymNodeEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getNodeId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getNodeId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeEntity)) {
+			return false;
+		}
+		SymNodeEntity other = (SymNodeEntity) o;
+		return nodeId != null && nodeId.equals(other.getNodeId());
+	}
 
 }

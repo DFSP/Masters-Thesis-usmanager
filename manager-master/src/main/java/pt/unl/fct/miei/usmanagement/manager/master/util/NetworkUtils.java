@@ -24,24 +24,25 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import lombok.experimental.UtilityClass;
-
 @UtilityClass
 public class NetworkUtils {
 
-  public String getLocalIp() {
-    try (DatagramSocket socket = new DatagramSocket()) {
-      socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-      return socket.getLocalAddress().getHostAddress();
-    } catch (SocketException | UnknownHostException e) {
-      e.printStackTrace();
-    }
-    return "";
-  }
+	public String getLocalIp() {
+		try (DatagramSocket socket = new DatagramSocket()) {
+			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+			return socket.getLocalAddress().getHostAddress();
+		}
+		catch (SocketException | UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 
 }

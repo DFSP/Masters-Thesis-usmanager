@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,58 +44,59 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService
 @Service
 class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
 
-  private final HostsService hostsService;
+	private final HostsService hostsService;
 
-  @Value("${external-id}")
-  private String id;
+	@Value("${external-id}")
+	private String id;
 
-  SymDatabaseMonitor(HostsService hostsService) {
-    this.hostsService = hostsService;
-  }
+	SymDatabaseMonitor(HostsService hostsService) {
+		this.hostsService = hostsService;
+	}
 
-  @Override
-  public void afterWrite(DataContext context, Table table, CsvData data) {
-    final String channelId = context.getBatch().getChannelId();
-    if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
-      final String tableName = table.getName();
-      if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-        StringBuilder stringBuilder = new StringBuilder();
-        data.writeCsvDataDetails(stringBuilder);
-        System.out.println(stringBuilder.toString());
-        final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
-        System.out.println("Old values:");
-        oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
-        final String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
-        final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
-        System.out.println("New values:");
-        newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
-        final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
-        final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
-        log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
-        if (publicIpAddress != null) {
-          // cloud host is running
-          if (Objects.equals(id, newWorkerId)) {
-            // is a cloud host managed by this worker
-            if (!Objects.equals(id, oldWorkerId)) {
-              // is a newly added cloud host
-              String privateIpAddress = newCloudHost.get("PRIVATE_IP_ADDRESS");
-              hostsService.setupHost(publicIpAddress, privateIpAddress, NodeRole.WORKER);
-            }
-          } else if (Objects.equals(id, oldWorkerId)) {
-            // is not a cloud host managed by this worker, but used to be
-            hostsService.removeHost(publicIpAddress);
-          }
-        }
-      }
+	@Override
+	public void afterWrite(DataContext context, Table table, CsvData data) {
+		final String channelId = context.getBatch().getChannelId();
+		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
+			final String tableName = table.getName();
+			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
+				StringBuilder stringBuilder = new StringBuilder();
+				data.writeCsvDataDetails(stringBuilder);
+				System.out.println(stringBuilder.toString());
+				final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
+				System.out.println("Old values:");
+				oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
+				final String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
+				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
+				System.out.println("New values:");
+				newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
+				final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
+				final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
+				log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
+				if (publicIpAddress != null) {
+					// cloud host is running
+					if (Objects.equals(id, newWorkerId)) {
+						// is a cloud host managed by this worker
+						if (!Objects.equals(id, oldWorkerId)) {
+							// is a newly added cloud host
+							String privateIpAddress = newCloudHost.get("PRIVATE_IP_ADDRESS");
+							hostsService.setupHost(publicIpAddress, privateIpAddress, NodeRole.WORKER);
+						}
+					}
+					else if (Objects.equals(id, oldWorkerId)) {
+						// is not a cloud host managed by this worker, but used to be
+						hostsService.removeHost(publicIpAddress);
+					}
+				}
+			}
       /*if ("edge_hosts".equalsIgnoreCase(tableName)) {
 
       }*/
-    }
-  }
+		}
+	}
 
-  @Override
-  public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
-    throw new WorkerManagerException(ex);
-  }
+	@Override
+	public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
+		throw new WorkerManagerException(ex);
+	}
 
 }

@@ -29,8 +29,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class MathUtils {
 
-  public int ensureRange(int value, int min, int max) {
-    return Math.min(Math.max(value, min), max);
-  }
+	public int ensureRange(int value, int min, int max) {
+		return Math.min(Math.max(value, min), max);
+	}
 
 }

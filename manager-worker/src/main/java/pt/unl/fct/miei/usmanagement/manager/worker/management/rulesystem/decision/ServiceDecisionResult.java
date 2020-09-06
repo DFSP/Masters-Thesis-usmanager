@@ -37,19 +37,19 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @EqualsAndHashCode(callSuper = true)
 public final class ServiceDecisionResult extends DecisionResult {
 
-  private final String containerId;
-  private final String serviceName;
+	private final String containerId;
+	private final String serviceName;
 
-  public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName) {
-    this(serviceHostname, containerId, serviceName, RuleDecision.NONE, 0, new HashMap<>(), 0);
-  }
+	public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName) {
+		this(serviceHostname, containerId, serviceName, RuleDecision.NONE, 0, new HashMap<>(), 0);
+	}
 
-  public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName, RuleDecision decision,
-                               long ruleId, Map<String, Double> fields, int priority) {
-    super(serviceHostname, decision, ruleId, fields, priority,
-        fields.values().stream().mapToDouble(Double::doubleValue).sum());
-    this.containerId = containerId;
-    this.serviceName = serviceName;
-  }
+	public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName, RuleDecision decision,
+								 long ruleId, Map<String, Double> fields, int priority) {
+		super(serviceHostname, decision, ruleId, fields, priority,
+			fields.values().stream().mapToDouble(Double::doubleValue).sum());
+		this.containerId = containerId;
+		this.serviceName = serviceName;
+	}
 
 }

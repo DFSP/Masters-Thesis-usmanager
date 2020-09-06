@@ -36,24 +36,24 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class RegionsService {
 
-  private final RegionRepository regions;
+	private final RegionRepository regions;
 
-  public RegionsService(RegionRepository regions) {
-    this.regions = regions;
-  }
+	public RegionsService(RegionRepository regions) {
+		this.regions = regions;
+	}
 
-  public List<RegionEntity> getRegions() {
-    return regions.findAll();
-  }
+	public List<RegionEntity> getRegions() {
+		return regions.findAll();
+	}
 
-  public RegionEntity getRegion(Long id) {
-    return regions.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
-  }
+	public RegionEntity getRegion(Long id) {
+		return regions.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
+	}
 
-  public RegionEntity getRegion(String name) {
-    return regions.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(RegionEntity.class, "name", name));
-  }
+	public RegionEntity getRegion(String name) {
+		return regions.findByNameIgnoreCase(name).orElseThrow(() ->
+			new EntityNotFoundException(RegionEntity.class, "name", name));
+	}
 
 }

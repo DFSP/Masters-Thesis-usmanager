@@ -24,21 +24,15 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.router;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,63 +43,68 @@ import lombok.Setter;
 @Table(name = "sym_router")
 public class SymRouterEntity {
 
-  @Id
-  private String routerId;
+	@Id
+	private String routerId;
 
-  private String targetCatalogName;
+	private String targetCatalogName;
 
-  private String targetSchemaName;
+	private String targetSchemaName;
 
-  private String targetTableName;
+	private String targetTableName;
 
-  @NotNull
-  private String sourceNodeGroupId;
+	@NotNull
+	private String sourceNodeGroupId;
 
-  @NotNull
-  private String targetNodeGroupId;
+	@NotNull
+	private String targetNodeGroupId;
 
-  @Builder.Default @Column(columnDefinition = "varchar(50) default 'default'")
-  private String routerType = "default";
+	@Builder.Default
+	@Column(columnDefinition = "varchar(50) default 'default'")
+	private String routerType = "default";
 
-  private String routerExpression;
+	private String routerExpression;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Short syncOnUpdate = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Short syncOnUpdate = 1;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Short syncOnInsert = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Short syncOnInsert = 1;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Short syncOnDelete = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Short syncOnDelete = 1;
 
-  @Builder.Default @Column(columnDefinition = "integer default 1")
-  private Short useSourceCatalogSchema = 1;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 1")
+	private Short useSourceCatalogSchema = 1;
 
-  @NotNull
-  private LocalDateTime createTime;
+	@NotNull
+	private LocalDateTime createTime;
 
-  private String lastUpdateBy;
+	private String lastUpdateBy;
 
-  @NotNull
-  private LocalDateTime lastUpdateTime;
+	@NotNull
+	private LocalDateTime lastUpdateTime;
 
-  private String description;
+	private String description;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymRouterEntity)) {
-      return false;
-    }
-    SymRouterEntity other = (SymRouterEntity) o;
-    return routerId != null && routerId.equals(other.getRouterId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getRouterId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getRouterId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymRouterEntity)) {
+			return false;
+		}
+		SymRouterEntity other = (SymRouterEntity) o;
+		return routerId != null && routerId.equals(other.getRouterId());
+	}
 
 }

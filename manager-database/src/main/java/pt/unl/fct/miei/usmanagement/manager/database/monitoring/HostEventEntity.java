@@ -24,22 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,35 +39,35 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Decisio
 @Table(name = "host_events")
 public class HostEventEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  /*  @OneToMany
-    private HostEntity hostEntity; TODO*/
-  private String hostname;
+	/*  @OneToMany
+	  private HostEntity hostEntity; TODO*/
+	private String hostname;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private DecisionEntity decision;
 
-  private int count;
+	private int count;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof HostEventEntity)) {
-      return false;
-    }
-    HostEventEntity other = (HostEventEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostEventEntity)) {
+			return false;
+		}
+		HostEventEntity other = (HostEventEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

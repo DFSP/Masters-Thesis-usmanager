@@ -24,11 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.io.IOUtils;
@@ -38,41 +33,47 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 public class JsonPathArgumentResolver implements HandlerMethodArgumentResolver {
 
-  private static final String JSON_BODY_ATTRIBUTE = "JSON_REQUEST_BODY";
+	private static final String JSON_BODY_ATTRIBUTE = "JSON_REQUEST_BODY";
 
-  @Override
-  public boolean supportsParameter(MethodParameter parameter) {
-    return parameter.hasParameterAnnotation(Json.class);
-  }
+	@Override
+	public boolean supportsParameter(MethodParameter parameter) {
+		return parameter.hasParameterAnnotation(Json.class);
+	}
 
-  @Override
-  public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-    String body = getRequestBody(webRequest);
-    Json annotation = parameter.getParameterAnnotation(Json.class);
-    String path = Text.isNullOrEmpty(annotation.value()) ? parameter.getParameter().getName() : annotation.value();
-    Object result = null;
-    try {
-      result = JsonPath.read(body, path);
-    } catch (PathNotFoundException ignored) {
-    }
-    return result;
-  }
+	@Override
+	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+								  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+		String body = getRequestBody(webRequest);
+		Json annotation = parameter.getParameterAnnotation(Json.class);
+		String path = Text.isNullOrEmpty(annotation.value()) ? parameter.getParameter().getName() : annotation.value();
+		Object result = null;
+		try {
+			result = JsonPath.read(body, path);
+		}
+		catch (PathNotFoundException ignored) {
+		}
+		return result;
+	}
 
-  private String getRequestBody(NativeWebRequest webRequest) {
-    HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-    String jsonBody = (String) servletRequest.getAttribute(JSON_BODY_ATTRIBUTE);
-    if (jsonBody == null) {
-      try {
-        jsonBody = IOUtils.toString(servletRequest.getInputStream(), StandardCharsets.UTF_8);
-        servletRequest.setAttribute(JSON_BODY_ATTRIBUTE, jsonBody);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return jsonBody;
-  }
+	private String getRequestBody(NativeWebRequest webRequest) {
+		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
+		String jsonBody = (String) servletRequest.getAttribute(JSON_BODY_ATTRIBUTE);
+		if (jsonBody == null) {
+			try {
+				jsonBody = IOUtils.toString(servletRequest.getInputStream(), StandardCharsets.UTF_8);
+				servletRequest.setAttribute(JSON_BODY_ATTRIBUTE, jsonBody);
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return jsonBody;
+	}
 
 }

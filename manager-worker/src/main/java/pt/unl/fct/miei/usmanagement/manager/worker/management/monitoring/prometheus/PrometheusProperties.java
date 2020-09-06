@@ -37,20 +37,20 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("prometheus")
 public class PrometheusProperties {
 
-  private final NodeExporter nodeExporter;
+	private final NodeExporter nodeExporter;
 
-  public PrometheusProperties() {
-    this.nodeExporter = new NodeExporter();
-  }
+	public PrometheusProperties() {
+		this.nodeExporter = new NodeExporter();
+	}
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class NodeExporter {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class NodeExporter {
 
-    private String installScript;
-    private String installScriptPath;
+		private String installScript;
+		private String installScriptPath;
 
-  }
+	}
 
 }

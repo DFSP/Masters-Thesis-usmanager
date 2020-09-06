@@ -24,67 +24,61 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/worker-managers")
 public class WorkerManagersController {
 
-  private final WorkerManagersService workerManagersService;
+	private final WorkerManagersService workerManagersService;
 
-  public WorkerManagersController(WorkerManagersService workerManagersService) {
-    this.workerManagersService = workerManagersService;
-  }
+	public WorkerManagersController(WorkerManagersService workerManagersService) {
+		this.workerManagersService = workerManagersService;
+	}
 
-  @GetMapping
-  public List<WorkerManagerEntity> getWorkerManagers() {
-    return workerManagersService.getWorkerManagers();
-  }
+	@GetMapping
+	public List<WorkerManagerEntity> getWorkerManagers() {
+		return workerManagersService.getWorkerManagers();
+	}
 
-  @GetMapping("/{workerManagerId}")
-  public WorkerManagerEntity getWorkerManager(@PathVariable String workerManagerId) {
-    return workerManagersService.getWorkerManager(workerManagerId);
-  }
+	@GetMapping("/{workerManagerId}")
+	public WorkerManagerEntity getWorkerManager(@PathVariable String workerManagerId) {
+		return workerManagersService.getWorkerManager(workerManagerId);
+	}
 
-  @PostMapping
-  public WorkerManagerEntity launchWorkerManager(@Json String host) {
-    return workerManagersService.launchWorkerManager(host);
-  }
+	@PostMapping
+	public WorkerManagerEntity launchWorkerManager(@Json String host) {
+		return workerManagersService.launchWorkerManager(host);
+	}
 
-  @DeleteMapping("/{workerManagerId}")
-  public void deleteWorkerManager(@PathVariable String workerManagerId) {
-    workerManagersService.deleteWorkerManager(workerManagerId);
-  }
+	@DeleteMapping("/{workerManagerId}")
+	public void deleteWorkerManager(@PathVariable String workerManagerId) {
+		workerManagersService.deleteWorkerManager(workerManagerId);
+	}
 
-  @GetMapping("/{workerManagerId}/assigned-hosts")
-  public List<String> getHosts(@PathVariable String workerManagerId) {
-    return workerManagersService.getAssignedHosts(workerManagerId);
-  }
+	@GetMapping("/{workerManagerId}/assigned-hosts")
+	public List<String> getHosts(@PathVariable String workerManagerId) {
+		return workerManagersService.getAssignedHosts(workerManagerId);
+	}
 
-  @PostMapping("/{workerManagerId}/assigned-hosts")
-  public void assignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
-    workerManagersService.assignHosts(workerManagerId, Arrays.asList(hosts));
-  }
+	@PostMapping("/{workerManagerId}/assigned-hosts")
+	public void assignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
+		workerManagersService.assignHosts(workerManagerId, Arrays.asList(hosts));
+	}
 
-  @DeleteMapping("/{workerManagerId}/assigned-hosts")
-  public void unassignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
-    workerManagersService.unassignHosts(workerManagerId, Arrays.asList(hosts));
-  }
+	@DeleteMapping("/{workerManagerId}/assigned-hosts")
+	public void unassignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
+		workerManagersService.unassignHosts(workerManagerId, Arrays.asList(hosts));
+	}
 
-  @DeleteMapping("/{workerManagerId}/assigned-hosts/{hostname}")
-  public void removeHost(@PathVariable String workerManagerId, @PathVariable String hostname) {
-    workerManagersService.unassignHost(workerManagerId, hostname);
-  }
+	@DeleteMapping("/{workerManagerId}/assigned-hosts/{hostname}")
+	public void removeHost(@PathVariable String workerManagerId, @PathVariable String hostname) {
+		workerManagersService.unassignHost(workerManagerId, hostname);
+	}
 
 }

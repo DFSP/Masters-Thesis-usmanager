@@ -34,18 +34,18 @@ import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
-  private final DockerSwarmService dockerSwarmService;
-  private final SymService symService;
+	private final DockerSwarmService dockerSwarmService;
+	private final SymService symService;
 
-  public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
-    this.dockerSwarmService = dockerSwarmService;
-    this.symService = symService;
-  }
+	public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
+		this.dockerSwarmService = dockerSwarmService;
+		this.symService = symService;
+	}
 
-  @Override
-  public void onApplicationEvent(@NonNull ContextClosedEvent event) {
-    dockerSwarmService.destroy();
-    symService.stopSymmetricDSServer();
-  }
+	@Override
+	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
+		dockerSwarmService.destroy();
+		symService.stopSymmetricDSServer();
+	}
 
 }

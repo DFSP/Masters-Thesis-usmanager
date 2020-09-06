@@ -26,39 +26,39 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.containers;
 
 public final class ContainerConstants {
 
-  private ContainerConstants() {
-  }
+	private ContainerConstants() {
+	}
 
-  public static final class Environment {
-    public static final String SERVICE_CONTINENT = "SERVICE_CONTINENT";
-    public static final String SERVICE_REGION = "SERVICE_REGION";
-    public static final String SERVICE_COUNTRY = "SERVICE_COUNTRY";
-    public static final String SERVICE_CITY = "SERVICE_CITY";
-    public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
-    public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
-    public static final String PROXY_PASS = "PROXY_PASS";
-    public static final String SERVER1 = "SERVER1";
-    public static final String SERVER1_CONTINENT = "SERVER1_CONTINENT";
-    public static final String SERVER1_REGION = "SERVER1_REGION";
-    public static final String SERVER1_COUNTRY = "SERVER1_COUNTRY";
-    public static final String SERVER1_CITY = "SERVER1_CITY";
-    public static final String ID = "ID";
-    public static final String MASTER = "MASTER";
-  }
+	public static final class Environment {
+		public static final String SERVICE_CONTINENT = "SERVICE_CONTINENT";
+		public static final String SERVICE_REGION = "SERVICE_REGION";
+		public static final String SERVICE_COUNTRY = "SERVICE_COUNTRY";
+		public static final String SERVICE_CITY = "SERVICE_CITY";
+		public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
+		public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
+		public static final String PROXY_PASS = "PROXY_PASS";
+		public static final String SERVER1 = "SERVER1";
+		public static final String SERVER1_CONTINENT = "SERVER1_CONTINENT";
+		public static final String SERVER1_REGION = "SERVER1_REGION";
+		public static final String SERVER1_COUNTRY = "SERVER1_COUNTRY";
+		public static final String SERVER1_CITY = "SERVER1_CITY";
+		public static final String ID = "ID";
+		public static final String MASTER = "MASTER";
+	}
 
-  public static final class Label {
-    public static final String SERVICE_NAME = "serviceName";
-    public static final String SERVICE_TYPE = "serviceType";
-    public static final String SERVICE_ADDRESS = "serviceAddr";
-    public static final String SERVICE_HOSTNAME = "serviceHostname";
-    public static final String SERVICE_CONTINENT = "serviceContinent";
-    public static final String SERVICE_REGION = "serviceRegion";
-    public static final String SERVICE_COUNTRY = "serviceCountry";
-    public static final String SERVICE_CITY = "serviceCity";
-    public static final String FOR_SERVICE = "forService";
-    public static final String IS_REPLICABLE = "isReplicable";
-    public static final String IS_STOPPABLE = "isStoppable";
-    public static final String IS_TRACEABLE = "isTraceable";
-  }
+	public static final class Label {
+		public static final String SERVICE_NAME = "serviceName";
+		public static final String SERVICE_TYPE = "serviceType";
+		public static final String SERVICE_ADDRESS = "serviceAddr";
+		public static final String SERVICE_HOSTNAME = "serviceHostname";
+		public static final String SERVICE_CONTINENT = "serviceContinent";
+		public static final String SERVICE_REGION = "serviceRegion";
+		public static final String SERVICE_COUNTRY = "serviceCountry";
+		public static final String SERVICE_CITY = "serviceCity";
+		public static final String FOR_SERVICE = "forService";
+		public static final String IS_REPLICABLE = "isReplicable";
+		public static final String IS_STOPPABLE = "isStoppable";
+		public static final String IS_TRACEABLE = "isTraceable";
+	}
 
 }

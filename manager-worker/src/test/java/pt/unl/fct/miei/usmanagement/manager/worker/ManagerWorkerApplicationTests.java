@@ -24,13 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker;
 
-import org.junit.jupiter.api.Test;import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ManagerWorkerApplicationTests {
 
-  @Test
-  void contextLoads() {
-  }
+	@Test
+	void contextLoads() {
+	}
 
 }

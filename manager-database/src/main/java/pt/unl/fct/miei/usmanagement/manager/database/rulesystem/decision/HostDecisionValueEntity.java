@@ -24,22 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,35 +39,35 @@ import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 @Table(name = "host_decision_values")
 public class HostDecisionValueEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "host_decision_id")
-  private HostDecisionEntity hostDecision;
+	@ManyToOne
+	@JoinColumn(name = "host_decision_id")
+	private HostDecisionEntity hostDecision;
 
-  @ManyToOne
-  @JoinColumn(name = "field_id")
-  private FieldEntity field;
+	@ManyToOne
+	@JoinColumn(name = "field_id")
+	private FieldEntity field;
 
-  private double value;
+	private double value;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof HostDecisionValueEntity)) {
-      return false;
-    }
-    HostDecisionValueEntity other = (HostDecisionValueEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostDecisionValueEntity)) {
+			return false;
+		}
+		HostDecisionValueEntity other = (HostDecisionValueEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

@@ -24,20 +24,20 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.prediction;
 
-import java.time.LocalDate;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+
 @Repository
 public interface ServiceEventPredictionRepository extends JpaRepository<ServiceEventPredictionEntity, Long> {
 
-  @Query("select sp.minimumReplicas "
-      + "from ServiceEventPredictionEntity sp inner join sp.service s "
-      + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
-      + "order by sp.lastUpdate desc")
-  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") LocalDate date);
+	@Query("select sp.minimumReplicas "
+		+ "from ServiceEventPredictionEntity sp inner join sp.service s "
+		+ "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
+		+ "order by sp.lastUpdate desc")
+	Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") LocalDate date);
 
 }

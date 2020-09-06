@@ -24,21 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.operators;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface OperatorRepository extends JpaRepository<OperatorEntity, Long> {
 
-  Optional<OperatorEntity> findByOperator(@Param("operator") Operator operator);
+	Optional<OperatorEntity> findByOperator(@Param("operator") Operator operator);
 
-  @Query("select case when count(o) > 0 then true else false end "
-      + "from OperatorEntity o "
-      + "where o.operator = :operator")
-  boolean hasOperator(@Param("operator") Operator operator);
+	@Query("select case when count(o) > 0 then true else false end "
+		+ "from OperatorEntity o "
+		+ "where o.operator = :operator")
+	boolean hasOperator(@Param("operator") Operator operator);
 
 }

@@ -24,33 +24,33 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.util;
 
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.DuplicateResponseEntryException;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.ResponseEntryNotFoundException;
 
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.Set;
+
 @Data
 public class Response {
 
-  private final Set<Map.Entry<Object, Object>> response;
-  private final boolean successful;
+	private final Set<Map.Entry<Object, Object>> response;
+	private final boolean successful;
 
-  public Response add(Object key, Object value) throws DuplicateResponseEntryException {
-    final Map.Entry<Object, Object> entry = new AbstractMap.SimpleImmutableEntry<>(key, value);
-    if (!response.add(entry)) {
-      throw new DuplicateResponseEntryException();
-    }
-    return this;
-  }
+	public Response add(Object key, Object value) throws DuplicateResponseEntryException {
+		final Map.Entry<Object, Object> entry = new AbstractMap.SimpleImmutableEntry<>(key, value);
+		if (!response.add(entry)) {
+			throw new DuplicateResponseEntryException();
+		}
+		return this;
+	}
 
-  public Response remove(Map.Entry<Object, Object> entry) throws ResponseEntryNotFoundException {
-    if (!response.remove(entry)) {
-      throw new ResponseEntryNotFoundException();
-    }
-    return this;
-  }
+	public Response remove(Map.Entry<Object, Object> entry) throws ResponseEntryNotFoundException {
+		if (!response.remove(entry)) {
+			throw new ResponseEntryNotFoundException();
+		}
+		return this;
+	}
 
 }

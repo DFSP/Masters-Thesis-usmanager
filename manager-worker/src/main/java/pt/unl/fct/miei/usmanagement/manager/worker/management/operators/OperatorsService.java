@@ -37,25 +37,25 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class OperatorsService {
 
-  private final OperatorRepository operators;
+	private final OperatorRepository operators;
 
-  public OperatorsService(OperatorRepository operators) {
-    this.operators = operators;
-  }
+	public OperatorsService(OperatorRepository operators) {
+		this.operators = operators;
+	}
 
-  public List<OperatorEntity> getOperators() {
-    return operators.findAll();
-  }
+	public List<OperatorEntity> getOperators() {
+		return operators.findAll();
+	}
 
-  public OperatorEntity getOperator(Long id) {
-    return operators.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(OperatorEntity.class, "id", id.toString()));
-  }
+	public OperatorEntity getOperator(Long id) {
+		return operators.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(OperatorEntity.class, "id", id.toString()));
+	}
 
-  public OperatorEntity getOperator(String operatorName) {
-    Operator operator = Operator.valueOf(operatorName.toUpperCase());
-    return operators.findByOperator(operator).orElseThrow(() ->
-        new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
-  }
+	public OperatorEntity getOperator(String operatorName) {
+		Operator operator = Operator.valueOf(operatorName.toUpperCase());
+		return operators.findByOperator(operator).orElseThrow(() ->
+			new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
+	}
 
 }

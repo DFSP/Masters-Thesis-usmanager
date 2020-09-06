@@ -34,32 +34,32 @@ import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMap
 @Data
 public final class DockerContainer {
 
-  private final String id;
-  private final long created;
-  private final List<String> names;
-  private final String image;
-  private final String command;
-  private final String state;
-  private final String status;
-  private final String hostname;
-  private final List<ContainerPortMapping> ports;
-  private final Map<String, String> labels;
+	private final String id;
+	private final long created;
+	private final List<String> names;
+	private final String image;
+	private final String command;
+	private final String state;
+	private final String status;
+	private final String hostname;
+	private final List<ContainerPortMapping> ports;
+	private final Map<String, String> labels;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof DockerContainer)) {
-      return false;
-    }
-    DockerContainer other = (DockerContainer) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof DockerContainer)) {
+			return false;
+		}
+		DockerContainer other = (DockerContainer) o;
+		return id != null && id.equals(other.getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
 }

@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,44 +31,47 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long> {
 
-  Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
+	Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 
-  Optional<CloudHostEntity> findByPublicIpAddress(@Param("publicIpAddress") String publicIpAddress);
+	Optional<CloudHostEntity> findByPublicIpAddress(@Param("publicIpAddress") String publicIpAddress);
 
-  Optional<CloudHostEntity> findByInstanceIdOrPublicDnsName(@Param("instanceId") String instanceId,
-                                                            @Param("publicDnsName") String publicDnsName);
+	Optional<CloudHostEntity> findByInstanceIdOrPublicDnsName(@Param("instanceId") String instanceId,
+															  @Param("publicDnsName") String publicDnsName);
 
-  Optional<CloudHostEntity> findByInstanceIdOrPublicIpAddress(@Param("instanceId") String instanceId,
-                                                              @Param("publicIpAddress") String publicIpAddress);
+	Optional<CloudHostEntity> findByInstanceIdOrPublicIpAddress(@Param("instanceId") String instanceId,
+																@Param("publicIpAddress") String publicIpAddress);
 
-  @Query("select r "
-      + "from CloudHostEntity h join h.hostRules r "
-      + "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname)")
-  List<HostRuleEntity> getRules(@Param("hostname") String hostname);
+	@Query("select r "
+		+ "from CloudHostEntity h join h.hostRules r "
+		+ "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname)")
+	List<HostRuleEntity> getRules(@Param("hostname") String hostname);
 
-  @Query("select r "
-      + "from CloudHostEntity h join h.hostRules r "
-      + "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname) "
-      + "and r.name = :ruleName")
-  Optional<HostRuleEntity> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
+	@Query("select r "
+		+ "from CloudHostEntity h join h.hostRules r "
+		+ "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname) "
+		+ "and r.name = :ruleName")
+	Optional<HostRuleEntity> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
 
-  @Query("select m "
-      + "from CloudHostEntity h join h.simulatedHostMetrics m "
-      + "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
-  List<HostSimulatedMetricEntity> getSimulatedMetrics(@Param("hostname") String hostname);
+	@Query("select m "
+		+ "from CloudHostEntity h join h.simulatedHostMetrics m "
+		+ "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
+	List<HostSimulatedMetricEntity> getSimulatedMetrics(@Param("hostname") String hostname);
 
-  @Query("select m "
-      + "from CloudHostEntity h join h.simulatedHostMetrics m "
-      + "where (h.publicIpAddress = :hostname or h.instanceId = :hostname) and m.name = :simulatedMetricName")
-  Optional<HostSimulatedMetricEntity> getSimulatedMetric(@Param("hostname") String hostname,
-                                                         @Param("simulatedMetricName") String simulatedMetricName);
+	@Query("select m "
+		+ "from CloudHostEntity h join h.simulatedHostMetrics m "
+		+ "where (h.publicIpAddress = :hostname or h.instanceId = :hostname) and m.name = :simulatedMetricName")
+	Optional<HostSimulatedMetricEntity> getSimulatedMetric(@Param("hostname") String hostname,
+														   @Param("simulatedMetricName") String simulatedMetricName);
 
-  @Query("select case when count(h) > 0 then true else false end "
-      + "from CloudHostEntity h "
-      + "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
-  boolean hasCloudHost(@Param("hostname") String hostname);
+	@Query("select case when count(h) > 0 then true else false end "
+		+ "from CloudHostEntity h "
+		+ "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
+	boolean hasCloudHost(@Param("hostname") String hostname);
 
 }

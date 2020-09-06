@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 class QueryOutput {
 
-  private String status;
-  private QueryData data;
+	private String status;
+	private QueryData data;
 
 }

@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.minidev.json.JSONArray;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,19 +31,22 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequestMapping("/eureka-server")
 public class EurekaController {
 
-  private final EurekaService eurekaService;
+	private final EurekaService eurekaService;
 
-  public EurekaController(EurekaService eurekaService) {
-    this.eurekaService = eurekaService;
-  }
+	public EurekaController(EurekaService eurekaService) {
+		this.eurekaService = eurekaService;
+	}
 
-  @PostMapping
-  public List<ContainerEntity> launchEureka(@Json JSONArray regions) {
-    return eurekaService.launchEurekaServers(Arrays.asList(regions.toArray(new String[0])));
-  }
+	@PostMapping
+	public List<ContainerEntity> launchEureka(@Json JSONArray regions) {
+		return eurekaService.launchEurekaServers(Arrays.asList(regions.toArray(new String[0])));
+	}
 
 }

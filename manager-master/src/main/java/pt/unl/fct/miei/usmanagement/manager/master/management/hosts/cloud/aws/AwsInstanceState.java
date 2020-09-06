@@ -25,27 +25,27 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.aws;
 
 public enum AwsInstanceState {
-  PENDING("pending", 0),
-  RUNNING("running", 16),
-  SHUTTING_DOWN("shutting-down", 32),
-  TERMINATED("terminated", 48),
-  STOPPING("stopping", 64),
-  STOPPED("stopped", 80);
+	PENDING("pending", 0),
+	RUNNING("running", 16),
+	SHUTTING_DOWN("shutting-down", 32),
+	TERMINATED("terminated", 48),
+	STOPPING("stopping", 64),
+	STOPPED("stopped", 80);
 
-  private final String state;
-  private final int code;
+	private final String state;
+	private final int code;
 
-  AwsInstanceState(String state, int code) {
-    this.state = state;
-    this.code = code;
-  }
+	AwsInstanceState(String state, int code) {
+		this.state = state;
+		this.code = code;
+	}
 
-  public String getState() {
-    return state;
-  }
+	public String getState() {
+		return state;
+	}
 
-  public int getCode() {
-    return code;
-  }
+	public int getCode() {
+		return code;
+	}
 
 }

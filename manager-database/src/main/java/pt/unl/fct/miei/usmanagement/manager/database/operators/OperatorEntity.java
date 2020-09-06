@@ -24,30 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.operators;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -58,38 +44,38 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.Condit
 @Table(name = "operators")
 public class OperatorEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NaturalId
-  @Enumerated(EnumType.STRING)
-  private Operator operator;
+	@NaturalId
+	@Enumerated(EnumType.STRING)
+	private Operator operator;
 
-  @NotNull
-  @Column(unique = true)
-  private String symbol;
+	@NotNull
+	@Column(unique = true)
+	private String symbol;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ConditionEntity> conditions = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<ConditionEntity> conditions = new HashSet<>();
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof OperatorEntity)) {
-      return false;
-    }
-    OperatorEntity other = (OperatorEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof OperatorEntity)) {
+			return false;
+		}
+		OperatorEntity other = (OperatorEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

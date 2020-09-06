@@ -24,22 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.logging;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,34 +39,34 @@ import lombok.Setter;
 @Table(name = "logging_event_property")
 public class LoggingEventPropertyEntity {
 
-  @Id
-  private Long eventId;
+	@Id
+	private Long eventId;
 
-  @Id
-  private String mappedKey;
+	@Id
+	private String mappedKey;
 
-  private String mappedValue;
+	private String mappedValue;
 
-  @OneToOne
-  @MapsId
-  @JoinColumn(name = "eventId")
-  private LoggingEventEntity loggingEvent;
+	@OneToOne
+	@MapsId
+	@JoinColumn(name = "eventId")
+	private LoggingEventEntity loggingEvent;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof LoggingEventPropertyEntity)) {
-      return false;
-    }
-    LoggingEventPropertyEntity other = (LoggingEventPropertyEntity) o;
-    return eventId != null && eventId.equals(other.getEventId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getEventId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getEventId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof LoggingEventPropertyEntity)) {
+			return false;
+		}
+		LoggingEventPropertyEntity other = (LoggingEventPropertyEntity) o;
+		return eventId != null && eventId.equals(other.getEventId());
+	}
 
 }

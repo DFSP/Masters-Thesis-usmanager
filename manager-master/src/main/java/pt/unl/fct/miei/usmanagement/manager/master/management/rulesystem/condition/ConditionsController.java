@@ -24,54 +24,47 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/rules/conditions")
 public class ConditionsController {
 
-  private final ConditionsService conditionsService;
+	private final ConditionsService conditionsService;
 
-  public ConditionsController(ConditionsService conditionsService) {
-    this.conditionsService = conditionsService;
-  }
+	public ConditionsController(ConditionsService conditionsService) {
+		this.conditionsService = conditionsService;
+	}
 
-  @GetMapping
-  public List<ConditionEntity> getConditions() {
-    return conditionsService.getConditions();
-  }
+	@GetMapping
+	public List<ConditionEntity> getConditions() {
+		return conditionsService.getConditions();
+	}
 
-  @GetMapping("/{conditionName}")
-  public ConditionEntity getCondition(@PathVariable String conditionName) {
-    return conditionsService.getCondition(conditionName);
-  }
+	@GetMapping("/{conditionName}")
+	public ConditionEntity getCondition(@PathVariable String conditionName) {
+		return conditionsService.getCondition(conditionName);
+	}
 
-  @PostMapping
-  public ConditionEntity addCondition(@RequestBody ConditionEntity condition) {
-    Validation.validatePostRequest(condition.getId());
-    return conditionsService.addCondition(condition);
-  }
+	@PostMapping
+	public ConditionEntity addCondition(@RequestBody ConditionEntity condition) {
+		Validation.validatePostRequest(condition.getId());
+		return conditionsService.addCondition(condition);
+	}
 
-  @PutMapping("/{conditionName}")
-  public ConditionEntity updateCondition(@PathVariable String conditionName, @RequestBody ConditionEntity condition) {
-    Validation.validatePutRequest(condition.getId());
-    return conditionsService.updateCondition(conditionName, condition);
-  }
+	@PutMapping("/{conditionName}")
+	public ConditionEntity updateCondition(@PathVariable String conditionName, @RequestBody ConditionEntity condition) {
+		Validation.validatePutRequest(condition.getId());
+		return conditionsService.updateCondition(conditionName, condition);
+	}
 
-  @DeleteMapping("/{conditionName}")
-  public void deleteCondition(@PathVariable String conditionName) {
-    conditionsService.deleteCondition(conditionName);
-  }
+	@DeleteMapping("/{conditionName}")
+	public void deleteCondition(@PathVariable String conditionName) {
+		conditionsService.deleteCondition(conditionName);
+	}
 
 }

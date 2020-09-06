@@ -43,116 +43,116 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ServicesService {
 
-  private final ServiceRepository services;
-  private final ServiceEventPredictionRepository serviceEventPredictions;
+	private final ServiceRepository services;
+	private final ServiceEventPredictionRepository serviceEventPredictions;
 
-  public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions) {
-    this.services = services;
-    this.serviceEventPredictions = serviceEventPredictions;
-  }
+	public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions) {
+		this.services = services;
+		this.serviceEventPredictions = serviceEventPredictions;
+	}
 
-  public List<ServiceEntity> getServices() {
-    return services.findAll();
-  }
+	public List<ServiceEntity> getServices() {
+		return services.findAll();
+	}
 
-  public ServiceEntity getService(Long id) {
-    return services.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEntity.class, "id", id.toString()));
-  }
+	public ServiceEntity getService(Long id) {
+		return services.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ServiceEntity.class, "id", id.toString()));
+	}
 
-  public ServiceEntity getService(String serviceName) {
-    return services.findByServiceNameIgnoreCase(serviceName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
-  }
+	public ServiceEntity getService(String serviceName) {
+		return services.findByServiceNameIgnoreCase(serviceName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
+	}
 
-  public List<ServiceEntity> getServicesByDockerRepository(String dockerRepository) {
-    return services.findByDockerRepositoryIgnoreCase(dockerRepository);
-  }
+	public List<ServiceEntity> getServicesByDockerRepository(String dockerRepository) {
+		return services.findByDockerRepositoryIgnoreCase(dockerRepository);
+	}
 
-  public AppEntity getApp(String serviceName, String appName) {
-    assertServiceExists(serviceName);
-    return services.getApp(serviceName, appName).orElseThrow(() ->
-        new EntityNotFoundException(AppEntity.class, "appName", appName));
-  }
+	public AppEntity getApp(String serviceName, String appName) {
+		assertServiceExists(serviceName);
+		return services.getApp(serviceName, appName).orElseThrow(() ->
+			new EntityNotFoundException(AppEntity.class, "appName", appName));
+	}
 
-  public List<AppEntity> getApps(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getApps(serviceName);
-  }
+	public List<AppEntity> getApps(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getApps(serviceName);
+	}
 
-  public List<ServiceEntity> getDependencies(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getDependencies(serviceName);
-  }
+	public List<ServiceEntity> getDependencies(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getDependencies(serviceName);
+	}
 
-  public List<ServiceEntity> getDependenciesByType(String serviceName, ServiceType type) {
-    assertServiceExists(serviceName);
-    return services.getDependenciesByType(serviceName, type);
-  }
+	public List<ServiceEntity> getDependenciesByType(String serviceName, ServiceType type) {
+		assertServiceExists(serviceName);
+		return services.getDependenciesByType(serviceName, type);
+	}
 
-  public boolean serviceDependsOn(String serviceName, String otherServiceName) {
-    assertServiceExists(serviceName);
-    assertServiceExists(otherServiceName);
-    return services.dependsOn(serviceName, otherServiceName);
-  }
+	public boolean serviceDependsOn(String serviceName, String otherServiceName) {
+		assertServiceExists(serviceName);
+		assertServiceExists(otherServiceName);
+		return services.dependsOn(serviceName, otherServiceName);
+	}
 
-  public List<ServiceEntity> getDependents(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getDependents(serviceName);
-  }
+	public List<ServiceEntity> getDependents(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getDependents(serviceName);
+	}
 
-  public List<ServiceEventPredictionEntity> getPredictions(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getPredictions(serviceName);
-  }
+	public List<ServiceEventPredictionEntity> getPredictions(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getPredictions(serviceName);
+	}
 
-  public ServiceEventPredictionEntity getEventPrediction(String serviceName, String predictionsName) {
-    assertServiceExists(serviceName);
-    return services.getPrediction(serviceName, predictionsName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEventPredictionEntity.class, "predictionsName", predictionsName));
-  }
+	public ServiceEventPredictionEntity getEventPrediction(String serviceName, String predictionsName) {
+		assertServiceExists(serviceName);
+		return services.getPrediction(serviceName, predictionsName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceEventPredictionEntity.class, "predictionsName", predictionsName));
+	}
 
-  public List<ServiceRuleEntity> getRules(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getRules(serviceName);
-  }
+	public List<ServiceRuleEntity> getRules(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getRules(serviceName);
+	}
 
-  public ServiceRuleEntity getRule(String serviceName, String ruleName) {
-    assertServiceExists(serviceName);
-    return services.getRule(serviceName, ruleName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName)
-    );
-  }
+	public ServiceRuleEntity getRule(String serviceName, String ruleName) {
+		assertServiceExists(serviceName);
+		return services.getRule(serviceName, ruleName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName)
+		);
+	}
 
-  public List<ServiceSimulatedMetricEntity> getSimulatedMetrics(String serviceName) {
-    assertServiceExists(serviceName);
-    return services.getSimulatedMetrics(serviceName);
-  }
+	public List<ServiceSimulatedMetricEntity> getSimulatedMetrics(String serviceName) {
+		assertServiceExists(serviceName);
+		return services.getSimulatedMetrics(serviceName);
+	}
 
-  public ServiceSimulatedMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
-    assertServiceExists(serviceName);
-    return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
-    );
-  }
+	public ServiceSimulatedMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
+		assertServiceExists(serviceName);
+		return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+		);
+	}
 
-  public int getMinReplicasByServiceName(String serviceName) {
-    Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
-    if (customMinReplicas != null) {
-      log.info("Found event prediction with {} replicas", customMinReplicas);
-      return customMinReplicas;
-    }
-    return services.getMinReplicas(serviceName);
-  }
+	public int getMinReplicasByServiceName(String serviceName) {
+		Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
+		if (customMinReplicas != null) {
+			log.info("Found event prediction with {} replicas", customMinReplicas);
+			return customMinReplicas;
+		}
+		return services.getMinReplicas(serviceName);
+	}
 
-  public int getMaxReplicasByServiceName(String serviceName) {
-    return services.getMaxReplicas(serviceName);
-  }
+	public int getMaxReplicasByServiceName(String serviceName) {
+		return services.getMaxReplicas(serviceName);
+	}
 
-  private void assertServiceExists(String serviceName) {
-    if (!services.hasService(serviceName)) {
-      throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
-    }
-  }
+	private void assertServiceExists(String serviceName) {
+		if (!services.hasService(serviceName)) {
+			throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
+		}
+	}
 
 }

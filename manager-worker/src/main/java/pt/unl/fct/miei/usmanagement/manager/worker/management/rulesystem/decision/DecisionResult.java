@@ -32,25 +32,27 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 @Data
 public class DecisionResult implements Comparable<DecisionResult> {
 
-  private final String hostname;
-  private final RuleDecision decision;
-  private final long ruleId;
-  private final Map<String, Double> fields;
-  private final int priority;
-  private final double sumFields;
+	private final String hostname;
+	private final RuleDecision decision;
+	private final long ruleId;
+	private final Map<String, Double> fields;
+	private final int priority;
+	private final double sumFields;
 
-  @Override
-  public int compareTo(DecisionResult o) {
-    if (this.getDecision() == o.getDecision()) {
-      if (this.getPriority() == o.getPriority()) {
-        return this.getSumFields() < o.getSumFields() ? -1 : 1;
-      } else {
-        return this.getPriority() < o.getPriority() ? -1 : 1;
-      }
-    } else {
-      return this.getDecision() == RuleDecision.START
-          || (this.getDecision() == RuleDecision.STOP && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
-    }
-  }
+	@Override
+	public int compareTo(DecisionResult o) {
+		if (this.getDecision() == o.getDecision()) {
+			if (this.getPriority() == o.getPriority()) {
+				return this.getSumFields() < o.getSumFields() ? -1 : 1;
+			}
+			else {
+				return this.getPriority() < o.getPriority() ? -1 : 1;
+			}
+		}
+		else {
+			return this.getDecision() == RuleDecision.START
+				|| (this.getDecision() == RuleDecision.STOP && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
+		}
+	}
 
 }

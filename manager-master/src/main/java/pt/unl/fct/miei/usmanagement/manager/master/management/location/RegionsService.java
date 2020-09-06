@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.location;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,58 +33,60 @@ import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionRepository;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class RegionsService {
 
-  private final RegionRepository regions;
+	private final RegionRepository regions;
 
-  public RegionsService(RegionRepository regions) {
-    this.regions = regions;
-  }
+	public RegionsService(RegionRepository regions) {
+		this.regions = regions;
+	}
 
-  public List<RegionEntity> getRegions() {
-    return regions.findAll();
-  }
+	public List<RegionEntity> getRegions() {
+		return regions.findAll();
+	}
 
-  public RegionEntity getRegion(Long id) {
-    return regions.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
-  }
+	public RegionEntity getRegion(Long id) {
+		return regions.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
+	}
 
-  public RegionEntity getRegion(String name) {
-    return regions.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(RegionEntity.class, "name", name));
-  }
+	public RegionEntity getRegion(String name) {
+		return regions.findByNameIgnoreCase(name).orElseThrow(() ->
+			new EntityNotFoundException(RegionEntity.class, "name", name));
+	}
 
-  public RegionEntity addRegion(RegionEntity region) {
-    assertRegionDoesntExist(region);
-    log.info("Saving region {}", ToStringBuilder.reflectionToString(region));
-    return regions.save(region);
-  }
+	public RegionEntity addRegion(RegionEntity region) {
+		assertRegionDoesntExist(region);
+		log.info("Saving region {}", ToStringBuilder.reflectionToString(region));
+		return regions.save(region);
+	}
 
-  public RegionEntity updateRegion(String name, RegionEntity newRegion) {
-    var region = getRegion(name);
-    log.info("Updating region {} with {}",
-        ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
-    log.info("Region before copying properties: {}",
-        ToStringBuilder.reflectionToString(region));
-    ObjectUtils.copyValidProperties(newRegion, region);
-    log.info("Region after copying properties: {}",
-        ToStringBuilder.reflectionToString(region));
-    return regions.save(region);
-  }
+	public RegionEntity updateRegion(String name, RegionEntity newRegion) {
+		var region = getRegion(name);
+		log.info("Updating region {} with {}",
+			ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
+		log.info("Region before copying properties: {}",
+			ToStringBuilder.reflectionToString(region));
+		ObjectUtils.copyValidProperties(newRegion, region);
+		log.info("Region after copying properties: {}",
+			ToStringBuilder.reflectionToString(region));
+		return regions.save(region);
+	}
 
-  public void deleteRegion(String name) {
-    var region = getRegion(name);
-    regions.delete(region);
-  }
+	public void deleteRegion(String name) {
+		var region = getRegion(name);
+		regions.delete(region);
+	}
 
-  private void assertRegionDoesntExist(RegionEntity region) {
-    var name = region.getName();
-    if (regions.hasRegion(name)) {
-      throw new DataIntegrityViolationException("Region '" + name + "' already exists");
-    }
-  }
+	private void assertRegionDoesntExist(RegionEntity region) {
+		var name = region.getName();
+		if (regions.hasRegion(name)) {
+			throw new DataIntegrityViolationException("Region '" + name + "' already exists");
+		}
+	}
 
 }

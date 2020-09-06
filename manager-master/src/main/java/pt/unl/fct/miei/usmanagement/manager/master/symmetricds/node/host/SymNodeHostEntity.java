@@ -24,22 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.node.host;
 
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,70 +41,74 @@ import lombok.Setter;
 @Table(name = "sym_node_host")
 public class SymNodeHostEntity {
 
-  @Id
-  private String nodeId;
+	@Id
+	private String nodeId;
 
-  @Id
-  private String hostName;
+	@Id
+	private String hostName;
 
-  private String instanceId;
+	private String instanceId;
 
-  private String ipAddress;
+	private String ipAddress;
 
-  private String osUser;
+	private String osUser;
 
-  private String osName;
+	private String osName;
 
-  private String osArch;
+	private String osArch;
 
-  private String osVersion;
+	private String osVersion;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Integer availableProcessors = 0;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Integer availableProcessors = 0;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Long freeMemoryBytes = 0L;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Long freeMemoryBytes = 0L;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Long totalMemoryBytes = 0L;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Long totalMemoryBytes = 0L;
 
-  @Builder.Default @Column(columnDefinition = "integer default 0")
-  private Long maxMemoryBytes = 0L;
+	@Builder.Default
+	@Column(columnDefinition = "integer default 0")
+	private Long maxMemoryBytes = 0L;
 
-  private String javaVersion;
+	private String javaVersion;
 
-  private String javaVendor;
+	private String javaVendor;
 
-  private String jdbcVersion;
+	private String jdbcVersion;
 
-  private String symmetricVersion;
+	private String symmetricVersion;
 
-  private String timezoneOffset;
+	private String timezoneOffset;
 
-  private LocalDateTime heartbeatTime;
+	private LocalDateTime heartbeatTime;
 
-  @NotNull
-  private LocalDateTime lastRestartTime;
+	@NotNull
+	private LocalDateTime lastRestartTime;
 
-  @NotNull
-  private LocalDateTime createTime;
+	@NotNull
+	private LocalDateTime createTime;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SymNodeHostEntity)) {
-      return false;
-    }
-    SymNodeHostEntity other = (SymNodeHostEntity) o;
-    return nodeId != null && nodeId.equals(other.getNodeId())
-        && hostName != null && hostName.equals(other.getHostName());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(getNodeId(), getHostName());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(getNodeId(), getHostName());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SymNodeHostEntity)) {
+			return false;
+		}
+		SymNodeHostEntity other = (SymNodeHostEntity) o;
+		return nodeId != null && nodeId.equals(other.getNodeId())
+			&& hostName != null && hostName.equals(other.getHostName());
+	}
 
 }

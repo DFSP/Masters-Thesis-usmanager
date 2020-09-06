@@ -24,13 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
-import java.io.Serializable;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
@@ -39,8 +35,8 @@ import lombok.ToString;
 @ToString
 public class SymTriggerRouterId implements Serializable {
 
-  private String triggerId;
+	private String triggerId;
 
-  private String routerId;
+	private String routerId;
 
 }

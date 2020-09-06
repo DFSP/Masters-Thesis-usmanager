@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,51 +31,54 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ContainerRuleRepository extends JpaRepository<ContainerRuleEntity, Long> {
 
-  Optional<ContainerRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<ContainerRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select r "
-      + "from ContainerRuleEntity r join r.containers c "
-      + "where c.containerId = :containerId")
-  List<ContainerRuleEntity> findByContainerId(@Param("containerId") String containerId);
+	@Query("select r "
+		+ "from ContainerRuleEntity r join r.containers c "
+		+ "where c.containerId = :containerId")
+	List<ContainerRuleEntity> findByContainerId(@Param("containerId") String containerId);
 
-  @Query("select r "
-      + "from ContainerRuleEntity r "
-      + "where r.generic = true")
-  List<ContainerRuleEntity> findGenericContainerRules();
+	@Query("select r "
+		+ "from ContainerRuleEntity r "
+		+ "where r.generic = true")
+	List<ContainerRuleEntity> findGenericContainerRules();
 
-  @Query("select r "
-      + "from ContainerRuleEntity r "
-      + "where r.generic = true and r.name = :ruleName")
-  Optional<ContainerRuleEntity> findGenericContainerRule(@Param("ruleName") String ruleName);
+	@Query("select r "
+		+ "from ContainerRuleEntity r "
+		+ "where r.generic = true and r.name = :ruleName")
+	Optional<ContainerRuleEntity> findGenericContainerRule(@Param("ruleName") String ruleName);
 
-  @Query("select case when count(r) > 0 then true else false end "
-      + "from ContainerRuleEntity r "
-      + "where lower(r.name) = lower(:ruleName)")
-  boolean hasRule(@Param("ruleName") String ruleName);
+	@Query("select case when count(r) > 0 then true else false end "
+		+ "from ContainerRuleEntity r "
+		+ "where lower(r.name) = lower(:ruleName)")
+	boolean hasRule(@Param("ruleName") String ruleName);
 
-  @Query("select rc.containerCondition "
-      + "from ContainerRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName")
-  List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
+	@Query("select rc.containerCondition "
+		+ "from ContainerRuleEntity r join r.conditions rc "
+		+ "where r.name = :ruleName")
+	List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
 
-  @Query("select rc.containerCondition "
-      + "from ContainerRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName and rc.containerCondition.name = :conditionName")
-  Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
-                                         @Param("conditionName") String conditionName);
+	@Query("select rc.containerCondition "
+		+ "from ContainerRuleEntity r join r.conditions rc "
+		+ "where r.name = :ruleName and rc.containerCondition.name = :conditionName")
+	Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
+										   @Param("conditionName") String conditionName);
 
-  @Query("select c "
-      + "from ContainerRuleEntity r join r.containers c "
-      + "where r.name = :ruleName")
-  List<ContainerEntity> getContainers(@Param("ruleName") String ruleName);
+	@Query("select c "
+		+ "from ContainerRuleEntity r join r.containers c "
+		+ "where r.name = :ruleName")
+	List<ContainerEntity> getContainers(@Param("ruleName") String ruleName);
 
-  @Query("select c "
-      + "from ContainerRuleEntity r join r.containers c "
-      + "where r.name = :ruleName and c.containerId = :containerId")
-  Optional<ContainerEntity> getContainer(@Param("ruleName") String ruleName,
-                                         @Param("containerId") String containerId);
+	@Query("select c "
+		+ "from ContainerRuleEntity r join r.containers c "
+		+ "where r.name = :ruleName and c.containerId = :containerId")
+	Optional<ContainerEntity> getContainer(@Param("ruleName") String ruleName,
+										   @Param("containerId") String containerId);
 
 }

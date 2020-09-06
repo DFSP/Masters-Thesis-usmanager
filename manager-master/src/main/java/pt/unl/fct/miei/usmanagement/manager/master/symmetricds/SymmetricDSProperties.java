@@ -24,12 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,32 +37,32 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("symmetricds")
 public class SymmetricDSProperties {
 
-  private final Tables tables;
+	private final Tables tables;
 
-  public SymmetricDSProperties() {
-    this.tables = new Tables();
-  }
+	public SymmetricDSProperties() {
+		this.tables = new Tables();
+	}
 
-  @Getter
-  @Setter
-  public static final class Tables {
+	@Getter
+	@Setter
+	public static final class Tables {
 
-    private final Exclude exclude;
+		private final Exclude exclude;
 
-    private Tables() {
-      this.exclude = new Exclude();
-    }
+		private Tables() {
+			this.exclude = new Exclude();
+		}
 
-    @Getter
-    @Setter
-    public static final class Exclude {
+		@Getter
+		@Setter
+		public static final class Exclude {
 
-      private List<String> startsWith;
-      private List<String> endsWith;
-      private List<String> contains;
+			private List<String> startsWith;
+			private List<String> endsWith;
+			private List<String> contains;
 
-    }
+		}
 
-  }
+	}
 
 }

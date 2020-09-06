@@ -24,23 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.apps;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,36 +40,36 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 @Table(name = "app_services")
 public class AppServiceEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @JsonIgnore
-  @ManyToOne
-  @JoinColumn(name = "app_id")
-  private AppEntity app;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "app_id")
+	private AppEntity app;
 
-  @ManyToOne
-  @JoinColumn(name = "service_id")
-  private ServiceEntity service;
+	@ManyToOne
+	@JoinColumn(name = "service_id")
+	private ServiceEntity service;
 
-  private int launchOrder;
+	private int launchOrder;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof AppServiceEntity)) {
-      return false;
-    }
-    AppServiceEntity other = (AppServiceEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof AppServiceEntity)) {
+			return false;
+		}
+		AppServiceEntity other = (AppServiceEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

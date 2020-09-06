@@ -44,49 +44,49 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.services.ServicesS
 @Service
 public class EurekaService {
 
-  public static final String EUREKA_SERVER = "eureka-server";
+	public static final String EUREKA_SERVER = "eureka-server";
 
-  private final HostsService hostsService;
-  private final ServicesService serviceService;
-  private final ContainersService containersService;
-  private final int port;
+	private final HostsService hostsService;
+	private final ServicesService serviceService;
+	private final ContainersService containersService;
+	private final int port;
 
-  public EurekaService(HostsService hostsService, ServicesService serviceService,
-                       @Lazy ContainersService containersService, EurekaProperties eurekaProperties) {
-    this.hostsService = hostsService;
-    this.serviceService = serviceService;
-    this.containersService = containersService;
-    this.port = eurekaProperties.getPort();
-  }
+	public EurekaService(HostsService hostsService, ServicesService serviceService,
+						 @Lazy ContainersService containersService, EurekaProperties eurekaProperties) {
+		this.hostsService = hostsService;
+		this.serviceService = serviceService;
+		this.containersService = containersService;
+		this.port = eurekaProperties.getPort();
+	}
 
-  public Optional<String> getEurekaServerAddress(String region) {
-    return containersService.getContainersWithLabels(Set.of(
-        Pair.of(ContainerConstants.Label.SERVICE_NAME, EUREKA_SERVER),
-        Pair.of(ContainerConstants.Label.SERVICE_REGION, region)))
-        .stream()
-        .map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
-        .findFirst();
-  }
+	public Optional<String> getEurekaServerAddress(String region) {
+		return containersService.getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, EUREKA_SERVER),
+			Pair.of(ContainerConstants.Label.SERVICE_REGION, region)))
+			.stream()
+			.map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
+			.findFirst();
+	}
 
-  public ContainerEntity launchEurekaServer(String region) {
-    return launchEurekaServers(List.of(region)).get(0);
-  }
+	public ContainerEntity launchEurekaServer(String region) {
+		return launchEurekaServers(List.of(region)).get(0);
+	}
 
-  public List<ContainerEntity> launchEurekaServers(List<String> regions) {
-    double expectedMemoryConsumption = serviceService.getService(EUREKA_SERVER).getExpectedMemoryConsumption();
-    List<HostDetails> availableHosts = hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions);
-    List<String> customEnvs = Collections.emptyList();
-    Map<String, String> customLabels = Collections.emptyMap();
-    String eurekaServers = availableHosts.stream()
-        .map(host -> host.getHostAddress().getPublicIpAddress())
-        .map(hostname -> String.format("http://%s:%s/eureka/", hostname, port))
-        .collect(Collectors.joining(","));
-    Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
-    return availableHosts.stream()
-        .map(host -> host.getHostAddress().getPublicIpAddress())
-        .map(hostname ->
-            containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs, customLabels, dynamicLaunchParams))
-        .collect(Collectors.toList());
-  }
+	public List<ContainerEntity> launchEurekaServers(List<String> regions) {
+		double expectedMemoryConsumption = serviceService.getService(EUREKA_SERVER).getExpectedMemoryConsumption();
+		List<HostDetails> availableHosts = hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions);
+		List<String> customEnvs = Collections.emptyList();
+		Map<String, String> customLabels = Collections.emptyMap();
+		String eurekaServers = availableHosts.stream()
+			.map(host -> host.getHostAddress().getPublicIpAddress())
+			.map(hostname -> String.format("http://%s:%s/eureka/", hostname, port))
+			.collect(Collectors.joining(","));
+		Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
+		return availableHosts.stream()
+			.map(host -> host.getHostAddress().getPublicIpAddress())
+			.map(hostname ->
+				containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs, customLabels, dynamicLaunchParams))
+			.collect(Collectors.toList());
+	}
 
 }

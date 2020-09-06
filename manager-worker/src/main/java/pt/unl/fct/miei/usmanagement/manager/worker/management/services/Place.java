@@ -26,7 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.worker.management.services;
 
 public enum Place {
 
-  CLOUD,
-  EDGE,
+	CLOUD,
+	EDGE,
 
 }

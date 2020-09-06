@@ -34,22 +34,22 @@ import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 @Component
 public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {
 
-  private final ContainersService containersService;
-  private final DockerSwarmService dockerSwarmService;
-  private final SymService symService;
+	private final ContainersService containersService;
+	private final DockerSwarmService dockerSwarmService;
+	private final SymService symService;
 
-  public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-                               SymService symService) {
-    this.containersService = containersService;
-    this.dockerSwarmService = dockerSwarmService;
-    this.symService = symService;
-  }
+	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
+								 SymService symService) {
+		this.containersService = containersService;
+		this.dockerSwarmService = dockerSwarmService;
+		this.symService = symService;
+	}
 
-  @Override
-  public void onApplicationEvent(ContextClosedEvent event) {
-    containersService.stopAll();
-    dockerSwarmService.destroy();
-    symService.stopSymmetricDSServer();
-  }
+	@Override
+	public void onApplicationEvent(ContextClosedEvent event) {
+		containersService.stopAll();
+		dockerSwarmService.destroy();
+		symService.stopSymmetricDSServer();
+	}
 
 }

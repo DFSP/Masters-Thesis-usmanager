@@ -42,80 +42,80 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundExce
 @Service
 public class ServiceSimulatedMetricsService {
 
-  private final ServiceSimulatedMetricsRepository serviceSimulatedMetrics;
+	private final ServiceSimulatedMetricsRepository serviceSimulatedMetrics;
 
-  public ServiceSimulatedMetricsService(ServiceSimulatedMetricsRepository serviceSimulatedMetrics) {
-    this.serviceSimulatedMetrics = serviceSimulatedMetrics;
-  }
+	public ServiceSimulatedMetricsService(ServiceSimulatedMetricsRepository serviceSimulatedMetrics) {
+		this.serviceSimulatedMetrics = serviceSimulatedMetrics;
+	}
 
-  public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
-    return serviceSimulatedMetrics.findAll();
-  }
+	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
+		return serviceSimulatedMetrics.findAll();
+	}
 
-  public ServiceSimulatedMetricEntity getServiceSimulatedMetric(Long id) {
-    return serviceSimulatedMetrics.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "id", id.toString()));
-  }
+	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(Long id) {
+		return serviceSimulatedMetrics.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "id", id.toString()));
+	}
 
-  public ServiceSimulatedMetricEntity getServiceSimulatedMetric(String simulatedMetricName) {
-    return serviceSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(String simulatedMetricName) {
+		return serviceSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public List<ServiceSimulatedMetricEntity> getGenericServiceSimulatedMetrics() {
-    return serviceSimulatedMetrics.findGenericServiceSimulatedMetrics();
-  }
+	public List<ServiceSimulatedMetricEntity> getGenericServiceSimulatedMetrics() {
+		return serviceSimulatedMetrics.findGenericServiceSimulatedMetrics();
+	}
 
-  public ServiceSimulatedMetricEntity getGenericServiceSimulatedMetric(String simulatedMetricName) {
-    return serviceSimulatedMetrics.findGenericServiceSimulatedMetric(simulatedMetricName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
-  }
+	public ServiceSimulatedMetricEntity getGenericServiceSimulatedMetric(String simulatedMetricName) {
+		return serviceSimulatedMetrics.findGenericServiceSimulatedMetric(simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+	}
 
-  public List<ServiceEntity> getServices(String simulatedMetricName) {
-    assertServiceSimulatedMetricExists(simulatedMetricName);
-    return serviceSimulatedMetrics.getServices(simulatedMetricName);
-  }
+	public List<ServiceEntity> getServices(String simulatedMetricName) {
+		assertServiceSimulatedMetricExists(simulatedMetricName);
+		return serviceSimulatedMetrics.getServices(simulatedMetricName);
+	}
 
-  public ServiceEntity getService(String simulatedMetricName, String serviceName) {
-    assertServiceSimulatedMetricExists(simulatedMetricName);
-    return serviceSimulatedMetrics.getService(simulatedMetricName, serviceName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
-  }
-  
-  private void assertServiceSimulatedMetricExists(String simulatedMetricName) {
-    if (!serviceSimulatedMetrics.hasServiceSimulatedMetric(simulatedMetricName)) {
-      throw new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
-    }
-  }
-  
-  public Map<String, Double> getSimulatedFieldsValues(String serviceName) {
-    List<ServiceSimulatedMetricEntity> metrics = serviceSimulatedMetrics.findByService(serviceName);
-    return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
-  }
-  
-  public Optional<Double> getSimulatedFieldValue(String serviceName, String field) {
-    Optional<ServiceSimulatedMetricEntity> metric = serviceSimulatedMetrics.findByServiceAndField(serviceName, field);
-    Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
-    if (fieldValue.isPresent() && metric.get().isOverride()) {
-      return fieldValue;
-    }
-    Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
-    if (genericFieldValue.isPresent()) {
-      return genericFieldValue;
-    }
-    return fieldValue;
-  }
+	public ServiceEntity getService(String simulatedMetricName, String serviceName) {
+		assertServiceSimulatedMetricExists(simulatedMetricName);
+		return serviceSimulatedMetrics.getService(simulatedMetricName, serviceName).orElseThrow(() ->
+			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
+	}
 
-  private Double randomizeFieldValue(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-    var random = new Random();
-    double minValue = serviceSimulatedMetric.getMinimumValue();
-    double maxValue = serviceSimulatedMetric.getMaximumValue();
-    return minValue + (maxValue - minValue) * random.nextDouble();
-  }
+	private void assertServiceSimulatedMetricExists(String simulatedMetricName) {
+		if (!serviceSimulatedMetrics.hasServiceSimulatedMetric(simulatedMetricName)) {
+			throw new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
+		}
+	}
 
-  private Optional<Double> randomizeGenericFieldValue(String field) {
-    Optional<ServiceSimulatedMetricEntity> serviceSimulatedMetric = serviceSimulatedMetrics.findGenericByField(field);
-    return serviceSimulatedMetric.map(this::randomizeFieldValue);
-  }
+	public Map<String, Double> getSimulatedFieldsValues(String serviceName) {
+		List<ServiceSimulatedMetricEntity> metrics = serviceSimulatedMetrics.findByService(serviceName);
+		return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
+	}
+
+	public Optional<Double> getSimulatedFieldValue(String serviceName, String field) {
+		Optional<ServiceSimulatedMetricEntity> metric = serviceSimulatedMetrics.findByServiceAndField(serviceName, field);
+		Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
+		if (fieldValue.isPresent() && metric.get().isOverride()) {
+			return fieldValue;
+		}
+		Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
+		if (genericFieldValue.isPresent()) {
+			return genericFieldValue;
+		}
+		return fieldValue;
+	}
+
+	private Double randomizeFieldValue(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+		var random = new Random();
+		double minValue = serviceSimulatedMetric.getMinimumValue();
+		double maxValue = serviceSimulatedMetric.getMaximumValue();
+		return minValue + (maxValue - minValue) * random.nextDouble();
+	}
+
+	private Optional<Double> randomizeGenericFieldValue(String field) {
+		Optional<ServiceSimulatedMetricEntity> serviceSimulatedMetric = serviceSimulatedMetrics.findGenericByField(field);
+		return serviceSimulatedMetric.map(this::randomizeFieldValue);
+	}
 
 }

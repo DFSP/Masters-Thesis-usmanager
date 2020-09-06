@@ -37,10 +37,10 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("decision")
 public class DecisionProperties {
 
-  private int startHostOnEventsCount;
-  private int stopHostOnEventsCount;
-  private int replicateContainerOnEventCount;
-  private int migrateContainerOnEventCount;
-  private int stopContainerOnEventCount;
+	private int startHostOnEventsCount;
+	private int stopHostOnEventsCount;
+	private int replicateContainerOnEventCount;
+	private int migrateContainerOnEventCount;
+	private int stopContainerOnEventCount;
 
 }

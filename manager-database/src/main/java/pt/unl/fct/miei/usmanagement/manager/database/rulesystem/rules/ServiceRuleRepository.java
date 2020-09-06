@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,50 +31,53 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ServiceRuleRepository extends JpaRepository<ServiceRuleEntity, Long> {
 
-  @Query("select r "
-      + "from ServiceRuleEntity r "
-      + "where r.name = :ruleName")
-  Optional<ServiceRuleEntity> findServiceRule(@Param("ruleName") String ruleName);
+	@Query("select r "
+		+ "from ServiceRuleEntity r "
+		+ "where r.name = :ruleName")
+	Optional<ServiceRuleEntity> findServiceRule(@Param("ruleName") String ruleName);
 
-  Optional<ServiceRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<ServiceRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select r "
-      + "from ServiceRuleEntity r join r.services s "
-      + "where r.generic = false and s.serviceName = :serviceName")
-  List<ServiceRuleEntity> findByServiceName(@Param("serviceName") String serviceName);
+	@Query("select r "
+		+ "from ServiceRuleEntity r join r.services s "
+		+ "where r.generic = false and s.serviceName = :serviceName")
+	List<ServiceRuleEntity> findByServiceName(@Param("serviceName") String serviceName);
 
-  @Query("select r "
-      + "from ServiceRuleEntity r "
-      + "where r.generic = true")
-  List<ServiceRuleEntity> findGenericServiceRules();
+	@Query("select r "
+		+ "from ServiceRuleEntity r "
+		+ "where r.generic = true")
+	List<ServiceRuleEntity> findGenericServiceRules();
 
-  @Query("select case when count(r) > 0 then true else false end "
-      + "from ServiceRuleEntity r "
-      + "where lower(r.name) = lower(:ruleName)")
-  boolean hasRule(@Param("ruleName") String ruleName);
+	@Query("select case when count(r) > 0 then true else false end "
+		+ "from ServiceRuleEntity r "
+		+ "where lower(r.name) = lower(:ruleName)")
+	boolean hasRule(@Param("ruleName") String ruleName);
 
-  @Query("select rc.serviceCondition "
-      + "from ServiceRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName")
-  List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
+	@Query("select rc.serviceCondition "
+		+ "from ServiceRuleEntity r join r.conditions rc "
+		+ "where r.name = :ruleName")
+	List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
 
-  @Query("select rc.serviceCondition "
-      + "from ServiceRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName and rc.serviceCondition.name = :conditionName")
-  Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
-                                         @Param("conditionName") String conditionName);
+	@Query("select rc.serviceCondition "
+		+ "from ServiceRuleEntity r join r.conditions rc "
+		+ "where r.name = :ruleName and rc.serviceCondition.name = :conditionName")
+	Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
+										   @Param("conditionName") String conditionName);
 
-  @Query("select s "
-      + "from ServiceRuleEntity r join r.services s "
-      + "where r.name = :ruleName")
-  List<ServiceEntity> getServices(@Param("ruleName") String ruleName);
+	@Query("select s "
+		+ "from ServiceRuleEntity r join r.services s "
+		+ "where r.name = :ruleName")
+	List<ServiceEntity> getServices(@Param("ruleName") String ruleName);
 
-  @Query("select s "
-      + "from ServiceRuleEntity r join r.services s "
-      + "where r.name = :ruleName and s.serviceName = :serviceName")
-  Optional<ServiceEntity> getService(@Param("ruleName") String ruleName, @Param("serviceName") String serviceName);
+	@Query("select s "
+		+ "from ServiceRuleEntity r join r.services s "
+		+ "where r.name = :ruleName and s.serviceName = :serviceName")
+	Optional<ServiceEntity> getService(@Param("ruleName") String ruleName, @Param("serviceName") String serviceName);
 
 }

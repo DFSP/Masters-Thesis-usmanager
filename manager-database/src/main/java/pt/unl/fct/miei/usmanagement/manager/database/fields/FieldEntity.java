@@ -24,30 +24,18 @@
 
 package pt.unl.fct.miei.usmanagement.manager.database.fields;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionValueEntity;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -58,49 +46,49 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Service
 @Table(name = "fields")
 public class FieldEntity {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ConditionEntity> conditions = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<ConditionEntity> conditions = new HashSet<>();
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<HostSimulatedMetricEntity> simulatedHostMetrics = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<HostSimulatedMetricEntity> simulatedHostMetrics = new HashSet<>();
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ServiceSimulatedMetricEntity> simulatedServiceMetrics = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<ServiceSimulatedMetricEntity> simulatedServiceMetrics = new HashSet<>();
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof FieldEntity)) {
-      return false;
-    }
-    FieldEntity other = (FieldEntity) o;
-    return id != null && id.equals(other.getId());
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(getId());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof FieldEntity)) {
+			return false;
+		}
+		FieldEntity other = (FieldEntity) o;
+		return id != null && id.equals(other.getId());
+	}
 
 }

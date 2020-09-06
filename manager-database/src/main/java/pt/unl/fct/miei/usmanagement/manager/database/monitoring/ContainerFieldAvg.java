@@ -29,9 +29,9 @@ import lombok.Data;
 @Data
 public class ContainerFieldAvg {
 
-  private final String containerId;
-  private final String field;
-  private final double average;
-  private final long count;
+	private final String containerId;
+	private final String field;
+	private final double average;
+	private final long count;
 
 }

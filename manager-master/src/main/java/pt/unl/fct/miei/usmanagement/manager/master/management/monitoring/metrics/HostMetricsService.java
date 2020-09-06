@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.management.fields.FieldsService;
@@ -34,49 +31,52 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostProperti
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class HostMetricsService {
 
-  private final PrometheusService prometheusService;
-  private final HostSimulatedMetricsService hostSimulatedMetricsService;
-  private final FieldsService fieldsService;
-  private final double maximumRamPercentage;
+	private final PrometheusService prometheusService;
+	private final HostSimulatedMetricsService hostSimulatedMetricsService;
+	private final FieldsService fieldsService;
+	private final double maximumRamPercentage;
 
-  public HostMetricsService(PrometheusService prometheusService,
-                            HostSimulatedMetricsService hostSimulatedMetricsService,
-                            FieldsService fieldsService,
-                            HostProperties hostProperties) {
-    this.prometheusService = prometheusService;
-    this.hostSimulatedMetricsService = hostSimulatedMetricsService;
-    this.fieldsService = fieldsService;
-    this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
-  }
+	public HostMetricsService(PrometheusService prometheusService,
+							  HostSimulatedMetricsService hostSimulatedMetricsService,
+							  FieldsService fieldsService,
+							  HostProperties hostProperties) {
+		this.prometheusService = prometheusService;
+		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
+		this.fieldsService = fieldsService;
+		this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
+	}
 
-  public boolean nodeHasAvailableResources(String hostname, double avgContainerMem) {
-    double totalRam = prometheusService.getTotalMemory(hostname);
-    double availableRam = prometheusService.getAvailableMemory(hostname);
-    //double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
-    final var predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
-    //TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
-    return predictedRamUsage < maximumRamPercentage;
-  }
+	public boolean nodeHasAvailableResources(String hostname, double avgContainerMem) {
+		double totalRam = prometheusService.getTotalMemory(hostname);
+		double availableRam = prometheusService.getAvailableMemory(hostname);
+		//double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
+		final var predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
+		//TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
+		return predictedRamUsage < maximumRamPercentage;
+	}
 
-  public Map<String, Double> getHostStats(String hostname) {
-    var fieldsValues = new HashMap<String, Double>();
-    double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
-    if (cpuPercentage != -1) {
-      // just to make sure cpu-% is a valid field name
-      FieldEntity field = fieldsService.getField("cpu-%");
-      fieldsValues.put(field.getName(), cpuPercentage);
-    }
-    double ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
-    if (ramPercentage != -1) {
-      // just to make sure ram-% is a valid field name
-      FieldEntity field = fieldsService.getField("ram-%");
-      fieldsValues.put(field.getName(), ramPercentage);
-    }
-    fieldsValues.putAll(hostSimulatedMetricsService.getSimulatedFieldsValues(hostname));
-    return fieldsValues;
-  }
+	public Map<String, Double> getHostStats(String hostname) {
+		var fieldsValues = new HashMap<String, Double>();
+		double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
+		if (cpuPercentage != -1) {
+			// just to make sure cpu-% is a valid field name
+			FieldEntity field = fieldsService.getField("cpu-%");
+			fieldsValues.put(field.getName(), cpuPercentage);
+		}
+		double ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
+		if (ramPercentage != -1) {
+			// just to make sure ram-% is a valid field name
+			FieldEntity field = fieldsService.getField("ram-%");
+			fieldsValues.put(field.getName(), ramPercentage);
+		}
+		fieldsValues.putAll(hostSimulatedMetricsService.getSimulatedFieldsValues(hostname));
+		return fieldsValues;
+	}
 
 }

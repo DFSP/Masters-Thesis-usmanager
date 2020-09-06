@@ -33,13 +33,13 @@ import pt.unl.fct.miei.usmanagement.manager.worker.ManagerWorkerProperties;
 @Service
 public class Consumer {
 
-  private final String ownTopic;
-  private final ObjectMapper objectMapper;
+	private final String ownTopic;
+	private final ObjectMapper objectMapper;
 
-  public Consumer(ManagerWorkerProperties managerWorkerProperties) {
-    this.ownTopic = String.format("worker-manager-%s", managerWorkerProperties.getId());
-    this.objectMapper = new ObjectMapper();
-  }
+	public Consumer(ManagerWorkerProperties managerWorkerProperties) {
+		this.ownTopic = String.format("worker-manager-%s", managerWorkerProperties.getId());
+		this.objectMapper = new ObjectMapper();
+	}
 
   /*public String getOwnTopic() {
     return ownTopic;

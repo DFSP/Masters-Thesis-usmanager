@@ -26,21 +26,21 @@ package pt.unl.fct.miei.usmanagement.manager.database.operators;
 
 public enum Operator {
 
-  NOT_EQUAL_TO("!="),
-  EQUAL_TO("=="),
-  GREATER_THAN(">"),
-  LESS_THAN("<"),
-  GREATER_THAN_OR_EQUAL_TO(">="),
-  LESS_THAN_OR_EQUAL_TO("<=");
+	NOT_EQUAL_TO("!="),
+	EQUAL_TO("=="),
+	GREATER_THAN(">"),
+	LESS_THAN("<"),
+	GREATER_THAN_OR_EQUAL_TO(">="),
+	LESS_THAN_OR_EQUAL_TO("<=");
 
-  private final String symbol;
+	private final String symbol;
 
-  Operator(String symbol) {
-    this.symbol = symbol;
-  }
+	Operator(String symbol) {
+		this.symbol = symbol;
+	}
 
-  public String getSymbol() {
-    return symbol;
-  }
+	public String getSymbol() {
+		return symbol;
+	}
 
 }
