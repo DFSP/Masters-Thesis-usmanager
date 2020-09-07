@@ -83,7 +83,12 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 			else if ("edge_hosts".equalsIgnoreCase(tableName)) {
 				final Map<String, String> newEdgeHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
 				final Long id = Long.valueOf(newEdgeHost.get("ID"));
-				oldEdgeHost = edgeHostsService.getEdgeHostById(id);
+				try {
+					oldEdgeHost = edgeHostsService.getEdgeHostById(id);
+				}
+				catch (EntityNotFoundException e) {
+					System.out.println(e.getMessage());
+				}
 			}
 		}
 		return true;

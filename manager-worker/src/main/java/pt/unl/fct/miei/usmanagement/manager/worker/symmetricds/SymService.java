@@ -125,8 +125,6 @@ public class SymService {
 		serverSymmetricEngine.start();
 
 		//waitForInitialLoad(monitor);
-
-
 	}
 
 	private void waitForInitialLoad(MonitorFilter monitor) {

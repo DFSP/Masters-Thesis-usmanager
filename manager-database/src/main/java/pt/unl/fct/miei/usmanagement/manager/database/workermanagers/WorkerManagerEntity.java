@@ -71,8 +71,10 @@ public class WorkerManagerEntity {
 	private Set<EdgeHostEntity> assignedEdgeHosts;
 
 	@PrePersist
-	private void ensure() {
-		this.setId(UUID.randomUUID().toString());
+	private void prePersist() {
+		if (this.getId() == null) {
+			this.setId(UUID.randomUUID().toString());
+		}
 		if (this.getStartedAt() == null) {
 			this.setStartedAt(LocalDateTime.now());
 		}
