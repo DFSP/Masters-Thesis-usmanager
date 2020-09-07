@@ -54,24 +54,38 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 	}
 
 	@Override
+	public boolean beforeWrite(DataContext context, Table table, CsvData data) {
+		final String channelId = context.getBatch().getChannelId();
+		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
+			final String tableName = table.getName();
+			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
+				final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
+				System.out.println("Before write old values:");
+				oldCloudHost.forEach((column, value) -> System.out.println(column + "=" + value));
+				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
+				System.out.println("Before write new values:");
+				newCloudHost.forEach((column, value) -> System.out.println(column + "=" + value));
+			}
+		}
+		return true;
+	}
+
+	@Override
 	public void afterWrite(DataContext context, Table table, CsvData data) {
 		final String channelId = context.getBatch().getChannelId();
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
 			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-				StringBuilder stringBuilder = new StringBuilder();
-				data.writeCsvDataDetails(stringBuilder);
-				System.out.println(stringBuilder.toString());
 				final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
 				System.out.println("Old values:");
-				oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
+				oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + "\n"));
 				final String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
 				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
 				System.out.println("New values:");
-				newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + " "));
-				final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
+				newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + "\n"));
+				/*final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
 				final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
-				log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
+				/*log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
 				if (publicIpAddress != null) {
 					// cloud host is running
 					if (Objects.equals(id, newWorkerId)) {
@@ -86,7 +100,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 						// is not a cloud host managed by this worker, but used to be
 						hostsService.removeHost(publicIpAddress);
 					}
-				}
+				}*/
 			}
       /*if ("edge_hosts".equalsIgnoreCase(tableName)) {
 
