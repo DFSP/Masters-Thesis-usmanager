@@ -24,9 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
-import java.util.Map;
-import java.util.Objects;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jumpmind.db.model.Table;
 import org.jumpmind.symmetric.common.Constants;
@@ -36,21 +33,36 @@ import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
 import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
+
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
 class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
 
 	private final HostsService hostsService;
+	private final CloudHostsService cloudHostsService;
+	private CloudHostEntity oldCloudHost;
+	private final EdgeHostsService edgeHostsService;
+	private EdgeHostEntity oldEdgeHost;
 
 	@Value("${external-id}")
 	private String id;
 
-	SymDatabaseMonitor(HostsService hostsService) {
+	SymDatabaseMonitor(HostsService hostsService, CloudHostsService cloudHostsService,
+					   EdgeHostsService edgeHostsService) {
 		this.hostsService = hostsService;
+		this.cloudHostsService = cloudHostsService;
+		this.edgeHostsService = edgeHostsService;
 	}
 
 	@Override
@@ -59,12 +71,19 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
 			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-				final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
-				System.out.println("Before write old values:");
-				oldCloudHost.forEach((column, value) -> System.out.println(column + "=" + value));
 				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
-				System.out.println("Before write new values:");
-				newCloudHost.forEach((column, value) -> System.out.println(column + "=" + value));
+				final Long id = Long.valueOf(newCloudHost.get("ID"));
+				try {
+					oldCloudHost = cloudHostsService.getCloudHostById(id);
+				}
+				catch (EntityNotFoundException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+			else if ("edge_hosts".equalsIgnoreCase(tableName)) {
+				final Map<String, String> newEdgeHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
+				final Long id = Long.valueOf(newEdgeHost.get("ID"));
+				oldEdgeHost = edgeHostsService.getEdgeHostById(id);
 			}
 		}
 		return true;
@@ -76,16 +95,13 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
 			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-				final Map<String, String> oldCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.OLD_DATA);
-				System.out.println("Old values:");
-				oldCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + "\n"));
-				final String oldWorkerId = oldCloudHost.get("MANAGED_BY_WORKER_ID");
 				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
-				System.out.println("New values:");
-				newCloudHost.forEach((column, value) -> System.out.print(column + "=" + value + "\n"));
-				/*final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
+				final String oldWorkerId = oldCloudHost == null
+					? null
+					: (oldCloudHost.getManagedByWorker() == null ? null : oldCloudHost.getManagedByWorker().getId());
+				final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
 				final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
-				/*log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
+				log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
 				if (publicIpAddress != null) {
 					// cloud host is running
 					if (Objects.equals(id, newWorkerId)) {
@@ -100,7 +116,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 						// is not a cloud host managed by this worker, but used to be
 						hostsService.removeHost(publicIpAddress);
 					}
-				}*/
+				}
 			}
       /*if ("edge_hosts".equalsIgnoreCase(tableName)) {
 

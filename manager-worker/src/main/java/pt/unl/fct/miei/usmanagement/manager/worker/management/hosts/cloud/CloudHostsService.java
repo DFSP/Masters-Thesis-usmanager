@@ -69,6 +69,11 @@ public class CloudHostsService {
 	}
 
 	public CloudHostEntity getCloudHostById(Long id) {
+		return cloudHosts.getCloudHost(id).orElseThrow(() ->
+			new EntityNotFoundException(CloudHostEntity.class, "id", id.toString()));
+	}
+
+	public CloudHostEntity getCloudHost(Long id) {
 		try {
 			return cloudHosts.getOne(id);
 		}

@@ -37,6 +37,11 @@ import java.util.Optional;
 @Repository
 public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long> {
 
+	@Query("select h "
+		+ "from CloudHostEntity h "
+		+ "where h.id = :id")
+	Optional<CloudHostEntity> getCloudHost(@Param("id") Long id);
+
 	Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 
 	Optional<CloudHostEntity> findByPublicIpAddress(@Param("publicIpAddress") String publicIpAddress);
