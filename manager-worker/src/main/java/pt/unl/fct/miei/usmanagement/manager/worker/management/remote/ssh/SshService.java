@@ -24,8 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.management.remote.ssh;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
@@ -91,25 +90,29 @@ public class SshService {
 		}
 		catch (EntityNotFoundException e) {
 			username = awsUser;
-			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
+			publicKeyFile = awsKeyFilePath;
 		}
-		return initClient(username, hostname, new File(publicKeyFile));
+		return initClientPubKey(username, hostname, publicKeyFile);
 	}
 
-	private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
+	private SSHClient initClientPubKey(String username, String hostname, String publicKeyFile) throws IOException {
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream(publicKeyFile);
+		if (is == null) {
+			throw new IOException("failed to open connection to file " + publicKeyFile);
+		}
 		var sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 		log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
 		var keyFile = new PKCS8KeyFile();
-		keyFile.init(publicKeyFile);
+		keyFile.init(new BufferedReader(new InputStreamReader(is)));
 		sshClient.authPublickey(username, keyFile);
 		log.info("Logged in to host '{}@{}'", username, hostname);
 		return sshClient;
 	}
 
-	private SSHClient initClient(String hostname, String username, String password) throws IOException {
+	private SSHClient initClientPwd(String hostname, String username, String password) throws IOException {
 		var sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
@@ -149,7 +152,7 @@ public class SshService {
 	}
 
 	public SshCommandResult executeCommand(String hostname, String username, String password, String command) {
-		try (SSHClient sshClient = initClient(hostname, username, password);
+		try (SSHClient sshClient = initClientPwd(hostname, username, password);
 			 Session session = sshClient.startSession()) {
 			return executeCommand(session, hostname, command);
 		}

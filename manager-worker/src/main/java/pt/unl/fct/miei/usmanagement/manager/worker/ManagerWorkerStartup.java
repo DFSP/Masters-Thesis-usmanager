@@ -60,11 +60,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		// 2. start kafka process
 		hostsService.setHostAddress();
 		symService.startSymmetricDSServer();
-   /* try {
-      hostsService.clusterHosts();
-    } catch (WorkerManagerException e) {
-      log.error(e.getMessage());
-    }
+   /*
     servicesMonitoringService.initServiceMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();*/
 	}

@@ -1,4 +1,4 @@
-FROM usmanager/manager-database as database
+FROM manager-database as database
 
 FROM maven:3.6.0-jdk-11-slim
 COPY --from=database /root/.m2 /root/.m2
