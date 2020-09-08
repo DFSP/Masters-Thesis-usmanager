@@ -99,33 +99,42 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 		final String channelId = context.getBatch().getChannelId();
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
-			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
-				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
-				final String oldWorkerId = oldCloudHost == null
-					? null
-					: (oldCloudHost.getManagedByWorker() == null ? null : oldCloudHost.getManagedByWorker().getId());
-				final String newWorkerId = newCloudHost.get("MANAGED_BY_WORKER_ID");
-				final String publicIpAddress = newCloudHost.get("PUBLIC_IP_ADDRESS");
-				log.info("Inserted a cloud host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
-				if (publicIpAddress != null) {
-					// cloud host is running
-					if (Objects.equals(id, newWorkerId)) {
-						// is a cloud host managed by this worker
-						if (!Objects.equals(id, oldWorkerId)) {
-							// is a newly added cloud host
-							String privateIpAddress = newCloudHost.get("PRIVATE_IP_ADDRESS");
-							hostsService.setupHost(publicIpAddress, privateIpAddress, NodeRole.WORKER);
-						}
+			if ("cloud_hosts".equalsIgnoreCase(tableName) || "edge_hosts".equalsIgnoreCase(tableName)) {
+				final Map<String, String> columns =
+					data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
+				final String publicIpAddress = columns.get("PUBLIC_IP_ADDRESS");
+				final String privateIpAddress = columns.get("PRIVATE_IP_ADDRESS");
+				final String newWorkerId = columns.get("MANAGED_BY_WORKER_ID");
+				String oldWorkerId = null;
+				if ("cloud_hosts".equalsIgnoreCase(tableName)) {
+					if (oldCloudHost != null && oldCloudHost.getManagedByWorker() != null) {
+						oldWorkerId = oldCloudHost.getManagedByWorker().getId();
 					}
-					else if (Objects.equals(id, oldWorkerId)) {
-						// is not a cloud host managed by this worker, but used to be
-						hostsService.removeHost(publicIpAddress);
+				} else if ("edge_hosts".equalsIgnoreCase(tableName)) {
+					if (oldEdgeHost != null && oldEdgeHost.getManagedByWorker() != null) {
+						oldWorkerId = oldEdgeHost.getManagedByWorker().getId();
 					}
 				}
+				updateHost(publicIpAddress, privateIpAddress, oldWorkerId, newWorkerId);
 			}
-      /*if ("edge_hosts".equalsIgnoreCase(tableName)) {
+		}
+	}
 
-      }*/
+	private void updateHost(String publicIpAddress, String privateIpAddress, String oldWorkerId, String newWorkerId) {
+		log.info("Inserted a host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
+		if (publicIpAddress != null) {
+			// host is running
+			if (Objects.equals(id, newWorkerId)) {
+				// is a host managed by this worker
+				if (!Objects.equals(id, oldWorkerId)) {
+					// is a newly added host
+					hostsService.setupHost(publicIpAddress, privateIpAddress, NodeRole.WORKER);
+				}
+			}
+			else if (Objects.equals(id, oldWorkerId)) {
+				// is not a host managed by this worker, but used to be
+				hostsService.removeHost(publicIpAddress);
+			}
 		}
 	}
 
