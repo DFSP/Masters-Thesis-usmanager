@@ -68,6 +68,11 @@ public class EdgeHostsService {
 		}
 	}
 
+	public EdgeHostEntity getEdgeHostByIdWithWorker(Long id) {
+		return edgeHosts.getEdgeHostWithWorker(id).orElseThrow(() ->
+			new EntityNotFoundException(EdgeHostEntity.class, "id", id.toString()));
+	}
+
 	public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
 		return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
 			new EntityNotFoundException(EdgeHostEntity.class, "host", host));

@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
@@ -69,7 +70,16 @@ public class CloudHostsService {
 	}
 
 	public CloudHostEntity getCloudHostById(Long id) {
-		return cloudHosts.getCloudHost(id).orElseThrow(() ->
+		try {
+			return cloudHosts.getOne(id);
+		}
+		catch (javax.persistence.EntityNotFoundException e) {
+			throw new EntityNotFoundException(CloudHostEntity.class, "id", id.toString());
+		}
+	}
+
+	public CloudHostEntity getCloudHostByIdWithWorker(Long id) {
+		return cloudHosts.getCloudHostWithWorker(id).orElseThrow(() ->
 			new EntityNotFoundException(CloudHostEntity.class, "id", id.toString()));
 	}
 

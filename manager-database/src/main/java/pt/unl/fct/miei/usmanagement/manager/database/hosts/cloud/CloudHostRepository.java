@@ -38,9 +38,9 @@ import java.util.Optional;
 public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long> {
 
 	@Query("select h "
-		+ "from CloudHostEntity h "
+		+ "from CloudHostEntity h join fetch h.managedByWorker "
 		+ "where h.id = :id")
-	Optional<CloudHostEntity> getCloudHost(@Param("id") Long id);
+	Optional<CloudHostEntity> getCloudHostWithWorker(@Param("id") Long id);
 
 	Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 

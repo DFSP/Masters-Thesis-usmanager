@@ -74,7 +74,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 				final Map<String, String> newCloudHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
 				final Long id = Long.valueOf(newCloudHost.get("ID"));
 				try {
-					oldCloudHost = cloudHostsService.getCloudHostById(id);
+					oldCloudHost = cloudHostsService.getCloudHostByIdWithWorker(id);
 				}
 				catch (EntityNotFoundException e) {
 					System.out.println(e.getMessage());
@@ -84,7 +84,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 				final Map<String, String> newEdgeHost = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA);
 				final Long id = Long.valueOf(newEdgeHost.get("ID"));
 				try {
-					oldEdgeHost = edgeHostsService.getEdgeHostById(id);
+					oldEdgeHost = edgeHostsService.getEdgeHostByIdWithWorker(id);
 				}
 				catch (EntityNotFoundException e) {
 					System.out.println(e.getMessage());
