@@ -25,20 +25,85 @@
 import Card from "../../../components/cards/Card";
 import React from "react";
 import {IApp} from "./App";
+import Form from "../../../components/form/Form";
+import BaseComponent from "../../../components/BaseComponent";
+import {MenuItem, MenuItemProps} from "react-contextmenu";
+import {Link} from "react-router-dom";
+
+interface State {
+    loading: boolean;
+}
 
 interface AppCardProps {
-  app: IApp;
+    app: IApp;
 }
 
 type Props = AppCardProps;
 
-const CardApp = Card<IApp>();
-const AppCard = ({app}: Props) => (
-  <CardApp title={app.name}
-           link={{to: {pathname: `/apps/${app.name}`, state: app}}}
-           height={'30px'}
-           margin={'10px 0'}
-           hoverable/>
-);
+export default class AppCard extends BaseComponent<Props, State> {
 
-export default AppCard;
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (app: IApp): void => {
+        super.toast(`<span class="green-text">App <b class="white-text">${app.name}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private onDeleteFailure = (reason: string, app: IApp): void => {
+        super.toast(`Unable to delete <b>${app.name}</b> app`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {app} = this.props;
+        return [
+            <Link to={{
+                pathname: `/apps/${app.name}#services`,
+                state: app
+            }}>
+                <MenuItem className='custom-context-menu-item'>
+                    Modify services
+                </MenuItem>
+            </Link>
+        ];
+    }
+
+    public render() {
+        const {app} = this.props;
+        const {loading} = this.state;
+        const CardApp = Card<IApp>();
+        return <CardApp id={`app-${app.name}`}
+                        title={app.name}
+                        link={{to: {pathname: `/apps/${app.name}#app`, state: app}}}
+                        height={'30px'}
+                        margin={'10px 0'}
+                        hoverable
+                        delete={{
+                            url: `apps/${app.name}`,
+                            successCallback: this.onDeleteSuccess,
+                            failureCallback: this.onDeleteFailure
+                        }}
+                        loading={loading}
+                        contextMenuItems={this.contextMenu()}/>
+    }
+
+}

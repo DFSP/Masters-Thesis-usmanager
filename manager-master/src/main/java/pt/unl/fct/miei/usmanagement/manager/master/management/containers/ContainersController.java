@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
@@ -66,7 +67,7 @@ public class ContainersController {
 	@PostMapping
 	public ContainerEntity launchContainer(@Json String hostname, @Json String service,
 										   @Json String internalPort, @Json String externalPort) {
-		return containersService.launchContainer(hostname, service, internalPort, externalPort);
+		return containersService.launchContainer(new HostAddress(hostname), service, internalPort, externalPort);
 	}
 
 	@DeleteMapping("/{id}")

@@ -100,12 +100,12 @@ public class SshService {
 		if (is == null) {
 			throw new IOException("failed to open connection to file " + publicKeyFile);
 		}
-		var sshClient = new SSHClient();
+		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-		log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
+		log.info("Logging in to host '{}@{}' using key {}", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
-		var keyFile = new PKCS8KeyFile();
+		PKCS8KeyFile keyFile = new PKCS8KeyFile();
 		keyFile.init(new BufferedReader(new InputStreamReader(is)));
 		sshClient.authPublickey(username, keyFile);
 		log.info("Logged in to host '{}@{}'", username, hostname);
@@ -113,7 +113,7 @@ public class SshService {
 	}
 
 	private SSHClient initClientPwd(String hostname, String username, String password) throws IOException {
-		var sshClient = new SSHClient();
+		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 		log.info("Logging in to host '{}@{}' using password", username, hostname);
@@ -130,7 +130,7 @@ public class SshService {
 			if (scriptPath == null) {
 				throw new EntityNotFoundException(File.class, "name", filename);
 			}
-			var file = new File(scriptPath);
+			File file = new File(scriptPath);
 			log.info("Transferring file {} to host {}", filename, hostname);
 			sftpClient.put(new FileSystemFile(file), filename);
 		}

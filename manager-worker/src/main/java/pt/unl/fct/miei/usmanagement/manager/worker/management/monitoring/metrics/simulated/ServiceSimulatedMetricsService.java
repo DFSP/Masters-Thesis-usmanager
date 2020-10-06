@@ -107,7 +107,7 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	private Double randomizeFieldValue(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-		var random = new Random();
+		Random random = new Random();
 		double minValue = serviceSimulatedMetric.getMinimumValue();
 		double maxValue = serviceSimulatedMetric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();

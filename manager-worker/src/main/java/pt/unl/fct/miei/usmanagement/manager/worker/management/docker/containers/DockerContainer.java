@@ -41,7 +41,8 @@ public final class DockerContainer {
 	private final String command;
 	private final String state;
 	private final String status;
-	private final String hostname;
+	private final String publicIpAddress;
+	private final String privateIpAddress;
 	private final List<ContainerPortMapping> ports;
 	private final Map<String, String> labels;
 

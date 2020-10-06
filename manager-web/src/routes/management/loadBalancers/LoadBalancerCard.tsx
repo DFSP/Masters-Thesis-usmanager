@@ -43,7 +43,7 @@ const LoadBalancerCard = ({loadBalancer}: Props) => (
                     hoverable>
     <CardItem key={'hostname'}
               label={'Hostname'}
-              value={loadBalancer.hostname}/>
+              value={loadBalancer.publicIpAddress}/>
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${loadBalancer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>

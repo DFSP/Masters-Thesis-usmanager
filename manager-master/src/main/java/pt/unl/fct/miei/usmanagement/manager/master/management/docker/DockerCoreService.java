@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh.SshService;
 
 import java.util.Base64;
@@ -48,14 +49,14 @@ public class DockerCoreService {
 		this.sshService = sshService;
 		String dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		String dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
-		var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
+		byte[] auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
 		this.dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
 		this.dockerApiPort = dockerProperties.getApiProxy().getPort();
 		this.dockerScriptFile = dockerProperties.getInstallScript();
 	}
 
-	public DockerClient getDockerClient(String hostname) {
-		String uri = String.format("http://%s:%d", hostname, dockerApiPort);
+	public DockerClient getDockerClient(HostAddress hostAddress) {
+		String uri = String.format("http://%s:%d", hostAddress.getPublicIpAddress(), dockerApiPort);
 		return DefaultDockerClient.builder()
 			.uri(uri)
 			.header("Authorization", dockerAuthorization)
@@ -64,10 +65,10 @@ public class DockerCoreService {
 			.build();
 	}
 
-	public void installDocker(String hostname) {
-		sshService.uploadFile(hostname, dockerScriptFile);
+	public void installDocker(HostAddress hostAddress) {
+		sshService.uploadFile(hostAddress, dockerScriptFile);
 		String installDockerCommand = String.format("sh %s", dockerScriptFile);
-		sshService.executeCommand(hostname, installDockerCommand);
+		sshService.executeCommand(installDockerCommand, hostAddress);
 	}
 
 }

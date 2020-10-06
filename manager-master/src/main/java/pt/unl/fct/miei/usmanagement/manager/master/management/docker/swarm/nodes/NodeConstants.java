@@ -32,6 +32,7 @@ public final class NodeConstants {
 	public static final class Label {
 
 		public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
+		public static final String USERNAME = "username";
 
 	}
 

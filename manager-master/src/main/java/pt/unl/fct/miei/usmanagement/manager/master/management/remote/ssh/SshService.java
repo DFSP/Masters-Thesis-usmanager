@@ -33,6 +33,7 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.xfer.FileSystemFile;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
@@ -81,36 +82,38 @@ public class SshService {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
 
-	private SSHClient initClient(String hostname) throws IOException {
+	private SSHClient initClient(HostAddress hostAddress) throws IOException {
 		String username;
 		String publicKeyFile;
 		try {
-			EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
-			username = edgeHostEntity.getUsername();
-			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
+			username = edgeHost.getUsername();
+			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
 			username = awsUser;
 			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
 		}
-		return initClient(username, hostname, new File(publicKeyFile));
+		return initClient(hostAddress, username, new File(publicKeyFile));
 	}
 
-	private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
-		var sshClient = new SSHClient();
+	private SSHClient initClient(HostAddress hostAddress, String username, File publicKeyFile) throws IOException {
+		String hostname = hostAddress.getPublicIpAddress();
+		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-		log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
+		log.info("Logging in to host '{}@{}' using key {}", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
-		var keyFile = new PKCS8KeyFile();
+		PKCS8KeyFile keyFile = new PKCS8KeyFile();
 		keyFile.init(publicKeyFile);
 		sshClient.authPublickey(username, keyFile);
 		log.info("Logged in to host '{}@{}'", username, hostname);
 		return sshClient;
 	}
 
-	private SSHClient initClient(String hostname, String username, String password) throws IOException {
-		var sshClient = new SSHClient();
+	private SSHClient initClient(HostAddress hostAddress, String username, String password) throws IOException {
+		String hostname = hostAddress.getPublicIpAddress();
+		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 		log.info("Logging in to host '{}@{}' using password", username, hostname);
@@ -120,15 +123,15 @@ public class SshService {
 		return sshClient;
 	}
 
-	public void uploadFile(String hostname, String filename) {
-		try (SSHClient sshClient = initClient(hostname);
+	public void uploadFile(HostAddress hostAddress, String filename) {
+		try (SSHClient sshClient = initClient(hostAddress);
 			 SFTPClient sftpClient = sshClient.newSFTPClient()) {
 			String scriptPath = scriptPaths.get(filename);
 			if (scriptPath == null) {
 				throw new EntityNotFoundException(File.class, "name", filename);
 			}
-			var file = new File(scriptPath);
-			log.info("Transferring file {} to host {}", filename, hostname);
+			File file = new File(scriptPath);
+			log.info("Transferring file {} to host {}", filename, hostAddress);
 			sftpClient.put(new FileSystemFile(file), filename);
 		}
 		catch (IOException e) {
@@ -137,44 +140,44 @@ public class SshService {
 		}
 	}
 
-	public SshCommandResult executeCommand(String hostname, String command) {
-		try (SSHClient sshClient = initClient(hostname);
+	public SshCommandResult executeCommand(String command, HostAddress hostAddress) {
+		try (SSHClient sshClient = initClient(hostAddress);
 			 Session session = sshClient.startSession()) {
-			return executeCommand(session, hostname, command);
+			return executeCommand(session, hostAddress, command);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
+			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}
 
-	public SshCommandResult executeCommand(String hostname, String username, String password, String command) {
-		try (SSHClient sshClient = initClient(hostname, username, password);
+	public SshCommandResult executeCommand(HostAddress hostAddress, String username, String password, String command) {
+		try (SSHClient sshClient = initClient(hostAddress, username, password);
 			 Session session = sshClient.startSession()) {
-			return executeCommand(session, hostname, command);
+			return executeCommand(session, hostAddress, command);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
+			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}
 
-	private SshCommandResult executeCommand(Session session, String hostname, String command) throws IOException {
-		log.info("Executing: {}, at host {}", command, hostname);
+	private SshCommandResult executeCommand(Session session, HostAddress hostAddress, String command) throws IOException {
+		log.info("Executing: {}, at host {}", command, hostAddress);
 		Session.Command cmd = session.exec(command);
 		cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
 		int exitStatus = cmd.getExitStatus();
 		List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
 		List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));
 		log.info("Command exited with\nstatus: {}\noutput: {}\nerror: {}", exitStatus, output, error);
-		return new SshCommandResult(hostname, command, exitStatus, output, error);
+		return new SshCommandResult(hostAddress, command, exitStatus, output, error);
 	}
 
-	public boolean hasConnection(String hostname) {
-		log.info("Checking connectivity to {}", hostname);
-		try (SSHClient client = initClient(hostname);
+	public boolean hasConnection(HostAddress hostAddress) {
+		log.info("Checking connectivity to {}", hostAddress);
+		try (SSHClient client = initClient(hostAddress);
 			 Session ignored = client.startSession()) {
-			log.info("Successfully connected to {}", hostname);
+			log.info("Successfully connected to {}", hostAddress);
 			return true;
 		}
 		catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
@@ -183,7 +186,7 @@ public class SshService {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("Failed to connect to {}", hostname);
+		log.info("Failed to connect to {}", hostAddress);
 		return false;
 	}
 

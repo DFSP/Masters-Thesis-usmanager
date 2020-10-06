@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.node
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.Map;
 
@@ -35,7 +36,7 @@ import java.util.Map;
 public final class SimpleNode {
 
 	private final String id;
-	private final String hostname;
+	private final String publicIpAddress;
 	private final NodeAvailability availability;
 	private final NodeRole role;
 	private final long version;
@@ -45,6 +46,17 @@ public final class SimpleNode {
 	@JsonIgnore
 	public String getPrivateIpAddress() {
 		return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+	}
+
+	public String getUsername() {
+		return labels.get(NodeConstants.Label.USERNAME);
+	}
+
+	@JsonIgnore
+	public HostAddress getHostAddress() {
+		final String username = getUsername();
+		final String privateIpAddress = getPrivateIpAddress();
+		return new HostAddress(username, publicIpAddress, privateIpAddress);
 	}
 
 }

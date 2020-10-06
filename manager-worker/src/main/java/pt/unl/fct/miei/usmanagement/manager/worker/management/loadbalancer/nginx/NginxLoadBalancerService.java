@@ -67,15 +67,15 @@ public class NginxLoadBalancerService {
 		this.headers = new HttpHeaders();
 		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
-		var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
-		var basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
+		byte[] auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
+		String basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
 		this.headers.add("Authorization", basicAuthorization);
 		this.restTemplate = new RestTemplate();
 	}
 
 	private ContainerEntity launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
 											   String region, String country, String city) {
-		var environment = List.of(
+		List<String> environment = List.of(
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1, serverAddr),
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1_CONTINENT, continent),
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1_REGION, region),
@@ -84,7 +84,7 @@ public class NginxLoadBalancerService {
 			String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername),
 			String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword)
 		);
-		var labels = Map.of(
+		Map<String, String> labels = Map.of(
 			ContainerConstants.Label.FOR_SERVICE, serviceName
 		);
 		return containersService.launchContainer(hostname, LOAD_BALANCER, environment, labels);
@@ -105,10 +105,10 @@ public class NginxLoadBalancerService {
 			loadBalancers = List.of(container);
 		}
 		loadBalancers.forEach(loadBalancer -> {
-			String loadBalancerHostname = loadBalancer.getHostname();
+			String loadBalancerHostname = loadBalancer.getHostAddress().getPublicIpAddress();
 			int loadBalancerPort = loadBalancer.getPorts().get(0).getPublicPort();
-			var loadBalancerUrl = String.format("%s:%s", loadBalancerHostname, loadBalancerPort);
-			var nginxServer = new NginxServer(serverAddr, continent, region, country, city);
+			String loadBalancerUrl = String.format("%s:%s", loadBalancerHostname, loadBalancerPort);
+			NginxServer nginxServer = new NginxServer(serverAddr, continent, region, country, city);
 			String url = String.format("http://%s%s/servers", loadBalancerUrl, nginxApiUrl);
 			HttpEntity<NginxServer> request = new HttpEntity<>(nginxServer, headers);
 			ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.POST, request, Message.class);
@@ -126,7 +126,7 @@ public class NginxLoadBalancerService {
 	}
 
 	public void removeContainerFromLoadBalancer(String containerId) {
-		log.info("Removing container '{}' from load balancer", containerId);
+		log.info("Removing container {} from load balancer", containerId);
 		Map<String, String> labels = containersService.getContainer(containerId).getLabels();
 		String serviceType = labels.get(ContainerConstants.Label.SERVICE_TYPE);
 		String serviceName = labels.get(ContainerConstants.Label.SERVICE_NAME);
@@ -144,7 +144,7 @@ public class NginxLoadBalancerService {
 		loadBalancers.forEach(loadBalancer -> {
 			String url = String.format("http://%s%s/servers",
 				loadBalancer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS), nginxApiUrl);
-			var server = new NginxSimpleServer(serverAddress);
+			NginxSimpleServer server = new NginxSimpleServer(serverAddress);
 			HttpEntity<NginxSimpleServer> request = new HttpEntity<>(server, headers);
 			ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.DELETE, request, Message.class);
 			Message responseBody = response.getBody();

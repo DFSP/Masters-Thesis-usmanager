@@ -68,7 +68,7 @@ public class ComponentTypesService {
 	}
 
 	public ComponentTypeEntity updateComponentType(String componentTypeName, ComponentTypeEntity newComponentType) {
-		var componentType = getComponentType(componentTypeName);
+		ComponentTypeEntity componentType = getComponentType(componentTypeName);
 		log.info("Updating componentType {} with {}",
 			ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
 		log.info("ComponentType before copying properties: {}",
@@ -81,12 +81,12 @@ public class ComponentTypesService {
 	}
 
 	public void deleteComponentType(String componentTypeName) {
-		var componentType = getComponentType(componentTypeName);
+		ComponentTypeEntity componentType = getComponentType(componentTypeName);
 		componentTypes.delete(componentType);
 	}
 
 	private void assertComponentTypeDoesntExist(ComponentTypeEntity componentType) {
-		var componentTypeName = componentType.getType().name();
+		String componentTypeName = componentType.getType().name();
 		if (componentTypes.hasComponentType(componentTypeName)) {
 			throw new DataIntegrityViolationException("Component type '" + componentTypeName + "' already exists");
 		}

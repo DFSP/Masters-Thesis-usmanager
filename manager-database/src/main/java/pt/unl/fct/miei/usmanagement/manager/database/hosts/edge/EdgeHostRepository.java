@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
@@ -48,6 +49,12 @@ public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> 
 
 	Optional<EdgeHostEntity> findByPublicDnsNameOrPublicIpAddress(@Param("publicDnsName") String publicDnsName,
 																  @Param("publicIpAddress") String publicIpAddress);
+
+	@Query("select h "
+		+ "from EdgeHostEntity h "
+		+ "where h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
+	Optional<EdgeHostEntity> findByAddress(@Param("publicIpAddress") String publicIpAddress,
+										   @Param("privateIpAddress") String privateIpAddress);
 
 	List<EdgeHostEntity> findByRegion(@Param("region") RegionEntity region);
 

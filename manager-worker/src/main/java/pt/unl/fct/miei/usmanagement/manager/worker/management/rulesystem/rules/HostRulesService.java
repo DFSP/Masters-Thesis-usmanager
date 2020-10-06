@@ -144,7 +144,7 @@ public class HostRulesService {
 
 	public HostDecisionResult executeHostRules(String hostname, Map<String, Double> fields) {
 		log.info("Running host rules at {} for fields {}", hostname, fields);
-		var hostEvent = new HostEvent(hostname);
+		HostEvent hostEvent = new HostEvent(hostname);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 		hostsMonitoringService.getHostMonitoring(hostname)
 			.stream()
@@ -179,7 +179,7 @@ public class HostRulesService {
 
 	private List<Rule> generateHostRules(String hostname) {
 		List<HostRuleEntity> hostRules = getRules(hostname);
-		var rules = new ArrayList<Rule>(hostRules.size());
+		List<Rule> rules = new ArrayList<>(hostRules.size());
 		log.info("Generating host rules... (count: {})", rules.size());
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
 		return rules;

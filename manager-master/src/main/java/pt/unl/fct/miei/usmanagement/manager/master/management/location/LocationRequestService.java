@@ -97,10 +97,9 @@ public class LocationRequestService {
 		return locationMonitoringResponses;
 	}
 
-	public Map<String, HostDetails> getBestLocationToStartServices(
-		Map<String, List<ServiceDecisionResult>> allServicesDecisions, int secondsFromLastRun) {
-		Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> servicesLocationMonitoring = getLocationMonitoring(
-			secondsFromLastRun);
+	public Map<String, HostDetails> findHostsToStartServices(Map<String, List<ServiceDecisionResult>> allServicesDecisions,
+															 int secondsFromLastRun) {
+		Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> servicesLocationMonitoring = getLocationMonitoring(secondsFromLastRun);
 		Map<String, HostDetails> finalLocations = new HashMap<>();
 		for (Entry<String, List<ServiceDecisionResult>> services : allServicesDecisions.entrySet()) {
 			String serviceName = services.getKey();
@@ -127,7 +126,7 @@ public class LocationRequestService {
 		List<LocationMonitoringResponse> allLocationMonitoringData = new ArrayList<>();
 
 		for (SimpleNode node : nodes) {
-			String hostname = node.getHostname();
+			String hostname = node.getPublicIpAddress();
 			allLocationMonitoringData.addAll(getAllMonitoringDataTop(hostname, seconds));
 		}
 		for (LocationMonitoringResponse locationMonitoringResponse : allLocationMonitoringData) {
@@ -204,11 +203,6 @@ public class LocationRequestService {
 				String region = hostLocation.getRegion();
 				String country = hostLocation.getCountry();
 				String city = hostLocation.getCity();
-        /*if (locationDetails instanceof EdgeHostDetails) {
-          final var edgeHostDetails = (EdgeHostDetails)locationDetails;
-          country = edgeHostDetails.getCountry();
-          city = edgeHostDetails.getCity();
-        }*/
 				int runningContainerOnRegion = locationsbyRunningContainers.getOrDefault(region, 0);
 				int runningContainerOnCountry = locationsbyRunningContainers.getOrDefault(region + "_" + country, 0);
 				int runingContainersOnLocal = locationsbyRunningContainers.getOrDefault(locationReqCount.getKey(), 0);

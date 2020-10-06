@@ -129,7 +129,7 @@ public class HostDecisionsService {
 	}
 
 	public void processDecisions(Map<String, Map<String, Double>> hostsMonitoring) {
-		var hostsDecisions = new LinkedList<HostDecisionResult>();
+		List<HostDecisionResult> hostsDecisions = new LinkedList<>();
 		for (Map.Entry<String, Map<String, Double>> hostFields : hostsMonitoring.entrySet()) {
 			String hostname = hostFields.getKey();
 			Map<String, Double> fields = hostFields.getValue();
@@ -137,11 +137,11 @@ public class HostDecisionsService {
 			hostsDecisions.add(hostDecisionResult);
 		}
 		log.info("Processing host decisions...");
-		var relevantHostDecisions = new LinkedList<HostDecisionResult>();
+		List<HostDecisionResult> relevantHostDecisions = new LinkedList<>();
 		for (HostDecisionResult hostDecision : hostsDecisions) {
 			String hostname = hostDecision.getHostname();
 			RuleDecision decision = hostDecision.getDecision();
-			log.info("Hostname '{}' had decision '{}'", hostname, decision);
+			log.info("Hostname {} had decision {}", hostname, decision);
 			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, this.getDecision(decision.toString()));
 			int hostEventCount = hostEvent.getCount();
 			if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)

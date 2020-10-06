@@ -840,3 +840,47 @@ select.no-validation-field ~ input.select-dropdown {
     font-size: 25px !important;
     padding-top: 5px;
 }
+
+.custom-context-menu {
+    width: auto;
+    height: auto;
+    z-index: 999;
+    line-height: 20px;
+    background: #282828;
+}
+
+.custom-context-menu:focus {
+    outline: none;
+}
+
+.custom-context-menu-item-disable,
+.custom-context-menu-item {
+    margin: 8px;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.custom-context-menu-item:hover {
+    background: #36393F;
+    cursor: pointer;
+}
+
+.custom-context-menu-item-disable:active,
+.custom-context-menu-item:active {
+    border: unset;
+}
+
+.custom-context-menu-item-disable:focus,
+.custom-context-menu-item:focus {
+    outline: none;
+}
+
+.custom-context-menu-item-disable {
+    color: grey !important;
+}
+
+.custom-context-menu-item-divider {
+    border-top: 1px solid #36393F;
+    margin: 0 8px;
+}
+

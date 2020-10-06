@@ -33,12 +33,13 @@ import javax.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 @UtilityClass
 public class ObjectUtils {
 
 	public void copyValidProperties(Object source, Object target) {
-		var ignoreProperties = new LinkedList<String>();
+		List<String> ignoreProperties = new LinkedList<>();
 		ignoreProperties.add("id");
 		// loop to include super classes except Object
 		for (Class<?> current = target.getClass(); current.getSuperclass() != null; current = current.getSuperclass()) {

@@ -146,7 +146,7 @@ public class ContainerSimulatedMetricsService {
 	}
 
 	private void assertContainerSimulatedMetricDoesntExist(ContainerSimulatedMetricEntity containerSimulatedMetric) {
-		var name = containerSimulatedMetric.getName();
+		String name = containerSimulatedMetric.getName();
 		if (containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated container metric '" + name + "' already exists");
 		}
@@ -172,7 +172,7 @@ public class ContainerSimulatedMetricsService {
 	}
 
 	private Double randomizeFieldValue(ContainerSimulatedMetricEntity metric) {
-		var random = new Random();
+		Random random = new Random();
 		double minValue = metric.getMinimumValue();
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();

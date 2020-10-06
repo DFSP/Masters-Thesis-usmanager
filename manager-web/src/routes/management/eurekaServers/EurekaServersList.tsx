@@ -65,7 +65,7 @@ class EurekaServersList extends BaseComponent<Props, {}> {
     <EurekaServerCard key={eurekaServer.containerId} eurekaServer={eurekaServer}/>;
 
   private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
-    eurekaServer.hostname.toLowerCase().includes(search);
+    eurekaServer.publicIpAddress.toLowerCase().includes(search);
 
 }
 

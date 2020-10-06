@@ -91,11 +91,11 @@ public class DatabaseLoader {
 								   DockerProperties dockerProperties) {
 		return args -> {
 
-			var dockerHubUsername = dockerProperties.getHub().getUsername();
+			String dockerHubUsername = dockerProperties.getHub().getUsername();
 
 			// users
 			if (!usersService.hasUser("admin")) {
-				var sysAdmin = UserEntity.builder()
+				UserEntity sysAdmin = UserEntity.builder()
 					.firstName("admin")
 					.lastName("admin")
 					.username("admin")
@@ -544,147 +544,147 @@ public class DatabaseLoader {
 
 			// service dependencies
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), eurekaServer.getServiceName())) {
-				var frontendEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity frontendEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(frontendEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), user.getServiceName())) {
-				var frontendUserDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity frontendUserDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
 					.dependency(user)
 					.build();
 				servicesDependencies.save(frontendUserDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), catalogue.getServiceName())) {
-				var frontendCatalogueDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity frontendCatalogueDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
 					.dependency(catalogue)
 					.build();
 				servicesDependencies.save(frontendCatalogueDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), payment.getServiceName())) {
-				var frontendPaymentDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity frontendPaymentDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
 					.dependency(payment)
 					.build();
 				servicesDependencies.save(frontendPaymentDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), carts.getServiceName())) {
-				var frontendCartsDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity frontendCartsDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
 					.dependency(carts)
 					.build();
 				servicesDependencies.save(frontendCartsDependency);
 			}
 			if (!servicesDependencies.hasDependency(user.getServiceName(), eurekaServer.getServiceName())) {
-				var userEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity userEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(user)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(userEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(user.getServiceName(), userDb.getServiceName())) {
-				var userUserDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity userUserDbDependency = ServiceDependencyEntity.builder()
 					.service(user)
 					.dependency(userDb)
 					.build();
 				servicesDependencies.save(userUserDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), eurekaServer.getServiceName())) {
-				var catalogueEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity catalogueEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(catalogue)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(catalogueEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), catalogueDb.getServiceName())) {
-				var catalogueCatalogueDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity catalogueCatalogueDbDependency = ServiceDependencyEntity.builder()
 					.service(catalogue)
 					.dependency(catalogueDb)
 					.build();
 				servicesDependencies.save(catalogueCatalogueDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(payment.getServiceName(), eurekaServer.getServiceName())) {
-				var paymentEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity paymentEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(payment)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(paymentEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(carts.getServiceName(), eurekaServer.getServiceName())) {
-				var cartsEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity cartsEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(carts)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(cartsEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(carts.getServiceName(), cartsDb.getServiceName())) {
-				var cartsCartsDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity cartsCartsDbDependency = ServiceDependencyEntity.builder()
 					.service(carts)
 					.dependency(cartsDb)
 					.build();
 				servicesDependencies.save(cartsCartsDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), eurekaServer.getServiceName())) {
-				var ordersEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity ordersEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(orders)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(ordersEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), payment.getServiceName())) {
-				var ordersPaymentDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity ordersPaymentDependency = ServiceDependencyEntity.builder()
 					.service(orders)
 					.dependency(payment)
 					.build();
 				servicesDependencies.save(ordersPaymentDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), shipping.getServiceName())) {
-				var ordersShippingDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity ordersShippingDependency = ServiceDependencyEntity.builder()
 					.service(orders)
 					.dependency(shipping)
 					.build();
 				servicesDependencies.save(ordersShippingDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), ordersDb.getServiceName())) {
-				var ordersOrdersDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity ordersOrdersDbDependency = ServiceDependencyEntity.builder()
 					.service(orders)
 					.dependency(ordersDb)
 					.build();
 				servicesDependencies.save(ordersOrdersDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(shipping.getServiceName(), eurekaServer.getServiceName())) {
-				var shippingEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity shippingEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(shipping)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(shippingEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(shipping.getServiceName(), rabbitmq.getServiceName())) {
-				var shippingRabbitmqDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity shippingRabbitmqDependency = ServiceDependencyEntity.builder()
 					.service(shipping)
 					.dependency(rabbitmq)
 					.build();
 				servicesDependencies.save(shippingRabbitmqDependency);
 			}
 			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), eurekaServer.getServiceName())) {
-				var queueMasterEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity queueMasterEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(queueMaster)
 					.dependency(eurekaServer)
 					.build();
 				servicesDependencies.save(queueMasterEurekaServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), rabbitmq.getServiceName())) {
-				var queueMasterRabbitmqDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity queueMasterRabbitmqDependency = ServiceDependencyEntity.builder()
 					.service(queueMaster)
 					.dependency(rabbitmq)
 					.build();
 				servicesDependencies.save(queueMasterRabbitmqDependency);
 			}
 			if (!servicesDependencies.hasDependency(rabbitmq.getServiceName(), eurekaServer.getServiceName())) {
-				var rabbitmqEurekaServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependencyEntity rabbitmqEurekaServerDependency = ServiceDependencyEntity.builder()
 					.service(rabbitmq)
 					.dependency(eurekaServer)
 					.build();
@@ -1129,12 +1129,12 @@ public class DatabaseLoader {
 					.build();
 				cpuAndRamOver90GenericHostRule = hostRulesService.addRule(cpuAndRamOver90GenericHostRule);
 
-				var cpuOver90Condition = HostRuleConditionEntity.builder()
+				HostRuleConditionEntity cpuOver90Condition = HostRuleConditionEntity.builder()
 					.hostRule(cpuAndRamOver90GenericHostRule)
 					.hostCondition(cpuPercentageOver90)
 					.build();
 				hostRuleConditions.save(cpuOver90Condition);
-				var ramOver90Condition = HostRuleConditionEntity.builder()
+				HostRuleConditionEntity ramOver90Condition = HostRuleConditionEntity.builder()
 					.hostRule(cpuAndRamOver90GenericHostRule)
 					.hostCondition(ramPercentageOver90)
 					.build();
@@ -1153,7 +1153,7 @@ public class DatabaseLoader {
 					.generic(true)
 					.build();
 				rxOver500000GenericServiceRule = serviceRulesService.addRule(rxOver500000GenericServiceRule);
-				var rxOver500000Condition = ServiceRuleConditionEntity.builder()
+				ServiceRuleConditionEntity rxOver500000Condition = ServiceRuleConditionEntity.builder()
 					.serviceRule(rxOver500000GenericServiceRule)
 					.serviceCondition(rxBytesPerSecOver500000)
 					.build();

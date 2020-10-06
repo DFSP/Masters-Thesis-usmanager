@@ -94,19 +94,19 @@ public class WorkerManagersService {
 	}
 
 	private ContainerEntity launchWorkerManager(String hostname, String id) {
-		var environment = new LinkedList<>(List.of(
+		List<String> environment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.ID + "=" + id,
 			ContainerConstants.Environment.MASTER + "=" + hostsService.getHostAddress().getPublicIpAddress()));
 		return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
 
 	public void deleteWorkerManager(String workerManagerId) {
-		var workerManager = getWorkerManager(workerManagerId);
+		WorkerManagerEntity workerManager = getWorkerManager(workerManagerId);
 		containersService.stopContainer(workerManager.getContainer().getContainerId());
 	}
 
 	public void deleteWorkerManagerByContainer(ContainerEntity container) {
-		var workerManager = getWorkerManager(container);
+		WorkerManagerEntity workerManager = getWorkerManager(container);
 		workerManagers.delete(workerManager);
 	}
 
@@ -139,7 +139,7 @@ public class WorkerManagersService {
 	}
 
 	public void unassignHosts(String workerManagerId, List<String> hosts) {
-		var workerManager = getWorkerManager(workerManagerId);
+		WorkerManagerEntity workerManager = getWorkerManager(workerManagerId);
 		log.info("Removing hosts {}", hosts);
 		hosts.forEach(host -> {
 			try {

@@ -65,8 +65,8 @@ public class DockerApiProxyService {
 		ServiceType serviceType = dockerApiProxy.getServiceType();
 		String externalPort = dockerApiProxy.getDefaultExternalPort();
 		String internalPort = dockerApiProxy.getDefaultInternalPort();
-		var dockerRepository = dockerApiProxy.getDockerRepository();
-		var command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
+		String dockerRepository = dockerApiProxy.getDockerRepository();
+		String command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
 				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
 				+ "docker pull %s && "
@@ -80,7 +80,7 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
 			ContainerConstants.Label.SERVICE_TYPE, serviceType,
 			ContainerConstants.Label.SERVICE_ADDRESS, hostname, externalPort,
-			ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
+			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostname,
 			ContainerConstants.Label.IS_STOPPABLE, false,
 			ContainerConstants.Label.IS_REPLICABLE, false,
 			dockerRepository);

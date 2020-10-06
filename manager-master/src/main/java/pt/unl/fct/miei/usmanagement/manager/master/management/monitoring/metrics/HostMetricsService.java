@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metric
 
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
@@ -52,17 +53,18 @@ public class HostMetricsService {
 		this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
 	}
 
-	public boolean nodeHasAvailableResources(String hostname, double avgContainerMem) {
+	public boolean hostHasAvailableResources(HostAddress hostAddress, double avgContainerMem) {
+		String hostname = hostAddress.getPublicIpAddress();
 		double totalRam = prometheusService.getTotalMemory(hostname);
 		double availableRam = prometheusService.getAvailableMemory(hostname);
 		//double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
-		final var predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
+		double predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
 		//TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
 		return predictedRamUsage < maximumRamPercentage;
 	}
 
 	public Map<String, Double> getHostStats(String hostname) {
-		var fieldsValues = new HashMap<String, Double>();
+		Map<String, Double> fieldsValues = new HashMap<>();
 		double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
 		if (cpuPercentage != -1) {
 			// just to make sure cpu-% is a valid field name

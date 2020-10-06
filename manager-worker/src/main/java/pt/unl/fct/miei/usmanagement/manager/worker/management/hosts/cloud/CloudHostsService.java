@@ -83,15 +83,6 @@ public class CloudHostsService {
 			new EntityNotFoundException(CloudHostEntity.class, "id", id.toString()));
 	}
 
-	public CloudHostEntity getCloudHost(Long id) {
-		try {
-			return cloudHosts.getOne(id);
-		}
-		catch (javax.persistence.EntityNotFoundException e) {
-			throw new EntityNotFoundException(CloudHostEntity.class, "id", id.toString());
-		}
-	}
-
 	public CloudHostEntity getCloudHostByInstanceId(String instanceId) {
 		return cloudHosts.findByInstanceId(instanceId).orElseThrow(() ->
 			new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));

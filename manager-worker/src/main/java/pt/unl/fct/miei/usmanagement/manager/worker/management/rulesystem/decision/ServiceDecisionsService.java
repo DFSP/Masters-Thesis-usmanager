@@ -157,7 +157,7 @@ public class ServiceDecisionsService {
 	}
 
 	public void processDecisions(Map<ContainerEntity, Map<String, Double>> servicesMonitoring, int secondsFromLastRun) {
-		var servicesDecisions = new HashMap<String, List<ServiceDecisionResult>>();
+		Map<String, List<ServiceDecisionResult>> servicesDecisions = new HashMap<>();
 		for (Map.Entry<ContainerEntity, Map<String, Double>> serviceFields : servicesMonitoring.entrySet()) {
 			ContainerEntity container = serviceFields.getKey();
 			String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
@@ -176,13 +176,13 @@ public class ServiceDecisionsService {
 			}
 		}
 		log.info("Processing container decisions...");
-		var relevantServicesDecisions = new HashMap<String, List<ServiceDecisionResult>>();
+		Map<String, List<ServiceDecisionResult>> relevantServicesDecisions = new HashMap<>();
 		for (List<ServiceDecisionResult> containerDecisions : servicesDecisions.values()) {
 			for (ServiceDecisionResult containerDecision : containerDecisions) {
 				String serviceName = containerDecision.getServiceName();
 				String containerId = containerDecision.getContainerId();
 				RuleDecision decision = containerDecision.getDecision();
-				log.info("Service '{}' on container '{}' had decision '{}'", serviceName, containerId, decision);
+				log.info("Service {} on container {} had decision {}", serviceName, containerId, decision);
 				ServiceEventEntity serviceEvent =
 					servicesEventsService.saveServiceEvent(containerId, serviceName, this.getDecision(decision.toString()));
 				int serviceEventCount = serviceEvent.getCount();
@@ -268,12 +268,12 @@ public class ServiceDecisionsService {
 		HostLocation hostLocation;
 		if (servicesLocations.containsKey(serviceName)) {
 			hostLocation = servicesLocations.get(serviceName).getHostLocation();
-			log.info("Starting container for service '{}'. Location from request-location-monitor: '{}' ({})", serviceName,
+			log.info("Starting container for service {}. Location from request-location-monitor: {} ({})", serviceName,
 				hostname, hostLocation.getRegion());
 		}
 		else {
 			hostLocation = hostsService.getHostDetails(hostname).getHostLocation();
-			log.info("Starting container for service '{}'. Location: '{}' ({})", serviceName, hostname,
+			log.info("Starting container for service {}. Location: {} ({})", serviceName, hostname,
 				hostLocation.getRegion());
 		}
 		double expectedMemoryConsumption = servicesService.getService(serviceName).getExpectedMemoryConsumption();

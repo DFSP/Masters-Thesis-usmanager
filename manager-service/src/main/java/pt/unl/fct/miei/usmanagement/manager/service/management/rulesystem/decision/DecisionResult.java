@@ -22,30 +22,38 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import styles from './ActionLoadingSpinner.module.css';
+package pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision;
 
-interface LoadingProgressProps {
-  loading: boolean;
-  backgroundColor?: string;
-  progressBarColor?: string;
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostDetails;
+
+import java.util.Map;
+
+@Data
+public class DecisionResult implements Comparable<DecisionResult> {
+
+	private final HostDetails hostDetails;
+	private final RuleDecision decision;
+	private final long ruleId;
+	private final Map<String, Double> fields;
+	private final int priority;
+	private final double sumFields;
+
+	@Override
+	public int compareTo(DecisionResult o) {
+		if (this.getDecision() == o.getDecision()) {
+			if (this.getPriority() == o.getPriority()) {
+				return this.getSumFields() < o.getSumFields() ? -1 : 1;
+			}
+			else {
+				return this.getPriority() < o.getPriority() ? -1 : 1;
+			}
+		}
+		else {
+			return this.getDecision() == RuleDecision.START
+				|| (this.getDecision() == RuleDecision.STOP && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
+		}
+	}
+
 }
-
-const ActionProgressBar: React.FC<LoadingProgressProps> = (props: LoadingProgressProps) =>
-  <div className={styles.container}>
-    <div className="progress"
-         style={{backgroundColor: props.progressBarColor ? props.progressBarColor : '#36393F'}}>
-      {props.loading
-        ?
-        <div className="indeterminate"
-             style={{backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'}}/>
-        :
-        <div className="determinate"
-             style={{
-               width: '100%',
-               backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'
-             }}/>}
-    </div>
-  </div>;
-
-export default ActionProgressBar;

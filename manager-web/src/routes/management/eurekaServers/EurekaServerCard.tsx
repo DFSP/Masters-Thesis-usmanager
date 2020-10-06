@@ -43,7 +43,7 @@ const EurekaServerCard = ({eurekaServer}: Props) => (
                     hoverable>
     <CardItem key={'hostname'}
               label={'Hostname'}
-              value={eurekaServer.hostname}/>
+              value={eurekaServer.publicIpAddress}/>
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${eurekaServer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>

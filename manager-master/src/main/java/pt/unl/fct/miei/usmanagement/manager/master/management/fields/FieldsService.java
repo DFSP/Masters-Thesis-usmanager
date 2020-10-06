@@ -66,7 +66,7 @@ public class FieldsService {
 	}
 
 	public FieldEntity updateField(String fieldName, FieldEntity newField) {
-		var field = getField(fieldName);
+		FieldEntity field = getField(fieldName);
 		log.info("Updating field {} with {}",
 			ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
 		log.info("Field before copying properties: {}",
@@ -79,12 +79,12 @@ public class FieldsService {
 	}
 
 	public void deleteField(String fieldName) {
-		var field = getField(fieldName);
+		FieldEntity field = getField(fieldName);
 		fields.delete(field);
 	}
 
 	private void assertFieldDoesntExist(FieldEntity field) {
-		var fieldName = field.getName();
+		String fieldName = field.getName();
 		if (fields.hasField(fieldName)) {
 			throw new DataIntegrityViolationException("Field '" + fieldName + "' already exists");
 		}

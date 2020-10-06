@@ -138,7 +138,7 @@ class WorkerManager extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IWorkerManager>): void => {
     const workerManager = reply.data;
-    const hostname = workerManager.container.hostname;
+    const hostname = workerManager.container.publicIpAddress;
     super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${hostname}</span>`);
     this.props.addWorkerManager(workerManager);
     this.saveEntities(workerManager);
@@ -233,7 +233,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     container.containerId;
 
   private containerHostnameField = (container: IContainer) =>
-    container.hostname;
+    container.publicIpAddress;
 
   private workerManager = () => {
     const {isLoading, error, newWorkerManager} = this.props;

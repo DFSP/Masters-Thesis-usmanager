@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decisi
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
 import java.util.HashMap;
@@ -40,14 +41,13 @@ public final class ServiceDecisionResult extends DecisionResult {
 	private final String containerId;
 	private final String serviceName;
 
-	public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName) {
-		this(serviceHostname, containerId, serviceName, RuleDecision.NONE, 0, new HashMap<>(), 0);
+	public ServiceDecisionResult(HostAddress hostAddress, String containerId, String serviceName) {
+		this(hostAddress, containerId, serviceName, RuleDecision.NONE, 0, new HashMap<>(), 0);
 	}
 
-	public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName, RuleDecision decision,
+	public ServiceDecisionResult(HostAddress hostAddress, String containerId, String serviceName, RuleDecision decision,
 								 long ruleId, Map<String, Double> fields, int priority) {
-		super(serviceHostname, decision, ruleId, fields, priority,
-			fields.values().stream().mapToDouble(Double::doubleValue).sum());
+		super(hostAddress, decision, ruleId, fields, priority, fields.values().stream().mapToDouble(Double::doubleValue).sum());
 		this.containerId = containerId;
 		this.serviceName = serviceName;
 	}

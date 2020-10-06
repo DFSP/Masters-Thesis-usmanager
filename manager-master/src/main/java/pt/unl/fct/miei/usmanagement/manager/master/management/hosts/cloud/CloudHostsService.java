@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -99,6 +100,11 @@ public class CloudHostsService {
 	public CloudHostEntity getCloudHostByIdOrIp(String value) {
 		return cloudHosts.findByInstanceIdOrPublicIpAddress(value, value).orElseThrow(() ->
 			new EntityNotFoundException(CloudHostEntity.class, "value", value));
+	}
+
+	public CloudHostEntity getCloudHostByAddress(HostAddress address) {
+		return cloudHosts.findByAddress(address.getPublicIpAddress(), address.getPrivateIpAddress()).orElseThrow(() ->
+			new EntityNotFoundException(CloudHostEntity.class, "address", address.toString()));
 	}
 
 	private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {

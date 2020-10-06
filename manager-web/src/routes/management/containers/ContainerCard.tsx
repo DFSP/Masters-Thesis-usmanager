@@ -48,7 +48,7 @@ const ServiceCard = ({container}: Props) => (
               value={container.image}/>
     <CardItem key={'hostname'}
               label={'Hostname'}
-              value={container.hostname}/>
+              value={container.publicIpAddress}/>
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>

@@ -38,6 +38,7 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.Event;
@@ -90,7 +91,7 @@ public class DroolsService {
 		ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
 		StatelessKieSession serviceRuleSession = kieServices
 			.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
-		var agendaEventListener = new TrackingAgendaEventListener();
+		TrackingAgendaEventListener agendaEventListener = new TrackingAgendaEventListener();
 		serviceRuleSession.addEventListener(agendaEventListener);
 		serviceRuleSessions.put(serviceName, serviceRuleSession);
 	}
@@ -108,13 +109,13 @@ public class DroolsService {
 		ReleaseId releaseId = kieServices.getRepository().getDefaultReleaseId();
 		StatelessKieSession hostRuleSession = kieServices
 			.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
-		var agendaEventListener = new TrackingAgendaEventListener();
+		TrackingAgendaEventListener agendaEventListener = new TrackingAgendaEventListener();
 		hostRuleSession.addEventListener(agendaEventListener);
 		hostRuleSessions.put(hostname, hostRuleSession);
 	}
 
 	public Map<Long, String> executeDroolsRules(Event event, List<Rule> rules, String templateFile) {
-		var droolsRules = new HashMap<Long, String>();
+		Map<Long, String> droolsRules = new HashMap<>();
 		for (Rule rule : rules) {
 			String droolsRule = applyRuleTemplate(event, rule, templateFile);
 			droolsRules.put(rule.getId(), droolsRule);
@@ -123,13 +124,13 @@ public class DroolsService {
 	}
 
 	private String applyRuleTemplate(Event event, Rule rule, String templateFile) {
-		var data = Map.of(
+		Map<String, Object> data = Map.of(
 			"ruleId", rule.getId(),
 			"rule", rule,
 			"eventType", event.getClass().getName(),
 			"decision", RuleDecision.class.getSimpleName() + "." + rule.getDecision().toString(),
 			"priority", rule.getPriority());
-		final var ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
+		ByteArrayInputStream ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
 		return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);
 	}
 
@@ -137,8 +138,8 @@ public class DroolsService {
 	public String getRuleTemplate(String templateFile) {
 		log.info("Getting rule template...");
 		InputStream ruleTemplate = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFile);
-		var result = new ByteArrayOutputStream();
-		var buffer = new byte[1024];
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
 		try {
 			int length;
 			while ((length = ruleTemplate.read(buffer)) != -1) {
@@ -151,19 +152,19 @@ public class DroolsService {
 		return result.toString(StandardCharsets.UTF_8);
 	}
 
-	public ServiceDecisionResult evaluate(String serviceHostname, ContainerEvent event) {
-		var containerDecision = new Decision();
+	public ServiceDecisionResult evaluate(HostAddress hostAddress, ContainerEvent event) {
+		Decision containerDecision = new Decision();
 		String serviceName = event.getServiceName();
 		StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
 		serviceRuleSession.getGlobals().set("containerDecision", containerDecision);
 		serviceRuleSession.execute(event);
 		long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
-		return new ServiceDecisionResult(serviceHostname, event.getContainerId(), event.getServiceName(),
+		return new ServiceDecisionResult(hostAddress, event.getContainerId(), event.getServiceName(),
 			containerDecision.getDecision(), ruleId, event.getFields(), containerDecision.getPriority());
 	}
 
 	public HostDecisionResult evaluate(HostEvent event) {
-		var hostDecision = new Decision();
+		Decision hostDecision = new Decision();
 		String hostname = event.getHostname();
 		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostname);
 		hostRuleSession.getGlobals().set("hostDecision", hostDecision);

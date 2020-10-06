@@ -65,7 +65,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
 																	 HttpHeaders headers, HttpStatus status,
 																	 WebRequest request) {
-		var builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		builder.append(ex.getContentType());
 		builder.append(" media type is not supported. Supported media types are ");
 		ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
@@ -87,7 +87,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
 																		  HttpHeaders headers, HttpStatus status,
 																		  WebRequest request) {
-		var error = ex.getParameterName() + " parameter is missing";
+		String error = ex.getParameterName() + " parameter is missing";
 		return buildResponseEntity(
 			new ApiError(HttpStatus.BAD_REQUEST, error, ex)
 		);
@@ -159,7 +159,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
 																   HttpStatus status, WebRequest request) {
 		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-		var message = String.format("Could not find the %s method for URL %s", ex.getHttpMethod(), ex.getRequestURL());
+		String message = String.format("Could not find the %s method for URL %s", ex.getHttpMethod(), ex.getRequestURL());
 		apiError.setMessage(message);
 		apiError.setDebugMessage(ex.getMessage());
 		return buildResponseEntity(apiError);
@@ -222,7 +222,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
 																	  WebRequest request) {
 		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-		var message = String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
+		String message = String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
 			ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
 		apiError.setMessage(message);
 		apiError.setDebugMessage(ex.getMessage());

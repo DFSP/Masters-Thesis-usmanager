@@ -56,13 +56,13 @@ public class HostMetricsService {
 		double totalRam = prometheusService.getTotalMemory(hostname);
 		double availableRam = prometheusService.getAvailableMemory(hostname);
 		//double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
-		final var predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
+		double predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
 		//TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
 		return predictedRamUsage < maximumRamPercentage;
 	}
 
 	public Map<String, Double> getHostStats(String hostname) {
-		var fieldsValues = new HashMap<String, Double>();
+		Map<String, Double> fieldsValues = new HashMap<>();
 		double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
 		if (cpuPercentage != -1) {
 			// just to make sure cpu-% is a valid field name

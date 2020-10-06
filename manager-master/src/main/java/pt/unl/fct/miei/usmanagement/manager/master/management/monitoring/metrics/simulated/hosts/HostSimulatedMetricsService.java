@@ -183,7 +183,7 @@ public class HostSimulatedMetricsService {
 	}
 
 	private void assertHostSimulatedMetricDoesntExist(HostSimulatedMetricEntity simulatedHostMetric) {
-		var name = simulatedHostMetric.getName();
+		String name = simulatedHostMetric.getName();
 		if (hostSimulatedMetrics.hasHostSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated host metric '" + name + "' already exists");
 		}
@@ -208,7 +208,7 @@ public class HostSimulatedMetricsService {
 	}
 
 	private Double randomizeFieldValue(HostSimulatedMetricEntity metric) {
-		var random = new Random();
+		Random random = new Random();
 		double minValue = metric.getMinimumValue();
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();

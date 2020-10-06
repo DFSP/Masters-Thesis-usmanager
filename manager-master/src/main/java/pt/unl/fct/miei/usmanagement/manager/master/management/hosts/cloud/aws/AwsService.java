@@ -63,8 +63,8 @@ public class AwsService {
 		this.sshService = sshService;
 		String awsAccessKey = awsProperties.getAccess().getKey();
 		String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
-		var awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
-		var awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+		BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
+		AWSStaticCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
 		this.ec2 = AmazonEC2ClientBuilder
 			.standard()
 			.withRegion(Regions.US_EAST_2)
@@ -81,8 +81,8 @@ public class AwsService {
 	}
 
 	public List<Instance> getInstances() {
-		var instances = new ArrayList<Instance>();
-		var request = new DescribeInstancesRequest();
+		List<Instance> instances = new ArrayList<>();
+		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		DescribeInstancesResult result;
 		do {
 			result = ec2.describeInstances(request);
@@ -128,7 +128,7 @@ public class AwsService {
 	}
 
 	private String createEC2() {
-		var runInstancesRequest = new RunInstancesRequest()
+		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
 			.withImageId(awsInstanceAmi)
 			.withInstanceType(awsInstanceType)
 			.withMinCount(1)
@@ -138,8 +138,8 @@ public class AwsService {
 		RunInstancesResult result = ec2.runInstances(runInstancesRequest);
 		Instance instance = result.getReservation().getInstances().get(0);
 		String instanceId = instance.getInstanceId();
-		var instanceName = String.format("ubuntu-%d", System.currentTimeMillis());
-		var createTagsRequest = new CreateTagsRequest().withResources(instanceId)
+		String instanceName = String.format("ubuntu-%d", System.currentTimeMillis());
+		CreateTagsRequest createTagsRequest = new CreateTagsRequest().withResources(instanceId)
 			.withTags(new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"));
 		ec2.createTags(createTagsRequest);
 		return instanceId;
@@ -180,7 +180,7 @@ public class AwsService {
 		if (!dryResponse.isSuccessful()) {
 			throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
 		}
-		var request = new StopInstancesRequest().withInstanceIds(instanceId);
+		StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instanceId);
 		ec2.stopInstances(request);
 	}
 
@@ -196,12 +196,12 @@ public class AwsService {
 		if (!dryResponse.isSuccessful()) {
 			throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
 		}
-		var request = new TerminateInstancesRequest().withInstanceIds(instanceId);
+		TerminateInstancesRequest request = new TerminateInstancesRequest().withInstanceIds(instanceId);
 		ec2.terminateInstances(request);
 	}
 
 	private Instance setInstanceState(String hostname, AwsInstanceState state) {
-		for (var tries = 0; tries < awsMaxRetries; tries++) {
+		for (int tries = 0; tries < awsMaxRetries; tries++) {
 			Instance instance = getInstance(hostname);
 			int instanceState = instance.getState().getCode();
 			if (instanceState == state.getCode()) {

@@ -41,7 +41,7 @@ public class SshController {
 
 	@PostMapping("/execute")
 	public SshCommandResult execute(@Json String hostname, @Json String command) {
-		return sshService.executeCommand(hostname, command);
+		return sshService.executeCommand(command, hostname);
 	}
 
 	@PostMapping("/upload")

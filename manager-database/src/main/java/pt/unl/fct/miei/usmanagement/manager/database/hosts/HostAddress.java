@@ -32,7 +32,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-@ToString
 public class HostAddress {
 
 	private final String username;
@@ -40,11 +39,24 @@ public class HostAddress {
 	private final String publicIpAddress;
 	private final String privateIpAddress;
 
+	public HostAddress(String publicIpAddress) {
+		this(publicIpAddress, null);
+	}
+
+	public HostAddress(String publicIpAddress, String privateIpAddress) {
+		this(null, publicIpAddress, privateIpAddress);
+	}
+
 	public HostAddress(String username, String publicIpAddress, String privateIpAddress) {
 		this.username = username;
 		this.publicDnsName = null;
 		this.privateIpAddress = privateIpAddress;
 		this.publicIpAddress = publicIpAddress;
+	}
+
+	@Override
+	public String toString() {
+		return username + "@" + publicIpAddress + "/" + privateIpAddress + (publicDnsName == null ? "" : "(" + publicDnsName + ")");
 	}
 
 }

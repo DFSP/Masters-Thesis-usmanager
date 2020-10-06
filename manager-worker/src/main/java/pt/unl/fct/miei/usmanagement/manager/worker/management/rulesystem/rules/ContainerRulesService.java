@@ -103,7 +103,7 @@ public class ContainerRulesService {
 	public List<Rule> generateContainerRules(String containerId) {
 		List<ContainerRuleEntity> genericContainerRules = getGenericContainerRules();
 		List<ContainerRuleEntity> containerRules = getContainerRules(containerId);
-		var rules = new ArrayList<Rule>(genericContainerRules.size() + containerRules.size());
+		List<Rule> rules = new ArrayList<>(genericContainerRules.size() + containerRules.size());
 		genericContainerRules.forEach(genericContainerRule -> rules.add(generateContainerRule(genericContainerRule)));
 		log.info("Generated generic container rules (count: {})", genericContainerRules.size());
 		containerRules.forEach(containerRule -> rules.add(generateContainerRule(containerRule)));

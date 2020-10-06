@@ -66,7 +66,7 @@ public class ValueModesService {
 	}
 
 	public ValueModeEntity updateValueMode(String valueModeName, ValueModeEntity newValueMode) {
-		var valueMode = getValueMode(valueModeName);
+		ValueModeEntity valueMode = getValueMode(valueModeName);
 		log.info("Updating valueMode {} with {}",
 			ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
 		log.info("valueMode before copying properties: {}",
@@ -79,12 +79,12 @@ public class ValueModesService {
 	}
 
 	public void deleteValueMode(String valueModeName) {
-		var valueMode = getValueMode(valueModeName);
+		ValueModeEntity valueMode = getValueMode(valueModeName);
 		valueModes.delete(valueMode);
 	}
 
 	private void assertValueModeDoesntExist(ValueModeEntity valueMode) {
-		var valueModeName = valueMode.getName();
+		String valueModeName = valueMode.getName();
 		if (valueModes.hasValueMode(valueModeName)) {
 			throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");
 		}

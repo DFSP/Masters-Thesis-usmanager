@@ -256,7 +256,7 @@ public class HostRulesService {
 	}
 
 	private void assertRuleDoesntExist(HostRuleEntity hostRule) {
-		var name = hostRule.getName();
+		String name = hostRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Host rule '" + name + "' already exists");
 		}
@@ -274,7 +274,7 @@ public class HostRulesService {
 	private List<Rule> generateHostRules(String hostname) {
 		//FIXME what about cloud hosts?
 		List<HostRuleEntity> hostRules = getRules(hostname);
-		var rules = new ArrayList<Rule>(hostRules.size());
+		List<Rule> rules = new ArrayList<>(hostRules.size());
 		log.info("Generating host rules... (count: {})", rules.size());
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
 		return rules;

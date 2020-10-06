@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes;
 
+import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
 import com.spotify.docker.client.messages.swarm.NodeInfo;
@@ -58,7 +59,7 @@ public class NodesService {
 	}
 
 	private List<SimpleNode> getNodes(Predicate<Node> filter) {
-		try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
 			Stream<Node> nodeStream = swarmManager.listNodes().stream();
 			if (filter != null) {
 				nodeStream = nodeStream.filter(filter);
@@ -125,13 +126,13 @@ public class NodesService {
 
 	public void removeNode(String nodeId) {
 		//var node = getNode(nodeId);
-		try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
 			swarmManager.deleteNode(nodeId);
       /*int hostNodes = getNodes(n -> Objects.equals(n.status().addr(), node.getHostname())).size();
       if (hostNodes == 0) {
         hostsService.removeHost(node.getHostname());
       }*/
-			log.info("Deleted node '{}'", nodeId);
+			log.info("Deleted node {}", nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
 			e.printStackTrace();
@@ -144,7 +145,7 @@ public class NodesService {
 	}
 
 	public boolean isManager(String nodeId) {
-		try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
 			NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
 			return nodeInfo.managerStatus() != null;
 		}
@@ -155,7 +156,7 @@ public class NodesService {
 	}
 
 	public boolean isWorker(String nodeId) {
-		try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
 			NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
 			return nodeInfo.managerStatus() == null;
 		}
@@ -220,7 +221,7 @@ public class NodesService {
 	}
 
 	private SimpleNode updateNode(SimpleNode node, NodeSpec nodeSpec) {
-		try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
 			String nodeId = node.getId();
 			swarmManager.updateNode(nodeId, node.getVersion(), nodeSpec);
 			return getNode(nodeId);

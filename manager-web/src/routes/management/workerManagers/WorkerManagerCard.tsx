@@ -48,7 +48,7 @@ const WorkerManagerCard = ({workerManager}: Props) => (
               value={workerManager.container.containerId}/>
     <CardItem key={'host'}
               label={'Host'}
-              value={workerManager.container.hostname}/>
+              value={workerManager.container.publicIpAddress}/>
   </CardWorkerManager>
 );
 

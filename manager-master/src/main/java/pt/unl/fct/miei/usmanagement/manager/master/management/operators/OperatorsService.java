@@ -68,7 +68,7 @@ public class OperatorsService {
 	}
 
 	public OperatorEntity updateOperator(String operatorName, OperatorEntity newOperator) {
-		var operator = getOperator(operatorName);
+		OperatorEntity operator = getOperator(operatorName);
 		log.info("Updating operator {} with {}",
 			ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
 		log.info("operator before copying properties: {}",
@@ -81,14 +81,14 @@ public class OperatorsService {
 	}
 
 	public void deleteOperator(String operatorName) {
-		var operator = getOperator(operatorName);
+		OperatorEntity operator = getOperator(operatorName);
 		operators.delete(operator);
 	}
 
 	private void assertOperatorDoesntExist(OperatorEntity operator) {
-		var op = operator.getOperator();
-		if (operators.hasOperator(op)) {
-			throw new DataIntegrityViolationException("Operator '" + op + "' already exists");
+		String operatorName = operator.getOperator();
+		if (operators.hasOperator(operatorName)) {
+			throw new DataIntegrityViolationException("Operator '" + operatorName + "' already exists");
 		}
 	}
 

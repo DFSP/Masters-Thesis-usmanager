@@ -206,7 +206,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                               onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
               )}
               {getError(formContext.errors) && (
-                <span className={"helper-text red-text darken-3"}>
+                <span className="helper-text red-text darken-3">
                     {getError(formContext.errors)}
                   </span>
               )}

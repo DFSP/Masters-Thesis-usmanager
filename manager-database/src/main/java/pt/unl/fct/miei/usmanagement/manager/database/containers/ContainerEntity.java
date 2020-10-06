@@ -29,6 +29,7 @@ import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 
@@ -68,7 +69,10 @@ public class ContainerEntity {
 	private String command;
 
 	@NotNull
-	private String hostname;
+	private String publicIpAddress;
+
+	@NotNull
+	private String privateIpAddress;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
@@ -114,6 +118,11 @@ public class ContainerEntity {
 	public void removeContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
 		simulatedContainerMetrics.remove(containerMetric);
 		containerMetric.getContainers().remove(this);
+	}
+
+	@JsonIgnore
+	public HostAddress getHostAddress() {
+		return new HostAddress(getPublicIpAddress(), getPrivateIpAddress());
 	}
 
 	@Override

@@ -118,7 +118,7 @@ public class HostSimulatedMetricsService {
 	}
 
 	private Double randomizeFieldValue(HostSimulatedMetricEntity metric) {
-		var random = new Random();
+		Random random = new Random();
 		double minValue = metric.getMinimumValue();
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();

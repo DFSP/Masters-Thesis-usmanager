@@ -145,7 +145,7 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	private void assertServiceSimulatedMetricDoesntExist(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-		var name = serviceSimulatedMetric.getName();
+		String name = serviceSimulatedMetric.getName();
 		if (serviceSimulatedMetrics.hasServiceSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated service metric '" + name + "' already exists");
 		}
@@ -170,7 +170,7 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	private Double randomizeFieldValue(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-		var random = new Random();
+		Random random = new Random();
 		double minValue = serviceSimulatedMetric.getMinimumValue();
 		double maxValue = serviceSimulatedMetric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();

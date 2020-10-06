@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
@@ -88,7 +89,8 @@ public class ContainersService {
 				.names(dockerContainer.getNames())
 				.image(dockerContainer.getImage())
 				.command(dockerContainer.getCommand())
-				.hostname(dockerContainer.getHostname())
+				.publicIpAddress(dockerContainer.getPublicIpAddress())
+				.privateIpAddress(dockerContainer.getPrivateIpAddress())
 				.ports(dockerContainer.getPorts())
 				.labels(dockerContainer.getLabels())
 				.build();
@@ -115,12 +117,13 @@ public class ContainersService {
 			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
 	}
 
-	public List<ContainerEntity> getHostContainers(String hostname) {
-		return containers.findByHostname(hostname);
+	public List<ContainerEntity> getHostContainers(HostAddress hostAddress) {
+		return containers.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress());
 	}
 
-	public List<ContainerEntity> getHostContainersWithLabels(String hostname, Set<Pair<String, String>> labels) {
-		List<ContainerEntity> containers = getHostContainers(hostname);
+	public List<ContainerEntity> getHostContainersWithLabels(HostAddress hostAddress, Set<Pair<String, String>> labels) {
+		List<ContainerEntity> containers = getHostContainers(hostAddress);
 		return filterContainersWithLabels(containers, labels);
 	}
 
@@ -178,101 +181,101 @@ public class ContainersService {
 		return containers;
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, boolean global) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, global);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean global) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, global);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
 										   List<String> environment) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
 			environment);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, labels);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, Map<String, String> labels) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName,
 										   boolean singleton, Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
 			labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
 										   Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
 										   Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
 										   List<String> environment, Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
 			environment, labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
 										   List<String> environment, Map<String, String> labels,
 										   Map<String, String> dynamicLaunchParams) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
 			environment, labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, String internalPort,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, String internalPort,
 										   String externalPort) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, internalPort,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, internalPort,
 			externalPort);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton, String internalPort,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton, String internalPort,
 										   String externalPort) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
 			internalPort, externalPort);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity replicateContainer(String id, String hostname) {
+	public ContainerEntity replicateContainer(String id, HostAddress toHostAddress) {
 		ContainerEntity containerEntity = getContainer(id);
-		Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, hostname);
+		Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public List<ContainerEntity> migrateAppContainers(String fromHostname, String toHostname) {
-		List<ContainerEntity> containers = getHostContainers(fromHostname).stream()
+	public List<ContainerEntity> migrateAppContainers(HostAddress fromHostAddress, HostAddress toHostAddress) {
+		List<ContainerEntity> containers = getHostContainers(fromHostAddress).stream()
 			.filter(c -> List.of("backend", "frontend").contains(c.getLabels().get(ContainerConstants.Label.SERVICE_TYPE)))
 			.collect(Collectors.toList());
-		var migratedContainers = new ArrayList<ContainerEntity>(containers.size());
-		containers.forEach(c -> migratedContainers.add(migrateContainer(c.getContainerId(), toHostname)));
+		List<ContainerEntity> migratedContainers = new ArrayList<>(containers.size());
+		containers.forEach(c -> migratedContainers.add(migrateContainer(c.getContainerId(), toHostAddress)));
 		return migratedContainers;
 	}
 
-	public ContainerEntity migrateContainer(String id, String hostname) {
+	public ContainerEntity migrateContainer(String id, HostAddress hostAddress) {
 		ContainerEntity container = getContainer(id);
-		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostname);
+		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
 		return dockerContainer.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
@@ -306,32 +309,32 @@ public class ContainersService {
 		);
 	}
 
-	public List<ContainerEntity> getAppContainers(String hostname) {
-		return getHostContainersWithLabels(hostname, Set.of(
+	public List<ContainerEntity> getAppContainers(HostAddress hostAddress) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "backend")));
 	}
 
-	public List<ContainerEntity> getDatabaseContainers(String hostname) {
-		return getHostContainersWithLabels(hostname, Set.of(
+	public List<ContainerEntity> getDatabaseContainers(HostAddress hostAddress) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "database")));
 	}
 
-	public List<ContainerEntity> getSystemContainers(String hostname) {
-		return getHostContainersWithLabels(hostname, Set.of(
+	public List<ContainerEntity> getSystemContainers(HostAddress hostAddress) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "system")));
 	}
 
-	public ContainerStats getContainerStats(String containerId, String hostname) {
+	public ContainerStats getContainerStats(String containerId, HostAddress hostAddress) {
 		ContainerEntity container = getContainer(containerId);
-		return dockerContainersService.getContainerStats(container, hostname);
+		return dockerContainersService.getContainerStats(container, hostAddress);
 	}
 
 	public String getLogs(String containerId) {
 		ContainerEntity container = getContainer(containerId);
 		String logs = dockerContainersService.getContainerLogs(container);
 		if (logs != null) {
-			String path = String.format("./logs/containers/%s%s.log", container.getHostname(), container.getNames().get(0));
+			String path = String.format("./logs/containers/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
 			Path logsPath = Paths.get(path);
 			try {
 				Files.createDirectories(logsPath.getParent());
@@ -430,7 +433,7 @@ public class ContainersService {
 	}
 
 	private void assertContainerDoesntExist(ContainerEntity container) {
-		var containerId = container.getContainerId();
+		String containerId = container.getContainerId();
 		if (containers.hasContainer(containerId)) {
 			throw new DataIntegrityViolationException("Container '" + containerId + "' already exists");
 		}

@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -88,6 +89,11 @@ public class EdgeHostsService {
 			new EntityNotFoundException(EdgeHostEntity.class, "host", host));
 	}
 
+	public EdgeHostEntity getEdgeHostByAddress(HostAddress address) {
+		return edgeHosts.findByAddress(address.getPublicIpAddress(), address.getPrivateIpAddress()).orElseThrow(() ->
+			new EntityNotFoundException(EdgeHostEntity.class, "address", address.toString()));
+	}
+
 	public EdgeHostEntity getEdgeHostByDns(String dns) {
 		return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
 			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
@@ -144,7 +150,7 @@ public class EdgeHostsService {
 	}
 
 	public void deleteEdgeHost(String hostname) {
-		var edgeHost = getEdgeHostByDnsOrIp(hostname);
+		EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
 		edgeHosts.delete(edgeHost);
 		deleteEdgeHostConfig(edgeHost);
 	}
@@ -253,7 +259,7 @@ public class EdgeHostsService {
 	}
 
 	private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
-		var hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
+		String hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
 		if (edgeHosts.hasEdgeHost(hostname)) {
 			throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
 		}

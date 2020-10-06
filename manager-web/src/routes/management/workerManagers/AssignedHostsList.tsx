@@ -179,7 +179,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
           .filter(([_, node]) => node.state === 'ready'
                                  && !assignedHosts.includes(node.hostname)
                                  && !unSavedHosts.includes(node.hostname)
-                                 && this.props.workerManager?.container?.hostname !== node.hostname)
+                                 && this.props.workerManager?.container?.publicIpAddress !== node.hostname)
           .map(([_, node]) => node.hostname)
   };
 

@@ -72,7 +72,7 @@ public class DockerSwarmService {
 	}
 
 	public Optional<String> getSwarmManagerNodeId(String hostname) {
-		try (var docker = dockerCoreService.getDockerClient(hostname)) {
+		try (DockerClient docker = dockerCoreService.getDockerClient(hostname)) {
 			return Objects.equals(docker.info().swarm().localNodeState(), "active")
 				&& docker.info().swarm().controlAvailable()
 				? Optional.of(nodesService.getHostNode(hostname).getId())
@@ -84,7 +84,7 @@ public class DockerSwarmService {
 	}
 
 	public Optional<String> getSwarmWorkerNodeId(String hostname) {
-		try (var docker = dockerCoreService.getDockerClient(hostname)) {
+		try (DockerClient docker = dockerCoreService.getDockerClient(hostname)) {
 			return Objects.equals(docker.info().swarm().localNodeState(), "active")
 				&& !docker.info().swarm().controlAvailable()
 				? Optional.of(docker.info().swarm().nodeId())
@@ -120,7 +120,7 @@ public class DockerSwarmService {
 
 	public SimpleNode rejoinSwarm(String nodeId) {
 		SimpleNode node = nodesService.getNode(nodeId);
-		String publicIpAddress = node.getHostname();
+		String publicIpAddress = node.getPublicIpAddress();
 		String privateIpAddress = node.getPrivateIpAddress();
 		NodeRole role = node.getRole();
 		nodesService.removeNode(nodeId);

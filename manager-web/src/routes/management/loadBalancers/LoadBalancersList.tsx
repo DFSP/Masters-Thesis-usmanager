@@ -65,7 +65,7 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
     <LoadBalancerCard key={loadBalancer.containerId} loadBalancer={loadBalancer}/>;
 
   private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
-    loadBalancer.hostname.toLowerCase().includes(search);
+    loadBalancer.publicIpAddress.toLowerCase().includes(search);
 
 }
 

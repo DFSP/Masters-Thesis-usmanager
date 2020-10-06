@@ -149,7 +149,7 @@ public class ContainerRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		var rule = getRule(ruleName);
+		ContainerRuleEntity rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
 		rules.save(rule);
@@ -201,7 +201,7 @@ public class ContainerRulesService {
 	}
 
 	private void assertRuleDoesntExist(ContainerRuleEntity containerRule) {
-		var name = containerRule.getName();
+		String name = containerRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}

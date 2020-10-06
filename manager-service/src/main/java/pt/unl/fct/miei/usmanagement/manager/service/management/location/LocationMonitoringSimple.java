@@ -22,16 +22,19 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
+package pt.unl.fct.miei.usmanagement.manager.service.management.location;
+
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 
 @Data
-public class LaunchApp {
+class LocationMonitoringSimple {
 
-	private final RegionEntity region;
-	private final String country;
-	private final String city;
+	private final String fromContinent;
+	private final String fromRegion;
+	private final String fromCountry;
+	private final String fromCity;
+	private final String toService;
+	private final int count;
 
 }

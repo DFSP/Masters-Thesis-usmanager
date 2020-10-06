@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.http.entity.StringEntity;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -96,7 +97,7 @@ public class ServicesService {
 	}
 
 	public ServiceEntity updateService(String serviceName, ServiceEntity newService) {
-		var service = getService(serviceName);
+		ServiceEntity service = getService(serviceName);
 		log.info("Updating service {} with {}",
 			ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
 		log.info("Service before copying properties: {}",
@@ -108,7 +109,7 @@ public class ServicesService {
 	}
 
 	public void deleteService(String serviceName) {
-		var service = getService(serviceName);
+		ServiceEntity service = getService(serviceName);
 		services.delete(service);
 	}
 
@@ -124,11 +125,11 @@ public class ServicesService {
 	}
 
 	public void addApp(String serviceName, AddServiceApp addServiceApp) {
-		var service = getService(serviceName);
-		var appName = addServiceApp.getName();
-		var launchOrder = addServiceApp.getLaunchOrder();
-		var app = appsService.getApp(appName);
-		var appService = AppServiceEntity.builder()
+		ServiceEntity service = getService(serviceName);
+		String appName = addServiceApp.getName();
+		int launchOrder = addServiceApp.getLaunchOrder();
+		AppEntity app = appsService.getApp(appName);
+		AppServiceEntity appService = AppServiceEntity.builder()
 			.app(app)
 			.service(service)
 			.launchOrder(launchOrder)
@@ -146,7 +147,7 @@ public class ServicesService {
 	}
 
 	public void removeApps(String serviceName, List<String> apps) {
-		var service = getService(serviceName);
+		ServiceEntity service = getService(serviceName);
 		log.info("Removing apps {}", apps);
 		service.getAppServices()
 			.removeIf(app -> apps.contains(app.getApp().getName()));
@@ -172,7 +173,7 @@ public class ServicesService {
 	public void addDependency(String serviceName, String dependencyName) {
 		ServiceEntity service = getService(serviceName);
 		ServiceEntity dependency = getService(dependencyName);
-		var serviceDependency = ServiceDependencyEntity.builder().service(service).dependency(dependency).build();
+		ServiceDependencyEntity serviceDependency = ServiceDependencyEntity.builder().service(service).dependency(dependency).build();
 		service = service.toBuilder().dependency(serviceDependency).build();
 		services.save(service);
 	}
@@ -186,7 +187,7 @@ public class ServicesService {
 	}
 
 	public void removeDependencies(String serviceName, List<String> dependencies) {
-		var service = getService(serviceName);
+		ServiceEntity service = getService(serviceName);
 		log.info("Removing dependencies {}", dependencies);
 		service.getDependencies().removeIf(dependency ->
 			dependencies.contains(dependency.getDependency().getServiceName()));
@@ -204,8 +205,9 @@ public class ServicesService {
 	}
 
 	public ServiceEventPredictionEntity addPrediction(String serviceName, ServiceEventPredictionEntity prediction) {
-		var service = getService(serviceName);
-		var servicePrediction = prediction.toBuilder().service(service).lastUpdate(Timestamp.from(Instant.now())).build();
+		ServiceEntity service = getService(serviceName);
+		ServiceEventPredictionEntity servicePrediction = prediction.toBuilder()
+			.service(service).lastUpdate(Timestamp.from(Instant.now())).build();
 		service = service.toBuilder().eventPrediction(servicePrediction).build();
 		services.save(service);
 		return getEventPrediction(serviceName, prediction.getName());
@@ -223,7 +225,7 @@ public class ServicesService {
 	}
 
 	public void removePredictions(String serviceName, List<String> predictionsName) {
-		var service = getService(serviceName);
+		ServiceEntity service = getService(serviceName);
 		service.getEventPredictions()
 			.removeIf(prediction -> predictionsName.contains(prediction.getName()));
 		services.save(service);
@@ -330,7 +332,7 @@ public class ServicesService {
 	}
 
 	private void assertServiceDoesntExist(ServiceEntity service) {
-		var name = service.getServiceName();
+		String name = service.getServiceName();
 		if (services.hasService(name)) {
 			throw new DataIntegrityViolationException("Service '" + name + "' already exists");
 		}

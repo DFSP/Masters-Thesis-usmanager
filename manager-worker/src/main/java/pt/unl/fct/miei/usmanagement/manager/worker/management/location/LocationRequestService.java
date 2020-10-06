@@ -134,7 +134,7 @@ public class LocationRequestService {
 			.map(hostname -> getAllMonitoringDataTop(hostname, seconds))
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
-		var locationMonitoring = new LocationMonitoring();
+		LocationMonitoring locationMonitoring = new LocationMonitoring();
 		locationMonitoringData.forEach(locationMonitoringResponse -> {
 			String serviceName = locationMonitoringResponse.getToService();
 			String fromContinent = locationMonitoringResponse.getLocationData().getFromContinent();

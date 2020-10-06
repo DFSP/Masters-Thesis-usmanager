@@ -72,7 +72,7 @@ public class ContainerMetricsService {
 			txBytes += stats.txBytes().doubleValue();
 		}
 		// Metrics from docker
-		final var fields = new HashMap<>(Map.of(
+		Map<String, Long> fields = new HashMap<>(Map.of(
 			"cpu", cpu,
 			"ram", ram,
 			"cpu-%", cpuPercent,

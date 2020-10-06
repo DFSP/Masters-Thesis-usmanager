@@ -39,7 +39,7 @@ public interface ContainerRepository extends JpaRepository<ContainerEntity, Long
 
 	Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
 
-	List<ContainerEntity> findByHostname(String hostname);
+	List<ContainerEntity> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
 	@Query("select r "
 		+ "from ContainerEntity c join c.containerRules r "

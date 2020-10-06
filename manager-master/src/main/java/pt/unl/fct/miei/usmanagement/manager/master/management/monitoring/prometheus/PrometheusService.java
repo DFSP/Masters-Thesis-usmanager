@@ -70,12 +70,12 @@ public class PrometheusService {
 	}
 
 	public double getMemoryUsagePercent(String hostname) {
-		final var availableMemory = getStat(hostname, HOST_AVAILABLE_MEMORY + "/" + HOST_TOTAL_MEMORY);
+		double availableMemory = getStat(hostname, HOST_AVAILABLE_MEMORY + "/" + HOST_TOTAL_MEMORY);
 		return availableMemory < 0 ? availableMemory : 100.0 - (availableMemory / PERCENT);
 	}
 
 	public double getCpuUsagePercent(String hostname) {
-		final var queryParam = "100 - (avg by (instance) (irate(node_cpu_seconds_total"
+		String queryParam = "100 - (avg by (instance) (irate(node_cpu_seconds_total"
 			+ "{job=\"node_exporter\", mode=\"idle\"}[5m])) * 100)";
 		return getStat(hostname, "{query}", queryParam);
 	}
@@ -86,8 +86,8 @@ public class PrometheusService {
 
 	private double getStat(String hostname, String statId, String queryParam) {
 		String currentTime = Double.toString((System.currentTimeMillis() * 1.0) / 1000.0);
-		var url = String.format(URL_FORMAT, hostname, DEFAULT_PORT, statId, currentTime);
-		var value = "";
+		String url = String.format(URL_FORMAT, hostname, DEFAULT_PORT, statId, currentTime);
+		String value = "";
 		try {
 			QueryOutput queryOutput;
 			if (queryParam == null) {

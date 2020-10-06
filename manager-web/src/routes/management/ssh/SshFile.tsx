@@ -84,7 +84,7 @@ class SshFile extends BaseComponent<Props, {}> {
                label='hostname'
                type={'dropdown'}
                dropdown={{
-                 defaultValue: 'Select hostname',
+                 defaultValue: 'Select publicIpAddress',
                  values: this.getSelectableHosts()
                }}/>
         <Field key='filename'

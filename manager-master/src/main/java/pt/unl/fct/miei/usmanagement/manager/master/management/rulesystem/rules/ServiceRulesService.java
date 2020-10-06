@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
@@ -157,7 +158,7 @@ public class ServiceRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		var rule = getRule(ruleName);
+		String rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
 		rules.save(rule);
@@ -209,13 +210,13 @@ public class ServiceRulesService {
 	}
 
 	private void assertRuleDoesntExist(ServiceRuleEntity serviceRule) {
-		var name = serviceRule.getName();
+		String name = serviceRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Service rule '" + name + "' already exists");
 		}
 	}
 
-	public ServiceDecisionResult processServiceEvent(String appName, String serviceHostname,
+	public ServiceDecisionResult processServiceEvent(String appName, HostAddress hostAddress,
 													 ContainerEvent containerEvent) {
 		//FIXME: appName and serviceHostname
 		String serviceName = containerEvent.getServiceName();
@@ -224,13 +225,13 @@ public class ServiceRulesService {
 			Map<Long, String> drools = droolsService.executeDroolsRules(containerEvent, rules, serviceRuleTemplateFile);
 			droolsService.createNewServiceRuleSession(serviceName, drools);
 		}
-		return droolsService.evaluate(serviceHostname, containerEvent);
+		return droolsService.evaluate(hostAddress, containerEvent);
 	}
 
 	private List<Rule> generateServiceRules(String appName, String serviceName) {
 		List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
 		List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
-		var rules = new ArrayList<Rule>(genericServiceRules.size() + serviceRules.size());
+		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size());
 		log.info("Generating service rules... (count: {})", rules.size());
 		genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
 		serviceRules.forEach(serviceRule -> rules.add(generateServiceRule(serviceRule)));

@@ -45,7 +45,7 @@ public class ManagerMasterConfiguration implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		var jsonPathArgumentResolver = new JsonPathArgumentResolver();
+		JsonPathArgumentResolver jsonPathArgumentResolver = new JsonPathArgumentResolver();
 		argumentResolvers.add(jsonPathArgumentResolver);
 	}
 

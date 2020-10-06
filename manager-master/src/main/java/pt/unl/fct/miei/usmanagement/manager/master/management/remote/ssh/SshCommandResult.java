@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
 import lombok.Builder;
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ import java.util.List;
 @Data
 public class SshCommandResult {
 
-	private final String hostname;
+	private final HostAddress hostAddress;
 	private final String command;
 	private final int exitStatus;
 	private final List<String> output;

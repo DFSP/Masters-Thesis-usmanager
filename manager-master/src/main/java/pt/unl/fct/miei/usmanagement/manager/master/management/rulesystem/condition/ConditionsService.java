@@ -66,19 +66,19 @@ public class ConditionsService {
 	}
 
 	public ConditionEntity updateCondition(String conditionName, ConditionEntity newCondition) {
-		var condition = getCondition(conditionName);
+		ConditionEntity condition = getCondition(conditionName);
 		ObjectUtils.copyValidProperties(newCondition, condition);
 		condition = conditions.save(condition);
 		return condition;
 	}
 
 	public void deleteCondition(String conditionName) {
-		var condition = getCondition(conditionName);
+		ConditionEntity condition = getCondition(conditionName);
 		conditions.delete(condition);
 	}
 
 	private void assertConditionDoesntExist(ConditionEntity condition) {
-		var name = condition.getName();
+		String name = condition.getName();
 		if (conditions.hasCondition(name)) {
 			throw new DataIntegrityViolationException("Condition '" + name + "' already exists");
 		}

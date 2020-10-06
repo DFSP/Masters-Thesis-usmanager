@@ -222,12 +222,12 @@ public class HostsService {
 		String region = hostLocation.getRegion();
 		String country = hostLocation.getCountry();
 		String city = hostLocation.getCity();
-		log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
-			+ "city '{}'", expectedMemoryConsumption, region, country, city);
-		var otherRegionsHosts = new LinkedList<String>();
-		var sameRegionHosts = new LinkedList<String>();
-		var sameCountryHosts = new LinkedList<String>();
-		var sameCityHosts = new LinkedList<String>();
+		log.info("Looking for available nodes to host container with at least {} memory at region {}, country {}, "
+			+ "city {}", expectedMemoryConsumption, region, country, city);
+		List<String> otherRegionsHosts = new LinkedList<>();
+		List<String> sameRegionHosts = new LinkedList<>();
+		List<String> sameCountryHosts = new LinkedList<>();
+		List<String> sameCityHosts = new LinkedList<>();
 		nodesService.getActiveNodes().stream()
 			.map(SimpleNode::getHostname)
 			.filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
@@ -254,7 +254,7 @@ public class HostsService {
 		log.info("Found hosts {} on same country", sameCountryHosts.toString());
 		log.info("Found hosts {} on same city", sameCityHosts.toString());
 		log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
-		var random = new Random();
+		Random random = new Random();
 		if (!sameCityHosts.isEmpty()) {
 			return getHostDetails(sameCityHosts.get(random.nextInt(sameCityHosts.size())));
 		}
@@ -346,7 +346,7 @@ public class HostsService {
 
 	//TODO choose cloud host based on region
 	private CloudHostEntity chooseCloudHost() {
-		for (var cloudHost : cloudHostsService.getCloudHosts()) {
+		for (CloudHostEntity cloudHost : cloudHostsService.getCloudHosts()) {
 			int stateCode = cloudHost.getState().getCode();
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
 				String hostname = cloudHost.getPublicIpAddress();
@@ -390,13 +390,13 @@ public class HostsService {
 	}
 
 	public String findAvailableExternalPort(String hostname, String startExternalPort) {
-		var command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+		String command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
 		try {
 			List<Integer> usedExternalPorts = executeCommand(command, hostname).stream()
 				.filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
 				.map(Integer::parseInt)
 				.collect(Collectors.toList());
-			for (var i = Integer.parseInt(startExternalPort); ; i++) {
+			for (int i = Integer.parseInt(startExternalPort); ; i++) {
 				if (!usedExternalPorts.contains(i)) {
 					return String.valueOf(i);
 				}
@@ -420,7 +420,7 @@ public class HostsService {
 				String toHostname = this.getAvailableHost(expectedMemoryConsumption, hostLocation).getHostAddress()
 					.getPublicIpAddress();
 				containersService.migrateContainer(containerId, toHostname);
-				log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", hostname, containerId);
+				log.info("RuleDecision executed: Started host {} and migrated container {} to it", hostname, containerId);
 			});
 	}
 
@@ -440,7 +440,7 @@ public class HostsService {
 				removeHost(hostname);
 			}
 		}, containers.size() * DELAY_STOP_HOST);
-		log.info("RuleDecision executed: Stopped host '{}' and migrated containers to host '{}'", hostname,
+		log.info("RuleDecision executed: Stopped host {} and migrated containers to host {}", hostname,
 			migrateToHostname);
 	}
 

@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.containers
 
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.List;
 import java.util.Map;
@@ -41,9 +42,14 @@ public final class DockerContainer {
 	private final String command;
 	private final String state;
 	private final String status;
-	private final String hostname;
+	private final String publicIpAddress;
+	private final String privateIpAddress;
 	private final List<ContainerPortMapping> ports;
 	private final Map<String, String> labels;
+
+	public HostAddress getHostAddress() {
+		return new HostAddress(publicIpAddress, privateIpAddress);
+	}
 
 	@Override
 	public int hashCode() {

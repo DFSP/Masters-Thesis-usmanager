@@ -151,7 +151,7 @@ public class HostsService {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
 		int maxInstances = Math.min(this.maxInstances, maxWorkers);
 		List<CloudHostEntity> cloudHosts = new ArrayList<>(maxInstances);
-		for (var i = 0; i < maxInstances; i++) {
+		for (int i = 0; i < maxInstances; i++) {
 			cloudHosts.add(chooseCloudHost());
 		}
 		return cloudHosts;
@@ -226,7 +226,7 @@ public class HostsService {
 		}
 	}
 
-	public List<String> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
+	public List<HostAddress> getAvailableHostsOnRegions(double expectedMemoryConsumption, List<String> regions) {
 		return regions.stream()
 			.map(regionsService::getRegion)
 			.map(regionEntity -> new HostLocation(null, null, regionEntity.getName(), null))
@@ -234,43 +234,43 @@ public class HostsService {
 			.collect(Collectors.toList());
 	}
 
-	public String getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
+	public HostAddress getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
 		// TODO implement algorithm to get the closest machine based on coordinates
 		return null;
 	}
 
 	//FIXME
 	@Deprecated
-	public String getAvailableHost(double expectedMemoryConsumption, HostLocation hostLocation) {
+	public HostAddress getAvailableHost(double expectedMemoryConsumption, HostLocation hostLocation) {
 		//TODO try to improve method
 		String region = hostLocation.getRegion();
 		String country = hostLocation.getCountry();
 		String city = hostLocation.getCity();
-		log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
-			+ "city '{}'", expectedMemoryConsumption, region, country, city);
-		var otherRegionsHosts = new LinkedList<String>();
-		var sameRegionHosts = new LinkedList<String>();
-		var sameCountryHosts = new LinkedList<String>();
-		var sameCityHosts = new LinkedList<String>();
+		log.info("Looking for available nodes to host container with at least {} memory at region {}, country {}, "
+			+ "city {}", expectedMemoryConsumption, region, country, city);
+		List<HostAddress> otherRegionsHosts = new LinkedList<>();
+		List<HostAddress> sameRegionHosts = new LinkedList<>();
+		List<HostAddress> sameCountryHosts = new LinkedList<>();
+		List<HostAddress> sameCityHosts = new LinkedList<>();
 		nodesService.getActiveNodes().stream()
-			.map(SimpleNode::getHostname)
-			.filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
-			.forEach(hostname -> {
-				HostLocation nodeLocation = getHostDetails(hostname).getHostLocation();
+			.map(SimpleNode::getHostAddress)
+			.filter(hostAddress -> hostMetricsService.hostHasAvailableResources(hostAddress, expectedMemoryConsumption))
+			.forEach(hostAddress -> {
+				HostLocation nodeLocation = getHostLocation(hostAddress);
 				String nodeRegion = nodeLocation.getRegion();
 				String nodeCountry = nodeLocation.getCountry();
 				String nodeCity = nodeLocation.getCity();
 				if (Objects.equals(nodeRegion, region)) {
-					sameRegionHosts.add(hostname);
+					sameRegionHosts.add(hostAddress);
 					if (!Text.isNullOrEmpty(country) && nodeCountry.equalsIgnoreCase(country)) {
-						sameCountryHosts.add(hostname);
+						sameCountryHosts.add(hostAddress);
 					}
 					if (!Text.isNullOrEmpty(city) && nodeCity.equalsIgnoreCase(city)) {
-						sameCityHosts.add(hostname);
+						sameCityHosts.add(hostAddress);
 					}
 				}
 				else {
-					otherRegionsHosts.add(hostname);
+					otherRegionsHosts.add(hostAddress);
 				}
 			});
 		//TODO https://developers.google.com/maps/documentation/geocoding/start?csw=1
@@ -278,7 +278,7 @@ public class HostsService {
 		log.info("Found hosts {} on same country", sameCountryHosts.toString());
 		log.info("Found hosts {} on same city", sameCityHosts.toString());
 		log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
-		var random = new Random();
+		Random random = new Random();
 		if (!sameCityHosts.isEmpty()) {
 			return sameCityHosts.get(random.nextInt(sameCityHosts.size()));
 		}
@@ -295,8 +295,23 @@ public class HostsService {
 		}
 		else {
 			log.info("Didn't find any available node");
-			return addHost(regionsService.getRegion(region), country, city, NodeRole.WORKER).getHostname();
+			return addHost(regionsService.getRegion(region), country, city, NodeRole.WORKER).getHostAddress();
 		}
+	}
+
+	public HostDetails getHostDetails(HostAddress hostAddress) {
+		HostLocation hostLocation;
+		try {
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
+			hostAddress = edgeHost.getAddress();
+			hostLocation = edgeHost.getLocation();
+		}
+		catch (EntityNotFoundException e) {
+			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByAddress(hostAddress);
+			hostAddress = cloudHost.getAddress();
+			hostLocation = cloudHost.getLocation();
+		}
+		return new HostDetails(hostAddress, hostLocation);
 	}
 
 	public HostDetails getHostDetails(String hostname) {
@@ -313,6 +328,19 @@ public class HostsService {
 			hostLocation = cloudHost.getLocation();
 		}
 		return new HostDetails(hostAddress, hostLocation);
+	}
+
+	public HostLocation getHostLocation(HostAddress address) {
+		HostLocation hostLocation;
+		try {
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(address);
+			hostLocation = edgeHost.getLocation();
+		}
+		catch (EntityNotFoundException e) {
+			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByAddress(address);
+			hostLocation = cloudHost.getLocation();
+		}
+		return hostLocation;
 	}
 
 	public SimpleNode addHost(RegionEntity region, String country, String city, NodeRole role) {
@@ -361,7 +389,7 @@ public class HostsService {
 	}
 
 	private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {
-		return sshService.hasConnection(edgeHost.getHostname());
+		return sshService.hasConnection(edgeHost.getAddress());
 	}
 
 	private Optional<EdgeHostEntity> chooseEdgeHost(RegionEntity region, String country, String city) {
@@ -383,7 +411,7 @@ public class HostsService {
 
 	//TODO choose cloud host based on region
 	private CloudHostEntity chooseCloudHost() {
-		for (var cloudHost : cloudHostsService.getCloudHosts()) {
+		for (CloudHostEntity cloudHost : cloudHostsService.getCloudHosts()) {
 			int stateCode = cloudHost.getState().getCode();
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
 				String hostname = cloudHost.getPublicIpAddress();
@@ -398,11 +426,12 @@ public class HostsService {
 		return cloudHostsService.startCloudHost();
 	}
 
-	public List<String> executeCommand(String command, String hostname) {
+	public List<String> executeCommand(String command, HostAddress hostAddress) {
 		List<String> result = null;
 		String error = null;
-		if (this.hostAddress.getPrivateIpAddress().equalsIgnoreCase(hostname)
-			|| this.hostAddress.getPublicIpAddress().equalsIgnoreCase(hostname)) {
+		if (Objects.equals(this.hostAddress.getPublicIpAddress(), hostAddress.getPublicIpAddress())
+			&& Objects.equals(this.hostAddress.getPrivateIpAddress(), hostAddress.getPrivateIpAddress())) {
+			// execute local command
 			BashCommandResult bashCommandResult = bashService.executeCommand(command);
 			if (!bashCommandResult.isSuccessful()) {
 				error = String.join("\n", bashCommandResult.getError());
@@ -412,7 +441,8 @@ public class HostsService {
 			}
 		}
 		else {
-			SshCommandResult sshCommandResult = sshService.executeCommand(hostname, command);
+			// execute remote command
+			SshCommandResult sshCommandResult = sshService.executeCommand(command, hostAddress);
 			if (!sshCommandResult.isSuccessful()) {
 				error = String.join("\n", sshCommandResult.getError());
 			}
@@ -427,24 +457,24 @@ public class HostsService {
 	}
 
 	public String findAvailableExternalPort(String startExternalPort) {
-		return findAvailableExternalPort("127.0.0.1", startExternalPort);
+		return findAvailableExternalPort(hostAddress, startExternalPort);
 	}
 
-	public String findAvailableExternalPort(String hostname, String startExternalPort) {
-		var command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {
+		String command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
 		try {
-			List<Integer> usedExternalPorts = executeCommand(command, hostname).stream()
+			List<Integer> usedExternalPorts = executeCommand(command, hostAddress).stream()
 				.filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
 				.map(Integer::parseInt)
 				.collect(Collectors.toList());
-			for (var i = Integer.parseInt(startExternalPort); ; i++) {
+			for (int i = Integer.parseInt(startExternalPort); ; i++) {
 				if (!usedExternalPorts.contains(i)) {
 					return String.valueOf(i);
 				}
 			}
 		}
 		catch (MasterManagerException e) {
-			throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
+			throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostAddress,
 				e.getMessage());
 		}
 	}

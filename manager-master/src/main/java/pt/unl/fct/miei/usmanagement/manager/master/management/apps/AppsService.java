@@ -80,7 +80,7 @@ public class AppsService {
 	}
 
 	public AppEntity updateApp(String appName, AppEntity newApp) {
-		var app = getApp(appName);
+		AppEntity app = getApp(appName);
 		log.info("Updating app {} with {}",
 			ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
 		log.info("Service before copying properties: {}",
@@ -92,7 +92,7 @@ public class AppsService {
 	}
 
 	public void deleteApp(String name) {
-		var app = getApp(name);
+		AppEntity app = getApp(name);
 		apps.delete(app);
 	}
 
@@ -102,9 +102,9 @@ public class AppsService {
 	}
 
 	public void addService(String appName, String serviceName, int order) {
-		var app = getApp(appName);
-		var service = servicesService.getService(serviceName);
-		var appService = AppServiceEntity.builder()
+		AppEntity app = getApp(appName);
+		ServiceEntity service = servicesService.getService(serviceName);
+		AppServiceEntity appService = AppServiceEntity.builder()
 			.app(app)
 			.service(service)
 			.launchOrder(order)
@@ -122,7 +122,7 @@ public class AppsService {
 	}
 
 	public void removeServices(String appName, List<String> services) {
-		var app = getApp(appName);
+		AppEntity app = getApp(appName);
 		log.info("Removing services {}", services);
 		app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
 		apps.save(app);
@@ -144,7 +144,7 @@ public class AppsService {
 	}
 
 	private void assertAppDoesntExist(AppEntity app) {
-		var name = app.getName();
+		String name = app.getName();
 		if (apps.hasApp(name)) {
 			throw new DataIntegrityViolationException("App '" + name + "' already exists");
 		}

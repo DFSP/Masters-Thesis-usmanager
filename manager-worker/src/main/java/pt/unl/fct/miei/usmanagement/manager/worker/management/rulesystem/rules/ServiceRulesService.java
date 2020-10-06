@@ -131,7 +131,7 @@ public class ServiceRulesService {
 
 	public ServiceDecisionResult executeRules(String serviceHostname, String containerId, String serviceName,
 											  Map<String, Double> fields) {
-		var containerEvent = new ContainerEvent(serviceHostname, containerId, serviceName);
+		ContainerEvent containerEvent = new ContainerEvent(serviceHostname, containerId, serviceName);
 		Map<String, Double> containerEventFields = containerEvent.getFields();
 		servicesMonitoringService.getContainerMonitoring(containerId).stream()
 			.filter(loggedField ->
@@ -170,7 +170,7 @@ public class ServiceRulesService {
 		List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
 		List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
 		List<Rule> containerRules = containerRulesService.generateContainerRules(containerId);
-		var rules = new ArrayList<Rule>(genericServiceRules.size() + serviceRules.size() + containerRules.size());
+		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size() + containerRules.size());
 		genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
 		log.info("Generated generic service rules (count: {})", genericServiceRules.size());
 		serviceRules.forEach(serviceRule -> rules.add(generateServiceRule(serviceRule)));

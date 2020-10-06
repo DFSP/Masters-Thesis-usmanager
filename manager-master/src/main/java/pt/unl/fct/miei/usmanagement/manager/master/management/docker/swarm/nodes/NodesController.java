@@ -72,7 +72,7 @@ public class NodesController {
 			RegionEntity region = addNode.getRegion();
 			String country = addNode.getCountry();
 			String city = addNode.getCity();
-			for (var i = 0; i < quantity; i++) {
+			for (int i = 0; i < quantity; i++) {
 				SimpleNode node = hostsService.addHost(region, country, city, role);
 				nodes.add(node);
 			}

@@ -25,14 +25,16 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
 
 import java.util.Map;
 
 @Data
 public class DecisionResult implements Comparable<DecisionResult> {
 
-	private final String hostname;
+	private final HostDetails hostDetails;
 	private final RuleDecision decision;
 	private final long ruleId;
 	private final Map<String, Double> fields;

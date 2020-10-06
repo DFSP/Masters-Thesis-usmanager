@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
@@ -182,10 +183,10 @@ public class HostsMonitoringService {
 
 	private void monitorHostsTask() {
 		log.info("Starting host monitoring task...");
-		var hostDecisions = new LinkedList<HostDecisionResult>();
+		List<HostDecisionResult> hostDecisions = new LinkedList<>();
 		List<SimpleNode> nodes = nodesService.getReadyNodes();
 		for (SimpleNode node : nodes) {
-			String hostname = node.getHostname();
+			String hostname = node.getPublicIpAddress();
 			Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
 			newFields.forEach((field, value) -> saveHostMonitoring(hostname, field, value));
 			HostDecisionResult hostDecisionResult = runHostRules(hostname, newFields);
@@ -197,7 +198,7 @@ public class HostsMonitoringService {
 	}
 
 	private HostDecisionResult runHostRules(String hostname, Map<String, Double> newFields) {
-		var hostEvent = new HostEvent(hostname);
+		HostEvent hostEvent = new HostEvent(hostname);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 		getHostMonitoring(hostname)
 			.stream()
@@ -225,12 +226,12 @@ public class HostsMonitoringService {
 
 	//TODO move to decisionsService?
 	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<SimpleNode> nodes) {
-		var relevantHostDecisions = new LinkedList<HostDecisionResult>();
+		List<HostDecisionResult> relevantHostDecisions = new LinkedList<>();
 		log.info("Processing host decisions...");
 		for (HostDecisionResult hostDecision : hostDecisions) {
 			String hostname = hostDecision.getHostname();
 			RuleDecision decision = hostDecision.getDecision();
-			log.info("Hostname '{}' had decision '{}'", hostname, decision);
+			log.info("Hostname {} had decision {}", hostname, decision);
 			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, decision.toString());
 			int hostEventCount = hostEvent.getCount();
 			if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
@@ -273,21 +274,21 @@ public class HostsMonitoringService {
 		if (!containerId.isEmpty()) {
 			ServiceEntity serviceConfig = servicesService.getService(serviceName);
 			double serviceAvgMem = serviceConfig.getExpectedMemoryConsumption();
-			String toHostname = hostsService.getAvailableHost(serviceAvgMem, hostLocation);
+			HostAddress toHostAddress = hostsService.getAvailableHost(serviceAvgMem, hostLocation);
 			// TODO porquê migrar logo um container?
-			containersService.migrateContainer(containerId, toHostname);
-			log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);
+			containersService.migrateContainer(containerId, toHostAddress);
+			log.info("RuleDecision executed: Started host {} and migrated container {} to it", toHostAddress, containerId);
 		}
 	}
 
 	private void stopHost(List<HostDecisionResult> relevantHostDecisions, List<SimpleNode> nodes) {
 		//TODO : review stop host
-		var stopHostname = "";
+		String stopHostname = "";
 		ListIterator<HostDecisionResult> decisionIterator =
 			relevantHostDecisions.listIterator(relevantHostDecisions.size());
 		while (decisionIterator.hasPrevious()) {
 			String hostname = decisionIterator.previous().getHostname();
-			if (nodes.stream().anyMatch(n -> n.getHostname().equals(hostname) && n.getRole() != NodeRole.MANAGER)) {
+			if (nodes.stream().anyMatch(n -> n.getPublicIpAddress().equals(hostname) && n.getRole() != NodeRole.MANAGER)) {
 				// Node with least priority that is not a manager
 				stopHostname = hostname;
 				break;
@@ -304,17 +305,17 @@ public class HostsMonitoringService {
 			}
 		}, containers.size() * DELAY_STOP_HOST);
 		//TODO garantir que o host é removido dinamicamente só depois de serem migrados todos os containers
-		log.info("RuleDecision executed: Stopped host '{}' and migrated containers to host '{}'",
+		log.info("RuleDecision executed: Stopped host {} and migrated containers to host {}",
 			stopHostname, migrateToHostname);
 	}
 
 	private String getHostToMigrate(String hostToRemove, List<SimpleNode> nodes) {
 		//TODO e se não existir mais nenhum node na mesma zona?
 		return nodes.stream()
-			.filter(n -> !n.getHostname().equals(hostToRemove)
+			.filter(n -> !n.getPublicIpAddress().equals(hostToRemove)
 				&& Objects.equals(hostsService.getHostDetails(hostToRemove).getHostLocation().getRegion(),
-				hostsService.getHostDetails(n.getHostname()).getHostLocation().getRegion()))
-			.map(SimpleNode::getHostname)
+				hostsService.getHostDetails(n.getPublicIpAddress()).getHostLocation().getRegion()))
+			.map(SimpleNode::getPublicIpAddress)
 			.findFirst()
 			.orElseThrow(() -> new MasterManagerException("Can't find new host to migrate containers to"));
 	}

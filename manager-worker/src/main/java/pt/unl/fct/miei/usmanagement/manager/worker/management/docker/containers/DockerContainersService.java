@@ -53,6 +53,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerPortMapping;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
@@ -95,66 +96,66 @@ public class DockerContainersService {
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName) {
-		return launchContainer(hostname, serviceName, false);
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName) {
+		return launchContainer(hostAddress, serviceName, false);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global) {
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, boolean global) {
 		List<String> environment = Collections.emptyList();
-		return launchContainer(hostname, serviceName, global, environment);
+		return launchContainer(hostAddress, serviceName, global, environment);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, List<String> environment) {
-		return launchContainer(hostname, serviceName, false, environment);
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, List<String> environment) {
+		return launchContainer(hostAddress, serviceName, false, environment);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName,
 													 boolean global, List<String> environment) {
 		Map<String, String> labels = Collections.emptyMap();
-		return launchContainer(hostname, serviceName, global, environment, labels);
+		return launchContainer(hostAddress, serviceName, global, environment, labels);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, Map<String, String> labels) {
-		return launchContainer(hostname, serviceName, false, labels);
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, Map<String, String> labels) {
+		return launchContainer(hostAddress, serviceName, false, labels);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName,
 													 boolean global, Map<String, String> labels) {
 		List<String> environment = Collections.emptyList();
-		return launchContainer(hostname, serviceName, global, environment, labels);
+		return launchContainer(hostAddress, serviceName, global, environment, labels);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, List<String> environment,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
 													 Map<String, String> labels) {
-		return launchContainer(hostname, serviceName, false, environment, labels);
+		return launchContainer(hostAddress, serviceName, false, environment, labels);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, List<String> environment,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
 													 Map<String, String> labels,
 													 Map<String, String> dynamicLaunchParams) {
-		return launchContainer(hostname, serviceName, false, environment, labels, dynamicLaunchParams);
+		return launchContainer(hostAddress, serviceName, false, environment, labels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName,
 													 boolean global, List<String> environment,
 													 Map<String, String> labels) {
 		Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-		return launchContainer(hostname, serviceName, global, environment, labels, dynamicLaunchParams);
+		return launchContainer(hostAddress, serviceName, global, environment, labels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, boolean global,
 													 List<String> environment, Map<String, String> labels,
 													 Map<String, String> dynamicLaunchParams) {
 		ServiceEntity service = servicesService.getService(serviceName);
-		return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
+		return launchContainer(hostAddress, service, global, environment, labels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, String internalPort,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, String internalPort,
 													 String externalPort) {
-		return launchContainer(hostname, serviceName, false, internalPort, externalPort);
+		return launchContainer(hostAddress, serviceName, false, internalPort, externalPort);
 	}
 
-	public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
+	public Optional<DockerContainer> launchContainer(HostAddress hostAddress, String serviceName, boolean global,
 													 String internalPort, String externalPort) {
 		ServiceEntity service = servicesService.getService(serviceName).toBuilder()
 			.defaultInternalPort(internalPort)
@@ -163,21 +164,22 @@ public class DockerContainersService {
 		List<String> environment = Collections.emptyList();
 		Map<String, String> labels = Collections.emptyMap();
 		Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-		return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
+		return launchContainer(hostAddress, service, global, environment, labels, dynamicLaunchParams);
 	}
 
-	private Optional<DockerContainer> launchContainer(String hostname, ServiceEntity service,
+	private Optional<DockerContainer> launchContainer(HostAddress hostAddress, ServiceEntity service,
 													  boolean global, List<String> environment,
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
 		String serviceName = service.getServiceName();
-		log.info("Launching container with service '{}' at '{}'...", serviceName, hostname);
+		log.info("Launching container with service {} at {}...", serviceName, hostAddress);
 		if (global) {
 			List<DockerContainer> containers = List.of();
 			try {
 				containers = getContainers(
 					DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
-					DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, hostname)
+					DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
+					DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress())
 				);
 			}
 			catch (WorkerManagerException e) {
@@ -191,7 +193,7 @@ public class DockerContainersService {
 		}
 		String serviceType = service.getServiceType().name();
 		String internalPort = service.getDefaultInternalPort();
-		String externalPort = hostsService.findAvailableExternalPort(hostname, service.getDefaultExternalPort());
+		String externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
 		String serviceAddr = String.format("%s:%s", hostname, externalPort);
 		String containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
 		String dockerRepository = service.getDockerRepository();
@@ -222,17 +224,18 @@ public class DockerContainersService {
 		for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
 			launchCommand = launchCommand.replace(param.getKey(), param.getValue());
 		}
-		var containerEnvironment = new LinkedList<>(List.of(
+		List<String> containerEnvironment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.SERVICE_CONTINENT + "=" + continent,
 			ContainerConstants.Environment.SERVICE_REGION + "=" + region,
 			ContainerConstants.Environment.SERVICE_COUNTRY + "=" + country,
 			ContainerConstants.Environment.SERVICE_CITY + "=" + city));
 		containerEnvironment.addAll(environment);
-		var containerLabels = new HashMap<>(Map.of(
+		Map<String, String> containerLabels = new HashMap<>(Map.of(
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
 			ContainerConstants.Label.SERVICE_TYPE, serviceType,
 			ContainerConstants.Label.SERVICE_ADDRESS, serviceAddr,
-			ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
+			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostname,
+			ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostname,
 			ContainerConstants.Label.SERVICE_CONTINENT, continent,
 			ContainerConstants.Label.SERVICE_REGION, region,
 			ContainerConstants.Label.SERVICE_COUNTRY, country,
@@ -242,8 +245,8 @@ public class DockerContainersService {
 			containerLabels.put(ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
 			containerLabels.put(ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false));
 		}
-		log.info("hostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
-				+ "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
+		log.info("hostname = {}, internalPort = {}, externalPort = {}, containerName = {}, "
+				+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
 			hostname, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
 			containerLabels);
 		HostConfig hostConfig = HostConfig.builder()
@@ -259,7 +262,7 @@ public class DockerContainersService {
 		ContainerConfig containerConfig = launchCommand.isEmpty()
 			? containerBuilder.build()
 			: containerBuilder.cmd(launchCommand.split(" ")).build();
-		try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostname)) {
 			dockerClient.pull(dockerRepository);
 			ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 			String containerId = containerCreation.id();
@@ -278,15 +281,15 @@ public class DockerContainersService {
 		}
 	}
 
-	private String getDatabaseHostForService(String hostname, String databaseServiceName) {
+	private String getDatabaseHostForService(HostAddress hostAddress, String databaseServiceName) {
 		ContainerEntity databaseContainer = containersService.getHostContainersWithLabels(hostname,
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
-			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostname, databaseServiceName));
+			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, databaseServiceName));
 		if (databaseContainer == null) {
-			throw new WorkerManagerException("Failed to launch database '{}' on host '{}'", databaseServiceName, hostname);
+			throw new WorkerManagerException("Failed to launch database {} on host {}", databaseServiceName, hostname);
 		}
 		String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
-		log.info("Found database '{}' on host '{}'", address, hostname);
+		log.info("Found database {} on host {}", address, hostname);
 		return address;
 	}
 
@@ -300,13 +303,13 @@ public class DockerContainersService {
 		this.stopContainer(id, hostname, null);
 	}
 
-	public void stopContainer(String id, String hostname, Integer delay) {
+	public void stopContainer(String id, HostAddress hostAddress, Integer delay) {
 		ContainerInfo containerInfo = inspectContainer(id, hostname);
 		String serviceType = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE);
 		if (Objects.equals(serviceType, "frontend")) {
 			nginxLoadBalancerService.removeContainerFromLoadBalancer(id);
 		}
-		try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostname)) {
 			//TODO espera duas vezes no caso de migração!?!?
 			String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
 			int delayBeforeStop = delay == null ? dockerDelayBeforeStopContainer : delay;
@@ -341,7 +344,7 @@ public class DockerContainersService {
 		}
 		else {
 			List<String> args = fromContainer.args();
-			var params = Arrays.asList(service.getLaunchCommand().split(" "));
+			List<String> params = Arrays.asList(service.getLaunchCommand().split(" "));
 			assert args.size() == params.size();
 			// Merge the 2 lists into a map
 			dynamicLaunchParams = IntStream
@@ -352,7 +355,7 @@ public class DockerContainersService {
 		return launchContainer(toHostname, service, false, customEnvs, customLabels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> migrateContainer(ContainerEntity container, String hostname, String toHostname) {
+	public Optional<DockerContainer> migrateContainer(ContainerEntity container, HostAddress hostAddress, String toHostname) {
 		String containerId = container.getContainerId();
 		Optional<DockerContainer> replicaContainer = replicateContainer(container, toHostname);
 		new Timer("StopContainerTimer").schedule(new TimerTask() {
@@ -377,8 +380,8 @@ public class DockerContainersService {
 		return getAllContainers(filter);
 	}
 
-	public List<DockerContainer> getContainers(String hostname, DockerClient.ListContainersParam... filter) {
-		try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
+	public List<DockerContainer> getContainers(HostAddress hostAddress, DockerClient.ListContainersParam... filter) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostname)) {
 			return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
 		}
 		catch (DockerException | InterruptedException e) {
@@ -387,7 +390,7 @@ public class DockerContainersService {
 		}
 	}
 
-	public Optional<DockerContainer> findContainer(String hostname, DockerClient.ListContainersParam... filter) {
+	public Optional<DockerContainer> findContainer(HostAddress hostAddress, DockerClient.ListContainersParam... filter) {
 		return getContainers(hostname, filter).stream().findFirst();
 	}
 
@@ -430,7 +433,7 @@ public class DockerContainersService {
 	}
 
 	private ContainerInfo inspectContainer(String containerId, String hostname) {
-		try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostname)) {
 			return dockerClient.inspectContainer(containerId);
 		}
 		catch (DockerException | InterruptedException e) {
@@ -439,11 +442,9 @@ public class DockerContainersService {
 		}
 	}
 
-	public ContainerStats getContainerStats(ContainerEntity container) {
-		String hostname = container.getHostname();
-		try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
-			String id = container.getContainerId();
-			return dockerClient.stats(id);
+	public ContainerStats getContainerStats(ContainerEntity container, HostAddress hostAddress) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
+			return dockerClient.stats(container.getContainerId());
 		}
 		catch (DockerException | InterruptedException e) {
 			e.printStackTrace();
@@ -459,12 +460,14 @@ public class DockerContainersService {
 		String command = container.command();
 		String state = container.state();
 		String status = container.status();
-		String hostname = container.labels().get(ContainerConstants.Label.SERVICE_HOSTNAME);
+		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
+		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
 		List<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
-		return new DockerContainer(id, created, names, image, command, state, status, hostname, ports, labels);
+		return new DockerContainer(id, created, names, image, command, state, status, publicIpAddress, privateIpAddress,
+			ports, labels);
 	}
 
 }

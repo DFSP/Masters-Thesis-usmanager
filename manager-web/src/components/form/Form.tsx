@@ -30,7 +30,7 @@ import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {isEqualWith} from "lodash";
-import ActionProgressBar from "./ActionProgressBar";
+import ActionProgressBar from "../actionloading/ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";

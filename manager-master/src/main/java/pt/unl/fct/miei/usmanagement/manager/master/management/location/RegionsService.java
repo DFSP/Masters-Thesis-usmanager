@@ -66,7 +66,7 @@ public class RegionsService {
 	}
 
 	public RegionEntity updateRegion(String name, RegionEntity newRegion) {
-		var region = getRegion(name);
+		RegionEntity region = getRegion(name);
 		log.info("Updating region {} with {}",
 			ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
 		log.info("Region before copying properties: {}",
@@ -78,12 +78,12 @@ public class RegionsService {
 	}
 
 	public void deleteRegion(String name) {
-		var region = getRegion(name);
+		RegionEntity region = getRegion(name);
 		regions.delete(region);
 	}
 
 	private void assertRegionDoesntExist(RegionEntity region) {
-		var name = region.getName();
+		String name = region.getName();
 		if (regions.hasRegion(name)) {
 			throw new DataIntegrityViolationException("Region '" + name + "' already exists");
 		}
