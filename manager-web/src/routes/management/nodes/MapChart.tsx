@@ -128,7 +128,7 @@ class MapChart extends React.Component<Props, State> {
                     </MenuItem>
                     <MenuItem className="custom-context-menu-item-divider"/>
                     <MenuItem className="custom-context-menu-item red-text">
-                        Close
+                        Close menu
                     </MenuItem>
                 </ContextMenu>
             </div>

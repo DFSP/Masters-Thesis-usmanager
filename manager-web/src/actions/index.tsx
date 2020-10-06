@@ -88,6 +88,15 @@ export function updateApp(previousApp: IApp, currentApp: IApp): EntitiesAction {
   }
 }
 
+export const DELETE_APP = 'DELETE_APP';
+
+export function deleteApp(app: IApp): EntitiesAction {
+    return {
+        type: DELETE_APP,
+        data: {apps: [app]}
+    }
+}
+
 export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
 export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
 export const APP_SERVICES_FAILURE = 'APP_SERVICES_FAILURE';
@@ -163,6 +172,15 @@ export function updateService(previousService: IService, currentService: IServic
     type: UPDATE_SERVICE,
     data: {services: [previousService, currentService]}
   }
+}
+
+export const DELETE_SERVICE = 'DELETE_SERVICE';
+
+export function deleteService(service: IService): EntitiesAction {
+    return {
+        type: DELETE_SERVICE,
+        data: {services: [service]}
+    }
 }
 
 export const SERVICE_APPS_REQUEST = 'SERVICE_APPS_REQUEST';
@@ -384,6 +402,15 @@ export function addContainer(container: IContainer): EntitiesAction {
   }
 }
 
+export const DELETE_CONTAINER = 'DELETE_CONTAINER';
+
+export function deleteContainer(container: IContainer): EntitiesAction {
+    return {
+        type: DELETE_CONTAINER,
+        data: {containers: [container]}
+    }
+}
+
 export const reloadContainers = () => ({
   [CALL_API]: {
     types: [CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE],
@@ -393,6 +420,7 @@ export const reloadContainers = () => ({
     method: 'post'
   }
 });
+
 export const CONTAINER_LOGS_REQUEST = 'CONTAINER_LOGS_REQUEST';
 export const CONTAINER_LOGS_SUCCESS = 'CONTAINER_LOGS_SUCCESS';
 export const CONTAINER_LOGS_FAILURE = 'CONTAINER_LOGS_FAILURE';
@@ -524,6 +552,15 @@ export function updateCloudHost(previousCloudHost: ICloudHost, currentCloudHost:
   }
 }
 
+export const DELETE_CLOUD_HOST = 'DELETE_CLOUD_HOST';
+
+export function deleteCloudHost(cloudHost: ICloudHost): EntitiesAction {
+    return {
+        type: DELETE_CLOUD_HOST,
+        data: {cloudHosts: [cloudHost]}
+    }
+}
+
 export const CLOUD_HOST_RULES_REQUEST = 'CLOUD_HOST_RULES_REQUEST';
 export const CLOUD_HOST_RULES_SUCCESS = 'CLOUD_HOST_RULES_SUCCESS';
 export const CLOUD_HOST_RULES_FAILURE = 'CLOUD_HOST_RULES_FAILURE';
@@ -633,6 +670,15 @@ export function updateEdgeHost(previousEdgeHost: IEdgeHost, currentEdgeHost: IEd
     type: UPDATE_EDGE_HOST,
     data: {edgeHosts: [previousEdgeHost, currentEdgeHost]}
   }
+}
+
+export const DELETE_EDGE_HOST = 'DELETE_EDGE_HOST';
+
+export function deleteEdgeHost(edgeHost: IEdgeHost): EntitiesAction {
+    return {
+        type: DELETE_EDGE_HOST,
+        data: {edgeHosts: [edgeHost]}
+    }
 }
 
 export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
@@ -746,6 +792,15 @@ export function updateNode(previousNode: INode, currentNode: INode): EntitiesAct
   }
 }
 
+export const DELETE_NODE = 'DELETE_NODE';
+
+export function deleteNode(node: INode): EntitiesAction {
+    return {
+        type: DELETE_NODE,
+        data: {nodes: [node]}
+    }
+}
+
 export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
 export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';
 export const RULES_HOST_FAILURE = 'RULES_HOST_FAILURE';
@@ -787,6 +842,15 @@ export function updateRuleHost(previousRuleHost: IRuleHost, currentRuleHost: IRu
     type: UPDATE_RULE_HOST,
     data: {hostRules: [previousRuleHost, currentRuleHost]}
   }
+}
+
+export const DELETE_RULE_HOST = 'DELETE_RULE_HOST';
+
+export function deleteHostRule(hostRule: IRuleHost): EntitiesAction {
+    return {
+        type: DELETE_RULE_HOST,
+        data: {hostRules: [hostRule]}
+    }
 }
 
 export const RULE_HOST_CONDITIONS_REQUEST = 'RULE_HOST_CONDITIONS_REQUEST';
@@ -934,6 +998,15 @@ export function updateRuleService(previousRuleService: IRuleService, currentRule
   }
 }
 
+export const DELETE_RULE_SERVICE = 'DELETE_RULE_SERVICE';
+
+export function deleteServiceRule(serviceRule: IRuleService): EntitiesAction {
+    return {
+        type: DELETE_RULE_SERVICE,
+        data: {serviceRules: [serviceRule]}
+    }
+}
+
 export const RULE_SERVICE_CONDITIONS_REQUEST = 'RULE_SERVICE_CONDITIONS_REQUEST';
 export const RULE_SERVICE_CONDITIONS_SUCCESS = 'RULE_SERVICE_CONDITIONS_SUCCESS';
 export const RULE_SERVICE_CONDITIONS_FAILURE = 'RULE_SERVICE_CONDITIONS_FAILURE';
@@ -1045,6 +1118,15 @@ export function updateRuleContainer(previousRuleContainer: IRuleContainer, curre
   }
 }
 
+export const DELETE_RULE_CONTAINER = 'DELETE_RULE_CONTAINER';
+
+export function deleteContainerRule(containerRule: IRuleContainer): EntitiesAction {
+    return {
+        type: DELETE_RULE_CONTAINER,
+        data: {containerRules: [containerRule]}
+    }
+}
+
 export const RULE_CONTAINER_CONDITIONS_REQUEST = 'RULE_CONTAINER_CONDITIONS_REQUEST';
 export const RULE_CONTAINER_CONDITIONS_SUCCESS = 'RULE_CONTAINER_CONDITIONS_SUCCESS';
 export const RULE_CONTAINER_CONDITIONS_FAILURE = 'RULE_CONTAINER_CONDITIONS_FAILURE';
@@ -1154,6 +1236,15 @@ export function updateCondition(previousCondition: IRuleCondition, currentCondit
     type: UPDATE_CONDITION,
     data: {conditions: [previousCondition, currentCondition]}
   }
+}
+
+export const DELETE_CONDITION = 'DELETE_CONDITION';
+
+export function deleteCondition(condition: IRuleCondition): EntitiesAction {
+    return {
+        type: DELETE_CONDITION,
+        data: {conditions: [condition]}
+    }
 }
 
 export const VALUE_MODES_REQUEST = 'VALUE_MODES_REQUEST';
@@ -1271,6 +1362,15 @@ export function updateSimulatedHostMetric(previousSimulatedHostMetric: ISimulate
   }
 }
 
+export const DELETE_SIMULATED_HOST_METRIC = 'DELETE_SIMULATED_HOST_METRIC';
+
+export function deleteSimulatedHostMetric(simulatedHostMetric: ISimulatedHostMetric): EntitiesAction {
+    return {
+        type: DELETE_SIMULATED_HOST_METRIC,
+        data: {simulatedHostMetrics: [simulatedHostMetric]}
+    }
+}
+
 export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST';
 export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS';
 export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE';
@@ -1383,6 +1483,15 @@ export function updateSimulatedServiceMetric(previousSimulatedServiceMetric: ISi
   }
 }
 
+export const DELETE_SIMULATED_SERVICE_METRIC = 'DELETE_SIMULATED_SERVICE_METRIC';
+
+export function deleteSimulatedServiceMetric(simulatedServiceMetric: ISimulatedServiceMetric): EntitiesAction {
+    return {
+        type: DELETE_SIMULATED_SERVICE_METRIC,
+        data: {simulatedServiceMetrics: [simulatedServiceMetric]}
+    }
+}
+
 export const SIMULATED_SERVICE_METRIC_SERVICES_REQUEST = 'SIMULATED_SERVICE_METRIC_SERVICES_REQUEST';
 export const SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS = 'SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS';
 export const SIMULATED_SERVICE_METRIC_SERVICES_FAILURE = 'SIMULATED_SERVICE_METRIC_SERVICES_FAILURE';
@@ -1461,6 +1570,15 @@ export function updateSimulatedContainerMetric(previousSimulatedContainerMetric:
   }
 }
 
+export const DELETE_SIMULATED_CONTAINER_METRIC = 'DELETE_SIMULATED_CONTAINER_METRIC';
+
+export function deleteSimulatedContainerMetric(simulatedContainerMetric: ISimulatedContainerMetric): EntitiesAction {
+    return {
+        type: DELETE_SIMULATED_CONTAINER_METRIC,
+        data: {simulatedContainerMetrics: [simulatedContainerMetric]}
+    }
+}
+
 export const SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST = 'SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST';
 export const SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS = 'SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS';
 export const SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE = 'SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE';
@@ -1536,6 +1654,15 @@ export function updateRegion(previousRegion: IRegion, currentRegion: IRegion): E
     type: UPDATE_REGION,
     data: {regions: [previousRegion, currentRegion]}
   }
+}
+
+export const DELETE_REGION = 'DELETE_REGION';
+
+export function deleteRegion(region: IRegion): EntitiesAction {
+    return {
+        type: DELETE_REGION,
+        data: {regions: [region]}
+    }
 }
 
 export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
@@ -1638,6 +1765,15 @@ export function addWorkerManager(workerManager: IWorkerManager): EntitiesAction 
     type: ADD_WORKER_MANAGER,
     data: {workerManagers: new Array(workerManager)}
   }
+}
+
+export const DELETE_WORKER_MANAGER = 'DELETE_WORKER_MANAGER';
+
+export function deleteWorkerManager(workerManager: IWorkerManager): EntitiesAction {
+    return {
+        type: DELETE_WORKER_MANAGER,
+        data: {workerManagers: [workerManager]}
+    }
 }
 
 export const WORKER_MANAGER_HOSTS_REQUEST = 'WORKER_MANAGER_HOSTS_REQUEST';

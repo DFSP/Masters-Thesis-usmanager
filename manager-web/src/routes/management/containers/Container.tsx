@@ -48,7 +48,7 @@ import {
 } from "../../../actions";
 import {connect} from "react-redux";
 import React, {createRef} from "react";
-import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
 import ContainerPortsList from "./ContainerPortsList";
@@ -463,7 +463,7 @@ class Container extends BaseComponent<Props, State> {
         if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
             return '/hosts/cloud';
         }
-        if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname))  {
+        if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname)) {
             return '/hosts/edge';
         }
         return null;
@@ -635,7 +635,7 @@ class Container extends BaseComponent<Props, State> {
         },
         {
             title: 'Generic rules',
-            id: 'genericEdgeRules',
+            id: 'genericContainerRules',
             content: () => this.genericRules()
         },
         {

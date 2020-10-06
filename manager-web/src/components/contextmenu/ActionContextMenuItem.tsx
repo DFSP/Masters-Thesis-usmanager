@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-.container {
-    padding: 5% 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+import {MenuItem} from "react-contextmenu";
+import {Link} from "react-router-dom";
+import React from "react";
+
+interface Props<T> {
+    option: string;
+    state: T;
+    onClick: (e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>, data: T, target: HTMLElement) => void;
 }
 
-.icon {
-    color: #e51220;
-    font-size: 4rem;
-}
+const ActionContextMenuItem = <T extends object>({option, state, onClick}: Props<T>) => (
+    <MenuItem className='custom-context-menu-item' data={state} onClick={onClick}>
+        {option}
+    </MenuItem>
+);
 
-.message {
-    color: white;
-    margin: 0 !important;
-    padding: 25px;
-}
+export default ActionContextMenuItem;

@@ -26,36 +26,133 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {IContainer} from "./Container";
+import BaseComponent from "../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
+import {EntitiesAction} from "../../../reducers/entities";
+import {deleteContainer} from "../../../actions";
+import {connect} from "react-redux";
 
-interface ContainerCardProps {
-  container: IContainer;
+interface State {
+    loading: boolean;
 }
 
-type Props = ContainerCardProps;
+interface ContainerCardProps {
+    container: IContainer;
+}
 
-const CardService = Card<IContainer>();
-const ServiceCard = ({container}: Props) => (
-  <CardService title={container.containerId.toString()}
-               link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
-               height={'215px'}
-               margin={'10px 0'}
-               hoverable>
-    <CardItem key={'names'}
-              label={'Names'}
-              value={container.names.join(', ')}/>
-    <CardItem key={'image'}
-              label={'Image'}
-              value={container.image}/>
-    <CardItem key={'hostname'}
-              label={'Hostname'}
-              value={container.publicIpAddress}/>
-    <CardItem key={'ports'}
-              label={'Ports'}
-              value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
-    <CardItem key={'type'}
-              label={'Type'}
-              value={`${container.labels['serviceType']}`}/>
-  </CardService>
-);
+interface DispatchToProps {
+    deleteContainer: (container: IContainer) => void;
+}
 
-export default ServiceCard;
+type Props = DispatchToProps & ContainerCardProps;
+
+class ContainerCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (container: IContainer): void => {
+        super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteContainer(container);
+    }
+
+    private onDeleteFailure = (reason: string, container: IContainer): void => {
+        super.toast(`Unable to stop ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {container} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'View ports'}
+                pathname={`/containers/${container.containerId}#ports`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'View labels'}
+                pathname={`/containers/${container.containerId}#labels`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'Check logs'}
+                pathname={`/containers/${container.containerId}#logs`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'Modify rules'}
+                pathname={`/containers/${container.containerId}#rules`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'View generic rules'}
+                pathname={`/containers/${container.containerId}#genericContainerRules`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'Modify simulated metrics'}
+                pathname={`/containers/${container.containerId}#simulatedMetrics`}
+                state={container}/>,
+            <LinkedContextMenuItem
+                option={'View generic simulated metrics'}
+                pathname={`/containers/${container.containerId}#genericSimulatedMetrics`}
+                state={container}/>
+        ];
+    }
+
+    public render() {
+        const {container} = this.props;
+        const {loading} = this.state;
+        const CardContainer = Card<IContainer>();
+        return <CardContainer id={`container-${container.containerId}`}
+                              title={container.containerId.toString()}
+                              link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
+                              height={'215px'}
+                              margin={'10px 0'}
+                              hoverable
+                              delete={{
+                                  textButton: 'Stop',
+                                  url: `containers/${container.containerId}`,
+                                  successCallback: this.onDeleteSuccess,
+                                  failureCallback: this.onDeleteFailure
+                              }}
+                              loading={loading}
+                              contextMenuItems={this.contextMenu()}>
+            <CardItem key={'names'}
+                      label={'Names'}
+                      value={container.names.join(', ')}/>
+            <CardItem key={'image'}
+                      label={'Image'}
+                      value={container.image}/>
+            <CardItem key={'hostname'}
+                      label={'Hostname'}
+                      value={container.publicIpAddress}/>
+            <CardItem key={'ports'}
+                      label={'Ports'}
+                      value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+            <CardItem key={'type'}
+                      label={'Type'}
+                      value={`${container.labels['serviceType']}`}/>
+        </CardContainer>
+    }
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteContainer
+};
+
+export default connect(null, mapDispatchToProps)(ContainerCard);

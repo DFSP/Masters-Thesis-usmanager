@@ -22,20 +22,13 @@
  * SOFTWARE.
  */
 
-.container {
-    padding: 5% 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+import {MenuItem} from "react-contextmenu";
+import {Link} from "react-router-dom";
+import React from "react";
 
-.icon {
-    color: #e51220;
-    font-size: 4rem;
-}
 
-.message {
-    color: white;
-    margin: 0 !important;
-    padding: 25px;
-}
+const DividerContextMenuItem = <T extends object>() => (
+    <MenuItem className='custom-context-menu-item-divider'/>
+);
+
+export default DividerContextMenuItem;

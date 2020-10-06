@@ -27,27 +27,124 @@ import CardItem from "../../../components/list/CardItem";
 import Card from "../../../components/cards/Card";
 import {ILoadBalancer} from "./LoadBalancer";
 import {IContainer} from "../containers/Container";
+import BaseComponent from "../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
+import {deleteContainer} from "../../../actions";
+import {connect} from "react-redux";
 
-interface LoadBalancerCardProps {
-  loadBalancer: ILoadBalancer;
+interface State {
+    loading: boolean;
 }
 
-type Props = LoadBalancerCardProps;
+interface LoadBalancerCardProps {
+    loadBalancer: ILoadBalancer;
+}
 
-const CardLoadBalancer = Card<IContainer>();
-const LoadBalancerCard = ({loadBalancer}: Props) => (
-  <CardLoadBalancer title={loadBalancer.containerId.toString()}
-                    link={{to: {pathname: `/load-balancers/${loadBalancer.containerId}`, state: loadBalancer}}}
-                    height={'125px'}
-                    margin={'10px 0'}
-                    hoverable>
-    <CardItem key={'hostname'}
-              label={'Hostname'}
-              value={loadBalancer.publicIpAddress}/>
-    <CardItem key={'ports'}
-              label={'Ports'}
-              value={`${loadBalancer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
-  </CardLoadBalancer>
-);
+interface DispatchToProps {
+    deleteContainer: (loadBalancer: ILoadBalancer) => void;
+}
 
-export default LoadBalancerCard;
+type Props = DispatchToProps & LoadBalancerCardProps;
+
+class LoadBalancerCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onStopSuccess = (loadBalancer: ILoadBalancer): void => {
+        super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteContainer(loadBalancer)
+    }
+
+    private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
+        super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {loadBalancer} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'View ports'}
+                pathname={`/containers/${loadBalancer.containerId}#ports`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'View labels'}
+                pathname={`/containers/${loadBalancer.containerId}#labels`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'Check logs'}
+                pathname={`/containers/${loadBalancer.containerId}#logs`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'Modify rules'}
+                pathname={`/containers/${loadBalancer.containerId}#rules`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'View generic rules'}
+                pathname={`/containers/${loadBalancer.containerId}#genericContainerRules`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'Modify simulated metrics'}
+                pathname={`/containers/${loadBalancer.containerId}#simulatedMetrics`}
+                state={loadBalancer}/>,
+            <LinkedContextMenuItem
+                option={'View generic simulated metrics'}
+                pathname={`/containers/${loadBalancer.containerId}#genericSimulatedMetrics`}
+                state={loadBalancer}/>
+        ];
+    }
+
+    public render() {
+        const {loadBalancer} = this.props;
+        const {loading} = this.state;
+        const CardLoadBalancer = Card<IContainer>();
+        return <CardLoadBalancer id={`load-balancer-${loadBalancer.id}`}
+                                 title={loadBalancer.containerId.toString()}
+                                 link={{to: {pathname: `/load-balancers/${loadBalancer.containerId}`, state: loadBalancer}}}
+                                 height={'125px'}
+                                 margin={'10px 0'}
+                                 hoverable
+                                 delete={{
+                                     textButton: 'Stop',
+                                     url: `containers/${loadBalancer.containerId}`,
+                                     successCallback: this.onStopSuccess,
+                                     failureCallback: this.onStopFailure,
+                                 }}
+                                 loading={loading}
+                                 contextMenuItems={this.contextMenu()}>
+            <CardItem key={'hostname'}
+                      label={'Hostname'}
+                      value={loadBalancer.publicIpAddress}/>
+            <CardItem key={'ports'}
+                      label={'Ports'}
+                      value={`${loadBalancer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+        </CardLoadBalancer>
+    }
+
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteContainer
+};
+
+export default connect(null, mapDispatchToProps)(LoadBalancerCard);

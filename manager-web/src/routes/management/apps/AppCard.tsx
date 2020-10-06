@@ -25,10 +25,11 @@
 import Card from "../../../components/cards/Card";
 import React from "react";
 import {IApp} from "./App";
-import Form from "../../../components/form/Form";
 import BaseComponent from "../../../components/BaseComponent";
-import {MenuItem, MenuItemProps} from "react-contextmenu";
-import {Link} from "react-router-dom";
+import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
+import {EntitiesAction} from "../../../reducers/entities";
+import {deleteApp} from "../../../actions";
+import {connect} from "react-redux";
 
 interface State {
     loading: boolean;
@@ -38,9 +39,13 @@ interface AppCardProps {
     app: IApp;
 }
 
-type Props = AppCardProps;
+interface DispatchToProps {
+    deleteApp: (app: IApp) => EntitiesAction;
+}
 
-export default class AppCard extends BaseComponent<Props, State> {
+type Props = DispatchToProps & AppCardProps;
+
+class AppCard extends BaseComponent<Props, State> {
 
     private mounted = false;
 
@@ -55,7 +60,7 @@ export default class AppCard extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -64,10 +69,11 @@ export default class AppCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
+        this.props.deleteApp(app);
     }
 
     private onDeleteFailure = (reason: string, app: IApp): void => {
-        super.toast(`Unable to delete <b>${app.name}</b> app`, 10000, reason, true);
+        super.toast(`Unable to delete ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -76,14 +82,10 @@ export default class AppCard extends BaseComponent<Props, State> {
     private contextMenu = (): JSX.Element[] => {
         const {app} = this.props;
         return [
-            <Link to={{
-                pathname: `/apps/${app.name}#services`,
-                state: app
-            }}>
-                <MenuItem className='custom-context-menu-item'>
-                    Modify services
-                </MenuItem>
-            </Link>
+            <LinkedContextMenuItem
+                option={'Modify services'}
+                pathname={`/apps/${app.name}#services`}
+                state={app}/>,
         ];
     }
 
@@ -107,3 +109,9 @@ export default class AppCard extends BaseComponent<Props, State> {
     }
 
 }
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteApp
+};
+
+export default connect(null, mapDispatchToProps)(AppCard);

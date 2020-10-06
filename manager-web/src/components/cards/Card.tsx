@@ -28,22 +28,22 @@ import {Link} from "react-router-dom";
 import CardTitle from "../list/CardTitle";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
-import {ContextMenu, ContextMenuTrigger, MenuItem, MenuItemProps} from "react-contextmenu";
+import {ContextMenu, ContextMenuTrigger, MenuItem} from "react-contextmenu";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {deleteData} from "../../utils/api";
 import {RestOperation} from "../form/Form";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 
 interface CardProps<T> {
-    id?: string; // TODO remove optional
+    id: string;
     title?: string;
     link?: { to: { pathname: string, state: T } };
     height?: number | string;
     margin?: number | string;
     hoverable?: boolean;
     children?: any[];
-    delete?: RestOperation; // TODO remove optional
-    loading?: boolean; // TODO remove optional
+    delete?: RestOperation;
+    loading?: boolean;
     contextMenuItems?: JSX.Element[];
 }
 
@@ -88,7 +88,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
         const {loading} = this.state;
         const cardElement =
             <>
-                <ActionProgressBar loading={loading} backgroundColor={"#1F1F1F"} progressBarColor={"#c93030"}/>
+                <ActionProgressBar loading={loading} backgroundColor={"#1F1F1F"} progressBarColor={"#e51220"}/>
                 {this.cardElement()}
             </>;
         return (
@@ -124,27 +124,30 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                             <MenuItem className="custom-context-menu-item-divider"/>
                         </div>
                     )}
-                    <div className={`${loading ? '' : 'modal-trigger'}`} data-target={id}>
+                    {this.props.delete != undefined && <div className={`${loading ? '' : 'modal-trigger'}`} data-target={id}>
                         <MenuItem className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
-                                  data={{foo: 'bar'}}
+                                  data={this.props.link?.to.state}
                                   disabled={loading}>
-                            Delete
+                            {this.props.delete.textButton || 'Delete'}
                         </MenuItem>
-                    </div>
+                    </div>}
                 </ContextMenu>
-                <ConfirmDialog id={id || ''}
-                               message={`delete ${title}`}
-                               confirmCallback={this.onDelete}/>
+                {this.props.delete != undefined && <ConfirmDialog id={id}
+                               message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${title}`}`}
+                               confirmCallback={this.onDelete}/>}
             </>
         )
     }
 
     private onDelete = () => {
-        const args = this.props.link?.to.state;
-        deleteData(this.props.delete?.url || '',
-            () => this.props.delete?.successCallback(args),
-            (reply) => this.props.delete?.failureCallback(reply, args));
-        this.setState({loading: true});
+        const {delete: deleteCard} = this.props;
+        if (deleteCard) {
+            const args = this.props.link?.to.state;
+            deleteData(deleteCard.url,
+                () => deleteCard.successCallback(args),
+                (reply) => deleteCard.failureCallback(reply, args));
+            this.setState({loading: true});
+        }
     }
 
     private getChildrenCount = (): number =>

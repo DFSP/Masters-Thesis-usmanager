@@ -26,51 +26,135 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {IEdgeHost} from "./EdgeHost";
+import BaseComponent from "../../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
+import {deleteEdgeHost} from "../../../../actions";
+import {connect} from "react-redux";
 
-interface EdgeHostCardProps {
-  edgeHost: IEdgeHost;
+interface State {
+    loading: boolean;
 }
 
-type Props = EdgeHostCardProps;
+interface EdgeHostCardProps {
+    edgeHost: IEdgeHost;
+}
 
-const CardEdgeHost = Card<IEdgeHost>();
-const EdgeHostCard = ({edgeHost}: Props) => (
-  <CardEdgeHost title={edgeHost.publicIpAddress}
-                link={{
-                  to: {
-                    pathname: `/hosts/edge/${edgeHost.publicIpAddress}`,
-                    state: edgeHost
-                  }
-                }}
-                height={'215px'}
-                margin={'10px 0'}
-                hoverable>
-    <CardItem key={'username'}
-              label={'Username'}
-              value={`${edgeHost.username}`}/>
-    <CardItem key={'publicDnsName'}
-              label={'Public dns name'}
-              value={`${edgeHost.publicDnsName}`}/>
-    <CardItem key={'privateIpAddress'}
-              label={'Private ip address'}
-              value={`${edgeHost.privateIpAddress}`}/>
-    <CardItem key={'publicIpAddress'}
-              label={'Public ip address'}
-              value={`${edgeHost.publicIpAddress}`}/>
-    <CardItem key={'region'}
-              label={'Region'}
-              value={`${edgeHost.region.name}`}/>
-    <CardItem key={'country'}
-              label={'Country'}
-              value={`${edgeHost.country}`}/>
-    <CardItem key={'city'}
-              label={'City'}
-              value={`${edgeHost.city}`}/>
-    {edgeHost.managedByWorker &&
-     <CardItem key={'managedByWorker'}
-               label={'managedByWorker'}
-               value={`${edgeHost.managedByWorker.id}`}/>}
-  </CardEdgeHost>
-);
+interface DispatchToProps {
+    deleteEdgeHost: (edgeHost: IEdgeHost) => void;
+}
 
-export default EdgeHostCard;
+type Props = DispatchToProps & EdgeHostCardProps;
+
+class EdgeHostCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
+        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteEdgeHost(edgeHost);
+    }
+
+    private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {edgeHost} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'Modify rules'}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#rules`}
+                state={edgeHost}/>,
+            <LinkedContextMenuItem
+                option={'View generic rules'}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#genericContainerRules`}
+                state={edgeHost}/>,
+            <LinkedContextMenuItem
+                option={'Modify simulated metrics'}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#simulatedMetrics`}
+                state={edgeHost}/>,
+            <LinkedContextMenuItem
+                option={'View generic simulated metrics'}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#genericSimulatedMetrics`}
+                state={edgeHost}/>
+        ];
+    }
+
+    public render() {
+        const {edgeHost} = this.props;
+        const {loading} = this.state;
+        const CardEdgeHost = Card<IEdgeHost>();
+        return <CardEdgeHost id={`edgeHost-${edgeHost.id}`}
+                             title={edgeHost.publicIpAddress}
+                             link={{
+                                 to: {
+                                     pathname: `/hosts/edge/${edgeHost.publicIpAddress}`,
+                                     state: edgeHost
+                                 }
+                             }}
+                             height={'215px'}
+                             margin={'10px 0'}
+                             hoverable
+                             delete={{
+                                 url: `hosts/edge/${edgeHost.publicIpAddress}`,
+                                 successCallback: this.onDeleteSuccess,
+                                 failureCallback: this.onDeleteFailure,
+                             }}
+                             loading={loading}
+                             contextMenuItems={this.contextMenu()}>
+            <CardItem key={'username'}
+                      label={'Username'}
+                      value={`${edgeHost.username}`}/>
+            <CardItem key={'publicDnsName'}
+                      label={'Public dns name'}
+                      value={`${edgeHost.publicDnsName}`}/>
+            <CardItem key={'privateIpAddress'}
+                      label={'Private ip address'}
+                      value={`${edgeHost.privateIpAddress}`}/>
+            <CardItem key={'publicIpAddress'}
+                      label={'Public ip address'}
+                      value={`${edgeHost.publicIpAddress}`}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={`${edgeHost.region.name}`}/>
+            <CardItem key={'country'}
+                      label={'Country'}
+                      value={`${edgeHost.country}`}/>
+            <CardItem key={'city'}
+                      label={'City'}
+                      value={`${edgeHost.city}`}/>
+            {edgeHost.managedByWorker &&
+            <CardItem key={'managedByWorker'}
+                      label={'managedByWorker'}
+                      value={`${edgeHost.managedByWorker.id}`}/>}
+        </CardEdgeHost>
+    }
+
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteEdgeHost,
+};
+
+export default connect(null, mapDispatchToProps)(EdgeHostCard);

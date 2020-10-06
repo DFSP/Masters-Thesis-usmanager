@@ -22,34 +22,114 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {IRuleHost} from "./RuleHost";
 import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
+import React from "react";
+import {deleteHostRule} from "../../../../actions";
+import BaseComponent from "../../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
+import {connect} from "react-redux";
+import {IRuleHost} from "./RuleHost";
 
-interface HostRuleCardProps {
-  rule: IRuleHost;
+interface State {
+    loading: boolean;
 }
 
-type Props = HostRuleCardProps;
+interface HostCardProps {
+    rule: IRuleHost;
+}
 
-const CardRuleHost = Card<IRuleHost>();
-const RuleHostCard = ({rule}: Props) => (
-  <CardRuleHost title={rule.name}
-                link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
-                height={'120px'}
-                margin={'10px 0'}
-                hoverable>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.ruleDecision}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
-  </CardRuleHost>
-);
+interface DispatchToProps {
+    deleteHostRule: (hostRule: IRuleHost) => void;
+}
 
-export default RuleHostCard;
+type Props = DispatchToProps & HostCardProps;
+
+class RuleHostCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (ruleHost: IRuleHost): void => {
+        super.toast(`<span class="green-text">Host rule <b class="white-text">${ruleHost.name}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteHostRule(ruleHost);
+    }
+
+    private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {rule} = this.props;
+        const menuItems = [
+            <LinkedContextMenuItem
+                option={'Modify conditions'}
+                pathname={`/rules/hosts/${rule.name}#conditions`}
+                state={rule}/>
+        ];
+        if (!rule.generic) {
+            menuItems.push(
+                <LinkedContextMenuItem
+                    option={'Modify hosts'}
+                    pathname={`/rules/hosts/${rule.name}#hosts`}
+                    state={rule}/>
+            );
+        }
+        return menuItems;
+    }
+
+    public render() {
+        const {rule} = this.props;
+        const {loading} = this.state;
+        const CardRuleHost = Card<IRuleHost>();
+        return <CardRuleHost id={`host-rule-${rule.id}`}
+                             title={rule.name}
+                             link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
+                             height={'120px'}
+                             margin={'10px 0'}
+                             hoverable
+                             delete={{
+                                 url: `rules/hosts/${rule.name}`,
+                                 successCallback: this.onDeleteSuccess,
+                                 failureCallback: this.onDeleteFailure,
+                             }}
+                             loading={loading}
+                             contextMenuItems={this.contextMenu()}>
+            <CardItem key={'priority'}
+                      label={'Priority'}
+                      value={`${rule.priority}`}/>
+            <CardItem key={'decision'}
+                      label={'Decision'}
+                      value={`${rule.decision.ruleDecision}`}/>
+            <CardItem key={'generic'}
+                      label={'Generic'}
+                      value={`${rule.generic}`}/>
+        </CardRuleHost>
+    }
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteHostRule,
+};
+
+export default connect(null, mapDispatchToProps)(RuleHostCard);

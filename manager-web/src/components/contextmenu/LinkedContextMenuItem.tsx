@@ -22,20 +22,22 @@
  * SOFTWARE.
  */
 
-.container {
-    padding: 5% 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+import {MenuItem} from "react-contextmenu";
+import {Link} from "react-router-dom";
+import React from "react";
+
+interface Props<T> {
+    option: string;
+    pathname: string;
+    state: T;
 }
 
-.icon {
-    color: #e51220;
-    font-size: 4rem;
-}
+const LinkedContextMenuItem = <T extends object>({option, pathname, state}: Props<T>) => (
+    <Link to={{pathname, state}}>
+        <MenuItem className='custom-context-menu-item' data={state}>
+            {option}
+        </MenuItem>
+    </Link>
+);
 
-.message {
-    color: white;
-    margin: 0 !important;
-    padding: 25px;
-}
+export default LinkedContextMenuItem;

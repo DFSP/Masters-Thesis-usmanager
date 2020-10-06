@@ -26,41 +26,112 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedContainerMetric} from "./SimulatedContainerMetric";
+import BaseComponent from "../../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
+import {deleteSimulatedContainerMetric} from "../../../../actions";
+import {connect} from "react-redux";
 
-interface SimulatedContainerMetricCardProps {
-  simulatedContainerMetric: ISimulatedContainerMetric;
+interface State {
+    loading: boolean;
 }
 
-type Props = SimulatedContainerMetricCardProps;
+interface SimulatedContainerMetricCardProps {
+    simulatedContainerMetric: ISimulatedContainerMetric;
+}
 
-const CardSimulatedContainerMetric = Card<ISimulatedContainerMetric>();
-const SimulatedContainerMetricCard = ({simulatedContainerMetric}: Props) => (
-  <CardSimulatedContainerMetric title={simulatedContainerMetric.name}
-                                link={{
-                                  to: {
-                                    pathname: `/simulated-metrics/containers/${simulatedContainerMetric.name}`,
-                                    state: simulatedContainerMetric
-                                  }
-                                }}
-                                height={'170px'}
-                                margin={'10px 0'}
-                                hoverable>
-    <CardItem key={'Field'}
-              label={'Field'}
-              value={`${simulatedContainerMetric.field.name}`}/>
-    <CardItem key={'MinimumValue'}
-              label='Minimum value'
-              value={`${simulatedContainerMetric.minimumValue}`}/>
-    <CardItem key={'MaximumValue'}
-              label='Maximum value'
-              value={`${simulatedContainerMetric.maximumValue}`}/>
-    <CardItem key={'Override'}
-              label='Override'
-              value={`${simulatedContainerMetric.override}`}/>
-    <CardItem key={'Generic'}
-              label='Generic'
-              value={`${simulatedContainerMetric.generic}`}/>
-  </CardSimulatedContainerMetric>
-);
+interface DispatchToProps {
+    deleteSimulatedContainerMetric: (simulatedContainerMetric: ISimulatedContainerMetric) => void;
+}
 
-export default SimulatedContainerMetricCard;
+type Props = DispatchToProps & SimulatedContainerMetricCardProps;
+
+class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
+        super.toast(`<span class="green-text">Simulated container metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteSimulatedContainerMetric(simulatedMetric);
+    }
+
+    private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {simulatedContainerMetric} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'Modify containers'}
+                pathname={`/simulated-metrics/containers/${simulatedContainerMetric.name}#containers`}
+                state={simulatedContainerMetric}/>,
+        ];
+    }
+
+    public render() {
+        const {simulatedContainerMetric} = this.props;
+        const {loading} = this.state;
+        const CardSimulatedContainerMetric = Card<ISimulatedContainerMetric>();
+        return <CardSimulatedContainerMetric id={`simulated-container-metric-${simulatedContainerMetric.id}`}
+                                             title={simulatedContainerMetric.name}
+                                             link={{
+                                                 to: {
+                                                     pathname: `/simulated-metrics/containers/${simulatedContainerMetric.name}`,
+                                                     state: simulatedContainerMetric
+                                                 }
+                                             }}
+                                             height={'170px'}
+                                             margin={'10px 0'}
+                                             hoverable
+                                             delete={{
+                                                 url: `simulated-metrics/containers/${simulatedContainerMetric.name}`,
+                                                 successCallback: this.onDeleteSuccess,
+                                                 failureCallback: this.onDeleteFailure,
+                                             }}
+                                             loading={loading}
+                                             contextMenuItems={this.contextMenu()}>
+            <CardItem key={'Field'}
+                      label={'Field'}
+                      value={`${simulatedContainerMetric.field.name}`}/>
+            <CardItem key={'MinimumValue'}
+                      label='Minimum value'
+                      value={`${simulatedContainerMetric.minimumValue}`}/>
+            <CardItem key={'MaximumValue'}
+                      label='Maximum value'
+                      value={`${simulatedContainerMetric.maximumValue}`}/>
+            <CardItem key={'Override'}
+                      label='Override'
+                      value={`${simulatedContainerMetric.override}`}/>
+            <CardItem key={'Generic'}
+                      label='Generic'
+                      value={`${simulatedContainerMetric.generic}`}/>
+        </CardSimulatedContainerMetric>;
+    }
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteSimulatedContainerMetric,
+};
+
+export default connect(null, mapDispatchToProps)(SimulatedContainerMetricCard);

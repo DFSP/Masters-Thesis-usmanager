@@ -60,7 +60,7 @@ class Apps extends BaseComponent<Props, {}> {
         <div className={`${styles.container}`}>
           <CardList<IApp>
             isLoading={this.props.isLoading}
-            /*error={this.props.error}*/
+            error={this.props.error}
             emptyMessage={"No apps to display"}
             list={this.props.apps}
             card={this.app}
@@ -82,7 +82,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
   {
     isLoading: state.entities.apps.isLoadingApps,
     error: state.entities.apps.loadAppsError,
-    apps: [{id: '0', name: 'test'}]/*(state.entities.apps.data && Object.values(state.entities.apps.data)) || []*/,
+    apps: (state.entities.apps.data && Object.values(state.entities.apps.data)) || [],
   }
 );
 

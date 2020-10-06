@@ -26,41 +26,116 @@ import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedHostMetric} from "./SimulatedHostMetric";
+import BaseComponent from "../../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
+import {deleteSimulatedHostMetric} from "../../../../actions";
+import {connect} from "react-redux";
 
-interface SimulatedHostMetricCardProps {
-  simulatedHostMetric: ISimulatedHostMetric;
+interface State {
+    loading: boolean;
 }
 
-type Props = SimulatedHostMetricCardProps;
+interface SimulatedHostMetricCardProps {
+    simulatedHostMetric: ISimulatedHostMetric;
+}
 
-const CardSimulatedHostMetric = Card<ISimulatedHostMetric>();
-const SimulatedHostMetricCard = ({simulatedHostMetric}: Props) => (
-  <CardSimulatedHostMetric title={simulatedHostMetric.name}
-                           link={{
-                             to: {
-                               pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`,
-                               state: simulatedHostMetric
-                             }
-                           }}
-                           height={'170px'}
-                           margin={'10px 0'}
-                           hoverable>
-    <CardItem key={'Field'}
-              label={'Field'}
-              value={`${simulatedHostMetric.field.name}`}/>
-    <CardItem key={'MinimumValue'}
-              label='Minimum value'
-              value={`${simulatedHostMetric.minimumValue}`}/>
-    <CardItem key={'MaximumValue'}
-              label='Maximum value'
-              value={`${simulatedHostMetric.maximumValue}`}/>
-    <CardItem key={'Override'}
-              label='Override'
-              value={`${simulatedHostMetric.override}`}/>
-    <CardItem key={'Generic'}
-              label='Generic'
-              value={`${simulatedHostMetric.generic}`}/>
-  </CardSimulatedHostMetric>
-);
+interface DispatchToProps {
+    deleteSimulatedHostMetric: (simulatedHostMetric: ISimulatedHostMetric) => void;
+}
 
-export default SimulatedHostMetricCard;
+type Props = DispatchToProps & SimulatedHostMetricCardProps;
+
+class SimulatedHostMetricCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
+        super.toast(`<span class="green-text">Simulated host metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteSimulatedHostMetric(simulatedMetric);
+    }
+
+    private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {simulatedHostMetric} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'Modify cloud hosts'}
+                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}#cloudHosts`}
+                state={simulatedHostMetric}/>,
+            <LinkedContextMenuItem
+                option={'Modify edge hosts'}
+                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}#edgeHosts`}
+                state={simulatedHostMetric}/>,
+        ];
+    }
+
+    public render() {
+        const {simulatedHostMetric} = this.props;
+        const {loading} = this.state;
+        const CardSimulatedHostMetric = Card<ISimulatedHostMetric>();
+        return <CardSimulatedHostMetric id={`simulated-host-metric-${simulatedHostMetric.id}`}
+                                        title={simulatedHostMetric.name}
+                                        link={{
+                                            to: {
+                                                pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`,
+                                                state: simulatedHostMetric
+                                            }
+                                        }}
+                                        height={'170px'}
+                                        margin={'10px 0'}
+                                        hoverable
+                                        delete={{
+                                            url: `simulated-metrics/hosts/${simulatedHostMetric.name}`,
+                                            successCallback: this.onDeleteSuccess,
+                                            failureCallback: this.onDeleteFailure,
+                                        }}
+                                        loading={loading}
+                                        contextMenuItems={this.contextMenu()}>
+            <CardItem key={'Field'}
+                      label={'Field'}
+                      value={`${simulatedHostMetric.field.name}`}/>
+            <CardItem key={'MinimumValue'}
+                      label='Minimum value'
+                      value={`${simulatedHostMetric.minimumValue}`}/>
+            <CardItem key={'MaximumValue'}
+                      label='Maximum value'
+                      value={`${simulatedHostMetric.maximumValue}`}/>
+            <CardItem key={'Override'}
+                      label='Override'
+                      value={`${simulatedHostMetric.override}`}/>
+            <CardItem key={'Generic'}
+                      label='Generic'
+                      value={`${simulatedHostMetric.generic}`}/>
+        </CardSimulatedHostMetric>
+    }
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteSimulatedHostMetric,
+};
+
+export default connect(null, mapDispatchToProps)(SimulatedHostMetricCard);

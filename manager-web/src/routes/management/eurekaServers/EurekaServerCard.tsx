@@ -27,27 +27,129 @@ import CardItem from "../../../components/list/CardItem";
 import Card from "../../../components/cards/Card";
 import {IEurekaServer} from "./EurekaServer";
 import {IContainer} from "../containers/Container";
+import BaseComponent from "../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
+import {deleteContainer} from "../../../actions";
+import {connect} from "react-redux";
 
-interface EurekaServerCardProps {
-  eurekaServer: IEurekaServer;
+interface State {
+    loading: boolean;
 }
 
-type Props = EurekaServerCardProps;
+interface EurekaServerCardProps {
+    eurekaServer: IEurekaServer;
+}
 
-const CardEurekaServer = Card<IContainer>();
-const EurekaServerCard = ({eurekaServer}: Props) => (
-  <CardEurekaServer title={eurekaServer.containerId.toString()}
-                    link={{to: {pathname: `/eureka-servers/${eurekaServer.containerId}`, state: eurekaServer}}}
-                    height={'125px'}
-                    margin={'10px 0'}
-                    hoverable>
-    <CardItem key={'hostname'}
-              label={'Hostname'}
-              value={eurekaServer.publicIpAddress}/>
-    <CardItem key={'ports'}
-              label={'Ports'}
-              value={`${eurekaServer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
-  </CardEurekaServer>
-);
+interface DispatchToProps {
+    deleteContainer: (eurekaServer: IEurekaServer) => void;
+}
 
-export default EurekaServerCard;
+type Props = DispatchToProps & EurekaServerCardProps;
+
+class EurekaServerCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onStopSuccess = (eurekaServer: IEurekaServer): void => {
+        super.toast(`<span class="green-text">Eureka server <b class="white-text">${eurekaServer.containerId}</b> successfully stopped</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteContainer(eurekaServer)
+    }
+
+    private onStopFailure = (reason: string, eurekaServer: IEurekaServer): void => {
+        super.toast(`Unable to stop ${this.mounted ? `<b>${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} eureka server`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {eurekaServer} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'View ports'}
+                pathname={`/containers/${eurekaServer.containerId}#ports`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'View labels'}
+                pathname={`/containers/${eurekaServer.containerId}#labels`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'Check logs'}
+                pathname={`/containers/${eurekaServer.containerId}#logs`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'Modify rules'}
+                pathname={`/containers/${eurekaServer.containerId}#rules`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'View generic rules'}
+                pathname={`/containers/${eurekaServer.containerId}#genericContainerRules`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'Modify simulated metrics'}
+                pathname={`/containers/${eurekaServer.containerId}#simulatedMetrics`}
+                state={eurekaServer}/>,
+            <LinkedContextMenuItem
+                option={'View generic simulated metrics'}
+                pathname={`/containers/${eurekaServer.containerId}#genericSimulatedMetrics`}
+                state={eurekaServer}/>
+        ];
+    }
+
+    public render() {
+        const {eurekaServer} = this.props;
+        const {loading} = this.state;
+        const CardEurekaServer = Card<IContainer>();
+        return <CardEurekaServer id={`eurekaServer-${eurekaServer.containerId}`}
+                                 title={eurekaServer.containerId.toString()}
+                                 link={{
+                                     to: {
+                                         pathname: `/eureka-servers/${eurekaServer.containerId}`,
+                                         state: eurekaServer
+                                     }
+                                 }}
+                                 height={'125px'}
+                                 margin={'10px 0'}
+                                 hoverable
+                                 delete={{
+                                     textButton: 'Stop',
+                                     url: `containers/${eurekaServer.containerId}`,
+                                     successCallback: this.onStopSuccess,
+                                     failureCallback: this.onStopFailure,
+                                 }}
+                                 loading={loading}
+                                 contextMenuItems={this.contextMenu()}>
+            <CardItem key={'hostname'}
+                      label={'Hostname'}
+                      value={eurekaServer.publicIpAddress}/>
+            <CardItem key={'ports'}
+                      label={'Ports'}
+                      value={`${eurekaServer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+        </CardEurekaServer>
+    }
+
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteContainer
+};
+
+export default connect(null, mapDispatchToProps)(EurekaServerCard);

@@ -25,42 +25,113 @@
 import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
+import {deleteSimulatedServiceMetric} from "../../../../actions";
 import {ISimulatedServiceMetric} from "./SimulatedServiceMetric";
+import BaseComponent from "../../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
+import {connect} from "react-redux";
 
-interface SimulatedServiceMetricCardProps {
-  simulatedServiceMetric: ISimulatedServiceMetric;
+interface State {
+    loading: boolean;
 }
 
-type Props = SimulatedServiceMetricCardProps;
+interface SimulatedServiceMetricCardProps {
+    simulatedServiceMetric: ISimulatedServiceMetric;
+}
 
-const CardSimulatedServiceMetric = Card<ISimulatedServiceMetric>();
-const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
-  <CardSimulatedServiceMetric title={simulatedServiceMetric.name}
-                              link={{
-                                to: {
-                                  pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`,
-                                  state: simulatedServiceMetric
-                                }
-                              }}
-                              height={'180px'}
-                              margin={'10px 0'}
-                              hoverable>
-    <CardItem key={'Field'}
-              label={'Field'}
-              value={`${simulatedServiceMetric.field.name}`}/>
-    <CardItem key={'MinimumValue'}
-              label='Minimum value'
-              value={`${simulatedServiceMetric.minimumValue}`}/>
-    <CardItem key={'MaximumValue'}
-              label='Maximum value'
-              value={`${simulatedServiceMetric.maximumValue}`}/>
-    <CardItem key={'Override'}
-              label='Override'
-              value={`${simulatedServiceMetric.override}`}/>
-    <CardItem key={'Generic'}
-              label='Generic'
-              value={`${simulatedServiceMetric.generic}`}/>
-  </CardSimulatedServiceMetric>
-);
+interface DispatchToProps {
+    deleteSimulatedServiceMetric: (simulatedServiceMetric: ISimulatedServiceMetric) => void;
+}
 
-export default SimulatedServiceMetricCard;
+type Props = DispatchToProps & SimulatedServiceMetricCardProps;
+
+class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
+        super.toast(`<span class="green-text">Simulated service metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteSimulatedServiceMetric(simulatedMetric);
+    }
+
+    private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {simulatedServiceMetric} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'Modify services'}
+                pathname={`/simulated-metrics/services/${simulatedServiceMetric.name}#services`}
+                state={simulatedServiceMetric}/>,
+        ];
+    }
+
+    public render() {
+        const {simulatedServiceMetric} = this.props;
+        const {loading} = this.state;
+        const CardSimulatedServiceMetric = Card<ISimulatedServiceMetric>();
+        return <CardSimulatedServiceMetric id={`simulated-service-metric-${simulatedServiceMetric.id}`}
+                                            title={simulatedServiceMetric.name}
+                                           link={{
+                                               to: {
+                                                   pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`,
+                                                   state: simulatedServiceMetric
+                                               }
+                                           }}
+                                           height={'180px'}
+                                           margin={'10px 0'}
+                                           hoverable
+                                           delete={{
+                                               url: `simulated-metrics/services/${simulatedServiceMetric.name}`,
+                                               successCallback: this.onDeleteSuccess,
+                                               failureCallback: this.onDeleteFailure,
+                                           }}
+                                           loading={loading}
+                                           contextMenuItems={this.contextMenu()}>
+            <CardItem key={'Field'}
+                      label={'Field'}
+                      value={`${simulatedServiceMetric.field.name}`}/>
+            <CardItem key={'MinimumValue'}
+                      label='Minimum value'
+                      value={`${simulatedServiceMetric.minimumValue}`}/>
+            <CardItem key={'MaximumValue'}
+                      label='Maximum value'
+                      value={`${simulatedServiceMetric.maximumValue}`}/>
+            <CardItem key={'Override'}
+                      label='Override'
+                      value={`${simulatedServiceMetric.override}`}/>
+            <CardItem key={'Generic'}
+                      label='Generic'
+                      value={`${simulatedServiceMetric.generic}`}/>
+        </CardSimulatedServiceMetric>
+    }
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteSimulatedServiceMetric,
+};
+
+export default connect(null, mapDispatchToProps)(SimulatedServiceMetricCard);

@@ -188,7 +188,7 @@ const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefi
 const edgeHosts = new schema.Array(edgeHost);
 
 const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
-  idAttribute: (node: INode) => node.id
+  idAttribute: (node: INode) => node.id.toString()
 });
 
 const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefined, {

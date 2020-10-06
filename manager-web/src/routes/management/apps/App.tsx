@@ -52,8 +52,6 @@ import InputDialog from "../../../components/dialogs/InputDialog";
 import {IRegion} from "../region/Region";
 import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
-import TestMap from "./TestMap";
-import {ContextMenu, ContextMenuTrigger, MenuItem} from "react-contextmenu";
 
 export interface IApp extends IDatabaseData {
     name: string;
@@ -414,9 +412,6 @@ class App extends BaseComponent<Props, State> {
                          onAddAppService={this.addAppService}
                          onRemoveAppServices={this.removeAppServices}/>;
 
-    private map = (): JSX.Element =>
-        <TestMap/>
-
     private tabs = (): Tab[] => [
         {
             title: 'App',
@@ -428,11 +423,6 @@ class App extends BaseComponent<Props, State> {
             id: 'services',
             content: () => this.services()
         },
-        {
-            title: 'Map',
-            id: 'map',
-            content: () => this.map()
-        }
     ];
 
 }

@@ -22,58 +22,159 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import CardItem from '../../../components/list/CardItem';
-import {IService} from "./Service";
 import Card from "../../../components/cards/Card";
+import React from "react";
+import {IService} from "./Service";
+import BaseComponent from "../../../components/BaseComponent";
+import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
+import {EntitiesAction} from "../../../reducers/entities";
+import {deleteService} from "../../../actions";
+import {connect} from "react-redux";
+import CardItem from "../../../components/list/CardItem";
 
-interface ServiceCardProps {
-  service: IService;
+interface State {
+    loading: boolean;
 }
 
-type Props = ServiceCardProps;
+interface ServiceCardProps {
+    service: IService;
+}
 
-const getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
-  if (minReplicas === maxReplicas) {
-    return `${minReplicas}`;
-  } else if (maxReplicas === 0) {
-    return `At least ${minReplicas}`
-  } else {
-    return `At least ${minReplicas} up to ${maxReplicas}`;
-  }
+interface DispatchToProps {
+    deleteService: (service: IService) => EntitiesAction;
+}
+
+type Props = DispatchToProps & ServiceCardProps;
+
+class ServiceCard extends BaseComponent<Props, State> {
+
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: false
+        }
+    }
+
+    public componentDidMount(): void {
+        this.mounted = true;
+    };
+
+    public componentWillUnmount(): void {
+        this.mounted = false;
+    }
+
+    private onDeleteSuccess = (service: IService): void => {
+        super.toast(`<span class="green-text">Service <b class="white-text">${service.serviceName}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.deleteService(service);
+    }
+
+    private onDeleteFailure = (reason: string, service: IService): void => {
+        super.toast(`Unable to delete ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    }
+
+    private contextMenu = (): JSX.Element[] => {
+        const {service} = this.props;
+        return [
+            <LinkedContextMenuItem
+                option={'Modify apps'}
+                pathname={`/services/${service.serviceName}#apps`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'Modify dependencies'}
+                pathname={`/services/${service.serviceName}#dependencies`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'View dependents'}
+                pathname={`/services/${service.serviceName}#dependents`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'Modify predictions'}
+                pathname={`/services/${service.serviceName}#predictions`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'Modify rules'}
+                pathname={`/services/${service.serviceName}#serviceRules`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'View generic rules'}
+                pathname={`/services/${service.serviceName}#genericRules`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'Modify simulated metrics'}
+                pathname={`/services/${service.serviceName}#simulatedMetrics`}
+                state={service}/>,
+            <LinkedContextMenuItem
+                option={'View generic simulated metrics'}
+                pathname={`/services/${service.serviceName}#genericSimulatedMetrics`}
+                state={service}/>
+        ];
+    }
+
+    private getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
+        if (minReplicas === maxReplicas) {
+            return `${minReplicas}`;
+        } else if (maxReplicas === 0) {
+            return `At least ${minReplicas}`
+        } else {
+            return `At least ${minReplicas} up to ${maxReplicas}`;
+        }
+    };
+
+    public render() {
+        const {service} = this.props;
+        const {loading} = this.state;
+        const CardService = Card<IService>();
+        return <CardService id={`service-${service.id}`}
+                            title={service.serviceName}
+                            link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
+                            height={'250px'}
+                            margin={'10px 0'}
+                            hoverable
+                            delete={{
+                                url: `services/${service.serviceName}`,
+                                successCallback: this.onDeleteSuccess,
+                                failureCallback: this.onDeleteFailure
+                            }}
+                            loading={loading}
+                            contextMenuItems={this.contextMenu()}>
+            <CardItem key={'serviceType'}
+                      label={'Service type'}
+                      value={`${service.serviceType}`}/>
+            <CardItem key={'replicas'}
+                      label={'Replicas'}
+                      value={this.getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
+            <CardItem key={'ports'}
+                      label={'Ports'}
+                      value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
+            {service.launchCommand !== '' &&
+            <CardItem key={'launchCommand'}
+                      label={'Launch command'}
+                      value={service.launchCommand}/>}
+            <CardItem key={'outputLabel'}
+                      label={'Output label'}
+                      value={`${service.outputLabel}`}/>
+            {service.defaultDb !== 'NOT_APPLICABLE' &&
+            <CardItem key={'database'}
+                      label={'Database'}
+                      value={service.defaultDb}/>}
+            <CardItem key={'memory'}
+                      label={'Memory'}
+                      value={`${service.expectedMemoryConsumption} bytes`}/>
+        </CardService>
+    }
+
+}
+
+const mapDispatchToProps: DispatchToProps = {
+    deleteService
 };
 
-const CardService = Card<IService>();
-const ServiceCard = ({service}: Props) => (
-  <CardService title={service.serviceName}
-               link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
-               height={'250px'}
-               margin={'10px 0'}
-               hoverable>
-    <CardItem key={'serviceType'}
-              label={'Service type'}
-              value={`${service.serviceType}`}/>
-    <CardItem key={'replicas'}
-              label={'Replicas'}
-              value={getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
-    <CardItem key={'ports'}
-              label={'Ports'}
-              value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
-    {service.launchCommand !== '' &&
-     <CardItem key={'launchCommand'}
-               label={'Launch command'}
-               value={service.launchCommand}/>}
-    <CardItem key={'outputLabel'}
-              label={'Output label'}
-              value={`${service.outputLabel}`}/>
-    {service.defaultDb !== 'NOT_APPLICABLE' &&
-     <CardItem key={'database'}
-               label={'Database'}
-               value={service.defaultDb}/>}
-    <CardItem key={'memory'}
-              label={'Memory'}
-              value={`${service.expectedMemoryConsumption} bytes`}/>
-  </CardService>
-);
-
-export default ServiceCard;
+export default connect(null, mapDispatchToProps)(ServiceCard);
