@@ -74,7 +74,7 @@
 		</dependency>
 		<dependency>
 			<groupId>pt.unl.fct.usmanagement.manager</groupId>
-			<artifactId>manager-service</artifactId>
+			<artifactId>manager-services</artifactId>
 			<version>0.0.1</version>
 			<scope>compile</scope>
 		</dependency>

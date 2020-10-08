@@ -29,10 +29,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>pt.unl.fct.usmanagement.manager</groupId>
-	<artifactId>manager-service</artifactId>
+	<artifactId>manager-services</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<name>Manager Service</name>
+	<name>Manager Services</name>
 
 	<licenses>
 		<license>

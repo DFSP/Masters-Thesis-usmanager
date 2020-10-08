@@ -1,20 +1,19 @@
-# Manager database
+# Manager services
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
 
-Módulo que contém todas as entidades e repositórios que constituem a base de dados dos componentes 
-[master](../manager-master) e [worker](../manager-worker) managers.
+Módulo que contém todos os serviços comuns aos [master](../manager-master) e [worker](../manager-worker) managers.
 
 ## Requisitos
 
-#### Maven com java 11  
+##### Maven com java 11  
 ```shell script
-sudo apt install maven`  
+sudo apt install maven  
 maven --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  
- ## Executar   
+## Instalar
  
 ```shell script
  mvn -DskipTests install
@@ -25,7 +24,7 @@ Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/
 ```xml
 <dependency>
     <groupId>pt.unl.fct.usmanagement.manager</groupId>
-    <artifactId>manager-database</artifactId>
+    <artifactId>manager-services</artifactId>
     <version>0.0.1</version>
     <scope>compile</scope>
 </dependency>
