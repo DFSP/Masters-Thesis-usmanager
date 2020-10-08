@@ -15,6 +15,10 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [worker-manager](manager-worker)
 
+- [database-manager](manager-database)
+
+- [services-manager](manager-services)
+
 - [web-manager](manager-web)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
