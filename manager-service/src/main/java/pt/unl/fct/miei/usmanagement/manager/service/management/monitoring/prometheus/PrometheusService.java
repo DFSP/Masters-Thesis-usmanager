@@ -40,8 +40,6 @@ import java.util.Objects;
 @Service
 public class PrometheusService {
 
-	//TODO mudar as propriedades que são constantes para valores static final na respetiva classe?
-
 	public static final String PROMETHEUS = "prometheus";
 	private static final double PERCENT = 0.01;
 	private static final String DEFAULT_PORT = "9090";
@@ -62,32 +60,32 @@ public class PrometheusService {
 		return containersService.launchContainer(hostAddress, PROMETHEUS, true);
 	}
 
-	public double getAvailableMemory(String hostname) {
-		return getStat(hostname, HOST_AVAILABLE_MEMORY);
+	public double getAvailableMemory(HostAddress hostAddress) {
+		return getStat(hostAddress, HOST_AVAILABLE_MEMORY);
 	}
 
-	public double getTotalMemory(String hostname) {
-		return getStat(hostname, HOST_TOTAL_MEMORY);
+	public double getTotalMemory(HostAddress hostAddress) {
+		return getStat(hostAddress, HOST_TOTAL_MEMORY);
 	}
 
-	public double getMemoryUsagePercent(String hostname) {
-		double availableMemory = getStat(hostname, HOST_AVAILABLE_MEMORY + "/" + HOST_TOTAL_MEMORY);
+	public double getMemoryUsagePercent(HostAddress hostAddress) {
+		double availableMemory = getStat(hostAddress, HOST_AVAILABLE_MEMORY + "/" + HOST_TOTAL_MEMORY);
 		return availableMemory < 0 ? availableMemory : 100.0 - (availableMemory / PERCENT);
 	}
 
-	public double getCpuUsagePercent(String hostname) {
+	public double getCpuUsagePercent(HostAddress hostAddress) {
 		String queryParam = "100 - (avg by (instance) (irate(node_cpu_seconds_total"
 			+ "{job=\"node_exporter\", mode=\"idle\"}[5m])) * 100)";
-		return getStat(hostname, "{query}", queryParam);
+		return getStat(hostAddress, "{query}", queryParam);
 	}
 
-	private double getStat(String hostname, String statId) {
-		return getStat(hostname, statId, null);
+	private double getStat(HostAddress hostAddress, String statId) {
+		return getStat(hostAddress, statId, null);
 	}
 
-	private double getStat(String hostname, String statId, String queryParam) {
+	private double getStat(HostAddress hostAddress, String statId, String queryParam) {
 		String currentTime = Double.toString((System.currentTimeMillis() * 1.0) / 1000.0);
-		String url = String.format(URL_FORMAT, hostname, DEFAULT_PORT, statId, currentTime);
+		String url = String.format(URL_FORMAT, hostAddress.getPublicIpAddress(), DEFAULT_PORT, statId, currentTime);
 		String value = "";
 		try {
 			QueryOutput queryOutput;

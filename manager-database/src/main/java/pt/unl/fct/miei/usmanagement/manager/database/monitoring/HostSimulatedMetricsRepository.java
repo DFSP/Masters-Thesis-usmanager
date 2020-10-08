@@ -41,14 +41,18 @@ public interface HostSimulatedMetricsRepository extends JpaRepository<HostSimula
 
 	@Query("select m "
 		+ "from HostSimulatedMetricEntity m join m.cloudHosts c join m.edgeHosts e "
-		+ "where c.publicIpAddress = :hostname or e.publicDnsName = :hostname")
-	List<HostSimulatedMetricEntity> findByHost(@Param("hostname") String hostname);
+		+ "where (c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
+		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)")
+	List<HostSimulatedMetricEntity> findByHostAddress(@Param("publicIpAddress") String publicIpAddress,
+													  @Param("privateIpAddress") String privateIpAddress);
 
 	@Query("select m "
 		+ "from HostSimulatedMetricEntity m join m.cloudHosts c join m.edgeHosts e "
-		+ "where (c.publicIpAddress = :hostname or e.publicDnsName = :hostname or e.publicIpAddress = :hostname) "
+		+ "where ((c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
+		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)) "
 		+ "and lower(m.field.name) = lower(:field)")
-	Optional<HostSimulatedMetricEntity> findByHostAndField(@Param("hostname") String hostname,
+	Optional<HostSimulatedMetricEntity> findByHostAndField(@Param("publicIpAddress") String publicIpAddress,
+														   @Param("privateIpAddress") String privateIpAddress,
 														   @Param("field") String field);
 
 	@Query("select m "

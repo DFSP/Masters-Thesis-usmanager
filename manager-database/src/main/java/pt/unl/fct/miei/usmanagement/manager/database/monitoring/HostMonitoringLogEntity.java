@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -47,7 +48,7 @@ public class HostMonitoringLogEntity {
 	private Long id;
 
 	@NotNull
-	private String hostname;
+	private HostAddress hostAddress;
 
 	@NotNull
 	private String field;

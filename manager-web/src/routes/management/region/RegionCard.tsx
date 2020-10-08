@@ -75,7 +75,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, region: IRegion): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/regions/${region.name}><b>${region.name}</b></a> region`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

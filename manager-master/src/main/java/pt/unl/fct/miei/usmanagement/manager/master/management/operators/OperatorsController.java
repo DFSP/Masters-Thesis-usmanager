@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.operators;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.operators.OperatorsService;
 
 import java.util.List;
 

@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostRepository;
@@ -99,17 +100,16 @@ public class EdgeHostsService {
 			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
 	}
 
-	public EdgeHostEntity addEdgeHost(AddEdgeHostRequest addEdgeHostRequest) {
+	public EdgeHostEntity addEdgeHost(String username, String password, String publicDnsName, String publicIpAddress,
+									  String privateIpAddress, Coordinates coordinates) {
 		EdgeHostEntity edgeHost = EdgeHostEntity.builder()
-			.username(addEdgeHostRequest.getUsername())
-			.publicDnsName(addEdgeHostRequest.getPublicDnsName())
-			.publicIpAddress(addEdgeHostRequest.getPublicIpAddress())
-			.privateIpAddress(addEdgeHostRequest.getPrivateIpAddress())
-			.region(addEdgeHostRequest.getRegion())
-			.country(addEdgeHostRequest.getCountry())
-			.city(addEdgeHostRequest.getCity())
+			.username(username)
+			.publicDnsName(publicDnsName)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.coordinates(coordinates)
 			.build();
-		return addEdgeHost(edgeHost, addEdgeHostRequest.getPassword());
+		return addEdgeHost(edgeHost, password);
 	}
 
 	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHostEntity) {
@@ -267,8 +267,7 @@ public class EdgeHostsService {
 	private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
 		String privateKeyFilePath = getKeyFilePath(edgeHost);
 		String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
-		String cleanupCommand = String.format("rm -f %s %s", privateKeyFilePath, publicKeyFilePath);
-		bashService.executeCommand(cleanupCommand);
+		bashService.cleanup(privateKeyFilePath, publicKeyFilePath);
 	}
 
 }

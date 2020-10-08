@@ -31,6 +31,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,12 +79,12 @@ public class ContainersController {
 
 	@PostMapping("/{id}/replicate")
 	public ContainerEntity replicateContainer(@PathVariable String id, @Json String hostname) {
-		return containersService.replicateContainer(id, hostname);
+		return containersService.replicateContainer(id, new HostAddress(hostname));
 	}
 
 	@PostMapping("/{id}/migrate")
 	public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
-		return containersService.migrateContainer(id, hostname);
+		return containersService.migrateContainer(id, new HostAddress(hostname));
 	}
 
 	@PostMapping("/reload")

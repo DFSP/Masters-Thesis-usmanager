@@ -117,7 +117,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStopFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Failed to stop ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+        super.toast(`Failed to stop <a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a> instance`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -140,7 +140,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onTerminateFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Failed to terminate ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+        super.toast(`Failed to terminate <a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a> instance`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

@@ -29,10 +29,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class HostAddress {
+public class HostAddress implements Serializable {
 
 	private final String username;
 	private final String publicDnsName;

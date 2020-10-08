@@ -86,9 +86,9 @@ public class OperatorsService {
 	}
 
 	private void assertOperatorDoesntExist(OperatorEntity operator) {
-		String operatorName = operator.getOperator();
-		if (operators.hasOperator(operatorName)) {
-			throw new DataIntegrityViolationException("Operator '" + operatorName + "' already exists");
+		Operator op = operator.getOperator();
+		if (operators.hasOperator(op)) {
+			throw new DataIntegrityViolationException("Operator '" + op.getSymbol() + "' already exists");
 		}
 	}
 

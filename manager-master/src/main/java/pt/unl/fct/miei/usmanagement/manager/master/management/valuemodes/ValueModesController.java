@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.valuemodes;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.valuemodes.ValueModesService;
 
 import java.util.List;
 

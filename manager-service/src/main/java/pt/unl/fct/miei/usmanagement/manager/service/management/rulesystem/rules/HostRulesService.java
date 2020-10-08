@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.Operator;
@@ -86,9 +88,10 @@ public class HostRulesService {
 		return rules.findAll();
 	}
 
-	public List<HostRuleEntity> getRules(String hostname) {
-		//TODO what about cloud
-		return rules.findByEdgeHostname(hostname);
+	public List<HostRuleEntity> getRules(HostAddress hostAddress) {
+		String publicIpAddress = hostAddress.getPublicIpAddress();
+		String privateIpAddress = hostAddress.getPrivateIpAddress();
+		return rules.findByHostAddress(publicIpAddress, privateIpAddress);
 	}
 
 	public HostRuleEntity getRule(Long id) {
@@ -262,18 +265,18 @@ public class HostRulesService {
 		}
 	}
 
-	public HostDecisionResult processHostEvent(String hostname, HostEvent hostEvent) {
-		if (droolsService.shouldCreateNewRuleSession(hostname, lastUpdateHostRules.get())) {
-			List<Rule> rules = generateHostRules(hostname);
+	public HostDecisionResult processHostEvent(HostDetails hostDetails, HostEvent hostEvent) {
+		if (droolsService.shouldCreateNewHostRuleSession(hostDetails, lastUpdateHostRules.get())) {
+			List<Rule> rules = generateHostRules(hostDetails);
 			Map<Long, String> drools = droolsService.executeDroolsRules(hostEvent, rules, hostRuleTemplateFile);
-			droolsService.createNewHostRuleSession(hostname, drools);
+			droolsService.createNewHostRuleSession(hostDetails, drools);
 		}
 		return droolsService.evaluate(hostEvent);
 	}
 
-	private List<Rule> generateHostRules(String hostname) {
+	private List<Rule> generateHostRules(HostDetails hostDetails) {
 		//FIXME what about cloud hosts?
-		List<HostRuleEntity> hostRules = getRules(hostname);
+		List<HostRuleEntity> hostRules = getRules(hostDetails.getAddress());
 		List<Rule> rules = new ArrayList<>(hostRules.size());
 		log.info("Generating host rules... (count: {})", rules.size());
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));

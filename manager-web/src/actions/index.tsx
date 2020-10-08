@@ -1856,3 +1856,11 @@ export const changeComponent = (component: IComponent) => (
     component
   }
 );
+
+export const HIDE_CONFIRMATION_DIALOG = 'HIDE_CONFIRMATION_DIALOG';
+export const hideConfirmationDialog = (hidden: boolean) => (
+    {
+        type: HIDE_CONFIRMATION_DIALOG,
+        hidden
+    }
+);

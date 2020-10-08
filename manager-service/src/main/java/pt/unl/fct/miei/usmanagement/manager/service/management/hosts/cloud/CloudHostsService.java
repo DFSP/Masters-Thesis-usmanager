@@ -60,7 +60,6 @@ public class CloudHostsService {
 	private final HostRulesService hostRulesService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final HostsService hostsService;
-	private final ContainersService containersService;
 
 	private final CloudHostRepository cloudHosts;
 
@@ -68,13 +67,11 @@ public class CloudHostsService {
 							 @Lazy HostRulesService hostRulesService,
 							 @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							 @Lazy HostsService hostsService,
-							 @Lazy ContainersService containersService,
 							 CloudHostRepository cloudHosts) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.hostsService = hostsService;
-		this.containersService = containersService;
 		this.cloudHosts = cloudHosts;
 	}
 
@@ -191,7 +188,7 @@ public class CloudHostsService {
 	public void terminateCloudHost(String hostname) {
 		CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
 		try {
-			hostsService.removeHost(cloudHost.getPublicIpAddress());
+			hostsService.removeHost(cloudHost.getAddress());
 		}
 		catch (ManagerException e) {
 			log.error(e.getMessage());

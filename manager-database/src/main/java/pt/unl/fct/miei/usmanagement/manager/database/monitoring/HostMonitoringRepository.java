@@ -28,29 +28,30 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.List;
 
 @Repository
 public interface HostMonitoringRepository extends JpaRepository<HostMonitoringEntity, Long> {
 
-	List<HostMonitoringEntity> getByHostname(@Param("hostname") String hostname);
+	List<HostMonitoringEntity> getByHostAddress(@Param("hostAddress") HostAddress hostAddress);
 
-	HostMonitoringEntity getByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname,
-														 @Param("field") String field);
+	HostMonitoringEntity getByHostAddressAndFieldIgnoreCase(@Param("hostAddress") HostAddress hostAddress,
+															@Param("field") String field);
 
-	long countByHostnameAndFieldIgnoreCase(@Param("hostname") String hostname, @Param("field") String field);
-
-	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
-		+ "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
-		+ "from HostMonitoringEntity m "
-		+ "where m.hostname = :hostname")
-	List<HostFieldAvg> getHostFieldsAvg(@Param("hostname") String serviceName);
+	long countByHostAddressAndFieldIgnoreCase(@Param("hostAddress") HostAddress hostAddress, @Param("field") String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
-		+ "HostFieldAvg(m.hostname, m.field, m.sumValue / m.count, m.count) "
+		+ "HostFieldAvg(m.hostAddress, m.field, m.sumValue / m.count, m.count) "
 		+ "from HostMonitoringEntity m "
-		+ "where m.hostname = :hostname and m.field = :field")
-	HostFieldAvg getHostFieldAvg(@Param("hostname") String hostname, @Param("field") String field);
+		+ "where m.hostAddress = :hostAddress")
+	List<HostFieldAvg> getHostFieldsAvg(@Param("hostAddress") HostAddress hostAddress);
+
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.database.monitoring."
+		+ "HostFieldAvg(m.hostAddress, m.field, m.sumValue / m.count, m.count) "
+		+ "from HostMonitoringEntity m "
+		+ "where m.hostAddress = :hostAddress and m.field = :field")
+	HostFieldAvg getHostFieldAvg(@Param("hostAddress") HostAddress hostAddress, @Param("field") String field);
 
 }

@@ -299,8 +299,7 @@ public class DockerContainersService {
 			String containerId = containerCreation.id();
 			dockerClient.startContainer(containerId);
 			if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
-				nginxLoadBalancerService.addServiceToLoadBalancer(hostAddress.getPublicIpAddress(), serviceName,
-					serviceAddr, continent, region, country, city);
+				nginxLoadBalancerService.addServiceToLoadBalancer(hostAddress, serviceName, serviceAddr, continent, region, country, city);
 			}
 			return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")
 				? Optional.empty()

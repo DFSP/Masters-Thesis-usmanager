@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
 
 import java.util.List;
 

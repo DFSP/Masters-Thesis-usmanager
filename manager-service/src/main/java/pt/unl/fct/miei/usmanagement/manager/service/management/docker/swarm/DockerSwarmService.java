@@ -101,15 +101,10 @@ public class DockerSwarmService {
 		String advertiseAddress = hostAddress.getPublicIpAddress();
 		String listenAddress = hostAddress.getPrivateIpAddress();
 		log.info("Initializing docker swarm at {}", advertiseAddress);
-		String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
-			advertiseAddress, listenAddress);
-		BashCommandResult result = bashService.executeCommand(command);
-		if (!result.isSuccessful()) {
-			throw new ManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, result.getError());
-		}
-		String output = String.join("\n", result.getOutput());
+		List<String> output = bashService.initDockerSwarm(advertiseAddress, listenAddress);
+		String outputMessage = String.join("\n", output);
 		String nodeIdRegex = "(?<=Swarm initialized: current node \\()(.*)(?=\\) is now a manager)";
-		Matcher nodeIdRegexExpression = Pattern.compile(nodeIdRegex).matcher(output);
+		Matcher nodeIdRegexExpression = Pattern.compile(nodeIdRegex).matcher(outputMessage);
 		if (!nodeIdRegexExpression.find()) {
 			throw new ManagerException("Unable to get docker swarm node id");
 		}

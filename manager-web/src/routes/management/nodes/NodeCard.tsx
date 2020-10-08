@@ -75,10 +75,10 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`Node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} was unable to leave the swarm`, 10000, reason, true);
+            super.toast(`Node <a href=/nodes/${node.id}><b>${node.id}</b></a> was unable to leave the swarm`, 10000, reason, true);
         }
         else if (node.state === 'down') {
-            super.toast(`Unable to remove node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} from the swarm`, 10000, reason, true);
+            super.toast(`Unable to remove node <a href=/nodes/${node.id}><b>${node.id}</b></a> from the swarm`, 10000, reason, true);
         }
         if (this.mounted) {
             this.setState({loading: false});

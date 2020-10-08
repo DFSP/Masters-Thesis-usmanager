@@ -25,11 +25,12 @@
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 @Data
 public class HostFieldAvg {
 
-	private final String hostname;
+	private final HostAddress hostAddress;
 	private final String field;
 	private final double average;
 	private final long count;

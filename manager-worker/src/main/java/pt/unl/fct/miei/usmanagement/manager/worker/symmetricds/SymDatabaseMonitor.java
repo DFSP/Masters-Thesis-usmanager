@@ -35,12 +35,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.edge.EdgeHostsService;
 
 import java.util.Map;
 import java.util.Objects;
@@ -67,7 +66,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 
 	@Override
 	public boolean beforeWrite(DataContext context, Table table, CsvData data) {
-		final String channelId = context.getBatch().getChannelId();
+		/*final String channelId = context.getBatch().getChannelId();
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
 			if ("cloud_hosts".equalsIgnoreCase(tableName)) {
@@ -90,13 +89,13 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 					System.out.println(e.getMessage());
 				}
 			}
-		}
+		}*/
 		return true;
 	}
 
 	@Override
 	public void afterWrite(DataContext context, Table table, CsvData data) {
-		final String channelId = context.getBatch().getChannelId();
+		/*final String channelId = context.getBatch().getChannelId();
 		if (channelId.equals(Constants.CHANNEL_RELOAD) || channelId.equals(Constants.CHANNEL_DEFAULT)) {
 			final String tableName = table.getName();
 			if ("cloud_hosts".equalsIgnoreCase(tableName) || "edge_hosts".equalsIgnoreCase(tableName)) {
@@ -117,11 +116,11 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 				}
 				updateHost(publicIpAddress, privateIpAddress, oldWorkerId, newWorkerId);
 			}
-		}
+		}*/
 	}
 
 	private void updateHost(String publicIpAddress, String privateIpAddress, String oldWorkerId, String newWorkerId) {
-		log.info("Inserted a host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
+		/*log.info("Inserted a host {}: {} -> {} ({})", publicIpAddress, oldWorkerId, newWorkerId, id);
 		if (publicIpAddress != null) {
 			// host is running
 			if (Objects.equals(id, newWorkerId)) {
@@ -135,7 +134,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 				// is not a host managed by this worker, but used to be
 				hostsService.removeHost(publicIpAddress);
 			}
-		}
+		}*/
 	}
 
 	@Override

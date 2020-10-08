@@ -27,7 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
+import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshService;
 
 @RestController
 @RequestMapping("/ssh")
@@ -40,13 +43,13 @@ public class SshController {
 	}
 
 	@PostMapping("/execute")
-	public SshCommandResult execute(@Json String hostname, @Json String command) {
-		return sshService.executeCommand(command, hostname);
+	public SshCommandResult execute(@Json String command, @Json String hostname) {
+		return sshService.executeCommand(command, new HostAddress(hostname));
 	}
 
 	@PostMapping("/upload")
-	public void upload(@Json String hostname, @Json String filename) {
-		sshService.uploadFile(hostname, filename);
+	public void upload(@Json String filename, @Json String hostname) {
+		sshService.uploadFile(filename, new HostAddress(hostname));
 	}
 
 }

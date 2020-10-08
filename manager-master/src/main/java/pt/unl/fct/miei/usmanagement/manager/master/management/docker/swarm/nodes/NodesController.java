@@ -25,10 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes;
 
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +104,7 @@ public class NodesController {
 
 	@DeleteMapping("/{hostname}/leave")
 	public void leaveSwarm(@PathVariable("hostname") String hostname) {
-		dockerSwarmService.leaveSwarm(hostname);
+		dockerSwarmService.leaveSwarm(new HostAddress(hostname));
 	}
 
 }

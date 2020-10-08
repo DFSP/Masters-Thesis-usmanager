@@ -73,7 +73,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, app: IApp): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/apps/${app.name}><b>${app.name}</b></a> app`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

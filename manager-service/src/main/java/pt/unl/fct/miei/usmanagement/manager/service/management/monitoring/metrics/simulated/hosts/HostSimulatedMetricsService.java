@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -189,13 +190,17 @@ public class HostSimulatedMetricsService {
 		}
 	}
 
-	public Map<String, Double> getSimulatedFieldsValues(String hostname) {
-		List<HostSimulatedMetricEntity> metrics = hostSimulatedMetrics.findByHost(hostname);
+	public Map<String, Double> getSimulatedFieldsValues(HostAddress hostAddress) {
+		String publicIpAddress = hostAddress.getPublicIpAddress();
+		String privateIpAddress = hostAddress.getPrivateIpAddress();
+		List<HostSimulatedMetricEntity> metrics = hostSimulatedMetrics.findByHostAddress(publicIpAddress, privateIpAddress);
 		return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
 	}
 
-	public Optional<Double> getSimulatedFieldValue(String hostname, String field) {
-		Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findByHostAndField(hostname, field);
+	public Optional<Double> getSimulatedFieldValue(HostAddress hostAddress, String field) {
+		String publicIpAddress = hostAddress.getPublicIpAddress();
+		String privateIpAddress = hostAddress.getPrivateIpAddress();
+		Optional<HostSimulatedMetricEntity> metric = hostSimulatedMetrics.findByHostAndField(publicIpAddress, privateIpAddress, field);
 		Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
 		if (fieldValue.isPresent() && metric.get().isOverride()) {
 			return fieldValue;

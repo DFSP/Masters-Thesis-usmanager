@@ -73,6 +73,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>pt.unl.fct.usmanagement.manager</groupId>
+			<artifactId>manager-service</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>

@@ -74,7 +74,7 @@ class ServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, service: IService): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/services/${service.serviceName}><b>${service.serviceName}</b></a> service`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

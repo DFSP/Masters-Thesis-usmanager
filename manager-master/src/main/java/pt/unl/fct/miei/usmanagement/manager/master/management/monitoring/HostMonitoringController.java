@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogEntity;
@@ -51,17 +52,17 @@ public class HostMonitoringController {
 
 	@GetMapping("/{hostname}")
 	public List<HostMonitoringEntity> getHostMonitoring(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostMonitoring(hostname);
+		return hostsMonitoringService.getHostMonitoring(new HostAddress(hostname));
 	}
 
 	@GetMapping("/{hostname}/avg")
 	public List<HostFieldAvg> getHostMonitoringAvg(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostFieldsAvg(hostname);
+		return hostsMonitoringService.getHostFieldsAvg(new HostAddress(hostname));
 	}
 
 	@GetMapping("/{hostname}/fields/{field}/avg")
 	public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field) {
-		return hostsMonitoringService.getHostFieldAvg(hostname, field);
+		return hostsMonitoringService.getHostFieldAvg(new HostAddress(hostname), field);
 	}
 
 	@GetMapping("/logs")
@@ -70,8 +71,8 @@ public class HostMonitoringController {
 	}
 
 	@GetMapping("/logs/hosts/{hostname}")
-	public List<HostMonitoringLogEntity> getHostMonitoringLogsByHostname(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostMonitoringLogsByHostname(hostname);
+	public List<HostMonitoringLogEntity> getHostMonitoringLogs(@PathVariable String hostname) {
+		return hostsMonitoringService.getHostMonitoringLogsByAddress(new HostAddress(hostname));
 	}
 
 }

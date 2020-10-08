@@ -40,19 +40,20 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.Service
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostDetails;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.LocationRequestService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.location.LocationRequestService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -219,10 +220,12 @@ public class ServicesMonitoringService {
 		Map<String, List<ServiceDecisionResult>> servicesDecisions = new HashMap<>();
 		List<ContainerEntity> containers = containersService.getAppContainers();
 		if (isTestEnable) {
-			List<ContainerEntity> managerMasterContainers = containersService.getContainersWithLabels(
-				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, ManagerMasterProperties.MASTER_MANAGER)));
-			// TODO include MANAGER_WORKERS too
-			containers.addAll(managerMasterContainers);
+			List<ContainerEntity> systemContainers = containersService.getContainersWithLabels(
+				Set.of(
+					Pair.of(ContainerConstants.Label.SERVICE_NAME, ManagerMasterProperties.MASTER_MANAGER),
+					Pair.of(ContainerConstants.Label.SERVICE_NAME, WorkerManagerProperties.WORKER_MANAGER)
+				));
+			containers.addAll(systemContainers);
 		}
 		for (ContainerEntity container : containers) {
 			log.info("On {}", container);
@@ -276,9 +279,10 @@ public class ServicesMonitoringService {
 			double deviationFromLastValue = ((newValue - lastValue) / lastValue) * 100;
 			containerEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 		}
+		HostDetails hostDetails = hostsService.getHostDetails(hostAddress);
 		return containerEventFields.isEmpty()
-			? new ServiceDecisionResult(hostAddress, containerId, serviceName)
-			: serviceRulesService.processServiceEvent(appName, hostAddress, containerEvent);
+			? new ServiceDecisionResult(hostDetails, containerId, serviceName)
+			: serviceRulesService.processServiceEvent(appName, hostDetails, containerEvent);
 	}
 
 	private void processContainerDecisions(Map<String, List<ServiceDecisionResult>> servicesDecisions,
@@ -337,8 +341,11 @@ public class ServicesMonitoringService {
 					if (maximumReplicas == 0 || currentReplicas < maximumReplicas) {
 						String containerId = topPriorityDecisionResult.getContainerId();
 						String service = topPriorityDecisionResult.getServiceName();
-						HostDetails hostDetails = topPriorityDecisionResult.getHostDetails();
-						executeStartContainerDecision(containerId, service, hostDetails, servicesHosts);
+						String decision = topPriorityDecisionResult.getDecision().name();
+						long ruleId = topPriorityDecisionResult.getRuleId();
+						HostAddress hostAddress = topPriorityDecisionResult.getHostDetails().getAddress();
+						Map<String, Double> fields = topPriorityDecisionResult.getFields();
+						executeStartContainerDecision(containerId, service, decision, ruleId, hostAddress, fields, servicesHosts);
 					}
 				}
 				else if (topPriorityDecision == RuleDecision.STOP) {
@@ -346,8 +353,11 @@ public class ServicesMonitoringService {
 						ServiceDecisionResult leastPriorityContainer = relevantContainerDecisions.get(relevantContainerDecisions.size() - 1);
 						String containerId = leastPriorityContainer.getContainerId();
 						String service = leastPriorityContainer.getServiceName();
-						HostDetails hostDetails = leastPriorityContainer.getHostDetails();
-						executeStopContainerDecision(containerId, service, hostDetails);
+						String decision = leastPriorityContainer.getDecision().name();
+						long ruleId = leastPriorityContainer.getRuleId();
+						HostAddress hostAddress = leastPriorityContainer.getHostDetails().getAddress();
+						Map<String, Double> fields = leastPriorityContainer.getFields();
+						executeStopContainerDecision(containerId, service, decision, ruleId, hostAddress, fields);
 					}
 				}
 			}
@@ -376,21 +386,22 @@ public class ServicesMonitoringService {
 					.findFirst();
 			}
 		}
-		containerDecision.ifPresent(decision -> executeStartContainerDecision(decision, servicesLocationsRegions));
+		containerDecision.ifPresent(decision ->
+			executeStartContainerDecision(decision.getContainerId(), decision.getServiceName(), decision.getDecision().name(),
+				decision.getRuleId(), decision.getHostDetails().getAddress(), decision.getFields(), servicesLocationsRegions));
 	}
 
-	private void executeStartContainerDecision(ServiceDecisionResult serviceDecisionResult, Map<String, HostDetails> servicesHostDetails) {
-		String containerId = serviceDecisionResult.getContainerId();
-		String serviceName = serviceDecisionResult.getServiceName();
-		HostDetails hostDetails = serviceDecisionResult.getHostDetails();
+	private void executeStartContainerDecision(String containerId, String serviceName, String decision, long ruleId,
+											   HostAddress hostAddress, Map<String, Double> fields,
+											   Map<String, HostDetails> servicesHostDetails) {
 		final HostLocation startLocation;
 		if (servicesHostDetails.containsKey(serviceName)) {
-			startLocation = servicesHostDetails.get(serviceName).getHostLocation();
-			log.info("Starting service {} from {} at {} (location from request-location-monitor)", serviceName, hostDetails, startLocation);
+			startLocation = servicesHostDetails.get(serviceName).getLocation();
+			log.info("Starting service {} from {} at {} (location from request-location-monitor)", serviceName, hostAddress, startLocation);
 		}
 		else {
-			startLocation = hostDetails.getHostLocation();
-			log.info("Starting service {} from {} on the same host", serviceName, hostDetails);
+			startLocation = hostsService.getHostLocation(hostAddress);
+			log.info("Starting service {} from {} on the same host", serviceName, hostAddress);
 		}
 		double serviceExpectedMemoryConsumption = servicesService.getService(serviceName).getExpectedMemoryConsumption();
 		HostAddress selectedHostAddress = hostsService.getAvailableHost(serviceExpectedMemoryConsumption, startLocation);
@@ -398,26 +409,20 @@ public class ServicesMonitoringService {
 		HostDetails selectedHostDetails = hostsService.getHostDetails(selectedHostAddress);
 		String result = String.format("replicated container %s of service %s to container %s on %s",
 			containerId, serviceName, replicatedContainerId, selectedHostDetails);
-		saveServiceDecision(serviceDecisionResult, result);
+		saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
 	}
 
-	private void executeStopContainerDecision(ServiceDecisionResult serviceDecisionResult) {
-		String containerId = serviceDecisionResult.getContainerId();
+	private void executeStopContainerDecision(String containerId, String serviceName, String decision, long ruleId,
+											  HostAddress hostAddress, Map<String, Double> fields) {
 		containersService.stopContainer(containerId);
-		String serviceName = serviceDecisionResult.getServiceName();
-		HostDetails hostDetails = serviceDecisionResult.getHostDetails();
-		String result = String.format("stopped container %s of service %s on host %s", containerId, serviceName, hostDetails);
-		saveServiceDecision(serviceDecisionResult, result);
+		String result = String.format("stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
+		saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
 	}
 
-	private void saveServiceDecision(ServiceDecisionResult serviceDecisionResult, String result) {
+	private void saveServiceDecision(String containerId, String serviceName, String decision, long ruleId,
+									 Map<String, Double> fields, String result) {
 		log.info("Executed decision: {}", result);
-		String serviceName = serviceDecisionResult.getServiceName();
 		servicesEventsService.resetServiceEvent(serviceName);
-		String containerId = serviceDecisionResult.getContainerId();
-		String decision = serviceDecisionResult.getDecision().name();
-		long ruleId = serviceDecisionResult.getRuleId();
-		Map<String, Double> fields = serviceDecisionResult.getFields();
 		ServiceDecisionEntity serviceDecision = decisionsService.addServiceDecision(containerId, serviceName, decision, ruleId, result);
 		decisionsService.addServiceDecisionValueFromFields(serviceDecision, fields);
 	}

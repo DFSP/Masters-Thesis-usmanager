@@ -53,6 +53,7 @@ interface State {
 
 interface StateToProps {
     sidenavVisible: boolean;
+    confirmationDialog: boolean,
 }
 
 type Props<T> = CardProps<T> & StateToProps;
@@ -84,7 +85,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
     }
 
     public render() {
-        const {id, title, link, margin, contextMenuItems} = this.props;
+        const {id, title, link, margin, contextMenuItems, confirmationDialog} = this.props;
         const {loading} = this.state;
         const cardElement =
             <>
@@ -124,17 +125,21 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                             <MenuItem className="custom-context-menu-item-divider"/>
                         </div>
                     )}
-                    {this.props.delete != undefined && <div className={`${loading ? '' : 'modal-trigger'}`} data-target={id}>
+                    {this.props.delete != undefined
+                    && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id} >
                         <MenuItem className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
                                   data={this.props.link?.to.state}
-                                  disabled={loading}>
+                                  disabled={loading}
+                                  onClick={confirmationDialog ? undefined : this.onDelete}>
                             {this.props.delete.textButton || 'Delete'}
                         </MenuItem>
                     </div>}
                 </ContextMenu>
-                {this.props.delete != undefined && <ConfirmDialog id={id}
-                               message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${title}`}`}
-                               confirmCallback={this.onDelete}/>}
+                {this.props.delete != undefined
+                && confirmationDialog
+                && <ConfirmDialog id={id}
+                                  message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${title}`}`}
+                                  confirmCallback={this.onDelete}/>}
             </>
         )
     }
@@ -197,6 +202,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
 const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+        confirmationDialog: state.ui.confirmationDialog,
     }
 );
 

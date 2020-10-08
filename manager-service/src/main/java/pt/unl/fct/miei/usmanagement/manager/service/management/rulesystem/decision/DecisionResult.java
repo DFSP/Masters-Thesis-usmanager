@@ -26,7 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decis
 
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 
 import java.util.Map;
 

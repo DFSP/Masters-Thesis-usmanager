@@ -25,9 +25,11 @@
 package pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events;
 
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
 
 import java.util.List;
@@ -44,15 +46,14 @@ public class HostsEventsService {
 		this.decisionsService = decisionsService;
 	}
 
-	public List<HostEventEntity> getHostEventsByHostname(String hostname) {
-		return hostEvents.findByHostname(hostname);
+	public List<HostEventEntity> getHostEventsByHostAddress(HostAddress hostAddress) {
+		return hostEvents.findByHostAddress(hostAddress);
 	}
 
-	public HostEventEntity saveHostEvent(String hostname, String decisionName) {
+	public HostEventEntity saveHostEvent(HostDetails hostDetails, String decisionName) {
 		DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
-		HostEventEntity hostEvent = hostEvents
-			.findByHostname(hostname).stream().findFirst()
-			.orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
+		HostEventEntity hostEvent = getHostEventsByHostAddress(hostDetails.getAddress()).stream().findFirst()
+			.orElse(HostEventEntity.builder().hostDetails(hostDetails).decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
 			hostEvent.setCount(1);

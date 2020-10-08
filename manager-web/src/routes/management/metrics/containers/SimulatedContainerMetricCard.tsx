@@ -73,7 +73,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a> simulated container metric`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

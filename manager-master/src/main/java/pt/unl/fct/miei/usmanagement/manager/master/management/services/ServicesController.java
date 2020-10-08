@@ -32,6 +32,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.prediction.ServiceEventPred
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.AddServiceApp;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
 
 import java.util.Arrays;
 import java.util.List;

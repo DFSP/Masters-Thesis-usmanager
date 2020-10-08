@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("manager-master")
+@ConfigurationProperties("master-manager")
 public class ManagerMasterProperties {
 
 	public static final String MASTER_MANAGER = "master-manager";

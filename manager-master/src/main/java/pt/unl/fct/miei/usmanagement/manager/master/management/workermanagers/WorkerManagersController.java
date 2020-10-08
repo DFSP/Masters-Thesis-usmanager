@@ -25,8 +25,10 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
+import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagersService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +55,7 @@ public class WorkerManagersController {
 
 	@PostMapping
 	public WorkerManagerEntity launchWorkerManager(@Json String host) {
-		return workerManagersService.launchWorkerManager(host);
+		return workerManagersService.launchWorkerManager(new HostAddress(host));
 	}
 
 	@DeleteMapping("/{workerManagerId}")

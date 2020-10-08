@@ -28,8 +28,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ServicesEventsService;
 
 import java.util.List;
 
@@ -46,8 +49,8 @@ public class EventsController {
 	}
 
 	@GetMapping("/hosts/{hostname}")
-	public List<HostEventEntity> getHostEventsByHostname(@PathVariable String hostname) {
-		return hostsEventsService.getHostEventsByHostname(hostname);
+	public List<HostEventEntity> getHostEvents(@PathVariable String hostname) {
+		return hostsEventsService.getHostEventsByHostAddress(new HostAddress(hostname));
 	}
 
 	@GetMapping("/services/{serviceName}")

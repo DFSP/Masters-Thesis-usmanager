@@ -24,8 +24,18 @@
 
 import React, {createRef} from "react";
 import M from "materialize-css";
+import {ReduxState} from "../../reducers";
+import {bindActionCreators} from "redux";
+import {hideConfirmationDialog} from "../../actions";
+import {connect} from "react-redux";
+import styles from './ConfirmDialog.module.css';
 
-interface Props {
+
+interface DispatchToProps {
+    hideConfirmationDialog: (hidden: boolean) => void;
+}
+
+interface ConfirmDialogProps {
     id: string;
     message: string;
     cancel?: boolean;
@@ -34,9 +44,12 @@ interface Props {
     confirmCallback?: () => void;
 }
 
-export default class ConfirmDialog extends React.Component<Props, {}> {
+type Props = DispatchToProps & ConfirmDialogProps;
+
+class ConfirmDialog extends React.Component<Props, {}> {
 
     private modal = createRef<HTMLDivElement>();
+    private checkbox = createRef<HTMLInputElement>();
 
     public componentDidMount(): void {
         this.initModal();
@@ -53,22 +66,42 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
             preventScrolling: false
         });
 
+    private handleCancel = () => {
+        this.props.cancelCallback?.();
+        this.props.hideConfirmationDialog(this.checkbox?.current?.checked || false);
+    }
+
+    private handleConfirm = () => {
+        this.props.confirmCallback?.();
+        this.props.hideConfirmationDialog(this.checkbox?.current?.checked || false);
+    }
+
     public render() {
         const {message} = this.props;
         return (
             <div id={this.props.id} className='modal dialog' ref={this.modal}>
                 <div className="modal-content">
-                    <div className="modal-message">{`Are you sure you want ${message.startsWith('to ') ? 'to ' : ''}`}<div
-                        className="dialog-message">{message.startsWith('to ') ? message.substr(3, message.length) : message}</div>?
+                    <div className="modal-message">{`Are you sure you want ${message.startsWith('to ') ? 'to ' : ''}`}
+                        <div
+                            className="dialog-message">{message.startsWith('to ') ? message.substr(3, message.length) : message}</div>
+                        ?
                     </div>
                 </div>
                 <div className={`modal-footer dialog-footer`}>
+                    <div className={`${styles.hideSection}`}>
+                        <label>
+                            <input ref={this.checkbox}
+                                   id={'disable-confirmation-dialog'}
+                                   type="checkbox"/>
+                            <span className={`${styles.hideMessage}`}>Don't show me this again</span>
+                        </label>
+                    </div>
                     <button className="modal-close waves-effect waves-red btn-flat white-text"
-                            onClick={this.props.cancelCallback}>
+                            onClick={this.handleCancel}>
                         No
                     </button>
                     <button className="modal-close waves-effect waves-green btn-flat white-text"
-                            onClick={this.props.confirmCallback}>
+                            onClick={this.handleConfirm}>
                         Absolutely
                     </button>
                 </div>
@@ -77,3 +110,8 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
     }
 
 }
+
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({hideConfirmationDialog}, dispatch);
+
+export default connect(null, mapDispatchToProps)(ConfirmDialog);

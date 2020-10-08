@@ -74,7 +74,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Unable to stop ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to stop <a href=/containers/${container.containerId}><b>${container.containerId}</b></a> container`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

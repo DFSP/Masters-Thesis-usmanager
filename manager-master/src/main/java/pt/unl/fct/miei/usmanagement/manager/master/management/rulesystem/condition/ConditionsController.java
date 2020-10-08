@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condit
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.condition.ConditionsService;
 
 import java.util.List;
 

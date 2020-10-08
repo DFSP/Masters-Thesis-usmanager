@@ -37,7 +37,6 @@ import java.util.List;
 @EnableAsync
 public class ManagerMasterConfiguration implements WebMvcConfigurer {
 
-
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**");

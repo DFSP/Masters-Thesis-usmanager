@@ -35,6 +35,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
 import {Method} from "axios";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
+import {compose} from "redux";
 
 export interface IFormModal {
     id: string,
@@ -97,7 +100,11 @@ interface FormProps {
     loading?: IFormLoading;
 }
 
-type Props = FormProps & RouteComponentProps;
+interface StateToProps {
+    confirmationDialog: boolean,
+}
+
+type Props = FormProps & RouteComponentProps & StateToProps;
 
 interface State {
     values: IValues;
@@ -265,11 +272,11 @@ class Form extends React.Component<Props, State> {
         const {saveRequired, loading} = this.state;
         const {
             id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
-            children
+            children, confirmationDialog
         } = this.props;
         return (
             <>
-                {this.props.delete && (
+                {this.props.delete && confirmationDialog && (
                     <ConfirmDialog id={id}
                                    message={`to ${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
                                    confirmCallback={this.onClickDelete}/>)}
@@ -329,9 +336,10 @@ class Form extends React.Component<Props, State> {
                                             ))}
                                             {deletable !== undefined && !loading && (
                                                 <button
-                                                    className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
+                                                    className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
                                                     type="button"
-                                                    data-target={id}>
+                                                    data-target={id}
+                                                    onClick={confirmationDialog ? undefined : this.onClickDelete}>
                                                     {this.props.delete?.textButton || 'Delete'}
                                                 </button>)}
                                             {!loading && (
@@ -611,4 +619,11 @@ class Form extends React.Component<Props, State> {
 
 }
 
-export default withRouter(Form);
+const mapStateToProps = (state: ReduxState): StateToProps => (
+    {
+        confirmationDialog: state.ui.confirmationDialog,
+    }
+);
+
+
+export default withRouter(connect(mapStateToProps, undefined)(Form));

@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.node
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
 
 @AllArgsConstructor
 @Getter

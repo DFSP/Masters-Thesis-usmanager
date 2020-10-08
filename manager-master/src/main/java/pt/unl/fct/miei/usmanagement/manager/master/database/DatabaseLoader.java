@@ -49,26 +49,26 @@ import pt.unl.fct.miei.usmanagement.manager.database.users.UserRole;
 import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.componenttypes.ComponentTypesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.LocationRequestService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.location.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.prometheus.PrometheusService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.discovery.eureka.EurekaService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.location.LocationRequestService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.location.RegionsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.discovery.eureka.EurekaService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.valuemodes.ValueModesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
 
 import java.util.List;
 
@@ -493,7 +493,6 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				workerManager = ServiceEntity.builder()
 					.serviceName(WorkerManagerProperties.WORKER_MANAGER)
-					//TODO .dockerRepository(dockerHubUsername + "/manager-worker")
 					.dockerRepository(dockerHubUsername + "/manager-worker")
 					.defaultExternalPort("8081")
 					.defaultInternalPort("8081")

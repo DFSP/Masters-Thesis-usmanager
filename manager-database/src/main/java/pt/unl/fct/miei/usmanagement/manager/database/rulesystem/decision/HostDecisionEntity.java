@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 
 import javax.persistence.*;
@@ -56,7 +57,7 @@ public class HostDecisionEntity {
 	@JoinColumn(name = "rule_id")
 	private HostRuleEntity rule;
 
-	private String hostname;
+	private HostAddress hostAddress;
 
 	@Basic
 	private Timestamp timestamp;

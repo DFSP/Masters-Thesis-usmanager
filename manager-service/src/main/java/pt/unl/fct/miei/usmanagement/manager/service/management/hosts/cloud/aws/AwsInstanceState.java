@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.aws;
 
 public enum AwsInstanceState {
+
 	PENDING("pending", 0),
 	RUNNING("running", 16),
 	SHUTTING_DOWN("shutting-down", 32),

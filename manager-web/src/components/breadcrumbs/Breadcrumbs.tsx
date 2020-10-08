@@ -34,6 +34,7 @@ import {
 import {camelCaseToSentenceCase, capitalize, snakeCaseToCamelCase} from "../../utils/text";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import {compose} from "redux";
 
 export type IBreadcrumb = { title: string, link?: string };
 
@@ -47,7 +48,7 @@ interface StateToProps {
   component: IComponent,
 }
 
-type Props = StateToProps & RouteProps & RouteComponentProps;
+type Props = RouteComponentProps & StateToProps;
 
 class Breadcrumbs extends React.Component<Props, State> {
 

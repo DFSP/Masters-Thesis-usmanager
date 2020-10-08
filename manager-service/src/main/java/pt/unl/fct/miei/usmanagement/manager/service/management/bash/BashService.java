@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.service.management.bash;
 
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.service.exceptions.ManagerException;
@@ -60,6 +61,21 @@ public class BashService {
 			throw new ManagerException("Unable to get private ip: %s", privateIpResult.getError());
 		}
 		return privateIpResult.getOutput().get(0);
+	}
+
+	public List<String> initDockerSwarm(String advertiseAddress, String listenAddress) {
+		String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
+			advertiseAddress, listenAddress);
+		BashCommandResult initDockerSwarmResult = executeCommand(command);
+		if (!initDockerSwarmResult.isSuccessful()) {
+			throw new ManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, initDockerSwarmResult.getError());
+		}
+		return initDockerSwarmResult.getOutput();
+	}
+
+	public void cleanup(String... files) {
+		String cleanupCommand = String.format("rm -f" + Strings.repeat(" %s", files.length), files);
+		executeCommand(cleanupCommand);
 	}
 
 	public BashCommandResult executeCommand(String command) {

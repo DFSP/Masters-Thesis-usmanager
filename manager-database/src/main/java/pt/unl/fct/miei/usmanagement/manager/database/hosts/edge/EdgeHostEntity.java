@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.database.hosts.edge;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -60,26 +61,19 @@ public class EdgeHostEntity {
 
 	private String publicIpAddress;
 
+	@Deprecated
 	@ManyToOne
 	private RegionEntity region;
 
+	@Deprecated
 	@NotNull
 	private String country;
 
+	@Deprecated
 	@NotNull
 	private String city;
 
-	//@NotNull
-	@JsonIgnore
-	private String address;
-
-	//@NotNull
-	@JsonIgnore
-	private Double latitude;
-
-	//@NotNull
-	@JsonIgnore
-	private Double longitude;
+	private Coordinates coordinates;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne

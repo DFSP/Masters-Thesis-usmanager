@@ -27,6 +27,9 @@ package pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decis
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.*;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleEntity;
@@ -130,11 +133,11 @@ public class DecisionsService {
 		return serviceDecisions.save(serviceDecision);
 	}
 
-	public HostDecisionEntity addHostDecision(String hostname, String decisionName, long ruleId) {
+	public HostDecisionEntity addHostDecision(HostDetails hostDetails, String decisionName, long ruleId) {
 		HostRuleEntity rule = hostRulesService.getRule(ruleId);
 		DecisionEntity decision = getHostPossibleDecision(decisionName);
-		HostDecisionEntity hostDecision = HostDecisionEntity.builder().hostname(hostname).rule(rule).decision(decision)
-			.build();
+		HostAddress hostAddress = hostDetails.getAddress();
+		HostDecisionEntity hostDecision = HostDecisionEntity.builder().hostAddress(hostAddress).rule(rule).decision(decision).build();
 		return hostDecisions.save(hostDecision);
 	}
 

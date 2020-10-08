@@ -66,7 +66,7 @@ public class DockerCoreService {
 	}
 
 	public void installDocker(HostAddress hostAddress) {
-		sshService.uploadFile(hostAddress, dockerScriptFile);
+		sshService.uploadFile(dockerScriptFile, hostAddress);
 		String installDockerCommand = String.format("sh %s", dockerScriptFile);
 		sshService.executeCommand(installDockerCommand, hostAddress);
 	}

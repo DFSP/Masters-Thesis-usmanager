@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
 @ToString
-public class Coordinates {
+public class Coordinates implements Serializable {
 
 	private final String address;
 	private final float latitude;

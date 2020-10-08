@@ -24,12 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.service.management.hosts;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
@@ -58,7 +60,6 @@ import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metric
 import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.service.util.Text;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -254,10 +255,10 @@ public class HostsService {
 				String nodeCity = nodeLocation.getCity();
 				if (Objects.equals(nodeRegion, region)) {
 					sameRegionHosts.add(hostAddress);
-					if (!Text.isNullOrEmpty(country) && nodeCountry.equalsIgnoreCase(country)) {
+					if (!Strings.isNullOrEmpty(country) && nodeCountry.equalsIgnoreCase(country)) {
 						sameCountryHosts.add(hostAddress);
 					}
-					if (!Text.isNullOrEmpty(city) && nodeCity.equalsIgnoreCase(city)) {
+					if (!Strings.isNullOrEmpty(city) && nodeCity.equalsIgnoreCase(city)) {
 						sameCityHosts.add(hostAddress);
 					}
 				}
@@ -335,41 +336,35 @@ public class HostsService {
 		return hostLocation;
 	}
 
+	// TODO add coordinates instead
 	public SimpleNode addHost(RegionEntity region, String country, String city, NodeRole role) {
-		String publicIpAddress;
-		String privateIpAddress;
+		final HostAddress hostAddress;
 		Optional<EdgeHostEntity> edgeHost = chooseEdgeHost(region, country, city);
 		if (edgeHost.isPresent()) {
-			publicIpAddress = edgeHost.get().getPublicIpAddress();
-			privateIpAddress = edgeHost.get().getPrivateIpAddress();
+			hostAddress = edgeHost.get().getAddress();
 		}
 		else {
 			CloudHostEntity cloudHost = chooseCloudHost();
-			publicIpAddress = cloudHost.getPublicIpAddress();
-			privateIpAddress = cloudHost.getPrivateIpAddress();
+			hostAddress = cloudHost.getAddress();
 		}
-		log.info("Found host {} ({}) to join swarm at {}/{}/{} as {}", publicIpAddress, privateIpAddress,
-			region.getName(), country, city, role.name());
-		return setupHost(publicIpAddress, privateIpAddress, role);
+		log.info("Found host {} to join swarm as {}", hostAddress, role.name());
+		return setupHost(hostAddress, role);
 	}
 
 	public SimpleNode addHost(String host, NodeRole role) {
-		String publicIpAddress;
-		String privateIpAddress;
+		HostAddress hostAddress;
 		try {
 			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
 			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
 				cloudHost = cloudHostsService.startCloudHost(host, false);
 			}
-			publicIpAddress = cloudHost.getPublicIpAddress();
-			privateIpAddress = cloudHost.getPrivateIpAddress();
+			hostAddress = cloudHost.getAddress();
 		}
 		catch (EntityNotFoundException e) {
 			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
-			publicIpAddress = edgeHost.getPublicIpAddress();
-			privateIpAddress = edgeHost.getPrivateIpAddress();
+			hostAddress = edgeHost.getAddress();
 		}
-		return setupHost(publicIpAddress, privateIpAddress, role);
+		return setupHost(hostAddress, role);
 	}
 
 	public void removeHost(HostAddress hostAddress) {
@@ -386,10 +381,10 @@ public class HostsService {
 
 	private Optional<EdgeHostEntity> chooseEdgeHost(RegionEntity region, String country, String city) {
 		List<EdgeHostEntity> edgeHosts = List.of();
-		if (!Text.isNullOrEmpty(city)) {
+		if (!Strings.isNullOrEmpty(city)) {
 			edgeHosts = edgeHostsService.getHostsByCity(city);
 		}
-		else if (!Text.isNullOrEmpty(country)) {
+		else if (!Strings.isNullOrEmpty(country)) {
 			edgeHosts = edgeHostsService.getHostsByCountry(country);
 		}
 		else if (region != null) {
@@ -421,8 +416,7 @@ public class HostsService {
 	public List<String> executeCommand(String command, HostAddress hostAddress) {
 		List<String> result = null;
 		String error = null;
-		if (Objects.equals(this.hostAddress.getPublicIpAddress(), hostAddress.getPublicIpAddress())
-			&& Objects.equals(this.hostAddress.getPrivateIpAddress(), hostAddress.getPrivateIpAddress())) {
+		if (Objects.equals(this.hostAddress, hostAddress)) {
 			// execute local command
 			BashCommandResult bashCommandResult = bashService.executeCommand(command);
 			if (!bashCommandResult.isSuccessful()) {

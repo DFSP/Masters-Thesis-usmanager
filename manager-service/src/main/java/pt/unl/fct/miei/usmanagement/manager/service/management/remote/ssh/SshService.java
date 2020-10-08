@@ -122,7 +122,7 @@ public class SshService {
 		return sshClient;
 	}
 
-	public void uploadFile(HostAddress hostAddress, String filename) {
+	public void uploadFile(String filename, HostAddress hostAddress) {
 		try (SSHClient sshClient = initClient(hostAddress);
 			 SFTPClient sftpClient = sshClient.newSFTPClient()) {
 			String scriptPath = scriptPaths.get(filename);

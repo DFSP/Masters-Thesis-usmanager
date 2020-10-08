@@ -25,6 +25,8 @@
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
 import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
 import javax.persistence.*;
@@ -43,9 +45,7 @@ public class HostEventEntity {
 	@GeneratedValue
 	private Long id;
 
-	/*  @OneToMany
-	  private HostEntity hostEntity; TODO*/
-	private String hostname;
+	private HostDetails hostDetails;
 
 	@ManyToOne
 	@JoinColumn(name = "decision_id")

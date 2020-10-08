@@ -73,7 +73,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a> simulated host metric`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

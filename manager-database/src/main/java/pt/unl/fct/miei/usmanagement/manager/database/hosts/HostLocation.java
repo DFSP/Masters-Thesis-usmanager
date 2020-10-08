@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
 @ToString
-public class HostLocation {
+public class HostLocation implements Serializable {
 
 	//TODO get location based on ip?
 	// cache information after first lookup

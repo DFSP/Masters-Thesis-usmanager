@@ -40,7 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.ServiceDecisionResult;
 

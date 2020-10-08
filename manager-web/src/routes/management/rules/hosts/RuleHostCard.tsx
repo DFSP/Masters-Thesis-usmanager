@@ -73,7 +73,7 @@ class RuleHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a> host rule`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

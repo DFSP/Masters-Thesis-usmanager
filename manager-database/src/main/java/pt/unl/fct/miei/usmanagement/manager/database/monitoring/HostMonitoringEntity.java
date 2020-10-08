@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
 import lombok.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -43,7 +44,7 @@ public class HostMonitoringEntity {
 	@GeneratedValue
 	private Long id;
 
-	private String hostname;
+	private HostAddress hostAddress;
 
 	private String field;
 

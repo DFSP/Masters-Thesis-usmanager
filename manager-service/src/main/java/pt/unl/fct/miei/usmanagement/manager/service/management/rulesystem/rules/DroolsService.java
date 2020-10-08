@@ -39,6 +39,7 @@ import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.Event;
@@ -59,20 +60,32 @@ import java.util.stream.Collectors;
 @Service
 public class DroolsService {
 
-	private final Map<String, Long> lastUpdateRules;
+	private final Map<String, Long> lastUpdateServiceRules;
+	private final Map<HostDetails, Long> lastUpdateHostRules;
 	private final Map<String, StatelessKieSession> serviceRuleSessions;
-	private final Map<String, StatelessKieSession> hostRuleSessions;
+	private final Map<HostDetails, StatelessKieSession> hostRuleSessions;
 
 	public DroolsService() {
-		this.lastUpdateRules = new HashMap<>();
+		this.lastUpdateServiceRules = new HashMap<>();
+		this.lastUpdateHostRules = new HashMap<>();
 		this.serviceRuleSessions = new HashMap<>();
 		this.hostRuleSessions = new HashMap<>();
 	}
 
-	public boolean shouldCreateNewRuleSession(String key, long lastUpdate) {
-		final long currVal = lastUpdateRules.getOrDefault(key, -1L);
+	public boolean shouldCreateNewServiceRuleSession(String serviceName, long lastUpdate) {
+		final long currVal = lastUpdateServiceRules.getOrDefault(serviceName, -1L);
 		if (currVal < lastUpdate) {
-			lastUpdateRules.put(key, lastUpdate);
+			lastUpdateServiceRules.put(serviceName, lastUpdate);
+			return true;
+		}
+		return false;
+	}
+
+
+	public boolean shouldCreateNewHostRuleSession(HostDetails hostDetails, long lastUpdate) {
+		final long currVal = lastUpdateHostRules.getOrDefault(hostDetails, -1L);
+		if (currVal < lastUpdate) {
+			lastUpdateHostRules.put(hostDetails, lastUpdate);
 			return true;
 		}
 		return false;
@@ -96,7 +109,7 @@ public class DroolsService {
 		serviceRuleSessions.put(serviceName, serviceRuleSession);
 	}
 
-	public void createNewHostRuleSession(String hostname, Map<Long, String> drools) {
+	public void createNewHostRuleSession(HostDetails hostDetails, Map<Long, String> drools) {
 		KieServices kieServices = KieServices.Factory.get();
 		KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
 		for (Map.Entry<Long, String> drl : drools.entrySet()) {
@@ -111,7 +124,7 @@ public class DroolsService {
 			.newKieContainer(releaseId).getKieBase().newStatelessKieSession();
 		TrackingAgendaEventListener agendaEventListener = new TrackingAgendaEventListener();
 		hostRuleSession.addEventListener(agendaEventListener);
-		hostRuleSessions.put(hostname, hostRuleSession);
+		hostRuleSessions.put(hostDetails, hostRuleSession);
 	}
 
 	public Map<Long, String> executeDroolsRules(Event event, List<Rule> rules, String templateFile) {
@@ -152,25 +165,25 @@ public class DroolsService {
 		return result.toString(StandardCharsets.UTF_8);
 	}
 
-	public ServiceDecisionResult evaluate(HostAddress hostAddress, ContainerEvent event) {
+	public ServiceDecisionResult evaluate(HostDetails hostDetails, ContainerEvent event) {
 		Decision containerDecision = new Decision();
 		String serviceName = event.getServiceName();
 		StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
 		serviceRuleSession.getGlobals().set("containerDecision", containerDecision);
 		serviceRuleSession.execute(event);
 		long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
-		return new ServiceDecisionResult(hostAddress, event.getContainerId(), event.getServiceName(),
+		return new ServiceDecisionResult(hostDetails, event.getContainerId(), event.getServiceName(),
 			containerDecision.getDecision(), ruleId, event.getFields(), containerDecision.getPriority());
 	}
 
 	public HostDecisionResult evaluate(HostEvent event) {
 		Decision hostDecision = new Decision();
-		String hostname = event.getHostname();
-		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostname);
+		HostDetails hostDetails = event.getHostDetails();
+		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostDetails);
 		hostRuleSession.getGlobals().set("hostDecision", hostDecision);
 		hostRuleSession.execute(event);
 		long ruleId = getRuleFired(hostRuleSession.getAgendaEventListeners());
-		return new HostDecisionResult(hostname, hostDecision.getDecision(), ruleId, event.getFields(),
+		return new HostDecisionResult(hostDetails, hostDecision.getDecision(), ruleId, event.getFields(),
 			hostDecision.getPriority());
 	}
 

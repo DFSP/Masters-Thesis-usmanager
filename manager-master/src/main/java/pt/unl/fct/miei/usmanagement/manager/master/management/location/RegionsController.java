@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.location;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.location.RegionsService;
 
 import java.util.List;
 

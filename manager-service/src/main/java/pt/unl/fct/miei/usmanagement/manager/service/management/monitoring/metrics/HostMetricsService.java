@@ -54,30 +54,29 @@ public class HostMetricsService {
 	}
 
 	public boolean hostHasAvailableResources(HostAddress hostAddress, double avgContainerMem) {
-		String hostname = hostAddress.getPublicIpAddress();
-		double totalRam = prometheusService.getTotalMemory(hostname);
-		double availableRam = prometheusService.getAvailableMemory(hostname);
+		double totalRam = prometheusService.getTotalMemory(hostAddress);
+		double availableRam = prometheusService.getAvailableMemory(hostAddress);
 		//double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
 		double predictedRamUsage = (1.0 - ((availableRam - avgContainerMem) / totalRam)) * 100.0;
 		//TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
 		return predictedRamUsage < maximumRamPercentage;
 	}
 
-	public Map<String, Double> getHostStats(String hostname) {
+	public Map<String, Double> getHostStats(HostAddress hostAddress) {
 		Map<String, Double> fieldsValues = new HashMap<>();
-		double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
+		double cpuPercentage = prometheusService.getCpuUsagePercent(hostAddress);
 		if (cpuPercentage != -1) {
 			// just to make sure cpu-% is a valid field name
 			FieldEntity field = fieldsService.getField("cpu-%");
 			fieldsValues.put(field.getName(), cpuPercentage);
 		}
-		double ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
+		double ramPercentage = prometheusService.getMemoryUsagePercent(hostAddress);
 		if (ramPercentage != -1) {
 			// just to make sure ram-% is a valid field name
 			FieldEntity field = fieldsService.getField("ram-%");
 			fieldsValues.put(field.getName(), ramPercentage);
 		}
-		fieldsValues.putAll(hostSimulatedMetricsService.getSimulatedFieldsValues(hostname));
+		fieldsValues.putAll(hostSimulatedMetricsService.getSimulatedFieldsValues(hostAddress));
 		return fieldsValues;
 	}
 

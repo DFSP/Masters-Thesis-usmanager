@@ -28,6 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 
 @RequiredArgsConstructor
 @Getter
@@ -35,6 +37,6 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public final class HostEvent extends Event {
 
-	private final String hostname;
+	private final HostDetails hostDetails;
 
 }

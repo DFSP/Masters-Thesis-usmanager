@@ -41,11 +41,18 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 	Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
-		+ "from HostRuleEntity r join r.cloudHosts h join r.edgeHosts e "
-		+ "where h.publicIpAddress = :hostname or e.publicIpAddress = :hostname")
-	List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);
+		+ "from HostRuleEntity r join r.cloudHosts c join r.edgeHosts e "
+		+ "where (c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
+		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)")
+	List<HostRuleEntity> findByHostAddress(@Param("publicIpAddress") String publicIpAddress,
+									@Param("privateIpAddress") String privateIpAddress);
 
-	@Query("select r "
+/*	@Query("select r "
+		+ "from HostRuleEntity r join r.cloudHosts c join r.edgeHosts e "
+		+ "where c.publicIpAddress = :hostname or e.publicIpAddress = :hostname")
+	List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);*/
+
+/*	@Query("select r "
 		+ "from HostRuleEntity r join r.cloudHosts h "
 		+ "where h.instanceId = :instanceId")
 	List<HostRuleEntity> findByCloudInstanceId(@Param("instanceId") String instanceId);
@@ -53,7 +60,7 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 	@Query("select r "
 		+ "from HostRuleEntity r join r.edgeHosts h "
 		+ "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
-	List<HostRuleEntity> findByEdgeHostname(@Param("hostname") String hostname);
+	List<HostRuleEntity> findByEdgeHostname(@Param("hostname") String hostname);*/
 
 	@Query("select r "
 		+ "from HostRuleEntity r "

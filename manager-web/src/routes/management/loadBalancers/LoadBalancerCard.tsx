@@ -74,7 +74,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
-        super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
+        super.toast(`Unable to stop <a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a> load-balancer`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

@@ -29,6 +29,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 
 import java.util.List;
 

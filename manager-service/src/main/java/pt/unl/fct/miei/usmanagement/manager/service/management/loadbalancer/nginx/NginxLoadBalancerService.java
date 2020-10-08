@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.service.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
@@ -82,18 +83,18 @@ public class NginxLoadBalancerService {
 		ServiceEntity serviceConfig = serviceService.getService(LOAD_BALANCER);
 		double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
 		return hostsService.getAvailableHostsOnRegions(expectedMemoryConsumption, regions).stream()
-			.map(hostname -> launchLoadBalancer(hostname, serviceName))
+			.map(hostAddress -> launchLoadBalancer(hostAddress, serviceName))
 			.collect(Collectors.toList());
 	}
 
-	private ContainerEntity launchLoadBalancer(String hostname, String serviceName) {
+	private ContainerEntity launchLoadBalancer(HostAddress hostAddress, String serviceName) {
 		//TODO get port from properties
-		return launchLoadBalancer(hostname, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
+		return launchLoadBalancer(hostAddress, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
 	}
 
-	private ContainerEntity launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
+	private ContainerEntity launchLoadBalancer(HostAddress hostAddress, String serviceName, String serverAddr, String continent,
 											   String region, String country, String city) {
-		List<String, String> environment = List.of(
+		List<String> environment = List.of(
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1, serverAddr),
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1_CONTINENT, continent),
 			String.format("%s=%s", ContainerConstants.Environment.SERVER1_REGION, region),
@@ -105,7 +106,7 @@ public class NginxLoadBalancerService {
 		Map<String, String> labels = Map.of(
 			ContainerConstants.Label.FOR_SERVICE, serviceName
 		);
-		return containersService.launchContainer(hostname, LOAD_BALANCER, environment, labels);
+		return containersService.launchContainer(hostAddress, LOAD_BALANCER, environment, labels);
 	}
 
 	private List<ContainerEntity> getLoadBalancersFromService(String serviceName) {
@@ -114,11 +115,11 @@ public class NginxLoadBalancerService {
 			Pair.of(ContainerConstants.Label.FOR_SERVICE, serviceName)));
 	}
 
-	public void addServiceToLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
+	public void addServiceToLoadBalancer(HostAddress hostAddress, String serviceName, String serverAddr, String continent,
 										 String region, String country, String city) {
 		List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
 		if (loadBalancers.isEmpty()) {
-			ContainerEntity container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region, country,
+			ContainerEntity container = launchLoadBalancer(hostAddress, serviceName, serverAddr, continent, region, country,
 				city);
 			loadBalancers = List.of(container);
 		}

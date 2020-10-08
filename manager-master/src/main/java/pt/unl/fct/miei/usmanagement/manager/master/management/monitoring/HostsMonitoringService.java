@@ -36,20 +36,21 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecisi
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.master.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.metrics.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.master.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -112,20 +113,20 @@ public class HostsMonitoringService {
 		return hostsMonitoring.findAll();
 	}
 
-	public List<HostMonitoringEntity> getHostMonitoring(String hostname) {
-		return hostsMonitoring.getByHostname(hostname);
+	public List<HostMonitoringEntity> getHostMonitoring(HostAddress hostAddress) {
+		return hostsMonitoring.getByHostAddress(hostAddress);
 	}
 
-	public HostMonitoringEntity getHostMonitoring(String hostname, String field) {
-		return hostsMonitoring.getByHostnameAndFieldIgnoreCase(hostname, field);
+	public HostMonitoringEntity getHostMonitoring(HostAddress hostAddress, String field) {
+		return hostsMonitoring.getByHostAddressAndFieldIgnoreCase(hostAddress, field);
 	}
 
-	public void saveHostMonitoring(String hostname, String field, double value) {
-		HostMonitoringEntity hostMonitoring = getHostMonitoring(hostname, field);
+	public void saveHostMonitoring(HostAddress hostAddress, String field, double value) {
+		HostMonitoringEntity hostMonitoring = getHostMonitoring(hostAddress, field);
 		Timestamp updateTime = Timestamp.from(Instant.now());
 		if (hostMonitoring == null) {
 			hostMonitoring = HostMonitoringEntity.builder()
-				.hostname(hostname)
+				.hostAddress(hostAddress)
 				.field(field)
 				.minValue(value).maxValue(value).sumValue(value).lastValue(value)
 				.count(1)
@@ -137,21 +138,21 @@ public class HostsMonitoringService {
 		}
 		hostsMonitoring.save(hostMonitoring);
 		if (isTestEnable) {
-			saveHostMonitoringLog(hostname, field, value);
+			saveHostMonitoringLog(hostAddress, field, value);
 		}
 	}
 
-	public List<HostFieldAvg> getHostFieldsAvg(String hostname) {
-		return hostsMonitoring.getHostFieldsAvg(hostname);
+	public List<HostFieldAvg> getHostFieldsAvg(HostAddress hostAddress) {
+		return hostsMonitoring.getHostFieldsAvg(hostAddress);
 	}
 
-	public HostFieldAvg getHostFieldAvg(String hostname, String field) {
-		return hostsMonitoring.getHostFieldAvg(hostname, field);
+	public HostFieldAvg getHostFieldAvg(HostAddress hostAddress, String field) {
+		return hostsMonitoring.getHostFieldAvg(hostAddress, field);
 	}
 
-	public void saveHostMonitoringLog(String hostname, String field, double effectiveValue) {
+	public void saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
 		HostMonitoringLogEntity hostMonitoringLogEntity = HostMonitoringLogEntity.builder()
-			.hostname(hostname)
+			.hostAddress(hostAddress)
 			.field(field)
 			.timestamp(LocalDateTime.now())
 			.effectiveValue(effectiveValue)
@@ -163,8 +164,8 @@ public class HostsMonitoringService {
 		return hostMonitoringLogs.findAll();
 	}
 
-	public List<HostMonitoringLogEntity> getHostMonitoringLogsByHostname(String hostname) {
-		return hostMonitoringLogs.findByHostname(hostname);
+	public List<HostMonitoringLogEntity> getHostMonitoringLogsByAddress(HostAddress hostAddress) {
+		return hostMonitoringLogs.findByHostAddress(hostAddress);
 	}
 
 	public void initHostMonitorTimer() {
@@ -186,10 +187,11 @@ public class HostsMonitoringService {
 		List<HostDecisionResult> hostDecisions = new LinkedList<>();
 		List<SimpleNode> nodes = nodesService.getReadyNodes();
 		for (SimpleNode node : nodes) {
-			String hostname = node.getPublicIpAddress();
-			Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
-			newFields.forEach((field, value) -> saveHostMonitoring(hostname, field, value));
-			HostDecisionResult hostDecisionResult = runHostRules(hostname, newFields);
+			HostAddress hostAddress = node.getHostAddress();
+			HostDetails hostDetails = hostsService.getHostDetails(hostAddress);
+			Map<String, Double> newFields = hostMetricsService.getHostStats(hostAddress);
+			newFields.forEach((field, value) -> saveHostMonitoring(hostAddress, field, value));
+			HostDecisionResult hostDecisionResult = runHostRules(hostDetails, newFields);
 			hostDecisions.add(hostDecisionResult);
 		}
 		if (!hostDecisions.isEmpty()) {
@@ -197,10 +199,10 @@ public class HostsMonitoringService {
 		}
 	}
 
-	private HostDecisionResult runHostRules(String hostname, Map<String, Double> newFields) {
-		HostEvent hostEvent = new HostEvent(hostname);
+	private HostDecisionResult runHostRules(HostDetails hostDetails, Map<String, Double> newFields) {
+		HostEvent hostEvent = new HostEvent(hostDetails);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
-		getHostMonitoring(hostname)
+		getHostMonitoring(hostDetails.getAddress())
 			.stream()
 			.filter(loggedField -> loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT
 				&& newFields.get(loggedField.getField()) != null)
@@ -220,8 +222,8 @@ public class HostsMonitoringService {
 				hostEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 			});
 		return hostEventFields.isEmpty()
-			? new HostDecisionResult(hostname)
-			: hostRulesService.processHostEvent(hostname, hostEvent);
+			? new HostDecisionResult(hostDetails)
+			: hostRulesService.processHostEvent(hostDetails, hostEvent);
 	}
 
 	//TODO move to decisionsService?
@@ -229,17 +231,15 @@ public class HostsMonitoringService {
 		List<HostDecisionResult> relevantHostDecisions = new LinkedList<>();
 		log.info("Processing host decisions...");
 		for (HostDecisionResult hostDecision : hostDecisions) {
-			String hostname = hostDecision.getHostname();
+			HostDetails hostDetails = hostDecision.getHostDetails();
 			RuleDecision decision = hostDecision.getDecision();
-			log.info("Hostname {} had decision {}", hostname, decision);
-			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostname, decision.toString());
+			log.info("Host {} had decision {}", hostDetails, decision);
+			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostDetails, decision.toString());
 			int hostEventCount = hostEvent.getCount();
 			if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
 				|| (decision == RuleDecision.STOP && hostEventCount >= stopHostOnEventsCount)) {
 				relevantHostDecisions.add(hostDecision);
-				HostDecisionEntity hostDecisionEntity = decisionsService.addHostDecision(
-					hostDecision.getHostname(),
-					hostDecision.getDecision().name(),
+				HostDecisionEntity hostDecisionEntity = decisionsService.addHostDecision(hostDetails, decision.name(),
 					hostDecision.getRuleId());
 				decisionsService.addHostDecisionValueFromFields(hostDecisionEntity, hostDecision.getFields());
 			}
@@ -256,7 +256,7 @@ public class HostsMonitoringService {
 		RuleDecision decision = topPriorityHostDecision.getDecision();
 		if (decision == RuleDecision.START) {
 			if (maximumHosts <= 0 || nodes.size() < maximumHosts) {
-				startHost(topPriorityHostDecision.getHostname());
+				startHost(topPriorityHostDecision.getHostDetails());
 			}
 		}
 		else if (decision == RuleDecision.STOP) {
@@ -266,9 +266,10 @@ public class HostsMonitoringService {
 		}
 	}
 
-	private void startHost(String hostname) {
-		HostLocation hostLocation = hostsService.getHostDetails(hostname).getHostLocation();
-		Pair<String, String> container = getRandomContainerToMigrate(hostname);
+	private void startHost(HostDetails hostDetails) {
+		HostAddress hostAddress= hostDetails.getAddress();
+		HostLocation hostLocation = hostDetails.getLocation();
+		Pair<String, String> container = getRandomContainerToMigrate(hostAddress);
 		String serviceName = container.getFirst();
 		String containerId = container.getSecond();
 		if (!containerId.isEmpty()) {
@@ -283,46 +284,53 @@ public class HostsMonitoringService {
 
 	private void stopHost(List<HostDecisionResult> relevantHostDecisions, List<SimpleNode> nodes) {
 		//TODO : review stop host
-		String stopHostname = "";
+		HostAddress hostToStop = null;
 		ListIterator<HostDecisionResult> decisionIterator =
 			relevantHostDecisions.listIterator(relevantHostDecisions.size());
 		while (decisionIterator.hasPrevious()) {
-			String hostname = decisionIterator.previous().getHostname();
-			if (nodes.stream().anyMatch(n -> n.getPublicIpAddress().equals(hostname) && n.getRole() != NodeRole.MANAGER)) {
+			HostAddress hostAddress = decisionIterator.previous().getHostDetails().getAddress();
+			if (nodes.stream().anyMatch(n -> n.getHostAddress().equals(hostAddress) && n.getRole() != NodeRole.MANAGER)) {
 				// Node with least priority that is not a manager
-				stopHostname = hostname;
+				hostToStop = hostAddress;
 				break;
 			}
 		}
-		String migrateToHostname = getHostToMigrate(stopHostname, nodes);
-		List<ContainerEntity> containers = containersService.migrateAppContainers(stopHostname, migrateToHostname);
-		String hostnameToRemove = stopHostname;
+		if (hostToStop == null) {
+			// TODO now what?
+			return;
+		}
+		HostAddress migrateToHost = getHostToMigrate(hostToStop, nodes);
+		List<ContainerEntity> containers = containersService.migrateAppContainers(hostToStop, migrateToHost);
+		final HostAddress hostToRemove = hostToStop;
 		//TODO os containers não migram em paralelo?
 		new Timer("RemoveHostFromSwarmTimer").schedule(new TimerTask() {
 			@Override
 			public void run() {
-				hostsService.removeHost(hostnameToRemove);
+				hostsService.removeHost(hostToRemove);
 			}
 		}, containers.size() * DELAY_STOP_HOST);
 		//TODO garantir que o host é removido dinamicamente só depois de serem migrados todos os containers
-		log.info("RuleDecision executed: Stopped host {} and migrated containers to host {}",
-			stopHostname, migrateToHostname);
+		log.info("RuleDecision executed: Stopped host {} and migrated containers to host {}", hostToRemove, migrateToHost);
 	}
 
-	private String getHostToMigrate(String hostToRemove, List<SimpleNode> nodes) {
-		//TODO e se não existir mais nenhum node na mesma zona?
+	private HostAddress getHostToMigrate(HostAddress hostAddress, List<SimpleNode> nodes) {
 		return nodes.stream()
-			.filter(n -> !n.getPublicIpAddress().equals(hostToRemove)
-				&& Objects.equals(hostsService.getHostDetails(hostToRemove).getHostLocation().getRegion(),
-				hostsService.getHostDetails(n.getPublicIpAddress()).getHostLocation().getRegion()))
-			.map(SimpleNode::getPublicIpAddress)
+			.filter(n -> {
+				HostDetails hostDetails = hostsService.getHostDetails(hostAddress);
+				HostDetails nodeHostDetails = hostsService.getHostDetails(n.getHostAddress());
+				return !n.getHostAddress().equals(hostAddress)
+					// TODO e se não existir mais nenhum node na mesma zona?
+					// TODO mudar para coordenadas
+					&& Objects.equals(hostDetails.getLocation().getRegion(), nodeHostDetails.getLocation().getRegion());
+			})
+			.map(SimpleNode::getHostAddress)
 			.findFirst()
 			.orElseThrow(() -> new MasterManagerException("Can't find new host to migrate containers to"));
 	}
 
-	private Pair<String, String> getRandomContainerToMigrate(String hostname) {
+	private Pair<String, String> getRandomContainerToMigrate(HostAddress hostAddress) {
 		// TODO: Improve container choice
-		List<ContainerEntity> hostContainers = containersService.getAppContainers(hostname);
+		List<ContainerEntity> hostContainers = containersService.getAppContainers(hostAddress);
 		if (hostContainers.isEmpty()) {
 			return Pair.of("", "");
 		}

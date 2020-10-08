@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.services.ServiceSimulatedMetricsService;
 
 import java.util.List;
 

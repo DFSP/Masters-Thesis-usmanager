@@ -33,10 +33,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 
 @Slf4j
 @Component
@@ -71,6 +71,5 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		hostsMonitoringService.initHostMonitorTimer();
 		symService.startSymmetricDSServer(hostAddress);
 	}
-
 
 }

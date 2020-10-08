@@ -29,9 +29,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
@@ -56,13 +54,10 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		// 1. start zookeeper process
-		// 2. start kafka process
 		hostsService.setHostAddress();
 		symService.startSymmetricDSServer();
-   /*
-    servicesMonitoringService.initServiceMonitorTimer();
-    hostsMonitoringService.initHostMonitorTimer();*/
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
 	}
 
 }

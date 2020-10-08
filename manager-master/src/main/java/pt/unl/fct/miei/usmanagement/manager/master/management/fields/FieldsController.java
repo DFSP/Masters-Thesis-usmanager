@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.fields;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.fields.FieldsService;
 
 import java.util.List;
 

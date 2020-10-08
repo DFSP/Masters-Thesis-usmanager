@@ -25,15 +25,16 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 
 import org.springframework.web.bind.annotation.*;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.AddEdgeHostRequest;
-import pt.unl.fct.miei.usmanagement.manager.master.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.edge.EdgeHostsService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -150,8 +151,11 @@ public class HostsController {
 	}
 
 	@PostMapping("/edge")
-	public EdgeHostEntity addEdgeHost(@RequestBody AddEdgeHostRequest addEdgeHostRequest) {
-		return edgeHostsService.addEdgeHost(addEdgeHostRequest);
+	public EdgeHostEntity addEdgeHost(@Json String username, @Json String password, @Json String publicDnsName,
+									  @Json String privateIpAddress, @Json String publicIpAddress,
+									  @Json float latitude, float longitude) {
+		return edgeHostsService.addEdgeHost(username, password, publicDnsName, privateIpAddress, publicIpAddress,
+			new Coordinates(null, latitude, longitude));
 	}
 
 	@PutMapping("/edge/{hostname}")

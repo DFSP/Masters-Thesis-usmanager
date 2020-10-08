@@ -73,7 +73,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
-        super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+        super.toast(`Unable to delete <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a> edge host`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

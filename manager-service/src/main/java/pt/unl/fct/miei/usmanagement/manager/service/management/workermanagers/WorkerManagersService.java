@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
@@ -85,19 +86,19 @@ public class WorkerManagersService {
 		return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
 	}
 
-	public WorkerManagerEntity launchWorkerManager(String host) {
-		log.info("Launching worker manager at {}", host);
+	public WorkerManagerEntity launchWorkerManager(HostAddress hostAddress) {
+		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
-		ContainerEntity container = launchWorkerManager(host, id);
+		ContainerEntity container = launchWorkerManager(hostAddress, id);
 		WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
 		return workerManagers.save(workerManagerEntity);
 	}
 
-	private ContainerEntity launchWorkerManager(String hostname, String id) {
+	private ContainerEntity launchWorkerManager(HostAddress hostAddress, String id) {
 		List<String> environment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.ID + "=" + id,
 			ContainerConstants.Environment.MASTER + "=" + hostsService.getHostAddress().getPublicIpAddress()));
-		return containersService.launchContainer(hostname, WorkerManagerProperties.WORKER_MANAGER, environment);
+		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
 
 	public void deleteWorkerManager(String workerManagerId) {

@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.componenttypes;
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.service.management.componenttypes.ComponentTypesService;
 
 import java.util.List;
 

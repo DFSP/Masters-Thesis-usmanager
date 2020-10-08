@@ -92,7 +92,7 @@ host:
   minimum-hosts: 1
   monitor-period: 60000
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
-manager-master:
+master-manager:
   #mode: LOCAL
   monitor-period: 30000
   tests:
