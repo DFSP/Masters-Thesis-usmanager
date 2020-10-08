@@ -26,11 +26,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.exceptions;
 
+import org.springframework.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-import org.springframework.util.StringUtils;
 
 
 public class EntityNotFoundException extends RuntimeException {

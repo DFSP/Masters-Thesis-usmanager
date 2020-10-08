@@ -30,46 +30,46 @@ import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
 import M from "materialize-css";
 
 interface StateToProps {
-  sidenavVisible: boolean;
+    sidenavVisible: boolean;
 }
 
 interface IMainLayout {
-  children?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 type Props = IMainLayout & StateToProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
-  public componentDidMount(): void {
-    M.AutoInit();
-  }
+    public componentDidMount(): void {
+        M.AutoInit();
+    }
 
-  public render() {
-    const paddingLeft = this.props.sidenavVisible ? 200 : 0;
+    public render() {
+        const paddingLeft = this.props.sidenavVisible ? 200 : 0;
 
-    return (
-      <div>
-        <Sidenav/>
-        <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
-          <div className="row col s12">
-            {/* @ts-ignore*/}
-            <Breadcrumbs/>
-          </div>
-          <div className='row col s12 m12'>
-            {this.props.children}
-          </div>
-        </div>
-      </div>
-    );
-  }
+        return (
+            <div>
+                <Sidenav/>
+                <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
+                    <div className="row col s12">
+                        {/* @ts-ignore*/}
+                        <Breadcrumbs/>
+                    </div>
+                    <div className='row col s12 m12'>
+                        {this.props.children}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
-  }
+    {
+        sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+    }
 );
 
 export default connect(mapStateToProps)(MainLayout);

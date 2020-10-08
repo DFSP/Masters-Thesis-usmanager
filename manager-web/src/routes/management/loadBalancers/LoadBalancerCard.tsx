@@ -120,7 +120,12 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         const CardLoadBalancer = Card<IContainer>();
         return <CardLoadBalancer id={`load-balancer-${loadBalancer.id}`}
                                  title={loadBalancer.containerId.toString()}
-                                 link={{to: {pathname: `/load-balancers/${loadBalancer.containerId}`, state: loadBalancer}}}
+                                 link={{
+                                     to: {
+                                         pathname: `/load-balancers/${loadBalancer.containerId}`,
+                                         state: loadBalancer
+                                     }
+                                 }}
                                  height={'125px'}
                                  margin={'10px 0'}
                                  hoverable

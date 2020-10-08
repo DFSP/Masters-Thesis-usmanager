@@ -78,120 +78,120 @@ import MonitoringSettings from "../routes/monitoring/settings/Settings";
 import DataManagementSettings from "../routes/dataManagement/settings/Settings";
 
 interface RootContainerProps {
-  store: any;
+    store: any;
 }
 
 interface StateToProps {
-  component: IComponent;
+    component: IComponent;
 }
 
 type Props = StateToProps & RootContainerProps;
 
 export const managementAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-  "/home": {title: 'Microservices dynamic system management', component: ManagementLanding},
-  "/apps": {component: Apps, search: true},
-  "/apps/:name": {component: App},
-  "/services": {component: Services, search: true},
-  "/services/:name": {component: Service},
-  "/services/service": {component: Service},
-  "/containers": {component: Containers, search: true},
-  "/containers/:id": {component: Container},
-  "/hosts": {component: Hosts, search: true},
-  "/hosts/cloud": {component: CloudHosts},
-  "/hosts/cloud/:instanceId": {component: CloudHost},
-  "/hosts/edge": {component: EdgeHosts},
-  "/hosts/edge/:hostname": {component: EdgeHost},
-  "/nodes": {component: Nodes, search: true},
-  "/nodes/:id": {component: Node},
-  "/rules": {component: Rules, search: true},
-  "/rules/hosts": {component: RulesHost, search: true},
-  "/rules/hosts/:name": {component: RuleHost},
-  "/rules/services": {component: RulesService, search: true},
-  "/rules/services/:name": {component: RuleService},
-  "/rules/containers": {component: RulesContainer, search: true},
-  "/rules/containers/:name": {component: RuleContainer},
-  "/rules/conditions": {component: RuleConditions, search: true},
-  "/rules/conditions/:name": {component: Condition},
-  "/simulated-metrics": {component: SimulatedMetrics, search: true},
-  "/simulated-metrics/services": {component: SimulatedServiceMetrics, search: true},
-  "/simulated-metrics/services/:name?": {component: SimulatedServiceMetric},
-  "/simulated-metrics/containers": {component: SimulatedContainerMetrics, search: true},
-  "/simulated-metrics/containers/:name?": {component: SimulatedContainerMetric},
-  "/simulated-metrics/hosts": {component: SimulatedHostMetrics, search: true},
-  "/simulated-metrics/hosts/:name?": {component: SimulatedHostMetric},
-  "/regions": {component: Regions, search: true},
-  "/regions/:name": {component: Region},
-  "/load-balancers": {component: LoadBalancers, search: true},
-  "/load-balancers/:id": {component: LoadBalancer},
-  "/eureka-servers": {component: EurekaServers, search: true},
-  "/eureka-servers/:id": {component: EurekaServer},
-  "/ssh": {component: Ssh},
-  "/settings": {component: Settings},
-  "/logs": {component: ManagementLogs, search: true},
-  "/*": {title: "404 - Not found", component: PageNotFound},
+    "/home": {title: 'Microservices dynamic system management', component: ManagementLanding},
+    "/apps": {component: Apps, search: true},
+    "/apps/:name": {component: App},
+    "/services": {component: Services, search: true},
+    "/services/:name": {component: Service},
+    "/services/service": {component: Service},
+    "/containers": {component: Containers, search: true},
+    "/containers/:id": {component: Container},
+    "/hosts": {component: Hosts, search: true},
+    "/hosts/cloud": {component: CloudHosts},
+    "/hosts/cloud/:instanceId": {component: CloudHost},
+    "/hosts/edge": {component: EdgeHosts},
+    "/hosts/edge/:hostname": {component: EdgeHost},
+    "/nodes": {component: Nodes, search: true},
+    "/nodes/:id": {component: Node},
+    "/rules": {component: Rules, search: true},
+    "/rules/hosts": {component: RulesHost, search: true},
+    "/rules/hosts/:name": {component: RuleHost},
+    "/rules/services": {component: RulesService, search: true},
+    "/rules/services/:name": {component: RuleService},
+    "/rules/containers": {component: RulesContainer, search: true},
+    "/rules/containers/:name": {component: RuleContainer},
+    "/rules/conditions": {component: RuleConditions, search: true},
+    "/rules/conditions/:name": {component: Condition},
+    "/simulated-metrics": {component: SimulatedMetrics, search: true},
+    "/simulated-metrics/services": {component: SimulatedServiceMetrics, search: true},
+    "/simulated-metrics/services/:name?": {component: SimulatedServiceMetric},
+    "/simulated-metrics/containers": {component: SimulatedContainerMetrics, search: true},
+    "/simulated-metrics/containers/:name?": {component: SimulatedContainerMetric},
+    "/simulated-metrics/hosts": {component: SimulatedHostMetrics, search: true},
+    "/simulated-metrics/hosts/:name?": {component: SimulatedHostMetric},
+    "/regions": {component: Regions, search: true},
+    "/regions/:name": {component: Region},
+    "/load-balancers": {component: LoadBalancers, search: true},
+    "/load-balancers/:id": {component: LoadBalancer},
+    "/eureka-servers": {component: EurekaServers, search: true},
+    "/eureka-servers/:id": {component: EurekaServer},
+    "/ssh": {component: Ssh},
+    "/settings": {component: Settings},
+    "/logs": {component: ManagementLogs, search: true},
+    "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
 export const monitoringAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-  "/home": {title: 'Microservices dynamic system monitoring', component: MonitoringLanding},
-  "/settings": {component: MonitoringSettings},
-  "/*": {title: "404 - Not found", component: PageNotFound},
+    "/home": {title: 'Microservices dynamic system monitoring', component: MonitoringLanding},
+    "/settings": {component: MonitoringSettings},
+    "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
 export const dataAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-  "/home": {title: 'Microservices dynamic system data management', component: DataManagementLanding},
-  "/settings": {component: DataManagementSettings},
-  "/*": {title: "404 - Not found", component: PageNotFound},
+    "/home": {title: 'Microservices dynamic system data management', component: DataManagementLanding},
+    "/settings": {component: DataManagementSettings},
+    "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
 export type IComponent = 'Management' | 'Monitoring' | 'Data';
 
 export const components: IComponent[] = [
-  'Management', 'Monitoring', 'Data'
+    'Management', 'Monitoring', 'Data'
 ];
 
 class Root extends React.Component<Props, {}> {
 
-  public componentDidMount(): void {
-    M.AutoInit();
-  }
+    public componentDidMount(): void {
+        M.AutoInit();
+    }
 
-  public render() {
-    let routes = (function (component) {
-      switch (component) {
-        case "Management":
-          return managementAuthenticatedRoutes;
-        case "Monitoring":
-          return monitoringAuthenticatedRoutes;
-        case "Data":
-          return dataAuthenticatedRoutes;
-      }
-    })(this.props.component);
-    return (
-      <main>
-        <Provider store={this.props.store}>
-          <LoadingBar showFastActions className="loading-bar"/>
-          <Navbar/>
-          <div className='main-content'>
-            <Switch>
-              <Route path="/" exact component={Login}/>
-              <Route path="/login" exact component={Login}/>
-              {Object.entries(routes).map(([path, {title, component}], index) =>
-                <AuthenticatedRoute key={index} exact path={path} title={title}
-                                    component={component}/>)}
-            </Switch>
-          </div>
-        </Provider>
-        <Footer/>
-      </main>
-    );
-  }
+    public render() {
+        let routes = (function (component) {
+            switch (component) {
+                case "Management":
+                    return managementAuthenticatedRoutes;
+                case "Monitoring":
+                    return monitoringAuthenticatedRoutes;
+                case "Data":
+                    return dataAuthenticatedRoutes;
+            }
+        })(this.props.component);
+        return (
+            <main>
+                <Provider store={this.props.store}>
+                    <LoadingBar showFastActions className="loading-bar"/>
+                    <Navbar/>
+                    <div className='main-content'>
+                        <Switch>
+                            <Route path="/" exact component={Login}/>
+                            <Route path="/login" exact component={Login}/>
+                            {Object.entries(routes).map(([path, {title, component}], index) =>
+                                <AuthenticatedRoute key={index} exact path={path} title={title}
+                                                    component={component}/>)}
+                        </Switch>
+                    </div>
+                </Provider>
+                <Footer/>
+            </main>
+        );
+    }
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    component: state.ui.component
-  }
+    return {
+        component: state.ui.component
+    }
 }
 
 export default connect(mapStateToProps, undefined)(Root);

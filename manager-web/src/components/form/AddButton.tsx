@@ -29,87 +29,87 @@ import M from "materialize-css";
 import ScrollBar from "react-perfect-scrollbar";
 
 interface Props {
-  tooltip: { text: string, position: 'left' | 'right' | 'bottom' | 'top' };
-  pathname?: string;
-  dropdown?: {
-    id: string | number,
-    title: string,
-    empty?: string,
-    data: { text: string, pathname: string }[]
-  }
-  offset?: number;
+    tooltip: { text: string, position: 'left' | 'right' | 'bottom' | 'top' };
+    pathname?: string;
+    dropdown?: {
+        id: string | number,
+        title: string,
+        empty?: string,
+        data: { text: string, pathname: string }[]
+    }
+    offset?: number;
 }
 
 export default class AddButton extends React.Component<Props, {}> {
 
-  private dropdown = createRef<HTMLDivElement>();
-  private scrollbar: (ScrollBar | null) = null;
+    private dropdown = createRef<HTMLDivElement>();
+    private scrollbar: (ScrollBar | null) = null;
 
-  public componentDidMount(): void {
-    this.initDropdown();
-  }
+    public componentDidMount(): void {
+        this.initDropdown();
+    }
 
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    this.initDropdown();
-  }
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+        this.initDropdown();
+    }
 
-  public render() {
-    const {offset, tooltip, pathname, dropdown} = this.props;
-    return (
-      <>
-        {!dropdown
-          ? <div className="fixed-action-btn tooltipped"
-                 data-position={tooltip.position}
-                 data-tooltip={tooltip.text}
-                 style={offset ? {right: `${offset * 55 + 23}px`} : undefined}>
-            <Link className="waves-effect btn-floating grey darken-3"
-                  to={pathname || ""}>
-              <i className="large material-icons">add</i>
-            </Link>
-          </div>
-          : <>
-            <div
-              className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
-              data-position={tooltip.position}
-              data-tooltip={tooltip.text}
-              data-target={`dropdown-${dropdown.id}`}
-              ref={this.dropdown}>
-              <i className="large material-icons">add</i>
-            </div>
-            <ul id={`dropdown-${dropdown.id}`}
-                className={`dropdown-content ${styles.dropdown}`}>
-              <li className={`${styles.disabled}`}>
-                <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
-                  {dropdown.data.length ? dropdown.title : dropdown.empty}
-                </a>
-              </li>
-              <ScrollBar ref={(ref) => {
-                this.scrollbar = ref;
-              }}>
-                {dropdown.data.map((data, index) =>
-                  <li key={index}>
-                    <Link to={data.pathname}>
-                      {data.text}
-                    </Link>
-                  </li>
-                )}
-              </ScrollBar>
-            </ul>
-          </>
-        }
+    public render() {
+        const {offset, tooltip, pathname, dropdown} = this.props;
+        return (
+            <>
+                {!dropdown
+                    ? <div className="fixed-action-btn tooltipped"
+                           data-position={tooltip.position}
+                           data-tooltip={tooltip.text}
+                           style={offset ? {right: `${offset * 55 + 23}px`} : undefined}>
+                        <Link className="waves-effect btn-floating grey darken-3"
+                              to={pathname || ""}>
+                            <i className="large material-icons">add</i>
+                        </Link>
+                    </div>
+                    : <>
+                        <div
+                            className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
+                            data-position={tooltip.position}
+                            data-tooltip={tooltip.text}
+                            data-target={`dropdown-${dropdown.id}`}
+                            ref={this.dropdown}>
+                            <i className="large material-icons">add</i>
+                        </div>
+                        <ul id={`dropdown-${dropdown.id}`}
+                            className={`dropdown-content ${styles.dropdown}`}>
+                            <li className={`${styles.disabled}`}>
+                                <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                                    {dropdown.data.length ? dropdown.title : dropdown.empty}
+                                </a>
+                            </li>
+                            <ScrollBar ref={(ref) => {
+                                this.scrollbar = ref;
+                            }}>
+                                {dropdown.data.map((data, index) =>
+                                    <li key={index}>
+                                        <Link to={data.pathname}>
+                                            {data.text}
+                                        </Link>
+                                    </li>
+                                )}
+                            </ScrollBar>
+                        </ul>
+                    </>
+                }
 
-      </>
-    );
-  }
+            </>
+        );
+    }
 
-  private initDropdown = () => {
-    M.Dropdown.init(this.dropdown.current as Element,
-      {
-        onOpenEnd: this.onOpenDropdown
-      });
-  };
+    private initDropdown = () => {
+        M.Dropdown.init(this.dropdown.current as Element,
+            {
+                onOpenEnd: this.onOpenDropdown
+            });
+    };
 
-  private onOpenDropdown = () =>
-    this.scrollbar?.updateScroll();
+    private onOpenDropdown = () =>
+        this.scrollbar?.updateScroll();
 
 }

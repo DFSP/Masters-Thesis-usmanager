@@ -26,26 +26,26 @@ import React from "react";
 import styles from './ActionLoadingSpinner.module.css';
 
 interface LoadingProgressProps {
-  loading: boolean;
-  backgroundColor?: string;
-  progressBarColor?: string;
+    loading: boolean;
+    backgroundColor?: string;
+    progressBarColor?: string;
 }
 
 const ActionProgressBar: React.FC<LoadingProgressProps> = (props: LoadingProgressProps) =>
-  <div className={styles.container}>
-    <div className="progress"
-         style={{backgroundColor: props.backgroundColor ? props.backgroundColor : '#36393F'}}>
-      {props.loading
-        ?
-        <div className="indeterminate"
-             style={{backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'}}/>
-        :
-        <div className="determinate"
-             style={{
-               width: '100%',
-               backgroundColor: props.backgroundColor ? props.backgroundColor : 'black'
-             }}/>}
-    </div>
-  </div>;
+    <div className={styles.container}>
+        <div className="progress"
+             style={{backgroundColor: props.backgroundColor ? props.backgroundColor : '#36393F'}}>
+            {props.loading
+                ?
+                <div className="indeterminate"
+                     style={{backgroundColor: props.progressBarColor ? props.progressBarColor : 'black'}}/>
+                :
+                <div className="determinate"
+                     style={{
+                         width: '100%',
+                         backgroundColor: props.backgroundColor ? props.backgroundColor : 'black'
+                     }}/>}
+        </div>
+    </div>;
 
 export default ActionProgressBar;

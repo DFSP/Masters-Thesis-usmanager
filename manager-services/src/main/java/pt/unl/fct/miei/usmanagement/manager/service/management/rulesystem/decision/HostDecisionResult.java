@@ -28,8 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
+import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 
 import java.util.Collections;
 import java.util.Map;

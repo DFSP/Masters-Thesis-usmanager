@@ -24,13 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.kafka;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+
+import java.io.Serializable;
 
 @Getter
 @Setter

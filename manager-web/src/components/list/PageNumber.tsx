@@ -25,23 +25,23 @@
 import * as React from "react";
 
 interface PageNumberProps {
-  page: number;
-  active: boolean;
-  setPage: (pageIndex: number) => void;
+    page: number;
+    active: boolean;
+    setPage: (pageIndex: number) => void;
 }
 
 export class PageNumber extends React.Component<PageNumberProps, {}> {
 
-  public render() {
-    const {page, active} = this.props;
-    return (
-      <li key={page} className={active ? "active" : "waves-effect"}>
-        <a onClick={this.changePage}>{page}</a>
-      </li>
-    );
-  };
+    public render() {
+        const {page, active} = this.props;
+        return (
+            <li key={page} className={active ? "active" : "waves-effect"}>
+                <a onClick={this.changePage}>{page}</a>
+            </li>
+        );
+    };
 
-  private changePage = () => {
-    this.props.setPage(this.props.page - 1);
-  };
+    private changePage = () => {
+        this.props.setPage(this.props.page - 1);
+    };
 }

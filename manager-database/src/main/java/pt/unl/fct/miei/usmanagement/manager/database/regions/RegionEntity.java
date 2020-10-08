@@ -25,12 +25,23 @@
 package pt.unl.fct.miei.usmanagement.manager.database.regions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -60,7 +71,7 @@ public class RegionEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<EdgeHostEntity> edgeHosts = new HashSet<>();
+	private Set<EdgeHostEntity> edgeHosts;
 
 	@Override
 	public int hashCode() {

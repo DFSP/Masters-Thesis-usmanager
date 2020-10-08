@@ -34,60 +34,60 @@ import {connect} from "react-redux";
 import {loadRulesContainer} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericContainerRules: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericContainerRules: string[];
 }
 
 interface DispatchToProps {
-  loadRulesContainer: () => void;
+    loadRulesContainer: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericContainerRuleList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesContainer();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesContainer();
+    }
 
-  public render() {
-    const RulesList = List<string>();
-    return (
-      <RulesList isLoading={this.props.isLoading}
-                 error={this.props.error}
-                 emptyMessage={`Generic container rules list is empty`}
-                 list={this.props.genericContainerRules}
-                 show={this.rule}/>
-    );
-  }
+    public render() {
+        const RulesList = List<string>();
+        return (
+            <RulesList isLoading={this.props.isLoading}
+                       error={this.props.error}
+                       emptyMessage={`Generic container rules list is empty`}
+                       list={this.props.genericContainerRules}
+                       show={this.rule}/>
+        );
+    }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericContainerRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/containers/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private rule = (rule: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericContainerRules.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{rule}</span>
+            </div>
+            <Link to={`/rules/containers/${rule}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.rules.containers.isLoadingRules,
-    error: state.entities.rules.containers.loadRulesError,
-    genericContainerRules: Object.entries(state.entities.rules.containers.data)
-                                 .filter(([_, rule]) => rule.generic)
-                                 .map(([ruleName, _]) => ruleName)
-  }
+    return {
+        isLoading: state.entities.rules.containers.isLoadingRules,
+        error: state.entities.rules.containers.loadRulesError,
+        genericContainerRules: Object.entries(state.entities.rules.containers.data)
+            .filter(([_, rule]) => rule.generic)
+            .map(([ruleName, _]) => ruleName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesContainer,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesContainer,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericContainerRuleList);

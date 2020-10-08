@@ -25,12 +25,23 @@
 package pt.unl.fct.miei.usmanagement.manager.database.valuemodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -51,10 +62,10 @@ public class ValueModeEntity {
 	@Column(unique = true)
 	private String name;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<ConditionEntity> conditions = new HashSet<>();
+	private Set<ConditionEntity> conditions;
 
 	@Override
 	public int hashCode() {

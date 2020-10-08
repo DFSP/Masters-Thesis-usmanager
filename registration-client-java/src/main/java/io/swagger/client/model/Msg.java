@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -37,77 +37,77 @@
 
 package io.swagger.client.model;
 
-import java.util.Objects;
-
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Objects;
 
 /**
  * Msg
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-09-28T21:06:30.769Z")
 public class Msg {
-  @SerializedName("content")
-  private String content = null;
+	@SerializedName("content")
+	private String content = null;
 
-  public Msg content(String content) {
-    this.content = content;
-    return this;
-  }
+	public Msg content(String content) {
+		this.content = content;
+		return this;
+	}
 
-  /**
-   * Get content
-   *
-   * @return content
-   **/
-  @ApiModelProperty(example = "success", value = "")
-  public String getContent() {
-    return content;
-  }
+	/**
+	 * Get content
+	 *
+	 * @return content
+	 **/
+	@ApiModelProperty(example = "success", value = "")
+	public String getContent() {
+		return content;
+	}
 
-  public void setContent(String content) {
-    this.content = content;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Msg msg = (Msg) o;
-    return Objects.equals(this.content, msg.content);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(content);
-  }
+	public void setContent(String content) {
+		this.content = content;
+	}
 
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Msg {\n");
+	@Override
+	public boolean equals(java.lang.Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Msg msg = (Msg) o;
+		return Objects.equals(this.content, msg.content);
+	}
 
-    sb.append("    content: ").append(toIndentedString(content)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(content);
+	}
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("class Msg {\n");
+
+		sb.append("    content: ").append(toIndentedString(content)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
+	}
 
 }
 

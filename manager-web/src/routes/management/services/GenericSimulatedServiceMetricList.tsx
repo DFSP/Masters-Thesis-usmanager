@@ -34,60 +34,60 @@ import ListItem from "../../../components/list/ListItem";
 import {loadSimulatedServiceMetrics} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericSimulatedServiceMetrics: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericSimulatedServiceMetrics: string[];
 }
 
 interface DispatchToProps {
-  loadSimulatedServiceMetrics: () => void;
+    loadSimulatedServiceMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericSimulatedServiceMetricList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedServiceMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedServiceMetrics();
+    }
 
-  public render() {
-    const SimulatedMetricsList = List<string>();
-    return (
-      <SimulatedMetricsList isLoading={this.props.isLoading}
-                            error={this.props.error}
-                            emptyMessage={`Generic simulated metrics list is empty`}
-                            list={this.props.genericSimulatedServiceMetrics}
-                            show={this.simulatedMetric}/>
-    );
-  }
+    public render() {
+        const SimulatedMetricsList = List<string>();
+        return (
+            <SimulatedMetricsList isLoading={this.props.isLoading}
+                                  error={this.props.error}
+                                  emptyMessage={`Generic simulated metrics list is empty`}
+                                  list={this.props.genericSimulatedServiceMetrics}
+                                  show={this.simulatedMetric}/>
+        );
+    }
 
-  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericSimulatedServiceMetrics.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{simulatedMetric}</span>
-      </div>
-      <Link to={`/simulated-metrics/services/${simulatedMetric}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericSimulatedServiceMetrics.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{simulatedMetric}</span>
+            </div>
+            <Link to={`/simulated-metrics/services/${simulatedMetric}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
-    error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
-    genericSimulatedServiceMetrics: Object.entries(state.entities.simulatedMetrics.services.data)
-                                          .filter(([_, simulatedMetric]) => simulatedMetric.generic)
-                                          .map(([simulatedMetricName, _]) => simulatedMetricName)
-  }
+    return {
+        isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
+        error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
+        genericSimulatedServiceMetrics: Object.entries(state.entities.simulatedMetrics.services.data)
+            .filter(([_, simulatedMetric]) => simulatedMetric.generic)
+            .map(([simulatedMetricName, _]) => simulatedMetricName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadSimulatedServiceMetrics,
-  }, dispatch);
+    bindActionCreators({
+        loadSimulatedServiceMetrics,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericSimulatedServiceMetricList);

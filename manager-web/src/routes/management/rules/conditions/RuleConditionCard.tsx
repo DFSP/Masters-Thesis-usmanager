@@ -95,17 +95,17 @@ class RuleConditionCard extends BaseComponent<Props, State> {
         const CardRuleCondition = Card<IRuleCondition>();
         return <CardRuleCondition id={`condition-${condition.id}`}
                                   title={condition.name.toString()}
-                                   link={{to: {pathname: `/rules/conditions/${condition.name}`, state: condition}}}
-                                   height={'150px'}
-                                   margin={'10px 0'}
-                                   hoverable
-                                   delete={{
-                                       url: `simulated-metrics/services/${condition.name}`,
-                                       successCallback: this.onDeleteSuccess,
-                                       failureCallback: this.onDeleteFailure,
-                                   }}
-                                   loading={loading}
-                                   contextMenuItems={this.contextMenu()}>
+                                  link={{to: {pathname: `/rules/conditions/${condition.name}`, state: condition}}}
+                                  height={'150px'}
+                                  margin={'10px 0'}
+                                  hoverable
+                                  delete={{
+                                      url: `simulated-metrics/services/${condition.name}`,
+                                      successCallback: this.onDeleteSuccess,
+                                      failureCallback: this.onDeleteFailure,
+                                  }}
+                                  loading={loading}
+                                  contextMenuItems={this.contextMenu()}>
             <CardItem key={'valueMode'}
                       label={'Value mode'}
                       value={condition.valueMode.name}/>

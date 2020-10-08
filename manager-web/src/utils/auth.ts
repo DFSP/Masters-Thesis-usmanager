@@ -29,28 +29,28 @@ import Cookies from 'universal-cookie';
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
 export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse> =>
-  axios.get(`${API_URL}/basicauth`, {
-    headers: {
-      authorization: createBasicAuthToken(username, password)
-    }
-  });
+    axios.get(`${API_URL}/basicauth`, {
+        headers: {
+            authorization: createBasicAuthToken(username, password)
+        }
+    });
 
 export const createBasicAuthToken = (username: string, password: string): string =>
-  `Basic ` + window.btoa(username + ":" + password);
+    `Basic ` + window.btoa(username + ":" + password);
 
 export const isAuthenticated = (): boolean =>
-  !!getLoggedInUser();
+    !!getLoggedInUser();
 
 export const registerSuccessfulLogin = (username: string, password: string): void => {
-  // 1 year expire date
-  let expires = new Date();
-  expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
-  new Cookies().set(USER_NAME_SESSION_ATTRIBUTE_NAME, username, { path: '/', expires });
-  setupAxiosInterceptors(createBasicAuthToken(username, password));
+    // 1 year expire date
+    let expires = new Date();
+    expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
+    new Cookies().set(USER_NAME_SESSION_ATTRIBUTE_NAME, username, {path: '/', expires});
+    setupAxiosInterceptors(createBasicAuthToken(username, password));
 };
 
 export const getLoggedInUser = () =>
-  new Cookies().get(USER_NAME_SESSION_ATTRIBUTE_NAME);
+    new Cookies().get(USER_NAME_SESSION_ATTRIBUTE_NAME);
 
 export const logout = () =>
-  new Cookies().remove(USER_NAME_SESSION_ATTRIBUTE_NAME);
+    new Cookies().remove(USER_NAME_SESSION_ATTRIBUTE_NAME);

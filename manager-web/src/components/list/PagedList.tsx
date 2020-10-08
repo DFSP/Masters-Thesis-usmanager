@@ -29,111 +29,111 @@ import {Dropdown} from "../form/Dropdown";
 import Pagination from "./Pagination";
 
 export interface IPagedList<T> {
-  list: T[];
-  show: (element: T, index: number, last: boolean) => JSX.Element;
-  paginate: {
-    pagesize: {
-      initial: number,
-      options?: ('all' | number)[],
-    },
-    page?: {
-      index?: number,
-      last?: boolean
-    },
-    position?: 'top' | 'bottom' | 'top-bottom';
-  };
+    list: T[];
+    show: (element: T, index: number, last: boolean) => JSX.Element;
+    paginate: {
+        pagesize: {
+            initial: number,
+            options?: ('all' | number)[],
+        },
+        page?: {
+            index?: number,
+            last?: boolean
+        },
+        position?: 'top' | 'bottom' | 'top-bottom';
+    };
 }
 
 interface State {
-  max: number;
-  pagesize: number;
-  page: number;
+    max: number;
+    pagesize: number;
+    page: number;
 }
 
 export class PagedList<T> extends React.Component<IPagedList<T>, State> {
 
-  private max: number = 0;
+    private max: number = 0;
 
-  constructor(props: IPagedList<T>) {
-    super(props);
-    const initialMax = Math.max(0, Math.ceil(props.list.length / (props.paginate.pagesize.initial || 1)) - 1);
-    this.state = {
-      max: initialMax,
-      page: (props.paginate.page?.last ? initialMax : props.paginate.page?.index) || 0,
-      pagesize: props.paginate.pagesize.initial,
-    };
-  }
-
-  public render() {
-    const {list: l, show, paginate} = this.props;
-    const {page = 0, pagesize = l.length} = this.state;
-    const list = l.slice(page * pagesize, page * pagesize + pagesize);
-    const pagination = <Pagination max={this.state.max}
-                                   page={page}
-                                   setPage={this.setPage}
-                                   prevPage={this.prevPage}
-                                   nextPage={this.nextPage}/>;
-    // TODO: page transition. e.g. slide to the left while new page comes from the right. Using react spring
-    return (
-      <div className={'list'}>
-        {paginate.pagesize.options && (
-          <div className={'pageSize'}>
-            <Dropdown<(number | 'all')>
-              id={'pageSize'}
-              name={'pageSize'}
-              value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
-              onChange={this.setPageSize}
-              dropdown={{
-                defaultValue: 'Page size',
-                values: paginate.pagesize.options,
-                optionToString: this.pageSizeOption
-              }}>
-            </Dropdown>
-          </div>
-        )}
-        {(paginate.position === undefined || paginate.position === 'top' || paginate.position === 'top-bottom')
-         && this.state.max > 0 && pagination}
-        <SimpleList<T> {...this.props} list={list} show={show}/>
-        {(paginate.position === 'bottom' || paginate.position === 'top-bottom')
-         && this.state.max > 0 && pagination}
-      </div>
-    );
-  }
-
-  private setPage = (pageIndex: number): void => {
-    this.setState(state => ({
-      page: state.page === undefined ? 0 : Math.max(0, pageIndex),
-      max: Math.max(0, Math.ceil(this.props.list.length / this.state.pagesize) - 1)
-    }));
-    window.scrollTo(0, 0);
-  };
-
-  private prevPage = (): void => {
-    const {page} = this.state;
-    this.setPage(page === undefined ? 0 : Math.max(0, page - 1));
-  };
-
-  private nextPage = (): void => {
-    const {page} = this.state;
-    this.setPage(page === undefined ? 0 : Math.min(this.state.max, page + 1));
-  };
-
-  private setPageSize = (e: React.FormEvent<HTMLSelectElement>) => {
-    const selectedPageSize = e.currentTarget.value;
-    let pagesize: number;
-    if (selectedPageSize === 'all') {
-      pagesize = Number.MAX_VALUE;
-    } else {
-      pagesize = parseInt(selectedPageSize);
+    constructor(props: IPagedList<T>) {
+        super(props);
+        const initialMax = Math.max(0, Math.ceil(props.list.length / (props.paginate.pagesize.initial || 1)) - 1);
+        this.state = {
+            max: initialMax,
+            page: (props.paginate.page?.last ? initialMax : props.paginate.page?.index) || 0,
+            pagesize: props.paginate.pagesize.initial,
+        };
     }
-    const max = Math.max(0, Math.ceil(this.props.list.length / pagesize) - 1);
-    this.setState({
-      pagesize,
-      max,
-      page: max,
-    })
-  };
 
-  private pageSizeOption = (option: (number | 'all')): string =>
-    option.toString();
+    public render() {
+        const {list: l, show, paginate} = this.props;
+        const {page = 0, pagesize = l.length} = this.state;
+        const list = l.slice(page * pagesize, page * pagesize + pagesize);
+        const pagination = <Pagination max={this.state.max}
+                                       page={page}
+                                       setPage={this.setPage}
+                                       prevPage={this.prevPage}
+                                       nextPage={this.nextPage}/>;
+        // TODO: page transition. e.g. slide to the left while new page comes from the right. Using react spring
+        return (
+            <div className={'list'}>
+                {paginate.pagesize.options && (
+                    <div className={'pageSize'}>
+                        <Dropdown<(number | 'all')>
+                            id={'pageSize'}
+                            name={'pageSize'}
+                            value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
+                            onChange={this.setPageSize}
+                            dropdown={{
+                                defaultValue: 'Page size',
+                                values: paginate.pagesize.options,
+                                optionToString: this.pageSizeOption
+                            }}>
+                        </Dropdown>
+                    </div>
+                )}
+                {(paginate.position === undefined || paginate.position === 'top' || paginate.position === 'top-bottom')
+                && this.state.max > 0 && pagination}
+                <SimpleList<T> {...this.props} list={list} show={show}/>
+                {(paginate.position === 'bottom' || paginate.position === 'top-bottom')
+                && this.state.max > 0 && pagination}
+            </div>
+        );
+    }
+
+    private setPage = (pageIndex: number): void => {
+        this.setState(state => ({
+            page: state.page === undefined ? 0 : Math.max(0, pageIndex),
+            max: Math.max(0, Math.ceil(this.props.list.length / this.state.pagesize) - 1)
+        }));
+        window.scrollTo(0, 0);
+    };
+
+    private prevPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.max(0, page - 1));
+    };
+
+    private nextPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.min(this.state.max, page + 1));
+    };
+
+    private setPageSize = (e: React.FormEvent<HTMLSelectElement>) => {
+        const selectedPageSize = e.currentTarget.value;
+        let pagesize: number;
+        if (selectedPageSize === 'all') {
+            pagesize = Number.MAX_VALUE;
+        } else {
+            pagesize = parseInt(selectedPageSize);
+        }
+        const max = Math.max(0, Math.ceil(this.props.list.length / pagesize) - 1);
+        this.setState({
+            pagesize,
+            max,
+            page: max,
+        })
+    };
+
+    private pageSizeOption = (option: (number | 'all')): string =>
+        option.toString();
 }

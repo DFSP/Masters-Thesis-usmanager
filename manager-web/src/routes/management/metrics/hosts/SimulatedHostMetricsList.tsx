@@ -32,54 +32,54 @@ import {ISimulatedHostMetric} from "./SimulatedHostMetric";
 import SimulatedHostMetricCard from "./SimulatedHostMetricCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  simulatedHostMetrics: ISimulatedHostMetric[];
+    isLoading: boolean
+    error?: string | null;
+    simulatedHostMetrics: ISimulatedHostMetric[];
 }
 
 interface DispatchToProps {
-  loadSimulatedHostMetrics: () => void;
+    loadSimulatedHostMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedHostMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedHostMetrics();
+    }
 
-  public render() {
-    return (
-      <CardList<ISimulatedHostMetric>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No simulated host metrics to display"}
-        list={this.props.simulatedHostMetrics}
-        card={this.simulatedHostMetric}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<ISimulatedHostMetric>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No simulated host metrics to display"}
+                list={this.props.simulatedHostMetrics}
+                card={this.simulatedHostMetric}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private simulatedHostMetric = (simulatedMetric: ISimulatedHostMetric): JSX.Element =>
-    <SimulatedHostMetricCard key={simulatedMetric.id} simulatedHostMetric={simulatedMetric}/>;
+    private simulatedHostMetric = (simulatedMetric: ISimulatedHostMetric): JSX.Element =>
+        <SimulatedHostMetricCard key={simulatedMetric.id} simulatedHostMetric={simulatedMetric}/>;
 
-  private predicate = (simulatedMetric: ISimulatedHostMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
+    private predicate = (simulatedMetric: ISimulatedHostMetric, search: string): boolean =>
+        simulatedMetric.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.simulatedMetrics.hosts.isLoadingSimulatedHostMetrics,
-    error: state.entities.simulatedMetrics.hosts.loadSimulatedHostMetricsError,
-    simulatedHostMetrics: (state.entities.simulatedMetrics.hosts.data
-                           && Object.values(state.entities.simulatedMetrics.hosts.data)) || [],
-  }
+    {
+        isLoading: state.entities.simulatedMetrics.hosts.isLoadingSimulatedHostMetrics,
+        error: state.entities.simulatedMetrics.hosts.loadSimulatedHostMetricsError,
+        simulatedHostMetrics: (state.entities.simulatedMetrics.hosts.data
+            && Object.values(state.entities.simulatedMetrics.hosts.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadSimulatedHostMetrics,
+    loadSimulatedHostMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimulatedHostMetricsList);

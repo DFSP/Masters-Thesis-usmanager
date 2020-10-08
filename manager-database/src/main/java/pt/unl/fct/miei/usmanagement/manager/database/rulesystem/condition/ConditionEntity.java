@@ -25,7 +25,13 @@
 package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleConditionEntity;
@@ -33,9 +39,16 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleCo
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -73,17 +86,17 @@ public class ConditionEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
+	private Set<HostRuleConditionEntity> hostRuleConditions;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
+	private Set<ServiceRuleConditionEntity> serviceConditions;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleConditionEntity> containerConditions = new HashSet<>();
+	private Set<ContainerRuleConditionEntity> containerConditions;
 
 	@Override
 	public int hashCode() {

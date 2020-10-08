@@ -29,12 +29,12 @@ import styles from './RulesHost.module.css';
 import RulesHostList from "./RulesHostList";
 
 const RulesHost: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add host rule', position: 'left'}}
-               pathname={'/rules/hosts/new_host_rule?new=true'}/>
-    <div className={`${styles.container}`}>
-      <RulesHostList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add host rule', position: 'left'}}
+                   pathname={'/rules/hosts/new_host_rule?new=true'}/>
+        <div className={`${styles.container}`}>
+            <RulesHostList/>
+        </div>
+    </MainLayout>;
 
 export default RulesHost;

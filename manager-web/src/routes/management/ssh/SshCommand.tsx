@@ -34,110 +34,110 @@ import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 export interface ISshCommand {
-  hostname: string;
-  command: string;
-  exitStatus: number;
-  output: string[];
-  error: string[];
+    hostname: string;
+    command: string;
+    exitStatus: number;
+    output: string[];
+    error: string[];
 }
 
 const buildNewSshCommand = (): Partial<ISshCommand> => ({
-  hostname: undefined,
-  command: undefined,
+    hostname: undefined,
+    command: undefined,
 });
 
 interface StateToProps {
-  cloudHosts: { [key: string]: ICloudHost };
-  edgeHosts: { [key: string]: IEdgeHost };
+    cloudHosts: { [key: string]: ICloudHost };
+    edgeHosts: { [key: string]: IEdgeHost };
 }
 
 interface DispatchToProps {
-  loadCloudHosts: () => void;
-  loadEdgeHosts: () => void;
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
 }
 
 interface SshCommandProps {
-  onExecuteCommand: (command: ISshCommand) => void;
+    onExecuteCommand: (command: ISshCommand) => void;
 }
 
 type Props = SshCommandProps & StateToProps & DispatchToProps;
 
 class SshCommand extends BaseComponent<Props, {}> {
 
-  public render() {
-    const command = buildNewSshCommand();
-    return (
-      <Form id={'sshCommand'}
-            fields={this.getFields()}
-            values={command}
-            isNew={true}
-            post={{
-              textButton: 'Execute',
-              url: 'ssh/execute',
-              successCallback: this.onPostSuccess,
-              failureCallback: this.onPostFailure
-            }}>
-        <Field key='hostname'
-               id={'hostname'}
-               label='hostname'
-               type={'dropdown'}
-               dropdown={{
-                 defaultValue: 'Select publicIpAddress',
-                 values: this.getSelectableHosts()
-               }}/>
-        <Field key='command'
-               id={'command'}
-               label='command'
-               type={'multilinetext'}/>
-      </Form>
-    );
-  }
-
-  private onPostSuccess = (reply: IReply<ISshCommand>): void => {
-    const command = reply.data;
-    this.props.onExecuteCommand(command);
-  };
-
-  private onPostFailure = (reason: string): void =>
-    super.toast(`Command execution failed`, 10000, reason, true);
-
-  private getFields = (): IFields => (
-    {
-      hostname: {
-        id: 'hostname',
-        label: 'hostname',
-        validation: {rule: required}
-      },
-      command: {
-        id: 'command',
-        label: 'command',
-        validation: {rule: requiredAndTrimmed}
-      },
+    public render() {
+        const command = buildNewSshCommand();
+        return (
+            <Form id={'sshCommand'}
+                  fields={this.getFields()}
+                  values={command}
+                  isNew={true}
+                  post={{
+                      textButton: 'Execute',
+                      url: 'ssh/execute',
+                      successCallback: this.onPostSuccess,
+                      failureCallback: this.onPostFailure
+                  }}>
+                <Field key='hostname'
+                       id={'hostname'}
+                       label='hostname'
+                       type={'dropdown'}
+                       dropdown={{
+                           defaultValue: 'Select publicIpAddress',
+                           values: this.getSelectableHosts()
+                       }}/>
+                <Field key='command'
+                       id={'command'}
+                       label='command'
+                       type={'multilinetext'}/>
+            </Form>
+        );
     }
-  );
 
-  private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
+    private onPostSuccess = (reply: IReply<ISshCommand>): void => {
+        const command = reply.data;
+        this.props.onExecuteCommand(command);
+    };
+
+    private onPostFailure = (reason: string): void =>
+        super.toast(`Command execution failed`, 10000, reason, true);
+
+    private getFields = (): IFields => (
+        {
+            hostname: {
+                id: 'hostname',
+                label: 'hostname',
+                validation: {rule: required}
+            },
+            command: {
+                id: 'command',
+                label: 'command',
+                validation: {rule: requiredAndTrimmed}
+            },
+        }
+    );
+
+    private getSelectableHosts = () => {
+        const cloudHosts = Object.values(this.props.cloudHosts)
+            .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+            .map(instance => instance.publicIpAddress);
+        const edgeHosts = Object.keys(this.props.edgeHosts);
+        return cloudHosts.concat(edgeHosts);
+    };
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  const cloudHosts = state.entities.hosts.cloud.data;
-  const edgeHosts = state.entities.hosts.edge.data;
-  return {
-    cloudHosts,
-    edgeHosts,
-  }
+    const cloudHosts = state.entities.hosts.cloud.data;
+    const edgeHosts = state.entities.hosts.edge.data;
+    return {
+        cloudHosts,
+        edgeHosts,
+    }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-  loadCloudHosts,
-  loadEdgeHosts,
+    loadCloudHosts,
+    loadEdgeHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SshCommand);

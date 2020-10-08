@@ -1,36 +1,6 @@
 spring:
   application:
-    name: manager-service
-  main:
-    allow-bean-definition-overriding: true
-  datasource:
-    driverClassName: org.h2.Driver
-    #url: jdbc:h2:file:./manager-master/db/manager-master-db
-    url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
-    username: sa
-    password: admin
-    platform: h2
-  h2:
-    console:
-      enabled: true
-      path: /console
-      settings:
-        trace: false
-        web-allow-others: true
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: false
-        show_sql: false
-        use_sql_comments: false
-management:
-  endpoints:
-    web:
-      exposure:
-        include: info, health, metrics, mappings
+    name: manager-services
 ssh:
   connection-timeout: 10000
 edge:
@@ -102,19 +72,3 @@ location-request:
 rules:
   service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
-symmetricds:
-  tables:
-    exclude:
-      startsWith: sym, logging
-      endsWith: events
-
-#debug: true
-#trace: true
-#  level:
-#    org:
-#      hibernate:
-#        sql: DEBUG
-#      type:
-#        descriptor:
-#          sql:
-#            BasicBinder: TRACE

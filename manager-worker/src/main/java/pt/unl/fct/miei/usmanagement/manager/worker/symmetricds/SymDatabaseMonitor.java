@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jumpmind.db.model.Table;
-import org.jumpmind.symmetric.common.Constants;
 import org.jumpmind.symmetric.io.data.CsvData;
 import org.jumpmind.symmetric.io.data.DataContext;
 import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
@@ -38,11 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
-
-import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @Service

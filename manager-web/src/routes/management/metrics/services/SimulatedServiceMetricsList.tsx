@@ -32,54 +32,54 @@ import SimulatedServiceMetricCard from "./SimulatedServiceMetricCard";
 import {loadSimulatedServiceMetrics} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  simulatedServiceMetrics: ISimulatedServiceMetric[];
+    isLoading: boolean
+    error?: string | null;
+    simulatedServiceMetrics: ISimulatedServiceMetric[];
 }
 
 interface DispatchToProps {
-  loadSimulatedServiceMetrics: () => void;
+    loadSimulatedServiceMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class SimulatedServiceMetricsList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedServiceMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedServiceMetrics();
+    }
 
-  public render() {
-    return (
-      <CardList<ISimulatedServiceMetric>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No simulated service metrics to display"}
-        list={this.props.simulatedServiceMetrics}
-        card={this.simulatedServiceMetric}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<ISimulatedServiceMetric>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No simulated service metrics to display"}
+                list={this.props.simulatedServiceMetrics}
+                card={this.simulatedServiceMetric}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private simulatedServiceMetric = (simulatedMetric: ISimulatedServiceMetric): JSX.Element =>
-    <SimulatedServiceMetricCard key={simulatedMetric.id} simulatedServiceMetric={simulatedMetric}/>;
+    private simulatedServiceMetric = (simulatedMetric: ISimulatedServiceMetric): JSX.Element =>
+        <SimulatedServiceMetricCard key={simulatedMetric.id} simulatedServiceMetric={simulatedMetric}/>;
 
-  private predicate = (simulatedMetric: ISimulatedServiceMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
+    private predicate = (simulatedMetric: ISimulatedServiceMetric, search: string): boolean =>
+        simulatedMetric.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
-    error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
-    simulatedServiceMetrics: (state.entities.simulatedMetrics.services.data
-                              && Object.values(state.entities.simulatedMetrics.services.data)) || [],
-  }
+    {
+        isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
+        error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
+        simulatedServiceMetrics: (state.entities.simulatedMetrics.services.data
+            && Object.values(state.entities.simulatedMetrics.services.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadSimulatedServiceMetrics,
+    loadSimulatedServiceMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimulatedServiceMetricsList);

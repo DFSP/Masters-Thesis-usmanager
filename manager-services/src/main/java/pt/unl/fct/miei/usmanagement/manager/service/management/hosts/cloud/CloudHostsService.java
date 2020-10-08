@@ -38,7 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.service.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.service.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.aws.AwsInstanceState;

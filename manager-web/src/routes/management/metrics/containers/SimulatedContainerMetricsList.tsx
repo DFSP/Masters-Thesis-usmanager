@@ -32,54 +32,54 @@ import SimulatedContainerMetricCard from "./SimulatedContainerMetricCard";
 import {loadSimulatedContainerMetrics} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  simulatedContainerMetrics: ISimulatedContainerMetric[];
+    isLoading: boolean
+    error?: string | null;
+    simulatedContainerMetrics: ISimulatedContainerMetric[];
 }
 
 interface DispatchToProps {
-  loadSimulatedContainerMetrics: () => void;
+    loadSimulatedContainerMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class SimulatedContainerMetricsList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedContainerMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedContainerMetrics();
+    }
 
-  public render() {
-    return (
-      <CardList<ISimulatedContainerMetric>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No simulated container metrics to display"}
-        list={this.props.simulatedContainerMetrics}
-        card={this.simulatedContainerMetric}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<ISimulatedContainerMetric>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No simulated container metrics to display"}
+                list={this.props.simulatedContainerMetrics}
+                card={this.simulatedContainerMetric}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private simulatedContainerMetric = (simulatedMetric: ISimulatedContainerMetric): JSX.Element =>
-    <SimulatedContainerMetricCard key={simulatedMetric.id} simulatedContainerMetric={simulatedMetric}/>;
+    private simulatedContainerMetric = (simulatedMetric: ISimulatedContainerMetric): JSX.Element =>
+        <SimulatedContainerMetricCard key={simulatedMetric.id} simulatedContainerMetric={simulatedMetric}/>;
 
-  private predicate = (simulatedMetric: ISimulatedContainerMetric, search: string): boolean =>
-    simulatedMetric.name.toLowerCase().includes(search);
+    private predicate = (simulatedMetric: ISimulatedContainerMetric, search: string): boolean =>
+        simulatedMetric.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
-    error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
-    simulatedContainerMetrics: (state.entities.simulatedMetrics.containers.data
-                                && Object.values(state.entities.simulatedMetrics.containers.data)) || [],
-  }
+    {
+        isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
+        error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
+        simulatedContainerMetrics: (state.entities.simulatedMetrics.containers.data
+            && Object.values(state.entities.simulatedMetrics.containers.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadSimulatedContainerMetrics,
+    loadSimulatedContainerMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimulatedContainerMetricsList);

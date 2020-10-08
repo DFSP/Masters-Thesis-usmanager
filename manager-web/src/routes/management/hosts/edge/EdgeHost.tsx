@@ -26,9 +26,9 @@ import IDatabaseData from "../../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {
-  IFields,
-  requiredAndTrimmed,
-  requiredAndTrimmedAndNotValidIpAddress
+    IFields,
+    requiredAndTrimmed,
+    requiredAndTrimmedAndNotValidIpAddress
 } from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
@@ -37,12 +37,12 @@ import Tabs, {Tab} from "../../../../components/tabs/Tabs";
 import MainLayout from "../../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../../reducers";
 import {
-  addEdgeHost,
-  addEdgeHostRules,
-  addEdgeHostSimulatedMetrics,
-  loadEdgeHosts,
-  loadRegions,
-  updateEdgeHost
+    addEdgeHost,
+    addEdgeHostRules,
+    addEdgeHostSimulatedMetrics,
+    loadEdgeHosts,
+    loadRegions,
+    updateEdgeHost
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -59,420 +59,420 @@ import {IRegion} from "../../region/Region";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
 
 export interface IEdgeHost extends IDatabaseData {
-  username: string;
-  publicDnsName: string;
-  privateIpAddress: string;
-  publicIpAddress: string;
-  region: IRegion;
-  country: string;
-  city: string;
+    username: string;
+    publicDnsName: string;
+    privateIpAddress: string;
+    publicIpAddress: string;
+    region: IRegion;
+    country: string;
+    city: string;
 
-  worker: IWorkerManager;
-  managedByWorker: IWorkerManager;
-  hostRules?: string[];
-  hostSimulatedMetrics?: string[];
+    worker: IWorkerManager;
+    managedByWorker: IWorkerManager;
+    hostRules?: string[];
+    hostSimulatedMetrics?: string[];
 }
 
 interface INewEdgeHost extends IEdgeHost {
-  password: string;
+    password: string;
 }
 
 const buildNewEdgeHost = (): Partial<INewEdgeHost> => ({
-  username: undefined,
-  password: undefined,
-  publicDnsName: undefined,
-  privateIpAddress: undefined,
-  publicIpAddress: undefined,
-  region: undefined,
-  country: undefined,
-  city: undefined,
+    username: undefined,
+    password: undefined,
+    publicDnsName: undefined,
+    privateIpAddress: undefined,
+    publicIpAddress: undefined,
+    region: undefined,
+    country: undefined,
+    city: undefined,
 });
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  edgeHost: Partial<IEdgeHost>;
-  formEdgeHost?: Partial<IEdgeHost>;
-  regions: { [key: string]: IRegion };
+    isLoading: boolean;
+    error?: string | null;
+    edgeHost: Partial<IEdgeHost>;
+    formEdgeHost?: Partial<IEdgeHost>;
+    regions: { [key: string]: IRegion };
 }
 
 interface DispatchToProps {
-  loadEdgeHosts: (hostname: string) => void;
-  addEdgeHost: (edgeHost: IEdgeHost) => void;
-  updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
-  loadRegions: () => void;
-  addEdgeHostRules: (hostname: string, rules: string[]) => void;
-  addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
+    loadEdgeHosts: (hostname: string) => void;
+    addEdgeHost: (edgeHost: IEdgeHost) => void;
+    updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
+    loadRegions: () => void;
+    addEdgeHostRules: (hostname: string, rules: string[]) => void;
+    addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
-  hostname: string;
+    hostname: string;
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 interface State {
-  edgeHost?: IEdgeHost,
-  formEdgeHost?: IEdgeHost,
-  unsavedRules: string[],
-  unsavedSimulatedMetrics: string[],
+    edgeHost?: IEdgeHost,
+    formEdgeHost?: IEdgeHost,
+    unsavedRules: string[],
+    unsavedSimulatedMetrics: string[],
 }
 
 class EdgeHost extends BaseComponent<Props, State> {
 
-  state: State = {
-    unsavedRules: [],
-    unsavedSimulatedMetrics: [],
-  };
-  private mounted = false;
+    state: State = {
+        unsavedRules: [],
+        unsavedSimulatedMetrics: [],
+    };
+    private mounted = false;
 
-  public componentDidMount(): void {
-    this.props.loadRegions();
-    this.loadEdgeHost();
-    this.mounted = true;
-  };
+    public componentDidMount(): void {
+        this.props.loadRegions();
+        this.loadEdgeHost();
+        this.mounted = true;
+    };
 
-  componentWillUnmount(): void {
-    this.mounted = false;
-  }
-
-  public render() {
-    return (
-      <MainLayout>
-        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
-  private loadEdgeHost = () => {
-    if (!isNew(this.props.location.search)) {
-      const hostname = this.props.match.params.hostname;
-      this.props.loadEdgeHosts(hostname);
+    componentWillUnmount(): void {
+        this.mounted = false;
     }
-  };
 
-  private getEdgeHost = () =>
-    this.state.edgeHost || this.props.edgeHost;
-
-  private getFormEdgeHost = () =>
-    this.state.formEdgeHost || this.props.formEdgeHost;
-
-  private isNew = () =>
-    isNew(this.props.location.search);
-
-  private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
-    const edgeHost = reply.data;
-    const hostname = edgeHost.publicIpAddress;
-    super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} saved</span>`);
-    this.props.addEdgeHost(edgeHost);
-    this.saveEntities(edgeHost);
-    if (this.mounted) {
-      this.updateEdgeHost(edgeHost);
-      this.props.history.replace(hostname);
+    public render() {
+        return (
+            <MainLayout>
+                {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
+                <div className="container">
+                    <Tabs {...this.props} tabs={this.tabs()}/>
+                </div>
+            </MainLayout>
+        );
     }
-  };
 
-  private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to save <b>${edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
-
-  private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
-    const edgeHost = reply.data;
-    const hostname = edgeHost.publicIpAddress;
-    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
-    this.saveEntities(edgeHost);
-    const previousEdgeHost = this.getEdgeHost();
-    if (previousEdgeHost.id) {
-      this.props.updateEdgeHost(previousEdgeHost as IEdgeHost, edgeHost);
-    }
-    if (this.mounted) {
-      this.updateEdgeHost(edgeHost);
-      this.props.history.replace(edgeHost.publicIpAddress);
-    }
-  };
-
-  private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
-
-  private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-    super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
-    if (this.mounted) {
-      this.props.history.push(`/hosts/edge`)
-    }
-  };
-
-  private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
-
-  private shouldShowSaveButton = () =>
-    !!this.state.unsavedRules.length
-    || !!this.state.unsavedSimulatedMetrics.length;
-
-  private saveEntities = (edgeHost: IEdgeHost) => {
-    this.saveEdgeHostRules(edgeHost);
-    this.saveEdgeHostSimulatedMetrics(edgeHost);
-  };
-
-  private addEdgeHostRule = (rule: string): void => {
-    this.setState({
-      unsavedRules: this.state.unsavedRules.concat(rule)
-    });
-  };
-
-  private removeEdgeHostRules = (rules: string[]): void => {
-    this.setState({
-      unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
-    });
-  };
-
-  private saveEdgeHostRules = (edgeHost: IEdgeHost): void => {
-    const {unsavedRules} = this.state;
-    if (unsavedRules.length) {
-      postData(`hosts/edge/${edgeHost.publicIpAddress}/rules`, unsavedRules,
-        () => this.onSaveRulesSuccess(edgeHost),
-        (reason) => this.onSaveRulesFailure(edgeHost, reason));
-    }
-  };
-
-  private onSaveRulesSuccess = (edgeHost: IEdgeHost): void => {
-    this.props.addEdgeHostRules(edgeHost.publicIpAddress, this.state.unsavedRules);
-    if (this.mounted) {
-      this.setState({unsavedRules: []});
-    }
-  };
-
-  private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
-    super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
-
-  private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
-    this.setState({
-      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
-    });
-  };
-
-  private addHostSimulatedMetric = (simulatedMetric: string): void => {
-    this.setState({
-      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
-    });
-  };
-
-  private saveEdgeHostSimulatedMetrics = (edgeHost: IEdgeHost): void => {
-    const {unsavedSimulatedMetrics} = this.state;
-    if (unsavedSimulatedMetrics.length) {
-      postData(`hosts/edge/${edgeHost.publicIpAddress}/simulated-metrics`, unsavedSimulatedMetrics,
-        () => this.onSaveSimulatedMetricsSuccess(edgeHost),
-        (reason) => this.onSaveSimulatedMetricsFailure(edgeHost, reason));
-    }
-  };
-
-  private onSaveSimulatedMetricsSuccess = (edgeHost: IEdgeHost): void => {
-    this.props.addEdgeHostSimulatedMetrics(edgeHost.publicIpAddress, this.state.unsavedSimulatedMetrics);
-    if (this.mounted) {
-      this.setState({unsavedSimulatedMetrics: []});
-    }
-  };
-
-  private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
-    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
-
-  private updateEdgeHost = (edgeHost: IEdgeHost) => {
-    edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
-    const formEdgeHost = {...edgeHost};
-    removeFields(formEdgeHost);
-    this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
-  };
-
-  private getFields = (edgeHost: Partial<IEdgeHost>): IFields =>
-    Object.entries(edgeHost).map(([key, _]) => {
-      return {
-        [key]: {
-          id: key,
-          label: key,
-          validation:
-            key.toLowerCase().includes('address')
-              ? {rule: requiredAndTrimmedAndNotValidIpAddress}
-              : {rule: requiredAndTrimmed}
+    private loadEdgeHost = () => {
+        if (!isNew(this.props.location.search)) {
+            const hostname = this.props.match.params.hostname;
+            this.props.loadEdgeHosts(hostname);
         }
-      };
-    }).reduce((fields, field) => {
-      for (let key in field) {
-        fields[key] = field[key];
-      }
-      return fields;
-    }, {});
+    };
 
-  private getSelectableRegions = () =>
-    Object.values(this.props.regions);
+    private getEdgeHost = () =>
+        this.state.edgeHost || this.props.edgeHost;
 
-  private regionDropdownOption = (region: IRegion) =>
-    region.name;
+    private getFormEdgeHost = () =>
+        this.state.formEdgeHost || this.props.formEdgeHost;
 
-  private managedByWorker = (worker: IWorkerManager) =>
-    worker.id.toString();
+    private isNew = () =>
+        isNew(this.props.location.search);
 
-  private edgeHost = () => {
-    const {isLoading, error} = this.props;
-    const edgeHost = this.getEdgeHost();
-    const formEdgeHost = this.getFormEdgeHost();
-    // @ts-ignore
-    const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
-    const isNewEdgeHost = this.isNew();
-    return (
-      <>
-        {!isNewEdgeHost && isLoading && <ListLoadingSpinner/>}
-        {!isNewEdgeHost && !isLoading && error && <Error message={error}/>}
-        {(isNewEdgeHost || !isLoading) && (isNewEdgeHost || !error) && formEdgeHost && (
-          <Form id={edgeHostKey}
-                fields={this.getFields(formEdgeHost)}
-                values={edgeHost}
-                isNew={isNew(this.props.location.search)}
-                showSaveButton={this.shouldShowSaveButton()}
-                post={{
-                  url: 'hosts/edge',
-                  successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure
-                }}
-                put={{
-                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
-                  successCallback: this.onPutSuccess,
-                  failureCallback: this.onPutFailure
-                }}
-                delete={{
-                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
-                  successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure
-                }}
-                saveEntities={this.saveEntities}>
-            {Object.keys(formEdgeHost).map((key, index) =>
-              key === 'local'
-                ? <Field<boolean> key={index}
-                                  id={key}
-                                  type="dropdown"
-                                  label={key}
-                                  dropdown={{
-                                    defaultValue: "Is a local machine?",
-                                    values: [true, false]
-                                  }}/>
-                : key === 'region'
-                ? <Field<IRegion> key='region'
-                                  id={'region'}
-                                  label='region'
-                                  type={'dropdown'}
-                                  dropdown={{
-                                    defaultValue: 'Select region',
-                                    values: this.getSelectableRegions(),
-                                    optionToString: this.regionDropdownOption
-                                  }}/>
-                : key === 'password'
-                  ? <Field key={index}
-                           id={key}
-                           label={key}
-                           hidden={true}/>
-                  : key === 'managedByWorker'
-                    ? <Field<IWorkerManager> key={index}
+    private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
+        const edgeHost = reply.data;
+        const hostname = edgeHost.publicIpAddress;
+        super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} saved</span>`);
+        this.props.addEdgeHost(edgeHost);
+        this.saveEntities(edgeHost);
+        if (this.mounted) {
+            this.updateEdgeHost(edgeHost);
+            this.props.history.replace(hostname);
+        }
+    };
+
+    private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
+        super.toast(`Unable to save <b>${edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
+
+    private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
+        const edgeHost = reply.data;
+        const hostname = edgeHost.publicIpAddress;
+        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
+        this.saveEntities(edgeHost);
+        const previousEdgeHost = this.getEdgeHost();
+        if (previousEdgeHost.id) {
+            this.props.updateEdgeHost(previousEdgeHost as IEdgeHost, edgeHost);
+        }
+        if (this.mounted) {
+            this.updateEdgeHost(edgeHost);
+            this.props.history.replace(edgeHost.publicIpAddress);
+        }
+    };
+
+    private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
+        super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+
+    private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
+        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
+        if (this.mounted) {
+            this.props.history.push(`/hosts/edge`)
+        }
+    };
+
+    private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
+        super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+
+    private shouldShowSaveButton = () =>
+        !!this.state.unsavedRules.length
+        || !!this.state.unsavedSimulatedMetrics.length;
+
+    private saveEntities = (edgeHost: IEdgeHost) => {
+        this.saveEdgeHostRules(edgeHost);
+        this.saveEdgeHostSimulatedMetrics(edgeHost);
+    };
+
+    private addEdgeHostRule = (rule: string): void => {
+        this.setState({
+            unsavedRules: this.state.unsavedRules.concat(rule)
+        });
+    };
+
+    private removeEdgeHostRules = (rules: string[]): void => {
+        this.setState({
+            unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
+        });
+    };
+
+    private saveEdgeHostRules = (edgeHost: IEdgeHost): void => {
+        const {unsavedRules} = this.state;
+        if (unsavedRules.length) {
+            postData(`hosts/edge/${edgeHost.publicIpAddress}/rules`, unsavedRules,
+                () => this.onSaveRulesSuccess(edgeHost),
+                (reason) => this.onSaveRulesFailure(edgeHost, reason));
+        }
+    };
+
+    private onSaveRulesSuccess = (edgeHost: IEdgeHost): void => {
+        this.props.addEdgeHostRules(edgeHost.publicIpAddress, this.state.unsavedRules);
+        if (this.mounted) {
+            this.setState({unsavedRules: []});
+        }
+    };
+
+    private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
+        super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+
+    private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
+        this.setState({
+            unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+        });
+    };
+
+    private addHostSimulatedMetric = (simulatedMetric: string): void => {
+        this.setState({
+            unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+        });
+    };
+
+    private saveEdgeHostSimulatedMetrics = (edgeHost: IEdgeHost): void => {
+        const {unsavedSimulatedMetrics} = this.state;
+        if (unsavedSimulatedMetrics.length) {
+            postData(`hosts/edge/${edgeHost.publicIpAddress}/simulated-metrics`, unsavedSimulatedMetrics,
+                () => this.onSaveSimulatedMetricsSuccess(edgeHost),
+                (reason) => this.onSaveSimulatedMetricsFailure(edgeHost, reason));
+        }
+    };
+
+    private onSaveSimulatedMetricsSuccess = (edgeHost: IEdgeHost): void => {
+        this.props.addEdgeHostSimulatedMetrics(edgeHost.publicIpAddress, this.state.unsavedSimulatedMetrics);
+        if (this.mounted) {
+            this.setState({unsavedSimulatedMetrics: []});
+        }
+    };
+
+    private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
+        super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+
+    private updateEdgeHost = (edgeHost: IEdgeHost) => {
+        edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
+        const formEdgeHost = {...edgeHost};
+        removeFields(formEdgeHost);
+        this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
+    };
+
+    private getFields = (edgeHost: Partial<IEdgeHost>): IFields =>
+        Object.entries(edgeHost).map(([key, _]) => {
+            return {
+                [key]: {
+                    id: key,
+                    label: key,
+                    validation:
+                        key.toLowerCase().includes('address')
+                            ? {rule: requiredAndTrimmedAndNotValidIpAddress}
+                            : {rule: requiredAndTrimmed}
+                }
+            };
+        }).reduce((fields, field) => {
+            for (let key in field) {
+                fields[key] = field[key];
+            }
+            return fields;
+        }, {});
+
+    private getSelectableRegions = () =>
+        Object.values(this.props.regions);
+
+    private regionDropdownOption = (region: IRegion) =>
+        region.name;
+
+    private managedByWorker = (worker: IWorkerManager) =>
+        worker.id.toString();
+
+    private edgeHost = () => {
+        const {isLoading, error} = this.props;
+        const edgeHost = this.getEdgeHost();
+        const formEdgeHost = this.getFormEdgeHost();
+        // @ts-ignore
+        const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
+        const isNewEdgeHost = this.isNew();
+        return (
+            <>
+                {!isNewEdgeHost && isLoading && <ListLoadingSpinner/>}
+                {!isNewEdgeHost && !isLoading && error && <Error message={error}/>}
+                {(isNewEdgeHost || !isLoading) && (isNewEdgeHost || !error) && formEdgeHost && (
+                    <Form id={edgeHostKey}
+                          fields={this.getFields(formEdgeHost)}
+                          values={edgeHost}
+                          isNew={isNew(this.props.location.search)}
+                          showSaveButton={this.shouldShowSaveButton()}
+                          post={{
+                              url: 'hosts/edge',
+                              successCallback: this.onPostSuccess,
+                              failureCallback: this.onPostFailure
+                          }}
+                          put={{
+                              url: `hosts/edge/${edgeHost.publicIpAddress}`,
+                              successCallback: this.onPutSuccess,
+                              failureCallback: this.onPutFailure
+                          }}
+                          delete={{
+                              url: `hosts/edge/${edgeHost.publicIpAddress}`,
+                              successCallback: this.onDeleteSuccess,
+                              failureCallback: this.onDeleteFailure
+                          }}
+                          saveEntities={this.saveEntities}>
+                        {Object.keys(formEdgeHost).map((key, index) =>
+                            key === 'local'
+                                ? <Field<boolean> key={index}
+                                                  id={key}
+                                                  type="dropdown"
+                                                  label={key}
+                                                  dropdown={{
+                                                      defaultValue: "Is a local machine?",
+                                                      values: [true, false]
+                                                  }}/>
+                                : key === 'region'
+                                ? <Field<IRegion> key='region'
+                                                  id={'region'}
+                                                  label='region'
+                                                  type={'dropdown'}
+                                                  dropdown={{
+                                                      defaultValue: 'Select region',
+                                                      values: this.getSelectableRegions(),
+                                                      optionToString: this.regionDropdownOption
+                                                  }}/>
+                                : key === 'password'
+                                    ? <Field key={index}
                                              id={key}
                                              label={key}
-                                             valueToString={this.managedByWorker}/>
-                    : <Field key={index}
-                             id={key}
-                             label={key}/>
-            )}
-          </Form>
-        )}
-      </>
-    )
-  };
+                                             hidden={true}/>
+                                    : key === 'managedByWorker'
+                                        ? <Field<IWorkerManager> key={index}
+                                                                 id={key}
+                                                                 label={key}
+                                                                 valueToString={this.managedByWorker}/>
+                                        : <Field key={index}
+                                                 id={key}
+                                                 label={key}/>
+                        )}
+                    </Form>
+                )}
+            </>
+        )
+    };
 
-  private rules = (): JSX.Element =>
-    <EdgeHostRuleList isLoadingEdgeHost={this.props.isLoading}
-                      loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
-                      edgeHost={this.getEdgeHost()}
-                      unsavedRules={this.state.unsavedRules}
-                      onAddHostRule={this.addEdgeHostRule}
-                      onRemoveHostRules={this.removeEdgeHostRules}/>;
+    private rules = (): JSX.Element =>
+        <EdgeHostRuleList isLoadingEdgeHost={this.props.isLoading}
+                          loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
+                          edgeHost={this.getEdgeHost()}
+                          unsavedRules={this.state.unsavedRules}
+                          onAddHostRule={this.addEdgeHostRule}
+                          onRemoveHostRules={this.removeEdgeHostRules}/>;
 
-  private genericRules = (): JSX.Element =>
-    <GenericHostRuleList/>;
+    private genericRules = (): JSX.Element =>
+        <GenericHostRuleList/>;
 
-  private simulatedMetrics = (): JSX.Element =>
-    <EdgeHostSimulatedMetricList isLoadingEdgeHost={this.props.isLoading}
-                                 loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
-                                 edgeHost={this.getEdgeHost()}
-                                 unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
-                                 onAddSimulatedHostMetric={this.addHostSimulatedMetric}
-                                 onRemoveSimulatedHostMetrics={this.removeHostSimulatedMetrics}/>;
+    private simulatedMetrics = (): JSX.Element =>
+        <EdgeHostSimulatedMetricList isLoadingEdgeHost={this.props.isLoading}
+                                     loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
+                                     edgeHost={this.getEdgeHost()}
+                                     unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                     onAddSimulatedHostMetric={this.addHostSimulatedMetric}
+                                     onRemoveSimulatedHostMetrics={this.removeHostSimulatedMetrics}/>;
 
-  private genericSimulatedMetrics = (): JSX.Element =>
-    <GenericSimulatedHostMetricList/>;
+    private genericSimulatedMetrics = (): JSX.Element =>
+        <GenericSimulatedHostMetricList/>;
 
-  private tabs = (): Tab[] => [
-    {
-      title: 'Edge host',
-      id: 'edgeHost',
-      content: () => this.edgeHost()
-    },
-    {
-      title: 'Rules',
-      id: 'rules',
-      content: () => this.rules()
-    },
-    {
-      title: 'Generic rules',
-      id: 'genericRules',
-      content: () => this.genericRules()
-    },
-    {
-      title: 'Simulated metrics',
-      id: 'simulatedMetrics',
-      content: () => this.simulatedMetrics()
-    },
-    {
-      title: 'Generic simulated metrics',
-      id: 'genericSimulatedMetrics',
-      content: () => this.genericSimulatedMetrics()
-    },
-  ];
+    private tabs = (): Tab[] => [
+        {
+            title: 'Edge host',
+            id: 'edgeHost',
+            content: () => this.edgeHost()
+        },
+        {
+            title: 'Rules',
+            id: 'rules',
+            content: () => this.rules()
+        },
+        {
+            title: 'Generic rules',
+            id: 'genericRules',
+            content: () => this.genericRules()
+        },
+        {
+            title: 'Simulated metrics',
+            id: 'simulatedMetrics',
+            content: () => this.simulatedMetrics()
+        },
+        {
+            title: 'Generic simulated metrics',
+            id: 'genericSimulatedMetrics',
+            content: () => this.genericSimulatedMetrics()
+        },
+    ];
 
 }
 
 function removeFields(edgeHost: Partial<IEdgeHost>) {
-  delete edgeHost["id"];
-  delete edgeHost["worker"];
-  if (!edgeHost.managedByWorker) {
-    delete edgeHost["managedByWorker"];
-  }
-  delete edgeHost["hostRules"];
-  delete edgeHost["hostSimulatedMetrics"];
+    delete edgeHost["id"];
+    delete edgeHost["worker"];
+    if (!edgeHost.managedByWorker) {
+        delete edgeHost["managedByWorker"];
+    }
+    delete edgeHost["hostRules"];
+    delete edgeHost["hostSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.hosts.edge.isLoadingHosts;
-  const error = state.entities.hosts.edge.loadHostsError;
-  const hostname = props.match.params.hostname;
-  const edgeHost = isNew(props.location.search) ? buildNewEdgeHost() : state.entities.hosts.edge.data[hostname];
-  let formEdgeHost;
-  if (edgeHost) {
-    formEdgeHost = {...edgeHost};
-    removeFields(formEdgeHost);
-  }
-  return {
-    isLoading,
-    error,
-    edgeHost,
-    formEdgeHost,
-    regions: state.entities.regions.data,
-  }
+    const isLoading = state.entities.hosts.edge.isLoadingHosts;
+    const error = state.entities.hosts.edge.loadHostsError;
+    const hostname = props.match.params.hostname;
+    const edgeHost = isNew(props.location.search) ? buildNewEdgeHost() : state.entities.hosts.edge.data[hostname];
+    let formEdgeHost;
+    if (edgeHost) {
+        formEdgeHost = {...edgeHost};
+        removeFields(formEdgeHost);
+    }
+    return {
+        isLoading,
+        error,
+        edgeHost,
+        formEdgeHost,
+        regions: state.entities.regions.data,
+    }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-  loadEdgeHosts,
-  addEdgeHost,
-  updateEdgeHost,
-  addEdgeHostRules,
-  addEdgeHostSimulatedMetrics,
-  loadRegions,
+    loadEdgeHosts,
+    addEdgeHost,
+    updateEdgeHost,
+    addEdgeHostRules,
+    addEdgeHostSimulatedMetrics,
+    loadRegions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);

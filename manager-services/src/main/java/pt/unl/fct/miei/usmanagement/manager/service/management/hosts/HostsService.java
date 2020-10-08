@@ -61,7 +61,12 @@ import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.promet
 import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.service.management.remote.ssh.SshService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -132,6 +137,7 @@ public class HostsService {
 		else {
 			this.hostAddress = new HostAddress(username, publicIp, privateIp);
 		}
+		log.info("Local address: {}", hostAddress.toString());
 		return hostAddress;
 	}
 

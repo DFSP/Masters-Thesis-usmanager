@@ -29,12 +29,12 @@ import styles from './EdgeHosts.module.css'
 import EdgeHostsList from "./EdgeHostsList";
 
 const EdgeHosts: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add edge host', position: 'left'}}
-               pathname={'/hosts/edge/add_machine?new=true'}/>
-    <div className={`${styles.container}`}>
-      <EdgeHostsList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add edge host', position: 'left'}}
+                   pathname={'/hosts/edge/add_machine?new=true'}/>
+        <div className={`${styles.container}`}>
+            <EdgeHostsList/>
+        </div>
+    </MainLayout>;
 
 export default EdgeHosts;

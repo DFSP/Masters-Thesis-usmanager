@@ -32,57 +32,57 @@ import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";
 
 interface ListProps<T> {
-  isLoading?: boolean;
-  error?: string | null;
-  emptyMessage?: string;
-  list: T[];
-  show: (element: T, index: number, last: boolean) => JSX.Element;
-  predicate?: (element: T, filter: string) => boolean;
-  paginate?: {
-    pagesize: {
-      initial: number,
-      options?: ('all' | number)[],
-    },
-    page?: {
-      index?: number,
-      last?: boolean
-    },
-    position?: 'top' | 'bottom' | 'top-bottom';
-  };
-  animate?: boolean;
-  header?: () => JSX.Element;
+    isLoading?: boolean;
+    error?: string | null;
+    emptyMessage?: string;
+    list: T[];
+    show: (element: T, index: number, last: boolean) => JSX.Element;
+    predicate?: (element: T, filter: string) => boolean;
+    paginate?: {
+        pagesize: {
+            initial: number,
+            options?: ('all' | number)[],
+        },
+        page?: {
+            index?: number,
+            last?: boolean
+        },
+        position?: 'top' | 'bottom' | 'top-bottom';
+    };
+    animate?: boolean;
+    header?: () => JSX.Element;
 }
 
 type Props<T> = ListProps<T>;
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 
-  public render() {
-    const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
+    public render() {
+        const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
+        if (isLoading) {
+            return <ListLoadingSpinner/>;
+        }
+        if (error) {
+            return <Error message={error}/>;
+        }
+        if (list.length === 0 && emptyMessage) {
+            return <Empty message={emptyMessage}/>
+        }
+        if (predicate) {
+            const ListFiltered = FilteredList<T>();
+            return <ListFiltered {...this.props} predicate={predicate}/>
+        }
+        if (paginate) {
+            return <PagedList {...this.props} paginate={paginate}/>
+        }
+        if (animate) {
+            return <AnimatedList {...this.props} />
+        }
+        return <SimpleList<T> {...this.props}/>
     }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (list.length === 0 && emptyMessage) {
-      return <Empty message={emptyMessage}/>
-    }
-    if (predicate) {
-      const ListFiltered = FilteredList<T>();
-      return <ListFiltered {...this.props} predicate={predicate}/>
-    }
-    if (paginate) {
-      return <PagedList {...this.props} paginate={paginate}/>
-    }
-    if (animate) {
-      return <AnimatedList {...this.props} />
-    }
-    return <SimpleList<T> {...this.props}/>
-  }
 
 }
 
 export default function List<T>() {
-  return (GenericList as new(props: Props<T>) => GenericList<T>);
+    return (GenericList as new(props: Props<T>) => GenericList<T>);
 }

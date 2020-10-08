@@ -29,12 +29,12 @@ import styles from './RulesContainer.module.css';
 import RulesContainerList from "./RulesContainerList";
 
 const RulesContainer: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add container rule', position: 'left'}}
-               pathname={'/rules/containers/new_container_rule?new=true'}/>
-    <div className={`${styles.container}`}>
-      <RulesContainerList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add container rule', position: 'left'}}
+                   pathname={'/rules/containers/new_container_rule?new=true'}/>
+        <div className={`${styles.container}`}>
+            <RulesContainerList/>
+        </div>
+    </MainLayout>;
 
 export default RulesContainer;

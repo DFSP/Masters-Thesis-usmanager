@@ -45,7 +45,7 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 		+ "where (c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
 		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)")
 	List<HostRuleEntity> findByHostAddress(@Param("publicIpAddress") String publicIpAddress,
-									@Param("privateIpAddress") String privateIpAddress);
+										   @Param("privateIpAddress") String privateIpAddress);
 
 /*	@Query("select r "
 		+ "from HostRuleEntity r join r.cloudHosts c join r.edgeHosts e "

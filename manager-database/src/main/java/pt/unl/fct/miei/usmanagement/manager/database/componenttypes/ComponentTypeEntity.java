@@ -25,12 +25,24 @@
 package pt.unl.fct.miei.usmanagement.manager.database.componenttypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
-import javax.persistence.*;
-import java.util.HashSet;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.Objects;
 import java.util.Set;
 
@@ -51,10 +63,10 @@ public class ComponentTypeEntity {
 	@Enumerated(EnumType.STRING)
 	private ComponentType type;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<DecisionEntity> decisions = new HashSet<>();
+	private Set<DecisionEntity> decisions;
 
 	@Override
 	public int hashCode() {

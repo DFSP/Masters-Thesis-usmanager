@@ -32,53 +32,53 @@ import {connect} from "react-redux";
 import {loadRulesContainer} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  containerRules: IRuleContainer[];
+    isLoading: boolean
+    error?: string | null;
+    containerRules: IRuleContainer[];
 }
 
 interface DispatchToProps {
-  loadRulesContainer: () => any;
+    loadRulesContainer: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class RulesContainerList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesContainer();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesContainer();
+    }
 
-  public render() {
-    return (
-      <CardList<IRuleContainer>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No container rules to display"}
-        list={this.props.containerRules}
-        card={this.rule}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IRuleContainer>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No container rules to display"}
+                list={this.props.containerRules}
+                card={this.rule}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private rule = (rule: IRuleContainer): JSX.Element =>
-    <RuleContainerCard key={rule.id} rule={rule}/>;
+    private rule = (rule: IRuleContainer): JSX.Element =>
+        <RuleContainerCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IRuleContainer, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
+    private predicate = (rule: IRuleContainer, search: string): boolean =>
+        rule.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.rules.containers.isLoadingRules,
-    error: state.entities.rules.containers.loadRulesError,
-    containerRules: Object.values(state.entities.rules.containers.data)
-  }
+    {
+        isLoading: state.entities.rules.containers.isLoadingRules,
+        error: state.entities.rules.containers.loadRulesError,
+        containerRules: Object.values(state.entities.rules.containers.data)
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadRulesContainer,
+    loadRulesContainer,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesContainerList);

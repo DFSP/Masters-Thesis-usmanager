@@ -31,17 +31,17 @@ import rootReducer from "../reducers";
 import {loadState} from "./localStorage";
 
 const configureStore = (persistedState = loadState()) =>
-  createStore(
-    rootReducer,
-    persistedState,
-    applyMiddleware(
-      thunk,
-      api,
-      promise(),
-      loadingBarMiddleware({
-        promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
-      })
-    )
-  );
+    createStore(
+        rootReducer,
+        persistedState,
+        applyMiddleware(
+            thunk,
+            api,
+            promise(),
+            loadingBarMiddleware({
+                promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+            })
+        )
+    );
 
 export default configureStore;

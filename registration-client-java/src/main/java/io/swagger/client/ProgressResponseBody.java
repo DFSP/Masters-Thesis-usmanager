@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -37,8 +37,6 @@
 
 package io.swagger.client;
 
-import java.io.IOException;
-
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.ResponseBody;
 import okio.Buffer;
@@ -47,53 +45,55 @@ import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
 
+import java.io.IOException;
+
 public class ProgressResponseBody extends ResponseBody {
 
-  private final ResponseBody responseBody;
-  private final ProgressListener progressListener;
-  private BufferedSource bufferedSource;
+	private final ResponseBody responseBody;
+	private final ProgressListener progressListener;
+	private BufferedSource bufferedSource;
 
-  public ProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener) {
-    this.responseBody = responseBody;
-    this.progressListener = progressListener;
-  }
+	public ProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener) {
+		this.responseBody = responseBody;
+		this.progressListener = progressListener;
+	}
 
-  @Override
-  public MediaType contentType() {
-    return responseBody.contentType();
-  }
+	@Override
+	public MediaType contentType() {
+		return responseBody.contentType();
+	}
 
-  @Override
-  public long contentLength() throws IOException {
-    return responseBody.contentLength();
-  }
+	@Override
+	public long contentLength() throws IOException {
+		return responseBody.contentLength();
+	}
 
-  @Override
-  public BufferedSource source() throws IOException {
-    if (bufferedSource == null) {
-      bufferedSource = Okio.buffer(source(responseBody.source()));
-    }
-    return bufferedSource;
-  }
+	@Override
+	public BufferedSource source() throws IOException {
+		if (bufferedSource == null) {
+			bufferedSource = Okio.buffer(source(responseBody.source()));
+		}
+		return bufferedSource;
+	}
 
-  private Source source(Source source) {
-    return new ForwardingSource(source) {
-      long totalBytesRead = 0L;
+	private Source source(Source source) {
+		return new ForwardingSource(source) {
+			long totalBytesRead = 0L;
 
-      @Override
-      public long read(Buffer sink, long byteCount) throws IOException {
-        long bytesRead = super.read(sink, byteCount);
-        // read() returns the number of bytes read, or -1 if this source is exhausted.
-        totalBytesRead += bytesRead != -1 ? bytesRead : 0;
-        progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
-        return bytesRead;
-      }
-    };
-  }
+			@Override
+			public long read(Buffer sink, long byteCount) throws IOException {
+				long bytesRead = super.read(sink, byteCount);
+				// read() returns the number of bytes read, or -1 if this source is exhausted.
+				totalBytesRead += bytesRead != -1 ? bytesRead : 0;
+				progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+				return bytesRead;
+			}
+		};
+	}
 
-  public interface ProgressListener {
-    void update(long bytesRead, long contentLength, boolean done);
-  }
+	public interface ProgressListener {
+		void update(long bytesRead, long contentLength, boolean done);
+	}
 }
 
 

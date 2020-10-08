@@ -29,12 +29,12 @@ import styles from "./RuleConditions.module.css";
 import RuleConditionsList from "./RuleConditionsList";
 
 const RuleConditions: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add rule condition', position: 'left'}}
-               pathname={'/rules/conditions/new_condition?new=true'}/>
-    <div className={`${styles.container}`}>
-      <RuleConditionsList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add rule condition', position: 'left'}}
+                   pathname={'/rules/conditions/new_condition?new=true'}/>
+        <div className={`${styles.container}`}>
+            <RuleConditionsList/>
+        </div>
+    </MainLayout>;
 
 export default RuleConditions;

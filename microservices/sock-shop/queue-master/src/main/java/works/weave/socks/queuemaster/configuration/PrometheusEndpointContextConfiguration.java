@@ -38,27 +38,27 @@ import works.weave.socks.queuemaster.monitoring.PrometheusMetricWriter;
 @ManagementContextConfiguration
 public class PrometheusEndpointContextConfiguration {
 
-  @Bean
-  public PrometheusEndpoint prometheusEndpoint(CollectorRegistry registry) {
-    return new PrometheusEndpoint(registry);
-  }
+	@Bean
+	public PrometheusEndpoint prometheusEndpoint(CollectorRegistry registry) {
+		return new PrometheusEndpoint(registry);
+	}
 
-  @Bean
-  @ConditionalOnBean(PrometheusEndpoint.class)
-  @ConditionalOnEnabledEndpoint("prometheus")
-  PrometheusMvcEndpoint prometheusMvcEndpoint(PrometheusEndpoint prometheusEndpoint) {
-    return new PrometheusMvcEndpoint(prometheusEndpoint);
-  }
+	@Bean
+	@ConditionalOnBean(PrometheusEndpoint.class)
+	@ConditionalOnEnabledEndpoint("prometheus")
+	PrometheusMvcEndpoint prometheusMvcEndpoint(PrometheusEndpoint prometheusEndpoint) {
+		return new PrometheusMvcEndpoint(prometheusEndpoint);
+	}
 
-  @Bean
-  CollectorRegistry collectorRegistry() {
-    return new CollectorRegistry();
-  }
+	@Bean
+	CollectorRegistry collectorRegistry() {
+		return new CollectorRegistry();
+	}
 
-  @Bean
-  @ExportMetricWriter
-  MetricWriter prometheusMetricWriter(CollectorRegistry registry) {
-    return new PrometheusMetricWriter(registry);
-  }
+	@Bean
+	@ExportMetricWriter
+	MetricWriter prometheusMetricWriter(CollectorRegistry registry) {
+		return new PrometheusMetricWriter(registry);
+	}
 
 }

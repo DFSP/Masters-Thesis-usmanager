@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -37,8 +37,6 @@
 
 package io.swagger.client;
 
-import java.io.IOException;
-
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import okio.Buffer;
@@ -47,53 +45,55 @@ import okio.ForwardingSink;
 import okio.Okio;
 import okio.Sink;
 
+import java.io.IOException;
+
 public class ProgressRequestBody extends RequestBody {
 
-  private final RequestBody requestBody;
-  private final ProgressRequestListener progressListener;
+	private final RequestBody requestBody;
+	private final ProgressRequestListener progressListener;
 
-  public ProgressRequestBody(RequestBody requestBody, ProgressRequestListener progressListener) {
-    this.requestBody = requestBody;
-    this.progressListener = progressListener;
-  }
+	public ProgressRequestBody(RequestBody requestBody, ProgressRequestListener progressListener) {
+		this.requestBody = requestBody;
+		this.progressListener = progressListener;
+	}
 
-  @Override
-  public MediaType contentType() {
-    return requestBody.contentType();
-  }
+	@Override
+	public MediaType contentType() {
+		return requestBody.contentType();
+	}
 
-  @Override
-  public long contentLength() throws IOException {
-    return requestBody.contentLength();
-  }
+	@Override
+	public long contentLength() throws IOException {
+		return requestBody.contentLength();
+	}
 
-  @Override
-  public void writeTo(BufferedSink sink) throws IOException {
-    BufferedSink bufferedSink = Okio.buffer(sink(sink));
-    requestBody.writeTo(bufferedSink);
-    bufferedSink.flush();
-  }
+	@Override
+	public void writeTo(BufferedSink sink) throws IOException {
+		BufferedSink bufferedSink = Okio.buffer(sink(sink));
+		requestBody.writeTo(bufferedSink);
+		bufferedSink.flush();
+	}
 
-  private Sink sink(Sink sink) {
-    return new ForwardingSink(sink) {
+	private Sink sink(Sink sink) {
+		return new ForwardingSink(sink) {
 
-      long bytesWritten = 0L;
-      long contentLength = 0L;
+			long bytesWritten = 0L;
+			long contentLength = 0L;
 
-      @Override
-      public void write(Buffer source, long byteCount) throws IOException {
-        super.write(source, byteCount);
-        if (contentLength == 0) {
-          contentLength = contentLength();
-        }
+			@Override
+			public void write(Buffer source, long byteCount) throws IOException {
+				super.write(source, byteCount);
+				if (contentLength == 0) {
+					contentLength = contentLength();
+				}
 
-        bytesWritten += byteCount;
-        progressListener.onRequestProgress(bytesWritten, contentLength, bytesWritten == contentLength);
-      }
-    };
-  }
+				bytesWritten += byteCount;
+				progressListener.onRequestProgress(bytesWritten, contentLength, bytesWritten == contentLength);
+			}
+		};
+	}
 
-  public interface ProgressRequestListener {
-    void onRequestProgress(long bytesWritten, long contentLength, boolean done);
-  }
+	public interface ProgressRequestListener {
+		void onRequestProgress(long bytesWritten, long contentLength, boolean done);
+	}
 }

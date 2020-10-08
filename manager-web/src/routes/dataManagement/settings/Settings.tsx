@@ -26,9 +26,9 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import React from "react";
 
 const Settings = () => (
-  <MainLayout>
+    <MainLayout>
 
-  </MainLayout>
+    </MainLayout>
 );
 
 export default Settings;

@@ -24,7 +24,6 @@
 
 import React, {createRef} from "react";
 import M from "materialize-css";
-import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {hideConfirmationDialog} from "../../actions";
 import {connect} from "react-redux";

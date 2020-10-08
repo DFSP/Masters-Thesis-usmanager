@@ -43,7 +43,11 @@ import pt.unl.fct.miei.usmanagement.manager.service.management.docker.DockerProp
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

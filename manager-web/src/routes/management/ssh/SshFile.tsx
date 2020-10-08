@@ -34,119 +34,119 @@ import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IReply} from "../../../utils/api";
 
 export interface ISshFile {
-  hostname: string;
-  filename: string;
+    hostname: string;
+    filename: string;
 }
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
-  hostname: undefined,
-  filename: undefined,
+    hostname: undefined,
+    filename: undefined,
 });
 
 interface StateToProps {
-  cloudHosts: { [key: string]: ICloudHost };
-  edgeHosts: { [key: string]: IEdgeHost };
+    cloudHosts: { [key: string]: ICloudHost };
+    edgeHosts: { [key: string]: IEdgeHost };
 }
 
 interface DispatchToProps {
-  loadCloudHosts: () => void;
-  loadEdgeHosts: () => void;
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
 }
 
 interface SshFileProps {
-  onTransferFile: (transfer: ISshFile) => void;
+    onTransferFile: (transfer: ISshFile) => void;
 }
 
 type Props = SshFileProps & StateToProps & DispatchToProps;
 
 class SshFile extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadEdgeHosts();
-    this.props.loadCloudHosts();
-  };
+    public componentDidMount(): void {
+        this.props.loadEdgeHosts();
+        this.props.loadCloudHosts();
+    };
 
-  public render() {
-    const command = buildNewSshCommand();
-    return (
-      <Form id={'sshCommand'}
-            fields={this.getFields()}
-            values={command}
-            isNew={true}
-            post={{
-              textButton: 'Upload',
-              url: 'ssh/upload',
-              successCallback: this.onPostSuccess,
-              failureCallback: this.onPostFailure
-            }}>
-        <Field key='hostname'
-               id={'hostname'}
-               label='hostname'
-               type={'dropdown'}
-               dropdown={{
-                 defaultValue: 'Select publicIpAddress',
-                 values: this.getSelectableHosts()
-               }}/>
-        <Field key='filename'
-               id={'filename'}
-               label='filename'
-               type={'dropdown'}
-               dropdown={{
-                 defaultValue: 'Select filename',
-                 values: this.getSelectableFiles()
-               }}/>
-      </Form>
-    );
-  }
-
-  private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
-    super.toast(`<span class="green-text">File uploaded</span>`);
-    this.props.onTransferFile(args);
-  };
-
-  private onPostFailure = (reason: string): void =>
-    super.toast(`Failed to upload file`, 10000, reason, true);
-
-  private getFields = (): IFields => (
-    {
-      hostname: {
-        id: 'hostname',
-        label: 'hostname',
-        validation: {rule: required}
-      },
-      filename: {
-        id: 'filename',
-        label: 'filename',
-        validation: {rule: required}
-      },
+    public render() {
+        const command = buildNewSshCommand();
+        return (
+            <Form id={'sshCommand'}
+                  fields={this.getFields()}
+                  values={command}
+                  isNew={true}
+                  post={{
+                      textButton: 'Upload',
+                      url: 'ssh/upload',
+                      successCallback: this.onPostSuccess,
+                      failureCallback: this.onPostFailure
+                  }}>
+                <Field key='hostname'
+                       id={'hostname'}
+                       label='hostname'
+                       type={'dropdown'}
+                       dropdown={{
+                           defaultValue: 'Select publicIpAddress',
+                           values: this.getSelectableHosts()
+                       }}/>
+                <Field key='filename'
+                       id={'filename'}
+                       label='filename'
+                       type={'dropdown'}
+                       dropdown={{
+                           defaultValue: 'Select filename',
+                           values: this.getSelectableFiles()
+                       }}/>
+            </Form>
+        );
     }
-  );
 
-  private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
+    private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
+        super.toast(`<span class="green-text">File uploaded</span>`);
+        this.props.onTransferFile(args);
+    };
 
-  //TODO get available scripts from the server instead
-  private getSelectableFiles = () => ['docker-install.sh', 'docker-install2.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
+    private onPostFailure = (reason: string): void =>
+        super.toast(`Failed to upload file`, 10000, reason, true);
+
+    private getFields = (): IFields => (
+        {
+            hostname: {
+                id: 'hostname',
+                label: 'hostname',
+                validation: {rule: required}
+            },
+            filename: {
+                id: 'filename',
+                label: 'filename',
+                validation: {rule: required}
+            },
+        }
+    );
+
+    private getSelectableHosts = () => {
+        const cloudHosts = Object.values(this.props.cloudHosts)
+            .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+            .map(instance => instance.publicIpAddress);
+        const edgeHosts = Object.keys(this.props.edgeHosts);
+        return cloudHosts.concat(edgeHosts);
+    };
+
+    //TODO get available scripts from the server instead
+    private getSelectableFiles = () => ['docker-install.sh', 'docker-install2.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  const cloudHosts = state.entities.hosts.cloud.data;
-  const edgeHosts = state.entities.hosts.edge.data;
-  return {
-    cloudHosts,
-    edgeHosts,
-  }
+    const cloudHosts = state.entities.hosts.cloud.data;
+    const edgeHosts = state.entities.hosts.edge.data;
+    return {
+        cloudHosts,
+        edgeHosts,
+    }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-  loadCloudHosts,
-  loadEdgeHosts,
+    loadCloudHosts,
+    loadEdgeHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SshFile);

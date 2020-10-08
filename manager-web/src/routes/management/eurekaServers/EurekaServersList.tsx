@@ -32,53 +32,53 @@ import {loadEurekaServers} from "../../../actions";
 import EurekaServerCard from "./EurekaServerCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  eurekaServers: IEurekaServer[];
+    isLoading: boolean
+    error?: string | null;
+    eurekaServers: IEurekaServer[];
 }
 
 interface DispatchToProps {
-  loadEurekaServers: () => void;
+    loadEurekaServers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class EurekaServersList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadEurekaServers();
-  }
+    public componentDidMount(): void {
+        this.props.loadEurekaServers();
+    }
 
-  public render() {
-    return (
-      <CardList<IEurekaServer>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No eureka servers to display"}
-        list={this.props.eurekaServers}
-        card={this.eurekaServer}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IEurekaServer>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No eureka servers to display"}
+                list={this.props.eurekaServers}
+                card={this.eurekaServer}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private eurekaServer = (eurekaServer: IEurekaServer): JSX.Element =>
-    <EurekaServerCard key={eurekaServer.containerId} eurekaServer={eurekaServer}/>;
+    private eurekaServer = (eurekaServer: IEurekaServer): JSX.Element =>
+        <EurekaServerCard key={eurekaServer.containerId} eurekaServer={eurekaServer}/>;
 
-  private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
-    eurekaServer.publicIpAddress.toLowerCase().includes(search);
+    private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
+        eurekaServer.publicIpAddress.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.eurekaServers.isLoadingEurekaServers,
-    error: state.entities.eurekaServers.loadEurekaServersError,
-    eurekaServers: (state.entities.eurekaServers.data && Object.values(state.entities.eurekaServers.data)) || [],
-  }
+    {
+        isLoading: state.entities.eurekaServers.isLoadingEurekaServers,
+        error: state.entities.eurekaServers.loadEurekaServersError,
+        eurekaServers: (state.entities.eurekaServers.data && Object.values(state.entities.eurekaServers.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadEurekaServers,
+    loadEurekaServers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EurekaServersList);

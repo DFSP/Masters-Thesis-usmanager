@@ -25,9 +25,9 @@
 let Root: any;
 
 if (process.env.NODE_ENV === 'production') {
-  Root = require('./Root.prod').default as JSX.Element;
+    Root = require('./Root.prod').default as JSX.Element;
 } else {
-  Root = require('./Root.dev').default as JSX.Element;
+    Root = require('./Root.dev').default as JSX.Element;
 }
 
 export default Root;

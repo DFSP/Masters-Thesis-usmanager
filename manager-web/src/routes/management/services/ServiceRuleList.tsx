@@ -36,164 +36,164 @@ import {IRuleService} from "../rules/services/RuleService";
 import {Link} from "react-router-dom";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  rules: { [key: string]: IRuleService },
-  rulesName: string[];
+    isLoading: boolean;
+    error?: string | null;
+    rules: { [key: string]: IRuleService },
+    rulesName: string[];
 }
 
 interface DispatchToProps {
-  loadRulesService: (name?: string) => any;
-  loadServiceRules: (serviceName: string) => void;
-  removeServiceRules: (serviceName: string, rules: string[]) => void;
+    loadRulesService: (name?: string) => any;
+    loadServiceRules: (serviceName: string) => void;
+    removeServiceRules: (serviceName: string, rules: string[]) => void;
 }
 
 interface ServiceRuleListProps {
-  isLoadingService: boolean;
-  loadServiceError?: string | null;
-  service: IService | Partial<IService> | null;
-  unsavedRules: string[];
-  onAddServiceRule: (rule: string) => void;
-  onRemoveServiceRules: (rule: string[]) => void;
+    isLoadingService: boolean;
+    loadServiceError?: string | null;
+    service: IService | Partial<IService> | null;
+    unsavedRules: string[];
+    onAddServiceRule: (rule: string) => void;
+    onRemoveServiceRules: (rule: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceRuleListProps;
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class ServiceRuleList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadRulesService();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
-      this.setState({entitySaved: true});
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                           emptyMessage={`Rules list is empty`}
-                           data={this.props.rulesName}
-                           dropdown={{
-                             id: 'rules',
-                             title: 'Add rule',
-                             empty: 'No rules to add',
-                             data: this.getSelectableRules()
-                           }}
-                           show={this.rule}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service?.serviceName}/rules`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.loadServiceRules(serviceName);
+    public componentDidMount(): void {
+        this.props.loadRulesService();
+        this.loadEntities();
     }
-  };
 
-  private isNew = () =>
-    this.props.service?.serviceName === undefined;
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+            this.setState({entitySaved: true});
+        }
+    }
 
-  private rule = (index: number, rule: string, separate: boolean, checked: boolean,
-                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedRules.includes(rule);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${styles.linkedItemContent}`}>
-          <label>
-            <input id={rule}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                               error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                               emptyMessage={`Rules list is empty`}
+                               data={this.props.rulesName}
+                               dropdown={{
+                                   id: 'rules',
+                                   title: 'Add rule',
+                                   empty: 'No rules to add',
+                                   data: this.getSelectableRules()
+                               }}
+                               show={this.rule}
+                               onAdd={this.onAdd}
+                               onRemove={this.onRemove}
+                               onDelete={{
+                                   url: `services/${this.props.service?.serviceName}/rules`,
+                                   successCallback: this.onDeleteSuccess,
+                                   failureCallback: this.onDeleteFailure
+                               }}
+                               entitySaved={this.state.entitySaved}/>;
+    }
+
+    private loadEntities = () => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.loadServiceRules(serviceName);
+        }
+    };
+
+    private isNew = () =>
+        this.props.service?.serviceName === undefined;
+
+    private rule = (index: number, rule: string, separate: boolean, checked: boolean,
+                    handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedRules.includes(rule);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${styles.linkedItemContent}`}>
+                    <label>
+                        <input id={rule}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {rule}
                </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/rules/services/${rule}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/rules/services/${rule}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (rule: string): void =>
-    this.props.onAddServiceRule(rule);
+    private onAdd = (rule: string): void =>
+        this.props.onAddServiceRule(rule);
 
-  private onRemove = (rules: string[]) =>
-    this.props.onRemoveServiceRules(rules);
+    private onRemove = (rules: string[]) =>
+        this.props.onRemoveServiceRules(rules);
 
-  private onDeleteSuccess = (rules: string[]): void => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.removeServiceRules(serviceName, rules);
-    }
-  };
+    private onDeleteSuccess = (rules: string[]): void => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.removeServiceRules(serviceName, rules);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete rule`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to delete rule`, 10000, reason, true);
 
-  private getSelectableRules = () => {
-    const {rules, rulesName, unsavedRules} = this.props;
-    return Object.entries(rules)
-                 .filter(([_, rule]) => !rule.generic)
-                 .map(([ruleName, _]) => ruleName)
-                 .filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
-  };
+    private getSelectableRules = () => {
+        const {rules, rulesName, unsavedRules} = this.props;
+        return Object.entries(rules)
+            .filter(([_, rule]) => !rule.generic)
+            .map(([ruleName, _]) => ruleName)
+            .filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleListProps): StateToProps {
-  const serviceName = ownProps.service?.serviceName;
-  const service = serviceName && state.entities.services.data[serviceName];
-  const rulesName = service && service.serviceRules;
-  return {
-    isLoading: state.entities.services.isLoadingRules,
-    error: state.entities.services.loadRulesError,
-    rules: Object.entries(state.entities.rules.services.data)
-                 .filter(([_, rule]) => !rule.generic)
-                 .map(([key, value]) => ({[key]: value}))
-                 .reduce((fields, field) => {
-                   for (let key in field) {
-                     fields[key] = field[key];
-                   }
-                   return fields;
-                 }, {}),
-    rulesName: rulesName || [],
-  }
+    const serviceName = ownProps.service?.serviceName;
+    const service = serviceName && state.entities.services.data[serviceName];
+    const rulesName = service && service.serviceRules;
+    return {
+        isLoading: state.entities.services.isLoadingRules,
+        error: state.entities.services.loadRulesError,
+        rules: Object.entries(state.entities.rules.services.data)
+            .filter(([_, rule]) => !rule.generic)
+            .map(([key, value]) => ({[key]: value}))
+            .reduce((fields, field) => {
+                for (let key in field) {
+                    fields[key] = field[key];
+                }
+                return fields;
+            }, {}),
+        rulesName: rulesName || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesService,
-    loadServiceRules,
-    removeServiceRules,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesService,
+        loadServiceRules,
+        removeServiceRules,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceRuleList);

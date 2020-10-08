@@ -26,4 +26,4 @@ import React from "react";
 import MainLayout from "../views/mainLayout/MainLayout";
 
 export const PageNotFound: React.FC = () =>
-  <MainLayout/>;
+    <MainLayout/>;

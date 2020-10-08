@@ -31,7 +31,12 @@ import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
-import pt.unl.fct.miei.usmanagement.manager.database.monitoring.*;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringLogsRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
@@ -55,7 +60,14 @@ import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerExcep
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Slf4j
 @Service
@@ -267,7 +279,7 @@ public class HostsMonitoringService {
 	}
 
 	private void startHost(HostDetails hostDetails) {
-		HostAddress hostAddress= hostDetails.getAddress();
+		HostAddress hostAddress = hostDetails.getAddress();
 		HostLocation hostLocation = hostDetails.getLocation();
 		Pair<String, String> container = getRandomContainerToMigrate(hostAddress);
 		String serviceName = container.getFirst();

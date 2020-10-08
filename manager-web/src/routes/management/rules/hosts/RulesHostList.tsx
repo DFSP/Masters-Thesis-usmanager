@@ -32,53 +32,53 @@ import {connect} from "react-redux";
 import {loadRulesHost} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  hostRules: IRuleHost[];
+    isLoading: boolean
+    error?: string | null;
+    hostRules: IRuleHost[];
 }
 
 interface DispatchToProps {
-  loadRulesHost: () => any;
+    loadRulesHost: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class RulesHostList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesHost();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesHost();
+    }
 
-  public render() {
-    return (
-      <CardList<IRuleHost>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No cloud host rules to display"}
-        list={this.props.hostRules}
-        card={this.rule}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IRuleHost>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No cloud host rules to display"}
+                list={this.props.hostRules}
+                card={this.rule}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private rule = (rule: IRuleHost): JSX.Element =>
-    <RuleHostCard key={rule.id} rule={rule}/>;
+    private rule = (rule: IRuleHost): JSX.Element =>
+        <RuleHostCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IRuleHost, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
+    private predicate = (rule: IRuleHost, search: string): boolean =>
+        rule.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.rules.hosts.isLoadingRules,
-    error: state.entities.rules.hosts.loadRulesError,
-    hostRules: Object.values(state.entities.rules.hosts.data)
-  }
+    {
+        isLoading: state.entities.rules.hosts.isLoadingRules,
+        error: state.entities.rules.hosts.loadRulesError,
+        hostRules: Object.values(state.entities.rules.hosts.data)
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadRulesHost,
+    loadRulesHost,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesHostList);

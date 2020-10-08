@@ -29,12 +29,12 @@ import styles from './RulesService.module.css';
 import RulesServiceList from "./RulesServiceList";
 
 const RulesService: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add service rule', position: 'left'}}
-               pathname={'/rules/services/new_service_rule?new=true'}/>
-    <div className={`${styles.container}`}>
-      <RulesServiceList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add service rule', position: 'left'}}
+                   pathname={'/rules/services/new_service_rule?new=true'}/>
+        <div className={`${styles.container}`}>
+            <RulesServiceList/>
+        </div>
+    </MainLayout>;
 
 export default RulesService;

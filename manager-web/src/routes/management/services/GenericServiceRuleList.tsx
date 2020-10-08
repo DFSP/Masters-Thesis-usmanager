@@ -34,60 +34,60 @@ import ListItem from "../../../components/list/ListItem";
 import {loadRulesService} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericServiceRules: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericServiceRules: string[];
 }
 
 interface DispatchToProps {
-  loadRulesService: () => void;
+    loadRulesService: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesService();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesService();
+    }
 
-  public render() {
-    const RulesList = List<string>();
-    return (
-      <RulesList isLoading={this.props.isLoading}
-                 error={this.props.error}
-                 emptyMessage={`Generic service rules list is empty`}
-                 list={this.props.genericServiceRules}
-                 show={this.rule}/>
-    );
-  }
+    public render() {
+        const RulesList = List<string>();
+        return (
+            <RulesList isLoading={this.props.isLoading}
+                       error={this.props.error}
+                       emptyMessage={`Generic service rules list is empty`}
+                       list={this.props.genericServiceRules}
+                       show={this.rule}/>
+        );
+    }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericServiceRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/services/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private rule = (rule: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericServiceRules.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{rule}</span>
+            </div>
+            <Link to={`/rules/services/${rule}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.rules.services.isLoadingRules,
-    error: state.entities.rules.services.loadRulesError,
-    genericServiceRules: Object.entries(state.entities.rules.services.data)
-                               .filter(([_, rule]) => rule.generic)
-                               .map(([ruleName, _]) => ruleName)
-  }
+    return {
+        isLoading: state.entities.rules.services.isLoadingRules,
+        error: state.entities.rules.services.loadRulesError,
+        genericServiceRules: Object.entries(state.entities.rules.services.data)
+            .filter(([_, rule]) => rule.generic)
+            .map(([ruleName, _]) => ruleName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesService,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesService,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericServiceRuleList);

@@ -28,40 +28,40 @@ import {Link} from "react-router-dom";
 import UseLongPress from "./UseLongPress";
 
 interface ListItemProps<T> {
-  link?: { pathname: string, state: any };
-  separate?: boolean | { color: string };
-  longPressCallback?: () => void;
+    link?: { pathname: string, state: any };
+    separate?: boolean | { color: string };
+    longPressCallback?: () => void;
 }
 
 export default class ListItem<T> extends React.Component<ListItemProps<T>, {}> {
 
-  public render() {
-    const {link, longPressCallback} = this.props;
-    const separatorColor = this.getSeparatorColor();
-    return (
-      link
-        ? <Link to={{pathname: link.pathname, state: link.state}}>
-          <div id='listItem' className={`${styles.item}`}
-               style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
-            {this.props.children}
-          </div>
-        </Link>
-        : <UseLongPress callback={longPressCallback && longPressCallback} ms={500}>
-          <div id='listItem' className={`${styles.item} white-text`}
-               style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
-            {this.props.children}
-          </div>
-        </UseLongPress>
-    );
-  }
-
-  private getSeparatorColor = (): string | undefined => {
-    const {separate} = this.props;
-    if (typeof separate === 'boolean' && separate) {
-      return "black";
-    } else if (typeof separate === 'object') {
-      return separate.color ? separate.color : "black";
+    public render() {
+        const {link, longPressCallback} = this.props;
+        const separatorColor = this.getSeparatorColor();
+        return (
+            link
+                ? <Link to={{pathname: link.pathname, state: link.state}}>
+                    <div id='listItem' className={`${styles.item}`}
+                         style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
+                        {this.props.children}
+                    </div>
+                </Link>
+                : <UseLongPress callback={longPressCallback && longPressCallback} ms={500}>
+                    <div id='listItem' className={`${styles.item} white-text`}
+                         style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
+                        {this.props.children}
+                    </div>
+                </UseLongPress>
+        );
     }
-  };
+
+    private getSeparatorColor = (): string | undefined => {
+        const {separate} = this.props;
+        if (typeof separate === 'boolean' && separate) {
+            return "black";
+        } else if (typeof separate === 'object') {
+            return separate.color ? separate.color : "black";
+        }
+    };
 }
 

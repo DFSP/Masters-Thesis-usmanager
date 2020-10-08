@@ -37,214 +37,214 @@ import {IFields, IValues, requiredAndNumberAndMin, requiredAndTrimmed} from "../
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 
 export interface IPrediction extends IDatabaseData {
-  name: string;
-  description: string;
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  minimumReplicas: number;
+    name: string;
+    description: string;
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    minimumReplicas: number;
 }
 
 const emptyPrediction = (): Partial<IPrediction> => ({
-  name: undefined,
-  description: undefined,
-  startDate: undefined,
-  startTime: undefined,
-  endDate: undefined,
-  endTime: undefined,
-  minimumReplicas: undefined
+    name: undefined,
+    description: undefined,
+    startDate: undefined,
+    startTime: undefined,
+    endDate: undefined,
+    endTime: undefined,
+    minimumReplicas: undefined
 });
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  predictions: IPrediction[];
+    isLoading: boolean;
+    error?: string | null;
+    predictions: IPrediction[];
 }
 
 interface DispatchToProps {
-  loadServicePredictions: (serviceName: string) => void;
-  removeServicePredictions: (serviceName: string, predictions: string[]) => void;
+    loadServicePredictions: (serviceName: string) => void;
+    removeServicePredictions: (serviceName: string, predictions: string[]) => void;
 }
 
 interface ServicePredictionListProps {
-  isLoadingService: boolean;
-  loadServiceError?: string | null;
-  service: IService | Partial<IService> | null;
-  unsavedPredictions: IPrediction[];
-  onAddServicePrediction: (prediction: IPrediction) => void;
-  onRemoveServicePredictions: (prediction: string[]) => void;
+    isLoadingService: boolean;
+    loadServiceError?: string | null;
+    service: IService | Partial<IService> | null;
+    unsavedPredictions: IPrediction[];
+    onAddServicePrediction: (prediction: IPrediction) => void;
+    onRemoveServicePredictions: (prediction: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServicePredictionListProps;
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class ServicePredictionList extends BaseComponent<Props, State> {
 
-  //TODO allow to edit prediction details, by clicking the prediction opening a filled modal form
+    //TODO allow to edit prediction details, by clicking the prediction opening a filled modal form
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
-      this.setState({entitySaved: true});
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    console.log(window.innerWidth)
-    return <ControlledList<IPrediction>
-      isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-      error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-      emptyMessage='Predictions list is empty'
-      data={this.props.predictions}
-      dataKey={['name']}
-      formModal={{
-        id: 'servicePrediction',
-        title: 'Add prediction',
-        fields: this.getFields(),
-        values: emptyPrediction(),
-        content: this.predictionModal,
-        fullScreen: window.innerWidth < 993,
-      }}
-      show={this.prediction}
-      onAddInput={this.onAdd}
-      onRemove={this.onRemove}
-      onDelete={{
-        url: `services/${this.props.service?.serviceName}/predictions`,
-        successCallback: this.onDeleteSuccess,
-        failureCallback: this.onDeleteFailure
-      }}
-      entitySaved={this.state.entitySaved}/>;
-
-  }
-
-  private loadEntities = () => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.loadServicePredictions(serviceName);
+    public componentDidMount(): void {
+        this.loadEntities();
     }
-  };
 
-  private isNew = () =>
-    this.props.service?.serviceName === undefined;
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+            this.setState({entitySaved: true});
+        }
+    }
 
-  private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
-                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedPredictions.includes(prediction);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${styles.listItemContent}`}>
-          <label>
-            <input id={prediction.name}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    public render() {
+        const isNew = this.isNew();
+        console.log(window.innerWidth)
+        return <ControlledList<IPrediction>
+            isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+            error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+            emptyMessage='Predictions list is empty'
+            data={this.props.predictions}
+            dataKey={['name']}
+            formModal={{
+                id: 'servicePrediction',
+                title: 'Add prediction',
+                fields: this.getFields(),
+                values: emptyPrediction(),
+                content: this.predictionModal,
+                fullScreen: window.innerWidth < 993,
+            }}
+            show={this.prediction}
+            onAddInput={this.onAdd}
+            onRemove={this.onRemove}
+            onDelete={{
+                url: `services/${this.props.service?.serviceName}/predictions`,
+                successCallback: this.onDeleteSuccess,
+                failureCallback: this.onDeleteFailure
+            }}
+            entitySaved={this.state.entitySaved}/>;
+
+    }
+
+    private loadEntities = () => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.loadServicePredictions(serviceName);
+        }
+    };
+
+    private isNew = () =>
+        this.props.service?.serviceName === undefined;
+
+    private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
+                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedPredictions.includes(prediction);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${styles.listItemContent}`}>
+                    <label>
+                        <input id={prediction.name}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                 {prediction.name} ({prediction.minimumReplicas} replicas)
               </div>
             </span>
-          </label>
-          <div className={`${styles.smallText}`}>
-            {prediction.startDate === prediction.endDate ?
-              <div>{prediction.startDate} {prediction.startTime} <span
-                className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
-              :
-              <>
-                <div>{prediction.startDate} {prediction.startTime}</div>
-                <div>{prediction.endDate} {prediction.endTime}</div>
-              </>
-            }
-          </div>
-        </div>
-      </ListItem>
-    );
-  };
+                    </label>
+                    <div className={`${styles.smallText}`}>
+                        {prediction.startDate === prediction.endDate ?
+                            <div>{prediction.startDate} {prediction.startTime} <span
+                                className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
+                            :
+                            <>
+                                <div>{prediction.startDate} {prediction.startTime}</div>
+                                <div>{prediction.endDate} {prediction.endTime}</div>
+                            </>
+                        }
+                    </div>
+                </div>
+            </ListItem>
+        );
+    };
 
-  private onAdd = (prediction: IValues): void => {
-    this.props.onAddServicePrediction(prediction as IPrediction);
-  };
+    private onAdd = (prediction: IValues): void => {
+        this.props.onAddServicePrediction(prediction as IPrediction);
+    };
 
-  private onRemove = (predictions: string[]) =>
-    this.props.onRemoveServicePredictions(predictions);
+    private onRemove = (predictions: string[]) =>
+        this.props.onRemoveServicePredictions(predictions);
 
-  private onDeleteSuccess = (predictions: string[]): void => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.removeServicePredictions(serviceName, predictions);
-    }
-  };
-
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete prediction`, 10000, reason, true);
-
-  private getFields = (): IFields =>
-    Object.entries(emptyPrediction()).map(([key, value]) => {
-      return {
-        [key]: {
-          id: key,
-          label: key,
-          validation: getTypeFromValue(value) === 'number'
-            ? {rule: requiredAndNumberAndMin, args: 0}
-            : {rule: requiredAndTrimmed}
+    private onDeleteSuccess = (predictions: string[]): void => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.removeServicePredictions(serviceName, predictions);
         }
-      };
-    }).reduce((fields, field) => {
-      for (let key in field) {
-        fields[key] = field[key];
-      }
-      return fields;
-    }, {});
+    };
 
-  private predictionModal = () =>
-    <div>
-      <Field key='name' id={'name'} label='name'/>
-      <Field key='description' id={'description'} label='description' type='multilinetext'/>
-      <div className={'col s6 inline-field'}>
-        <Field key='startDate' id={'startDate'} label='startDate' type='datepicker'/>
-      </div>
-      <div className={'col s6 inline-field'}>
-        <Field key='startTime' id={'startTime'} label='startTime' type='timepicker' icon={{include: false}}/>
-      </div>
-      <div className={'col s6 inline-field'}>
-        <Field key='endDate' id={'endDate'} label='endDate' type='datepicker'/>
-      </div>
-      <div className={'col s6 inline-field'}>
-        <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' icon={{include: false}}/>
-      </div>
-      <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
-    </div>;
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to delete prediction`, 10000, reason, true);
+
+    private getFields = (): IFields =>
+        Object.entries(emptyPrediction()).map(([key, value]) => {
+            return {
+                [key]: {
+                    id: key,
+                    label: key,
+                    validation: getTypeFromValue(value) === 'number'
+                        ? {rule: requiredAndNumberAndMin, args: 0}
+                        : {rule: requiredAndTrimmed}
+                }
+            };
+        }).reduce((fields, field) => {
+            for (let key in field) {
+                fields[key] = field[key];
+            }
+            return fields;
+        }, {});
+
+    private predictionModal = () =>
+        <div>
+            <Field key='name' id={'name'} label='name'/>
+            <Field key='description' id={'description'} label='description' type='multilinetext'/>
+            <div className={'col s6 inline-field'}>
+                <Field key='startDate' id={'startDate'} label='startDate' type='datepicker'/>
+            </div>
+            <div className={'col s6 inline-field'}>
+                <Field key='startTime' id={'startTime'} label='startTime' type='timepicker' icon={{include: false}}/>
+            </div>
+            <div className={'col s6 inline-field'}>
+                <Field key='endDate' id={'endDate'} label='endDate' type='datepicker'/>
+            </div>
+            <div className={'col s6 inline-field'}>
+                <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' icon={{include: false}}/>
+            </div>
+            <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
+        </div>;
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServicePredictionListProps): StateToProps {
-  const serviceName = ownProps.service?.serviceName;
-  const service = serviceName && state.entities.services.data[serviceName];
-  const predictions = service && service.predictions;
-  return {
-    isLoading: state.entities.services.isLoadingPredictions,
-    error: state.entities.services.loadPredictionsError,
-    predictions: (predictions && Object.values(predictions)) || [],
-  }
+    const serviceName = ownProps.service?.serviceName;
+    const service = serviceName && state.entities.services.data[serviceName];
+    const predictions = service && service.predictions;
+    return {
+        isLoading: state.entities.services.isLoadingPredictions,
+        error: state.entities.services.loadPredictionsError,
+        predictions: (predictions && Object.values(predictions)) || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadServicePredictions,
-    removeServicePredictions,
-  }, dispatch);
+    bindActionCreators({
+        loadServicePredictions,
+        removeServicePredictions,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServicePredictionList);

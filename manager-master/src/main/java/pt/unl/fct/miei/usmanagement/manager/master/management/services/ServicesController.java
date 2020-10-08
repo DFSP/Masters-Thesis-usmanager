@@ -25,7 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.services;
 
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.prediction.ServiceEventPredictionEntity;
@@ -132,14 +139,12 @@ public class ServicesController {
 	}
 
 	@DeleteMapping("/{serviceName}/predictions")
-	public void removeServicePredictions(@PathVariable String serviceName,
-										 @RequestBody String[] predictions) {
+	public void removeServicePredictions(@PathVariable String serviceName, @RequestBody String[] predictions) {
 		servicesService.removePredictions(serviceName, Arrays.asList(predictions));
 	}
 
 	@DeleteMapping("/{serviceName}/predictions/{predictionName}")
-	public void removeServicePrediction(@PathVariable String serviceName,
-										@PathVariable String predictionName) {
+	public void removeServicePrediction(@PathVariable String serviceName, @PathVariable String predictionName) {
 		servicesService.removePrediction(serviceName, predictionName);
 	}
 

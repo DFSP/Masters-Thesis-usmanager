@@ -28,10 +28,10 @@ import {IService} from "./Service";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
-  addServiceDependencies,
-  loadServiceDependencies,
-  loadServices,
-  removeServiceDependencies
+    addServiceDependencies,
+    loadServiceDependencies,
+    loadServices,
+    removeServiceDependencies
 } from "../../../actions";
 import BaseComponent from "../../../components/BaseComponent";
 import {Link} from "react-router-dom";
@@ -43,156 +43,156 @@ export interface IServiceDependency extends IService {
 }
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  services: { [key: string]: IService },
-  dependencies: string[];
+    isLoading: boolean;
+    error?: string | null;
+    services: { [key: string]: IService },
+    dependencies: string[];
 }
 
 interface DispatchToProps {
-  loadServices: () => void;
-  loadServiceDependencies: (serviceName: string) => void;
-  removeServiceDependencies: (serviceName: string, dependencies: string[]) => void;
+    loadServices: () => void;
+    loadServiceDependencies: (serviceName: string) => void;
+    removeServiceDependencies: (serviceName: string, dependencies: string[]) => void;
 }
 
 interface ServiceDependencyProps {
-  isLoadingService: boolean;
-  loadServiceError?: string | null;
-  service: IService | Partial<IService> | null;
-  unsavedDependencies: string[];
-  onAddServiceDependency: (dependency: string) => void;
-  onRemoveServiceDependencies: (dependencies: string[]) => void;
+    isLoadingService: boolean;
+    loadServiceError?: string | null;
+    service: IService | Partial<IService> | null;
+    unsavedDependencies: string[];
+    onAddServiceDependency: (dependency: string) => void;
+    onRemoveServiceDependencies: (dependencies: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class ServiceDependencyList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadServices();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
-      this.setState({entitySaved: true});
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                           emptyMessage={`Dependencies list is empty`}
-                           data={this.props.dependencies}
-                           dropdown={{
-                             id: 'dependencies',
-                             title: 'Add dependency',
-                             empty: 'No dependencies to add',
-                             data: this.getSelectableServicesNames()
-                           }}
-                           show={this.dependency}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service?.serviceName}/dependencies`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-
-  }
-
-  private loadEntities = () => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.loadServiceDependencies(serviceName);
+    public componentDidMount(): void {
+        this.props.loadServices();
+        this.loadEntities();
     }
-  };
 
-  private isNew = () =>
-    this.props.service?.serviceName === undefined;
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+            this.setState({entitySaved: true});
+        }
+    }
 
-  private dependency = (index: number, dependency: string, separate: boolean, checked: boolean,
-                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedDependencies.includes(dependency);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${styles.linkedItemContent}`}>
-          <label>
-            <input id={dependency}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                               error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                               emptyMessage={`Dependencies list is empty`}
+                               data={this.props.dependencies}
+                               dropdown={{
+                                   id: 'dependencies',
+                                   title: 'Add dependency',
+                                   empty: 'No dependencies to add',
+                                   data: this.getSelectableServicesNames()
+                               }}
+                               show={this.dependency}
+                               onAdd={this.onAdd}
+                               onRemove={this.onRemove}
+                               onDelete={{
+                                   url: `services/${this.props.service?.serviceName}/dependencies`,
+                                   successCallback: this.onDeleteSuccess,
+                                   failureCallback: this.onDeleteFailure
+                               }}
+                               entitySaved={this.state.entitySaved}/>;
+
+    }
+
+    private loadEntities = () => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.loadServiceDependencies(serviceName);
+        }
+    };
+
+    private isNew = () =>
+        this.props.service?.serviceName === undefined;
+
+    private dependency = (index: number, dependency: string, separate: boolean, checked: boolean,
+                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedDependencies.includes(dependency);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${styles.linkedItemContent}`}>
+                    <label>
+                        <input id={dependency}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {dependency}
               </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/services/${dependency}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/services/${dependency}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (dependency: string): void =>
-    this.props.onAddServiceDependency(dependency);
+    private onAdd = (dependency: string): void =>
+        this.props.onAddServiceDependency(dependency);
 
-  private onRemove = (dependencies: string[]) =>
-    this.props.onRemoveServiceDependencies(dependencies);
+    private onRemove = (dependencies: string[]) =>
+        this.props.onRemoveServiceDependencies(dependencies);
 
-  private onDeleteSuccess = (dependencies: string[]): void => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.removeServiceDependencies(serviceName, dependencies);
-    }
-  };
+    private onDeleteSuccess = (dependencies: string[]): void => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.removeServiceDependencies(serviceName, dependencies);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete dependency`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to delete dependency`, 10000, reason, true);
 
-  private getSelectableServicesNames = () => {
-    const {services, service, dependencies, unsavedDependencies} = this.props;
-    return Object.keys(services)
-                 .filter(name => (!service || name !== service.serviceName) && !dependencies.includes(name) && !unsavedDependencies.includes(name));
-  };
+    private getSelectableServicesNames = () => {
+        const {services, service, dependencies, unsavedDependencies} = this.props;
+        return Object.keys(services)
+            .filter(name => (!service || name !== service.serviceName) && !dependencies.includes(name) && !unsavedDependencies.includes(name));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
-  const serviceName = ownProps.service?.serviceName;
-  const service = serviceName && state.entities.services.data[serviceName];
-  const dependencies = service && service.dependencies;
-  return {
-    isLoading: state.entities.services.isLoadingDependencies,
-    error: state.entities.services.loadDependenciesError,
-    services: state.entities.services.data,
-    dependencies: dependencies || [],
-  }
+    const serviceName = ownProps.service?.serviceName;
+    const service = serviceName && state.entities.services.data[serviceName];
+    const dependencies = service && service.dependencies;
+    return {
+        isLoading: state.entities.services.isLoadingDependencies,
+        error: state.entities.services.loadDependenciesError,
+        services: state.entities.services.data,
+        dependencies: dependencies || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadServices,
-    loadServiceDependencies,
-    addServiceDependencies,
-    removeServiceDependencies,
-  }, dispatch);
+    bindActionCreators({
+        loadServices,
+        loadServiceDependencies,
+        addServiceDependencies,
+        removeServiceDependencies,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

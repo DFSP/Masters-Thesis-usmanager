@@ -20,7 +20,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
+ *//*
+
 
 package pt.unl.fct.miei.usmanagement.manager.worker;
 
@@ -47,15 +48,26 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		/*Thread.sleep(2000);
-		 *//*Customer customer = new Customer("daniel", "pimenta");
+		*/
+/*Thread.sleep(2000);
+ *//*
+ */
+/*Customer customer = new Customer("daniel", "pimenta");
     producer.sendCustomer(customer);*//*
+ */
+/*
     Thread.sleep(2000);
     User user = new User("daniel");
     producer.sendUser(user);
-   *//* Thread.sleep(2000);
+   *//*
+ */
+/* Thread.sleep(2000);
     producer.sendMessage("fail");*//*
-    Thread.sleep(1000000000);*/
+ */
+/*
+    Thread.sleep(1000000000);*//*
+
 	}
 
 }
+*/

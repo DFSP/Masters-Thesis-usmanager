@@ -29,34 +29,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
+		<groupId>pt.unl.fct.usmanagement.manager</groupId>
+		<artifactId>manager-parent</artifactId>
+		<version>0.0.1</version>
 		<relativePath/>
 	</parent>
 
-	<groupId>pt.unl.fct.usmanagement.manager.worker</groupId>
 	<artifactId>manager-worker</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
+
 	<name>Manager Worker</name>
-	<description>Microservices worker manager. Decides to replicate and/or migrate
-		docker containered microservices between cloud and edge endpoints, based on
+	<description>Worker manager decides to replicate and/or migrate
+		docker container microservices between cloud and edge endpoints, based on
 		predefined rules and metrics collected globally. Also manages the edge machines used by the system.
 	</description>
-
-	<licenses>
-		<license>
-			<name>MIT</name>
-			<url>https://opensource.org/licenses/MIT</url>
-		</license>
-	</licenses>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>11</java.version>
-	</properties>
 
 	<repositories>
 		<repository>
@@ -80,76 +67,22 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+			<version>2.3.1.RELEASE</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.hierynomus</groupId>
-			<artifactId>sshj</artifactId>
-			<version>0.29.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.spotify</groupId>
-			<artifactId>docker-client</artifactId>
-			<version>8.16.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-templates</artifactId>
-			<version>7.40.0.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
+			<version>1.4.200</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jumpmind.symmetric</groupId>
 			<artifactId>symmetric-server</artifactId>
 			<version>3.11.10</version>
+			<scope>compile</scope>
 		</dependency>
-		<!--&lt;!&ndash; https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 &ndash;&gt;
-		<dependency>
-			<groupId>com.maxmind.geoip2</groupId>
-			<artifactId>geoip2</artifactId>
-			<version>2.14.0</version>
-		</dependency>-->
-
 	</dependencies>
 
 	<build>
@@ -161,17 +94,6 @@
 				<configuration>
 					<mainClass>pt.unl.fct.miei.usmanagement.manager.ManagerWorkerApplication</mainClass>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.1.1</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.shared</groupId>
-						<artifactId>maven-dependency-analyzer</artifactId>
-						<version>1.11.1</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

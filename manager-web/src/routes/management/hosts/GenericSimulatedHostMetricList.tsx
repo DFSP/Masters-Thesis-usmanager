@@ -34,60 +34,60 @@ import ListItem from "../../../components/list/ListItem";
 import {loadSimulatedHostMetrics} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericSimulatedHostMetrics: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericSimulatedHostMetrics: string[];
 }
 
 interface DispatchToProps {
-  loadSimulatedHostMetrics: () => void;
+    loadSimulatedHostMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedHostMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedHostMetrics();
+    }
 
-  public render() {
-    const SimulatedMetricsList = List<string>();
-    return (
-      <SimulatedMetricsList isLoading={this.props.isLoading}
-                            error={this.props.error}
-                            emptyMessage={`Generic simulated metrics list is empty`}
-                            list={this.props.genericSimulatedHostMetrics}
-                            show={this.simulatedMetric}/>
-    );
-  }
+    public render() {
+        const SimulatedMetricsList = List<string>();
+        return (
+            <SimulatedMetricsList isLoading={this.props.isLoading}
+                                  error={this.props.error}
+                                  emptyMessage={`Generic simulated metrics list is empty`}
+                                  list={this.props.genericSimulatedHostMetrics}
+                                  show={this.simulatedMetric}/>
+        );
+    }
 
-  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericSimulatedHostMetrics.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{simulatedMetric}</span>
-      </div>
-      <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericSimulatedHostMetrics.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{simulatedMetric}</span>
+            </div>
+            <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.simulatedMetrics.hosts.isLoadingSimulatedHostMetrics,
-    error: state.entities.simulatedMetrics.hosts.loadSimulatedHostMetricsError,
-    genericSimulatedHostMetrics: Object.entries(state.entities.simulatedMetrics.hosts.data)
-                                       .filter(([_, simulatedMetric]) => simulatedMetric.generic)
-                                       .map(([simulatedMetricName, _]) => simulatedMetricName)
-  }
+    return {
+        isLoading: state.entities.simulatedMetrics.hosts.isLoadingSimulatedHostMetrics,
+        error: state.entities.simulatedMetrics.hosts.loadSimulatedHostMetricsError,
+        genericSimulatedHostMetrics: Object.entries(state.entities.simulatedMetrics.hosts.data)
+            .filter(([_, simulatedMetric]) => simulatedMetric.generic)
+            .map(([simulatedMetricName, _]) => simulatedMetricName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadSimulatedHostMetrics,
-  }, dispatch);
+    bindActionCreators({
+        loadSimulatedHostMetrics,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericSimulatedHostMetricList);

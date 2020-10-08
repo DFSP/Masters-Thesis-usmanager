@@ -37,7 +37,6 @@ import M from "materialize-css";
 import {Method} from "axios";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
-import {compose} from "redux";
 
 export interface IFormModal {
     id: string,

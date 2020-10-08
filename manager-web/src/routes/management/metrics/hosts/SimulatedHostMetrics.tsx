@@ -29,12 +29,12 @@ import styles from './SimulatedHostMetrics.module.css'
 import SimulatedHostMetricsList from "./SimulatedHostMetricsList";
 
 const SimulatedHostMetrics: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add simulated host metric', position: 'left'}}
-               pathname={'/simulated-metrics/hosts/add_simulated_metric?new=true'}/>
-    <div className={`${styles.container}`}>
-      <SimulatedHostMetricsList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add simulated host metric', position: 'left'}}
+                   pathname={'/simulated-metrics/hosts/add_simulated_metric?new=true'}/>
+        <div className={`${styles.container}`}>
+            <SimulatedHostMetricsList/>
+        </div>
+    </MainLayout>;
 
 export default SimulatedHostMetrics;

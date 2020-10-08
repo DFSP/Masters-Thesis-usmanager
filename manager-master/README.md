@@ -11,7 +11,7 @@ Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/
 
 #### Maven com java 11  
 ```shell script
-sudo apt install maven`  
+sudo apt install maven
 maven --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).

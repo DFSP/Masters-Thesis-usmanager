@@ -35,14 +35,14 @@ import {saveState} from "./store/localStorage";
 const store = configureStore();
 
 store.subscribe(() => {
-  saveState(store.getState());
+    saveState(store.getState());
 });
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
+    <BrowserRouter>
+        <Root store={store}/>
+    </BrowserRouter>,
+    document.getElementById('body'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

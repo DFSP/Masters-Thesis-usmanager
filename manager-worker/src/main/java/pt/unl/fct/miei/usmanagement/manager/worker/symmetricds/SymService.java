@@ -24,6 +24,26 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.symmetricds;
 
+import lombok.extern.slf4j.Slf4j;
+import org.jumpmind.db.model.Table;
+import org.jumpmind.symmetric.common.Constants;
+import org.jumpmind.symmetric.common.ParameterConstants;
+import org.jumpmind.symmetric.io.data.CsvData;
+import org.jumpmind.symmetric.io.data.DataContext;
+import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
+import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
+import org.jumpmind.symmetric.service.INodeService;
+import org.jumpmind.symmetric.web.ServerSymmetricEngine;
+import org.jumpmind.symmetric.web.SymmetricEngineHolder;
+import org.jumpmind.symmetric.web.WebConstants;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
+
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -37,27 +57,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-
-import lombok.extern.slf4j.Slf4j;
-import org.jumpmind.db.model.Table;
-import org.jumpmind.symmetric.common.Constants;
-import org.jumpmind.symmetric.common.ParameterConstants;
-import org.jumpmind.symmetric.io.data.CsvData;
-import org.jumpmind.symmetric.io.data.DataContext;
-import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
-import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
-import org.jumpmind.symmetric.service.INodeService;
-import org.jumpmind.symmetric.web.ServerSymmetricEngine;
-import org.jumpmind.symmetric.web.SymmetricEngineHolder;
-import org.jumpmind.symmetric.web.WebConstants;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
-
 @Slf4j
 @Service
 public class SymService {
@@ -69,23 +68,23 @@ public class SymService {
 	private final ApplicationContext applicationContext;
 	private final DataSourceProperties dataSourceProperties;
 
-	@Value("${external-id}")
-	private String id;
-
-	@Value("${master:127.0.0.1}")
-	private String master;
+	private final String id;
+	private final String masterHostname;
 
 	private int tableCount;
 
 	private ServerSymmetricEngine serverSymmetricEngine;
 
 	public SymService(SymDatabaseMonitor symDatabaseMonitor, ServletContext servletContext, DataSource dataSource,
-					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties) {
+					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties,
+					  WorkerManagerProperties workerManagerProperties) {
 		this.symDatabaseMonitor = symDatabaseMonitor;
 		this.servletContext = servletContext;
 		this.dataSource = dataSource;
 		this.applicationContext = applicationContext;
 		this.dataSourceProperties = dataSourceProperties;
+		this.id = workerManagerProperties.getId();
+		this.masterHostname = workerManagerProperties.getMasterHostname();
 	}
 
 	public void startSymmetricDSServer() {
@@ -101,7 +100,7 @@ public class SymService {
 		}
 
 		properties.setProperty(ParameterConstants.REGISTRATION_URL,
-			properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", master));
+			properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", masterHostname));
 		properties.setProperty(ParameterConstants.EXTERNAL_ID,
 			properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${external-id}", id));
 

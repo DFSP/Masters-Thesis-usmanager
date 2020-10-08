@@ -62,6 +62,7 @@ import {
     ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS,
     ADD_SIMULATED_SERVICE_METRIC,
     ADD_SIMULATED_SERVICE_METRIC_SERVICES,
+    ADD_WORKER_MANAGER,
     APP_FAILURE,
     APP_REQUEST,
     APP_SERVICES_FAILURE,
@@ -71,6 +72,7 @@ import {
     APPS_FAILURE,
     APPS_REQUEST,
     APPS_SUCCESS,
+    ASSIGN_WORKER_MANAGER_MACHINES,
     CLOUD_HOST_FAILURE,
     CLOUD_HOST_REQUEST,
     CLOUD_HOST_RULES_FAILURE,
@@ -110,6 +112,21 @@ import {
     DECISIONS_FAILURE,
     DECISIONS_REQUEST,
     DECISIONS_SUCCESS,
+    DELETE_APP,
+    DELETE_CLOUD_HOST,
+    DELETE_CONDITION,
+    DELETE_CONTAINER,
+    DELETE_EDGE_HOST,
+    DELETE_NODE,
+    DELETE_REGION,
+    DELETE_RULE_CONTAINER,
+    DELETE_RULE_HOST,
+    DELETE_RULE_SERVICE,
+    DELETE_SERVICE,
+    DELETE_SIMULATED_CONTAINER_METRIC,
+    DELETE_SIMULATED_HOST_METRIC,
+    DELETE_SIMULATED_SERVICE_METRIC,
+    DELETE_WORKER_MANAGER,
     EDGE_HOST_FAILURE,
     EDGE_HOST_REQUEST,
     EDGE_HOST_RULES_FAILURE,
@@ -271,6 +288,7 @@ import {
     SIMULATED_SERVICE_METRICS_FAILURE,
     SIMULATED_SERVICE_METRICS_REQUEST,
     SIMULATED_SERVICE_METRICS_SUCCESS,
+    UNASSIGN_WORKER_MANAGER_MACHINES,
     UPDATE_APP,
     UPDATE_CLOUD_HOST,
     UPDATE_CONDITION,
@@ -288,32 +306,14 @@ import {
     VALUE_MODES_REQUEST,
     VALUE_MODES_SUCCESS,
     WORKER_MANAGER_FAILURE,
+    WORKER_MANAGER_HOSTS_FAILURE,
+    WORKER_MANAGER_HOSTS_REQUEST,
+    WORKER_MANAGER_HOSTS_SUCCESS,
     WORKER_MANAGER_REQUEST,
     WORKER_MANAGER_SUCCESS,
     WORKER_MANAGERS_FAILURE,
     WORKER_MANAGERS_REQUEST,
     WORKER_MANAGERS_SUCCESS,
-    ADD_WORKER_MANAGER,
-    ASSIGN_WORKER_MANAGER_MACHINES,
-    UNASSIGN_WORKER_MANAGER_MACHINES,
-    WORKER_MANAGER_HOSTS_REQUEST,
-    WORKER_MANAGER_HOSTS_SUCCESS,
-    WORKER_MANAGER_HOSTS_FAILURE,
-    DELETE_APP,
-    DELETE_SERVICE,
-    DELETE_CONTAINER,
-    DELETE_CLOUD_HOST,
-    DELETE_EDGE_HOST,
-    DELETE_NODE,
-    DELETE_RULE_HOST,
-    DELETE_RULE_SERVICE,
-    DELETE_RULE_CONTAINER,
-    DELETE_CONDITION,
-    DELETE_SIMULATED_HOST_METRIC,
-    DELETE_SIMULATED_SERVICE_METRIC,
-    DELETE_SIMULATED_CONTAINER_METRIC,
-    DELETE_REGION,
-    DELETE_WORKER_MANAGER,
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
@@ -1039,7 +1039,12 @@ const entities = (state: EntitiesState = {
                 const service = state.services.data[entity];
                 if (data?.predictions?.length) {
                     //FIXME saved entity has id = 0, might be a problem later if updating the entity
-                    const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: {...prediction, id: 0 }}));
+                    const newPredictions = data?.predictions.map(prediction => ({
+                        [prediction.name]: {
+                            ...prediction,
+                            id: 0
+                        }
+                    }));
                     service.predictions = merge({}, service.predictions, ...newPredictions);
                     return merge({}, state, {services: {data: {[service.serviceName]: {...service}}}});
                 }

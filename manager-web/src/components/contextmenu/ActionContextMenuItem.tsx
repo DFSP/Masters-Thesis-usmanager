@@ -23,7 +23,6 @@
  */
 
 import {MenuItem} from "react-contextmenu";
-import {Link} from "react-router-dom";
 import React from "react";
 
 interface Props<T> {

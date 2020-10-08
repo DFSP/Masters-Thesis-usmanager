@@ -34,11 +34,11 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureBefore(MongoAutoConfiguration.class)
 public class MongoConfiguration {
 
-  @Bean
-  public MongoClientOptions optionsProvider() {
-    MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
-    optionsBuilder.serverSelectionTimeout(10000);
-    MongoClientOptions options = optionsBuilder.build();
-    return options;
-  }
+	@Bean
+	public MongoClientOptions optionsProvider() {
+		MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
+		optionsBuilder.serverSelectionTimeout(10000);
+		MongoClientOptions options = optionsBuilder.build();
+		return options;
+	}
 }

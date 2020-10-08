@@ -29,12 +29,12 @@ import styles from "./LoadBalancers.module.css";
 import LoadBalancersList from "./LoadBalancersList";
 
 const LoadBalancers: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Launch load-balancer', position: 'left'}}
-               pathname={'/load-balancers/launch?new=true'}/>
-    <div className={`${styles.container}`}>
-      <LoadBalancersList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Launch load-balancer', position: 'left'}}
+                   pathname={'/load-balancers/launch?new=true'}/>
+        <div className={`${styles.container}`}>
+            <LoadBalancersList/>
+        </div>
+    </MainLayout>;
 
 export default LoadBalancers;

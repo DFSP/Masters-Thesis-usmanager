@@ -36,158 +36,158 @@ import {IContainer} from "../../containers/Container";
 import {IRuleContainer} from "./RuleContainer";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  ruleContainers: string[];
-  containers: { [key: string]: IContainer };
+    isLoading: boolean;
+    error?: string | null;
+    ruleContainers: string[];
+    containers: { [key: string]: IContainer };
 }
 
 interface DispatchToProps {
-  loadContainers: () => void;
-  loadRulesContainer: (ruleName: string) => void;
-  removeRuleContainers: (ruleName: string, containers: string[]) => void;
+    loadContainers: () => void;
+    loadRulesContainer: (ruleName: string) => void;
+    removeRuleContainers: (ruleName: string, containers: string[]) => void;
 }
 
 interface ContainerRuleContainersListProps {
-  isLoadingRuleContainer: boolean;
-  loadRuleContainerError?: string | null;
-  ruleContainer: IRuleContainer | Partial<IRuleContainer> | null;
-  unsavedContainers: string[];
-  onAddRuleContainer: (container: string) => void;
-  onRemoveRuleContainers: (containers: string[]) => void;
+    isLoadingRuleContainer: boolean;
+    loadRuleContainerError?: string | null;
+    ruleContainer: IRuleContainer | Partial<IRuleContainer> | null;
+    unsavedContainers: string[];
+    onAddRuleContainer: (container: string) => void;
+    onRemoveRuleContainers: (containers: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ContainerRuleContainersListProps
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class RuleContainerContainersList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadContainers();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.ruleContainer?.name !== this.props.ruleContainer?.name) {
-      this.loadEntities();
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-    if (!prevProps.ruleContainer?.name && this.props.ruleContainer?.name) {
-      this.setState({entitySaved: true});
+
+    public componentDidMount(): void {
+        this.props.loadContainers();
+        this.loadEntities();
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList
-      isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
-      error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
-      emptyMessage={`Containers list is empty`}
-      data={this.props.ruleContainers}
-      dropdown={{
-        id: 'containers',
-        title: 'Add container',
-        empty: 'No containers to add',
-        data: this.getSelectableContainerNames()
-      }}
-      show={this.container}
-      onAdd={this.onAdd}
-      onRemove={this.onRemove}
-      onDelete={{
-        url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
-        successCallback: this.onDeleteSuccess,
-        failureCallback: this.onDeleteFailure
-      }}
-      entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    if (this.props.ruleContainer?.name) {
-      const {name} = this.props.ruleContainer;
-      this.props.loadRulesContainer(name);
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.ruleContainer?.name !== this.props.ruleContainer?.name) {
+            this.loadEntities();
+        }
+        if (!prevProps.ruleContainer?.name && this.props.ruleContainer?.name) {
+            this.setState({entitySaved: true});
+        }
     }
-  };
 
-  private isNew = () =>
-    this.props.ruleContainer?.name === undefined;
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList
+            isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
+            error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
+            emptyMessage={`Containers list is empty`}
+            data={this.props.ruleContainers}
+            dropdown={{
+                id: 'containers',
+                title: 'Add container',
+                empty: 'No containers to add',
+                data: this.getSelectableContainerNames()
+            }}
+            show={this.container}
+            onAdd={this.onAdd}
+            onRemove={this.onRemove}
+            onDelete={{
+                url: `rules/containers/${this.props.ruleContainer?.name}/containers`,
+                successCallback: this.onDeleteSuccess,
+                failureCallback: this.onDeleteFailure
+            }}
+            entitySaved={this.state.entitySaved}/>;
+    }
 
-  private container = (index: number, container: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedContainers.includes(container);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={styles.linkedItemContent}>
-          <label>
-            <input id={container}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    private loadEntities = () => {
+        if (this.props.ruleContainer?.name) {
+            const {name} = this.props.ruleContainer;
+            this.props.loadRulesContainer(name);
+        }
+    };
+
+    private isNew = () =>
+        this.props.ruleContainer?.name === undefined;
+
+    private container = (index: number, container: string, separate: boolean, checked: boolean,
+                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedContainers.includes(container);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={styles.linkedItemContent}>
+                    <label>
+                        <input id={container}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                 {container}
               </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/containers/${container}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/containers/${container}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (container: string): void =>
-    this.props.onAddRuleContainer(container);
+    private onAdd = (container: string): void =>
+        this.props.onAddRuleContainer(container);
 
-  private onRemove = (containers: string[]) =>
-    this.props.onRemoveRuleContainers(containers);
+    private onRemove = (containers: string[]) =>
+        this.props.onRemoveRuleContainers(containers);
 
-  private onDeleteSuccess = (containers: string[]): void => {
-    if (this.props.ruleContainer?.name) {
-      const {name} = this.props.ruleContainer;
-      this.props.removeRuleContainers(name, containers);
-    }
-  };
+    private onDeleteSuccess = (containers: string[]): void => {
+        if (this.props.ruleContainer?.name) {
+            const {name} = this.props.ruleContainer;
+            this.props.removeRuleContainers(name, containers);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to remove container`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to remove container`, 10000, reason, true);
 
-  private getSelectableContainerNames = () => {
-    const {containers, ruleContainers, unsavedContainers} = this.props;
-    return Object.keys(containers)
-                 .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
-  };
+    private getSelectableContainerNames = () => {
+        const {containers, ruleContainers, unsavedContainers} = this.props;
+        return Object.keys(containers)
+            .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ContainerRuleContainersListProps): StateToProps {
-  const ruleName = ownProps.ruleContainer?.name;
-  const rule = ruleName && state.entities.rules.containers.data[ruleName];
-  const ruleContainers = rule && rule.containers;
-  return {
-    isLoading: state.entities.rules.containers.isLoadingContainers,
-    error: state.entities.rules.containers.loadContainersError,
-    ruleContainers: ruleContainers || [],
-    containers: state.entities.containers.data,
-  }
+    const ruleName = ownProps.ruleContainer?.name;
+    const rule = ruleName && state.entities.rules.containers.data[ruleName];
+    const ruleContainers = rule && rule.containers;
+    return {
+        isLoading: state.entities.rules.containers.isLoadingContainers,
+        error: state.entities.rules.containers.loadContainersError,
+        ruleContainers: ruleContainers || [],
+        containers: state.entities.containers.data,
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesContainer,
-    removeRuleContainers,
-    loadContainers,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesContainer,
+        removeRuleContainers,
+        loadContainers,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(RuleContainerContainersList);

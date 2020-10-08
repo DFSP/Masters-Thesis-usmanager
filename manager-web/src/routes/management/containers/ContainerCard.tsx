@@ -28,7 +28,6 @@ import React from "react";
 import {IContainer} from "./Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {EntitiesAction} from "../../../reducers/entities";
 import {deleteContainer} from "../../../actions";
 import {connect} from "react-redux";
 

@@ -23,5 +23,5 @@
  */
 
 export default interface IDatabaseData {
-  id: number | string;
+    id: number | string;
 }

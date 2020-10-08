@@ -30,34 +30,34 @@ import React from "react";
 import {IContainer} from "./Container";
 
 interface PortsListProps {
-  isLoadingContainer: boolean;
-  loadContainerError?: string | null;
-  container?: IContainer | null;
+    isLoadingContainer: boolean;
+    loadContainerError?: string | null;
+    container?: IContainer | null;
 }
 
 type Props = PortsListProps;
 
 export default class ContainerLabelsList extends BaseComponent<Props, {}> {
 
-  public render() {
-    const LabelsList = List<string>();
-    return (
-      <LabelsList isLoading={this.props.isLoadingContainer}
-                  error={this.props.loadContainerError}
-                  emptyMessage={`No labels associated`}
-                  list={this.labels()}
-                  show={this.label}/>
-    );
-  }
+    public render() {
+        const LabelsList = List<string>();
+        return (
+            <LabelsList isLoading={this.props.isLoadingContainer}
+                        error={this.props.loadContainerError}
+                        emptyMessage={`No labels associated`}
+                        list={this.labels()}
+                        show={this.label}/>
+        );
+    }
 
-  private labels = (): string[] =>
-    Object.entries(this.props.container?.labels || []).map(([key, value]) => `${key} = ${value}`);
+    private labels = (): string[] =>
+        Object.entries(this.props.container?.labels || []).map(([key, value]) => `${key} = ${value}`);
 
-  private label = (label: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.labels().length - 1}>
-      <div className={`${styles.listItemContent}`}>
-        <span>{label}</span>
-      </div>
-    </ListItem>;
+    private label = (label: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.labels().length - 1}>
+            <div className={`${styles.listItemContent}`}>
+                <span>{label}</span>
+            </div>
+        </ListItem>;
 
 }

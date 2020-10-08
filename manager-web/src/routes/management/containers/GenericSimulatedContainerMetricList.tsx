@@ -34,60 +34,60 @@ import ListItem from "../../../components/list/ListItem";
 import {loadSimulatedContainerMetrics} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericSimulatedContainerMetrics: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericSimulatedContainerMetrics: string[];
 }
 
 interface DispatchToProps {
-  loadSimulatedContainerMetrics: () => void;
+    loadSimulatedContainerMetrics: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericSimulatedContainerMetricList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadSimulatedContainerMetrics();
-  }
+    public componentDidMount(): void {
+        this.props.loadSimulatedContainerMetrics();
+    }
 
-  public render() {
-    const SimulatedMetricsList = List<string>();
-    return (
-      <SimulatedMetricsList isLoading={this.props.isLoading}
-                            error={this.props.error}
-                            emptyMessage={`Generic simulated metrics list is empty`}
-                            list={this.props.genericSimulatedContainerMetrics}
-                            show={this.simulatedMetric}/>
-    );
-  }
+    public render() {
+        const SimulatedMetricsList = List<string>();
+        return (
+            <SimulatedMetricsList isLoading={this.props.isLoading}
+                                  error={this.props.error}
+                                  emptyMessage={`Generic simulated metrics list is empty`}
+                                  list={this.props.genericSimulatedContainerMetrics}
+                                  show={this.simulatedMetric}/>
+        );
+    }
 
-  private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericSimulatedContainerMetrics.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{simulatedMetric}</span>
-      </div>
-      <Link to={`/simulated-metrics/containers/${simulatedMetric}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericSimulatedContainerMetrics.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{simulatedMetric}</span>
+            </div>
+            <Link to={`/simulated-metrics/containers/${simulatedMetric}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
-    error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
-    genericSimulatedContainerMetrics: Object.entries(state.entities.simulatedMetrics.containers.data)
-                                            .filter(([_, simulatedMetric]) => simulatedMetric.generic)
-                                            .map(([simulatedMetricName, _]) => simulatedMetricName)
-  }
+    return {
+        isLoading: state.entities.simulatedMetrics.containers.isLoadingSimulatedContainerMetrics,
+        error: state.entities.simulatedMetrics.containers.loadSimulatedContainerMetricsError,
+        genericSimulatedContainerMetrics: Object.entries(state.entities.simulatedMetrics.containers.data)
+            .filter(([_, simulatedMetric]) => simulatedMetric.generic)
+            .map(([simulatedMetricName, _]) => simulatedMetricName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadSimulatedContainerMetrics,
-  }, dispatch);
+    bindActionCreators({
+        loadSimulatedContainerMetrics,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericSimulatedContainerMetricList);

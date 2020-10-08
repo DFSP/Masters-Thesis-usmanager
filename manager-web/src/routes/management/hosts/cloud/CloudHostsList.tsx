@@ -32,55 +32,55 @@ import {ICloudHost} from "./CloudHost";
 import CloudHostCard from "./CloudHostCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  cloudHosts: ICloudHost[];
+    isLoading: boolean
+    error?: string | null;
+    cloudHosts: ICloudHost[];
 }
 
 interface DispatchToProps {
-  loadCloudHosts: (instanceId?: string) => any;
+    loadCloudHosts: (instanceId?: string) => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class CloudHostsList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadCloudHosts();
-  }
+    public componentDidMount(): void {
+        this.props.loadCloudHosts();
+    }
 
-  public render() {
-    return (
-      <CardList<ICloudHost>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No cloud instances to display"}
-        list={this.props.cloudHosts}
-        card={this.cloudHost}
-        predicate={this.predicate}/>
-    )
-  }
+    public render() {
+        return (
+            <CardList<ICloudHost>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No cloud instances to display"}
+                list={this.props.cloudHosts}
+                card={this.cloudHost}
+                predicate={this.predicate}/>
+        )
+    }
 
-  private cloudHost = (host: ICloudHost): JSX.Element =>
-    <CloudHostCard key={host.instanceId} cloudHost={host}/>;
+    private cloudHost = (host: ICloudHost): JSX.Element =>
+        <CloudHostCard key={host.instanceId} cloudHost={host}/>;
 
-  private predicate = (host: ICloudHost, search: string): boolean =>
-    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search))
-    || host.instanceId.includes(search);
+    private predicate = (host: ICloudHost, search: string): boolean =>
+        (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search))
+        || host.instanceId.includes(search);
 
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.hosts.cloud.isLoadingHosts,
-    error: state.entities.hosts.cloud.loadHostsError,
-    cloudHosts: (state.entities.hosts.cloud.data && Object.values(state.entities.hosts.cloud.data)) || [],
-  }
+    {
+        isLoading: state.entities.hosts.cloud.isLoadingHosts,
+        error: state.entities.hosts.cloud.loadHostsError,
+        cloudHosts: (state.entities.hosts.cloud.data && Object.values(state.entities.hosts.cloud.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadCloudHosts,
+    loadCloudHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CloudHostsList);

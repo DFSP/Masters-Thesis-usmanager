@@ -34,8 +34,15 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
-import pt.unl.fct.miei.usmanagement.manager.database.monitoring.*;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringLogEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringLogsRepository;
+import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
@@ -43,7 +50,6 @@ import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerExcep
 import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.location.LocationRequestService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ContainerEvent;
@@ -58,8 +64,17 @@ import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.Wo
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 @Service

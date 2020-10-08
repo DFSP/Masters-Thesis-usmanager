@@ -29,12 +29,12 @@ import styles from "./WorkerManagers.module.css";
 import WorkerManagersList from "./WorkerManagersList";
 
 const WorkerManagers: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Launch worker-manager', position: 'left'}}
-               pathname={'/worker-managers/launch?new=true'}/>
-    <div className={`${styles.container}`}>
-      <WorkerManagersList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Launch worker-manager', position: 'left'}}
+                   pathname={'/worker-managers/launch?new=true'}/>
+        <div className={`${styles.container}`}>
+            <WorkerManagersList/>
+        </div>
+    </MainLayout>;
 
 export default WorkerManagers;

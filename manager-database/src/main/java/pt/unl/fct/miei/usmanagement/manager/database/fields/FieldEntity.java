@@ -25,15 +25,26 @@
 package pt.unl.fct.miei.usmanagement.manager.database.fields;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionValueEntity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -54,25 +65,25 @@ public class FieldEntity {
 	@Column(unique = true)
 	private String name;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<ConditionEntity> conditions = new HashSet<>();
+	private Set<ConditionEntity> conditions;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<HostSimulatedMetricEntity> simulatedHostMetrics = new HashSet<>();
+	private Set<HostSimulatedMetricEntity> simulatedHostMetrics;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<ServiceSimulatedMetricEntity> simulatedServiceMetrics = new HashSet<>();
+	private Set<ServiceSimulatedMetricEntity> simulatedServiceMetrics;
 
+	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
+	private Set<ServiceDecisionValueEntity> componentDecisionValueLogs;
 
 	@Override
 	public int hashCode() {

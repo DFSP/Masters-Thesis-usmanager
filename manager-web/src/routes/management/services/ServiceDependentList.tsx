@@ -38,74 +38,74 @@ export interface IDependent extends IService {
 }
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  dependentNames: string[];
+    isLoading: boolean;
+    error?: string | null;
+    dependentNames: string[];
 }
 
 interface DispatchToProps {
-  loadServiceDependents: (serviceName: string) => void;
+    loadServiceDependents: (serviceName: string) => void;
 }
 
 interface ServiceDependentListProps {
-  isLoadingService: boolean;
-  loadServiceError?: string | null;
-  service: IService | Partial<IService> | null;
+    isLoadingService: boolean;
+    loadServiceError?: string | null;
+    service: IService | Partial<IService> | null;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceDependentListProps;
 
 class ServiceDependentList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.loadEntities();
-  }
-
-  public render() {
-    const DependentsList = List<string>();
-    return (
-      <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
-                      error={this.props.loadServiceError || this.props.error}
-                      emptyMessage={`Dependents list is empty`}
-                      list={this.props.dependentNames}
-                      show={this.dependent}/>
-    );
-  }
-
-  private loadEntities = () => {
-    if (this.props.service?.serviceName) {
-      const {serviceName} = this.props.service;
-      this.props.loadServiceDependents(serviceName);
+    public componentDidMount(): void {
+        this.loadEntities();
     }
-  };
 
-  private dependent = (dependent: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.dependentNames.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{dependent}</span>
-      </div>
-      <Link to={`/services/${dependent}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    public render() {
+        const DependentsList = List<string>();
+        return (
+            <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
+                            error={this.props.loadServiceError || this.props.error}
+                            emptyMessage={`Dependents list is empty`}
+                            list={this.props.dependentNames}
+                            show={this.dependent}/>
+        );
+    }
+
+    private loadEntities = () => {
+        if (this.props.service?.serviceName) {
+            const {serviceName} = this.props.service;
+            this.props.loadServiceDependents(serviceName);
+        }
+    };
+
+    private dependent = (dependent: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.dependentNames.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{dependent}</span>
+            </div>
+            <Link to={`/services/${dependent}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependentListProps): StateToProps {
-  const serviceName = ownProps.service?.serviceName;
-  const service = serviceName && state.entities.services.data[serviceName];
-  const serviceDependents = service && service.dependents;
-  return {
-    isLoading: state.entities.services.isLoadingDependents,
-    error: state.entities.services.loadDependentsError,
-    dependentNames: serviceDependents || [],
-  }
+    const serviceName = ownProps.service?.serviceName;
+    const service = serviceName && state.entities.services.data[serviceName];
+    const serviceDependents = service && service.dependents;
+    return {
+        isLoading: state.entities.services.isLoadingDependents,
+        error: state.entities.services.loadDependentsError,
+        dependentNames: serviceDependents || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadServiceDependents,
-  }, dispatch);
+    bindActionCreators({
+        loadServiceDependents,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependentList);

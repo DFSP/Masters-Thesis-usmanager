@@ -24,12 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.management.logging;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.logging.LoggingEventRepository;
+
+import java.util.List;
 
 @Slf4j
 @Service

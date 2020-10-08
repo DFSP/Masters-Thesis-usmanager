@@ -94,7 +94,7 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardSimulatedServiceMetric = Card<ISimulatedServiceMetric>();
         return <CardSimulatedServiceMetric id={`simulated-service-metric-${simulatedServiceMetric.id}`}
-                                            title={simulatedServiceMetric.name}
+                                           title={simulatedServiceMetric.name}
                                            link={{
                                                to: {
                                                    pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`,

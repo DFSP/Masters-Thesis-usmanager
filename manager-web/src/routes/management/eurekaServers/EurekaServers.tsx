@@ -29,12 +29,12 @@ import styles from "./EurekaServers.module.css";
 import EurekaServersList from "./EurekaServersList";
 
 const EurekaServers: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Launch eureka server', position: 'left'}}
-               pathname={'/eureka-servers/launch?new=true'}/>
-    <div className={`${styles.container}`}>
-      <EurekaServersList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Launch eureka server', position: 'left'}}
+                   pathname={'/eureka-servers/launch?new=true'}/>
+        <div className={`${styles.container}`}>
+            <EurekaServersList/>
+        </div>
+    </MainLayout>;
 
 export default EurekaServers;

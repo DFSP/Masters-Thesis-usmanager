@@ -36,169 +36,169 @@ import {IEdgeHost} from "./EdgeHost";
 import {loadEdgeHostRules, loadRulesHost, removeEdgeHostRules} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  rules: { [key: string]: IRuleHost },
-  rulesNames: string[];
+    isLoading: boolean;
+    error?: string | null;
+    rules: { [key: string]: IRuleHost },
+    rulesNames: string[];
 }
 
 interface DispatchToProps {
-  loadRulesHost: () => void;
-  loadEdgeHostRules: (hostname: string) => void;
-  removeEdgeHostRules: (hostname: string, rules: string[]) => void;
+    loadRulesHost: () => void;
+    loadEdgeHostRules: (hostname: string) => void;
+    removeEdgeHostRules: (hostname: string, rules: string[]) => void;
 }
 
 interface HostRuleListProps {
-  isLoadingEdgeHost: boolean;
-  loadEdgeHostError?: string | null;
-  edgeHost: IEdgeHost | Partial<IEdgeHost> | null;
-  unsavedRules: string[];
-  onAddHostRule: (rule: string) => void;
-  onRemoveHostRules: (rule: string[]) => void;
+    isLoadingEdgeHost: boolean;
+    loadEdgeHostError?: string | null;
+    edgeHost: IEdgeHost | Partial<IEdgeHost> | null;
+    unsavedRules: string[];
+    onAddHostRule: (rule: string) => void;
+    onRemoveHostRules: (rule: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & HostRuleListProps;
 
 type State = {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class EdgeHostRuleList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadRulesHost();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    const previousHostname = prevProps.edgeHost?.publicIpAddress;
-    const currentHostname = this.props.edgeHost?.publicIpAddress;
-    if (previousHostname !== currentHostname) {
-      this.loadEntities();
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-    if (!previousHostname && currentHostname) {
-      this.setState({entitySaved: true});
+
+    public componentDidMount(): void {
+        this.props.loadRulesHost();
+        this.loadEntities();
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
-                           emptyMessage={`Rules list is empty`}
-                           data={this.props.rulesNames}
-                           dropdown={{
-                             id: 'rules',
-                             title: 'Add host rule',
-                             empty: 'No rules to add',
-                             data: this.getSelectableRules()
-                           }}
-                           show={this.rule}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/rules`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    const hostname = this.props.edgeHost?.publicIpAddress;
-    if (hostname) {
-      this.props.loadEdgeHostRules(hostname);
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        const previousHostname = prevProps.edgeHost?.publicIpAddress;
+        const currentHostname = this.props.edgeHost?.publicIpAddress;
+        if (previousHostname !== currentHostname) {
+            this.loadEntities();
+        }
+        if (!previousHostname && currentHostname) {
+            this.setState({entitySaved: true});
+        }
     }
-  };
 
-  private isNew = () =>
-    this.props.edgeHost?.publicDnsName === undefined && this.props.edgeHost?.publicIpAddress === undefined;
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
+                               error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
+                               emptyMessage={`Rules list is empty`}
+                               data={this.props.rulesNames}
+                               dropdown={{
+                                   id: 'rules',
+                                   title: 'Add host rule',
+                                   empty: 'No rules to add',
+                                   data: this.getSelectableRules()
+                               }}
+                               show={this.rule}
+                               onAdd={this.onAdd}
+                               onRemove={this.onRemove}
+                               onDelete={{
+                                   url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/rules`,
+                                   successCallback: this.onDeleteSuccess,
+                                   failureCallback: this.onDeleteFailure
+                               }}
+                               entitySaved={this.state.entitySaved}/>;
+    }
 
-  private rule = (index: number, rule: string, separate: boolean, checked: boolean,
-                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedRules.includes(rule);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${styles.linkedItemContent}`}>
-          <label>
-            <input id={rule}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    private loadEntities = () => {
+        const hostname = this.props.edgeHost?.publicIpAddress;
+        if (hostname) {
+            this.props.loadEdgeHostRules(hostname);
+        }
+    };
+
+    private isNew = () =>
+        this.props.edgeHost?.publicDnsName === undefined && this.props.edgeHost?.publicIpAddress === undefined;
+
+    private rule = (index: number, rule: string, separate: boolean, checked: boolean,
+                    handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedRules.includes(rule);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${styles.linkedItemContent}`}>
+                    <label>
+                        <input id={rule}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
                <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {rule}
                </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/rules/hosts/${rule}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/rules/hosts/${rule}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (rule: string): void =>
-    this.props.onAddHostRule(rule);
+    private onAdd = (rule: string): void =>
+        this.props.onAddHostRule(rule);
 
-  private onRemove = (rules: string[]) =>
-    this.props.onRemoveHostRules(rules);
+    private onRemove = (rules: string[]) =>
+        this.props.onRemoveHostRules(rules);
 
-  private onDeleteSuccess = (rules: string[]): void => {
-    const hostname = this.props.edgeHost?.publicIpAddress;
-    if (hostname) {
-      this.props.removeEdgeHostRules(hostname, rules);
-    }
-  };
+    private onDeleteSuccess = (rules: string[]): void => {
+        const hostname = this.props.edgeHost?.publicIpAddress;
+        if (hostname) {
+            this.props.removeEdgeHostRules(hostname, rules);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to remove rule`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to remove rule`, 10000, reason, true);
 
-  private getSelectableRules = () => {
-    const {rules, rulesNames, unsavedRules} = this.props;
-    return Object.entries(rules)
-                 .filter(([_, rule]) => !rule.generic)
-                 .map(([ruleName, _]) => ruleName)
-                 .filter(name => !rulesNames.includes(name) && !unsavedRules.includes(name));
-  };
+    private getSelectableRules = () => {
+        const {rules, rulesNames, unsavedRules} = this.props;
+        return Object.entries(rules)
+            .filter(([_, rule]) => !rule.generic)
+            .map(([ruleName, _]) => ruleName)
+            .filter(name => !rulesNames.includes(name) && !unsavedRules.includes(name));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
-  const hostname = ownProps.edgeHost?.publicIpAddress;
-  const host = hostname && state.entities.hosts.edge.data[hostname];
-  const rulesNames = host && host.hostRules;
-  return {
-    isLoading: state.entities.hosts.edge.isLoadingRules,
-    error: state.entities.hosts.edge.loadRulesError,
-    rules: Object.entries(state.entities.rules.hosts.data)
-                 .filter(([_, rule]) => !rule.generic)
-                 .map(([key, value]) => ({[key]: value}))
-                 .reduce((fields, field) => {
-                   for (let key in field) {
-                     fields[key] = field[key];
-                   }
-                   return fields;
-                 }, {}),
-    rulesNames: rulesNames || [],
-  }
+    const hostname = ownProps.edgeHost?.publicIpAddress;
+    const host = hostname && state.entities.hosts.edge.data[hostname];
+    const rulesNames = host && host.hostRules;
+    return {
+        isLoading: state.entities.hosts.edge.isLoadingRules,
+        error: state.entities.hosts.edge.loadRulesError,
+        rules: Object.entries(state.entities.rules.hosts.data)
+            .filter(([_, rule]) => !rule.generic)
+            .map(([key, value]) => ({[key]: value}))
+            .reduce((fields, field) => {
+                for (let key in field) {
+                    fields[key] = field[key];
+                }
+                return fields;
+            }, {}),
+        rulesNames: rulesNames || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesHost,
-    loadEdgeHostRules,
-    removeEdgeHostRules,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesHost,
+        loadEdgeHostRules,
+        removeEdgeHostRules,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHostRuleList);

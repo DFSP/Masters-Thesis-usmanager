@@ -32,53 +32,53 @@ import {connect} from "react-redux";
 import {loadRulesService} from "../../../../actions";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  serviceRules: IRuleService[];
+    isLoading: boolean
+    error?: string | null;
+    serviceRules: IRuleService[];
 }
 
 interface DispatchToProps {
-  loadRulesService: () => any;
+    loadRulesService: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class RulesServiceList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesService();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesService();
+    }
 
-  public render() {
-    return (
-      <CardList<IRuleService>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No service rules to display"}
-        list={this.props.serviceRules}
-        card={this.rule}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IRuleService>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No service rules to display"}
+                list={this.props.serviceRules}
+                card={this.rule}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private rule = (rule: IRuleService): JSX.Element =>
-    <RuleServiceCard key={rule.id} rule={rule}/>;
+    private rule = (rule: IRuleService): JSX.Element =>
+        <RuleServiceCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IRuleService, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
+    private predicate = (rule: IRuleService, search: string): boolean =>
+        rule.name.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.rules.services.isLoadingRules,
-    error: state.entities.rules.services.loadRulesError,
-    serviceRules: Object.values(state.entities.rules.services.data)
-  }
+    {
+        isLoading: state.entities.rules.services.isLoadingRules,
+        error: state.entities.rules.services.loadRulesError,
+        serviceRules: Object.values(state.entities.rules.services.data)
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadRulesService,
+    loadRulesService,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesServiceList);

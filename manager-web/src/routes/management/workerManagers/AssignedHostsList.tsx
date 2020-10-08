@@ -30,179 +30,172 @@ import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-  loadCloudHosts,
-  loadEdgeHosts,
-  loadWorkerManagerHosts,
-  unassignWorkerManagerHosts,
-} from "../../../actions";
+import {loadCloudHosts, loadEdgeHosts, loadWorkerManagerHosts, unassignWorkerManagerHosts,} from "../../../actions";
 import {connect} from "react-redux";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
-import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IWorkerManager} from "./WorkerManager";
 import {INode} from "../nodes/Node";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  nodes: { [key: string]: INode };
-  assignedHosts: string[];
+    isLoading: boolean;
+    error?: string | null;
+    nodes: { [key: string]: INode };
+    assignedHosts: string[];
 }
 
 interface DispatchToProps {
-  loadCloudHosts: () => void;
-  loadEdgeHosts: () => void;
-  loadWorkerManagerHosts: (id: string) => void;
-  unassignWorkerManagerHosts: (id: string, assignedHosts: string[]) => void;
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
+    loadWorkerManagerHosts: (id: string) => void;
+    unassignWorkerManagerHosts: (id: string, assignedHosts: string[]) => void;
 }
 
 interface WorkerManagerHostListProps {
-  isLoadingWorkerManager: boolean;
-  loadWorkerManagerError?: string | null;
-  workerManager: IWorkerManager | Partial<IWorkerManager> | undefined;
-  unSavedHosts: string[];
-  onAssignHost: (assignedHost: string) => void;
-  onUnassignHosts: (assignedHosts: string[]) => void;
+    isLoadingWorkerManager: boolean;
+    loadWorkerManagerError?: string | null;
+    workerManager: IWorkerManager | Partial<IWorkerManager> | undefined;
+    unSavedHosts: string[];
+    onAssignHost: (assignedHost: string) => void;
+    onUnassignHosts: (assignedHosts: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & WorkerManagerHostListProps;
 
 interface State {
-  selectedHost?: string;
-  entitySaved: boolean;
+    selectedHost?: string;
+    entitySaved: boolean;
 }
 
 class AssignedHostsList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadCloudHosts();
-    this.props.loadEdgeHosts();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (!prevProps.workerManager?.id && this.props.workerManager?.id) {
-      this.setState({entitySaved: true});
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList<string>
-      isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
-      error={!isNew ? this.props.loadWorkerManagerError || this.props.error : undefined}
-      emptyMessage={`Assigned hosts list is empty`}
-      data={this.props.assignedHosts}
-      dropdown={{
-        id: 'workerManagerHosts',
-        title: 'Add host',
-        empty: 'No hosts to add',
-        data: this.getSelectableHosts(),
-      }}
-      show={this.assignedHost}
-      onAdd={this.onAdd}
-      onRemove={this.onRemove}
-      onDelete={{
-        url: `worker-managers/${this.props.workerManager?.id}/assigned-hosts`,
-        successCallback: this.onDeleteSuccess,
-        failureCallback: this.onDeleteFailure
-      }}
-      removeButtonText={'Unassign'}
-      entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    if (this.props.workerManager?.id) {
-      const {id} = this.props.workerManager;
-      this.props.loadWorkerManagerHosts(id.toString());
+    public componentDidMount(): void {
+        this.props.loadCloudHosts();
+        this.props.loadEdgeHosts();
+        this.loadEntities();
     }
-  };
 
-  private isNew = () =>
-    this.props.workerManager?.id === undefined;
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (!prevProps.workerManager?.id && this.props.workerManager?.id) {
+            this.setState({entitySaved: true});
+        }
+    }
 
-  private assignedHost = (index: number, assignedHost: string, separate: boolean, checked: boolean,
-                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unSavedHosts.includes(assignedHost);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${listItemStyles.linkedItemContent}`}>
-          <label>
-            <input id={assignedHost}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList<string>
+            isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
+            error={!isNew ? this.props.loadWorkerManagerError || this.props.error : undefined}
+            emptyMessage={`Assigned hosts list is empty`}
+            data={this.props.assignedHosts}
+            dropdown={{
+                id: 'workerManagerHosts',
+                title: 'Add host',
+                empty: 'No hosts to add',
+                data: this.getSelectableHosts(),
+            }}
+            show={this.assignedHost}
+            onAdd={this.onAdd}
+            onRemove={this.onRemove}
+            onDelete={{
+                url: `worker-managers/${this.props.workerManager?.id}/assigned-hosts`,
+                successCallback: this.onDeleteSuccess,
+                failureCallback: this.onDeleteFailure
+            }}
+            removeButtonText={'Unassign'}
+            entitySaved={this.state.entitySaved}/>;
+    }
+
+    private loadEntities = () => {
+        if (this.props.workerManager?.id) {
+            const {id} = this.props.workerManager;
+            this.props.loadWorkerManagerHosts(id.toString());
+        }
+    };
+
+    private isNew = () =>
+        this.props.workerManager?.id === undefined;
+
+    private assignedHost = (index: number, assignedHost: string, separate: boolean, checked: boolean,
+                            handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unSavedHosts.includes(assignedHost);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${listItemStyles.linkedItemContent}`}>
+                    <label>
+                        <input id={assignedHost}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
               <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
                 {assignedHost}
               </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/nodes/${assignedHost}`}
-                className={`${listItemStyles.link} waves-effect`}>
-            <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/nodes/${assignedHost}`}
+                          className={`${listItemStyles.link} waves-effect`}>
+                        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (assignedHost: string): void => {
-    this.props.onAssignHost(assignedHost);
-  };
+    private onAdd = (assignedHost: string): void => {
+        this.props.onAssignHost(assignedHost);
+    };
 
-  private onRemove = (assignedHosts: string[]): void => {
-    this.props.onUnassignHosts(assignedHosts);
-  };
+    private onRemove = (assignedHosts: string[]): void => {
+        this.props.onUnassignHosts(assignedHosts);
+    };
 
-  private onDeleteSuccess = (assignedHosts: string[]): void => {
-    if (this.props.workerManager?.id) {
-      const {id} = this.props.workerManager;
-      this.props.unassignWorkerManagerHosts(id.toString(), assignedHosts);
-    }
-  };
+    private onDeleteSuccess = (assignedHosts: string[]): void => {
+        if (this.props.workerManager?.id) {
+            const {id} = this.props.workerManager;
+            this.props.unassignWorkerManagerHosts(id.toString(), assignedHosts);
+        }
+    };
 
-  private onDeleteFailure = (reason: string, assignedHosts?: string[]): void =>
-    super.toast(`Unable to unassign ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
+    private onDeleteFailure = (reason: string, assignedHosts?: string[]): void =>
+        super.toast(`Unable to unassign ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
 
-  private getSelectableHosts = () => {
-    const {assignedHosts, nodes, unSavedHosts} = this.props;
-    return Object.entries(nodes)
-          .filter(([_, node]) => node.state === 'ready'
-                                 && !assignedHosts.includes(node.hostname)
-                                 && !unSavedHosts.includes(node.hostname)
-                                 && this.props.workerManager?.container?.publicIpAddress !== node.hostname)
-          .map(([_, node]) => node.hostname)
-  };
+    private getSelectableHosts = () => {
+        const {assignedHosts, nodes, unSavedHosts} = this.props;
+        return Object.entries(nodes)
+            .filter(([_, node]) => node.state === 'ready'
+                && !assignedHosts.includes(node.hostname)
+                && !unSavedHosts.includes(node.hostname)
+                && this.props.workerManager?.container?.publicIpAddress !== node.hostname)
+            .map(([_, node]) => node.hostname)
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: WorkerManagerHostListProps): StateToProps {
-  const id = ownProps.workerManager?.id;
-  const workerManager = id && state.entities.workerManagers.data[id];
-  const assignedHosts = workerManager && workerManager.assignedHosts;
-  return {
-    isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
-    error: state.entities.workerManagers.loadWorkerManagersError,
-    nodes: state.entities.nodes.data,
-    assignedHosts: (assignedHosts && Object.values(assignedHosts)) || [],
-  }
+    const id = ownProps.workerManager?.id;
+    const workerManager = id && state.entities.workerManagers.data[id];
+    const assignedHosts = workerManager && workerManager.assignedHosts;
+    return {
+        isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
+        error: state.entities.workerManagers.loadWorkerManagersError,
+        nodes: state.entities.nodes.data,
+        assignedHosts: (assignedHosts && Object.values(assignedHosts)) || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadCloudHosts,
-    loadEdgeHosts,
-    loadWorkerManagerHosts,
-    unassignWorkerManagerHosts,
-  }, dispatch);
+    bindActionCreators({
+        loadCloudHosts,
+        loadEdgeHosts,
+        loadWorkerManagerHosts,
+        unassignWorkerManagerHosts,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AssignedHostsList);

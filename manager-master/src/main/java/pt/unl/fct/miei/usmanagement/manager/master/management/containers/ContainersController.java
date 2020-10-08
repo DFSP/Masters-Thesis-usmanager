@@ -25,7 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
 import org.springframework.data.util.Pair;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
@@ -67,8 +74,8 @@ public class ContainersController {
 	}
 
 	@PostMapping
-	public ContainerEntity launchContainer(@Json String hostname, @Json String service,
-										   @Json String internalPort, @Json String externalPort) {
+	public ContainerEntity launchContainer(@Json String hostname, @Json String service, @Json String internalPort,
+										   @Json String externalPort) {
 		return containersService.launchContainer(new HostAddress(hostname), service, internalPort, externalPort);
 	}
 
@@ -128,14 +135,12 @@ public class ContainersController {
 	}
 
 	@DeleteMapping("/{containerId}/simulated-metrics")
-	public void removeContainerSimulatedMetrics(@PathVariable String containerId,
-												@RequestBody String[] simulatedMetrics) {
+	public void removeContainerSimulatedMetrics(@PathVariable String containerId, @RequestBody String[] simulatedMetrics) {
 		containersService.removeSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
 	}
 
 	@DeleteMapping("/{containerId}/simulated-metrics/{simulatedMetricName}")
-	public void removeContainerSimulatedMetric(@PathVariable String containerId,
-											   @PathVariable String simulatedMetricName) {
+	public void removeContainerSimulatedMetric(@PathVariable String containerId, @PathVariable String simulatedMetricName) {
 		containersService.removeSimulatedMetric(containerId, simulatedMetricName);
 	}
 

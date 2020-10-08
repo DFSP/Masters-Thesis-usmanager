@@ -29,12 +29,12 @@ import styles from './SimulatedServiceMetrics.module.css'
 import SimulatedServiceMetricsList from "./SimulatedServiceMetricsList";
 
 const SimulatedServiceMetrics: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={{text: 'Add simulated service metric', position: 'left'}}
-               pathname={'/simulated-metrics/services/add_simulated_metric?new=true'}/>
-    <div className={`${styles.container}`}>
-      <SimulatedServiceMetricsList/>
-    </div>
-  </MainLayout>;
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add simulated service metric', position: 'left'}}
+                   pathname={'/simulated-metrics/services/add_simulated_metric?new=true'}/>
+        <div className={`${styles.container}`}>
+            <SimulatedServiceMetricsList/>
+        </div>
+    </MainLayout>;
 
 export default SimulatedServiceMetrics;

@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-import {ComposableMap, Geographies, Geography, Point, Position, ZoomableGroup} from "react-simple-maps";
-import React, {createRef, memo} from "react";
+import {ComposableMap, Geographies, Geography, Point, ZoomableGroup} from "react-simple-maps";
+import React, {memo} from "react";
 import * as d3Geo from "d3-geo";
-import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import {ContextMenu, ContextMenuTrigger, MenuItem} from "react-contextmenu";
 
-const { geoPath } = d3Geo
+const {geoPath} = d3Geo
 
 type Props = {
     setTooltipContent: (tooltip: string) => void;
@@ -43,7 +43,7 @@ class MapChart extends React.Component<Props, State> {
     private MAP_MAX_WIDTH = 1500;
     private MAP_MAX_HEIGHT = 750;
 
-    constructor (props: Props) {
+    constructor(props: Props) {
         super(props)
         this.state = {scale: 1.0, center: [0, 0]}
         this.handleResize = this.handleResize.bind(this)
@@ -88,14 +88,14 @@ class MapChart extends React.Component<Props, State> {
                     <ComposableMap data-tip="">
                         <ZoomableGroup zoom={1.15}>
                             <Geographies geography={geoUrl}>
-                                {({ geographies }) =>
+                                {({geographies}) =>
                                     geographies.map(geo => (
                                         <Geography
                                             key={geo.rsmKey}
                                             geography={geo}
                                             onClick={() => this.onGeographyClick(this.getScale, geo.projection, () => console.log("test"))}
                                             onMouseEnter={() => {
-                                                const { NAME } = geo.properties;
+                                                const {NAME} = geo.properties;
                                                 setTooltipContent(`${NAME}`);
                                             }}
                                             onMouseLeave={() => {
@@ -135,7 +135,7 @@ class MapChart extends React.Component<Props, State> {
         );
     }
 
-    onGeographyClick (scale: any, projection: any, onCoordinatesClick: any) {
+    onGeographyClick(scale: any, projection: any, onCoordinatesClick: any) {
         const gp = geoPath().projection(projection)
 
         return function (geo: any, evt: any) {

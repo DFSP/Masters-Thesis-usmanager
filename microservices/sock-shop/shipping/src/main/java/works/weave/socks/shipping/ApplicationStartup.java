@@ -33,22 +33,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-  /**
-   * This event is executed as late as conceivably possible to indicate that the
-   * application is ready to service requests.
-   */
-  @Override
-  public void onApplicationEvent(final ApplicationReadyEvent event) {
-    registerOnEureka();
-  }
+	/**
+	 * This event is executed as late as conceivably possible to indicate that the
+	 * application is ready to service requests.
+	 */
+	@Override
+	public void onApplicationEvent(final ApplicationReadyEvent event) {
+		registerOnEureka();
+	}
 
-  private void registerOnEureka() {
-    AppsApi apiInstance = new AppsApi();
-    try {
-      apiInstance.register();
-    } catch (ApiException e) {
-      e.printStackTrace();
-    }
-  }
+	private void registerOnEureka() {
+		AppsApi apiInstance = new AppsApi();
+		try {
+			apiInstance.register();
+		}
+		catch (ApiException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

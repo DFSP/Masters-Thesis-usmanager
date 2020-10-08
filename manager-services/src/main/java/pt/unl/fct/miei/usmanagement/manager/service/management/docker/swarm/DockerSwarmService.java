@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.service.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.service.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.service.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeConstants;

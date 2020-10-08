@@ -25,4 +25,4 @@
 import {Search} from "history";
 
 export const isNew = (search: Search) =>
-  new URLSearchParams(search).get('new') === 'true';
+    new URLSearchParams(search).get('new') === 'true';

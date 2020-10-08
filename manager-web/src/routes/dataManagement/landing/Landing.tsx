@@ -26,8 +26,8 @@ import React from 'react';
 import MainLayout from '../../../views/mainLayout/MainLayout';
 
 const Landing = () =>
-  <MainLayout>
+    <MainLayout>
 
-  </MainLayout>;
+    </MainLayout>;
 
 export default Landing;

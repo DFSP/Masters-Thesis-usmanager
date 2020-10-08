@@ -34,93 +34,93 @@ import {AxiosError} from "axios";
 import BaseComponent from "../../components/BaseComponent";
 
 interface State {
-  username: string;
-  password: string;
-  showPassword: boolean;
+    username: string;
+    password: string;
+    showPassword: boolean;
 }
 
 interface DispatchToProps {
-  showSidenavByUser: (value: boolean) => void;
+    showSidenavByUser: (value: boolean) => void;
 }
 
 type Props = DispatchToProps & RouteComponentProps;
 
 class Login extends BaseComponent<Props, State> {
 
-  state = {
-    username: '',
-    password: '',
-    showPassword: false,
-  };
-  private tabs = createRef<HTMLUListElement>();
+    state = {
+        username: '',
+        password: '',
+        showPassword: false,
+    };
+    private tabs = createRef<HTMLUListElement>();
 
-  public componentDidMount(): void {
-    M.Tabs.init(this.tabs.current as Element);
-    M.updateTextFields();
-  }
-
-  public render() {
-    if (isAuthenticated()) {
-      this.props.history.push(`/home`);
+    public componentDidMount(): void {
+        M.Tabs.init(this.tabs.current as Element);
+        M.updateTextFields();
     }
-    const {username, password, showPassword} = this.state;
-    return (
-      <div className={`container ${styles.container} row`}>
-        <ul className={`tabs ${styles.tabs} col s9 m6 l6 offset-s1 offset-m3 offset-l3`} ref={this.tabs}>
-          <li className={`tab col s12`}><a className={styles.title}>Enter your credentials</a></li>
-        </ul>
-        <div className={`tab-content ${styles.tabContent} col s9 m6 l6 offset-s1 offset-m3 offset-l3`}>
-          <form onSubmit={this.handleLogin}>
-            <div className="input-field col s12">
-              <i className="material-icons prefix">account_circle</i>
-              <label className="active" htmlFor="username">Username</label>
-              <input id="username" name="username" value={username}
-                     type="text" required onChange={this.handleChange}/>
+
+    public render() {
+        if (isAuthenticated()) {
+            this.props.history.push(`/home`);
+        }
+        const {username, password, showPassword} = this.state;
+        return (
+            <div className={`container ${styles.container} row`}>
+                <ul className={`tabs ${styles.tabs} col s9 m6 l6 offset-s1 offset-m3 offset-l3`} ref={this.tabs}>
+                    <li className={`tab col s12`}><a className={styles.title}>Enter your credentials</a></li>
+                </ul>
+                <div className={`tab-content ${styles.tabContent} col s9 m6 l6 offset-s1 offset-m3 offset-l3`}>
+                    <form onSubmit={this.handleLogin}>
+                        <div className="input-field col s12">
+                            <i className="material-icons prefix">account_circle</i>
+                            <label className="active" htmlFor="username">Username</label>
+                            <input id="username" name="username" value={username}
+                                   type="text" required onChange={this.handleChange}/>
+                        </div>
+                        <div className="input-field col s12">
+                            <i className="material-icons prefix">vpn_key</i>
+                            <label className="active" htmlFor="password">Password</label>
+                            <input id="password" name="password" value={password}
+                                   autoComplete="off"
+                                   type={showPassword ? "text" : "password"}
+                                   required
+                                   onChange={this.handleChange}/>
+                            <i className="material-icons suffix" onClick={this.handleShowPassword}>
+                                {showPassword ? "visibility_off" : "visibility"}
+                            </i>
+                        </div>
+                        <button className="btn btn-flat waves-effect waves-light white-text right slide"
+                                type="submit" tabIndex={0} onClick={this.handleLogin}>
+                            Login
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div className="input-field col s12">
-              <i className="material-icons prefix">vpn_key</i>
-              <label className="active" htmlFor="password">Password</label>
-              <input id="password" name="password" value={password}
-                     autoComplete="off"
-                     type={showPassword ? "text" : "password"}
-                     required
-                     onChange={this.handleChange}/>
-              <i className="material-icons suffix" onClick={this.handleShowPassword}>
-                {showPassword ? "visibility_off" : "visibility"}
-              </i>
-            </div>
-            <button className="btn btn-flat waves-effect waves-light white-text right slide"
-                    type="submit" tabIndex={0} onClick={this.handleLogin}>
-              Login
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+        );
+    }
 
-  private handleChange = ({target: {name, value}}: React.ChangeEvent<HTMLInputElement>) =>
-    this.setState({[name]: value} as Pick<State, any>);
+    private handleChange = ({target: {name, value}}: React.ChangeEvent<HTMLInputElement>) =>
+        this.setState({[name]: value} as Pick<State, any>);
 
-  private handleShowPassword = () =>
-    this.setState({showPassword: !this.state.showPassword});
+    private handleShowPassword = () =>
+        this.setState({showPassword: !this.state.showPassword});
 
-  private handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const {username, password} = this.state;
-    basicAuthenticate(username, password)
-      .then(() => {
-        registerSuccessfulLogin(username, password);
-        super.toast(`Welcome ${username}`, undefined, undefined, true, true);
-        this.props.history.push(`/home`);
-      }).catch((e: AxiosError) => {
-      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true, true);
-    })
-  };
+    private handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        const {username, password} = this.state;
+        basicAuthenticate(username, password)
+            .then(() => {
+                registerSuccessfulLogin(username, password);
+                super.toast(`Welcome ${username}`, undefined, undefined, true, true);
+                this.props.history.push(`/home`);
+            }).catch((e: AxiosError) => {
+            super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true, true);
+        })
+    };
 
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({showSidenavByUser}, dispatch);
+    bindActionCreators({showSidenavByUser}, dispatch);
 
 export default connect(null, mapDispatchToProps)(Login);

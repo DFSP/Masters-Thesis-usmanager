@@ -126,11 +126,12 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                         </div>
                     )}
                     {this.props.delete != undefined
-                    && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id} >
-                        <MenuItem className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
-                                  data={this.props.link?.to.state}
-                                  disabled={loading}
-                                  onClick={confirmationDialog ? undefined : this.onDelete}>
+                    && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id}>
+                        <MenuItem
+                            className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
+                            data={this.props.link?.to.state}
+                            disabled={loading}
+                            onClick={confirmationDialog ? undefined : this.onDelete}>
                             {this.props.delete.textButton || 'Delete'}
                         </MenuItem>
                     </div>}

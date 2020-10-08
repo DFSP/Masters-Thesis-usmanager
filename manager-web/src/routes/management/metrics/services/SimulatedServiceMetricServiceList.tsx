@@ -32,166 +32,166 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {
-  loadServices,
-  loadSimulatedServiceMetricServices,
-  removeSimulatedServiceMetricServices,
+    loadServices,
+    loadSimulatedServiceMetricServices,
+    removeSimulatedServiceMetricServices,
 } from "../../../../actions";
 import {IService} from "../../services/Service";
 import {ISimulatedServiceMetric} from "./SimulatedServiceMetric";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  services: { [key: string]: IService },
-  simulatedMetricServices: string[];
+    isLoading: boolean;
+    error?: string | null;
+    services: { [key: string]: IService },
+    simulatedMetricServices: string[];
 }
 
 interface DispatchToProps {
-  loadServices: () => void;
-  loadSimulatedServiceMetricServices: (name: string) => void;
-  removeSimulatedServiceMetricServices: (name: string, services: string[]) => void;
+    loadServices: () => void;
+    loadSimulatedServiceMetricServices: (name: string) => void;
+    removeSimulatedServiceMetricServices: (name: string, services: string[]) => void;
 }
 
 interface SimulatedServiceMetricServiceListProps {
-  isLoadingSimulatedServiceMetric: boolean;
-  loadSimulatedServiceMetricError?: string | null;
-  simulatedServiceMetric: ISimulatedServiceMetric | Partial<ISimulatedServiceMetric> | null;
-  unsavedServices: string[];
-  onAddService: (service: string) => void;
-  onRemoveServices: (service: string[]) => void;
+    isLoadingSimulatedServiceMetric: boolean;
+    loadSimulatedServiceMetricError?: string | null;
+    simulatedServiceMetric: ISimulatedServiceMetric | Partial<ISimulatedServiceMetric> | null;
+    unsavedServices: string[];
+    onAddService: (service: string) => void;
+    onRemoveServices: (service: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & SimulatedServiceMetricServiceListProps;
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadServices();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.simulatedServiceMetric === undefined && this.props.simulatedServiceMetric?.name !== undefined) {
-      this.loadEntities();
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-    if (!prevProps.simulatedServiceMetric?.name && this.props.simulatedServiceMetric?.name) {
-      this.setState({entitySaved: true});
+
+    public componentDidMount(): void {
+        this.props.loadServices();
+        this.loadEntities();
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList
-      isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
-      error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
-      emptyMessage={`Services list is empty`}
-      data={this.props.simulatedMetricServices}
-      dropdown={{
-        id: 'services',
-        title: 'Add service',
-        empty: 'No services to add',
-        data: this.getSelectableServices()
-      }}
-      show={this.service}
-      onAdd={this.onAdd}
-      onRemove={this.onRemove}
-      onDelete={{
-        url: `simulated-metrics/services/${this.props.simulatedServiceMetric?.name}/services`,
-        successCallback: this.onDeleteSuccess,
-        failureCallback: this.onDeleteFailure
-      }}
-      entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    if (this.props.simulatedServiceMetric?.name) {
-      const {name} = this.props.simulatedServiceMetric;
-      this.props.loadSimulatedServiceMetricServices(name);
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.simulatedServiceMetric === undefined && this.props.simulatedServiceMetric?.name !== undefined) {
+            this.loadEntities();
+        }
+        if (!prevProps.simulatedServiceMetric?.name && this.props.simulatedServiceMetric?.name) {
+            this.setState({entitySaved: true});
+        }
     }
-  };
 
-  private isNew = () =>
-    this.props.simulatedServiceMetric?.name === undefined;
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList
+            isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
+            error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
+            emptyMessage={`Services list is empty`}
+            data={this.props.simulatedMetricServices}
+            dropdown={{
+                id: 'services',
+                title: 'Add service',
+                empty: 'No services to add',
+                data: this.getSelectableServices()
+            }}
+            show={this.service}
+            onAdd={this.onAdd}
+            onRemove={this.onRemove}
+            onDelete={{
+                url: `simulated-metrics/services/${this.props.simulatedServiceMetric?.name}/services`,
+                successCallback: this.onDeleteSuccess,
+                failureCallback: this.onDeleteFailure
+            }}
+            entitySaved={this.state.entitySaved}/>;
+    }
 
-  private service = (index: number, service: string, separate: boolean, checked: boolean,
-                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedServices.includes(service);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={`${styles.linkedItemContent}`}>
-          <label>
-            <input id={service}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    private loadEntities = () => {
+        if (this.props.simulatedServiceMetric?.name) {
+            const {name} = this.props.simulatedServiceMetric;
+            this.props.loadSimulatedServiceMetricServices(name);
+        }
+    };
+
+    private isNew = () =>
+        this.props.simulatedServiceMetric?.name === undefined;
+
+    private service = (index: number, service: string, separate: boolean, checked: boolean,
+                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedServices.includes(service);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={`${styles.linkedItemContent}`}>
+                    <label>
+                        <input id={service}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
                <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {service}
                </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/services/${service}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/services/${service}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (service: string): void =>
-    this.props.onAddService(service);
+    private onAdd = (service: string): void =>
+        this.props.onAddService(service);
 
-  private onRemove = (service: string[]) =>
-    this.props.onRemoveServices(service);
+    private onRemove = (service: string[]) =>
+        this.props.onRemoveServices(service);
 
-  private onDeleteSuccess = (service: string[]): void => {
-    if (this.props.simulatedServiceMetric?.name) {
-      const {name} = this.props.simulatedServiceMetric;
-      this.props.removeSimulatedServiceMetricServices(name, service);
-    }
-  };
+    private onDeleteSuccess = (service: string[]): void => {
+        if (this.props.simulatedServiceMetric?.name) {
+            const {name} = this.props.simulatedServiceMetric;
+            this.props.removeSimulatedServiceMetricServices(name, service);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to remove service`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to remove service`, 10000, reason, true);
 
-  private getSelectableServices = () => {
-    const {services, simulatedMetricServices, unsavedServices} = this.props;
-    return Object.keys(services).filter(service => !simulatedMetricServices.includes(service)
-                                                   && !unsavedServices.includes(service));
-  };
+    private getSelectableServices = () => {
+        const {services, simulatedMetricServices, unsavedServices} = this.props;
+        return Object.keys(services).filter(service => !simulatedMetricServices.includes(service)
+            && !unsavedServices.includes(service));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: SimulatedServiceMetricServiceListProps): StateToProps {
-  const name = ownProps.simulatedServiceMetric?.name;
-  const simulatedMetric = name && state.entities.simulatedMetrics.services.data[name];
-  const simulatedMetricServices = simulatedMetric && simulatedMetric.services;
-  return {
-    isLoading: state.entities.simulatedMetrics.services.isLoadingServices,
-    error: state.entities.simulatedMetrics.services.loadServicesError,
-    services: state.entities.services.data,
-    simulatedMetricServices: simulatedMetricServices || [],
-  }
+    const name = ownProps.simulatedServiceMetric?.name;
+    const simulatedMetric = name && state.entities.simulatedMetrics.services.data[name];
+    const simulatedMetricServices = simulatedMetric && simulatedMetric.services;
+    return {
+        isLoading: state.entities.simulatedMetrics.services.isLoadingServices,
+        error: state.entities.simulatedMetrics.services.loadServicesError,
+        services: state.entities.services.data,
+        simulatedMetricServices: simulatedMetricServices || [],
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadServices,
-    loadSimulatedServiceMetricServices,
-    removeSimulatedServiceMetricServices,
-  }, dispatch);
+    bindActionCreators({
+        loadServices,
+        loadSimulatedServiceMetricServices,
+        removeSimulatedServiceMetricServices,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimulatedServiceMetricServiceList);

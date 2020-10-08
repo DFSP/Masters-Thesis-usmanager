@@ -32,53 +32,53 @@ import {loadWorkerManagers} from "../../../actions";
 import WorkerManagerCard from "./WorkerManagerCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  workerManagers: IWorkerManager[];
+    isLoading: boolean
+    error?: string | null;
+    workerManagers: IWorkerManager[];
 }
 
 interface DispatchToProps {
-  loadWorkerManagers: () => void;
+    loadWorkerManagers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class WorkerManagersList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadWorkerManagers();
-  }
+    public componentDidMount(): void {
+        this.props.loadWorkerManagers();
+    }
 
-  public render() {
-    return (
-      <CardList<IWorkerManager>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No worker-managers to display"}
-        list={this.props.workerManagers}
-        card={this.workerManager}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IWorkerManager>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No worker-managers to display"}
+                list={this.props.workerManagers}
+                card={this.workerManager}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private workerManager = (workerManager: IWorkerManager): JSX.Element =>
-    <WorkerManagerCard key={workerManager.id} workerManager={workerManager}/>;
+    private workerManager = (workerManager: IWorkerManager): JSX.Element =>
+        <WorkerManagerCard key={workerManager.id} workerManager={workerManager}/>;
 
-  private predicate = (workerManager: IWorkerManager, search: string): boolean =>
-    workerManager.id.toString().toLowerCase().includes(search);
+    private predicate = (workerManager: IWorkerManager, search: string): boolean =>
+        workerManager.id.toString().toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
-    error: state.entities.workerManagers.loadWorkerManagersError,
-    workerManagers: (state.entities.workerManagers.data && Object.values(state.entities.workerManagers.data)) || [],
-  }
+    {
+        isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
+        error: state.entities.workerManagers.loadWorkerManagersError,
+        workerManagers: (state.entities.workerManagers.data && Object.values(state.entities.workerManagers.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadWorkerManagers,
+    loadWorkerManagers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WorkerManagersList);

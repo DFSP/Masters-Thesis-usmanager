@@ -32,53 +32,53 @@ import {loadLoadBalancers} from "../../../actions";
 import LoadBalancerCard from "./LoadBalancerCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  loadBalancers: ILoadBalancer[];
+    isLoading: boolean
+    error?: string | null;
+    loadBalancers: ILoadBalancer[];
 }
 
 interface DispatchToProps {
-  loadLoadBalancers: () => void;
+    loadLoadBalancers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class LoadBalancersList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadLoadBalancers();
-  }
+    public componentDidMount(): void {
+        this.props.loadLoadBalancers();
+    }
 
-  public render() {
-    return (
-      <CardList<ILoadBalancer>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No load-balancers to display"}
-        list={this.props.loadBalancers}
-        card={this.loadBalancer}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<ILoadBalancer>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No load-balancers to display"}
+                list={this.props.loadBalancers}
+                card={this.loadBalancer}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
-    <LoadBalancerCard key={loadBalancer.containerId} loadBalancer={loadBalancer}/>;
+    private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
+        <LoadBalancerCard key={loadBalancer.containerId} loadBalancer={loadBalancer}/>;
 
-  private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
-    loadBalancer.publicIpAddress.toLowerCase().includes(search);
+    private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
+        loadBalancer.publicIpAddress.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.loadBalancers.isLoadingLoadBalancers,
-    error: state.entities.loadBalancers.loadLoadBalancersError,
-    loadBalancers: (state.entities.loadBalancers.data && Object.values(state.entities.loadBalancers.data)) || [],
-  }
+    {
+        isLoading: state.entities.loadBalancers.isLoadingLoadBalancers,
+        error: state.entities.loadBalancers.loadLoadBalancersError,
+        loadBalancers: (state.entities.loadBalancers.data && Object.values(state.entities.loadBalancers.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadLoadBalancers,
+    loadLoadBalancers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadBalancersList);

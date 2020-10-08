@@ -32,54 +32,54 @@ import {loadEdgeHosts} from "../../../../actions";
 import EdgeHostCard from "./EdgeHostCard";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  edgeHosts: IEdgeHost[];
+    isLoading: boolean
+    error?: string | null;
+    edgeHosts: IEdgeHost[];
 }
 
 interface DispatchToProps {
-  loadEdgeHosts: (hostname?: string) => any;
+    loadEdgeHosts: (hostname?: string) => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class EdgeHostsList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadEdgeHosts();
-  }
+    public componentDidMount(): void {
+        this.props.loadEdgeHosts();
+    }
 
-  public render() {
-    return (
-      <CardList<IEdgeHost>
-        isLoading={this.props.isLoading}
-        error={this.props.error}
-        emptyMessage={"No edge hosts to display"}
-        list={this.props.edgeHosts}
-        card={this.edgeHost}
-        predicate={this.predicate}/>
-    );
-  }
+    public render() {
+        return (
+            <CardList<IEdgeHost>
+                isLoading={this.props.isLoading}
+                error={this.props.error}
+                emptyMessage={"No edge hosts to display"}
+                list={this.props.edgeHosts}
+                card={this.edgeHost}
+                predicate={this.predicate}/>
+        );
+    }
 
-  private edgeHost = (host: IEdgeHost): JSX.Element =>
-    <EdgeHostCard key={host.id} edgeHost={host}/>;
+    private edgeHost = (host: IEdgeHost): JSX.Element =>
+        <EdgeHostCard key={host.id} edgeHost={host}/>;
 
-  private predicate = (host: IEdgeHost, search: string): boolean =>
-    (!!host.publicDnsName && host.publicDnsName.toLowerCase().includes(search))
-    || (!!host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search));
+    private predicate = (host: IEdgeHost, search: string): boolean =>
+        (!!host.publicDnsName && host.publicDnsName.toLowerCase().includes(search))
+        || (!!host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search));
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.hosts.edge.isLoadingHosts,
-    error: state.entities.hosts.edge.loadHostsError,
-    edgeHosts: (state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data)) || [],
-  }
+    {
+        isLoading: state.entities.hosts.edge.isLoadingHosts,
+        error: state.entities.hosts.edge.loadHostsError,
+        edgeHosts: (state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadEdgeHosts,
+    loadEdgeHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHostsList);

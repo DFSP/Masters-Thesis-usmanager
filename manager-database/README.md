@@ -17,7 +17,7 @@ Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/
  ## Executar   
  
 ```shell script
- mvn -DskipTests install
+mvn clean install -DskipTests -U
 ```
 
 ## Para incluir a dependência 

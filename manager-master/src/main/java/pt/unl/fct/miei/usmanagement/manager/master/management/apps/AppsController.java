@@ -24,7 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
@@ -80,29 +87,25 @@ public final class AppsController {
 	}
 
 	@PostMapping("/{appName}/services")
-	public void addAppServices(@PathVariable String appName,
-							   @RequestBody AddAppService[] services) {
+	public void addAppServices(@PathVariable String appName, @RequestBody AddAppService[] services) {
 		Map<String, Integer> serviceOrders = Arrays.stream(services).collect(
 			Collectors.toMap(addAppService -> addAppService.getService().getServiceName(), AddAppService::getLaunchOrder));
 		appsService.addServices(appName, serviceOrders);
 	}
 
 	@DeleteMapping("/{appName}/services")
-	public void removeAppServices(@PathVariable String appName,
-								  @RequestBody String[] services) {
+	public void removeAppServices(@PathVariable String appName, @RequestBody String[] services) {
 		appsService.removeServices(appName, Arrays.asList(services));
 	}
 
 	@DeleteMapping("/{appName}/services/{serviceName}")
-	public void removeAppService(@PathVariable String appName,
-								 @PathVariable String serviceName) {
+	public void removeAppService(@PathVariable String appName, @PathVariable String serviceName) {
 		appsService.removeService(appName, serviceName);
 	}
 
 	//TODO fix client
 	@PostMapping("/{appName}/launch")
-	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName,
-													 @RequestBody Coordinates coordinates) {
+	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
 		return appsService.launch(appName, coordinates);
 	}
 

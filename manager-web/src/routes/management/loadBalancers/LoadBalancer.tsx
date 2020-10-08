@@ -46,248 +46,248 @@ export interface ILoadBalancer extends IContainer {
 }
 
 interface INewLoadBalancer {
-  service: IService | undefined,
-  regions: string[] | undefined
+    service: IService | undefined,
+    regions: string[] | undefined
 }
 
 const buildNewLoadBalancer = (): INewLoadBalancer => ({
-  service: undefined,
-  regions: undefined
+    service: undefined,
+    regions: undefined
 });
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  newLoadBalancer?: INewLoadBalancer;
-  loadBalancer?: ILoadBalancer;
-  formLoadBalancer?: Partial<ILoadBalancer> | INewLoadBalancer;
-  services: { [key: string]: IService };
-  regions: { [key: string]: IRegion };
+    isLoading: boolean;
+    error?: string | null;
+    newLoadBalancer?: INewLoadBalancer;
+    loadBalancer?: ILoadBalancer;
+    formLoadBalancer?: Partial<ILoadBalancer> | INewLoadBalancer;
+    services: { [key: string]: IService };
+    regions: { [key: string]: IRegion };
 }
 
 interface DispatchToProps {
-  loadLoadBalancers: (id: string) => void;
-  addLoadBalancer: (loadBalancer: ILoadBalancer) => void;
-  loadServices: () => void;
-  loadRegions: () => void;
+    loadLoadBalancers: (id: string) => void;
+    addLoadBalancer: (loadBalancer: ILoadBalancer) => void;
+    loadServices: () => void;
+    loadRegions: () => void;
 }
 
 interface MatchParams {
-  id: string;
+    id: string;
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 interface State {
-  loadBalancer?: ILoadBalancer,
-  formLoadBalancer?: ILoadBalancer,
+    loadBalancer?: ILoadBalancer,
+    formLoadBalancer?: ILoadBalancer,
 }
 
 class LoadBalancer extends BaseComponent<Props, State> {
 
-  state: State = {};
-  private mounted = false;
+    state: State = {};
+    private mounted = false;
 
-  public componentDidMount(): void {
-    this.loadLoadBalancer();
-    this.props.loadServices();
-    this.props.loadRegions();
-    this.mounted = true;
-  }
-
-  componentWillUnmount(): void {
-    this.mounted = false;
-  }
-
-  public render() {
-    return (
-      <MainLayout>
-        <div className="container">
-          <Tabs {...this.props} tabs={this.tabs()}/>
-        </div>
-      </MainLayout>
-    );
-  }
-
-  private loadLoadBalancer = () => {
-    if (!isNew(this.props.location.search)) {
-      const loadBalancerId = this.props.match.params.id;
-      this.props.loadLoadBalancers(loadBalancerId);
+    public componentDidMount(): void {
+        this.loadLoadBalancer();
+        this.props.loadServices();
+        this.props.loadRegions();
+        this.mounted = true;
     }
-  };
 
-  private getLoadBalancer = () =>
-    this.state.loadBalancer || this.props.loadBalancer;
-
-  private getFormLoadBalancer = () =>
-    this.state.formLoadBalancer || this.props.formLoadBalancer;
-
-  private isNew = () =>
-    isNew(this.props.location.search);
-
-  private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
-    const loadBalancers = reply.data;
-    loadBalancers.forEach(loadBalancer => {
-      super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
-      this.props.addLoadBalancer(loadBalancer);
-    });
-    if (this.mounted) {
-      if (loadBalancers.length === 1) {
-        const loadBalancer = loadBalancers[0];
-        this.updateLoadBalancer(loadBalancer);
-        this.props.history.replace(loadBalancer.containerId)
-      } else {
-        this.props.history.push('/load-balancers');
-      }
+    componentWillUnmount(): void {
+        this.mounted = false;
     }
-  };
 
-  private onPostFailure = (reason: string): void =>
-    super.toast(`Unable to launch load-balancer`, 10000, reason, true);
-
-  private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
-    super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
-    if (this.mounted) {
-      this.props.history.push(`/load-balancers`)
+    public render() {
+        return (
+            <MainLayout>
+                <div className="container">
+                    <Tabs {...this.props} tabs={this.tabs()}/>
+                </div>
+            </MainLayout>
+        );
     }
-  };
 
-  private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
-    super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
-
-  private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
-    loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
-    const formLoadBalancer = {...loadBalancer};
-    removeFields(formLoadBalancer);
-    this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});
-  };
-
-  private getFields = (loadBalancer: Partial<ILoadBalancer> | INewLoadBalancer): IFields =>
-    Object.entries(loadBalancer).map(([key, value]) => {
-      return {
-        [key]: {
-          id: key,
-          label: key,
-          validation: getTypeFromValue(value) === 'number'
-            ? {rule: requiredAndNumberAndMin, args: 0}
-            : {rule: requiredAndTrimmed}
+    private loadLoadBalancer = () => {
+        if (!isNew(this.props.location.search)) {
+            const loadBalancerId = this.props.match.params.id;
+            this.props.loadLoadBalancers(loadBalancerId);
         }
-      };
-    }).reduce((fields, field) => {
-      for (let key in field) {
-        fields[key] = field[key];
-      }
-      return fields;
-    }, {});
+    };
 
-  private getSelectableServices = () =>
-    Object.entries(this.props.services)
-          .filter(([_, service]) => service.serviceType.toLowerCase() === 'frontend')
-          .map(([key, _]) => key);
+    private getLoadBalancer = () =>
+        this.state.loadBalancer || this.props.loadBalancer;
 
-  private loadBalancer = () => {
-    const {isLoading, error, newLoadBalancer} = this.props;
-    const loadBalancer = this.getLoadBalancer();
-    const formLoadBalancer = this.getFormLoadBalancer();
-    // @ts-ignore
-    const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
-    const isNewLoadBalancer = this.isNew();
-    return (
-      <>
-        {!isNewLoadBalancer && isLoading && <ListLoadingSpinner/>}
-        {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
-        {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && formLoadBalancer && (
-          <Form id={loadBalancerKey}
-                fields={this.getFields(formLoadBalancer || {})}
-                values={loadBalancer || newLoadBalancer || {}}
-                isNew={isNew(this.props.location.search)}
-                post={{
-                  textButton: 'launch',
-                  url: 'load-balancer',
-                  successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure
-                }}
-                delete={{
-                  textButton: 'Stop',
-                  url: `containers/${loadBalancer?.containerId}`,
-                  successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure
-                }}>
-            {Object.entries(formLoadBalancer).map((([key, value], index) =>
-                key === 'service'
-                  ? <Field key={index}
-                           id={key}
-                           label={key}
-                           type={'dropdown'}
-                           dropdown={{
-                             defaultValue: "Select service",
-                             values: this.getSelectableServices()
-                           }}/>
-                  : key === 'regions'
-                  ? <Field key={index}
-                           id={key}
-                           label={key}
-                           type={'list'}
-                           value={value}/>
-                  : <Field key={index}
-                           id={key}
-                           label={key}/>
-            ))}
-          </Form>
-        )}
-      </>
-    )
-  };
+    private getFormLoadBalancer = () =>
+        this.state.formLoadBalancer || this.props.formLoadBalancer;
 
-  private tabs = (): Tab[] => [
-    {
-      title: 'Load balancer',
-      id: 'loadBalancer',
-      content: () => this.loadBalancer()
-    },
-  ];
+    private isNew = () =>
+        isNew(this.props.location.search);
+
+    private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
+        const loadBalancers = reply.data;
+        loadBalancers.forEach(loadBalancer => {
+            super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
+            this.props.addLoadBalancer(loadBalancer);
+        });
+        if (this.mounted) {
+            if (loadBalancers.length === 1) {
+                const loadBalancer = loadBalancers[0];
+                this.updateLoadBalancer(loadBalancer);
+                this.props.history.replace(loadBalancer.containerId)
+            } else {
+                this.props.history.push('/load-balancers');
+            }
+        }
+    };
+
+    private onPostFailure = (reason: string): void =>
+        super.toast(`Unable to launch load-balancer`, 10000, reason, true);
+
+    private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
+        super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
+        if (this.mounted) {
+            this.props.history.push(`/load-balancers`)
+        }
+    };
+
+    private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
+        super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
+
+    private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
+        loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
+        const formLoadBalancer = {...loadBalancer};
+        removeFields(formLoadBalancer);
+        this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});
+    };
+
+    private getFields = (loadBalancer: Partial<ILoadBalancer> | INewLoadBalancer): IFields =>
+        Object.entries(loadBalancer).map(([key, value]) => {
+            return {
+                [key]: {
+                    id: key,
+                    label: key,
+                    validation: getTypeFromValue(value) === 'number'
+                        ? {rule: requiredAndNumberAndMin, args: 0}
+                        : {rule: requiredAndTrimmed}
+                }
+            };
+        }).reduce((fields, field) => {
+            for (let key in field) {
+                fields[key] = field[key];
+            }
+            return fields;
+        }, {});
+
+    private getSelectableServices = () =>
+        Object.entries(this.props.services)
+            .filter(([_, service]) => service.serviceType.toLowerCase() === 'frontend')
+            .map(([key, _]) => key);
+
+    private loadBalancer = () => {
+        const {isLoading, error, newLoadBalancer} = this.props;
+        const loadBalancer = this.getLoadBalancer();
+        const formLoadBalancer = this.getFormLoadBalancer();
+        // @ts-ignore
+        const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
+        const isNewLoadBalancer = this.isNew();
+        return (
+            <>
+                {!isNewLoadBalancer && isLoading && <ListLoadingSpinner/>}
+                {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
+                {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && formLoadBalancer && (
+                    <Form id={loadBalancerKey}
+                          fields={this.getFields(formLoadBalancer || {})}
+                          values={loadBalancer || newLoadBalancer || {}}
+                          isNew={isNew(this.props.location.search)}
+                          post={{
+                              textButton: 'launch',
+                              url: 'load-balancer',
+                              successCallback: this.onPostSuccess,
+                              failureCallback: this.onPostFailure
+                          }}
+                          delete={{
+                              textButton: 'Stop',
+                              url: `containers/${loadBalancer?.containerId}`,
+                              successCallback: this.onDeleteSuccess,
+                              failureCallback: this.onDeleteFailure
+                          }}>
+                        {Object.entries(formLoadBalancer).map((([key, value], index) =>
+                                key === 'service'
+                                    ? <Field key={index}
+                                             id={key}
+                                             label={key}
+                                             type={'dropdown'}
+                                             dropdown={{
+                                                 defaultValue: "Select service",
+                                                 values: this.getSelectableServices()
+                                             }}/>
+                                    : key === 'regions'
+                                    ? <Field key={index}
+                                             id={key}
+                                             label={key}
+                                             type={'list'}
+                                             value={value}/>
+                                    : <Field key={index}
+                                             id={key}
+                                             label={key}/>
+                        ))}
+                    </Form>
+                )}
+            </>
+        )
+    };
+
+    private tabs = (): Tab[] => [
+        {
+            title: 'Load balancer',
+            id: 'loadBalancer',
+            content: () => this.loadBalancer()
+        },
+    ];
 
 }
 
 function removeFields(loadBalancer: Partial<ILoadBalancer>) {
-  delete loadBalancer["id"];
-  delete loadBalancer["ports"];
-  delete loadBalancer["labels"];
-  delete loadBalancer["logs"];
+    delete loadBalancer["id"];
+    delete loadBalancer["ports"];
+    delete loadBalancer["labels"];
+    delete loadBalancer["logs"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.loadBalancers.isLoadingLoadBalancers;
-  const error = state.entities.loadBalancers.loadLoadBalancersError;
-  const id = props.match.params.id;
-  const newLoadBalancer = isNew(props.location.search) ? buildNewLoadBalancer() : undefined;
-  const loadBalancer = !isNew(props.location.search) ? state.entities.loadBalancers.data[id] : undefined;
-  const regions = state.entities.regions.data;
-  let formLoadBalancer;
-  if (newLoadBalancer) {
-    formLoadBalancer = {...newLoadBalancer, regions: Object.keys(regions)};
-  }
-  if (loadBalancer) {
-    formLoadBalancer = {...loadBalancer};
-    removeFields(formLoadBalancer);
-  }
-  const services = state.entities.services.data;
-  return {
-    isLoading,
-    error,
-    newLoadBalancer,
-    loadBalancer,
-    formLoadBalancer,
-    services,
-    regions
-  }
+    const isLoading = state.entities.loadBalancers.isLoadingLoadBalancers;
+    const error = state.entities.loadBalancers.loadLoadBalancersError;
+    const id = props.match.params.id;
+    const newLoadBalancer = isNew(props.location.search) ? buildNewLoadBalancer() : undefined;
+    const loadBalancer = !isNew(props.location.search) ? state.entities.loadBalancers.data[id] : undefined;
+    const regions = state.entities.regions.data;
+    let formLoadBalancer;
+    if (newLoadBalancer) {
+        formLoadBalancer = {...newLoadBalancer, regions: Object.keys(regions)};
+    }
+    if (loadBalancer) {
+        formLoadBalancer = {...loadBalancer};
+        removeFields(formLoadBalancer);
+    }
+    const services = state.entities.services.data;
+    return {
+        isLoading,
+        error,
+        newLoadBalancer,
+        loadBalancer,
+        formLoadBalancer,
+        services,
+        regions
+    }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-  loadLoadBalancers,
-  addLoadBalancer,
-  loadServices,
-  loadRegions,
+    loadLoadBalancers,
+    addLoadBalancer,
+    loadServices,
+    loadRegions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadBalancer);

@@ -30,34 +30,34 @@ import React from "react";
 import {INode} from "./Node";
 
 interface PortsListProps {
-  isLoadingNode: boolean;
-  loadNodeError?: string | null;
-  node?: INode | null;
+    isLoadingNode: boolean;
+    loadNodeError?: string | null;
+    node?: INode | null;
 }
 
 type Props = PortsListProps;
 
 export default class NodeLabelsList extends BaseComponent<Props, {}> {
 
-  public render() {
-    const LabelsList = List<string>();
-    return (
-      <LabelsList isLoading={this.props.isLoadingNode}
-                  error={this.props.loadNodeError}
-                  emptyMessage={`No labels associated`}
-                  list={this.labels()}
-                  show={this.label}/>
-    );
-  }
+    public render() {
+        const LabelsList = List<string>();
+        return (
+            <LabelsList isLoading={this.props.isLoadingNode}
+                        error={this.props.loadNodeError}
+                        emptyMessage={`No labels associated`}
+                        list={this.labels()}
+                        show={this.label}/>
+        );
+    }
 
-  private labels = (): string[] =>
-    Object.entries(this.props.node?.labels || []).map(([key, value]) => `${key} = ${value}`);
+    private labels = (): string[] =>
+        Object.entries(this.props.node?.labels || []).map(([key, value]) => `${key} = ${value}`);
 
-  private label = (label: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.labels().length - 1}>
-      <div className={`${styles.listItemContent}`}>
-        <span>{label}</span>
-      </div>
-    </ListItem>;
+    private label = (label: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.labels().length - 1}>
+            <div className={`${styles.listItemContent}`}>
+                <span>{label}</span>
+            </div>
+        </ListItem>;
 
 }

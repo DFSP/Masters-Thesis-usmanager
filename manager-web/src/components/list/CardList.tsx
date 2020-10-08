@@ -26,55 +26,55 @@ import List from "./List";
 import React from "react";
 
 interface Props<T> {
-  isLoading: boolean;
-  error?: string | null;
-  emptyMessage: string;
-  list: T[];
-  card: (element: T) => JSX.Element;
-  predicate?: (item: T, filter: string) => boolean;
+    isLoading: boolean;
+    error?: string | null;
+    emptyMessage: string;
+    list: T[];
+    card: (element: T) => JSX.Element;
+    predicate?: (item: T, filter: string) => boolean;
 }
 
 interface State {
-  pagesize: number;
+    pagesize: number;
 }
 
 export default class CardList<T> extends React.Component<Props<T>, State> {
 
-  constructor(props: Props<T>) {
-    super(props);
-    this.state = {
-      pagesize: this.calcPagesize()
+    constructor(props: Props<T>) {
+        super(props);
+        this.state = {
+            pagesize: this.calcPagesize()
+        }
     }
-  }
 
-  public componentDidMount(): void {
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  componentWillUnmount(): void {
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  public render() {
-    const GenericList = List<T>();
-    return <GenericList {...this.props}
-                        show={this.props.card}
-                        paginate={{pagesize: {initial: this.state.pagesize}}}/>
-  }
-
-  private handleResize = (_: Event) => {
-    this.setState({pagesize: this.calcPagesize()})
-  };
-
-  private calcPagesize = () => {
-    const width = window.innerWidth;
-    if (width <= 600) {
-      return 4;
-    } else if (width <= 992) {
-      return 6;
-    } else {
-      return 8;
+    public componentDidMount(): void {
+        window.addEventListener('resize', this.handleResize);
     }
-  };
+
+    componentWillUnmount(): void {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    public render() {
+        const GenericList = List<T>();
+        return <GenericList {...this.props}
+                            show={this.props.card}
+                            paginate={{pagesize: {initial: this.state.pagesize}}}/>
+    }
+
+    private handleResize = (_: Event) => {
+        this.setState({pagesize: this.calcPagesize()})
+    };
+
+    private calcPagesize = () => {
+        const width = window.innerWidth;
+        if (width <= 600) {
+            return 4;
+        } else if (width <= 992) {
+            return 6;
+        } else {
+            return 8;
+        }
+    };
 
 }

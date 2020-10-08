@@ -33,38 +33,38 @@ import {syncCloudHosts} from "../../../../actions";
 import {connect} from "react-redux";
 
 interface DispatchToProps {
-  syncCloudHosts: () => void;
+    syncCloudHosts: () => void;
 }
 
 type Props = DispatchToProps;
 
 class CloudHosts extends BaseComponent<Props, {}> {
 
-  public render() {
-    return (
-      <MainLayout>
-        <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
-                   pathname={'/hosts/cloud/new_instance?new=true'}
-                   offset={0}/>
-        <ActionButton icon={'sync'}
-                      tooltip={{text: 'Sync cloud instances', position: 'left'}}
-                      clickCallback={this.syncCloudInstances}
-                      offset={1}/>
-        <div className={`${styles.container}`}>
-          <CloudHostsList/>
-        </div>
-      </MainLayout>
-    );
-  }
+    public render() {
+        return (
+            <MainLayout>
+                <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
+                           pathname={'/hosts/cloud/new_instance?new=true'}
+                           offset={0}/>
+                <ActionButton icon={'sync'}
+                              tooltip={{text: 'Sync cloud instances', position: 'left'}}
+                              clickCallback={this.syncCloudInstances}
+                              offset={1}/>
+                <div className={`${styles.container}`}>
+                    <CloudHostsList/>
+                </div>
+            </MainLayout>
+        );
+    }
 
-  private syncCloudInstances = () => {
-    this.props.syncCloudHosts();
-  };
+    private syncCloudInstances = () => {
+        this.props.syncCloudHosts();
+    };
 
 }
 
 const mapDispatchToProps: DispatchToProps = {
-  syncCloudHosts,
+    syncCloudHosts,
 };
 
 export default connect(null, mapDispatchToProps)(CloudHosts);

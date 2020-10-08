@@ -27,7 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.database.hosts;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.io.Serializable;
 

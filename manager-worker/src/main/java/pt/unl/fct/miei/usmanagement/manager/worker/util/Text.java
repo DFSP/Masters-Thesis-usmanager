@@ -24,9 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.util;
 
-import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
+
+import java.util.Objects;
 
 @UtilityClass
 public class Text {

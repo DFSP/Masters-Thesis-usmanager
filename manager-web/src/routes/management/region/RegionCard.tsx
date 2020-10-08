@@ -26,7 +26,6 @@
 import Card from "../../../components/cards/Card";
 import React from "react";
 import BaseComponent from "../../../components/BaseComponent";
-import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
 import {EntitiesAction} from "../../../reducers/entities";
 import {connect} from "react-redux";
 import {IRegion} from "./Region";
@@ -85,18 +84,18 @@ class RegionCard extends BaseComponent<Props, State> {
         const {region} = this.props;
         const {loading} = this.state;
         const CardRegion = Card<IRegion>();
-        return  <CardRegion id={`region-${region.id}`}
-                            title={region.name}
-                            link={{to: {pathname: `/regions/${region.name}`, state: region}}}
-                            height={'125px'}
-                            margin={'10px 0'}
-                            hoverable
-                            delete={{
-                                url: `regions/${region.name}`,
-                                successCallback: this.onDeleteSuccess,
-                                failureCallback: this.onDeleteFailure
-                            }}
-                            loading={loading}>
+        return <CardRegion id={`region-${region.id}`}
+                           title={region.name}
+                           link={{to: {pathname: `/regions/${region.name}`, state: region}}}
+                           height={'125px'}
+                           margin={'10px 0'}
+                           hoverable
+                           delete={{
+                               url: `regions/${region.name}`,
+                               successCallback: this.onDeleteSuccess,
+                               failureCallback: this.onDeleteFailure
+                           }}
+                           loading={loading}>
             <CardItem key={'name'}
                       label={'Name'}
                       value={`${region.name}`}/>

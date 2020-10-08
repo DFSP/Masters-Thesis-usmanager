@@ -24,7 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.symmetricds.trigger.router;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 

@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-import React, {useState} from "react";
+import React from "react";
 import TooltipedMap from "./TooltipedMap";
 
-type Props = {
-}
+type Props = {}
 
 type State = {
     scale: number;
@@ -37,28 +36,28 @@ export default class TestMap extends React.Component<Props, State> {
     private MAP_MAX_WIDTH = 1500;
     private MAP_MAX_HEIGHT = 750;
 
-    constructor (props: Props) {
+    constructor(props: Props) {
         super(props)
         this.state = {scale: 1.0}
         this.handleResize = this.handleResize.bind(this)
         this.getScale = this.getScale.bind(this)
     }
 
-    componentDidMount () {
+    componentDidMount() {
         if (global.window) {
             this.handleResize()
             global.window.addEventListener('resize', this.handleResize)
         }
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         if (global.window) {
             global.window.removeEventListener('resize', this.handleResize)
         }
     }
 
 
-    render () {
+    render() {
         const divProps = {style: {width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}}
         return (
             <div {...divProps}>
@@ -67,7 +66,7 @@ export default class TestMap extends React.Component<Props, State> {
         )
     }
 
-    handleResize () {
+    handleResize() {
         const svg = global.document.querySelector('svg');
         if (svg) {
             const {width} = svg.getBoundingClientRect();
@@ -75,7 +74,7 @@ export default class TestMap extends React.Component<Props, State> {
         }
     }
 
-    getScale () {
+    getScale() {
         return this.state.scale
     }
 

@@ -38,222 +38,222 @@ import checkboxListStyles from "./CheckboxList.module.css";
 import {Link} from "react-router-dom";
 
 export interface IValidation {
-  rule: (values: IValues, id: keyof IValues, args: any) => string;
-  args?: any;
+    rule: (values: IValues, id: keyof IValues, args: any) => string;
+    args?: any;
 }
 
 export interface FieldProps<T = string> {
-  id: string;
-  type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
-  label?: string;
-  value?: any;
-  valueToString?: (v: T) => string;
-  dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
-  number?: { min: number, max: number };
-  validation?: IValidation;
-  icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
-  disabled?: boolean;
-  hidden?: boolean;
+    id: string;
+    type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
+    label?: string;
+    value?: any;
+    valueToString?: (v: T) => string;
+    dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
+    number?: { min: number, max: number };
+    validation?: IValidation;
+    icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
+    disabled?: boolean;
+    hidden?: boolean;
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
-  value === undefined
-  || value === ''
-  || typeof value === 'boolean'
-  || (typeof value === 'string' && !value.trim().length)
-  || isNaN(value)
-    ? 'text'
-    : 'number';
+    value === undefined
+    || value === ''
+    || typeof value === 'boolean'
+    || (typeof value === 'string' && !value.trim().length)
+    || isNaN(value)
+        ? 'text'
+        : 'number';
 
 export default class Field<T> extends React.Component<FieldProps<T>> {
 
-  public componentDidMount(): void {
-    this.updateField();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<FieldProps<T>>, prevState: Readonly<{}>, snapshot?: any): void {
-    this.updateField();
-  }
-
-  private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any, valueToString: ((v: T) => string) | undefined): JSX.Element => {
-    const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
-    const valueString = value == undefined ? '' : (valueToString ? valueToString(value) : value);
-    let link;
-    if (typeof linkedTo === 'string') {
-      link = `${linkedTo}/${valueString}`;
-    } else if (linkedTo(value) !== null) {
-      link = `${linkedTo(value)}/${valueString}`;
-    } else {
-      return icon;
+    public componentDidMount(): void {
+        this.updateField();
     }
-    return <Link to={link}>{icon}</Link>;
-  }
 
-  public render() {
-    const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString} = this.props;
-    let elementId = `${id}_${label}`;
-    const getError = (errors: IErrors): string => (errors ? errors[id] : "");
-    const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
-      const hasErrors = getError(errors);
-      if (hasErrors) {
-        return "invalidate-field";
-      } else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value)) {
-        return "validate-field";
-      } else {
-        return "no-validation-field";
-      }
-    };
-    return (
-      <FormContext.Consumer>
-        {(formContext: IFormContext | null) => (
-          formContext && (
-            <div key={elementId}
-                 className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
-                 style={icon?.include !== undefined && !icon?.include ? {marginLeft: '10px'} : undefined}>
-              {label && type !== "list" && (
-                <>
-                  {(icon?.include === undefined || icon?.include) &&
-                   <i className="material-icons prefix">
-                     {icon?.linkedTo
-                       ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id], valueToString)
-                       : icon?.name ? icon.name : mapLabelToMaterialIcon(label, formContext.values[id])}
-                   </i>}
-                  <label className="active" htmlFor={elementId}>
-                    {camelCaseToSentenceCase(label)}
-                  </label>
-                </>
-              )}
-              {(!type || type.toLowerCase() === "text") && (
-                <TextBox<T>
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  disabled={disabled || !formContext.isEditing}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}
-                  valueToString={valueToString}
-                  onBlur={this.onBlur(id, formContext)}
-                  hidden={hidden}/>
-              )}
-              {type && type.toLowerCase() === "number" && (
-                <NumberBox
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  min={number && number.min}
-                  max={number && number.max}
-                  disabled={disabled || !formContext.isEditing}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}
-                  onBlur={this.onBlur(id, formContext)}/>
-              )}
-              {type && type.toLowerCase() === "date" && (
-                <TextBox
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={this.getDateStringFromTimestamp(formContext.values[id])}
-                  disabled={disabled || !formContext.isEditing}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}
-                  onBlur={this.onBlur(id, formContext)}/>
-              )}
-              {(type && type.toLowerCase() === "datepicker") && (
-                <Datepicker
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  disabled={disabled || !formContext.isEditing}
-                  onSelect={this.onSelect(id, formContext)}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
-              )}
-              {(type && type.toLowerCase() === "timepicker") && (
-                <Timepicker
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  disabled={disabled || !formContext?.isEditing}
-                  onSelect={this.onSelect(id, formContext)}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
-              )}
-              {type && type.toLowerCase() === "multilinetext" && (
-                <MultilineTextBox
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  disabled={disabled || !formContext.isEditing}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}
-                  onBlur={this.onBlur(id, formContext)}/>
-              )}
-              {type && type.toLowerCase() === "dropdown" && dropdown && (
-                <Dropdown
-                  className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                  id={elementId}
-                  name={id}
-                  value={formContext.values[id]}
-                  disabled={disabled || !formContext.isEditing}
-                  onChange={this.onChange(id, formContext, !!formContext.errors[id], true)}
-                  onBlur={this.onBlur(id, formContext)}
-                  dropdown={dropdown}/>
-              )}
-              {(type && type.toLowerCase() === "list") && (
-                <CheckboxList id={elementId}
-                              name={id}
-                              values={this.props.value}
-                              disabled={disabled || !formContext?.isEditing}
-                              onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
-              )}
-              {getError(formContext.errors) && (
-                <span className="helper-text red-text darken-3">
+    public componentDidUpdate(prevProps: Readonly<FieldProps<T>>, prevState: Readonly<{}>, snapshot?: any): void {
+        this.updateField();
+    }
+
+    private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any, valueToString: ((v: T) => string) | undefined): JSX.Element => {
+        const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
+        const valueString = value == undefined ? '' : (valueToString ? valueToString(value) : value);
+        let link;
+        if (typeof linkedTo === 'string') {
+            link = `${linkedTo}/${valueString}`;
+        } else if (linkedTo(value) !== null) {
+            link = `${linkedTo(value)}/${valueString}`;
+        } else {
+            return icon;
+        }
+        return <Link to={link}>{icon}</Link>;
+    }
+
+    public render() {
+        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString} = this.props;
+        let elementId = `${id}_${label}`;
+        const getError = (errors: IErrors): string => (errors ? errors[id] : "");
+        const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
+            const hasErrors = getError(errors);
+            if (hasErrors) {
+                return "invalidate-field";
+            } else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value)) {
+                return "validate-field";
+            } else {
+                return "no-validation-field";
+            }
+        };
+        return (
+            <FormContext.Consumer>
+                {(formContext: IFormContext | null) => (
+                    formContext && (
+                        <div key={elementId}
+                             className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
+                             style={icon?.include !== undefined && !icon?.include ? {marginLeft: '10px'} : undefined}>
+                            {label && type !== "list" && (
+                                <>
+                                    {(icon?.include === undefined || icon?.include) &&
+                                    <i className="material-icons prefix">
+                                        {icon?.linkedTo
+                                            ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id], valueToString)
+                                            : icon?.name ? icon.name : mapLabelToMaterialIcon(label, formContext.values[id])}
+                                    </i>}
+                                    <label className="active" htmlFor={elementId}>
+                                        {camelCaseToSentenceCase(label)}
+                                    </label>
+                                </>
+                            )}
+                            {(!type || type.toLowerCase() === "text") && (
+                                <TextBox<T>
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}
+                                    valueToString={valueToString}
+                                    onBlur={this.onBlur(id, formContext)}
+                                    hidden={hidden}/>
+                            )}
+                            {type && type.toLowerCase() === "number" && (
+                                <NumberBox
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    min={number && number.min}
+                                    max={number && number.max}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}
+                                    onBlur={this.onBlur(id, formContext)}/>
+                            )}
+                            {type && type.toLowerCase() === "date" && (
+                                <TextBox
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={this.getDateStringFromTimestamp(formContext.values[id])}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}
+                                    onBlur={this.onBlur(id, formContext)}/>
+                            )}
+                            {(type && type.toLowerCase() === "datepicker") && (
+                                <Datepicker
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onSelect={this.onSelect(id, formContext)}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
+                            )}
+                            {(type && type.toLowerCase() === "timepicker") && (
+                                <Timepicker
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    disabled={disabled || !formContext?.isEditing}
+                                    onSelect={this.onSelect(id, formContext)}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
+                            )}
+                            {type && type.toLowerCase() === "multilinetext" && (
+                                <MultilineTextBox
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id])}
+                                    onBlur={this.onBlur(id, formContext)}/>
+                            )}
+                            {type && type.toLowerCase() === "dropdown" && dropdown && (
+                                <Dropdown
+                                    className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                    id={elementId}
+                                    name={id}
+                                    value={formContext.values[id]}
+                                    disabled={disabled || !formContext.isEditing}
+                                    onChange={this.onChange(id, formContext, !!formContext.errors[id], true)}
+                                    onBlur={this.onBlur(id, formContext)}
+                                    dropdown={dropdown}/>
+                            )}
+                            {(type && type.toLowerCase() === "list") && (
+                                <CheckboxList id={elementId}
+                                              name={id}
+                                              values={this.props.value}
+                                              disabled={disabled || !formContext?.isEditing}
+                                              onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
+                            )}
+                            {getError(formContext.errors) && (
+                                <span className="helper-text red-text darken-3">
                     {getError(formContext.errors)}
                   </span>
-              )}
-            </div>
-          )
-        )}
-      </FormContext.Consumer>
-    )
-  }
-
-  private updateField = () =>
-    M.updateTextFields();
-
-  private onChange = (id: string, formContext: IFormContext, validate: boolean, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
-    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    let value = target.value;
-    if (!isNaN(+value)) {
-      value = `"${value}"`;
+                            )}
+                        </div>
+                    )
+                )}
+            </FormContext.Consumer>
+        )
     }
-    try {
-      value = JSON.parse(value);
-    } catch (_) {
-    }
-    if (selected) {
-      this.props.dropdown?.selectCallback?.(value);
-    }
-    formContext.setValue(id, value, validate);
-  };
 
-  private onSelect = (id: string, formContext: IFormContext) => (value: string) => {
-    formContext.setValue(id, value);
-  };
+    private updateField = () =>
+        M.updateTextFields();
 
-  private onBlur = (id: string, formContext: IFormContext) => (): void =>
-    formContext.validate(id);
+    private onChange = (id: string, formContext: IFormContext, validate: boolean, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+        const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        let value = target.value;
+        if (!isNaN(+value)) {
+            value = `"${value}"`;
+        }
+        try {
+            value = JSON.parse(value);
+        } catch (_) {
+        }
+        if (selected) {
+            this.props.dropdown?.selectCallback?.(value);
+        }
+        formContext.setValue(id, value, validate);
+    };
 
-  private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
-    if (checked) {
-      formContext.addValue(listId, itemId);
-    } else {
-      formContext.removeValue(listId, itemId);
-    }
-  };
+    private onSelect = (id: string, formContext: IFormContext) => (value: string) => {
+        formContext.setValue(id, value);
+    };
 
-  private getDateStringFromTimestamp = (value: number) => {
-    const date = new Date(value * 1000);
-    return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt")}`
-  };
+    private onBlur = (id: string, formContext: IFormContext) => (): void =>
+        formContext.validate(id);
+
+    private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
+        if (checked) {
+            formContext.addValue(listId, itemId);
+        } else {
+            formContext.removeValue(listId, itemId);
+        }
+    };
+
+    private getDateStringFromTimestamp = (value: number) => {
+        const date = new Date(value * 1000);
+        return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt")}`
+    };
 
 }

@@ -24,11 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
-
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Timing {

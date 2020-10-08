@@ -26,27 +26,27 @@ import * as React from "react";
 import styles from './SimpleList.module.css';
 
 interface GenericSimpleListProps<T> {
-  list: T[];
-  show: (element: T, index: number, last: boolean) => JSX.Element;
-  header?: () => JSX.Element;
+    list: T[];
+    show: (element: T, index: number, last: boolean) => JSX.Element;
+    header?: () => JSX.Element;
 }
 
 type Props<T> = GenericSimpleListProps<T>;
 
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
-  public render() {
-    const {list, show, header} = this.props;
-    return (
-      <div className={styles.listWrapper}>
-        <div className={styles.itemListWrapper}>
-          {header && header()}
-          {list.map((c, i) => (
-            <div key={i}>
-              {show(c, i, i === list.length - 1)}
-            </div>
-          ))}
-        </div>
-      </div>);
-  }
+    public render() {
+        const {list, show, header} = this.props;
+        return (
+            <div className={styles.listWrapper}>
+                <div className={styles.itemListWrapper}>
+                    {header && header()}
+                    {list.map((c, i) => (
+                        <div key={i}>
+                            {show(c, i, i === list.length - 1)}
+                        </div>
+                    ))}
+                </div>
+            </div>);
+    }
 }

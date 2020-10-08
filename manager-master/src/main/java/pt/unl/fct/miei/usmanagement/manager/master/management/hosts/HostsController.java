@@ -24,7 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
@@ -135,8 +142,7 @@ public class HostsController {
 	}
 
 	@DeleteMapping("/cloud/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public void removeCloudHostSimulatedMetric(@PathVariable String hostname,
-											   @PathVariable String simulatedMetricName) {
+	public void removeCloudHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
 		cloudHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
 	}
 

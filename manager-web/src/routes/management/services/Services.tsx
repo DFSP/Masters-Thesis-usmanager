@@ -35,59 +35,59 @@ import styles from './Services.module.css'
 import BaseComponent from "../../../components/BaseComponent";
 
 interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  services: IService[];
+    isLoading: boolean
+    error?: string | null;
+    services: IService[];
 }
 
 interface DispatchToProps {
-  loadServices: (name?: string) => any;
+    loadServices: (name?: string) => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class Services extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadServices();
-  }
+    public componentDidMount(): void {
+        this.props.loadServices();
+    }
 
-  public render() {
-    return (
-      <MainLayout>
-        <AddButton tooltip={{text: 'Add service', position: 'left'}}
-                   pathname={'/services/new_service?new=true'}/>
-        <div className={`${styles.container}`}>
-          <CardList<IService>
-            isLoading={this.props.isLoading}
-            error={this.props.error}
-            emptyMessage={"No services to display"}
-            list={this.props.services}
-            card={this.service}
-            predicate={this.predicate}/>
-        </div>
-      </MainLayout>
-    );
-  }
+    public render() {
+        return (
+            <MainLayout>
+                <AddButton tooltip={{text: 'Add service', position: 'left'}}
+                           pathname={'/services/new_service?new=true'}/>
+                <div className={`${styles.container}`}>
+                    <CardList<IService>
+                        isLoading={this.props.isLoading}
+                        error={this.props.error}
+                        emptyMessage={"No services to display"}
+                        list={this.props.services}
+                        card={this.service}
+                        predicate={this.predicate}/>
+                </div>
+            </MainLayout>
+        );
+    }
 
-  private service = (service: IService): JSX.Element =>
-    <ServiceCard key={service.id} service={service}/>;
+    private service = (service: IService): JSX.Element =>
+        <ServiceCard key={service.id} service={service}/>;
 
-  private predicate = (service: IService, search: string): boolean =>
-    service.serviceName.toLowerCase().includes(search);
+    private predicate = (service: IService, search: string): boolean =>
+        service.serviceName.toLowerCase().includes(search);
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.services.isLoadingServices,
-    error: state.entities.services.loadServicesError,
-    services: (state.entities.services.data && Object.values(state.entities.services.data)) || [],
-  }
+    {
+        isLoading: state.entities.services.isLoadingServices,
+        error: state.entities.services.loadServicesError,
+        services: (state.entities.services.data && Object.values(state.entities.services.data)) || [],
+    }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadServices,
+    loadServices,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Services);

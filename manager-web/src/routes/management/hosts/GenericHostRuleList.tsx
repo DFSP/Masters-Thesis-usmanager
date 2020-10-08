@@ -34,60 +34,60 @@ import {connect} from "react-redux";
 import {loadRulesHost} from "../../../actions";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  genericHostRules: string[];
+    isLoading: boolean;
+    error?: string | null;
+    genericHostRules: string[];
 }
 
 interface DispatchToProps {
-  loadRulesHost: () => void;
+    loadRulesHost: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class GenericHostRuleList extends BaseComponent<Props, {}> {
 
-  public componentDidMount(): void {
-    this.props.loadRulesHost();
-  }
+    public componentDidMount(): void {
+        this.props.loadRulesHost();
+    }
 
-  public render() {
-    const RulesList = List<string>();
-    return (
-      <RulesList isLoading={this.props.isLoading}
-                 error={this.props.error}
-                 emptyMessage={`Generic host rules list is empty`}
-                 list={this.props.genericHostRules}
-                 show={this.rule}/>
-    );
-  }
+    public render() {
+        const RulesList = List<string>();
+        return (
+            <RulesList isLoading={this.props.isLoading}
+                       error={this.props.error}
+                       emptyMessage={`Generic host rules list is empty`}
+                       list={this.props.genericHostRules}
+                       show={this.rule}/>
+        );
+    }
 
-  private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
-      <div className={`${styles.linkedItemContent}`}>
-        <span>{rule}</span>
-      </div>
-      <Link to={`/rules/hosts/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+    private rule = (rule: string, index: number): JSX.Element =>
+        <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
+            <div className={`${styles.linkedItemContent}`}>
+                <span>{rule}</span>
+            </div>
+            <Link to={`/rules/hosts/${rule}`}
+                  className={`${styles.link} waves-effect`}>
+                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+            </Link>
+        </ListItem>;
 
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
-  return {
-    isLoading: state.entities.rules.hosts.isLoadingRules,
-    error: state.entities.rules.hosts.loadRulesError,
-    genericHostRules: Object.entries(state.entities.rules.hosts.data)
-                            .filter(([_, rule]) => rule.generic)
-                            .map(([ruleName, _]) => ruleName)
-  }
+    return {
+        isLoading: state.entities.rules.hosts.isLoadingRules,
+        error: state.entities.rules.hosts.loadRulesError,
+        genericHostRules: Object.entries(state.entities.rules.hosts.data)
+            .filter(([_, rule]) => rule.generic)
+            .map(([ruleName, _]) => ruleName)
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRulesHost,
-  }, dispatch);
+    bindActionCreators({
+        loadRulesHost,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericHostRuleList);

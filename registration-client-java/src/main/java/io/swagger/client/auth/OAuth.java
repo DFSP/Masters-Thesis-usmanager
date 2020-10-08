@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -37,27 +37,27 @@
 
 package io.swagger.client.auth;
 
+import io.swagger.client.Pair;
+
 import java.util.List;
 import java.util.Map;
 
-import io.swagger.client.Pair;
-
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-09-28T21:06:30.769Z")
 public class OAuth implements Authentication {
-  private String accessToken;
+	private String accessToken;
 
-  public String getAccessToken() {
-    return accessToken;
-  }
+	public String getAccessToken() {
+		return accessToken;
+	}
 
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
 
-  @Override
-  public void applyToParams(List<Pair> queryParams, Map<String, String> headerParams) {
-    if (accessToken != null) {
-      headerParams.put("Authorization", "Bearer " + accessToken);
-    }
-  }
+	@Override
+	public void applyToParams(List<Pair> queryParams, Map<String, String> headerParams) {
+		if (accessToken != null) {
+			headerParams.put("Authorization", "Bearer " + accessToken);
+		}
+	}
 }

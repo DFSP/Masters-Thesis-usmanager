@@ -36,157 +36,157 @@ import {Link} from "react-router-dom";
 import {ICloudHost} from "../../hosts/cloud/CloudHost";
 
 interface StateToProps {
-  isLoading: boolean;
-  error?: string | null;
-  ruleCloudHosts: string[];
-  cloudHosts: { [key: string]: ICloudHost };
+    isLoading: boolean;
+    error?: string | null;
+    ruleCloudHosts: string[];
+    cloudHosts: { [key: string]: ICloudHost };
 }
 
 interface DispatchToProps {
-  loadCloudHosts: () => void;
-  loadRuleHostCloudHosts: (ruleName: string) => void;
-  removeRuleHostCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
+    loadCloudHosts: () => void;
+    loadRuleHostCloudHosts: (ruleName: string) => void;
+    removeRuleHostCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
 }
 
 interface HostRuleCloudHostListProps {
-  isLoadingHostRule: boolean;
-  loadHostRuleError?: string | null;
-  ruleHost: IRuleHost | Partial<IRuleHost> | null;
-  unsavedCloudHosts: string[];
-  onAddRuleCloudHost: (cloudHost: string) => void;
-  onRemoveRuleCloudHosts: (cloudHost: string[]) => void;
+    isLoadingHostRule: boolean;
+    loadHostRuleError?: string | null;
+    ruleHost: IRuleHost | Partial<IRuleHost> | null;
+    unsavedCloudHosts: string[];
+    onAddRuleCloudHost: (cloudHost: string) => void;
+    onRemoveRuleCloudHosts: (cloudHost: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & HostRuleCloudHostListProps
 
 interface State {
-  entitySaved: boolean;
+    entitySaved: boolean;
 }
 
 class HostRuleCloudHostList extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {entitySaved: !this.isNew()};
-  }
-
-  public componentDidMount(): void {
-    this.props.loadCloudHosts();
-    this.loadEntities();
-  }
-
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.ruleHost?.name !== this.props.ruleHost?.name) {
-      this.loadEntities();
+    constructor(props: Props) {
+        super(props);
+        this.state = {entitySaved: !this.isNew()};
     }
-    if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
-      this.setState({entitySaved: true});
+
+    public componentDidMount(): void {
+        this.props.loadCloudHosts();
+        this.loadEntities();
     }
-  }
 
-  public render() {
-    const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
-                           error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                           emptyMessage={`Cloud hosts list is empty`}
-                           data={this.props.ruleCloudHosts}
-                           dropdown={{
-                             id: 'cloudHosts',
-                             title: 'Add cloud instance',
-                             empty: 'No cloud instances to add',
-                             data: this.getSelectableCloudHostNames()
-                           }}
-                           show={this.cloudHost}
-                           onAdd={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `rules/hosts/${this.props.ruleHost?.name}/cloud-hosts`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}
-                           entitySaved={this.state.entitySaved}/>;
-  }
-
-  private loadEntities = () => {
-    if (this.props.ruleHost?.name) {
-      const {name} = this.props.ruleHost;
-      this.props.loadRuleHostCloudHosts(name);
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.ruleHost?.name !== this.props.ruleHost?.name) {
+            this.loadEntities();
+        }
+        if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
+            this.setState({entitySaved: true});
+        }
     }
-  };
 
-  private isNew = () =>
-    this.props.ruleHost?.name === undefined;
+    public render() {
+        const isNew = this.isNew();
+        return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
+                               error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
+                               emptyMessage={`Cloud hosts list is empty`}
+                               data={this.props.ruleCloudHosts}
+                               dropdown={{
+                                   id: 'cloudHosts',
+                                   title: 'Add cloud instance',
+                                   empty: 'No cloud instances to add',
+                                   data: this.getSelectableCloudHostNames()
+                               }}
+                               show={this.cloudHost}
+                               onAdd={this.onAdd}
+                               onRemove={this.onRemove}
+                               onDelete={{
+                                   url: `rules/hosts/${this.props.ruleHost?.name}/cloud-hosts`,
+                                   successCallback: this.onDeleteSuccess,
+                                   failureCallback: this.onDeleteFailure
+                               }}
+                               entitySaved={this.state.entitySaved}/>;
+    }
 
-  private cloudHost = (index: number, cloudHost: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.isNew();
-    const unsaved = this.props.unsavedCloudHosts.includes(cloudHost);
-    return (
-      <ListItem key={index} separate={separate}>
-        <div className={styles.linkedItemContent}>
-          <label>
-            <input id={cloudHost}
-                   type="checkbox"
-                   onChange={handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
+    private loadEntities = () => {
+        if (this.props.ruleHost?.name) {
+            const {name} = this.props.ruleHost;
+            this.props.loadRuleHostCloudHosts(name);
+        }
+    };
+
+    private isNew = () =>
+        this.props.ruleHost?.name === undefined;
+
+    private cloudHost = (index: number, cloudHost: string, separate: boolean, checked: boolean,
+                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+        const isNew = this.isNew();
+        const unsaved = this.props.unsavedCloudHosts.includes(cloudHost);
+        return (
+            <ListItem key={index} separate={separate}>
+                <div className={styles.linkedItemContent}>
+                    <label>
+                        <input id={cloudHost}
+                               type="checkbox"
+                               onChange={handleCheckbox}
+                               checked={checked}/>
+                        <span id={'checkbox'}>
                <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {cloudHost}
                </div>
             </span>
-          </label>
-        </div>
-        {!isNew && (
-          <Link to={`/hosts/cloud/${cloudHost}`}
-                className={`${styles.link} waves-effect`}>
-            <i className={`${styles.linkIcon} material-icons right`}>link</i>
-          </Link>
-        )}
-      </ListItem>
-    );
-  };
+                    </label>
+                </div>
+                {!isNew && (
+                    <Link to={`/hosts/cloud/${cloudHost}`}
+                          className={`${styles.link} waves-effect`}>
+                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                    </Link>
+                )}
+            </ListItem>
+        );
+    };
 
-  private onAdd = (cloudHost: string): void =>
-    this.props.onAddRuleCloudHost(cloudHost);
+    private onAdd = (cloudHost: string): void =>
+        this.props.onAddRuleCloudHost(cloudHost);
 
-  private onRemove = (cloudHosts: string[]) =>
-    this.props.onRemoveRuleCloudHosts(cloudHosts);
+    private onRemove = (cloudHosts: string[]) =>
+        this.props.onRemoveRuleCloudHosts(cloudHosts);
 
-  private onDeleteSuccess = (cloudHosts: string[]): void => {
-    if (this.props.ruleHost?.name) {
-      const {name} = this.props.ruleHost;
-      this.props.removeRuleHostCloudHosts(name, cloudHosts);
-    }
-  };
+    private onDeleteSuccess = (cloudHosts: string[]): void => {
+        if (this.props.ruleHost?.name) {
+            const {name} = this.props.ruleHost;
+            this.props.removeRuleHostCloudHosts(name, cloudHosts);
+        }
+    };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to remove cloud host`, 10000, reason, true);
+    private onDeleteFailure = (reason: string): void =>
+        super.toast(`Unable to remove cloud host`, 10000, reason, true);
 
-  private getSelectableCloudHostNames = () => {
-    const {cloudHosts, ruleCloudHosts, unsavedCloudHosts} = this.props;
-    return Object.keys(cloudHosts)
-                 .filter(cloudHost => !ruleCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
-  };
+    private getSelectableCloudHostNames = () => {
+        const {cloudHosts, ruleCloudHosts, unsavedCloudHosts} = this.props;
+        return Object.keys(cloudHosts)
+            .filter(cloudHost => !ruleCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
+    };
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleCloudHostListProps): StateToProps {
-  const ruleName = ownProps.ruleHost?.name;
-  const rule = ruleName && state.entities.rules.hosts.data[ruleName];
-  const ruleCloudHosts = rule && rule.cloudHosts;
-  return {
-    isLoading: state.entities.rules.hosts.isLoadingCloudHosts,
-    error: state.entities.rules.hosts.loadCloudHostsError,
-    ruleCloudHosts: ruleCloudHosts || [],
-    cloudHosts: state.entities.hosts.cloud.data,
-  }
+    const ruleName = ownProps.ruleHost?.name;
+    const rule = ruleName && state.entities.rules.hosts.data[ruleName];
+    const ruleCloudHosts = rule && rule.cloudHosts;
+    return {
+        isLoading: state.entities.rules.hosts.isLoadingCloudHosts,
+        error: state.entities.rules.hosts.loadCloudHostsError,
+        ruleCloudHosts: ruleCloudHosts || [],
+        cloudHosts: state.entities.hosts.cloud.data,
+    }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadRuleHostCloudHosts,
-    removeRuleHostCloudHosts,
-    loadCloudHosts,
-  }, dispatch);
+    bindActionCreators({
+        loadRuleHostCloudHosts,
+        removeRuleHostCloudHosts,
+        loadCloudHosts,
+    }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(HostRuleCloudHostList);

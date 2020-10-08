@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -39,47 +39,47 @@ package io.swagger.client;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-09-28T21:06:30.769Z")
 public class StringUtil {
-  /**
-   * Check if the given array contains the given value (with case-insensitive comparison).
-   *
-   * @param array The array
-   * @param value The value to search
-   * @return true if the array contains the value
-   */
-  public static boolean containsIgnoreCase(String[] array, String value) {
-    for (String str : array) {
-      if (value == null && str == null) {
-        return true;
-      }
-      if (value != null && value.equalsIgnoreCase(str)) {
-        return true;
-      }
-    }
-    return false;
-  }
+	/**
+	 * Check if the given array contains the given value (with case-insensitive comparison).
+	 *
+	 * @param array The array
+	 * @param value The value to search
+	 * @return true if the array contains the value
+	 */
+	public static boolean containsIgnoreCase(String[] array, String value) {
+		for (String str : array) {
+			if (value == null && str == null) {
+				return true;
+			}
+			if (value != null && value.equalsIgnoreCase(str)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-  /**
-   * Join an array of strings with the given separator.
-   * <p>
-   * Note: This might be replaced by utility method from commons-lang or guava someday
-   * if one of those libraries is added as dependency.
-   * </p>
-   *
-   * @param array     The array of strings
-   * @param separator The separator
-   * @return the resulting string
-   */
-  public static String join(String[] array, String separator) {
-    int len = array.length;
-    if (len == 0) {
-      return "";
-    }
+	/**
+	 * Join an array of strings with the given separator.
+	 * <p>
+	 * Note: This might be replaced by utility method from commons-lang or guava someday
+	 * if one of those libraries is added as dependency.
+	 * </p>
+	 *
+	 * @param array     The array of strings
+	 * @param separator The separator
+	 * @return the resulting string
+	 */
+	public static String join(String[] array, String separator) {
+		int len = array.length;
+		if (len == 0) {
+			return "";
+		}
 
-    StringBuilder out = new StringBuilder();
-    out.append(array[0]);
-    for (int i = 1; i < len; i++) {
-      out.append(separator).append(array[i]);
-    }
-    return out.toString();
-  }
+		StringBuilder out = new StringBuilder();
+		out.append(array[0]);
+		for (int i = 1; i < len; i++) {
+			out.append(separator).append(array[i]);
+		}
+		return out.toString();
+	}
 }
