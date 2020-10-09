@@ -29,16 +29,30 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>pt.unl.fct.usmanagement.manager</groupId>
-		<artifactId>manager-parent</artifactId>
-		<version>0.0.1</version>
-		<relativePath/>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.1.RELEASE</version>
 	</parent>
 
+	<groupId>pt.unl.fct.usmanagement.manager</groupId>
 	<artifactId>manager-services</artifactId>
+	<version>0.0.1</version>
+
 	<name>Manager Services</name>
-	<description>Manager services module containing all services used by both master and worker managers
-	</description>
+	<description>Manager services module containing all services used by both master and worker managers</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>11</java.version>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<dependency>
@@ -90,6 +104,18 @@
 			<version>7.7.0.Final</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--&lt;!&ndash; https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 &ndash;&gt;
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>2.14.0</version>
+		</dependency>-->
 	</dependencies>
 
 	<dependencyManagement>

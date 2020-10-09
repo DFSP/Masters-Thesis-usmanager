@@ -28,16 +28,30 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>pt.unl.fct.usmanagement.manager</groupId>
-		<artifactId>manager-parent</artifactId>
-		<version>0.0.1</version>
-		<relativePath/>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.1.RELEASE</version>
 	</parent>
 
+	<groupId>pt.unl.fct.usmanagement.manager</groupId>
 	<artifactId>manager-database</artifactId>
+	<version>0.0.1</version>
+
 	<name>Manager Database</name>
-	<description>Manager database module containing all tables and entities used by both master and worker managers
-	</description>
+	<description>Manager database replicated on all worker managers hosts and shared with the master manager</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>11</java.version>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<dependency>
@@ -94,6 +108,12 @@
 			<version>1.11.342</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.12</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -107,15 +127,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<finalName>manager-database</finalName>
-		<plugins>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.1.2</version>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
