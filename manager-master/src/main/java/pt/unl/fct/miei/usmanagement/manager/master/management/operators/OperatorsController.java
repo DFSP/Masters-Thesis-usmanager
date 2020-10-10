@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.operators.OperatorsService;
 
 import java.util.List;
 

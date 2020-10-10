@@ -49,6 +49,7 @@ import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
+import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleService extends IRule {
     services?: string[]
@@ -83,7 +84,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IRuleService,
+    selected: 'serviceRule' | 'ruleConditions' | 'services'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 type State = {
     ruleService?: IRuleService,
@@ -304,6 +310,7 @@ class RuleService extends BaseComponent<Props, State> {
                 {!isNewRuleService && isLoading && <ListLoadingSpinner/>}
                 {!isNewRuleService && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleService || !isLoading) && (isNewRuleService || !error) && formRuleService && (
+                    /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleService)}
                           values={ruleService}
@@ -377,18 +384,21 @@ class RuleService extends BaseComponent<Props, State> {
         {
             title: 'Service rule',
             id: 'serviceRule',
-            content: () => this.serviceRule()
+            content: () => this.serviceRule(),
+            active: this.props.location.state.selected === 'serviceRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
+            active: this.props.location.state.selected === 'ruleConditions'
         },
         {
             title: 'Services',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'services'
         }
     ];
 

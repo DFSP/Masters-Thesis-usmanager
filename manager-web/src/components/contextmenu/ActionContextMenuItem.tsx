@@ -29,10 +29,11 @@ interface Props<T> {
     option: string;
     state: T;
     onClick: (e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>, data: T, target: HTMLElement) => void;
+    className?: string;
 }
 
-const ActionContextMenuItem = <T extends object>({option, state, onClick}: Props<T>) => (
-    <MenuItem className='custom-context-menu-item' data={state} onClick={onClick}>
+const ActionContextMenuItem = <T extends object>({option, state, onClick, className}: Props<T>) => (
+    <MenuItem className={`custom-context-menu-item ${className ? className : ''}`} data={state} onClick={onClick}>
         {option}
     </MenuItem>
 );

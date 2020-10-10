@@ -84,31 +84,38 @@ class ContainerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'View ports'}
-                pathname={`/containers/${container.containerId}#ports`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'ports'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'View labels'}
-                pathname={`/containers/${container.containerId}#labels`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'containerLabels'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Check logs'}
-                pathname={`/containers/${container.containerId}#logs`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'logs'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/containers/${container.containerId}#rules`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'rules'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/containers/${container.containerId}#genericContainerRules`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'genericContainerRules'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/containers/${container.containerId}#simulatedMetrics`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'simulatedMetrics'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/containers/${container.containerId}#genericSimulatedMetrics`}
+                pathname={`/containers/${container.containerId}`}
+                selected={'genericSimulatedMetrics'}
                 state={container}/>
         ];
     }
@@ -125,12 +132,13 @@ class ContainerCard extends BaseComponent<Props, State> {
                               hoverable
                               delete={{
                                   textButton: 'Stop',
+                                  confirmMessage: `to stop container ${container.containerId}`,
                                   url: `containers/${container.containerId}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }}
                               loading={loading}
-                              contextMenuItems={this.contextMenu()}>
+                              bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'names'}
                       label={'Names'}
                       value={container.names.join(', ')}/>

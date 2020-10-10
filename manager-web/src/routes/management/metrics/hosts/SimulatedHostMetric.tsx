@@ -94,7 +94,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: ISimulatedHostMetric,
+    selected: 'simulatedHostMetric' | 'cloudHosts' | 'edgeHosts',
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     simulatedHostMetric?: ISimulatedHostMetric,
@@ -303,6 +308,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                 {!isNewSimulatedHostMetric && isLoading && <ListLoadingSpinner/>}
                 {!isNewSimulatedHostMetric && !isLoading && error && <Error message={error}/>}
                 {(isNewSimulatedHostMetric || !isLoading) && (isNewSimulatedHostMetric || !error) && formSimulatedHostMetric && (
+                    /*@ts-ignore*/
                     <Form id={simulatedHostMetricKey}
                           fields={this.getFields(formSimulatedHostMetric)}
                           values={simulatedHostMetric}
@@ -390,18 +396,21 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedHostMetric',
             content: () => this.simulatedHostMetric(),
+            active: this.props.location.state.selected === 'simulatedHostMetric'
         },
         {
             title: 'Cloud hosts',
             id: 'cloudHosts',
             content: () => this.cloudHosts(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'cloudHosts'
         },
         {
             title: 'Edge hosts',
             id: 'edgeHosts',
             content: () => this.edgeHosts(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'edgeHosts'
         },
     ];
 

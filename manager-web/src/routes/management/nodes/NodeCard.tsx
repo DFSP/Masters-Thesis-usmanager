@@ -89,7 +89,8 @@ class NodeCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'View labels'}
-                pathname={`/nodes/${node.id}#nodeLabels`}
+                pathname={`/nodes/${node.id}`}
+                selected={'nodeLabels'}
                 state={node}/>,
         ];
     }
@@ -112,7 +113,7 @@ class NodeCard extends BaseComponent<Props, State> {
                              failureCallback: this.onDeleteFailure
                          }}
                          loading={loading}
-                         contextMenuItems={this.contextMenu()}>
+                         bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'hostName'}
                       label={'Hostname'}
                       value={node.hostname}/>

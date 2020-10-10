@@ -140,7 +140,9 @@ public class SymService {
 	}
 
 	public void stopSymmetricDSServer() {
-		serverSymmetricEngine.stop();
+		if (serverSymmetricEngine != null) {
+			serverSymmetricEngine.stop();
+		}
 	}
 
 	private void loadSymmetricDS() throws SQLException {

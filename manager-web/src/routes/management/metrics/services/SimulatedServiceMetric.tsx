@@ -48,6 +48,8 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedServiceMetricServiceList from "./SimulatedServiceMetricServiceList";
+import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
+import {ISimulatedHostMetric} from "../hosts/SimulatedHostMetric";
 
 export interface ISimulatedServiceMetric extends IDatabaseData {
     name: string;
@@ -89,7 +91,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: ISimulatedServiceMetric,
+    selected: 'simulatedServiceMetric' | 'services',
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     simulatedServiceMetric?: ISimulatedServiceMetric,
@@ -266,6 +273,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                 {!isNewSimulatedServiceMetric && isLoading && <ListLoadingSpinner/>}
                 {!isNewSimulatedServiceMetric && !isLoading && error && <Error message={error}/>}
                 {(isNewSimulatedServiceMetric || !isLoading) && (isNewSimulatedServiceMetric || !error) && formSimulatedServiceMetric && (
+                    /*@ts-ignore*/
                     <Form id={simulatedServiceMetricKey}
                           fields={this.getFields(formSimulatedServiceMetric)}
                           values={simulatedServiceMetric}
@@ -345,12 +353,14 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedServiceMetric',
             content: () => this.simulatedServiceMetric(),
+            active: this.props.location.state.selected === 'simulatedServiceMetric'
         },
         {
             title: 'Services',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'services'
         },
     ];
 

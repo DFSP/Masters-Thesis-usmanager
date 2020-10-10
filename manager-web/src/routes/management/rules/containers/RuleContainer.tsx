@@ -49,6 +49,7 @@ import RuleContainerContainersList from "./RuleContainerContainersList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
+import {IRuleCondition} from "../conditions/RuleCondition";
 
 export interface IRuleContainer extends IRule {
     containers?: string[]
@@ -83,7 +84,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IRuleContainer,
+    selected: 'containerRule' | 'ruleConditions' | 'containers'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 type State = {
     ruleContainer?: IRuleContainer,
@@ -304,6 +310,7 @@ class RuleContainer extends BaseComponent<Props, State> {
                 {!isNewRuleContainer && isLoading && <ListLoadingSpinner/>}
                 {!isNewRuleContainer && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleContainer || !isLoading) && (isNewRuleContainer || !error) && formRuleContainer && (
+                    /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleContainer)}
                           values={ruleContainer}
@@ -377,18 +384,21 @@ class RuleContainer extends BaseComponent<Props, State> {
         {
             title: 'Container rule',
             id: 'containerRule',
-            content: () => this.containerRule()
+            content: () => this.containerRule(),
+            active: this.props.location.state.selected === 'containerRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
+            active: this.props.location.state.selected === 'ruleConditions'
         },
         {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'containers'
         }
     ];
 

@@ -45,20 +45,20 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitorin
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.location.LocationRequestService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.location.LocationRequestService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -222,7 +222,7 @@ public class ServicesMonitoringService {
 				try {
 					monitorServicesTask(diffSeconds);
 				}
-				catch (WorkerManagerException e) {
+				catch (ManagerException e) {
 					log.error(e.getMessage());
 				}
 			}

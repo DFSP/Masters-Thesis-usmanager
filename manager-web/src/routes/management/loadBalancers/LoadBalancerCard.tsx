@@ -85,31 +85,38 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'View ports'}
-                pathname={`/containers/${loadBalancer.containerId}#ports`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'ports'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'View labels'}
-                pathname={`/containers/${loadBalancer.containerId}#labels`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'labels'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Check logs'}
-                pathname={`/containers/${loadBalancer.containerId}#logs`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'logs'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/containers/${loadBalancer.containerId}#rules`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'rules'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/containers/${loadBalancer.containerId}#genericContainerRules`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'genericContainerRules'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/containers/${loadBalancer.containerId}#simulatedMetrics`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'simulatedMetrics'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/containers/${loadBalancer.containerId}#genericSimulatedMetrics`}
+                pathname={`/containers/${loadBalancer.containerId}`}
+                selected={'genericSimulatedMetrics'}
                 state={loadBalancer}/>
         ];
     }
@@ -136,7 +143,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
                                      failureCallback: this.onStopFailure,
                                  }}
                                  loading={loading}
-                                 contextMenuItems={this.contextMenu()}>
+                                 bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'hostname'}
                       label={'Hostname'}
                       value={loadBalancer.publicIpAddress}/>

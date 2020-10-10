@@ -146,29 +146,40 @@ class CloudHostCard extends BaseComponent<Props, State> {
         }
     };
 
-    private contextMenu = (): JSX.Element[] => {
+    private topContextMenu = (): JSX.Element[] => {
+        const {cloudHost} = this.props;
+        return [
+            <ActionContextMenuItem className={'green-text'} option={'Start'} state={cloudHost} onClick={this.startCloudHost}/>,
+            <ActionContextMenuItem className={'blue-text'} option={'Stop'} state={cloudHost} onClick={this.stopCloudHost}/>,
+            <ActionContextMenuItem className={'red-text'} option={'Terminate'} state={cloudHost} onClick={this.terminateCloudHost}/>,
+            <DividerContextMenuItem/>,
+            <DividerContextMenuItem/>,
+        ];
+    }
+
+    private bottomContextMenu = (): JSX.Element[] => {
         const {cloudHost} = this.props;
         const id = cloudHost.publicIpAddress || cloudHost.instanceId;
         return [
-            <ActionContextMenuItem option={'Start'} state={cloudHost} onClick={this.startCloudHost}/>,
-            <ActionContextMenuItem option={'Stop'} state={cloudHost} onClick={this.stopCloudHost}/>,
-            <ActionContextMenuItem option={'Terminate'} state={cloudHost} onClick={this.terminateCloudHost}/>,
-            <DividerContextMenuItem/>,
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/hosts/cloud/${id}#rules`}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'rules'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/hosts/cloud/${id}#genericContainerRules`}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'genericContainerRules'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/hosts/cloud/${id}#simulatedMetrics`}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'simulatedMetrics'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/hosts/cloud/${id}#genericSimulatedMetrics`}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'genericSimulatedMetrics'}
                 state={cloudHost}/>
         ];
     }
@@ -189,7 +200,8 @@ class CloudHostCard extends BaseComponent<Props, State> {
                               margin={'10px 0'}
                               hoverable
                               loading={loading}
-                              contextMenuItems={this.contextMenu()}>
+                              topContextMenuItems={this.topContextMenu()}
+                              bottomContextMenuItems={this.bottomContextMenu()}>
             <CardItem key={'imageId'}
                       label={'imageId'}
                       value={`${cloudHost.imageId}`}/>

@@ -141,7 +141,7 @@ class Ssh extends React.Component<Props, State> {
                                             <div>
                                                 <span
                                                     className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                                <span className={styles.hostname}>{command.hostname}</span>
+                                                <span className={styles.hostname}>{`${command.hostAddress.publicIpAddress} ${command.hostAddress.privateIpAddress || ''}`}</span>
                                                 <span className={styles.command}>{command.command}</span>
                                                 {command.exitStatus !== 0 &&
                                                 <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
@@ -157,7 +157,7 @@ class Ssh extends React.Component<Props, State> {
                                             <div>
                                                 <span
                                                     className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                                File {command.filename} transferred to {command.hostname}
+                                                File {command.filename} transferred to {`${command.hostAddress.publicIpAddress} ${command.hostAddress.privateIpAddress || ''}`}
                                             </div>
                                         </>
                                     }

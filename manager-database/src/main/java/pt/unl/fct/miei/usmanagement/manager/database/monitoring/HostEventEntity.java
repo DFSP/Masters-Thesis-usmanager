@@ -30,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
@@ -37,6 +38,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Objects;
@@ -54,7 +56,7 @@ public class HostEventEntity {
 	@GeneratedValue
 	private Long id;
 
-	private HostDetails hostDetails;
+	private HostAddress hostAddress;
 
 	@ManyToOne
 	@JoinColumn(name = "decision_id")

@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
-import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagersService;
 
 import java.util.Arrays;
 import java.util.List;

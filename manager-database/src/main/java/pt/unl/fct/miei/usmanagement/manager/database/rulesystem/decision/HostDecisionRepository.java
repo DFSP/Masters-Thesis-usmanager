@@ -26,12 +26,13 @@ package pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.List;
 
 @Repository
 public interface HostDecisionRepository extends JpaRepository<HostDecisionEntity, Long> {
 
-	List<HostDecisionEntity> findByHostname(String hostname);
+	List<HostDecisionEntity> findByHostAddress(HostAddress hostAddress);
 
 }

@@ -35,11 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
 import java.util.ArrayList;
 import java.util.List;

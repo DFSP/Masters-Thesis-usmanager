@@ -47,6 +47,7 @@ import {IReply} from "../../../../utils/api";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
+import {IApp} from "../../apps/App";
 
 export interface IRuleCondition extends IDatabaseData {
     name: string;
@@ -87,7 +88,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IRuleCondition,
+    selected: 'condition'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 type State = {
     condition?: IRuleCondition,
@@ -223,6 +229,7 @@ class RuleCondition extends BaseComponent<Props, State> {
                 {!isNewRuleCondition && isLoading && <ListLoadingSpinner/>}
                 {!isNewRuleCondition && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleCondition || !isLoading) && (isNewRuleCondition || !error) && formCondition && (
+                    /*@ts-ignore*/
                     <Form id={conditionKey}
                           fields={this.getFields(formCondition)}
                           values={condition}
@@ -281,7 +288,8 @@ class RuleCondition extends BaseComponent<Props, State> {
         {
             title: 'Condition',
             id: 'condition',
-            content: () => this.condition()
+            content: () => this.condition(),
+            active: this.props.location.state.selected === 'condition'
         },
     ];
 

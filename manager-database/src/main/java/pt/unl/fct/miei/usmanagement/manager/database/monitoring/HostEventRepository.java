@@ -25,16 +25,17 @@
 package pt.unl.fct.miei.usmanagement.manager.database.monitoring;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 
 import java.util.List;
 
 @Repository
 public interface HostEventRepository extends JpaRepository<HostEventEntity, Long> {
 
-	// TODO test
 	List<HostEventEntity> findByHostAddress(@Param("hostAddress") HostAddress hostAddress);
 
 }

@@ -40,22 +40,22 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRe
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -187,7 +187,7 @@ public class HostsMonitoringService {
 				try {
 					monitorHostsTask();
 				}
-				catch (WorkerManagerException e) {
+				catch (ManagerException e) {
 					log.error(e.getMessage());
 				}
 			}
@@ -337,7 +337,7 @@ public class HostsMonitoringService {
 			})
 			.map(SimpleNode::getHostAddress)
 			.findFirst()
-			.orElseThrow(() -> new WorkerManagerException("Can't find new host to migrate containers to"));
+			.orElseThrow(() -> new ManagerException("Can't find new host to migrate containers to"));
 	}
 
 	private Pair<String, String> getRandomContainerToMigrate(HostAddress hostAddress) {

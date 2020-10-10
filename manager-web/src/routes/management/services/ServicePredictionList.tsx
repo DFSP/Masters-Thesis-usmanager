@@ -103,7 +103,6 @@ class ServicePredictionList extends BaseComponent<Props, State> {
 
     public render() {
         const isNew = this.isNew();
-        console.log(window.innerWidth)
         return <ControlledList<IPrediction>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadServiceError || this.props.error : undefined}

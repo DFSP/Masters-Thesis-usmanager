@@ -37,7 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.apps.AppsService;
 
 import java.util.Arrays;
 import java.util.List;

@@ -60,7 +60,7 @@ class Nodes extends BaseComponent<Props, {}> {
                 <div className={`${styles.container}`}>
                     <CardList<INode>
                         isLoading={this.props.isLoading}
-                        /*error={this.props.error}*/
+                        error={this.props.error}
                         emptyMessage={"No nodes to display"}
                         list={this.props.nodes}
                         card={this.node}

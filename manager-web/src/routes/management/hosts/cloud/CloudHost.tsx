@@ -52,6 +52,7 @@ import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
+import {IApp} from "../../apps/App";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -115,7 +116,12 @@ interface MatchParams {
     instanceId: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: ICloudHost,
+    selected: 'cloudHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     cloudHost?: ICloudHost,
@@ -402,6 +408,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 {!isNewCloudHost && isLoading && <ListLoadingSpinner/>}
                 {!isNewCloudHost && !isLoading && error && <Error message={error}/>}
                 {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && formCloudHost && (
+                    /*@ts-ignore*/
                     <Form id={cloudHostKey}
                           fields={{}}
                           values={cloudHost}
@@ -467,27 +474,32 @@ class CloudHost extends BaseComponent<Props, State> {
         {
             title: 'Cloud host',
             id: 'cloudHost',
-            content: () => this.cloudHost()
+            content: () => this.cloudHost(),
+            active: this.props.location.state.selected === 'cloudHost'
         },
         {
             title: 'Rules',
             id: 'rules',
-            content: () => this.rules()
+            content: () => this.rules(),
+            active: this.props.location.state.selected === 'rules'
         },
         {
             title: 'Generic rules',
             id: 'genericRules',
-            content: () => this.genericRules()
+            content: () => this.genericRules(),
+            active: this.props.location.state.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
-            content: () => this.simulatedMetrics()
+            content: () => this.simulatedMetrics(),
+            active: this.props.location.state.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
-            content: () => this.genericSimulatedMetrics()
+            content: () => this.genericSimulatedMetrics(),
+            active: this.props.location.state.selected === 'genericSimulatedMetrics'
         },
     ];
 

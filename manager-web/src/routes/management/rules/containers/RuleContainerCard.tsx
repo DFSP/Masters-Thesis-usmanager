@@ -84,14 +84,16 @@ class RuleContainerCard extends BaseComponent<Props, State> {
         const menuItems = [
             <LinkedContextMenuItem
                 option={'Modify conditions'}
-                pathname={`/rules/containers/${rule.name}#conditions`}
+                pathname={`/rules/containers/${rule.name}`}
+                selected={'conditions'}
                 state={rule}/>
         ];
         if (!rule.generic) {
             menuItems.push(
                 <LinkedContextMenuItem
                     option={'Modify containers'}
-                    pathname={`/rules/containers/${rule.name}#containers`}
+                    pathname={`/rules/containers/${rule.name}`}
+                    selected={'containers'}
                     state={rule}/>
             );
         }
@@ -114,7 +116,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
                                       failureCallback: this.onDeleteFailure,
                                   }}
                                   loading={loading}
-                                  contextMenuItems={this.contextMenu()}>
+                                  bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'priority'}
                       label={'Priority'}
                       value={`${rule.priority}`}/>

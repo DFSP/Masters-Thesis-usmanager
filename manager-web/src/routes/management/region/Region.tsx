@@ -39,6 +39,7 @@ import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IApp} from "../apps/App";
 
 export interface IRegion extends IDatabaseData {
     name: string;
@@ -69,7 +70,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IRegion,
+    selected: 'region'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     region?: IRegion,
@@ -193,6 +199,7 @@ class Region extends BaseComponent<Props, State> {
                 {!isNewRegion && isLoading && <ListLoadingSpinner/>}
                 {!isNewRegion && !isLoading && error && <Error message={error}/>}
                 {(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (
+                    /*@ts-ignore*/
                     <Form id={regionKey}
                           fields={this.getFields(formRegion)}
                           values={region}
@@ -241,7 +248,8 @@ class Region extends BaseComponent<Props, State> {
         {
             title: 'Region',
             id: 'region',
-            content: () => this.region()
+            content: () => this.region(),
+            active: this.props.location.state.selected === 'region'
         },
     ];
 

@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.ConditionsService;
 
 import java.util.List;
 

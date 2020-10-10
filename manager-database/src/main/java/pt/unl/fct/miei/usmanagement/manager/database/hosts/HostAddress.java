@@ -27,18 +27,24 @@ package pt.unl.fct.miei.usmanagement.manager.database.hosts;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
-@EqualsAndHashCode
 public class HostAddress implements Serializable {
 
 	private final String username;
 	private final String publicDnsName;
 	private final String publicIpAddress;
 	private final String privateIpAddress;
+
+	public HostAddress() {
+		this(null);
+	}
 
 	public HostAddress(String publicIpAddress) {
 		this(publicIpAddress, null);
@@ -55,9 +61,38 @@ public class HostAddress implements Serializable {
 		this.publicIpAddress = publicIpAddress;
 	}
 
-	@Override
-	public String toString() {
-		return username + "@" + publicIpAddress + "/" + privateIpAddress + (publicDnsName == null ? "" : "(" + publicDnsName + ")");
+	public String getHostname() {
+		return publicDnsName != null ? publicDnsName : publicIpAddress;
 	}
 
+	@Override
+	public String toString() {
+		return (username == null ? "" : username + "@")
+			+ publicIpAddress
+			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
+			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
+			+ (publicDnsName == null ? "" : "/" + publicDnsName);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		HostAddress that = (HostAddress) o;
+		return Objects.equals(publicIpAddress, that.publicIpAddress);
+		// TODO implement equals to differentiate between edge hosts under the same network
+		/*return Objects.equals(username, that.username) &&
+			Objects.equals(publicDnsName, that.publicDnsName) &&
+			Objects.equals(publicIpAddress, that.publicIpAddress) &&
+			Objects.equals(privateIpAddress, that.privateIpAddress);*/
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(username, publicDnsName, publicIpAddress, privateIpAddress);
+	}
 }

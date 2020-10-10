@@ -84,7 +84,8 @@ class RuleConditionCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify services'}
-                pathname={`/simulated-metrics/services/${condition.name}#services`}
+                pathname={`/simulated-metrics/services/${condition.name}`}
+                selected={'services'}
                 state={condition}/>,
         ];
     }
@@ -105,7 +106,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
                                       failureCallback: this.onDeleteFailure,
                                   }}
                                   loading={loading}
-                                  contextMenuItems={this.contextMenu()}>
+                                  bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'valueMode'}
                       label={'Value mode'}
                       value={condition.valueMode.name}/>

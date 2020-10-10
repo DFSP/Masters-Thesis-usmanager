@@ -84,7 +84,8 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify containers'}
-                pathname={`/simulated-metrics/containers/${simulatedContainerMetric.name}#containers`}
+                pathname={`/simulated-metrics/containers/${simulatedContainerMetric.name}`}
+                selected={'containers'}
                 state={simulatedContainerMetric}/>,
         ];
     }
@@ -110,7 +111,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
                                                  failureCallback: this.onDeleteFailure,
                                              }}
                                              loading={loading}
-                                             contextMenuItems={this.contextMenu()}>
+                                             bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'Field'}
                       label={'Field'}
                       value={`${simulatedContainerMetric.field.name}`}/>

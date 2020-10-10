@@ -71,7 +71,12 @@ interface MatchParams {
     id: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IEurekaServer,
+    selected: 'eurekaServer';
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     eurekaServer?: IEurekaServer,
@@ -186,6 +191,7 @@ class EurekaServer extends BaseComponent<Props, State> {
                 {!isNewEurekaServer && isLoading && <ListLoadingSpinner/>}
                 {!isNewEurekaServer && !isLoading && error && <Error message={error}/>}
                 {(isNewEurekaServer || !isLoading) && (isNewEurekaServer || !error) && formEurekaServer && (
+                    /*@ts-ignore*/
                     <Form id={eurekaServerKey}
                           fields={this.getFields(formEurekaServer || {})}
                           values={eurekaServer || newEurekaServer || {}}
@@ -223,7 +229,8 @@ class EurekaServer extends BaseComponent<Props, State> {
         {
             title: 'Eureka Server',
             id: 'eurekaServer',
-            content: () => this.eurekaServer()
+            content: () => this.eurekaServer(),
+            active: this.props.location.state.selected === 'eurekaServer'
         },
     ];
 

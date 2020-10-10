@@ -38,8 +38,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 
 import java.util.Arrays;
 import java.util.List;

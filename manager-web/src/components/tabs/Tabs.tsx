@@ -28,7 +28,7 @@ import styles from './Tabs.module.css';
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 
-export type Tab = { title: string, id: string, content: () => JSX.Element, disabled?: boolean, hidden?: boolean }
+export type Tab = { title: string, id: string, content: () => JSX.Element, disabled?: boolean, hidden?: boolean, active?: boolean }
 
 interface TabsProps {
     tabs: Tab[];
@@ -115,15 +115,18 @@ class Tabs extends React.Component<Props, State> {
                     <div className="col s12">
                         <ul className="tabs tabs-fixed-width" ref={this.tabsRef}>
                             {tabs.map((tab, index) =>
-                                ((tab.hidden == undefined || !tab.hidden) && (
+                                ((tab.hidden === undefined || !tab.hidden) && (
                                     <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`}>
-                                        <a href={tabs.length === 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
+                                        <a className={`${tab.active ? 'active' : ''}`}
+                                           href={tabs.length === 1 ? undefined : `#${tab.id}`}>
+                                            {tab.title}
+                                        </a>
                                     </li>
                                 ))
                             )}
                         </ul>
                         {tabs.map((tab, index) =>
-                            ((tab.hidden == undefined || !tab.hidden) && (
+                            ((tab.hidden === undefined || !tab.hidden) && (
                                 <div id={tab.id} key={index} className={`tab-content ${styles.tabContent} col s12`}>
                                     {tab.content()}
                                 </div>

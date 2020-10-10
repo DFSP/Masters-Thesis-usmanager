@@ -84,7 +84,8 @@ class AppCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify services'}
-                pathname={`/apps/${app.name}#services`}
+                pathname={`/apps/${app.name}`}
+                selected={'services'}
                 state={app}/>,
         ];
     }
@@ -95,7 +96,7 @@ class AppCard extends BaseComponent<Props, State> {
         const CardApp = Card<IApp>();
         return <CardApp id={`app-${app.name}`}
                         title={app.name}
-                        link={{to: {pathname: `/apps/${app.name}#app`, state: app}}}
+                        link={{to: {pathname: `/apps/${app.name}`, state: app}}}
                         height={'30px'}
                         margin={'10px 0'}
                         hoverable
@@ -105,7 +106,7 @@ class AppCard extends BaseComponent<Props, State> {
                             failureCallback: this.onDeleteFailure
                         }}
                         loading={loading}
-                        contextMenuItems={this.contextMenu()}/>
+                        bottomContextMenuItems={this.contextMenu()}/>
     }
 
 }

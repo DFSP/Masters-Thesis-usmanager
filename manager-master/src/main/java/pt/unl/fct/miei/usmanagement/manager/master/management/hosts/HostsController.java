@@ -40,8 +40,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
 
 import java.util.Arrays;
 import java.util.List;

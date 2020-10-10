@@ -85,35 +85,43 @@ class ServiceCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify apps'}
-                pathname={`/services/${service.serviceName}#apps`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'apps'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'Modify dependencies'}
-                pathname={`/services/${service.serviceName}#dependencies`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'dependencies'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'View dependents'}
-                pathname={`/services/${service.serviceName}#dependents`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'dependents'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'Modify predictions'}
-                pathname={`/services/${service.serviceName}#predictions`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'predictions'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/services/${service.serviceName}#serviceRules`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'serviceRules'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/services/${service.serviceName}#genericRules`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'genericRules'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/services/${service.serviceName}#simulatedMetrics`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'simulatedMetrics'}
                 state={service}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/services/${service.serviceName}#genericSimulatedMetrics`}
+                pathname={`/services/${service.serviceName}`}
+                selected={'genericSimulatedMetrics'}
                 state={service}/>
         ];
     }
@@ -139,12 +147,13 @@ class ServiceCard extends BaseComponent<Props, State> {
                             margin={'10px 0'}
                             hoverable
                             delete={{
+                                confirmMessage: `to delete service ${service.serviceName}`,
                                 url: `services/${service.serviceName}`,
                                 successCallback: this.onDeleteSuccess,
                                 failureCallback: this.onDeleteFailure
                             }}
                             loading={loading}
-                            contextMenuItems={this.contextMenu()}>
+                            bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'serviceType'}
                       label={'Service type'}
                       value={`${service.serviceType}`}/>

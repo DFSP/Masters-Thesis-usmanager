@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.Condit
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ContainerRulesService;
 
 import java.util.List;
 

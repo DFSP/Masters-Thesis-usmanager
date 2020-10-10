@@ -30,6 +30,13 @@ import CloudHostsList from "./cloud/CloudHostsList";
 import EdgeHostsList from "./edge/EdgeHostsList";
 import Collapsible from "../../../components/collapsible/Collapsible";
 
+export interface IHostAddress {
+    username: string | undefined;
+    publicDnsName: string | undefined;
+    publicIpAddress: string;
+    privateIpAddress: string | undefined;
+}
+
 const Hosts = () =>
     <MainLayout>
         <AddButton tooltip={{text: 'Add host', position: 'left'}}

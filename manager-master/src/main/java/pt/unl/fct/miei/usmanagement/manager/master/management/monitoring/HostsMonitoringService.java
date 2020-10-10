@@ -40,22 +40,22 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRe
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.master.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -102,7 +102,7 @@ public class HostsMonitoringService {
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
 								  DecisionsService decisionsService, HostProperties hostProperties,
-								  ManagerMasterProperties managerMasterProperties) {
+								  MasterManagerProperties masterManagerProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
 		this.nodesService = nodesService;
@@ -118,7 +118,7 @@ public class HostsMonitoringService {
 		this.stopHostOnEventsCount = hostProperties.getStopHostOnEventsCount();
 		this.maximumHosts = hostProperties.getMaximumHosts();
 		this.minimumHosts = hostProperties.getMinimumHosts();
-		this.isTestEnable = managerMasterProperties.getTests().isEnabled();
+		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
 	}
 
 	public List<HostMonitoringEntity> getHostsMonitoring() {
@@ -187,7 +187,7 @@ public class HostsMonitoringService {
 				try {
 					monitorHostsTask();
 				}
-				catch (MasterManagerException e) {
+				catch (ManagerException e) {
 					log.error(e.getMessage());
 				}
 			}
@@ -198,6 +198,9 @@ public class HostsMonitoringService {
 		log.info("Starting host monitoring task...");
 		List<HostDecisionResult> hostDecisions = new LinkedList<>();
 		List<SimpleNode> nodes = nodesService.getReadyNodes();
+		if (nodes.size() == 0) {
+			log.info("No hosts to monitor");
+		}
 		for (SimpleNode node : nodes) {
 			HostAddress hostAddress = node.getHostAddress();
 			HostDetails hostDetails = hostsService.getHostDetails(hostAddress);
@@ -245,7 +248,7 @@ public class HostsMonitoringService {
 		for (HostDecisionResult hostDecision : hostDecisions) {
 			HostDetails hostDetails = hostDecision.getHostDetails();
 			RuleDecision decision = hostDecision.getDecision();
-			log.info("Host {} had decision {}", hostDetails, decision);
+			log.info("Host {} had decision {}", hostDetails.getAddress(), decision);
 			HostEventEntity hostEvent = hostsEventsService.saveHostEvent(hostDetails, decision.toString());
 			int hostEventCount = hostEvent.getCount();
 			if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
@@ -337,7 +340,7 @@ public class HostsMonitoringService {
 			})
 			.map(SimpleNode::getHostAddress)
 			.findFirst()
-			.orElseThrow(() -> new MasterManagerException("Can't find new host to migrate containers to"));
+			.orElseThrow(() -> new ManagerException("Can't find new host to migrate containers to"));
 	}
 
 	private Pair<String, String> getRandomContainerToMigrate(HostAddress hostAddress) {

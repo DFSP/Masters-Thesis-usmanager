@@ -34,10 +34,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.exceptions.WorkerManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 
 @Slf4j
 @Service
@@ -134,7 +134,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 
 	@Override
 	public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
-		throw new WorkerManagerException(ex);
+		throw new ManagerException(ex.getMessage());
 	}
 
 }

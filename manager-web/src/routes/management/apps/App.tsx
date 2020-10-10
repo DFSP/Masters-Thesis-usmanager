@@ -92,7 +92,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IApp,
+    selected: 'app' | 'services';
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     app?: IApp,
@@ -361,6 +366,7 @@ class App extends BaseComponent<Props, State> {
                 {!isNewApp && !isLoading && error && <Error message={error}/>}
                 {(isNewApp || !isLoading) && (isNewApp || !error) && formApp && (
                     <>
+                        {/*@ts-ignore*/}
                         <Form id={appKey}
                               fields={this.getFields(formApp)}
                               values={app}
@@ -416,12 +422,14 @@ class App extends BaseComponent<Props, State> {
         {
             title: 'App',
             id: 'app',
-            content: () => this.app()
+            content: () => this.app(),
+            active: this.props.location.state.selected === 'app'
         },
         {
             title: 'Services',
             id: 'services',
-            content: () => this.services()
+            content: () => this.services(),
+            active: this.props.location.state.selected === 'services',
         },
     ];
 

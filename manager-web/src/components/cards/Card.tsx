@@ -33,6 +33,7 @@ import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {deleteData} from "../../utils/api";
 import {RestOperation} from "../form/Form";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
+import LinkedContextMenuItem from "../contextmenu/LinkedContextMenuItem";
 
 interface CardProps<T> {
     id: string;
@@ -44,7 +45,8 @@ interface CardProps<T> {
     children?: any[];
     delete?: RestOperation;
     loading?: boolean;
-    contextMenuItems?: JSX.Element[];
+    topContextMenuItems?: JSX.Element[];
+    bottomContextMenuItems?: JSX.Element[];
 }
 
 interface State {
@@ -85,7 +87,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
     }
 
     public render() {
-        const {id, title, link, margin, contextMenuItems, confirmationDialog} = this.props;
+        const {id, title, link, margin, topContextMenuItems, bottomContextMenuItems, confirmationDialog} = this.props;
         const {loading} = this.state;
         const cardElement =
             <>
@@ -107,26 +109,28 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                     </div>
                 </ContextMenuTrigger>
                 <ContextMenu id={`contextMenu-${id}`} className="custom-context-menu">
-                    {link &&
-                    <>
-                        <Link to={{
-                            pathname: link?.to.pathname,
-                            state: link?.to.state
-                        }}>
-                            <MenuItem className='custom-context-menu-item'>
-                                Details
-                            </MenuItem>
-                        </Link>
-                        <MenuItem className="custom-context-menu-item-divider"/>
-                    </>}
-                    {contextMenuItems?.map((menuItem, index) =>
+                    {topContextMenuItems?.map((menuItem, index) =>
                         <div key={index}>
+                            {index > 0 && <MenuItem className="custom-context-menu-item-divider"/>}
                             {menuItem}
-                            <MenuItem className="custom-context-menu-item-divider"/>
                         </div>
                     )}
-                    {this.props.delete != undefined
+                    {link &&
+                    <>
+                    {topContextMenuItems?.length && <MenuItem className="custom-context-menu-item-divider"/>}
+                        <LinkedContextMenuItem option={'Details'}
+                                               pathname={link?.to.pathname}
+                                               state={{ data: link?.to.state }}/>
+                    </>}
+                    {bottomContextMenuItems?.map((menuItem, index) =>
+                        <div key={index}>
+                            {(topContextMenuItems?.length || link) && <MenuItem className="custom-context-menu-item-divider"/>}
+                            {menuItem}
+                        </div>
+                    )}
+                    {this.props.delete !== undefined
                     && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id}>
+                        {(topContextMenuItems?.length || link || bottomContextMenuItems?.length) && <MenuItem className="custom-context-menu-item-divider"/>}
                         <MenuItem
                             className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
                             data={this.props.link?.to.state}
@@ -136,7 +140,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                         </MenuItem>
                     </div>}
                 </ContextMenu>
-                {this.props.delete != undefined
+                {this.props.delete !== undefined
                 && confirmationDialog
                 && <ConfirmDialog id={id}
                                   message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${title}`}`}
@@ -161,7 +165,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
 
     private getHeight = (): number => {
         let height = this.props.height || this.getChildrenCount() * this.CARD_ITEM_HEIGHT;
-        if (typeof height == 'string') {
+        if (typeof height === 'string') {
             height = Number(height.replace(/[^0-9]/g, ''));
         }
         return height;

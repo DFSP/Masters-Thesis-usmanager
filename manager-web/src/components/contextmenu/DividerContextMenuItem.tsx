@@ -25,9 +25,12 @@
 import {MenuItem} from "react-contextmenu";
 import React from "react";
 
+interface Props {
+    className?: string;
+}
 
-const DividerContextMenuItem = <T extends object>() => (
-    <MenuItem className='custom-context-menu-item-divider'/>
+const DividerContextMenuItem = ({className}: Props) => (
+    <MenuItem className={`${className} custom-context-menu-item-divider`}/>
 );
 
 export default DividerContextMenuItem;

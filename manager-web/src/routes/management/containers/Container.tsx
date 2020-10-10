@@ -71,6 +71,7 @@ import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetr
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import formStyles from "../../../components/form/Form.module.css";
 import {INode} from "../nodes/Node";
+import {IApp} from "../apps/App";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -138,7 +139,13 @@ interface MatchParams {
     id: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IContainer,
+    selected: 'container' | 'ports' | 'containerLabels' | 'logs' | 'rules' | 'genericContainerRules'
+        | 'simulatedMetrics' | 'genericSimulatedMetrics';
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     container?: IContainer,
@@ -477,7 +484,7 @@ class Container extends BaseComponent<Props, State> {
                        label={'hostname'}
                        type={'dropdown'}
                        dropdown={{
-                           defaultValue: "Select publicIpAddress",
+                           defaultValue: "Select host",
                            values: this.getSelectableHosts()
                        }}/>
                 <Field key={'service'}
@@ -536,6 +543,7 @@ class Container extends BaseComponent<Props, State> {
                 {!isNewContainer && isLoading && <ListLoadingSpinner/>}
                 {!isNewContainer && !isLoading && error && <Error message={error}/>}
                 {(isNewContainer || !isLoading) && (isNewContainer || !error) && containerValues && (
+                    /*@ts-ignore*/
                     <Form id={containerKey}
                           fields={this.getFields(formContainer || {})}
                           values={containerValues}
@@ -608,45 +616,53 @@ class Container extends BaseComponent<Props, State> {
         {
             title: 'Container',
             id: 'container',
-            content: () => this.container()
+            content: () => this.container(),
+            active: this.props.location.state.selected === 'container'
         },
         {
             title: 'Ports',
             id: 'ports',
             content: () => this.ports(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'ports'
         },
         {
             title: 'Labels',
             id: 'containerLabels',
             content: () => this.labels(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'containerLabels'
         },
         {
             title: 'Logs',
             id: 'logs',
             content: () => this.logs(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'logs'
         },
         {
             title: 'Rules',
             id: 'rules',
-            content: () => this.rules()
+            content: () => this.rules(),
+            active: this.props.location.state.selected === 'rules'
         },
         {
             title: 'Generic rules',
             id: 'genericContainerRules',
-            content: () => this.genericRules()
+            content: () => this.genericRules(),
+            active: this.props.location.state.selected === 'genericContainerRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
-            content: () => this.simulatedMetrics()
+            content: () => this.simulatedMetrics(),
+            active: this.props.location.state.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
-            content: () => this.genericSimulatedMetrics()
+            content: () => this.genericSimulatedMetrics(),
+            active: this.props.location.state.selected === 'genericSimulatedMetrics'
         }
     ]);
 

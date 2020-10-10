@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.componenttypes.ComponentTypesService;
 
 import java.util.List;
 

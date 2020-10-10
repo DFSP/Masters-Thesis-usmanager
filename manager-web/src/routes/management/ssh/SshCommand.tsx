@@ -32,9 +32,10 @@ import {ReduxState} from "../../../reducers";
 import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
+import {IHostAddress} from "../hosts/Hosts";
 
 export interface ISshCommand {
-    hostname: string;
+    hostAddress: IHostAddress;
     command: string;
     exitStatus: number;
     output: string[];
@@ -42,7 +43,7 @@ export interface ISshCommand {
 }
 
 const buildNewSshCommand = (): Partial<ISshCommand> => ({
-    hostname: undefined,
+    hostAddress: undefined,
     command: undefined,
 });
 
@@ -67,6 +68,7 @@ class SshCommand extends BaseComponent<Props, {}> {
     public render() {
         const command = buildNewSshCommand();
         return (
+            /*@ts-ignore*/
             <Form id={'sshCommand'}
                   fields={this.getFields()}
                   values={command}
@@ -77,16 +79,17 @@ class SshCommand extends BaseComponent<Props, {}> {
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field key='hostname'
-                       id={'hostname'}
-                       label='hostname'
-                       type={'dropdown'}
-                       dropdown={{
-                           defaultValue: 'Select publicIpAddress',
-                           values: this.getSelectableHosts()
-                       }}/>
+                <Field<Partial<IHostAddress>> key='hostAddress'
+                                              id='hostAddress'
+                                              label='hostAddress'
+                                              type='dropdown'
+                                              dropdown={{
+                                                  defaultValue: 'Select host address',
+                                                  values: this.getSelectableHosts(),
+                                                  optionToString: this.hostAddressesDropdown
+                                              }}/>
                 <Field key='command'
-                       id={'command'}
+                       id='command'
                        label='command'
                        type={'multilinetext'}/>
             </Form>
@@ -103,9 +106,9 @@ class SshCommand extends BaseComponent<Props, {}> {
 
     private getFields = (): IFields => (
         {
-            hostname: {
-                id: 'hostname',
-                label: 'hostname',
+            hostAddress: {
+                id: 'hostAddress',
+                label: 'hostAddress',
                 validation: {rule: required}
             },
             command: {
@@ -116,13 +119,17 @@ class SshCommand extends BaseComponent<Props, {}> {
         }
     );
 
-    private getSelectableHosts = () => {
+    private getSelectableHosts = (): (Partial<IHostAddress>)[] => {
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-            .map(instance => instance.publicIpAddress);
-        const edgeHosts = Object.keys(this.props.edgeHosts);
-        return cloudHosts.concat(edgeHosts);
+            .map(instance => ({ publicIpAddress: instance.publicIpAddress, privateIpAddress: instance.privateIpAddress }));
+        const edgeHosts = Object.values(this.props.edgeHosts)
+            .map(host => ({ publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress }));
+        return [...cloudHosts, ...edgeHosts];
     };
+
+    private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
 
 }
 

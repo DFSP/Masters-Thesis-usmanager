@@ -57,6 +57,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
 import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
+import {IApp} from "../apps/App";
 
 export interface IService extends IDatabaseData {
     serviceName: string;
@@ -114,7 +115,13 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IService,
+    selected: 'services' | 'apps' | 'dependencies' | 'dependents' | 'predictions' | 'serviceRules' | 'genericRules'
+        | 'simulatedMetrics' | 'genericSimulatedMetrics'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     service?: IService,
@@ -426,6 +433,7 @@ class Service extends BaseComponent<Props, State> {
                 {!isNewService && isLoading && <ListLoadingSpinner/>}
                 {!isNewService && !isLoading && error && <Error message={error}/>}
                 {(isNewService || !isLoading) && (isNewService || !error) && formService && (
+                    /*@ts-ignore*/
                     <Form id={serviceKey}
                           fields={this.getFields(formService)}
                           values={service}
@@ -524,48 +532,57 @@ class Service extends BaseComponent<Props, State> {
         {
             title: 'Service',
             id: 'service',
-            content: () => this.service()
+            content: () => this.service(),
+            active: this.props.location.state.selected === 'services'
         },
         {
             title: 'Apps',
             id: 'apps',
-            content: () => this.apps()
+            content: () => this.apps(),
+            active: this.props.location.state.selected === 'apps'
         },
         {
             title: 'Dependencies',
             id: 'dependencies',
-            content: () => this.dependencies()
+            content: () => this.dependencies(),
+            active: this.props.location.state.selected === 'dependencies'
         },
         {
             title: 'Dependents',
             id: 'dependents',
             content: () => this.dependents(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'dependents'
         },
         {
             title: 'Predictions',
             id: 'predictions',
-            content: () => this.predictions()
+            content: () => this.predictions(),
+            active: this.props.location.state.selected === 'predictions'
         },
         {
             title: 'Rules',
             id: 'serviceRules',
-            content: () => this.rules()
+            content: () => this.rules(),
+            active: this.props.location.state.selected === 'serviceRules'
         },
         {
             title: 'Generic rules',
             id: 'genericRules',
-            content: () => this.genericRules()
+            content: () => this.genericRules(),
+            active: this.props.location.state.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
-            content: () => this.simulatedMetrics()
+            content: () => this.simulatedMetrics(),
+            active: this.props.location.state.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
-            content: () => this.genericSimulatedMetrics()
+            content: () => this.genericSimulatedMetrics(),
+            active: this.props.location.state.selected === 'genericSimulatedMetrics'
         }
     ]);
 

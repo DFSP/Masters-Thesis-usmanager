@@ -85,31 +85,38 @@ class EurekaServerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'View ports'}
-                pathname={`/containers/${eurekaServer.containerId}#ports`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'ports'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'View labels'}
-                pathname={`/containers/${eurekaServer.containerId}#labels`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'labels'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'Check logs'}
-                pathname={`/containers/${eurekaServer.containerId}#logs`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'logs'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/containers/${eurekaServer.containerId}#rules`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'rules'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/containers/${eurekaServer.containerId}#genericContainerRules`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'genericContainerRules'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/containers/${eurekaServer.containerId}#simulatedMetrics`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'simulatedMetrics'}
                 state={eurekaServer}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/containers/${eurekaServer.containerId}#genericSimulatedMetrics`}
+                pathname={`/containers/${eurekaServer.containerId}`}
+                selected={'genericSimulatedMetrics'}
                 state={eurekaServer}/>
         ];
     }
@@ -136,7 +143,7 @@ class EurekaServerCard extends BaseComponent<Props, State> {
                                      failureCallback: this.onStopFailure,
                                  }}
                                  loading={loading}
-                                 contextMenuItems={this.contextMenu()}>
+                                 bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'hostname'}
                       label={'Hostname'}
                       value={eurekaServer.publicIpAddress}/>

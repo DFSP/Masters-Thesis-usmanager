@@ -28,10 +28,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.DecisionsService;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class DecisionsController {
 
 	@GetMapping("/hosts/{hostname}")
 	public List<HostDecisionEntity> getHostDecisions(@PathVariable String hostname) {
-		return decisionsService.getHostDecisions(hostname);
+		return decisionsService.getHostDecisions(new HostAddress(hostname));
 	}
 
 }

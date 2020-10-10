@@ -84,7 +84,8 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify services'}
-                pathname={`/simulated-metrics/services/${simulatedServiceMetric.name}#services`}
+                pathname={`/simulated-metrics/services/${simulatedServiceMetric.name}`}
+                selected={'services'}
                 state={simulatedServiceMetric}/>,
         ];
     }
@@ -110,7 +111,7 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
                                                failureCallback: this.onDeleteFailure,
                                            }}
                                            loading={loading}
-                                           contextMenuItems={this.contextMenu()}>
+                                           bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'Field'}
                       label={'Field'}
                       value={`${simulatedServiceMetric.field.name}`}/>

@@ -46,6 +46,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -229,8 +231,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return buildResponseEntity(apiError);
 	}
 
-	@ExceptionHandler(MasterManagerException.class)
-	protected ResponseEntity<Object> handleInternalErrorException(MasterManagerException ex) {
+	@ExceptionHandler(ManagerException.class)
+	protected ResponseEntity<Object> handleInternalErrorException(ManagerException ex) {
 		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
 		apiError.setMessage(ex.getMessage());
 		return buildResponseEntity(apiError);

@@ -129,10 +129,11 @@ export const FormContext =
 
 //TODO validation for correct dates and times
 
-export const required = (values: IValues, id: keyof IValues): string =>
-    values[id] === undefined || values[id] === null || values[id] === ""
+export const required = (values: IValues, id: keyof IValues): string => {
+    return values[id] === undefined || values[id] === null || values[id] === ""
         ? `${camelCaseToSentenceCase(id as string)} is required`
         : "";
+}
 
 export const notAllowed = (values: IValues, id: keyof IValues, args: any[]): string =>
     args.indexOf(values[id].toLowerCase()) !== -1
@@ -483,6 +484,7 @@ class Form extends React.Component<Props, State> {
         const errors: IErrors = {};
         Object.keys(this.props.fields).forEach((fieldName: string) => errors[fieldName] = this.validate(fieldName));
         this.setState({errors});
+        console.log(this.isValid(errors))
         return this.isValid(errors);
     }
 

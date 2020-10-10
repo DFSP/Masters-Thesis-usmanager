@@ -41,6 +41,7 @@ import {isNew} from "../../../utils/router";
 import {IContainer} from "../containers/Container";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IEurekaServer} from "../eurekaServers/EurekaServer";
 
 export interface ILoadBalancer extends IContainer {
 }
@@ -76,7 +77,12 @@ interface MatchParams {
     id: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: ILoadBalancer,
+    selected: 'loadBalancer';
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     loadBalancer?: ILoadBalancer,
@@ -197,6 +203,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 {!isNewLoadBalancer && isLoading && <ListLoadingSpinner/>}
                 {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
                 {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && formLoadBalancer && (
+                    /*@ts-ignore*/
                     <Form id={loadBalancerKey}
                           fields={this.getFields(formLoadBalancer || {})}
                           values={loadBalancer || newLoadBalancer || {}}
@@ -243,7 +250,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
         {
             title: 'Load balancer',
             id: 'loadBalancer',
-            content: () => this.loadBalancer()
+            content: () => this.loadBalancer(),
+            active: this.props.location.state.selected === 'loadBalancer'
         },
     ];
 

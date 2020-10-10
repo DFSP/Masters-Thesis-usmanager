@@ -31,6 +31,12 @@ management:
     web:
       exposure:
         include: info, health, metrics, mappings
+manager:
+  mode:
+  master:
+    monitor-period: 30000
+    tests:
+      enabled: ${tests:true}
 ssh:
   connection-timeout: 10000
 edge:
@@ -47,7 +53,7 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-093ec0e715ae0adc3
+    ami: ami-0cab6419e9f386cfd
     security-group: us-manager-security-group
     key-pair: ec2
     type: t2.micro
@@ -91,12 +97,7 @@ host:
   maximum-ram-percentage: 90
   minimum-hosts: 1
   monitor-period: 60000
-  local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
-master-manager:
-  #mode: LOCAL
-  monitor-period: 30000
-  tests:
-    enabled: ${tests:true}
+  local-machine-dns: daniel@dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 nginx-load-balancer:
   api-url: /_/nginx-load-balancer-api/api
 location-request:

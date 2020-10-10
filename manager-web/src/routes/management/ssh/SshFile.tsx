@@ -32,14 +32,15 @@ import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IReply} from "../../../utils/api";
+import {IHostAddress} from "../hosts/Hosts";
 
 export interface ISshFile {
-    hostname: string;
+    hostAddress: IHostAddress;
     filename: string;
 }
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
-    hostname: undefined,
+    hostAddress: undefined,
     filename: undefined,
 });
 
@@ -69,6 +70,7 @@ class SshFile extends BaseComponent<Props, {}> {
     public render() {
         const command = buildNewSshCommand();
         return (
+            /*@ts-ignore*/
             <Form id={'sshCommand'}
                   fields={this.getFields()}
                   values={command}
@@ -79,18 +81,19 @@ class SshFile extends BaseComponent<Props, {}> {
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field key='hostname'
-                       id={'hostname'}
-                       label='hostname'
-                       type={'dropdown'}
-                       dropdown={{
-                           defaultValue: 'Select publicIpAddress',
-                           values: this.getSelectableHosts()
-                       }}/>
+                <Field<Partial<IHostAddress>> key='hostAddress'
+                                               id='hostAddress'
+                                               label='hostAddress'
+                                               type='dropdown'
+                                               dropdown={{
+                                                   defaultValue: 'Select host address',
+                                                   values: this.getSelectableHosts(),
+                                                   optionToString: this.hostAddressesDropdown
+                                               }}/>
                 <Field key='filename'
-                       id={'filename'}
+                       id='filename'
                        label='filename'
-                       type={'dropdown'}
+                       type='dropdown'
                        dropdown={{
                            defaultValue: 'Select filename',
                            values: this.getSelectableFiles()
@@ -109,9 +112,9 @@ class SshFile extends BaseComponent<Props, {}> {
 
     private getFields = (): IFields => (
         {
-            hostname: {
-                id: 'hostname',
-                label: 'hostname',
+            hostAddress: {
+                id: 'hostAddress',
+                label: 'hostAddress',
                 validation: {rule: required}
             },
             filename: {
@@ -122,16 +125,20 @@ class SshFile extends BaseComponent<Props, {}> {
         }
     );
 
-    private getSelectableHosts = () => {
+    private getSelectableHosts = (): (Partial<IHostAddress>)[] => {
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-            .map(instance => instance.publicIpAddress);
-        const edgeHosts = Object.keys(this.props.edgeHosts);
-        return cloudHosts.concat(edgeHosts);
+            .map(instance => ({ publicIpAddress: instance.publicIpAddress, privateIpAddress: instance.privateIpAddress }));
+        const edgeHosts = Object.values(this.props.edgeHosts)
+            .map(host => ({ publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress }));
+        return [...cloudHosts, ...edgeHosts];
     };
 
+    private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
+
     //TODO get available scripts from the server instead
-    private getSelectableFiles = () => ['docker-install.sh', 'docker-install2.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
+    private getSelectableFiles = () => ['docker-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
 
 }
 

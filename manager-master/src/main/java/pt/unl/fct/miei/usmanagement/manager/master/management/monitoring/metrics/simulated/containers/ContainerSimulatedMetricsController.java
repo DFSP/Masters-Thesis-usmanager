@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
 
 import java.util.List;
 

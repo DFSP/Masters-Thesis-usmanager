@@ -39,7 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.Condit
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
 
 import java.util.List;
 

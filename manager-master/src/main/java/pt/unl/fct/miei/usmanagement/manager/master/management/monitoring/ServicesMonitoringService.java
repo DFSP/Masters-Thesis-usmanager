@@ -45,21 +45,21 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitorin
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterProperties;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.MasterManagerException;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.location.LocationRequestService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.master.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.location.LocationRequestService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -111,7 +111,7 @@ public class ServicesMonitoringService {
 									 DecisionsService decisionsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 									 ContainerProperties containerProperties,
-									 ManagerMasterProperties managerMasterProperties) {
+									 MasterManagerProperties masterManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;
@@ -126,7 +126,7 @@ public class ServicesMonitoringService {
 		this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
 		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
 		this.migrateContainerOnEventCount = containerProperties.getMigrateContainerOnEventCount();
-		this.isTestEnable = managerMasterProperties.getTests().isEnabled();
+		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
 	}
 
 	public List<ServiceMonitoringEntity> getServicesMonitoring() {
@@ -223,7 +223,7 @@ public class ServicesMonitoringService {
 				try {
 					monitorServicesTask(diffSeconds);
 				}
-				catch (MasterManagerException e) {
+				catch (ManagerException e) {
 					log.error(e.getMessage());
 				}
 			}
@@ -237,10 +237,13 @@ public class ServicesMonitoringService {
 		if (isTestEnable) {
 			List<ContainerEntity> systemContainers = containersService.getContainersWithLabels(
 				Set.of(
-					Pair.of(ContainerConstants.Label.SERVICE_NAME, ManagerMasterProperties.MASTER_MANAGER),
+					Pair.of(ContainerConstants.Label.SERVICE_NAME, MasterManagerProperties.MASTER_MANAGER),
 					Pair.of(ContainerConstants.Label.SERVICE_NAME, WorkerManagerProperties.WORKER_MANAGER)
 				));
 			containers.addAll(systemContainers);
+		}
+		if (containers.size() == 0) {
+			log.info("No services to monitor");
 		}
 		for (ContainerEntity container : containers) {
 			log.info("On {}", container);

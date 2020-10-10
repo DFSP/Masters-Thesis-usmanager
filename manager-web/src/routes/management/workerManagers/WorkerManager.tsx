@@ -45,6 +45,8 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {IContainer} from "../containers/Container";
 import {INode} from "../nodes/Node";
 import AssignedHostsList from "./AssignedHostsList";
+import SshCommand from "../ssh/SshCommand";
+import {ILoadBalancer} from "../loadBalancers/LoadBalancer";
 
 export interface IWorkerManager extends IDatabaseData {
     startedAt: string,
@@ -80,7 +82,12 @@ interface MatchParams {
     id: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IWorkerManager,
+    selected: 'workerManager' | 'assignHosts';
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     workerManager?: IWorkerManager,
@@ -243,6 +250,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                 {!isNewWorkerManager && isLoading && <ListLoadingSpinner/>}
                 {!isNewWorkerManager && !isLoading && error && <Error message={error}/>}
                 {(isNewWorkerManager || !isLoading) && (isNewWorkerManager || !error) && formWorkerManager && (
+                    /*@ts-ignore*/
                     <Form id={workerManagerKey}
                           fields={this.getFields(formWorkerManager || {})}
                           values={workerManager || newWorkerManager || {}}
@@ -306,12 +314,14 @@ class WorkerManager extends BaseComponent<Props, State> {
         {
             title: 'Worker manager',
             id: 'workerManager',
-            content: () => this.workerManager()
+            content: () => this.workerManager(),
+            active: this.props.location.state.selected === 'workerManager'
         },
         {
             title: 'Assigned hosts',
             id: 'assignHosts',
-            content: () => this.assignHosts()
+            content: () => this.assignHosts(),
+            active: this.props.location.state.selected === 'assignHosts'
         }
     ];
 

@@ -88,7 +88,8 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                 state={workerManager}/>,
             <LinkedContextMenuItem
                 option={'Modify assigned hosts'}
-                pathname={`/worker-managers/${workerManager.id}#assignHosts`}
+                pathname={`/worker-managers/${workerManager.id}`}
+                selected={'assignHosts'}
                 state={workerManager}/>,
         ];
     }
@@ -110,7 +111,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                                       failureCallback: this.onStopFailure,
                                   }}
                                   loading={loading}
-                                  contextMenuItems={this.contextMenu()}>
+                                  bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'startedAt'}
                       label={'Started at'}
                       value={workerManager.startedAt}/>

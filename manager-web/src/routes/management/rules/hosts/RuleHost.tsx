@@ -51,6 +51,7 @@ import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
+import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleHost extends IRule {
     cloudHosts?: string[],
@@ -86,7 +87,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: IRuleHost,
+    selected: 'hostRule' | 'ruleConditions' | 'cloudHosts' | 'edgeHosts'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 type State = {
     ruleHost?: IRuleHost,
@@ -342,6 +348,7 @@ class RuleHost extends BaseComponent<Props, State> {
                 {!isNewRuleHost && isLoading && <ListLoadingSpinner/>}
                 {!isNewRuleHost && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleHost || !isLoading) && (isNewRuleHost || !error) && formRuleHost && (
+                    /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleHost)}
                           values={ruleHost}
@@ -424,23 +431,27 @@ class RuleHost extends BaseComponent<Props, State> {
             title: 'Host rule',
             id: 'hostRule',
             content: () => this.hostRule(),
+            active: this.props.location.state.selected === 'hostRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
+            active: this.props.location.state.selected === 'ruleConditions'
         },
         {
             title: 'Cloud hosts',
             id: 'cloudHosts',
             content: () => this.cloudHosts(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'cloudHosts'
         },
         {
             title: 'Edge hosts',
             id: 'edgeHosts',
             content: () => this.edgeHosts(),
-            disabled: this.state.isGeneric
+            disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'edgeHosts'
         }
     ];
 

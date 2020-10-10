@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.fields.FieldsService;
 
 import java.util.List;
 

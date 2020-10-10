@@ -84,19 +84,23 @@ class EdgeHostCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#rules`}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                selected={'rules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#genericContainerRules`}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                selected={'genericContainerRules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#simulatedMetrics`}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                selected={'simulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}#genericSimulatedMetrics`}
+                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                selected={'genericSimulatedMetrics'}
                 state={edgeHost}/>
         ];
     }
@@ -122,7 +126,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                                  failureCallback: this.onDeleteFailure,
                              }}
                              loading={loading}
-                             contextMenuItems={this.contextMenu()}>
+                             bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'username'}
                       label={'Username'}
                       value={`${edgeHost.username}`}/>

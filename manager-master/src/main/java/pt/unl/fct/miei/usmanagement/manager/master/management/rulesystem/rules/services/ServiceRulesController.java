@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRul
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.master.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.service.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ServiceRulesService;
 
 import java.util.List;
 

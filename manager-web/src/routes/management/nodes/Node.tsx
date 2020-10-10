@@ -52,6 +52,7 @@ import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
 import TestMap from "./TestMap";
+import {IApp} from "../apps/App";
 
 export interface INode extends IDatabaseData {
     hostname: string;
@@ -118,7 +119,12 @@ interface MatchParams {
     id: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: INode,
+    selected: 'newNode' | 'node' | 'nodeLabels'
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     node?: INode,
@@ -176,7 +182,7 @@ class Node extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<INode[]>): void => {
         const nodes = reply.data;
-        if (nodes.length == 1) {
+        if (nodes.length === 1) {
             const node = nodes[0];
             super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname} has joined the swarm</span>`);
             this.props.addNode(node);
@@ -442,6 +448,7 @@ class Node extends BaseComponent<Props, State> {
                 {!isNewNode && !isLoading && error && <Error message={error}/>}
                 {(isNewNode || !isLoading) && (isNewNode || !error) && node && (
                     <>
+                        {/*@ts-ignore*/}
                         <Form id={nodeKey}
                               fields={this.getFields(node)}
                               values={node}
@@ -490,19 +497,22 @@ class Node extends BaseComponent<Props, State> {
             title: 'Node',
             id: 'newNode',
             content: () => this.node(),
-            hidden: !this.isNew()
+            hidden: !this.isNew(),
+            active: this.props.location.state.selected === 'newNode'
         },
         {
             title: 'Node',
             id: 'node',
             content: () => this.node(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'node'
         },
         {
             title: 'Labels',
             id: 'nodeLabels',
             content: () => this.labels(),
-            hidden: this.isNew()
+            hidden: this.isNew(),
+            active: this.props.location.state.selected === 'nodeLabels'
         }
     ]);
 
@@ -518,7 +528,7 @@ function removeFields(node: Partial<INode>) {
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.nodes.isLoadingNodes;
     const error = state.entities.nodes.loadNodesError;
-    const id = props.match.params.id;
+    const id = props.match.params.id.split('#')[0];
     const newNodeHost = isNew(props.location.search) ? buildNewNodeHost() : undefined;
     const newNodeLocation = isNew(props.location.search) ? buildNewNodeLocation() : undefined;
     const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;

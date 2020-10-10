@@ -28,8 +28,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.service.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
 
 @Component
 public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {

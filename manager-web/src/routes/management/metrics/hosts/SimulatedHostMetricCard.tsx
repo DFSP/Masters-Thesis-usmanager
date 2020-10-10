@@ -84,11 +84,13 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Modify cloud hosts'}
-                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}#cloudHosts`}
+                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}`}
+                selected={'cloudHosts'}
                 state={simulatedHostMetric}/>,
             <LinkedContextMenuItem
                 option={'Modify edge hosts'}
-                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}#edgeHosts`}
+                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}`}
+                selected={'edgeHosts'}
                 state={simulatedHostMetric}/>,
         ];
     }
@@ -114,7 +116,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
                                             failureCallback: this.onDeleteFailure,
                                         }}
                                         loading={loading}
-                                        contextMenuItems={this.contextMenu()}>
+                                        bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'Field'}
                       label={'Field'}
                       value={`${simulatedHostMetric.field.name}`}/>

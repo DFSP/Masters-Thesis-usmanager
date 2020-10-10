@@ -83,6 +83,7 @@ export default class InputDialog extends BaseComponent<Props, State> {
     public render() {
         const {id, title, fields, values, children} = this.props;
         const {fullscreen} = this.state;
+
         return (
             <div id={id} className={`modal dialog ${fullscreen ? 'modal-fullscreen' : ''}`} ref={this.modal}>
                 <div className="modal-content">
@@ -110,6 +111,7 @@ export default class InputDialog extends BaseComponent<Props, State> {
                             </div>
                         </>
                     )}
+                    {/*@ts-ignore*/}
                     <Form id='inputDialog'
                           fields={fields}
                           values={values}

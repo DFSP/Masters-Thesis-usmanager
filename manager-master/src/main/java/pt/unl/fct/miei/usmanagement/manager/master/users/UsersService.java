@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.users.UserEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.users.UserRole;
 import pt.unl.fct.miei.usmanagement.manager.database.users.UsersRepository;
-import pt.unl.fct.miei.usmanagement.manager.master.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 
 import java.util.List;
 

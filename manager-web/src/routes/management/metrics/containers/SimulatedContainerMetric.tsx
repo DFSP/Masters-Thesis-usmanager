@@ -48,6 +48,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedContainerMetricContainerList from "./SimulatedContainerMetricContainerList";
+import {ILoadBalancer} from "../../loadBalancers/LoadBalancer";
 
 export interface ISimulatedContainerMetric extends IDatabaseData {
     name: string;
@@ -89,7 +90,12 @@ interface MatchParams {
     name: string;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+interface LocationState {
+    data: ISimulatedContainerMetric,
+    selected: 'simulatedContainerMetric' | 'containers',
+}
+
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
 
 interface State {
     simulatedContainerMetric?: ISimulatedContainerMetric,
@@ -267,6 +273,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                 {!isNewSimulatedContainerMetric && isLoading && <ListLoadingSpinner/>}
                 {!isNewSimulatedContainerMetric && !isLoading && error && <Error message={error}/>}
                 {(isNewSimulatedContainerMetric || !isLoading) && (isNewSimulatedContainerMetric || !error) && formSimulatedContainerMetric && (
+                    /*@ts-ignore*/
                     <Form id={simulatedContainerMetricKey}
                           fields={this.getFields(formSimulatedContainerMetric)}
                           values={simulatedContainerMetric}
@@ -346,12 +353,14 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedContainerMetric',
             content: () => this.simulatedContainerMetric(),
+            active: this.props.location.state.selected === 'simulatedContainerMetric'
         },
         {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
             disabled: this.state.isGeneric,
+            active: this.props.location.state.selected === 'containers'
         },
     ];
 
