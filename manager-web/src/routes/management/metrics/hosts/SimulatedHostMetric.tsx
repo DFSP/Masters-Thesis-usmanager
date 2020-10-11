@@ -396,21 +396,21 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedHostMetric',
             content: () => this.simulatedHostMetric(),
-            active: this.props.location.state.selected === 'simulatedHostMetric'
+            active: this.props.location.state?.selected === 'simulatedHostMetric'
         },
         {
             title: 'Cloud hosts',
             id: 'cloudHosts',
             content: () => this.cloudHosts(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'cloudHosts'
+            active: this.props.location.state?.selected === 'cloudHosts'
         },
         {
             title: 'Edge hosts',
             id: 'edgeHosts',
             content: () => this.edgeHosts(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'edgeHosts'
+            active: this.props.location.state?.selected === 'edgeHosts'
         },
     ];
 

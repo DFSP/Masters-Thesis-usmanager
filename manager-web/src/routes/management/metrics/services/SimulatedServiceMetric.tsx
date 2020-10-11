@@ -353,14 +353,14 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedServiceMetric',
             content: () => this.simulatedServiceMetric(),
-            active: this.props.location.state.selected === 'simulatedServiceMetric'
+            active: this.props.location.state?.selected === 'simulatedServiceMetric'
         },
         {
             title: 'Services',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'services'
+            active: this.props.location.state?.selected === 'services'
         },
     ];
 

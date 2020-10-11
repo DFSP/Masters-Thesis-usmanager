@@ -289,7 +289,7 @@ class RuleCondition extends BaseComponent<Props, State> {
             title: 'Condition',
             id: 'condition',
             content: () => this.condition(),
-            active: this.props.location.state.selected === 'condition'
+            active: this.props.location.state?.selected === 'condition'
         },
     ];
 

@@ -68,9 +68,9 @@ export default class extends React.Component<Props, State> {
         const {id, title, active, headerClassname, bodyClassname, children} = this.props;
         const {isOpen} = this.state;
         return (
-            <ul id={id} className="collapsible" ref={this.collapsible} onClick={this.onChange}>
+            <ul id={id} className="collapsible" ref={this.collapsible}>
                 <li className={active ? "active" : undefined}>
-                    <ul className={`collapsible-header no-select ${headerClassname}`}>
+                    <ul className={`collapsible-header no-select ${headerClassname}`} onClick={this.onChange}>
                         <div className={`subtitle`}>{title}</div>
                         <i className="material-icons">{isOpen ? 'arrow_drop_down' : 'arrow_drop_up'}</i>
                     </ul>

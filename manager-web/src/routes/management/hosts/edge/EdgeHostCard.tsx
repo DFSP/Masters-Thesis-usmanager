@@ -90,7 +90,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'View generic rules'}
                 pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
-                selected={'genericContainerRules'}
+                selected={'genericRules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
@@ -121,6 +121,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                              margin={'10px 0'}
                              hoverable
                              delete={{
+                                 confirmMessage: `to delete edge host ${edgeHost.publicIpAddress}`,
                                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure,

@@ -85,15 +85,20 @@ class RuleHostCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'Modify conditions'}
                 pathname={`/rules/hosts/${rule.name}`}
-                selected={'conditions'}
+                selected={'ruleConditions'}
                 state={rule}/>
         ];
         if (!rule.generic) {
             menuItems.push(
                 <LinkedContextMenuItem
-                    option={'Modify hosts'}
+                    option={'Modify cloud hosts'}
                     pathname={`/rules/hosts/${rule.name}`}
-                    selected={'hosts'}
+                    selected={'cloudHosts'}
+                    state={rule}/>,
+                <LinkedContextMenuItem
+                    option={'Modify edge hosts'}
+                    pathname={`/rules/hosts/${rule.name}`}
+                    selected={'edgeHosts'}
                     state={rule}/>
             );
         }

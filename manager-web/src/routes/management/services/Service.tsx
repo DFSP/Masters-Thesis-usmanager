@@ -533,56 +533,56 @@ class Service extends BaseComponent<Props, State> {
             title: 'Service',
             id: 'service',
             content: () => this.service(),
-            active: this.props.location.state.selected === 'services'
+            active: this.props.location.state?.selected === 'services'
         },
         {
             title: 'Apps',
             id: 'apps',
             content: () => this.apps(),
-            active: this.props.location.state.selected === 'apps'
+            active: this.props.location.state?.selected === 'apps'
         },
         {
             title: 'Dependencies',
             id: 'dependencies',
             content: () => this.dependencies(),
-            active: this.props.location.state.selected === 'dependencies'
+            active: this.props.location.state?.selected === 'dependencies'
         },
         {
             title: 'Dependents',
             id: 'dependents',
             content: () => this.dependents(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'dependents'
+            active: this.props.location.state?.selected === 'dependents'
         },
         {
             title: 'Predictions',
             id: 'predictions',
             content: () => this.predictions(),
-            active: this.props.location.state.selected === 'predictions'
+            active: this.props.location.state?.selected === 'predictions'
         },
         {
             title: 'Rules',
             id: 'serviceRules',
             content: () => this.rules(),
-            active: this.props.location.state.selected === 'serviceRules'
+            active: this.props.location.state?.selected === 'serviceRules'
         },
         {
             title: 'Generic rules',
             id: 'genericRules',
             content: () => this.genericRules(),
-            active: this.props.location.state.selected === 'genericRules'
+            active: this.props.location.state?.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
-            active: this.props.location.state.selected === 'simulatedMetrics'
+            active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state.selected === 'genericSimulatedMetrics'
+            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
         }
     ]);
 

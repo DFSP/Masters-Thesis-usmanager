@@ -419,31 +419,31 @@ class EdgeHost extends BaseComponent<Props, State> {
             title: 'Edge host',
             id: 'edgeHost',
             content: () => this.edgeHost(),
-            active: this.props.location.state.selected === 'edgeHost'
+            active: this.props.location.state?.selected === 'edgeHost'
         },
         {
             title: 'Rules',
             id: 'rules',
             content: () => this.rules(),
-            active: this.props.location.state.selected === 'rules'
+            active: this.props.location.state?.selected === 'rules'
         },
         {
             title: 'Generic rules',
             id: 'genericRules',
             content: () => this.genericRules(),
-            active: this.props.location.state.selected === 'genericRules'
+            active: this.props.location.state?.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
-            active: this.props.location.state.selected === 'simulatedMetrics'
+            active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state.selected === 'genericSimulatedMetrics'
+            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
         },
     ];
 

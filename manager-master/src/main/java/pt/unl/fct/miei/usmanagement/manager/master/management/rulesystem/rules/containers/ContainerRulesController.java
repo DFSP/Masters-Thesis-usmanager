@@ -65,9 +65,9 @@ public class ContainerRulesController {
 	@PostMapping("/containers")
 	public ContainerRuleEntity addRule(@RequestBody ContainerRuleEntity rule) {
 		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
-		if (decisionComponentType != ComponentType.CONTAINER) {
+		if (decisionComponentType != ComponentType.SERVICE) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
-				ComponentType.CONTAINER.name(), decisionComponentType.name());
+				ComponentType.SERVICE.name(), decisionComponentType.name());
 		}
 		Validation.validatePostRequest(rule.getId());
 		return containerRulesService.addRule(rule);

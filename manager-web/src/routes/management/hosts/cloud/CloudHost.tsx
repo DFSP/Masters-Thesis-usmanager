@@ -475,31 +475,31 @@ class CloudHost extends BaseComponent<Props, State> {
             title: 'Cloud host',
             id: 'cloudHost',
             content: () => this.cloudHost(),
-            active: this.props.location.state.selected === 'cloudHost'
+            active: this.props.location.state?.selected === 'cloudHost'
         },
         {
             title: 'Rules',
             id: 'rules',
             content: () => this.rules(),
-            active: this.props.location.state.selected === 'rules'
+            active: this.props.location.state?.selected === 'rules'
         },
         {
             title: 'Generic rules',
             id: 'genericRules',
             content: () => this.genericRules(),
-            active: this.props.location.state.selected === 'genericRules'
+            active: this.props.location.state?.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
-            active: this.props.location.state.selected === 'simulatedMetrics'
+            active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state.selected === 'genericSimulatedMetrics'
+            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
         },
     ];
 

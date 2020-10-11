@@ -431,27 +431,27 @@ class RuleHost extends BaseComponent<Props, State> {
             title: 'Host rule',
             id: 'hostRule',
             content: () => this.hostRule(),
-            active: this.props.location.state.selected === 'hostRule'
+            active: this.props.location.state?.selected === 'hostRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
-            active: this.props.location.state.selected === 'ruleConditions'
+            active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
             title: 'Cloud hosts',
             id: 'cloudHosts',
             content: () => this.cloudHosts(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'cloudHosts'
+            active: this.props.location.state?.selected === 'cloudHosts'
         },
         {
             title: 'Edge hosts',
             id: 'edgeHosts',
             content: () => this.edgeHosts(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'edgeHosts'
+            active: this.props.location.state?.selected === 'edgeHosts'
         }
     ];
 

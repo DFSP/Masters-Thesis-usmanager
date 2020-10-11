@@ -230,11 +230,12 @@ class ServiceAppList extends BaseComponent<Props, State> {
         return (
             <>
                 <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'number'}/>
+                {list && !!list.length &&
                 <Collapsible id={'otherServicesList'}
                              title={'Other services\' launch order'}
                              onChange={this.updateModalScrollbar}>
-                    {list && <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>}
-                </Collapsible>
+                    <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>
+                </Collapsible>}
             </>
         )
     };

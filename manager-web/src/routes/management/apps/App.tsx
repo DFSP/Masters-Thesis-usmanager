@@ -423,13 +423,13 @@ class App extends BaseComponent<Props, State> {
             title: 'App',
             id: 'app',
             content: () => this.app(),
-            active: this.props.location.state.selected === 'app'
+            active: this.props.location.state?.selected === 'app'
         },
         {
             title: 'Services',
             id: 'services',
             content: () => this.services(),
-            active: this.props.location.state.selected === 'services',
+            active: this.props.location.state?.selected === 'services',
         },
     ];
 

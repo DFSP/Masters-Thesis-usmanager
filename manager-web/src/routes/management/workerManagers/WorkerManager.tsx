@@ -315,13 +315,13 @@ class WorkerManager extends BaseComponent<Props, State> {
             title: 'Worker manager',
             id: 'workerManager',
             content: () => this.workerManager(),
-            active: this.props.location.state.selected === 'workerManager'
+            active: this.props.location.state?.selected === 'workerManager'
         },
         {
             title: 'Assigned hosts',
             id: 'assignHosts',
             content: () => this.assignHosts(),
-            active: this.props.location.state.selected === 'assignHosts'
+            active: this.props.location.state?.selected === 'assignHosts'
         }
     ];
 

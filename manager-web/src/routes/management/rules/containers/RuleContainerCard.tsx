@@ -85,7 +85,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'Modify conditions'}
                 pathname={`/rules/containers/${rule.name}`}
-                selected={'conditions'}
+                selected={'ruleConditions'}
                 state={rule}/>
         ];
         if (!rule.generic) {

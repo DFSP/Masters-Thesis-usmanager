@@ -251,7 +251,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
             title: 'Load balancer',
             id: 'loadBalancer',
             content: () => this.loadBalancer(),
-            active: this.props.location.state.selected === 'loadBalancer'
+            active: this.props.location.state?.selected === 'loadBalancer'
         },
     ];
 

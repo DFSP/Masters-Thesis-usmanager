@@ -79,17 +79,6 @@ class RuleConditionCard extends BaseComponent<Props, State> {
         }
     }
 
-    private contextMenu = (): JSX.Element[] => {
-        const {condition} = this.props;
-        return [
-            <LinkedContextMenuItem
-                option={'Modify services'}
-                pathname={`/simulated-metrics/services/${condition.name}`}
-                selected={'services'}
-                state={condition}/>,
-        ];
-    }
-
     public render() {
         const {condition} = this.props;
         const {loading} = this.state;
@@ -105,8 +94,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
                                       successCallback: this.onDeleteSuccess,
                                       failureCallback: this.onDeleteFailure,
                                   }}
-                                  loading={loading}
-                                  bottomContextMenuItems={this.contextMenu()}>
+                                  loading={loading}>
             <CardItem key={'valueMode'}
                       label={'Value mode'}
                       value={condition.valueMode.name}/>

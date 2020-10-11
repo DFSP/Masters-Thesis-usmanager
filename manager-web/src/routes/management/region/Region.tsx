@@ -249,7 +249,7 @@ class Region extends BaseComponent<Props, State> {
             title: 'Region',
             id: 'region',
             content: () => this.region(),
-            active: this.props.location.state.selected === 'region'
+            active: this.props.location.state?.selected === 'region'
         },
     ];
 

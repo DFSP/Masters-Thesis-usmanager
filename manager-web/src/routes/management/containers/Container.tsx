@@ -617,52 +617,52 @@ class Container extends BaseComponent<Props, State> {
             title: 'Container',
             id: 'container',
             content: () => this.container(),
-            active: this.props.location.state.selected === 'container'
+            active: this.props.location.state?.selected === 'container'
         },
         {
             title: 'Ports',
             id: 'ports',
             content: () => this.ports(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'ports'
+            active: this.props.location.state?.selected === 'ports'
         },
         {
             title: 'Labels',
             id: 'containerLabels',
             content: () => this.labels(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'containerLabels'
+            active: this.props.location.state?.selected === 'containerLabels'
         },
         {
             title: 'Logs',
             id: 'logs',
             content: () => this.logs(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'logs'
+            active: this.props.location.state?.selected === 'logs'
         },
         {
             title: 'Rules',
             id: 'rules',
             content: () => this.rules(),
-            active: this.props.location.state.selected === 'rules'
+            active: this.props.location.state?.selected === 'rules'
         },
         {
             title: 'Generic rules',
             id: 'genericContainerRules',
             content: () => this.genericRules(),
-            active: this.props.location.state.selected === 'genericContainerRules'
+            active: this.props.location.state?.selected === 'genericContainerRules'
         },
         {
             title: 'Simulated metrics',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
-            active: this.props.location.state.selected === 'simulatedMetrics'
+            active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
             title: 'Generic simulated metrics',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state.selected === 'genericSimulatedMetrics'
+            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
         }
     ]);
 

@@ -498,21 +498,21 @@ class Node extends BaseComponent<Props, State> {
             id: 'newNode',
             content: () => this.node(),
             hidden: !this.isNew(),
-            active: this.props.location.state.selected === 'newNode'
+            active: this.props.location.state?.selected === 'newNode'
         },
         {
             title: 'Node',
             id: 'node',
             content: () => this.node(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'node'
+            active: this.props.location.state?.selected === 'node'
         },
         {
             title: 'Labels',
             id: 'nodeLabels',
             content: () => this.labels(),
             hidden: this.isNew(),
-            active: this.props.location.state.selected === 'nodeLabels'
+            active: this.props.location.state?.selected === 'nodeLabels'
         }
     ]);
 

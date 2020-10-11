@@ -295,8 +295,8 @@ class RuleContainer extends BaseComponent<Props, State> {
         this.setState({isGeneric: generic});
 
     private getSelectableDecisions = () =>
-        Object.values(this.props.decisions).filter(decision =>
-            decision.componentType.type.toLocaleLowerCase() === componentTypes.CONTAINER.type.toLocaleLowerCase());
+        Object.values(this.props.decisions)
+            .filter(decision => decision.componentType.type.toLowerCase() === componentTypes.SERVICE.type.toLowerCase());
 
     private containerRule = () => {
         const {isLoading, error} = this.props;
@@ -385,20 +385,20 @@ class RuleContainer extends BaseComponent<Props, State> {
             title: 'Container rule',
             id: 'containerRule',
             content: () => this.containerRule(),
-            active: this.props.location.state.selected === 'containerRule'
+            active: this.props.location.state?.selected === 'containerRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
-            active: this.props.location.state.selected === 'ruleConditions'
+            active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'containers'
+            active: this.props.location.state?.selected === 'containers'
         }
     ];
 

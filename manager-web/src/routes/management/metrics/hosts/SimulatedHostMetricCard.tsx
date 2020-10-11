@@ -107,7 +107,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
                                                 state: simulatedHostMetric
                                             }
                                         }}
-                                        height={'170px'}
+                                        height={'180px'}
                                         margin={'10px 0'}
                                         hoverable
                                         delete={{

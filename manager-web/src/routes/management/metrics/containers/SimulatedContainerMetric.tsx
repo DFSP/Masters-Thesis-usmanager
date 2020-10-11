@@ -353,14 +353,14 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
             title: 'Simulated metric',
             id: 'simulatedContainerMetric',
             content: () => this.simulatedContainerMetric(),
-            active: this.props.location.state.selected === 'simulatedContainerMetric'
+            active: this.props.location.state?.selected === 'simulatedContainerMetric'
         },
         {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'containers'
+            active: this.props.location.state?.selected === 'containers'
         },
     ];
 

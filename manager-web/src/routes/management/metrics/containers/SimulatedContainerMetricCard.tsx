@@ -102,7 +102,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
                                                      state: simulatedContainerMetric
                                                  }
                                              }}
-                                             height={'170px'}
+                                             height={'180px'}
                                              margin={'10px 0'}
                                              hoverable
                                              delete={{

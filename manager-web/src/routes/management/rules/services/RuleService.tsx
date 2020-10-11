@@ -385,20 +385,20 @@ class RuleService extends BaseComponent<Props, State> {
             title: 'Service rule',
             id: 'serviceRule',
             content: () => this.serviceRule(),
-            active: this.props.location.state.selected === 'serviceRule'
+            active: this.props.location.state?.selected === 'serviceRule'
         },
         {
             title: 'Conditions',
             id: 'ruleConditions',
             content: () => this.conditions(),
-            active: this.props.location.state.selected === 'ruleConditions'
+            active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
             title: 'Services',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,
-            active: this.props.location.state.selected === 'services'
+            active: this.props.location.state?.selected === 'services'
         }
     ];
 

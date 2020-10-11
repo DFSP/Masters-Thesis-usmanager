@@ -85,7 +85,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'Modify conditions'}
                 pathname={`/rules/services/${rule.name}`}
-                selected={'conditions'}
+                selected={'ruleConditions'}
                 state={rule}/>
         ];
         if (!rule.generic) {

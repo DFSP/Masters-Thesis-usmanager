@@ -230,7 +230,7 @@ class EurekaServer extends BaseComponent<Props, State> {
             title: 'Eureka Server',
             id: 'eurekaServer',
             content: () => this.eurekaServer(),
-            active: this.props.location.state.selected === 'eurekaServer'
+            active: this.props.location.state?.selected === 'eurekaServer'
         },
     ];
 
