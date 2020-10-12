@@ -97,6 +97,7 @@ public class DockerSwarmService {
 
 	public SimpleNode initSwarm() {
 		HostAddress hostAddress = hostsService.getHostAddress();
+		String username = hostAddress.getUsername();
 		String advertiseAddress = hostAddress.getPublicIpAddress();
 		String listenAddress = hostAddress.getPrivateIpAddress();
 		log.info("Initializing docker swarm at {}", advertiseAddress);
@@ -109,6 +110,7 @@ public class DockerSwarmService {
 		}
 		String nodeId = nodeIdRegexExpression.group(0);
 		nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
+		nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
 		return nodesService.getNode(nodeId);
 	}
 
@@ -137,6 +139,7 @@ public class DockerSwarmService {
 				default:
 					throw new UnsupportedOperationException();
 			}
+			String username = hostAddress.getUsername();
 			String publicIpAddress = hostAddress.getPublicIpAddress();
 			String privateIpAddress = hostAddress.getPrivateIpAddress();
 			SwarmJoin swarmJoin = SwarmJoin.builder()
@@ -149,6 +152,7 @@ public class DockerSwarmService {
 			String nodeId = nodeClient.info().swarm().nodeId();
 			log.info("Host {} ({}) has joined the swarm as node {}", publicIpAddress, privateIpAddress, nodeId);
 			nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);
+			nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
 			return nodesService.getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
@@ -186,7 +190,9 @@ public class DockerSwarmService {
 	public void destroy() {
 		try {
 			getSwarmLeader().listNodes().parallelStream()
-				.map(node -> new HostAddress(node.status().addr())).forEach(this::leaveSwarm);
+				.map(node -> new HostAddress(node.spec().labels().get(NodeConstants.Label.USERNAME), node.status().addr(),
+					node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS)))
+				.forEach(this::leaveSwarm);
 		}
 		catch (DockerException | InterruptedException e) {
 			e.printStackTrace();

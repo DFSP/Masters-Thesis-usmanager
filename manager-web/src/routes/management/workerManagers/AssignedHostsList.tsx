@@ -170,10 +170,10 @@ class AssignedHostsList extends BaseComponent<Props, State> {
         const {assignedHosts, nodes, unSavedHosts} = this.props;
         return Object.entries(nodes)
             .filter(([_, node]) => node.state === 'ready'
-                && !assignedHosts.includes(node.hostname)
-                && !unSavedHosts.includes(node.hostname)
-                && this.props.workerManager?.container?.publicIpAddress !== node.hostname)
-            .map(([_, node]) => node.hostname)
+                && !assignedHosts.includes(node.publicIpAddress)
+                && !unSavedHosts.includes(node.publicIpAddress)
+                && this.props.workerManager?.container?.publicIpAddress !== node.publicIpAddress)
+            .map(([_, node]) => node.publicIpAddress)
     };
 
 }

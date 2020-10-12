@@ -92,8 +92,6 @@ public class SshService {
 			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
-			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByAddress(hostAddress);
-			hostAddress = cloudHost.getAddress();
 			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
 		}
 		return initClient(hostAddress.getUsername(), hostAddress.getHostname(), new File(publicKeyFile));

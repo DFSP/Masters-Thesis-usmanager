@@ -69,16 +69,11 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
                             {dropdown.defaultValue}
                         </option>
                     )}
-                    {dropdown.values.map((option, index) => {
-                            return (
-                                <option key={index}
-                                        value={typeof option === 'string' || typeof option === 'boolean' ? option.toString() : JSON.stringify(option)}>
-                                    {typeof option === 'string' || typeof option === 'boolean'
-                                        ? option.toString()
-                                        : dropdown.optionToString?.(option)}
-                                </option>
-                            );
-                        }
+                    {dropdown.values.map((option, index) =>
+                        <option key={index}
+                                value={typeof option === 'string' || typeof option === 'boolean' ? option.toString() : JSON.stringify(option)}>
+                            {typeof option === 'string' || typeof option === 'boolean' ? option.toString() : dropdown.optionToString?.(option)}
+                        </option>
                     )}
                 </>}
             </select>

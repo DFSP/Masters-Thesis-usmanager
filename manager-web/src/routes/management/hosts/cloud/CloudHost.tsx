@@ -52,7 +52,6 @@ import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
-import {IApp} from "../../apps/App";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -367,7 +366,6 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
         super.toast(`<span class="green-text">Successfully terminated <b class="white-text">${cloudHost.instanceId}</b> instance</span>`, 15000);
-
         if (this.mounted) {
             this.props.history.push('/hosts/cloud');
         }

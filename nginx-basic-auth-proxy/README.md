@@ -14,25 +14,24 @@ User ---------------> | nginx-basic-auth-proxy | ---> | HTTP Server |
 
 ```bash
 $ docker run \
-    --rm \
+    --itd \
     --name nginx-basic-auth-proxy \
     -p 8080:80 \
+    --rm \
     -e BASIC_AUTH_USERNAME=username \
     -e BASIC_AUTH_PASSWORD=password \
-    -e PROXY_PASS=https://www.google.com \
-    -e SERVER_NAME=proxy.dtan4.net \
-    -e PORT=80 \
-    quay.io/dtan4/nginx-basic-auth-proxy
+    -e PROXY_PASS=https://$PRIVATE_IP:2375 \
+    usmanager/nginx-basic-auth-proxy
 ```
 
-Aceder a http://localhost:8080 , e introduzir a *password* e *username*.
+Aceder a http://$PRIVATE_IP:2375 , e introduzir a *password* e *username*.
 
 ### Endpoints para monitorização
 
-`:8080/nginx_status` devolve as métricas do Nginx.
+`:2375/nginx_status` devolve as métricas do Nginx.
 
 ```sh-session
-$ curl localhost:8080/nginx_status
+$ curl $PRIVATE_IP:2375/nginx_status
 Active connections: 1
 server accepts handled requests
  8 8 8

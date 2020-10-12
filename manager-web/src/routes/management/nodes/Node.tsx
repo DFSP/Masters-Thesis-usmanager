@@ -55,7 +55,7 @@ import TestMap from "./TestMap";
 import {IApp} from "../apps/App";
 
 export interface INode extends IDatabaseData {
-    hostname: string;
+    publicIpAddress: string;
     state: string;
     availability: string;
     role: string;
@@ -184,14 +184,14 @@ class Node extends BaseComponent<Props, State> {
         const nodes = reply.data;
         if (nodes.length === 1) {
             const node = nodes[0];
-            super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname} has joined the swarm</span>`);
+            super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.publicIpAddress} has joined the swarm</span>`);
             this.props.addNode(node);
             if (this.mounted) {
                 this.updateNode(node);
                 this.props.history.replace(node.id.toString());
             }
         } else {
-            super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.hostname} => ${node.id}`)}</b> have joined the swarm</span>`);
+            super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> have joined the swarm</span>`);
             this.props.history.push("/nodes");
         }
 
@@ -234,7 +234,7 @@ class Node extends BaseComponent<Props, State> {
         super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">Host <b class="white-text">${node.hostname}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
+        super.toast(`<span class="green-text">Host <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
         if (this.mounted) {
             this.props.history.push(`/nodes`);
         }
@@ -270,7 +270,7 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmSuccess = (node: INode) => {
-        super.toast(`<span class="green-text">Host</span> <b>${node?.hostname}</b> <span class="green-text">successfully rejoined the swarm as node</span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`}`);
+        super.toast(`<span class="green-text">Host</span> <b>${node?.publicIpAddress}</b> <span class="green-text">successfully rejoined the swarm as node</span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`}`);
         if (this.mounted) {
             this.setState({loading: undefined});
             this.updateNode(node);
@@ -313,7 +313,7 @@ class Node extends BaseComponent<Props, State> {
         }, {});
 
     private getSelectableHosts = () => {
-        const nodesHostname = Object.values(this.props.nodes).map(node => node.hostname);
+        const nodesHostname = Object.values(this.props.nodes).map(node => node.publicIpAddress);
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
             .filter(instance => instance.state.name === 'running' || instance.state.name === 'stopped')
@@ -433,7 +433,7 @@ class Node extends BaseComponent<Props, State> {
         && Object.values(this.props.cloudHosts)
             .filter(instance => instance.state.name === 'running')
             .map(instance => instance.publicIpAddress)
-            .includes(node.hostname);
+            .includes(node.publicIpAddress);
 
     private node = () => {
         const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
@@ -469,7 +469,7 @@ class Node extends BaseComponent<Props, State> {
                             // delete button is never present on new nodes, so a type cast is safe
                               delete={{
                                   textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
-                                  url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).hostname}/leave`,
+                                  url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }}

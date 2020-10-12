@@ -62,8 +62,8 @@ import {ICloudHost} from "../cloud/CloudHost";
 export interface IEdgeHost extends IDatabaseData {
     username: string;
     publicDnsName: string;
-    privateIpAddress: string;
     publicIpAddress: string;
+    privateIpAddress: string;
     region: IRegion;
     country: string;
     city: string;

@@ -484,7 +484,6 @@ class Form extends React.Component<Props, State> {
         const errors: IErrors = {};
         Object.keys(this.props.fields).forEach((fieldName: string) => errors[fieldName] = this.validate(fieldName));
         this.setState({errors});
-        console.log(this.isValid(errors))
         return this.isValid(errors);
     }
 

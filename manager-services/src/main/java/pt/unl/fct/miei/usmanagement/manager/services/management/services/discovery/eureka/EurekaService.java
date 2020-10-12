@@ -78,7 +78,7 @@ public class EurekaService {
 		List<String> customEnvs = Collections.emptyList();
 		Map<String, String> customLabels = Collections.emptyMap();
 		String eurekaServers = availableHosts.stream()
-			.map(hostname -> String.format("http://%s:%s/eureka/", hostname, port))
+			.map(hostAddress -> String.format("http://%s:%s/eureka/", hostAddress.getPublicIpAddress(), port))
 			.collect(Collectors.joining(","));
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
 		return availableHosts.stream()

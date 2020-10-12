@@ -65,7 +65,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 			hostsService.clusterHosts();
 		}
 		catch (ManagerException e) {
-			log.error(e.getMessage());
+			e.printStackTrace();
 		}
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();

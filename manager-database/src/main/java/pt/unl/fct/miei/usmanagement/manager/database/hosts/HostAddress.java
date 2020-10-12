@@ -70,7 +70,6 @@ public class HostAddress implements Serializable {
 		return (username == null ? "" : username + "@")
 			+ publicIpAddress
 			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
-			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
 			+ (publicDnsName == null ? "" : "/" + publicDnsName);
 	}
 

@@ -133,7 +133,7 @@ class EurekaServerCard extends BaseComponent<Props, State> {
                                          state: eurekaServer
                                      }
                                  }}
-                                 height={'125px'}
+                                 height={'90px'}
                                  margin={'10px 0'}
                                  hoverable
                                  delete={{

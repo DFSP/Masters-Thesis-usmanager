@@ -134,12 +134,12 @@ class EdgeHostCard extends BaseComponent<Props, State> {
             <CardItem key={'publicDnsName'}
                       label={'Public dns name'}
                       value={`${edgeHost.publicDnsName}`}/>
-            <CardItem key={'privateIpAddress'}
-                      label={'Private ip address'}
-                      value={`${edgeHost.privateIpAddress}`}/>
             <CardItem key={'publicIpAddress'}
                       label={'Public ip address'}
                       value={`${edgeHost.publicIpAddress}`}/>
+            <CardItem key={'privateIpAddress'}
+                      label={'Private ip address'}
+                      value={`${edgeHost.privateIpAddress}`}/>
             <CardItem key={'region'}
                       label={'Region'}
                       value={`${edgeHost.region.name}`}/>

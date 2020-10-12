@@ -48,6 +48,7 @@ public final class SimpleNode {
 		return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
 	}
 
+	@JsonIgnore
 	public String getUsername() {
 		return labels.get(NodeConstants.Label.USERNAME);
 	}

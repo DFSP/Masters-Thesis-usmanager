@@ -41,9 +41,8 @@ import {
     addContainer,
     addContainerRules,
     addContainerSimulatedMetrics,
-    loadCloudHosts,
     loadContainers,
-    loadEdgeHosts,
+    loadNodes,
     loadServices
 } from "../../../actions";
 import {connect} from "react-redux";
@@ -71,7 +70,7 @@ import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetr
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import formStyles from "../../../components/form/Form.module.css";
 import {INode} from "../nodes/Node";
-import {IApp} from "../apps/App";
+import {IHostAddress} from "../hosts/Hosts";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -100,14 +99,14 @@ export interface IContainerLabel {
 }
 
 interface INewContainer {
-    publicIpAddress?: string,
+    hostAddress?: IHostAddress,
     service?: string,
     internalPort?: number,
     externalPort?: number,
 }
 
 const buildNewContainer = (): INewContainer => ({
-    publicIpAddress: undefined,
+    hostAddress: undefined,
     service: undefined,
     internalPort: undefined,
     externalPort: undefined,
@@ -127,8 +126,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadContainers: (id: string) => void;
-    loadCloudHosts: () => void;
-    loadEdgeHosts: () => void;
+    loadNodes: () => void;
     loadServices: () => void;
     addContainer: (container: IContainer) => void;
     addContainerRules: (containerId: string, rules: string[]) => void;
@@ -173,8 +171,7 @@ class Container extends BaseComponent<Props, State> {
 
     public componentDidMount(): void {
         this.loadContainer();
-        this.props.loadCloudHosts();
-        this.props.loadEdgeHosts();
+        this.props.loadNodes();
         this.props.loadServices();
         this.mounted = true;
     };
@@ -239,8 +236,8 @@ class Container extends BaseComponent<Props, State> {
         }
     };
 
-    private onPostFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Unable to start container at <b>${container.publicIpAddress}</b>`, 10000, reason, true);
+    private onPostFailure = (reason: string, container: INewContainer): void =>
+        super.toast(`Unable to start container at <b>${container.hostAddress?.publicIpAddress}/${container.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
 
     private onDeleteSuccess = (container: IContainer): void => {
         super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
@@ -259,11 +256,11 @@ class Container extends BaseComponent<Props, State> {
                     <>
                         <button
                             className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                            data-target={`replicate-dropdown-hostname`}
+                            data-target={`replicate-dropdown-host-address`}
                             ref={this.replicateDropdown}>
                             Replicate
                         </button>
-                        {this.chooseHostnameDropdown('replicate-dropdown-publicIpAddress', this.replicate)}
+                        {this.chooseHostAddressDropdown('replicate-dropdown-host-address', this.replicate)}
                     </>
             },
             {
@@ -271,11 +268,11 @@ class Container extends BaseComponent<Props, State> {
                     <>
                         <button
                             className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                            data-target={`migrate-dropdown-hostname`}
+                            data-target={`migrate-dropdown-host-address`}
                             ref={this.migrateDropdown}>
                             Migrate
                         </button>
-                        {this.chooseHostnameDropdown('migrate-dropdown-publicIpAddress', this.migrate)}
+                        {this.chooseHostAddressDropdown('migrate-dropdown-host-address', this.migrate)}
                     </>
             });
         return buttons;
@@ -283,10 +280,12 @@ class Container extends BaseComponent<Props, State> {
 
     private replicate = (event: any) => {
         const container = this.getContainer();
-        const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
+        const hostAddress = decodeHTML((event.target as HTMLLIElement).innerHTML).split(' (');
+        const publicIpAddress = hostAddress[0];
+        const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
         const url = `containers/${container?.containerId}/replicate`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, {hostname: hostname},
+        postData(url, {hostAddress: {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress}},
             (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
             (reason: string) => this.onReplicateFailure(reason, container));
     };
@@ -307,10 +306,12 @@ class Container extends BaseComponent<Props, State> {
 
     private migrate = (event: any) => {
         const container = this.getContainer();
-        const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
+        const hostAddress = decodeHTML((event.target as HTMLLIElement).innerHTML).split(' (');
+        const publicIpAddress = hostAddress[0];
+        const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
         const url = `containers/${container?.containerId}/migrate`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, {hostname: hostname},
+        postData(url, {hostAddress: {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress}},
             (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
             (reason) => this.onMigrateFailure(reason, container));
     };
@@ -401,26 +402,29 @@ class Container extends BaseComponent<Props, State> {
         this.saveContainerSimulatedMetrics(container);
     };
 
-    private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
-        <ul id={id}
-            className={`dropdown-content ${styles.dropdown}`}>
+    private chooseHostAddressDropdown = (id: string, onClick: (event: any) => void) => {
+        const nodes = Object.values(this.props.nodes)
+            .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress != this.getContainer()?.publicIpAddress));
+        return <ul id={id}
+                   className={`dropdown-content ${styles.dropdown}`}>
             <li className={`${styles.disabled}`}>
-                <a>
-                    Choose hostname
+                <a className={`${!nodes.length ? 'dropdown-empty' : ''}`}>
+                    {!nodes.length ? 'No nodes to select' : 'Choose host address'}
                 </a>
             </li>
             <PerfectScrollbar ref={(ref) => {
                 this.scrollbar = ref;
             }}>
-                {Object.values(this.props.nodes).filter(node => node.state === 'ready').map((node, index) =>
+                {nodes.map((node, index) =>
                     <li key={index} onClick={onClick}>
                         <a>
-                            {node.hostname}
+                            {`${node.publicIpAddress + (node.labels['privateIpAddress'] ? " (" + node.labels['privateIpAddress'] + ")" : '')}`}
                         </a>
                     </li>
                 )}
             </PerfectScrollbar>
         </ul>;
+    }
 
     private updateContainer = (container: IContainer) => {
         container = Object.values(normalize(container, Schemas.CONTAINER).entities.containers || {})[0];
@@ -447,10 +451,18 @@ class Container extends BaseComponent<Props, State> {
             return fields;
         }, {});
 
-    private getSelectableHosts = () =>
+    private getSelectableHosts = (): Partial<IHostAddress>[] =>
         Object.entries(this.props.nodes)
             .filter(([_, node]) => node.state === 'ready')
-            .map(([_, node]) => node.hostname)
+            .map(([_, node]) =>
+                ({
+                    username: node.labels['username'],
+                    publicIpAddress: node.publicIpAddress,
+                    privateIpAddress: node.labels['privateIpAddress']
+                }))
+
+    private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
 
     //TODO get apps' services instead (in case a service is associated to more than 1 app)
     private getSelectableServices = () =>
@@ -476,17 +488,18 @@ class Container extends BaseComponent<Props, State> {
         return null;
     }
 
-    private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element =>
+    private formFields = (formContainer: INewContainer | Partial<IContainer>, isNew: boolean): JSX.Element =>
         isNew ?
             <>
-                <Field key={'hostname'}
-                       id={'hostname'}
-                       label={'hostname'}
-                       type={'dropdown'}
-                       dropdown={{
-                           defaultValue: "Select host",
-                           values: this.getSelectableHosts()
-                       }}/>
+                <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                              id={'hostAddress'}
+                                              label={'hostAddress'}
+                                              type={'dropdown'}
+                                              dropdown={{
+                                                  defaultValue: "Select host address",
+                                                  values: this.getSelectableHosts(),
+                                                  optionToString: this.hostAddressesDropdown
+                                              }}/>
                 <Field key={'service'}
                        id={'service'}
                        label={'service'}
@@ -513,7 +526,7 @@ class Container extends BaseComponent<Props, State> {
                                  id={key}
                                  label={key}
                                  type={"date"}/>
-                        : key === 'hostname'
+                        : key === 'publicIpAddress'
                         ? <Field key={index}
                                  id={key}
                                  label={key}
@@ -711,8 +724,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
     loadContainers,
     addContainer,
-    loadCloudHosts,
-    loadEdgeHosts,
+    loadNodes,
     loadServices,
     addContainerRules,
     addContainerSimulatedMetrics,

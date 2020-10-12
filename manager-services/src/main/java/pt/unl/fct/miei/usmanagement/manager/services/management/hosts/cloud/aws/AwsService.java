@@ -267,7 +267,7 @@ public class AwsService {
 
 	private void waitToBoot(Instance instance) throws TimeoutException {
 		HostAddress hostAddress = new HostAddress(awsUsername, instance.getPublicIpAddress(), instance.getPrivateIpAddress());
-		log.info("Waiting for instance {} to boot...", hostAddress.getPublicIpAddress());
+		log.info("Waiting for instance {} to boot", hostAddress.getPublicIpAddress());
 		Timing.wait(() -> sshService.hasConnection(hostAddress), 1000, awsConnectionTimeout);
 	}
 

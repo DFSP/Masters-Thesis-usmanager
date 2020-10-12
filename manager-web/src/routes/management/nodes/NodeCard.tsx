@@ -66,7 +66,7 @@ class NodeCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">Node <b class="white-text">${node.hostname}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
+        super.toast(`<span class="green-text">Node <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -107,7 +107,7 @@ class NodeCard extends BaseComponent<Props, State> {
                          hoverable
                          delete={{
                              textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
-                             url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).hostname}/leave`,
+                             url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
                              confirmMessage: (node as INode).state === 'down' ? `to remove ${node.id} from the swarm` : `${node.id} to leave the swarm`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
@@ -116,7 +116,7 @@ class NodeCard extends BaseComponent<Props, State> {
                          bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'hostName'}
                       label={'Hostname'}
-                      value={node.hostname}/>
+                      value={node.publicIpAddress}/>
             <CardItem key={'state'}
                       label={'State'}
                       value={node.state}/>

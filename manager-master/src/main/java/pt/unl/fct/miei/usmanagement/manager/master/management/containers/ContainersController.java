@@ -74,9 +74,12 @@ public class ContainersController {
 	}
 
 	@PostMapping
-	public ContainerEntity launchContainer(@Json String hostname, @Json String service, @Json String internalPort,
-										   @Json String externalPort) {
-		return containersService.launchContainer(new HostAddress(hostname), service, internalPort, externalPort);
+	public ContainerEntity launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
+		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+		String serviceName = launchContainerRequest.getService();
+		String internalPort = launchContainerRequest.getInternalPort();
+		String externalPort = launchContainerRequest.getExternalPort();
+		return containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
 	}
 
 	@DeleteMapping("/{id}")
@@ -85,13 +88,13 @@ public class ContainersController {
 	}
 
 	@PostMapping("/{id}/replicate")
-	public ContainerEntity replicateContainer(@PathVariable String id, @Json String hostname) {
-		return containersService.replicateContainer(id, new HostAddress(hostname));
+	public ContainerEntity replicateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
+		return containersService.replicateContainer(id, hostAddress);
 	}
 
 	@PostMapping("/{id}/migrate")
-	public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
-		return containersService.migrateContainer(id, new HostAddress(hostname));
+	public ContainerEntity migrateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
+		return containersService.migrateContainer(id, hostAddress);
 	}
 
 	@PostMapping("/reload")

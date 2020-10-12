@@ -340,6 +340,9 @@ ul.dropdown-content.select-dropdown li.disabled span:hover {
     cursor: default;
 }
 
+.dropdown-empty {
+    border-bottom: solid 1px black !important;
+}
 
 .tab-content {
     border-left: 1px solid black;

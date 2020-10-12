@@ -82,17 +82,17 @@ export class CheckboxList extends React.Component<Props, State> {
         this.setState({values: this.state.values});
     };
 
-    private item = (index: number, region: string, checked: boolean): JSX.Element => {
+    private item = (index: number, option: string, checked: boolean): JSX.Element => {
         return (
             <ListItem key={index}>
                 <div className={`${listItemStyles.nonListContent}`}>
                     <label>
-                        <input id={region}
+                        <input id={option}
                                type="checkbox"
                                onChange={this.handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-                 {region}
+                 {option}
             </span>
                     </label>
                 </div>

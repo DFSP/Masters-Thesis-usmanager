@@ -25,17 +25,21 @@
 import Card from "../../../../components/cards/Card";
 import CardItem from "../../../../components/list/CardItem";
 import React from "react";
-import {ICloudHost} from "./CloudHost";
+import {awsInstanceStates, ICloudHost} from "./CloudHost";
 import BaseComponent from "../../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
-import {IReply, postData} from "../../../../utils/api";
+import {deleteData, IReply, postData} from "../../../../utils/api";
 import ActionContextMenuItem from "../../../../components/contextmenu/ActionContextMenuItem";
 import DividerContextMenuItem from "../../../../components/contextmenu/DividerContextMenuItem";
 import {deleteCloudHost, updateCloudHost} from "../../../../actions";
 import {connect} from "react-redux";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../../middleware/api";
+import {RouteComponentProps, withRouter} from "react-router";
 
 interface State {
     loading: boolean;
+    cloudHost?: ICloudHost,
 }
 
 interface CloudHostCardProps {
@@ -47,7 +51,7 @@ interface DispatchToProps {
     deleteCloudHost: (cloudHost: ICloudHost) => void;
 }
 
-type Props = DispatchToProps & CloudHostCardProps;
+type Props = DispatchToProps & CloudHostCardProps & RouteComponentProps;
 
 class CloudHostCard extends BaseComponent<Props, State> {
 
@@ -68,9 +72,11 @@ class CloudHostCard extends BaseComponent<Props, State> {
         this.mounted = false;
     }
 
+    private getCloudHost = () =>
+        this.state.cloudHost || this.props.cloudHost;
+
     private startCloudHost = () => {
-        /*const cloudHost = this.getCloudHost();*/
-        const {cloudHost} = this.props;
+        const cloudHost = this.getCloudHost();
         const url = `hosts/cloud/${cloudHost.instanceId}/state`;
         this.setState({loading: true});
         postData(url, 'start',
@@ -79,14 +85,14 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStartSuccess = (cloudHost: ICloudHost) => {
-        /*super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+        super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
         }
         if (this.mounted) {
             this.updateCloudHost(cloudHost);
-        }*/
+        }
     };
 
     private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
@@ -97,23 +103,23 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private stopCloudHost = () => {
-        /* const cloudHost = this.getCloudHost();
+         const cloudHost = this.getCloudHost();
          const url = `hosts/cloud/${cloudHost.instanceId}/state`;
-         this.setState({loading: {method: 'post', url: url}});
+         this.setState({loading: true});
          postData(url, 'stop',
              (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
-             (reason) => this.onStopFailure(reason, cloudHost));*/
+             (reason) => this.onStopFailure(reason, cloudHost));
     };
 
     private onStopSuccess = (cloudHost: ICloudHost) => {
-        /*super.toast(`<span class="green-text">Successfully stopped ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+        super.toast(`<span class="green-text">Successfully stopped ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
         }
         if (this.mounted) {
             this.updateCloudHost(cloudHost);
-        }*/
+        }
     };
 
     private onStopFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
@@ -124,18 +130,18 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private terminateCloudHost = () => {
-        /*const cloudHost = this.getCloudHost();
+        const cloudHost = this.getCloudHost();
         const url = `hosts/cloud/${cloudHost.instanceId}`;
-        this.setState({loading: {method: 'delete', url: url}});
+        this.setState({loading: true});
         deleteData(url,
             () => this.onTerminateSuccess(cloudHost),
-            (reason) => this.onTerminateFailure(reason, cloudHost));*/
+            (reason) => this.onTerminateFailure(reason, cloudHost));
     };
 
-    private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
+    private onTerminateSuccess = (cloudHost: ICloudHost) => {
         super.toast(`<span class="green-text">Successfully terminated <b class="white-text">${cloudHost.instanceId}</b> instance</span>`, 15000);
         if (this.mounted) {
-            this.setState({loading: false});
+            this.props.deleteCloudHost(cloudHost);
         }
     };
 
@@ -146,19 +152,32 @@ class CloudHostCard extends BaseComponent<Props, State> {
         }
     };
 
+    private updateCloudHost = (cloudHost: ICloudHost) => {
+        cloudHost = Object.values(normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts || {})[0];
+        this.setState({cloudHost: cloudHost, loading: false});
+    };
+
     private topContextMenu = (): JSX.Element[] => {
-        const {cloudHost} = this.props;
-        return [
-            <ActionContextMenuItem className={'green-text'} option={'Start'} state={cloudHost} onClick={this.startCloudHost}/>,
-            <ActionContextMenuItem className={'blue-text'} option={'Stop'} state={cloudHost} onClick={this.stopCloudHost}/>,
-            <ActionContextMenuItem className={'red-text'} option={'Terminate'} state={cloudHost} onClick={this.terminateCloudHost}/>,
-            <DividerContextMenuItem/>,
-            <DividerContextMenuItem/>,
-        ];
+        const cloudHost = this.getCloudHost();
+        const menus = [];
+        if (cloudHost.state.name === awsInstanceStates.STOPPED.name) {
+            menus.push(<ActionContextMenuItem className={'green-text'} option={'Start'} state={cloudHost} onClick={this.startCloudHost}/>);
+        }
+        if (cloudHost.state.name === awsInstanceStates.RUNNING.name) {
+            menus.push(<ActionContextMenuItem className={'blue-text'} option={'Stop'} state={cloudHost} onClick={this.stopCloudHost}/>);
+        }
+        if (!cloudHost.state.name.includes(awsInstanceStates.TERMINATED.name)
+            && !cloudHost.state.name.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
+            menus.push(<ActionContextMenuItem className={'red-text'} option={'Terminate'} state={cloudHost} onClick={this.terminateCloudHost}/>);
+        }
+        if (menus.length) {
+            menus.push(<DividerContextMenuItem/>, <DividerContextMenuItem/>);
+        }
+        return menus;
     }
 
     private bottomContextMenu = (): JSX.Element[] => {
-        const {cloudHost} = this.props;
+        const cloudHost = this.getCloudHost();
         const id = cloudHost.publicIpAddress || cloudHost.instanceId;
         return [
             <LinkedContextMenuItem
@@ -185,7 +204,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     }
 
     public render() {
-        const {cloudHost} = this.props;
+        const cloudHost = this.getCloudHost();
         const {loading} = this.state;
         const CardCloudHost = Card<ICloudHost>();
         return <CardCloudHost id={`cloudHost-${cloudHost.publicIpAddress || cloudHost.instanceId}`}
@@ -203,32 +222,32 @@ class CloudHostCard extends BaseComponent<Props, State> {
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>
             <CardItem key={'imageId'}
-                      label={'imageId'}
+                      label={'Image id'}
                       value={`${cloudHost.imageId}`}/>
             <CardItem key={'instanceType'}
-                      label={'instanceType'}
+                      label={'Instance type'}
                       value={`${cloudHost.instanceType}`}/>
             <CardItem key={'state'}
-                      label={'state'}
+                      label={'State'}
                       value={`${cloudHost.state.name}`}/>
             {cloudHost.publicDnsName &&
             <CardItem key={'publicDnsName'}
-                      label={'publicDnsName'}
+                      label={'Public dns name'}
                       value={`${cloudHost.publicDnsName}`}/>}
             {cloudHost.publicIpAddress &&
             <CardItem key={'publicIpAddress'}
-                      label={'publicIpAddress'}
+                      label={'Public ip address'}
                       value={`${cloudHost.publicIpAddress}`}/>}
             {cloudHost.privateIpAddress &&
             <CardItem key={'privateIpAddress'}
-                      label={'privateIpAddress'}
+                      label={'Private ip address'}
                       value={`${cloudHost.privateIpAddress}`}/>}
             <CardItem key={'placement'}
-                      label={'placement'}
+                      label={'Placement'}
                       value={`${cloudHost.placement.availabilityZone}`}/>
             {cloudHost.managedByWorker &&
             <CardItem key={'managedByWorker'}
-                      label={'managedByWorker'}
+                      label={'Managed by worker'}
                       value={`${cloudHost.managedByWorker.id}`}/>}
         </CardCloudHost>;
     }
@@ -240,4 +259,4 @@ const mapDispatchToProps: DispatchToProps = {
     deleteCloudHost,
 };
 
-export default connect(null, mapDispatchToProps)(CloudHostCard);
+export default withRouter(connect(null, mapDispatchToProps)(CloudHostCard));

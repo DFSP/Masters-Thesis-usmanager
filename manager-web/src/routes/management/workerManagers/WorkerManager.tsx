@@ -230,7 +230,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     private getSelectableHosts = () =>
         Object.entries(this.props.nodes)
             .filter(([_, node]) => node.state === 'ready')
-            .map(([_, node]) => node.hostname)
+            .map(([_, node]) => node.publicIpAddress)
 
     private containerIdField = (container: IContainer) =>
         container.containerId;

@@ -222,7 +222,7 @@ public class DockerContainersService {
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
 		String serviceName = service.getServiceName();
-		log.info("Launching container with service {} at {}...", serviceName, hostAddress);
+		log.info("Launching container with service {} at {}", serviceName, hostAddress);
 		if (global) {
 			List<DockerContainer> containers = List.of();
 			try {

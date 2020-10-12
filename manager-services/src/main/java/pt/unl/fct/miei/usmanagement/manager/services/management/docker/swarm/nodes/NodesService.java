@@ -189,10 +189,12 @@ public class NodesService {
 	public SimpleNode addLabel(String nodeId, String label, String value) {
 		log.info("Adding label {}={} to node {}", label, value, nodeId);
 		SimpleNode node = getNode(nodeId);
+		Map<String, String> labels = new HashMap<>(node.getLabels());
+		labels.put(label, value);
 		NodeSpec nodeSpec = NodeSpec.builder()
 			.availability(node.getAvailability().name())
 			.role(node.getRole().name())
-			.addLabel(label, value)
+			.labels(labels)
 			.build();
 		return updateNode(node, nodeSpec);
 	}

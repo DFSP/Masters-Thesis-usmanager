@@ -148,7 +148,7 @@ class Ssh extends React.Component<Props, State> {
                                             </div>
                                             <div dangerouslySetInnerHTML={{
                                                 __html:
-                                                    (command.exitStatus === 0 ? command.output.join("\n") : command.error.join("\n"))
+                                                    (command.exitStatus === 0 && command.error.length === 0 ? command.output.join("\n") : command.error.join("\n"))
                                                         .replace(/(?:\r\n|\r|\n)/g, '<br/>')
                                             }}/>
                                         </>

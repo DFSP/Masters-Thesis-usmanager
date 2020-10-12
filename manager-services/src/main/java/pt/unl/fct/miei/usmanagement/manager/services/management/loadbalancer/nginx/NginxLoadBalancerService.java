@@ -137,12 +137,12 @@ public class NginxLoadBalancerService {
 			ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.POST, request, Message.class);
 			Message responseBody = response.getBody();
 			if (responseBody == null) {
-				throw new ManagerException("Failed to add server %s to loadBalancer %s: responseBody is null",
+				throw new ManagerException("Failed to add server %s to load balancer %s: responseBody is null",
 					nginxServer, loadBalancerUrl);
 			}
 			String responseMessage = responseBody.getMessage();
 			if (!Objects.equals(responseMessage, "success")) {
-				throw new ManagerException("Failed to add server %s to loadBalancer %s: %s", nginxServer, loadBalancerUrl,
+				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, loadBalancerUrl,
 					responseMessage);
 			}
 		});

@@ -75,7 +75,7 @@ class Nodes extends BaseComponent<Props, {}> {
 
     private predicate = (node: INode, search: string): boolean =>
         node.id.toString().toLowerCase().includes(search)
-        || node.hostname.toLowerCase().includes(search)
+        || node.publicIpAddress.toLowerCase().includes(search)
         || node.state.toLowerCase().includes(search)
         || node.role.toLowerCase().includes(search);
 

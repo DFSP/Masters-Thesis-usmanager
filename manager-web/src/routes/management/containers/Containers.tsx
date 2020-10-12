@@ -82,6 +82,7 @@ class Containers extends BaseComponent<Props, {}> {
 
     private predicate = (container: IContainer, search: string): boolean =>
         container.containerId.toString().toLowerCase().includes(search)
+        || container.names.filter(name => name.includes(search)).length > 0
         || container.publicIpAddress.toLowerCase().includes(search)
         || container.labels['serviceType'].toLowerCase().includes(search);
 

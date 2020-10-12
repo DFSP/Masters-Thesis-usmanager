@@ -22,40 +22,17 @@
  * SOFTWARE.
  */
 
-.dropdown {
-    width: auto !important;
-    overflow-y: hidden;
-    background-color: #282828;
-}
+package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
-ul.dropdown li a {
-    background-color: #282828;
-    font-size: 14px;
-}
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
-ul.dropdown li a:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
+@Data
+public class LaunchContainerRequest {
 
-ul.dropdown li.disabled a {
-    border-bottom: solid 1px #666;
-    color: grey;
-}
+	private final HostAddress hostAddress;
+	private final String service;
+	private final String internalPort;
+	private final String externalPort;
 
-ul.dropdown li.disabled a:hover {
-    background-color: #282828;
-    cursor: default;
-}
-
-.nolabelCheckbox {
-    display: inline-block;
-    text-align: center;
-}
-
-.nolabelCheckbox label span {
-    margin-bottom: -7.5px;
-}
-
-.button {
-    margin-right: 10px;
 }
