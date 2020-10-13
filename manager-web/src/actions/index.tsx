@@ -1810,7 +1810,6 @@ export function unassignWorkerManagerHosts(id: string, hosts: string[]): Entitie
     }
 }
 
-
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';
 export const LOGS_FAILURE = 'LOGS_FAILURE';
@@ -1822,6 +1821,19 @@ const fetchLogs = () => ({
         types: [LOGS_REQUEST, LOGS_SUCCESS, LOGS_FAILURE],
         endpoint: `logs`,
         schema: Schemas.LOGS_ARRAY,
+    }
+});
+
+export const SCRIPTS_REQUEST = 'SCRIPTS_REQUEST';
+export const SCRIPTS_SUCCESS = 'SCRIPTS_SUCCESS';
+export const SCRIPTS_FAILURE = 'SCRIPTS_FAILURE';
+export const loadScripts = () => (dispatch: any) => {
+    return dispatch(fetchScripts());
+};
+const fetchScripts = () => ({
+    [CALL_API]: {
+        types: [SCRIPTS_REQUEST, SCRIPTS_SUCCESS, SCRIPTS_FAILURE],
+        endpoint: `ssh/scripts`
     }
 });
 

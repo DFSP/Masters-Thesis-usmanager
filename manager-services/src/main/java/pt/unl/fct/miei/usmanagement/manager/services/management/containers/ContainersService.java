@@ -423,7 +423,7 @@ public class ContainersService {
 		return containerId;
 	}
 
-	public void stopAll() {
+	public void stopContainers() {
 		dockerContainersService.stopAll();
 	}
 

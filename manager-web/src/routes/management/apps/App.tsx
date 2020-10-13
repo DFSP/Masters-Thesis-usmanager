@@ -25,14 +25,7 @@
 import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {
-    ICustomButton,
-    IFields,
-    IFormLoading,
-    IValues,
-    required,
-    requiredAndTrimmed
-} from "../../../components/form/Form";
+import Form, {ICustomButton, IFields, IFormLoading, requiredAndTrimmed} from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -48,10 +41,10 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {isNew} from "../../../utils/router";
-import InputDialog from "../../../components/dialogs/InputDialog";
 import {IRegion} from "../region/Region";
 import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
+import LaunchAppDialog, {ILaunchLocation} from "./LaunchAppDialog";
 
 export interface IApp extends IDatabaseData {
     name: string;
@@ -61,12 +54,6 @@ export interface IApp extends IDatabaseData {
 const buildNewApp = (): Partial<IApp> => ({
     name: undefined,
 });
-
-interface ILaunchLocation {
-    region: IRegion,
-    country: string,
-    city: string,
-}
 
 interface ILaunchApp {
     [key: string]: IContainer[]
@@ -230,58 +217,6 @@ class App extends BaseComponent<Props, State> {
     private onSaveServicesFailure = (app: IApp, reason: string): void =>
         super.toast(`Unable to save services of ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
 
-    private getSelectableRegions = () =>
-        Object.values(this.props.regions);
-
-    private regionDropdown = (region: IRegion) =>
-        region.name;
-
-    private launchAppFields = (): IFields => (
-        {
-            region: {
-                id: 'region',
-                label: 'region',
-                validation: {rule: required}
-            },
-            country: {
-                id: 'country',
-                label: 'country',
-                validation: {rule: requiredAndTrimmed}
-            },
-            city: {
-                id: 'city',
-                label: 'city',
-                validation: {rule: requiredAndTrimmed}
-            }
-        }
-    );
-
-    private launchAppModal = () =>
-        <div>
-            <Field<IRegion> key='region'
-                            id={'region'}
-                            label='region'
-                            type={'dropdown'}
-                            dropdown={{
-                                defaultValue: 'Select region',
-                                values: this.getSelectableRegions(),
-                                optionToString: this.regionDropdown
-                            }}/>
-            <Field key='country'
-                   id={'country'}
-                   label='country'/>
-            <Field key='city'
-                   id={'city'}
-                   label='city'/>
-        </div>;
-
-    private getModalValues = (): IValues => (
-        {
-            region: undefined,
-            country: undefined,
-            city: undefined
-        }
-    );
 
     private launchButton = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -396,14 +331,8 @@ class App extends BaseComponent<Props, State> {
                                        label={key}/>
                             )}
                         </Form>
-                        <InputDialog id={'launch-app-modal'}
-                                     title={'Launch app'}
-                                     fields={this.launchAppFields()}
-                                     values={this.getModalValues}
-                                     confirmCallback={this.launchApp}
-                                     fullscreen={false}>
-                            {this.launchAppModal()}
-                        </InputDialog>
+                        <LaunchAppDialog launchAppCallback={this.launchApp}
+                                         /*regions={Object.values(this.props.regions)}*//>
                     </>
                 )}
             </>

@@ -96,7 +96,7 @@ aws:
     key-file-path: /aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-0cab6419e9f386cfd
+    ami: ami-05ae3ee68e1579013
     security-group: us-worker-security-group
     key-pair: ec2
     type: t2.micro

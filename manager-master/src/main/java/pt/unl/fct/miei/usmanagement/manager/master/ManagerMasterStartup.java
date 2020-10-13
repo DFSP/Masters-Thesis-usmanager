@@ -38,6 +38,8 @@ import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.Service
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
+import java.sql.SQLException;
+
 @Slf4j
 @Component
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {

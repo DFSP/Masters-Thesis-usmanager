@@ -53,12 +53,8 @@ public class ServiceEventEntity {
 	@GeneratedValue
 	private Long id;
 
-	/*@OneToMany
-	private ContainerEntity containerEntity; TODO*/
 	private String containerId;
 
-	/*@OneToMany
-	private ServiceEntity serviceEntity; TODO*/
 	private String serviceName;
 
 	@ManyToOne

@@ -53,6 +53,7 @@ import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -79,6 +80,7 @@ public class SshService {
 		this.scriptPaths = Map.of(
 			dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
 			dockerProperties.getUninstallScript(), dockerProperties.getUninstallScriptPath(),
+			dockerProperties.getInstallApiScript(), dockerProperties.getInstallApiScriptPath(),
 			nodeExporterProperties.getInstallScript(), nodeExporterProperties.getInstallScriptPath()
 		);
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -92,6 +94,10 @@ public class SshService {
 			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
+			try {
+				CloudHostEntity cloudHost = cloudHostsService.getCloudHostByAddress(hostAddress);
+				hostAddress = cloudHost.getAddress();
+			} catch (EntityNotFoundException ignored) { }
 			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
 		}
 		return initClient(hostAddress.getUsername(), hostAddress.getHostname(), new File(publicKeyFile));
@@ -191,5 +197,7 @@ public class SshService {
 		return false;
 	}
 
-
+	public Set<String> getScripts() {
+		return scriptPaths.keySet();
+	}
 }

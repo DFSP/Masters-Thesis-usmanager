@@ -101,6 +101,7 @@ public class ServicesMonitoringService {
 	private final int replicateContainerOnEventCount;
 	private final int migrateContainerOnEventCount;
 	private final boolean isTestEnable;
+	private Timer serviceMonitoringTimer;
 
 	public ServicesMonitoringService(ServiceMonitoringRepository servicesMonitoring,
 									 ServiceMonitoringLogsRepository serviceMonitoringLogs,
@@ -211,13 +212,12 @@ public class ServicesMonitoringService {
 	}
 
 	public void initServiceMonitorTimer() {
-		new Timer("MonitorServicesTimer", true).schedule(new TimerTask() {
+		serviceMonitoringTimer = new Timer("MonitorServicesTimer", true);
+		serviceMonitoringTimer.schedule(new TimerTask() {
 			private long lastRun = System.currentTimeMillis();
-
 			@Override
 			public void run() {
 				long currRun = System.currentTimeMillis();
-				//TODO replace diffSeconds with calculation from previous database save
 				int diffSeconds = (int) ((currRun - lastRun) / TimeUnit.SECONDS.toMillis(1));
 				lastRun = currRun;
 				try {
@@ -502,4 +502,8 @@ public class ServicesMonitoringService {
 		return memStats.limit() < 1 ? 0.0 : (memStats.usage().doubleValue() / memStats.limit().doubleValue()) * 100.0;
 	}
 
+	public void stopServiceMonitoring() {
+		serviceMonitoringTimer.cancel();
+		log.info("Stopped service monitoring");
+	}
 }

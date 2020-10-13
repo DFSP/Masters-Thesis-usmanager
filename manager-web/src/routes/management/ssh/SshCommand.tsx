@@ -52,16 +52,11 @@ interface StateToProps {
     edgeHosts: { [key: string]: IEdgeHost };
 }
 
-interface DispatchToProps {
-    loadCloudHosts: () => void;
-    loadEdgeHosts: () => void;
-}
-
 interface SshCommandProps {
     onExecuteCommand: (command: ISshCommand) => void;
 }
 
-type Props = SshCommandProps & StateToProps & DispatchToProps;
+type Props = SshCommandProps & StateToProps;
 
 class SshCommand extends BaseComponent<Props, {}> {
 
@@ -142,9 +137,4 @@ function mapStateToProps(state: ReduxState): StateToProps {
     }
 }
 
-const mapDispatchToProps: DispatchToProps = {
-    loadCloudHosts,
-    loadEdgeHosts,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SshCommand);
+export default connect(mapStateToProps)(SshCommand);

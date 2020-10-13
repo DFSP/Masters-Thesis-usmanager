@@ -95,6 +95,7 @@ public class HostsMonitoringService {
 	private final int maximumHosts;
 	private final int minimumHosts;
 	private final boolean isTestEnable;
+	private Timer hostMonitoringTimer;
 
 	public HostsMonitoringService(HostMonitoringRepository hostsMonitoring,
 								  HostMonitoringLogsRepository hostMonitoringLogs, NodesService nodesService,
@@ -181,7 +182,8 @@ public class HostsMonitoringService {
 	}
 
 	public void initHostMonitorTimer() {
-		new Timer("MonitorHostTimer", true).schedule(new TimerTask() {
+		hostMonitoringTimer = new Timer("MonitorHostTimer", true);
+		hostMonitoringTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
@@ -353,4 +355,8 @@ public class HostsMonitoringService {
 		return Pair.of(container.getLabels().get(ContainerConstants.Label.SERVICE_NAME), container.getContainerId());
 	}
 
+	public void stopHostMonitoring() {
+		hostMonitoringTimer.cancel();
+		log.info("Stopped host monitoring");
+	}
 }

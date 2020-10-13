@@ -37,6 +37,7 @@ import M from "materialize-css";
 import {Method} from "axios";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import BaseComponent from "../BaseComponent";
 
 export interface IFormModal {
     id: string,
@@ -129,6 +130,18 @@ export const FormContext =
 
 //TODO validation for correct dates and times
 
+export const requireGreaterOrEqualSize = (values: IValues, id: keyof IValues, size: number): string => {
+    return values[id] === undefined || values[id] === null || values[id].length != size
+        ? `Number of ${camelCaseToSentenceCase(id as string)} must be at least ${size}`
+        : "";
+}
+
+export const requiredSize = (values: IValues, id: keyof IValues, size: number): string => {
+    return values[id] === undefined || values[id] === null || values[id].length != size
+        ? `Number of ${camelCaseToSentenceCase(id as string)} must be ${size}`
+        : "";
+}
+
 export const required = (values: IValues, id: keyof IValues): string => {
     return values[id] === undefined || values[id] === null || values[id] === ""
         ? `${camelCaseToSentenceCase(id as string)} is required`
@@ -207,7 +220,7 @@ export const requiredAndNumberAndMax = (values: IValues, id: keyof IValues, args
 export const requiredAndNumberAndMinAndMax = (values: IValues, id: keyof IValues, args: any) =>
     required(values, id) || number(values, id) || min(values, id, args[0]) || max(values, id, args[1]);
 
-class Form extends React.Component<Props, State> {
+class Form extends BaseComponent<Props, State> {
 
     private mounted = false;
     private dropdown = createRef<HTMLButtonElement>();
@@ -482,7 +495,13 @@ class Form extends React.Component<Props, State> {
 
     private validateForm(): boolean {
         const errors: IErrors = {};
-        Object.keys(this.props.fields).forEach((fieldName: string) => errors[fieldName] = this.validate(fieldName));
+        Object.entries(this.props.fields).forEach(([fieldName, field]) => {
+            const validateMessage = this.validate(fieldName);
+            if (field.hidden && validateMessage.length) {
+                super.toast(`<div class="red-text">Validation failed:</div> ${validateMessage}`);
+            }
+            errors[fieldName] = validateMessage;
+        });
         this.setState({errors});
         return this.isValid(errors);
     }

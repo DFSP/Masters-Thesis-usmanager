@@ -525,7 +525,7 @@ public class DockerContainersService {
 	}
 
 	public void stopAll() {
-		this.stopAllExcept(List.of(DockerApiProxyService.DOCKER_API_PROXY));
+		stopAllExcept(List.of(DockerApiProxyService.DOCKER_API_PROXY));
 	}
 
 	public void stopAllExcept(List<String> services) {
@@ -534,7 +534,7 @@ public class DockerContainersService {
 			String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
 			return services.contains(serviceName);
 		});
-		containers.forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
+		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
 	}
 
 }

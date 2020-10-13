@@ -19,7 +19,7 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-0cab6419e9f386cfd
+    ami: ami-05ae3ee68e1579013
     security-group: us-manager-security-group
     key-pair: ec2
     type: t2.micro
@@ -34,6 +34,8 @@ docker:
   install-script-path: src/main/resources/scripts/docker-install.sh
   uninstall-script: docker-uninstall.sh
   uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
+  install-api-script: docker-api-install.sh
+  install-api-script-path: src/main/resources/scripts/docker-api-install.sh
   api:
     port: 2376
   api-proxy:

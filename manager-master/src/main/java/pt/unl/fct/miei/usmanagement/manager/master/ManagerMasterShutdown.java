@@ -27,29 +27,43 @@ package pt.unl.fct.miei.usmanagement.manager.master;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
 
 @Component
 public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {
 
 	private final ContainersService containersService;
 	private final DockerSwarmService dockerSwarmService;
+	private final CloudHostsService cloudHostsService;
 	private final SymService symService;
+	private final HostsMonitoringService hostsMonitoringService;
+	private final ServicesMonitoringService servicesMonitoringService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 SymService symService) {
+								 SymService symService, CloudHostsService cloudHostsService,
+								 HostsMonitoringService hostsMonitoringService,
+								 ServicesMonitoringService servicesMonitoringService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.symService = symService;
+		this.cloudHostsService = cloudHostsService;
+		this.hostsMonitoringService = hostsMonitoringService;
+		this.servicesMonitoringService = servicesMonitoringService;
 	}
 
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) {
-		containersService.stopAll();
-		dockerSwarmService.destroy();
 		symService.stopSymmetricDSServer();
+		hostsMonitoringService.stopHostMonitoring();
+		servicesMonitoringService.stopServiceMonitoring();
+		containersService.stopContainers();
+		dockerSwarmService.destroySwarm();
+		cloudHostsService.terminateCloudHosts();
 	}
 
 }

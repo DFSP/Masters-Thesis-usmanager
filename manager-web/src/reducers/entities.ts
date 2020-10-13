@@ -233,7 +233,7 @@ import {
     RULES_HOST_SUCCESS,
     RULES_SERVICE_FAILURE,
     RULES_SERVICE_REQUEST,
-    RULES_SERVICE_SUCCESS,
+    RULES_SERVICE_SUCCESS, SCRIPTS_FAILURE, SCRIPTS_REQUEST, SCRIPTS_SUCCESS,
     SERVICE_APPS_FAILURE,
     SERVICE_APPS_REQUEST,
     SERVICE_APPS_SUCCESS,
@@ -510,6 +510,11 @@ export type EntitiesState = {
         isLoadingLogs: boolean,
         loadLogsError: string | null,
     },
+    scripts: {
+        data: string[],
+        isLoadingScripts: boolean,
+        loadScriptsError: string | null,
+    }
 }
 
 export type EntitiesAction = {
@@ -556,6 +561,7 @@ export type EntitiesAction = {
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
+        scripts?: string[],
     },
 };
 
@@ -727,6 +733,11 @@ const entities = (state: EntitiesState = {
                           data: {},
                           isLoadingLogs: false,
                           loadLogsError: null
+                      },
+                      scripts: {
+                          data: [],
+                          isLoadingScripts: false,
+                          loadScriptsError: null
                       },
                   },
                   action: EntitiesAction
@@ -3285,10 +3296,22 @@ const entities = (state: EntitiesState = {
             return {
                 ...state,
                 logs: {
-                    ...state.apps,
                     data: merge({}, pick(state.logs.data, keys(data?.logs)), data?.logs),
                     isLoadingLogs: false,
                     loadLogsError: null,
+                }
+            };
+        case SCRIPTS_REQUEST:
+            return merge({}, state, {scripts: {isLoadingScripts: true, loadScriptsError: null}});
+        case SCRIPTS_FAILURE:
+            return merge({}, state, {scripts: {isLoadingScripts: false, loadScriptsError: error}});
+        case SCRIPTS_SUCCESS:
+            return {
+                ...state,
+                scripts: {
+                    data: merge([], pick(state.scripts.data, keys(data)), data),
+                    isLoadingScripts: false,
+                    loadScriptsError: null,
                 }
             };
         default:

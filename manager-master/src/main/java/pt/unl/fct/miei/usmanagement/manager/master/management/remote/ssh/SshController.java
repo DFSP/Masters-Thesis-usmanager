@@ -24,14 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.remote.ssh;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshService;
+
+import java.util.Collection;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/ssh")
@@ -51,6 +53,11 @@ public class SshController {
 	@PostMapping("/upload")
 	public void upload(@RequestBody ExecuteSftpRequest request) {
 		sshService.uploadFile(request.getHostAddress(), request.getFilename());
+	}
+
+	@GetMapping("/scripts")
+	public Set<String> getScripts() {
+		return sshService.getScripts();
 	}
 
 }

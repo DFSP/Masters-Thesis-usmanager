@@ -28,7 +28,7 @@ import Field from "../../../components/form/Field";
 import React from "react";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {ReduxState} from "../../../reducers";
-import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
+import {loadScripts} from "../../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IReply} from "../../../utils/api";
@@ -47,11 +47,11 @@ const buildNewSshCommand = (): Partial<ISshFile> => ({
 interface StateToProps {
     cloudHosts: { [key: string]: ICloudHost };
     edgeHosts: { [key: string]: IEdgeHost };
+    scripts: string[];
 }
 
 interface DispatchToProps {
-    loadCloudHosts: () => void;
-    loadEdgeHosts: () => void;
+    loadScripts: () => void;
 }
 
 interface SshFileProps {
@@ -63,8 +63,7 @@ type Props = SshFileProps & StateToProps & DispatchToProps;
 class SshFile extends BaseComponent<Props, {}> {
 
     public componentDidMount(): void {
-        this.props.loadEdgeHosts();
-        this.props.loadCloudHosts();
+        this.props.loadScripts();
     };
 
     public render() {
@@ -82,21 +81,21 @@ class SshFile extends BaseComponent<Props, {}> {
                       failureCallback: this.onPostFailure
                   }}>
                 <Field<Partial<IHostAddress>> key='hostAddress'
-                                               id='hostAddress'
-                                               label='hostAddress'
-                                               type='dropdown'
-                                               dropdown={{
-                                                   defaultValue: 'Select host address',
-                                                   values: this.getSelectableHosts(),
-                                                   optionToString: this.hostAddressesDropdown
-                                               }}/>
+                                              id='hostAddress'
+                                              label='hostAddress'
+                                              type='dropdown'
+                                              dropdown={{
+                                                  defaultValue: 'Select host address',
+                                                  values: this.getSelectableHosts(),
+                                                  optionToString: this.hostAddressesDropdown
+                                              }}/>
                 <Field key='filename'
                        id='filename'
                        label='filename'
                        type='dropdown'
                        dropdown={{
                            defaultValue: 'Select filename',
-                           values: this.getSelectableFiles()
+                           values: this.props.scripts
                        }}/>
             </Form>
         );
@@ -128,32 +127,33 @@ class SshFile extends BaseComponent<Props, {}> {
     private getSelectableHosts = (): (Partial<IHostAddress>)[] => {
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-            .map(instance => ({ publicIpAddress: instance.publicIpAddress, privateIpAddress: instance.privateIpAddress }));
+            .map(instance => ({
+                publicIpAddress: instance.publicIpAddress,
+                privateIpAddress: instance.privateIpAddress
+            }));
         const edgeHosts = Object.values(this.props.edgeHosts)
-            .map(host => ({ publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress }));
+            .map(host => ({publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress}));
         return [...cloudHosts, ...edgeHosts];
     };
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
         hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
 
-    //TODO get available scripts from the server instead
-    private getSelectableFiles = () => ['docker-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
-
 }
 
 function mapStateToProps(state: ReduxState): StateToProps {
     const cloudHosts = state.entities.hosts.cloud.data;
     const edgeHosts = state.entities.hosts.edge.data;
+    const scripts = state.entities.scripts.data;
     return {
         cloudHosts,
         edgeHosts,
+        scripts
     }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    loadCloudHosts,
-    loadEdgeHosts,
+    loadScripts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SshFile);

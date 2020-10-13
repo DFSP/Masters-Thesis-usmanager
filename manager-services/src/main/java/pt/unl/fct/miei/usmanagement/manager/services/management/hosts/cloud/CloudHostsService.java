@@ -201,6 +201,10 @@ public class CloudHostsService {
 		cloudHosts.delete(cloudHost);
 	}
 
+	public void terminateCloudHosts() {
+		getCloudHosts().parallelStream().forEach(instance -> terminateCloudHost(instance.getInstanceId()));
+	}
+
 	public List<CloudHostEntity> syncCloudInstances() {
 		List<CloudHostEntity> cloudHosts = getCloudHosts();
 		List<Instance> awsInstances = awsService.getInstances();

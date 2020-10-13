@@ -56,6 +56,7 @@ public class HostEventEntity {
 	@GeneratedValue
 	private Long id;
 
+	@Lob
 	private HostAddress hostAddress;
 
 	@ManyToOne

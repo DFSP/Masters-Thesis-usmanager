@@ -46,6 +46,8 @@ public class DockerProperties {
 	private String installScriptPath;
 	private String uninstallScript;
 	private String uninstallScriptPath;
+	private String installApiScript;
+	private String installApiScriptPath;
 	private String repository;
 
 	public DockerProperties() {

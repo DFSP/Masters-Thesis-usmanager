@@ -142,20 +142,22 @@ public class HostsService {
 
 	public void clusterHosts() {
 		setupHost(hostAddress, NodeRole.MANAGER);
+		List<HostAddress> workerHosts = new LinkedList<>();
 		if (mode == null || mode == Mode.LOCAL) {
 			log.info("Clustering edge worker hosts into the swarm");
-			getLocalWorkerNodes().forEach(edgeHost -> setupHost(edgeHost.getAddress(), NodeRole.WORKER));
+			workerHosts.addAll(getLocalWorkerNodes().stream().map(EdgeHostEntity::getAddress).collect(Collectors.toList()));
 			if (getLocalWorkerNodes().size() < 1) {
 				log.info("No edge worker hosts found");
 			}
 		}
 		if (mode == null || mode == Mode.GLOBAL) {
 			log.info("Clustering cloud hosts into the swarm");
-			getCloudWorkerNodes().forEach(cloudHost -> setupHost(cloudHost.getAddress(), NodeRole.WORKER));
+			workerHosts.addAll(getCloudWorkerNodes().stream().map(CloudHostEntity::getAddress).collect(Collectors.toList()));
 			if (getCloudWorkerNodes().size() < 1) {
 				log.info("No cloud worker hosts found");
 			}
 		}
+		workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER));
 	}
 
 	private List<CloudHostEntity> getCloudWorkerNodes() {
@@ -227,7 +229,7 @@ public class HostsService {
 			return nodesService.getHostNode(hostAddress);
 		}
 		catch (EntityNotFoundException ignored) {
-			return dockerSwarmService.joinSwarm(hostAddress, role);
+			return dockerSwarmService.joinSwarm(hostAddress, role, false);
 		}
 	}
 

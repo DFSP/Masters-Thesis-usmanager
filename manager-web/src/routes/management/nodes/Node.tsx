@@ -51,8 +51,7 @@ import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
-import TestMap from "./TestMap";
-import {IApp} from "../apps/App";
+import LocationSelectorMap, {ICoordinates} from "../../../components/map/LocationSelectorMap";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
@@ -480,12 +479,17 @@ class Node extends BaseComponent<Props, State> {
                               customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
                             {this.formFields(isNewNode)}
                         </Form>
-                        {isNewNode && currentForm === 'On location' && <TestMap/>}
+                        {isNewNode && currentForm === 'On location' && <LocationSelectorMap onSelect={this.onSelectCoordinates}/>}
                     </>
                 )}
             </>
         )
     };
+
+    private onSelectCoordinates = (coordinates: ICoordinates): void => {
+        /*this.setState({selectedCoordinates: coordinates});*/
+        M.toast({html: 'latitude: ' + coordinates.latitude + ' longitude: ' + coordinates.longitude});
+    }
 
     private labels = (): JSX.Element =>
         <NodeLabelsList isLoadingNode={this.props.isLoading}

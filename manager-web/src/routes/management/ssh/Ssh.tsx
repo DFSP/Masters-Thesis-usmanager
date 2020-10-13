@@ -32,12 +32,18 @@ import {Resizable} from "re-resizable";
 import ScrollBar from "react-perfect-scrollbar";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
+import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
 
 interface StateToProps {
     sidenavVisible: boolean;
 }
 
-type Props = StateToProps;
+interface DispatchToProps {
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
+}
+
+type Props = StateToProps & DispatchToProps;
 
 interface ICommand extends ISshCommand {
     timestamp: number;
@@ -71,15 +77,18 @@ class Ssh extends React.Component<Props, State> {
         }
     }
 
+
     private static pad(n: number, width: number, padWith = 0) {
         return (String(padWith).repeat(width) + String(n)).slice(String(n).length);
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         this.updateScrollbars();
+        this.props.loadEdgeHosts();
+        this.props.loadCloudHosts();
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         if (!this.state.animate && prevProps.sidenavVisible !== this.props.sidenavVisible) {
             this.setState({animate: true});
         }
@@ -141,14 +150,14 @@ class Ssh extends React.Component<Props, State> {
                                             <div>
                                                 <span
                                                     className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                                <span className={styles.hostname}>{`${command.hostAddress.publicIpAddress} ${command.hostAddress.privateIpAddress || ''}`}</span>
+                                                <span className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>
                                                 <span className={styles.command}>{command.command}</span>
                                                 {command.exitStatus !== 0 &&
                                                 <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
                                             </div>
                                             <div dangerouslySetInnerHTML={{
                                                 __html:
-                                                    (command.exitStatus === 0 && command.error.length === 0 ? command.output.join("\n") : command.error.join("\n"))
+                                                    ((command.exitStatus === 0 && command.error.length && command.error[0] === "") ? command.output.join("\n") : command.error.join("\n"))
                                                         .replace(/(?:\r\n|\r|\n)/g, '<br/>')
                                             }}/>
                                         </>
@@ -157,7 +166,7 @@ class Ssh extends React.Component<Props, State> {
                                             <div>
                                                 <span
                                                     className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                                File {command.filename} transferred to {`${command.hostAddress.publicIpAddress} ${command.hostAddress.privateIpAddress || ''}`}
+                                                File {command.filename} transferred to {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}`}
                                             </div>
                                         </>
                                     }
@@ -239,4 +248,9 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     }
 );
 
-export default connect(mapStateToProps)(Ssh);
+const mapDispatchToProps: DispatchToProps = {
+    loadCloudHosts,
+    loadEdgeHosts,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Ssh);
