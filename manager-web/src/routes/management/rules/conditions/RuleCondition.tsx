@@ -257,7 +257,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                                        dropdown={{
                                            defaultValue: "Select field",
                                            values: Object.values(this.props.fields),
-                                           optionToString: this.fieldOption
+                                           optionToString: this.fieldOption,
+                                           emptyMessage: 'No fields available'
                                        }}/>
                         <Field<IOperator> key='operators'
                                           id='operator'
@@ -266,7 +267,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                                           dropdown={{
                                               defaultValue: "Select operator",
                                               values: Object.values(this.props.operators),
-                                              optionToString: this.operatorOption
+                                              optionToString: this.operatorOption,
+                                              emptyMessage: 'No operators available'
                                           }}/>
                         <Field<IValueMode> key='valueModes'
                                            id='valueMode'
@@ -275,7 +277,8 @@ class RuleCondition extends BaseComponent<Props, State> {
                                            dropdown={{
                                                defaultValue: 'Select value mode',
                                                values: Object.values(this.props.valueModes),
-                                               optionToString: this.valueModeOption
+                                               optionToString: this.valueModeOption,
+                                               emptyMessage: 'No value modes available'
                                            }}/>
                         <Field key='value' id='value' label='value' type="number"/>
                     </Form>

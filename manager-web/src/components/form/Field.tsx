@@ -36,6 +36,8 @@ import {Dropdown} from "./Dropdown";
 import {CheckboxList} from "./CheckboxList";
 import checkboxListStyles from "./CheckboxList.module.css";
 import {Link} from "react-router-dom";
+import LocationSelectorMap from "../map/LocationSelectorMap";
+import {Point} from "react-simple-maps";
 
 export interface IValidation {
     rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -44,11 +46,11 @@ export interface IValidation {
 
 export interface FieldProps<T = string> {
     id: string;
-    type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
+    type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list" | "map";
     label?: string;
     value?: any;
     valueToString?: (v: T) => string;
-    dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
+    dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void, emptyMessage?: string };
     number?: { min: number, max: number };
     validation?: IValidation;
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
@@ -204,6 +206,11 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                                               disabled={disabled || !formContext?.isEditing}
                                               onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
                             )}
+                            {(type && type.toLowerCase() === "map") && (
+                                <LocationSelectorMap
+                                    onSelect={this.onSelectCoordinates(id, formContext)}
+                                    locations={formContext.values[id] || []}/>
+                            )}
                             {getError(formContext.errors) && (
                                 <span className="helper-text red-text darken-3">
                     {getError(formContext.errors)}
@@ -249,6 +256,9 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
             formContext.removeValue(listId, itemId);
         }
     };
+
+    private onSelectCoordinates = (id: string, formContext: any) => (label: string, point: Point): void =>
+        formContext.addValue(id, {label, point});
 
     private getDateStringFromTimestamp = (value: number) => {
         const date = new Date(value * 1000);

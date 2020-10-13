@@ -304,7 +304,8 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                  dropdown={{
                                                      defaultValue: "Select field",
                                                      values: Object.values(this.props.fields),
-                                                     optionToString: this.fieldOption
+                                                     optionToString: this.fieldOption,
+                                                     emptyMessage: 'No fields available'
                                                  }}/>
                                 : key === 'override'
                                 ? <Field<boolean> key={index}

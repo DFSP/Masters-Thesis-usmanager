@@ -28,7 +28,7 @@ import Dialog from "../../../components/dialogs/Dialog";
 import {Point} from "react-simple-maps";
 
 interface Props {
-    launchAppCallback: (coordinates: Point) => void;
+    launchAppCallback: (coordinates: {label: string, point: Point}) => void;
 }
 
 interface State {
@@ -50,7 +50,7 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
         if (!this.state.selectedCoordinates) {
             M.toast({html:'<div class="red-text">Error</div><div style="margin-left: 3px"> - location not selected</div>'});
         } else {
-            this.props.launchAppCallback(this.state.selectedCoordinates.point);
+            this.props.launchAppCallback(this.state.selectedCoordinates);
         }
     }
 

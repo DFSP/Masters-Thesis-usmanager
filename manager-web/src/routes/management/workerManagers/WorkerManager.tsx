@@ -277,7 +277,8 @@ class WorkerManager extends BaseComponent<Props, State> {
                                              type={'dropdown'}
                                              dropdown={{
                                                  defaultValue: "Select host",
-                                                 values: this.getSelectableHosts()
+                                                 values: this.getSelectableHosts(),
+                                                 emptyMessage: 'No hosts available'
                                              }}/>
                                     : key === 'container'
                                     ? <>

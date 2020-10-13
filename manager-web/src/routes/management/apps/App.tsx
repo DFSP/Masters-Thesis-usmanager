@@ -236,7 +236,7 @@ class App extends BaseComponent<Props, State> {
         return buttons;
     };
 
-    private launchApp = (coordinates: Point) => {
+    private launchApp = (coordinates: {label: string, point: Point}) => {
         const app = this.getApp();
         const url = `apps/${app.name}/launch`;
         this.setState({loading: {method: 'post', url: url}});

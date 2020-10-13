@@ -87,7 +87,8 @@ class SshFile extends BaseComponent<Props, {}> {
                                               dropdown={{
                                                   defaultValue: 'Select host address',
                                                   values: this.getSelectableHosts(),
-                                                  optionToString: this.hostAddressesDropdown
+                                                  optionToString: this.hostAddressesDropdown,
+                                                  emptyMessage: 'No hosts available'
                                               }}/>
                 <Field key='filename'
                        id='filename'
@@ -95,7 +96,8 @@ class SshFile extends BaseComponent<Props, {}> {
                        type='dropdown'
                        dropdown={{
                            defaultValue: 'Select filename',
-                           values: this.props.scripts
+                           values: this.props.scripts,
+                           emptyMessage: 'No scripts available'
                        }}/>
             </Form>
         );

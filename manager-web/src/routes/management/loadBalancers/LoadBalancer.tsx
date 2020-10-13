@@ -228,7 +228,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
                                              type={'dropdown'}
                                              dropdown={{
                                                  defaultValue: "Select service",
-                                                 values: this.getSelectableServices()
+                                                 values: this.getSelectableServices(),
+                                                 emptyMessage: 'No services available'
                                              }}/>
                                     : key === 'regions'
                                     ? <Field key={index}

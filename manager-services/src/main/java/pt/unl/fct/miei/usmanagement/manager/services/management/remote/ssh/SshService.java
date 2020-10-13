@@ -107,7 +107,7 @@ public class SshService {
 		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(connectionTimeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-		log.info("Logging in to host {}@{} using key {} and hostname {}", username, hostname, publicKeyFile, hostname);
+		log.info("Logging in to host {}@{} using key {}", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
 		PKCS8KeyFile keyFile = new PKCS8KeyFile();
 		keyFile.init(publicKeyFile);

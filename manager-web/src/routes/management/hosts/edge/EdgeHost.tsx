@@ -370,7 +370,8 @@ class EdgeHost extends BaseComponent<Props, State> {
                                                   dropdown={{
                                                       defaultValue: 'Select region',
                                                       values: this.getSelectableRegions(),
-                                                      optionToString: this.regionDropdownOption
+                                                      optionToString: this.regionDropdownOption,
+                                                      emptyMessage: 'No regions available'
                                                   }}/>
                                 : key === 'password'
                                     ? <Field key={index}

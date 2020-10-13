@@ -26,18 +26,18 @@ package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.node
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
 final class AddNode {
 
 	private final String host;
-	private final int quantity;
-	private final RegionEntity region;
-	private final String country;
-	private final String city;
 	private final NodeRole role;
+	private final List<Coordinates> coordinates;
 
 }

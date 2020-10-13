@@ -27,9 +27,9 @@ import BaseComponent from "../../../components/BaseComponent";
 import Form, {
     ICustomButton,
     IFields,
-    IFormLoading,
+    IFormLoading, required,
     requiredAndNumberAndMin,
-    requiredAndTrimmed,
+    requiredAndTrimmed, requireGreaterOrEqualSize,
     trimmed
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
@@ -51,7 +51,6 @@ import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
-import LocationSelectorMap from "../../../components/map/LocationSelectorMap";
 import {Point} from "react-simple-maps";
 
 export interface INode extends IDatabaseData {
@@ -73,24 +72,18 @@ interface INewNodeHost {
 }
 
 interface INewNodeLocation {
-    region?: IRegion,
-    country?: string,
-    city?: string,
+    coordinates?: Point[];
     role?: string;
-    quantity: number,
 }
+
+const buildNewNodeLocation = (): INewNodeLocation => ({
+    coordinates: undefined,
+    role: undefined,
+});
 
 const buildNewNodeHost = (): INewNodeHost => ({
     host: undefined,
     role: undefined,
-});
-
-const buildNewNodeLocation = (): INewNodeLocation => ({
-    region: undefined,
-    country: undefined,
-    city: undefined,
-    role: undefined,
-    quantity: 1,
 });
 
 interface StateToProps {
@@ -131,13 +124,15 @@ interface State {
     formNode?: INode,
     loading: IFormLoading,
     currentForm: 'On host' | 'On location',
+    locations: Point[],
 }
 
 class Node extends BaseComponent<Props, State> {
 
     state: State = {
         loading: undefined,
-        currentForm: 'On host'
+        currentForm: 'On host',
+        locations: []
     };
 
     private mounted = false;
@@ -201,8 +196,8 @@ class Node extends BaseComponent<Props, State> {
         let message;
         if ("host" in place && place.host) {
             message = `Unable to start node at ${place.host}`;
-        } else if ("city" in place) {
-            message = `Unable to start node at ${place.city}`;
+        } else if ("coordinates" in place) {
+            message = `Unable to start node at ${place.coordinates}`;
         } else {
             message = `Unable to start node`;
         }
@@ -293,16 +288,14 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private getFields = (node: INewNodeHost | INewNodeLocation | INode): IFields =>
-        Object.entries(node).map(([key, value]) => {
+        Object.keys(node).map(key => {
             return {
                 [key]: {
                     id: key,
                     label: key,
-                    validation: getTypeFromValue(value) === 'number'
-                        ? {rule: requiredAndNumberAndMin, args: 1}
-                        : key === 'country' || key === 'city'
-                            ? {rule: trimmed}
-                            : {rule: requiredAndTrimmed}
+                    validation: key === 'coordinates'
+                        ? {rule: requireGreaterOrEqualSize, args: 1}
+                        : {rule: required}
                 }
             };
         }).reduce((fields, field) => {
@@ -323,9 +316,6 @@ class Node extends BaseComponent<Props, State> {
             .map(([hostname, _]) => hostname);
         return cloudHosts.concat(edgeHosts);
     };
-
-    private regionDropdownOption = (region: IRegion) =>
-        region.name;
 
     private hostnameLink = (hostname: string) => {
         if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
@@ -351,7 +341,8 @@ class Node extends BaseComponent<Props, State> {
                                        type="dropdown"
                                        dropdown={{
                                            defaultValue: "Select host",
-                                           values: this.getSelectableHosts()
+                                           values: this.getSelectableHosts(),
+                                           emptyMessage: 'No hosts to select'
                                        }}/>
                         <Field key={'role'}
                                id={'role'}
@@ -364,21 +355,6 @@ class Node extends BaseComponent<Props, State> {
                     </>
                     :
                     <>
-                        <Field<IRegion> key={'region'}
-                                        id={'region'}
-                                        label={'region'}
-                                        type="dropdown"
-                                        dropdown={{
-                                            defaultValue: "Select region",
-                                            values: Object.values(this.props.regions),
-                                            optionToString: this.regionDropdownOption
-                                        }}/>
-                        <Field key={'country'}
-                               id={'country'}
-                               label={'country'}/>
-                        <Field key={'city'}
-                               id={'city'}
-                               label={'city'}/>
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}
@@ -387,10 +363,7 @@ class Node extends BaseComponent<Props, State> {
                                    defaultValue: "Select role",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
-                        <Field key={'quantity'}
-                               id={'quantity'}
-                               label={'quantity'}
-                               type={"number"}/>
+                        <Field key='coordinates' id='coordinates' type='map'/>
                     </>
                 :
                 formNode && Object.entries(formNode).map(([key, value], index) =>
@@ -411,7 +384,8 @@ class Node extends BaseComponent<Props, State> {
                                  dropdown={{
                                      defaultValue: "Select role",
                                      values: ['MANAGER', 'WORKER']
-                                 }}/>
+                                 }}
+                                 disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'}/>
                         : key === 'hostname'
                             ? <Field key={index}
                                      id={key}
@@ -467,30 +441,26 @@ class Node extends BaseComponent<Props, State> {
                                   failureCallback: this.onPutFailure
                               }}
                             // delete button is never present on new nodes, so a type cast is safe
-                              delete={{
-                                  textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
-                                  url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
-                                  successCallback: this.onDeleteSuccess,
-                                  failureCallback: this.onDeleteFailure
-                              }}
+                              delete={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && node.role === 'MANAGER'
+                                  ? undefined
+                                  : {
+                                      textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
+                                      url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
+                                      successCallback: this.onDeleteSuccess,
+                                      failureCallback: this.onDeleteFailure
+                                  }}
                               switchDropdown={isNewNode ? {
-                                  options: ['On host', 'On location'],
+                                  options: currentForm === 'On host' ? ['On location'] : ['On host'],
                                   onSwitch: this.switchForm
                               } : undefined}
                               customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
                             {this.formFields(isNewNode)}
                         </Form>
-                        {isNewNode && currentForm === 'On location' && <LocationSelectorMap onSelect={this.onSelectCoordinates} locations={[]}/>}
                     </>
                 )}
             </>
         )
     };
-
-    private onSelectCoordinates = (label: string, coordinates: Point): void => {
-        /*this.setState({selectedCoordinates: coordinates});*/
-        M.toast({html: 'label: ' + label + ' latitude: ' + coordinates[0] + ' longitude: ' + coordinates[1]});
-    }
 
     private labels = (): JSX.Element =>
         <NodeLabelsList isLoadingNode={this.props.isLoading}

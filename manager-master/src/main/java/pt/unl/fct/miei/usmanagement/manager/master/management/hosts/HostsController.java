@@ -159,9 +159,8 @@ public class HostsController {
 	@PostMapping("/edge")
 	public EdgeHostEntity addEdgeHost(@Json String username, @Json String password, @Json String publicDnsName,
 									  @Json String privateIpAddress, @Json String publicIpAddress,
-									  @Json float latitude, float longitude) {
-		return edgeHostsService.addEdgeHost(username, password, publicDnsName, privateIpAddress, publicIpAddress,
-			new Coordinates(latitude, longitude));
+									  @Json Coordinates coordinates) {
+		return edgeHostsService.addEdgeHost(username, password, publicDnsName, privateIpAddress, publicIpAddress, coordinates);
 	}
 
 	@PutMapping("/edge/{hostname}")

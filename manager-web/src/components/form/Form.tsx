@@ -131,7 +131,7 @@ export const FormContext =
 //TODO validation for correct dates and times
 
 export const requireGreaterOrEqualSize = (values: IValues, id: keyof IValues, size: number): string => {
-    return values[id] === undefined || values[id] === null || values[id].length != size
+    return values[id] === undefined || values[id] === null || values[id].length < size
         ? `Number of ${camelCaseToSentenceCase(id as string)} must be at least ${size}`
         : "";
 }
@@ -598,11 +598,10 @@ class Form extends BaseComponent<Props, State> {
         } else {
             this.setState({values: {...this.state.values, ...values}});
         }
-
     };
 
     private addValue = (id: keyof IValues, value: any) =>
-        this.setValue(id, this.state.values[id] ? this.state.values[id].concat(value) : [value]);
+        this.setValue(id, this.state.values[id] ? [...this.state.values[id], value] : [value]);
 
     private removeValue = (id: keyof IValues, value: any) => {
         let values = this.state.values[id].filter((v: any) => v !== value);

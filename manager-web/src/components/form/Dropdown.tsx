@@ -31,7 +31,7 @@ interface Props<T> {
     name: string;
     value: any;
     disabled?: boolean;
-    dropdown: { defaultValue?: string | number, values: T[], optionToString?: (v: T) => string };
+    dropdown: { defaultValue?: string | number, values: T[], optionToString?: (v: T) => string, emptyMessage?: string };
     onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
     onBlur?: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
@@ -59,22 +59,24 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
                 id={id}
                 name={name}
                 value={valueString}
-                disabled={disabled}
+                disabled={disabled || dropdown.values.length === 0}
                 onChange={onChange}
                 onBlur={onBlur}
                 ref={this.dropdown}>
                 {<>
-                    {dropdown.defaultValue && (
-                        <option key={dropdown.defaultValue} value="" disabled hidden>
-                            {dropdown.defaultValue}
-                        </option>
-                    )}
+                    {dropdown.values.length > 0 && dropdown.defaultValue &&
+                    <option key={dropdown.defaultValue} value="" disabled hidden>
+                        {dropdown.defaultValue}
+                    </option>}
+                    {dropdown.values.length === 0 && dropdown.emptyMessage &&
+                    <option value="" disabled hidden>
+                        {dropdown.emptyMessage}
+                    </option>}
                     {dropdown.values.map((option, index) =>
                         <option key={index}
                                 value={typeof option === 'string' || typeof option === 'boolean' ? option.toString() : JSON.stringify(option)}>
                             {typeof option === 'string' || typeof option === 'boolean' ? option.toString() : dropdown.optionToString?.(option)}
-                        </option>
-                    )}
+                        </option>)}
                 </>}
             </select>
         )

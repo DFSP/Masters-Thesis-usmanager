@@ -379,7 +379,8 @@ class RuleHost extends BaseComponent<Props, State> {
                                                     dropdown={{
                                                         defaultValue: "Choose decision",
                                                         values: this.getSelectableDecisions(),
-                                                        optionToString: this.decisionDropdownOption
+                                                        optionToString: this.decisionDropdownOption,
+                                                        emptyMessage: 'No decisions available'
                                                     }}/>
                                 : key === 'generic'
                                 ? <Field<boolean> key={index}

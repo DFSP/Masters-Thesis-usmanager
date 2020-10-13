@@ -49,7 +49,7 @@ public final class ContainerConstants {
 	public static final class Label {
 		public static final String SERVICE_NAME = "serviceName";
 		public static final String SERVICE_TYPE = "serviceType";
-		public static final String SERVICE_ADDRESS = "serviceAddr";
+		public static final String SERVICE_ADDRESS = "serviceAddress";
 		public static final String SERVICE_PUBLIC_IP_ADDRESS = "servicePublicIpAddress";
 		public static final String SERVICE_PRIVATE_IP_ADDRESS = "servicePrivateIpAddress";
 		public static final String SERVICE_CONTINENT = "serviceContinent";

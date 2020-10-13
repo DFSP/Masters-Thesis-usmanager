@@ -81,7 +81,8 @@ class SshCommand extends BaseComponent<Props, {}> {
                                               dropdown={{
                                                   defaultValue: 'Select host address',
                                                   values: this.getSelectableHosts(),
-                                                  optionToString: this.hostAddressesDropdown
+                                                  optionToString: this.hostAddressesDropdown,
+                                                  emptyMessage: 'No hosts available'
                                               }}/>
                 <Field key='command'
                        id='command'

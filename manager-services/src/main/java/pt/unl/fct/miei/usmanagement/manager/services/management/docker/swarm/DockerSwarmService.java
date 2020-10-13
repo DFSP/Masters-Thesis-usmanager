@@ -119,16 +119,18 @@ public class DockerSwarmService {
 		HostAddress hostAddress = node.getHostAddress();
 		NodeRole role = node.getRole();
 		nodesService.removeNode(nodeId);
-		return joinSwarm(hostAddress, role, true);
+		return joinSwarm(hostAddress, role);
 	}
 
-	public SimpleNode joinSwarm(HostAddress hostAddress, NodeRole role, boolean leave) {
+	public SimpleNode joinSwarm(HostAddress hostAddress, NodeRole role) {
 		String leaderAddress = hostsService.getHostAddress().getPublicIpAddress();
 		try (DockerClient leaderClient = getSwarmLeader();
 			 DockerClient nodeClient = dockerCoreService.getDockerClient(hostAddress)) {
-			if (leave) {
+			/*try {*/
 				leaveSwarm(nodeClient);
-			}
+			/*} catch (Exception e) {
+				e.printStackTrace();
+			}*/
 			log.info("{} is joining the swarm as {}", hostAddress, role);
 			String joinToken;
 			switch (role) {

@@ -498,7 +498,8 @@ class Container extends BaseComponent<Props, State> {
                                               dropdown={{
                                                   defaultValue: "Select host address",
                                                   values: this.getSelectableHosts(),
-                                                  optionToString: this.hostAddressesDropdown
+                                                  optionToString: this.hostAddressesDropdown,
+                                                  emptyMessage: 'No hosts available'
                                               }}/>
                 <Field key={'service'}
                        id={'service'}
@@ -507,7 +508,8 @@ class Container extends BaseComponent<Props, State> {
                        dropdown={{
                            defaultValue: "Select service",
                            values: this.getSelectableServices(),
-                           selectCallback: this.setDefaultPorts
+                           selectCallback: this.setDefaultPorts,
+                           emptyMessage: 'No services available'
                        }}/>
                 <Field key={'internalPort'}
                        id={'internalPort'}

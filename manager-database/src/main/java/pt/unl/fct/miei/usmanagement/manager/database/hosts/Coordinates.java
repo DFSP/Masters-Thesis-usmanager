@@ -36,7 +36,8 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 public class Coordinates implements Serializable {
-	
+
+	private final String label;
 	private final float latitude;
 	private final float longitude;
 

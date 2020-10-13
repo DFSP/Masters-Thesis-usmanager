@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.master.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
@@ -72,20 +72,19 @@ public class NodesController {
 	@PostMapping
 	public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
 		NodeRole role = addNode.getRole();
-		int quantity = addNode.getQuantity();
 		String host = addNode.getHost();
-		List<SimpleNode> nodes = new ArrayList<>(addNode.getQuantity());
+		List<SimpleNode> nodes = new ArrayList<>();
 		if (host != null) {
 			SimpleNode node = hostsService.addHost(host, role);
 			nodes.add(node);
 		}
 		else {
-			RegionEntity region = addNode.getRegion();
-			String country = addNode.getCountry();
-			String city = addNode.getCity();
-			for (int i = 0; i < quantity; i++) {
-				SimpleNode node = hostsService.addHost(region, country, city, role);
-				nodes.add(node);
+			List<Coordinates> coordinates = addNode.getCoordinates();
+			for (Coordinates coordinate : coordinates) {
+				SimpleNode node = hostsService.addHost(coordinate, role);
+				if (node != null) { // TODO
+					nodes.add(node);
+				}
 			}
 		}
 		return nodes;

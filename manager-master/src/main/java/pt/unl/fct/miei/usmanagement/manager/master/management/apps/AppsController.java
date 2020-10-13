@@ -104,8 +104,8 @@ public final class AppsController {
 	}
 
 	@PostMapping("/{appName}/launch")
-	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName, @RequestBody float[] coordinates) {
-		return appsService.launch(appName, new Coordinates(coordinates[0], coordinates[1]));
+	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
+		return appsService.launch(appName, coordinates);
 	}
 
 }

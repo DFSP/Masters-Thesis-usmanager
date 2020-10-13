@@ -229,7 +229,7 @@ public class HostsService {
 			return nodesService.getHostNode(hostAddress);
 		}
 		catch (EntityNotFoundException ignored) {
-			return dockerSwarmService.joinSwarm(hostAddress, role, false);
+			return dockerSwarmService.joinSwarm(hostAddress, role);
 		}
 	}
 
@@ -379,6 +379,24 @@ public class HostsService {
 			hostAddress = edgeHost.getAddress();
 		}
 		return setupHost(hostAddress, role);
+	}
+
+	public SimpleNode addHost(Coordinates coordinates, NodeRole role) {
+		/*HostAddress hostAddress;
+		try {
+			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
+			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
+				cloudHost = cloudHostsService.startCloudHost(host, false);
+			}
+			hostAddress = cloudHost.getAddress();
+		}
+		catch (EntityNotFoundException e) {
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
+			hostAddress = edgeHost.getAddress();
+		}
+		return setupHost(hostAddress, role);*/
+		// TODO
+		return null;
 	}
 
 	public void removeHost(HostAddress hostAddress) {
