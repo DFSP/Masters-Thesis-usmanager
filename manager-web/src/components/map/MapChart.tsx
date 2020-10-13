@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-import {ComposableMap, Geographies, Geography, ZoomableGroup} from "react-simple-maps";
+import {ComposableMap, Geographies, Geography, Marker, Point} from "react-simple-maps";
 import React, {createRef, memo} from "react";
 import * as d3Geo from "d3-geo";
-import {ICoordinates} from "./LocationSelectorMap";
 
 const {geoPath} = d3Geo
 
 type Props = {
     setTooltipContent: (tooltip: string) => void;
-    onClick: (coordinates: ICoordinates) => void;
+    onClick: (label: string, coordinates: Point) => void;
+    markers?: {coordinates: Point, marker: JSX.Element}[];
 }
 
 type State = {
@@ -40,9 +40,14 @@ type State = {
 
 class MapChart extends React.Component<Props, State> {
 
-    private MAP_MAX_WIDTH = 1500;
-    private MAP_MAX_HEIGHT = 1000;
+    private MAP_MAX_WIDTH = window.innerWidth;
+    private MAP_MAX_HEIGHT = window.innerHeight - 125;
     private map = createRef<HTMLDivElement>();
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {scale: 1.0};
+    }
 
     public componentDidMount() {
         if (global.window) {
@@ -52,22 +57,32 @@ class MapChart extends React.Component<Props, State> {
         this.setState({scale: 1.0});
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+        this.calculateScale();
+    }
+
     public componentWillUnmount() {
         if (global.window) {
             global.window.removeEventListener('resize', this.handleResize);
         }
     }
 
-    private readonly handleResize = () => {
+    private handleResize = () => {
+       this.calculateScale();
+    }
+
+    private calculateScale = () => {
         const map = this.map.current;
         if (map) {
             const {width} = map.getBoundingClientRect();
-            this.setState({scale: width / this.MAP_MAX_WIDTH});
+            const newScale = width / this.MAP_MAX_WIDTH;
+            if (newScale !== this.state.scale) {
+                this.setState({scale: newScale});
+            }
         }
     }
 
     private onGeographyClick = (geography: any, projection: any) => (evt: any) => {
-        console.log(this.state.scale)
         const gp = geoPath().projection(projection);
         const dim = evt.target.getBoundingClientRect();
         const cx = evt.clientX - dim.left;
@@ -75,21 +90,20 @@ class MapChart extends React.Component<Props, State> {
         const [orgX, orgY] = gp.bounds(geography)[0];
         const {scale} = this.state;
         const coordinates = projection.invert([orgX + cx / scale, orgY + cy / scale]);
-        const longitude = coordinates[0];
-        const latitude = coordinates[1];
-        this.props.onClick({longitude, latitude});
+        this.props.onClick(geography.properties.NAME, coordinates);
     }
 
     public render() {
-        const geoUrl = "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
-        const {setTooltipContent} = this.props;
+        const geoUrl = "/resources/world-110m.json";
+        const {setTooltipContent, markers} = this.props;
+        const divProps = {style: {width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}}
         return (
-            <div style={{width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}} ref={this.map}>
-                <ComposableMap data-tip=""
+            <div {...divProps} ref={this.map}>
+                <ComposableMap data-tip="" projectionConfig={{scale: 315, rotate: [-11, 0, 0]}}
                                width={this.MAP_MAX_WIDTH}
                                height={this.MAP_MAX_HEIGHT}
                                style={{width: '100%', height: 'auto'}}>
-                    <Geographies geography={geoUrl}>
+                    <Geographies geography={geoUrl} >
                         {({geographies, projection}) =>
                             geographies.map(geo => (
                                 <Geography
@@ -121,6 +135,10 @@ class MapChart extends React.Component<Props, State> {
                             ))
                         }
                     </Geographies>
+                    {markers?.map((marker, index) =>
+                        <Marker key={index} coordinates={marker.coordinates}>
+                            {marker.marker}
+                        </Marker>)}
                 </ComposableMap>
             </div>
         );

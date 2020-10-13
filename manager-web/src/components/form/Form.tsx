@@ -349,7 +349,7 @@ class Form extends BaseComponent<Props, State> {
                                             ))}
                                             {deletable !== undefined && !loading && (
                                                 <button
-                                                    className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
+                                                    className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small waves-effect waves-light red-text inline-button`}
                                                     type="button"
                                                     data-target={id}
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
@@ -357,7 +357,7 @@ class Form extends BaseComponent<Props, State> {
                                                 </button>)}
                                             {!loading && (
                                                 <button
-                                                    className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
+                                                    className={`btn-flat btn-small waves-effect waves-light green-text slide inline-button`}
                                                     style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                                                     type="submit">
                                                     {this.props.post?.textButton || 'Save'}
@@ -365,7 +365,7 @@ class Form extends BaseComponent<Props, State> {
                                         </div>
                                         {editable !== undefined && !loading && (
                                             <button
-                                                className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
+                                                className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped inline-button`}
                                                 data-position="bottom"
                                                 data-tooltip="Edit"
                                                 type="button"
@@ -377,7 +377,7 @@ class Form extends BaseComponent<Props, State> {
                                 }
                                 {loading && (
                                     <button
-                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide ${styles.formButton}`}
+                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide inline-button`}
                                         onClick={this.cancelRequest}>
                                         Cancel
                                     </button>
@@ -385,7 +385,7 @@ class Form extends BaseComponent<Props, State> {
                                 {dropdown && (
                                     <>
                                         <button
-                                            className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
+                                            className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped inline-button`}
                                             data-position="bottom" data-tooltip={dropdown.title}
                                             data-target={`dropdown-${dropdown.id}`}
                                             ref={this.dropdown}>
@@ -444,17 +444,17 @@ class Form extends BaseComponent<Props, State> {
                         <div
                             className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
                             <div>
-                                <button className={`waves-effect waves-light btn-flat red-text ${styles.formButton}`}
+                                <button className={`waves-effect waves-light btn-flat red-text inline-button`}
                                         type="button"
                                         onClick={this.clearValues}>
                                     Clear
                                 </button>
                                 <button
-                                    className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
+                                    className={`modal-close waves-effect waves-light btn-flat red-text inline-button`}
                                     type="button">
                                     Cancel
                                 </button>
-                                <button className={`waves-effect waves-light btn-flat green-text ${styles.formButton}`}
+                                <button className={`waves-effect waves-light btn-flat green-text inline-button`}
                                         type="button"
                                         onClick={this.onModalConfirm}>
                                     Confirm

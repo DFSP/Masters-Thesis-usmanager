@@ -243,7 +243,7 @@ public class HostsService {
 
 	public HostAddress getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
 		// TODO implement algorithm to get the closest machine based on coordinates
-		return null;
+		return edgeHostsService.getEdgeHosts().get(0).getAddress();
 	}
 
 	//FIXME

@@ -25,19 +25,22 @@
 import BaseComponent from "../BaseComponent";
 import React, {createRef} from "react";
 import M, {ModalOptions} from "materialize-css";
-import Form, {IFields, IValues} from "../form/Form";
+import Form, {FormContext, IFields, IValues} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
+import styles from "../form/Form.module.css";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
-interface InputDialogProps {
+interface DialogProps {
     id: string;
     title?: string;
     position?: string;
     confirmCallback: (input: any) => void;
     fullscreen?: boolean;
     scrollbar?: React.RefObject<ScrollBar>;
+    locked?: boolean;
 }
 
-type Props = InputDialogProps;
+type Props = DialogProps;
 
 interface State {
     fullscreen: boolean;
@@ -79,9 +82,8 @@ export default class Dialog extends BaseComponent<Props, State> {
     }
 
     public render() {
-        const {id, title, children} = this.props;
+        const {id, title, children, locked} = this.props;
         const {fullscreen} = this.state;
-
         return (
             <div id={id} className={`modal dialog ${fullscreen ? 'modal-fullscreen' : ''}`} ref={this.modal}>
                 <div className="modal-content">
@@ -100,16 +102,37 @@ export default class Dialog extends BaseComponent<Props, State> {
                                         <button className='modal-close btn-floating btn-flat right'>
                                             <i className="material-icons">close</i>
                                         </button>
+
+                                        {!locked &&
                                         <button className='btn-floating btn-flat right'
-                                                onClick={this.toggleFullScreen}>
+                                                            onClick={this.toggleFullScreen}>
                                             <i className="material-icons">fullscreen_exit</i>
-                                        </button>
+                                        </button>}
                                     </>
                                 )}
                             </div>
                         </>
                     )}
-                    {children}
+                    <ScrollBar ref={this.scrollbar}
+                               component={'div'}
+                               style={this.state.scrollMaxHeight ? {maxHeight: Math.floor(this.state.scrollMaxHeight)} : undefined}>
+                        {children}
+                    </ScrollBar>
+                    <div
+                        className={`modal-footer dialog-footer`}>
+                        <div>
+                            <button
+                                className={`modal-close waves-effect waves-light btn-flat red-text inline-button`}
+                                type="button">
+                                Cancel
+                            </button>
+                            <button className={`waves-effect waves-light btn-flat green-text inline-button`}
+                                    type="button"
+                                    onClick={this.confirmCallback}>
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

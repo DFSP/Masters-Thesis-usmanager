@@ -129,7 +129,7 @@ public class AppsService {
 	}
 
 	public Map<String, List<ContainerEntity>> launch(String appName, Coordinates coordinates) {
-		log.info("Launching app {} at {} lat {} lon", appName, coordinates.getLatitude(), coordinates.getLongitude());
+		log.info("Launching app {} at latitude {} and longitude {}", appName, coordinates.getLatitude(), coordinates.getLongitude());
 		List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
 			.filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
 			.map(ServiceOrder::getService)

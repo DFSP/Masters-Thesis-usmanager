@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,30 +22,25 @@
  * SOFTWARE.
  */
 
-import React, {useState} from "react";
-import MapChart from "./MapChart";
-import ReactTooltip from "react-tooltip";
 import {Point} from "react-simple-maps";
-import Marker from "./Marker";
+import React from "react";
 
 interface Props {
-    onSelect: (label: string, coordinates: Point) => void;
-    locations: { label: string, point: Point }[],
+    setTooltipContent: (tooltip: string) => void;
+    label: string;
+    location: Point;
+    color: string;
+    size: number;
 }
 
-function LocationSelectorMap({onSelect, locations}: Props) {
-    const [content, setContent] = useState("");
-    const markers = locations.map(location => ({
-        coordinates: location.point,
-        marker: <Marker setTooltipContent={setContent} label={location.label} location={location.point}
-                        color={"#2196F3"} size={4}/>
-    }));
+export default function Marker({setTooltipContent, label, location, color, size}: Props) {
     return (
-        <>
-            <MapChart setTooltipContent={setContent} onClick={onSelect} markers={markers}/>
-            <ReactTooltip>{content}</ReactTooltip>
-        </>
-    )
+        <circle r={size} fill={color}
+                onMouseEnter={() => {
+                    setTooltipContent(`${label} (Lat: ${location[1].toFixed(2)} Lon: ${location[0].toFixed(2)})`);
+                }}
+                onMouseLeave={() => {
+                    setTooltipContent("");
+                }}/>
+    );
 }
-
-export default LocationSelectorMap;

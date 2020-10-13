@@ -51,7 +51,8 @@ import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
-import LocationSelectorMap, {ICoordinates} from "../../../components/map/LocationSelectorMap";
+import LocationSelectorMap from "../../../components/map/LocationSelectorMap";
+import {Point} from "react-simple-maps";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
@@ -479,16 +480,16 @@ class Node extends BaseComponent<Props, State> {
                               customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
                             {this.formFields(isNewNode)}
                         </Form>
-                        {isNewNode && currentForm === 'On location' && <LocationSelectorMap onSelect={this.onSelectCoordinates}/>}
+                        {isNewNode && currentForm === 'On location' && <LocationSelectorMap onSelect={this.onSelectCoordinates} locations={[]}/>}
                     </>
                 )}
             </>
         )
     };
 
-    private onSelectCoordinates = (coordinates: ICoordinates): void => {
+    private onSelectCoordinates = (label: string, coordinates: Point): void => {
         /*this.setState({selectedCoordinates: coordinates});*/
-        M.toast({html: 'latitude: ' + coordinates.latitude + ' longitude: ' + coordinates.longitude});
+        M.toast({html: 'label: ' + label + ' latitude: ' + coordinates[0] + ' longitude: ' + coordinates[1]});
     }
 
     private labels = (): JSX.Element =>

@@ -23,55 +23,45 @@
  */
 
 import React from "react";
-import InputDialog from "../../../components/dialogs/InputDialog";
-import {IRegion} from "../region/Region";
-import {IFields, IValues, requireGreaterOrEqualSize} from "../../../components/form/Form";
-import LocationSelectorMap, {ICoordinates} from "../../../components/map/LocationSelectorMap";
-
-export interface ILaunchLocation {
-   coordinates: ICoordinates
-}
+import LocationSelectorMap from "../../../components/map/LocationSelectorMap";
+import Dialog from "../../../components/dialogs/Dialog";
+import {Point} from "react-simple-maps";
 
 interface Props {
-    launchAppCallback: (location: ILaunchLocation) => void;
+    launchAppCallback: (coordinates: Point) => void;
 }
 
 interface State {
-    selectedCoordinates: ICoordinates
+    selectedCoordinates?: {label: string, point: Point}
 }
 
 export default class LaunchAppDialog extends React.Component<Props, State> {
 
-    private launchAppFields: IFields =
-        {
-            coordinates: {
-                id: 'coordinates',
-                validation: {rule: requireGreaterOrEqualSize, args: 1},
-                hidden: true
-            }
-        };
+    constructor(props: Props) {
+        super(props);
+        this.state = {};
+    }
 
-    private modalValues: IValues =
-        {
-            coordinates: []
-        };
+    private onSelectCoordinates = (label: string, coordinates: Point): void => {
+        this.setState({selectedCoordinates: {label: label, point: coordinates}});
+    }
 
-    private onSelectCoordinates = (coordinates: ICoordinates): void => {
-        this.setState({selectedCoordinates: coordinates});
-        M.toast({html: 'latitude: ' + coordinates.latitude + ' longitude: ' + coordinates.longitude});
+    private launchAppConfirm = () => {
+        if (!this.state.selectedCoordinates) {
+            M.toast({html:'<div class="red-text">Error</div><div style="margin-left: 3px"> - location not selected</div>'});
+        } else {
+            this.props.launchAppCallback(this.state.selectedCoordinates.point);
+        }
     }
 
     public render() {
-        const {launchAppCallback} = this.props;
-        return <InputDialog id={'launch-app-modal'}
-                            title={'Select location'}
-                            fields={this.launchAppFields}
-                            values={this.modalValues}
-                            confirmCallback={launchAppCallback}
-                            fullscreen={true}>
-            <div>
-                <LocationSelectorMap onSelect={this.onSelectCoordinates}/>
-            </div>
-        </InputDialog>;
+        const location = this.state.selectedCoordinates ? [this.state.selectedCoordinates] : [];
+        return <Dialog id={'launch-app-modal'}
+                       title={'Select location'}
+                       fullscreen={true}
+                       locked={true}
+                       confirmCallback={this.launchAppConfirm}>
+            <LocationSelectorMap onSelect={this.onSelectCoordinates} locations={location}/>
+        </Dialog>;
     }
 }

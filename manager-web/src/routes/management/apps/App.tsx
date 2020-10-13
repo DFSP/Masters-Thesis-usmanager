@@ -44,7 +44,8 @@ import {isNew} from "../../../utils/router";
 import {IRegion} from "../region/Region";
 import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
-import LaunchAppDialog, {ILaunchLocation} from "./LaunchAppDialog";
+import LaunchAppDialog from "./LaunchAppDialog";
+import {Point} from "react-simple-maps";
 
 export interface IApp extends IDatabaseData {
     name: string;
@@ -235,11 +236,11 @@ class App extends BaseComponent<Props, State> {
         return buttons;
     };
 
-    private launchApp = (location: ILaunchLocation) => {
+    private launchApp = (coordinates: Point) => {
         const app = this.getApp();
         const url = `apps/${app.name}/launch`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, location,
+        postData(url, coordinates,
             (reply: IReply<ILaunchApp>) => this.onLaunchSuccess(reply.data),
             (reason: string) => this.onLaunchFailure(reason, app));
     };
@@ -247,8 +248,8 @@ class App extends BaseComponent<Props, State> {
     private onLaunchSuccess = (launchApp: ILaunchApp) => {
         super.toast(`<span><span class="green-text">Successfully launched services<br/>
         </span>${Object.entries(launchApp)
-                .map(([service, containers]) => `<b>${service}</b> = [${containers.map(c =>
-                    `<a href=/containers/${c.containerId}>${c.containerId}</a>`).join(', ')}]`).join('<br/>')}</span>`,
+                .map(([service, containers]) => `<b>${service}</b> ${containers.map(c =>
+                    `<a href=/containers/${c.containerId}>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
             20000);
         if (this.mounted) {
             this.setState({loading: undefined});
@@ -331,8 +332,7 @@ class App extends BaseComponent<Props, State> {
                                        label={key}/>
                             )}
                         </Form>
-                        <LaunchAppDialog launchAppCallback={this.launchApp}
-                                         /*regions={Object.values(this.props.regions)}*//>
+                        <LaunchAppDialog launchAppCallback={this.launchApp}/>
                     </>
                 )}
             </>
