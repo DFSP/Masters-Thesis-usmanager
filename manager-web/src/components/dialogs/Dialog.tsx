@@ -74,6 +74,7 @@ export default class Dialog extends BaseComponent<Props, State> {
             modal.options.outDuration = 0;
             modal.options.onOpenEnd = this.onOpenModal;
             modal.options.onCloseStart = this.onCloseModal;
+            modal.options.preventScrolling = true;
         }
         this.scrollbar?.current?.updateScroll();
     }
@@ -148,6 +149,7 @@ export default class Dialog extends BaseComponent<Props, State> {
         let options: Partial<ModalOptions> = {
             onOpenEnd: this.onOpenModal,
             onCloseStart: this.onCloseModal,
+            preventScrolling: true
         };
         if (position) {
             options.startingTop = position;

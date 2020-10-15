@@ -31,7 +31,6 @@ import {connect} from "react-redux";
 import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
-import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
 
 interface StateToProps {
@@ -56,10 +55,11 @@ class Landing extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = { center: true };
+        this.state = {center: true};
     }
 
     public componentDidMount() {
+        this.props.loadContainers();
         this.reloadData = setInterval(this.props.loadContainers, 15000);
     }
 
@@ -91,7 +91,8 @@ class Landing extends React.Component<Props, State> {
                 <i className="material-icons">center_focus_weak</i>;
             </button>;
         const map =
-            <LocationMap locations={this.getContainers()} zoomable center={this.state.center} hover marker={{labeled: true}}/>;
+            <LocationMap locations={this.getContainers()} zoomable center={this.state.center} hover
+                         marker={{labeled: true}}/>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
                 <button className={`modal-trigger btn-floating btn-flat right tooltipped`}
