@@ -25,19 +25,20 @@
 import BaseComponent from "../BaseComponent";
 import React, {createRef} from "react";
 import M, {ModalOptions} from "materialize-css";
-import Form, {FormContext, IFields, IValues} from "../form/Form";
+import {IValues} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
-import styles from "../form/Form.module.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
 
 interface DialogProps {
     id: string;
     title?: string;
     position?: string;
-    confirmCallback: (input: any) => void;
+    confirmCallback?: (input: any) => void;
     fullscreen?: boolean;
     scrollbar?: React.RefObject<ScrollBar>;
     locked?: boolean;
+    footer?: false;
+    onClose?: () => void;
+    titleButtons?: JSX.Element;
 }
 
 type Props = DialogProps;
@@ -82,7 +83,7 @@ export default class Dialog extends BaseComponent<Props, State> {
     }
 
     public render() {
-        const {id, title, children, locked} = this.props;
+        const {id, title, children, locked, footer, confirmCallback, titleButtons} = this.props;
         const {fullscreen} = this.state;
         return (
             <div id={id} className={`modal dialog ${fullscreen ? 'modal-fullscreen' : ''}`} ref={this.modal}>
@@ -93,23 +94,26 @@ export default class Dialog extends BaseComponent<Props, State> {
                                 {title}
                                 {!fullscreen && (
                                     <button className='btn-floating btn-flat right'
-                                            onClick={this.toggleFullScreen}>
+                                            onClick={this.toggleFullScreen}
+                                            type='button'>
                                         <i className="material-icons">fullscreen</i>
                                     </button>
                                 )}
                                 {fullscreen && (
                                     <>
-                                        <button className='modal-close btn-floating btn-flat right'>
+                                        <button className='modal-close btn-floating btn-flat right'
+                                                type='button'>
                                             <i className="material-icons">close</i>
                                         </button>
-
                                         {!locked &&
                                         <button className='btn-floating btn-flat right'
-                                                            onClick={this.toggleFullScreen}>
+                                                onClick={this.toggleFullScreen}
+                                                type='button'>
                                             <i className="material-icons">fullscreen_exit</i>
                                         </button>}
                                     </>
                                 )}
+                                {titleButtons}
                             </div>
                         </>
                     )}
@@ -118,6 +122,7 @@ export default class Dialog extends BaseComponent<Props, State> {
                                style={this.state.scrollMaxHeight ? {maxHeight: Math.floor(this.state.scrollMaxHeight)} : undefined}>
                         {children}
                     </ScrollBar>
+                    {(footer == undefined || footer) &&
                     <div
                         className={`modal-footer dialog-footer`}>
                         <div>
@@ -126,13 +131,14 @@ export default class Dialog extends BaseComponent<Props, State> {
                                 type="button">
                                 Cancel
                             </button>
+                            {confirmCallback &&
                             <button className={`waves-effect waves-light btn-flat green-text inline-button`}
                                     type="button"
                                     onClick={this.confirmCallback}>
                                 Confirm
-                            </button>
+                            </button>}
                         </div>
-                    </div>
+                    </div>}
                 </div>
             </div>
         );
@@ -176,12 +182,13 @@ export default class Dialog extends BaseComponent<Props, State> {
         let modal = M.Modal.getInstance(this.modal.current as Element);
         modal.options.inDuration = 250;
         modal.options.outDuration = 250;
+        this.props.onClose?.();
     }
 
     private confirmCallback = (values: IValues): void => {
         let modal = M.Modal.getInstance(this.modal.current as Element);
         modal.close();
-        this.props.confirmCallback(values);
+        this.props.confirmCallback?.(values);
     };
 
     private toggleFullScreen = () => {

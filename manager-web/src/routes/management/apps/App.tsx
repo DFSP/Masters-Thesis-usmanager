@@ -46,6 +46,7 @@ import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
 import LaunchAppDialog from "./LaunchAppDialog";
 import {Point} from "react-simple-maps";
+import {IMarker} from "../../../components/map/Marker";
 
 export interface IApp extends IDatabaseData {
     name: string;
@@ -236,11 +237,11 @@ class App extends BaseComponent<Props, State> {
         return buttons;
     };
 
-    private launchApp = (coordinates: {label: string, point: Point}) => {
+    private launchApp = (position: IMarker) => {
         const app = this.getApp();
         const url = `apps/${app.name}/launch`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, coordinates,
+        postData(url, position,
             (reply: IReply<ILaunchApp>) => this.onLaunchSuccess(reply.data),
             (reason: string) => this.onLaunchFailure(reason, app));
     };

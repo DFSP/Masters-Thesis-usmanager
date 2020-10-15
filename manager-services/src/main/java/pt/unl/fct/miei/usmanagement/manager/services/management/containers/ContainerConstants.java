@@ -52,6 +52,7 @@ public final class ContainerConstants {
 		public static final String SERVICE_ADDRESS = "serviceAddress";
 		public static final String SERVICE_PUBLIC_IP_ADDRESS = "servicePublicIpAddress";
 		public static final String SERVICE_PRIVATE_IP_ADDRESS = "servicePrivateIpAddress";
+		public static final String COORDINATES = "coordinates";
 		public static final String SERVICE_CONTINENT = "serviceContinent";
 		public static final String SERVICE_REGION = "serviceRegion";
 		public static final String SERVICE_COUNTRY = "serviceCountry";

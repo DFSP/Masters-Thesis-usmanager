@@ -26,10 +26,12 @@ package pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud;
 
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Placement;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
@@ -41,6 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsInstanceState;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
@@ -122,6 +125,7 @@ public class CloudHostsService {
 			.publicDnsName(instance.getPublicDnsName())
 			.publicIpAddress(instance.getPublicIpAddress())
 			.privateIpAddress(instance.getPrivateIpAddress())
+			.coordinates(this.getPlacementCoordinates(instance.getPlacement()))
 			.placement(instance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
@@ -136,6 +140,7 @@ public class CloudHostsService {
 			.publicDnsName(simpleInstance.getPublicDnsName())
 			.publicIpAddress(simpleInstance.getPublicIpAddress())
 			.privateIpAddress(simpleInstance.getPrivateIpAddress())
+			.coordinates(this.getPlacementCoordinates(simpleInstance.getPlacement()))
 			.placement(simpleInstance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
@@ -332,5 +337,15 @@ public class CloudHostsService {
 		if (!hasCloudHost(hostname)) {
 			throw new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname);
 		}
+	}
+
+	private Coordinates getPlacementCoordinates(Placement placement) {
+		String availabilityZone = placement.getAvailabilityZone();
+		while (!Character.isDigit(availabilityZone.charAt(availabilityZone.length() - 1))) {
+			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
+		}
+		AwsRegion awsRegion = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
+		log.info("Instance placement {} is on aws region {}", placement, awsRegion);
+		return awsRegion.getCoordinates();
 	}
 }

@@ -35,6 +35,7 @@ import lombok.Singular;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
@@ -89,6 +90,9 @@ public class ContainerEntity {
 	@NotNull
 	private String privateIpAddress;
 
+	/*@NotNull*/
+	private Coordinates coordinates;
+
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<ContainerPortMapping> ports;
@@ -137,7 +141,7 @@ public class ContainerEntity {
 
 	@JsonIgnore
 	public HostAddress getHostAddress() {
-		return new HostAddress(getPublicIpAddress(), getPrivateIpAddress());
+		return new HostAddress(publicIpAddress, privateIpAddress, coordinates);
 	}
 
 	@Override

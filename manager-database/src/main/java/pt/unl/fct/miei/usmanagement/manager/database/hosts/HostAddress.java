@@ -41,6 +41,7 @@ public class HostAddress implements Serializable {
 	private final String publicDnsName;
 	private final String publicIpAddress;
 	private final String privateIpAddress;
+	private final Coordinates coordinates;
 
 	public HostAddress() {
 		this(null);
@@ -55,10 +56,19 @@ public class HostAddress implements Serializable {
 	}
 
 	public HostAddress(String username, String publicIpAddress, String privateIpAddress) {
+		this(username, publicIpAddress, privateIpAddress, null);
+	}
+
+	public HostAddress(String publicIpAddress, String privateIpAddress, Coordinates coordinates) {
+		this(null, publicIpAddress, privateIpAddress, coordinates);
+	}
+
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates) {
 		this.username = username;
 		this.publicDnsName = null;
 		this.privateIpAddress = privateIpAddress;
 		this.publicIpAddress = publicIpAddress;
+		this.coordinates = coordinates;
 	}
 
 	public String getHostname() {

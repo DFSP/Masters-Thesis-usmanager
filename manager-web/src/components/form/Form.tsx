@@ -29,7 +29,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import {isEqualWith} from "lodash";
+import {isEqualWith, isEqual} from "lodash";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
@@ -291,7 +291,7 @@ class Form extends BaseComponent<Props, State> {
             <>
                 {this.props.delete && confirmationDialog && (
                     <ConfirmDialog id={id}
-                                   message={`to ${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
+                                   message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${values[id]}`}`}
                                    confirmCallback={this.onClickDelete}/>)}
                 <form onSubmit={this.handleSubmit} noValidate>
                     {(controlsMode === undefined || controlsMode === 'top') && (
@@ -303,6 +303,7 @@ class Form extends BaseComponent<Props, State> {
                                             className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                                             data-position="bottom" data-tooltip={switchDropdown.title || 'Switch form'}
                                             data-target={`switch-dropdown`}
+                                            type={'button'}
                                             ref={this.dropdown}>
                                             <i className="material-icons">keyboard_arrow_down</i>
                                         </button>
@@ -330,8 +331,7 @@ class Form extends BaseComponent<Props, State> {
                                 {isNew && !loading
                                     ?
                                     <button
-                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
-                                        type="submit">
+                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}>
                                         {this.props.post?.textButton || 'Save'}
                                     </button>
                                     :
@@ -358,8 +358,7 @@ class Form extends BaseComponent<Props, State> {
                                             {!loading && (
                                                 <button
                                                     className={`btn-flat btn-small waves-effect waves-light green-text slide inline-button`}
-                                                    style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                                                    type="submit">
+                                                    style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}>
                                                     {this.props.post?.textButton || 'Save'}
                                                 </button>)}
                                         </div>
@@ -378,6 +377,7 @@ class Form extends BaseComponent<Props, State> {
                                 {loading && (
                                     <button
                                         className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide inline-button`}
+                                        type="button"
                                         onClick={this.cancelRequest}>
                                         Cancel
                                     </button>
@@ -388,6 +388,7 @@ class Form extends BaseComponent<Props, State> {
                                             className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped inline-button`}
                                             data-position="bottom" data-tooltip={dropdown.title}
                                             data-target={`dropdown-${dropdown.id}`}
+                                            type="button"
                                             ref={this.dropdown}>
                                             <i className="material-icons">add</i>
                                         </button>
@@ -585,7 +586,7 @@ class Form extends BaseComponent<Props, State> {
     private cancelRequest = () => {
         const {loading} = this.state;
         if (loading?.method && loading.url) {
-            getCancelRequest(loading.method, loading.url).cancel('Operation canceled by the user');
+            getCancelRequest(loading.method, loading.url)?.cancel('Operation canceled by the user');
             deleteCancelRequest(loading.method, loading.url);
             this.setState({loading: undefined});
         }
@@ -603,10 +604,13 @@ class Form extends BaseComponent<Props, State> {
     private addValue = (id: keyof IValues, value: any) =>
         this.setValue(id, this.state.values[id] ? [...this.state.values[id], value] : [value]);
 
-    private removeValue = (id: keyof IValues, value: any) => {
-        let values = this.state.values[id].filter((v: any) => v !== value);
-        if (!values.length) {
-            values = undefined;
+    private removeValue = (id: keyof IValues, value?: any) => {
+        let values = undefined;
+        if (value && Array.isArray(this.state.values[id])) {
+            values = this.state.values[id]?.filter((v: any) => !isEqual(v, value));
+            if (!values.length) {
+                values = undefined;
+            }
         }
         this.setValue(id, values, false);
     };

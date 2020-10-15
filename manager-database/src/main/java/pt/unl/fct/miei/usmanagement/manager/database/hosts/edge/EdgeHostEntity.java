@@ -67,26 +67,28 @@ public class EdgeHostEntity {
 	@GeneratedValue
 	private Long id;
 
+	@NotNull
 	private String username;
 
-	private String publicDnsName;
-
+	@NotNull
 	private String privateIpAddress;
 
+	@NotNull
 	private String publicIpAddress;
+
+	private String publicDnsName;
 
 	@Deprecated
 	@ManyToOne
 	private RegionEntity region;
 
 	@Deprecated
-	@NotNull
 	private String country;
 
 	@Deprecated
-	@NotNull
 	private String city;
 
+	@NotNull
 	private Coordinates coordinates;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
@@ -138,12 +140,12 @@ public class EdgeHostEntity {
 
 	@JsonIgnore
 	public HostAddress getAddress() {
-		return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress);
+		return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress, coordinates);
 	}
 
 	@JsonIgnore
 	public HostLocation getLocation() {
-		return new HostLocation(city, country, region.getName(), getContinent());
+		return new HostLocation(city, country, region == null ? "" : region.getName(), getContinent());
 	}
 
 	@JsonIgnore

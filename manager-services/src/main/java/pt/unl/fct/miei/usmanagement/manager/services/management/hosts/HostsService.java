@@ -122,16 +122,18 @@ public class HostsService {
 		String publicIp = bashService.getPublicIp();
 		String privateIp = bashService.getPrivateIp();
 		if ((mode == null || mode == Mode.LOCAL) && !edgeHostsService.hasEdgeHost(localMachineDns)) {
+			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
 			edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
 				.username(username)
-				.publicDnsName(localMachineDns)
 				.publicIpAddress(publicIp)
 				.privateIpAddress(privateIp)
+				.publicDnsName(localMachineDns)
 				.region(regionsService.getRegion("eu-central"))
 				.country("pt")
 				.city("lisbon")
+				.coordinates(coordinates)
 				.build());
-			this.hostAddress = new HostAddress(username, localMachineDns, publicIp, privateIp);
+			this.hostAddress = new HostAddress(username, localMachineDns, publicIp, privateIp, coordinates);
 		}
 		else {
 			this.hostAddress = new HostAddress(username, publicIp, privateIp);

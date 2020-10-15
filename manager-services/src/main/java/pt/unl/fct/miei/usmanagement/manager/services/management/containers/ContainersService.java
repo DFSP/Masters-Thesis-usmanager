@@ -96,6 +96,7 @@ public class ContainersService {
 				.command(dockerContainer.getCommand())
 				.publicIpAddress(dockerContainer.getPublicIpAddress())
 				.privateIpAddress(dockerContainer.getPrivateIpAddress())
+				.coordinates(dockerContainer.getCoordinates())
 				.ports(dockerContainer.getPorts())
 				.labels(dockerContainer.getLabels())
 				.build();

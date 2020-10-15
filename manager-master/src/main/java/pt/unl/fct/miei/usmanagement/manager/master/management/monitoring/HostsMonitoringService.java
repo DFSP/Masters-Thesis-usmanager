@@ -356,7 +356,9 @@ public class HostsMonitoringService {
 	}
 
 	public void stopHostMonitoring() {
-		hostMonitoringTimer.cancel();
-		log.info("Stopped host monitoring");
+		if (hostMonitoringTimer != null) {
+			hostMonitoringTimer.cancel();
+			log.info("Stopped host monitoring");
+		}
 	}
 }

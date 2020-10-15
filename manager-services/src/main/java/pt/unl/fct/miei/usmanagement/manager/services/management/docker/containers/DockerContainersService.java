@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.management.docker.containers;
 
+import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
@@ -284,6 +285,7 @@ public class DockerContainersService {
 			ContainerConstants.Label.SERVICE_ADDRESS, serviceAddr,
 			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
 			ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
+			ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.SERVICE_CONTINENT, continent,
 			ContainerConstants.Label.SERVICE_REGION, region,
 			ContainerConstants.Label.SERVICE_COUNTRY, country,
@@ -500,12 +502,13 @@ public class DockerContainersService {
 		String status = container.status();
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
+		Coordinates coordinates = new Gson().fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
 		List<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
 		return new DockerContainer(id, created, names, image, command, state, status, publicIpAddress, privateIpAddress,
-			ports, labels);
+			coordinates, ports, labels);
 	}
 
 	public String getContainerLogs(ContainerEntity container) {

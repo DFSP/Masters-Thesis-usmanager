@@ -36,8 +36,10 @@ import {Dropdown} from "./Dropdown";
 import {CheckboxList} from "./CheckboxList";
 import checkboxListStyles from "./CheckboxList.module.css";
 import {Link} from "react-router-dom";
-import LocationSelectorMap from "../map/LocationSelectorMap";
+import LocationMap from "../map/LocationMap";
 import {Point} from "react-simple-maps";
+import Dialog from "../dialogs/Dialog";
+import {IMarker} from "../map/Marker";
 
 export interface IValidation {
     rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -56,6 +58,7 @@ export interface FieldProps<T = string> {
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
     disabled?: boolean;
     hidden?: boolean;
+    map?: {editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean}
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -67,7 +70,7 @@ export const getTypeFromValue = (value: any): 'text' | 'number' =>
         ? 'text'
         : 'number';
 
-export default class Field<T> extends React.Component<FieldProps<T>> {
+export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     public componentDidMount(): void {
         this.updateField();
@@ -92,7 +95,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     }
 
     public render() {
-        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString} = this.props;
+        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map} = this.props;
         const getError = (errors: IErrors): string => (errors ? errors[id] : "");
         const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
             const hasErrors = getError(errors);
@@ -207,9 +210,12 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                                               onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
                             )}
                             {(type && type.toLowerCase() === "map") && (
-                                <LocationSelectorMap
-                                    onSelect={this.onSelectCoordinates(id, formContext)}
-                                    locations={formContext.values[id] || []}/>
+                                <LocationMap
+                                    onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
+                                    onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
+                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id] : [formContext.values[id]]) : []}
+                                    marker={{size: 5, labeled: map?.labeled}} hover clickHighlight zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
+                                    resizable/>
                             )}
                             {getError(formContext.errors) && (
                                 <span className="helper-text red-text darken-3">
@@ -257,8 +263,16 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
         }
     };
 
-    private onSelectCoordinates = (id: string, formContext: any) => (label: string, point: Point): void =>
-        formContext.addValue(id, {label, point});
+    private onSelectCoordinates = (id: string, formContext: any) => (marker: IMarker): void => {
+        if (this.props.map?.singleMarker) {
+            formContext.setValue(id, marker, false);
+        } else {
+            formContext.addValue(id, marker);
+        }
+    }
+
+    private onDeselectCoordinates = (id: string, formContext: any) => (marker: IMarker): void =>
+        formContext.removeValue(id, marker);
 
     private getDateStringFromTimestamp = (value: number) => {
         const date = new Date(value * 1000);

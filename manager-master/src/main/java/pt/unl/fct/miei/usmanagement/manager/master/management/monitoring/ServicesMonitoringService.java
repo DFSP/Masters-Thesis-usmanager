@@ -503,7 +503,9 @@ public class ServicesMonitoringService {
 	}
 
 	public void stopServiceMonitoring() {
-		serviceMonitoringTimer.cancel();
-		log.info("Stopped service monitoring");
+		if (serviceMonitoringTimer != null) {
+			serviceMonitoringTimer.cancel();
+			log.info("Stopped service monitoring");
+		}
 	}
 }

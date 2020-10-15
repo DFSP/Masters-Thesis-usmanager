@@ -71,6 +71,7 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import formStyles from "../../../components/form/Form.module.css";
 import {INode} from "../nodes/Node";
 import {IHostAddress} from "../hosts/Hosts";
+import {ICoordinates} from "../../../components/map/LocationMap";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -80,6 +81,7 @@ export interface IContainer extends IDatabaseData {
     command: string;
     publicIpAddress: string;
     privateIpAddress: string;
+    coordinates: ICoordinates;
     ports: IContainerPort[];
     labels: IContainerLabel;
     logs?: string;
@@ -533,9 +535,12 @@ class Container extends BaseComponent<Props, State> {
                                  id={key}
                                  label={key}
                                  icon={{linkedTo: this.hostnameLink}}/>
-                        : <Field key={index}
-                                 id={key}
-                                 label={key}/>
+                        : key === 'coordinates'
+                            ? <Field key='coordinates' id='coordinates' label='location' type='map'
+                                     map={{editable: false, zoomable: true}}/>
+                            : <Field key={index}
+                                     id={key}
+                                     label={key}/>
                 )}
             </>;
 
@@ -553,6 +558,7 @@ class Container extends BaseComponent<Props, State> {
             : formContainer;
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
+        console.log(containerValues, formContainer, container)
         return (
             <>
                 {!isNewContainer && isLoading && <ListLoadingSpinner/>}

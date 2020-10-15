@@ -111,6 +111,7 @@ public class DockerSwarmService {
 		String nodeId = nodeIdRegexExpression.group(0);
 		nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
 		nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
+		nodesService.addLabel(nodeId, NodeConstants.Label.MASTER_MANAGER, String.valueOf(true));
 		return nodesService.getNode(nodeId);
 	}
 

@@ -157,7 +157,7 @@ export const setCancelRequest = (method: Method, url: string): CancelTokenSource
     return cancelRequests[buildCancelRequest(method, url)] = CancelToken.source();
 };
 
-export const getCancelRequest = (method: Method, url: string): CancelTokenSource =>
+export const getCancelRequest = (method: Method, url: string): CancelTokenSource | undefined =>
     cancelRequests[buildCancelRequest(method, url)];
 
 export const deleteCancelRequest = (method: Method, url: string): boolean =>

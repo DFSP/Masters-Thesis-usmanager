@@ -24,23 +24,38 @@
 
 import {Point} from "react-simple-maps";
 import React from "react";
+import {ICoordinates} from "./LocationMap";
+
+export interface IMarker extends ICoordinates {
+    title: string,
+}
 
 interface Props {
     setTooltipContent: (tooltip: string) => void;
-    label: string;
+    title: string;
+    label?: string;
     location: Point;
     color: string;
     size: number;
+    onRemove?: () => void;
 }
 
-export default function Marker({setTooltipContent, label, location, color, size}: Props) {
+export default function Marker({setTooltipContent, title, label, location, color, size, onRemove}: Props) {
     return (
-        <circle r={size} fill={color}
-                onMouseEnter={() => {
-                    setTooltipContent(`${label} (Lat: ${location[1].toFixed(2)} Lon: ${location[0].toFixed(2)})`);
-                }}
-                onMouseLeave={() => {
-                    setTooltipContent("");
-                }}/>
+        <>
+            <circle r={size}
+                    fill={color}
+                    onMouseEnter={() => setTooltipContent(`${title ? title + ' (' : ''}Lat: ${location[1].toFixed(2)}, Lon: ${location[0].toFixed(2)}${title ? ')' : ''}`)}
+                    onMouseLeave={() => setTooltipContent("")}
+                    onClick={onRemove}/>
+            {label &&
+            <text
+                textAnchor="middle"
+                y={size * 3.7}
+                style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3 }}>
+                {label}
+            </text>}
+        </>
+
     );
 }

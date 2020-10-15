@@ -27,14 +27,13 @@ import BaseComponent from "../../../components/BaseComponent";
 import Form, {
     ICustomButton,
     IFields,
-    IFormLoading, required,
-    requiredAndNumberAndMin,
-    requiredAndTrimmed, requireGreaterOrEqualSize,
-    trimmed
+    IFormLoading,
+    required,
+    requireGreaterOrEqualSize
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Field, {getTypeFromValue} from "../../../components/form/Field";
+import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -327,8 +326,7 @@ class Node extends BaseComponent<Props, State> {
         return null;
     }
 
-    private formFields = (isNew: boolean) => {
-        const formNode = this.getFormNode();
+    private formFields = (isNew: boolean, formNode?: Partial<INode>, node?: INode | INewNodeHost | INewNodeLocation) => {
         const {currentForm} = this.state;
         return (
             isNew ?
@@ -363,7 +361,7 @@ class Node extends BaseComponent<Props, State> {
                                    defaultValue: "Select role",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
-                        <Field key='coordinates' id='coordinates' type='map'/>
+                        <Field key='coordinates' id='coordinates' label='select position(s)' type='map' map={{editable: true, labeled: false}}/>
                     </>
                 :
                 formNode && Object.entries(formNode).map(([key, value], index) =>
@@ -385,7 +383,8 @@ class Node extends BaseComponent<Props, State> {
                                      defaultValue: "Select role",
                                      values: ['MANAGER', 'WORKER']
                                  }}
-                                 disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'}/>
+                                 disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'
+                                 || (node && 'labels' in node && (node as INode).labels?.['masterManager'] === 'true')}/>
                         : key === 'hostname'
                             ? <Field key={index}
                                      id={key}
@@ -414,6 +413,7 @@ class Node extends BaseComponent<Props, State> {
         const {currentForm, loading} = this.state;
         const isNewNode = this.isNew();
         const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
+        const formNode = this.getFormNode();
         // @ts-ignore
         const nodeKey: (keyof INode) = node && Object.keys(node)[0];
         return (
@@ -442,6 +442,7 @@ class Node extends BaseComponent<Props, State> {
                               }}
                             // delete button is never present on new nodes, so a type cast is safe
                               delete={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && node.role === 'MANAGER'
+                              || (node as INode).labels?.['masterManager'] === 'true'
                                   ? undefined
                                   : {
                                       textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
@@ -454,7 +455,7 @@ class Node extends BaseComponent<Props, State> {
                                   onSwitch: this.switchForm
                               } : undefined}
                               customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
-                            {this.formFields(isNewNode)}
+                            {this.formFields(isNewNode, formNode, node)}
                         </Form>
                     </>
                 )}

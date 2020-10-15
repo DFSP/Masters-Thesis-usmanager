@@ -117,7 +117,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                                      state: edgeHost
                                  }
                              }}
-                             height={'215px'}
+                             height={'185px'}
                              margin={'10px 0'}
                              hoverable
                              delete={{
@@ -131,24 +131,18 @@ class EdgeHostCard extends BaseComponent<Props, State> {
             <CardItem key={'username'}
                       label={'Username'}
                       value={`${edgeHost.username}`}/>
-            <CardItem key={'publicDnsName'}
-                      label={'Public dns name'}
-                      value={`${edgeHost.publicDnsName}`}/>
             <CardItem key={'publicIpAddress'}
                       label={'Public ip address'}
                       value={`${edgeHost.publicIpAddress}`}/>
             <CardItem key={'privateIpAddress'}
                       label={'Private ip address'}
                       value={`${edgeHost.privateIpAddress}`}/>
-            <CardItem key={'region'}
-                      label={'Region'}
-                      value={`${edgeHost.region.name}`}/>
-            <CardItem key={'country'}
-                      label={'Country'}
-                      value={`${edgeHost.country}`}/>
-            <CardItem key={'city'}
-                      label={'City'}
-                      value={`${edgeHost.city}`}/>
+            <CardItem key={'publicDnsName'}
+                      label={'Public dns name'}
+                      value={`${edgeHost.publicDnsName}`}/>
+            <CardItem key={'coordinates'}
+                      label={'Coordinates'}
+                      value={`(${edgeHost.coordinates.latitude.toFixed(3)}, ${edgeHost.coordinates.longitude.toFixed(3)})`}/>
             {edgeHost.managedByWorker &&
             <CardItem key={'managedByWorker'}
                       label={'managedByWorker'}

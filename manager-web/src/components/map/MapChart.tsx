@@ -22,20 +22,28 @@
  * SOFTWARE.
  */
 
-import {ComposableMap, Geographies, Geography, Marker, Point} from "react-simple-maps";
+import {ComposableMap, Geographies, Geography, Marker, Point, ZoomableGroup} from "react-simple-maps";
 import React, {createRef, memo} from "react";
 import * as d3Geo from "d3-geo";
+import {IMarker} from "./Marker";
 
 const {geoPath} = d3Geo
 
 type Props = {
     setTooltipContent: (tooltip: string) => void;
-    onClick: (label: string, coordinates: Point) => void;
+    onClick?: (marker: IMarker) => void;
     markers?: {coordinates: Point, marker: JSX.Element}[];
+    hover?: boolean;
+    clickHighlight?: boolean;
+    zoomable?: boolean;
+    position?: { coordinates: Point, zoom: number },
+    center?: boolean;
+    onZoom?: (position: { coordinates: Point, zoom: number }) => void;
 }
 
 type State = {
     scale: number;
+    position: { coordinates: Point, zoom: number };
 }
 
 class MapChart extends React.Component<Props, State> {
@@ -46,7 +54,7 @@ class MapChart extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {scale: 1.0};
+        this.state = { scale: 1.0, position: { coordinates: [0, 0], zoom: 1 } };
     }
 
     public componentDidMount() {
@@ -59,6 +67,12 @@ class MapChart extends React.Component<Props, State> {
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         this.calculateScale();
+        if (this.props.center !== undefined && prevProps.center !== this.props.center) {
+            this.setState({position: {coordinates: [0, 0], zoom: 1}});
+        }
+        if (prevProps.zoomable !== this.props.zoomable) {
+            this.setState({position: {coordinates: this.props.position?.coordinates || [0, 0], zoom: 1}});
+        }
     }
 
     public componentWillUnmount() {
@@ -67,9 +81,8 @@ class MapChart extends React.Component<Props, State> {
         }
     }
 
-    private handleResize = () => {
-       this.calculateScale();
-    }
+    private handleResize = () =>
+        this.calculateScale();
 
     private calculateScale = () => {
         const map = this.map.current;
@@ -90,55 +103,61 @@ class MapChart extends React.Component<Props, State> {
         const [orgX, orgY] = gp.bounds(geography)[0];
         const {scale} = this.state;
         const coordinates = projection.invert([orgX + cx / scale, orgY + cy / scale]);
-        this.props.onClick(geography.properties.NAME, coordinates);
+        this.props.onClick?.({label: geography.properties.NAME, title: geography.properties.NAME, longitude: coordinates[0], latitude: coordinates[1]});
+    }
+
+    private handleMoveEnd = (position: { coordinates: Point, zoom: number }) => {
+        this.setState({position: position});
+        this.props.onZoom?.(position);
     }
 
     public render() {
+        const {setTooltipContent, hover, clickHighlight, markers, zoomable} = this.props;
+        const {position} = this.state;
         const geoUrl = "/resources/world-110m.json";
-        const {setTooltipContent, markers} = this.props;
-        const divProps = {style: {width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}}
         return (
-            <div {...divProps} ref={this.map}>
+            <div style={{width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}} ref={this.map}>
                 <ComposableMap data-tip="" projectionConfig={{scale: 315, rotate: [-11, 0, 0]}}
-                               width={this.MAP_MAX_WIDTH}
-                               height={this.MAP_MAX_HEIGHT}
+                               width={this.MAP_MAX_WIDTH} height={this.MAP_MAX_HEIGHT}
                                style={{width: '100%', height: 'auto'}}>
-                    <Geographies geography={geoUrl} >
-                        {({geographies, projection}) =>
-                            geographies.map(geo => (
-                                <Geography
-                                    key={geo.rsmKey}
-                                    geography={geo}
-                                    onClick={this.onGeographyClick(geo, projection)}
-                                    onMouseEnter={() => {
-                                        const {NAME} = geo.properties;
-                                        setTooltipContent(`${NAME}`);
-                                    }}
-                                    onMouseLeave={() => {
-                                        setTooltipContent("");
-                                    }}
-                                    style={{
-                                        default: {
-                                            fill: "#D6D6DA",
-                                            outline: "none"
-                                        },
-                                        hover: {
-                                            fill: "#F53",
-                                            outline: "none"
-                                        },
-                                        pressed: {
-                                            fill: "#E42",
-                                            outline: "none"
-                                        }
-                                    }}
-                                />
-                            ))
-                        }
-                    </Geographies>
-                    {markers?.map((marker, index) =>
-                        <Marker key={index} coordinates={marker.coordinates}>
-                            {marker.marker}
-                        </Marker>)}
+                    <ZoomableGroup zoom={position.zoom} maxZoom={!zoomable ? 1 : 5} center={position.coordinates} onMoveEnd={this.handleMoveEnd}>
+                        <Geographies geography={geoUrl}>
+                            {({geographies, projection}) =>
+                                geographies.map(geo => (
+                                    <Geography
+                                        key={geo.rsmKey}
+                                        geography={geo}
+                                        onClick={this.onGeographyClick(geo, projection)}
+                                        onMouseEnter={() => {
+                                            const {NAME} = geo.properties;
+                                            setTooltipContent(`${NAME}`);
+                                        }}
+                                        onMouseLeave={() => {
+                                            setTooltipContent("");
+                                        }}
+                                        style={{
+                                            default: {
+                                                fill: "#D6D6DA",
+                                                outline: "none"
+                                            },
+                                            hover: {
+                                                fill: hover ? "#F53" : "#D6D6DA",
+                                                outline: "none"
+                                            },
+                                            pressed: {
+                                                fill: clickHighlight ? "#E42" : "#D6D6DA",
+                                                outline: "none"
+                                            }
+                                        }}
+                                    />
+                                ))
+                            }
+                        </Geographies>
+                        {markers?.map((marker, index) =>
+                            <Marker key={index} coordinates={marker.coordinates}>
+                                {marker.marker}
+                            </Marker>)}
+                    </ZoomableGroup>
                 </ComposableMap>
             </div>
         );

@@ -23,16 +23,17 @@
  */
 
 import React from "react";
-import LocationSelectorMap from "../../../components/map/LocationSelectorMap";
+import LocationMap from "../../../components/map/LocationMap";
 import Dialog from "../../../components/dialogs/Dialog";
 import {Point} from "react-simple-maps";
+import {IMarker} from "../../../components/map/Marker";
 
 interface Props {
-    launchAppCallback: (coordinates: {label: string, point: Point}) => void;
+    launchAppCallback: (position: IMarker) => void;
 }
 
 interface State {
-    selectedCoordinates?: {label: string, point: Point}
+    selectedPosition?: IMarker
 }
 
 export default class LaunchAppDialog extends React.Component<Props, State> {
@@ -42,26 +43,29 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
         this.state = {};
     }
 
-    private onSelectCoordinates = (label: string, coordinates: Point): void => {
-        this.setState({selectedCoordinates: {label: label, point: coordinates}});
-    }
+    private onSelectCoordinates = (marker: IMarker): void =>
+        this.setState({selectedPosition: marker});
+
+    private onDeselectCoordinates = (marker: IMarker): void =>
+        this.setState({selectedPosition: undefined});
 
     private launchAppConfirm = () => {
-        if (!this.state.selectedCoordinates) {
+        if (!this.state.selectedPosition) {
             M.toast({html:'<div class="red-text">Error</div><div style="margin-left: 3px"> - location not selected</div>'});
         } else {
-            this.props.launchAppCallback(this.state.selectedCoordinates);
+            this.props.launchAppCallback(this.state.selectedPosition);
         }
     }
 
     public render() {
-        const location = this.state.selectedCoordinates ? [this.state.selectedCoordinates] : [];
+        const location = this.state.selectedPosition ? [this.state.selectedPosition] : [];
         return <Dialog id={'launch-app-modal'}
                        title={'Select location'}
                        fullscreen={true}
                        locked={true}
                        confirmCallback={this.launchAppConfirm}>
-            <LocationSelectorMap onSelect={this.onSelectCoordinates} locations={location}/>
+            <LocationMap onSelect={this.onSelectCoordinates} onDeselect={this.onDeselectCoordinates} locations={location}
+                         hover clickHighlight/>
         </Dialog>;
     }
 }

@@ -24,7 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.management.docker.proxy;
 
-
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -74,7 +74,7 @@ public class DockerApiProxyService {
 				+ "docker pull %s && "
 				+ "docker run -itd --name=%s -p %s:%s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-				+ "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s=%b -l %s=%b %s; fi",
+				+ "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%b -l %s=%b %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, internalPort,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
@@ -84,6 +84,7 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,
 			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
 			ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
+			ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.IS_STOPPABLE, false,
 			ContainerConstants.Label.IS_REPLICABLE, false,
 			dockerRepository);

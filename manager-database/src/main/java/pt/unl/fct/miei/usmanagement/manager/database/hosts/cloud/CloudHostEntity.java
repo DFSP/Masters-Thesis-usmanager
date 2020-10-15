@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -88,6 +89,9 @@ public class CloudHostEntity {
 
 	private Placement placement;
 
+	/*@NotNull*/
+	private Coordinates coordinates;
+
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne
 	private WorkerManagerEntity managedByWorker;
@@ -132,7 +136,7 @@ public class CloudHostEntity {
 
 	@JsonIgnore
 	public HostAddress getAddress() {
-		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress);
+		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress, coordinates);
 	}
 
 	@JsonIgnore

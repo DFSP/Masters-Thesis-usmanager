@@ -41,7 +41,6 @@ import {
     addEdgeHostRules,
     addEdgeHostSimulatedMetrics,
     loadEdgeHosts,
-    loadRegions,
     updateEdgeHost
 } from "../../../../actions";
 import {connect} from "react-redux";
@@ -57,17 +56,14 @@ import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import {IRegion} from "../../region/Region";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
-import {ICloudHost} from "../cloud/CloudHost";
+import {ICoordinates} from "../../../../components/map/LocationMap";
 
 export interface IEdgeHost extends IDatabaseData {
     username: string;
-    publicDnsName: string;
     publicIpAddress: string;
     privateIpAddress: string;
-    region: IRegion;
-    country: string;
-    city: string;
-
+    publicDnsName: string;
+    coordinates: ICoordinates;
     worker: IWorkerManager;
     managedByWorker: IWorkerManager;
     hostRules?: string[];
@@ -81,12 +77,10 @@ interface INewEdgeHost extends IEdgeHost {
 const buildNewEdgeHost = (): Partial<INewEdgeHost> => ({
     username: undefined,
     password: undefined,
-    publicDnsName: undefined,
     privateIpAddress: undefined,
     publicIpAddress: undefined,
-    region: undefined,
-    country: undefined,
-    city: undefined,
+    publicDnsName: undefined,
+    coordinates: undefined,
 });
 
 interface StateToProps {
@@ -101,7 +95,6 @@ interface DispatchToProps {
     loadEdgeHosts: (hostname: string) => void;
     addEdgeHost: (edgeHost: IEdgeHost) => void;
     updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
-    loadRegions: () => void;
     addEdgeHostRules: (hostname: string, rules: string[]) => void;
     addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
 }
@@ -133,7 +126,6 @@ class EdgeHost extends BaseComponent<Props, State> {
     private mounted = false;
 
     public componentDidMount(): void {
-        this.props.loadRegions();
         this.loadEdgeHost();
         this.mounted = true;
     };
@@ -309,12 +301,6 @@ class EdgeHost extends BaseComponent<Props, State> {
             return fields;
         }, {});
 
-    private getSelectableRegions = () =>
-        Object.values(this.props.regions);
-
-    private regionDropdownOption = (region: IRegion) =>
-        region.name;
-
     private managedByWorker = (worker: IWorkerManager) =>
         worker.id.toString();
 
@@ -347,13 +333,17 @@ class EdgeHost extends BaseComponent<Props, State> {
                               failureCallback: this.onPutFailure
                           }}
                           delete={{
+                              confirmMessage: `to delete ${edgeHost.publicIpAddress}`,
                               url: `hosts/edge/${edgeHost.publicIpAddress}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
                           saveEntities={this.saveEntities}>
                         {Object.keys(formEdgeHost).map((key, index) =>
-                            key === 'local'
+                            key === 'coordinates'
+                                ? <Field key='coordinates' id='coordinates' label='select position' type='map'
+                                         map={{editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
+                                : key === 'local'
                                 ? <Field<boolean> key={index}
                                                   id={key}
                                                   type="dropdown"
@@ -361,17 +351,6 @@ class EdgeHost extends BaseComponent<Props, State> {
                                                   dropdown={{
                                                       defaultValue: "Is a local machine?",
                                                       values: [true, false]
-                                                  }}/>
-                                : key === 'region'
-                                ? <Field<IRegion> key='region'
-                                                  id={'region'}
-                                                  label='region'
-                                                  type={'dropdown'}
-                                                  dropdown={{
-                                                      defaultValue: 'Select region',
-                                                      values: this.getSelectableRegions(),
-                                                      optionToString: this.regionDropdownOption,
-                                                      emptyMessage: 'No regions available'
                                                   }}/>
                                 : key === 'password'
                                     ? <Field key={index}
@@ -485,7 +464,6 @@ const mapDispatchToProps: DispatchToProps = {
     updateEdgeHost,
     addEdgeHostRules,
     addEdgeHostSimulatedMetrics,
-    loadRegions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);
