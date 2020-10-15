@@ -174,7 +174,7 @@ const container: schema.Entity<IContainer> = new schema.Entity('containers', und
 const containers = new schema.Array(container);
 
 const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
-    idAttribute: (host: ICloudHost) => host.publicIpAddress || host.instanceId
+    idAttribute: (host: ICloudHost) => host.instanceId
 });
 const cloudHosts = new schema.Array(cloudHost);
 

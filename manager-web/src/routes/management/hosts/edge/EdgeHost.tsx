@@ -341,7 +341,7 @@ class EdgeHost extends BaseComponent<Props, State> {
                           saveEntities={this.saveEntities}>
                         {Object.keys(formEdgeHost).map((key, index) =>
                             key === 'coordinates'
-                                ? <Field key='coordinates' id='coordinates' label='select position' type='map'
+                                ? <Field key='coordinates' id='coordinates' label='position' type='map'
                                          map={{editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
                                 : key === 'local'
                                 ? <Field<boolean> key={index}

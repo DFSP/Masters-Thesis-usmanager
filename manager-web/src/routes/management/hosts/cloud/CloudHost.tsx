@@ -52,6 +52,7 @@ import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
+import {ICoordinates} from "../../../../components/map/LocationMap";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -65,6 +66,7 @@ export interface ICloudHost extends IDatabaseData {
     publicIpAddress: string;
     privateIpAddress: string;
     placement: IPlacement;
+    coordinates: ICoordinates;
     worker: IWorkerManager
     managedByWorker: IWorkerManager;
     hostRules?: string[];
@@ -220,7 +222,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesSuccess = (cloudHost: ICloudHost): void => {
-        this.state.unsavedRules.forEach(rule => this.props.addCloudHostRule(cloudHost.publicIpAddress || cloudHost.instanceId, rule));
+        this.state.unsavedRules.forEach(rule => this.props.addCloudHostRule(cloudHost.instanceId, rule));
         if (this.mounted) {
             this.setState({unsavedRules: []});
         }
@@ -251,7 +253,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsSuccess = (cloudHost: ICloudHost): void => {
-        this.props.addCloudHostSimulatedMetrics(cloudHost.publicIpAddress || cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
+        this.props.addCloudHostSimulatedMetrics(cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
         if (this.mounted) {
             this.setState({unsavedSimulatedMetrics: []});
         }
@@ -410,11 +412,11 @@ class CloudHost extends BaseComponent<Props, State> {
                     <Form id={cloudHostKey}
                           fields={{}}
                           values={cloudHost}
-                          isNew={isNew(this.props.location.search)}
+                          isNew={isNewCloudHost}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
                               url: 'hosts/cloud',
-                              textButton: 'launch',
+                              textButton: isNewCloudHost ? 'launch' : 'save',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
@@ -432,14 +434,17 @@ class CloudHost extends BaseComponent<Props, State> {
                                                      id={key}
                                                      label={key}
                                                      valueToString={this.cloudHostPlacement}/>
-                                : key === 'managedByWorker'
-                                    ? <Field<IWorkerManager> key={index}
-                                                             id={key}
-                                                             label={key}
-                                                             valueToString={this.managedByWorker}/>
-                                    : <Field key={index}
-                                             id={key}
-                                             label={key}/>)}
+                                : key === 'coordinates'
+                                    ? <Field key='coordinates' id='coordinates' label='position' type='map'
+                                             map={{editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
+                                    : key === 'managedByWorker'
+                                        ? <Field<IWorkerManager> key={index}
+                                                                 id={key}
+                                                                 label={key}
+                                                                 valueToString={this.managedByWorker}/>
+                                        : <Field key={index}
+                                                 id={key}
+                                                 label={key}/>)}
                     </Form>
                 )}
             </>

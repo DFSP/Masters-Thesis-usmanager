@@ -81,9 +81,9 @@ export interface IContainer extends IDatabaseData {
     command: string;
     publicIpAddress: string;
     privateIpAddress: string;
-    coordinates: ICoordinates;
     ports: IContainerPort[];
     labels: IContainerLabel;
+    coordinates: ICoordinates;
     logs?: string;
     containerRules?: string[];
     containerSimulatedMetrics?: string[];

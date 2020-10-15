@@ -108,9 +108,9 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
     }
 
     private loadEntities = () => {
-        const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
-        if (hostname) {
-            this.props.loadCloudHostRules(hostname);
+        const instanceId = this.props.cloudHost?.instanceId;
+        if (instanceId) {
+            this.props.loadCloudHostRules(instanceId);
         }
     };
 
@@ -153,9 +153,9 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
         this.props.onRemoveHostRules(rules);
 
     private onDeleteSuccess = (rules: string[]): void => {
-        const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
-        if (hostname) {
-            this.props.removeCloudHostRules(hostname, rules);
+        const instanceId = this.props.cloudHost?.instanceId;
+        if (instanceId) {
+            this.props.removeCloudHostRules(instanceId, rules);
         }
     };
 
@@ -173,8 +173,8 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
-    const hostname = ownProps.cloudHost?.publicIpAddress || ownProps.cloudHost?.instanceId;
-    const host = hostname && state.entities.hosts.cloud.data[hostname];
+    const instanceId = ownProps.cloudHost?.instanceId;
+    const host = instanceId && state.entities.hosts.cloud.data[instanceId];
     const rulesName = host && host.hostRules;
     return {
         isLoading: state.entities.hosts.cloud.isLoadingRules,

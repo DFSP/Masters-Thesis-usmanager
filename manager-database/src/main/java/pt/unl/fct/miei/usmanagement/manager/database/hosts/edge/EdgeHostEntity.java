@@ -79,13 +79,16 @@ public class EdgeHostEntity {
 	private String publicDnsName;
 
 	@Deprecated
+	@JsonIgnore
 	@ManyToOne
 	private RegionEntity region;
 
 	@Deprecated
+	@JsonIgnore
 	private String country;
 
 	@Deprecated
+	@JsonIgnore
 	private String city;
 
 	@NotNull

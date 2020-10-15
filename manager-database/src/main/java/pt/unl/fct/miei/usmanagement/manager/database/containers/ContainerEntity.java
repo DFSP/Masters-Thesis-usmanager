@@ -90,9 +90,6 @@ public class ContainerEntity {
 	@NotNull
 	private String privateIpAddress;
 
-	/*@NotNull*/
-	private Coordinates coordinates;
-
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<ContainerPortMapping> ports;
@@ -100,6 +97,9 @@ public class ContainerEntity {
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private Map<String, String> labels;
+
+	@NotNull
+	private Coordinates coordinates;
 
 	@Singular
 	@JsonIgnore

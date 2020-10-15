@@ -112,9 +112,9 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
     }
 
     private loadEntities = () => {
-        const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
-        if (hostname) {
-            this.props.loadCloudHostSimulatedMetrics(hostname);
+        const instanceId = this.props.cloudHost?.instanceId;
+        if (instanceId) {
+            this.props.loadCloudHostSimulatedMetrics(instanceId);
         }
     };
 
@@ -157,9 +157,9 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
         this.props.onRemoveSimulatedHostMetrics(simulatedMetrics);
 
     private onDeleteSuccess = (simulatedMetrics: string[]): void => {
-        const hostname = this.props.cloudHost?.publicIpAddress || this.props.cloudHost?.instanceId;
-        if (hostname) {
-            this.props.removeCloudHostSimulatedMetrics(hostname, simulatedMetrics);
+        const instanceId = this.props.cloudHost?.instanceId;
+        if (instanceId) {
+            this.props.removeCloudHostSimulatedMetrics(instanceId, simulatedMetrics);
         }
     };
 
@@ -174,8 +174,8 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostSimulatedMetricListProps): StateToProps {
-    const hostname = ownProps.cloudHost?.publicIpAddress || ownProps.cloudHost?.instanceId;
-    const host = hostname && state.entities.hosts.cloud.data[hostname];
+    const instanceId = ownProps.cloudHost?.instanceId;
+    const host = instanceId && state.entities.hosts.cloud.data[instanceId];
     const simulatedMetricsName = host && host.hostSimulatedMetrics;
     return {
         isLoading: state.entities.hosts.cloud.isLoadingSimulatedMetrics,

@@ -120,7 +120,6 @@ class Landing extends React.Component<Props, State> {
 
 }
 
-
 function mapStateToProps(state: ReduxState): StateToProps {
     const isLoading = state.entities.containers.isLoadingContainers;
     const error = state.entities.containers.loadContainersError;

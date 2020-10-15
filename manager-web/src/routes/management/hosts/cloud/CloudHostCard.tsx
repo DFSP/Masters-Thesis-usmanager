@@ -211,11 +211,11 @@ class CloudHostCard extends BaseComponent<Props, State> {
                               title={cloudHost.publicIpAddress || cloudHost.instanceId}
                               link={{
                                   to: {
-                                      pathname: `/hosts/cloud/${cloudHost.publicIpAddress || cloudHost.instanceId}`,
+                                      pathname: `/hosts/cloud/${cloudHost.instanceId}`,
                                       state: cloudHost
                                   }
                               }}
-                              height={'185px'}
+                              height={'215px'}
                               margin={'10px 0'}
                               hoverable
                               loading={loading}
@@ -245,6 +245,9 @@ class CloudHostCard extends BaseComponent<Props, State> {
             <CardItem key={'placement'}
                       label={'Placement'}
                       value={`${cloudHost.placement.availabilityZone}`}/>
+            <CardItem key={'coordinates'}
+                      label={'Coordinates'}
+                      value={`(${cloudHost.coordinates.latitude.toFixed(3)}, ${cloudHost.coordinates.longitude.toFixed(3)})`}/>
             {cloudHost.managedByWorker &&
             <CardItem key={'managedByWorker'}
                       label={'Managed by worker'}
