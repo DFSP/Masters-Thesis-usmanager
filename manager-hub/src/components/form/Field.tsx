@@ -211,7 +211,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                 <LocationMap
                                     onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
                                     onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
-                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id].concat(map?.markers) : [formContext.values[id]].concat(map?.markers)) : map?.markers || []}
+                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id].concat(map?.markers || []) : [formContext.values[id]].concat(map?.markers || [])) : map?.markers || []}
                                     marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
                                     zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
                                     resizable/>
