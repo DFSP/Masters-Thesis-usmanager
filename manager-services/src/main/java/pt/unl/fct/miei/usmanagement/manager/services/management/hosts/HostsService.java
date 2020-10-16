@@ -243,6 +243,11 @@ public class HostsService {
 			.collect(Collectors.toList());
 	}
 
+	public HostAddress getClosestHost(Coordinates coordinates) {
+
+		return edgeHostsService.getEdgeHosts().get(0).getAddress();
+	}
+
 	public HostAddress getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
 		// TODO implement algorithm to get the closest machine based on coordinates
 		return edgeHostsService.getEdgeHosts().get(0).getAddress();
@@ -384,6 +389,7 @@ public class HostsService {
 	}
 
 	public SimpleNode addHost(Coordinates coordinates, NodeRole role) {
+		getClosestHost(coordinates)
 		/*HostAddress hostAddress;
 		try {
 			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);

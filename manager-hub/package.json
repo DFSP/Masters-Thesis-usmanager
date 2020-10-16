@@ -1,8 +1,9 @@
 {
-  "name": "manager-web",
+  "name": "manager-hub",
   "version": "0.1.0",
   "private": true,
   "description": "Web manager to visually manage a Microservices Dynamic Management System",
+  "homepage" : "http://myname.github.io/myapp",
   "contributors": [
     {
       "name": "André Carrusca",

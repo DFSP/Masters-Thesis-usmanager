@@ -1,4 +1,4 @@
-# Manager web
+# Manager hub
 
 [![js-eslint-style](https://img.shields.io/badge/code%20style-TSLint-blue.svg?style=flat-square)](https://palantir.github.io/tslint/)
 
@@ -21,8 +21,8 @@ npm start
 ### Docker
  
 ```shell script
-docker build -f docker/Dockerfile . -t manager-web
-docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true manager-web
+docker build -f docker/Dockerfile . -t manager-hub
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true manager-hub
 ```
 
 ### Ambiente

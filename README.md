@@ -19,7 +19,7 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [services-manager](manager-services)
 
-- [web-manager](manager-web)
+- [manager-hub](manager-hub)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 
@@ -59,7 +59,7 @@ As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos 
 
 > [Local manager](local-manager/README.md#ferramentas-usadas)  
 
-> [Web manager](manager-web/README.md#ferramentas-usadas)  
+> [Web manager](manager-hub/README.md#ferramentas-usadas)  
 
 ### Configuração
 
