@@ -464,11 +464,11 @@ class CloudHost extends BaseComponent<Props, State> {
                                        singleMarker: true,
                                        zoomable: true,
                                        labeled: true,
-                                       markers: this.props.cloudRegions.map(region => ({
+                                       markers: this.props.cloudRegions.filter(region => region.available).map(region => ({
                                            title: region.zone + " | " + region.name,
                                            latitude: region.coordinates.latitude,
                                            longitude: region.coordinates.longitude,
-                                           color: 'red'
+                                           color: 'green'
                                        }))
                                    }}/>
                             : formCloudHost && Object.keys(formCloudHost).map((key, index) =>
