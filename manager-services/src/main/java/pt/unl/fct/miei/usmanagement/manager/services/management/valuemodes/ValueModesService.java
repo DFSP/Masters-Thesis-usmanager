@@ -60,7 +60,7 @@ public class ValueModesService {
 	}
 
 	public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
-		assertValueModeDoesntExist(valueMode);
+		checkValueModeDoesntExist(valueMode);
 		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
 		return valueModes.save(valueMode);
 	}
@@ -83,7 +83,7 @@ public class ValueModesService {
 		valueModes.delete(valueMode);
 	}
 
-	private void assertValueModeDoesntExist(ValueModeEntity valueMode) {
+	private void checkValueModeDoesntExist(ValueModeEntity valueMode) {
 		String valueModeName = valueMode.getName();
 		if (valueModes.hasValueMode(valueModeName)) {
 			throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");

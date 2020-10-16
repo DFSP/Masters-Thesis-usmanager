@@ -89,8 +89,8 @@ public class CloudHostEntity {
 
 	private Placement placement;
 
-	/*@NotNull*/
-	private Coordinates coordinates;
+	@NotNull
+	private AwsRegion region;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne
@@ -136,23 +136,23 @@ public class CloudHostEntity {
 
 	@JsonIgnore
 	public HostAddress getAddress() {
-		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress, coordinates);
+		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress, region.getCoordinates());
 	}
 
 	@JsonIgnore
 	public HostLocation getLocation() {
-		return new HostLocation("", "", getRegion(), getContinent());
+		return new HostLocation("", "", getRegion().getZone(), getContinent());
 	}
 
-	@JsonIgnore
+	/*@JsonIgnore
 	public String getRegion() {
 		String zone = placement.getAvailabilityZone();
 		return Character.isDigit(zone.charAt(zone.length() - 1)) ? zone : zone.substring(0, zone.length() - 1);
-	}
+	}*/
 
 	@JsonIgnore
 	public String getContinent() {
-		String region = getRegion();
+		String region = getRegion().getZone();
 		String zone = region.substring(0, region.indexOf('-'));
 		if (zone.startsWith("us") || zone.startsWith("ca")) {
 			return "na";

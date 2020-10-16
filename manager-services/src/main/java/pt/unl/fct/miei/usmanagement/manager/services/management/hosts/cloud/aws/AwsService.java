@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
@@ -45,12 +44,15 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.Timing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -62,7 +64,8 @@ import java.util.stream.Collectors;
 public class AwsService {
 
 	private final SshService sshService;
-	private final AmazonEC2 ec2;
+	private final Map<AwsRegion, AmazonEC2> ec2Clients;
+	private final AWSStaticCredentialsProvider awsStaticCredentialsProvider;
 	private final String awsInstanceAmi;
 	private final String awsInstanceSecurityGroup;
 	private final String awsInstanceKeyPair;
@@ -75,15 +78,11 @@ public class AwsService {
 
 	public AwsService(SshService sshService, AwsProperties awsProperties) {
 		this.sshService = sshService;
+		this.ec2Clients = new HashMap<>(AwsRegion.getAvailableRegionsCount());
 		String awsAccessKey = awsProperties.getAccess().getKey();
 		String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
 		BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
-		AWSStaticCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-		this.ec2 = AmazonEC2ClientBuilder
-			.standard()
-			.withRegion(Regions.US_EAST_2)
-			.withCredentials(awsCredentialsProvider)
-			.build();
+		this.awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
 		this.awsInstanceAmi = awsProperties.getInstance().getAmi();
 		this.awsInstanceSecurityGroup = awsProperties.getInstance().getSecurityGroup();
 		this.awsInstanceKeyPair = awsProperties.getInstance().getKeyPair();
@@ -95,31 +94,49 @@ public class AwsService {
 		this.awsUsername = awsProperties.getAccess().getUsername();
 	}
 
+	private AmazonEC2 getEC2Client(AwsRegion region) {
+		AmazonEC2 amazonEC2 = ec2Clients.get(region);
+		if (amazonEC2 == null) {
+			amazonEC2 = AmazonEC2ClientBuilder
+				.standard()
+				.withRegion(region.getZone())
+				.withCredentials(awsStaticCredentialsProvider)
+				.build();
+			ec2Clients.put(region, amazonEC2);
+		}
+		return amazonEC2;
+	}
+
 	public List<Instance> getInstances() {
 		List<Instance> instances = new ArrayList<>();
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		DescribeInstancesResult result;
-		do {
-			result = ec2.describeInstances(request);
-			result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
-				.filter(this::isManagerInstance).forEach(instances::add);
-			request.setNextToken(result.getNextToken());
-		} while (result.getNextToken() != null);
+		for (AwsRegion region : AwsRegion.getAwsRegions()) {
+			do {
+				result = getEC2Client(region).describeInstances(request);
+				result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
+					.filter(this::isManagerInstance).forEach(instances::add);
+				request.setNextToken(result.getNextToken());
+			} while (result.getNextToken() != null);
+		}
 		return instances;
 	}
 
 	public Instance getInstance(String id) {
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
 		DescribeInstancesResult result;
-		do {
-			result = ec2.describeInstances(request);
-			Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
-				.flatMap(List::stream).filter(this::isManagerInstance).findFirst();
-			if (instance.isPresent()) {
-				return instance.get();
-			}
-			request.setNextToken(result.getNextToken());
-		} while (result.getNextToken() != null);
+		for (AwsRegion region : AwsRegion.getAwsRegions()) {
+			do {
+				result = getEC2Client(region).describeInstances(request);
+				Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
+					.flatMap(List::stream).filter(this::isManagerInstance).findFirst();
+				if (instance.isPresent()) {
+					return instance.get();
+				}
+				request.setNextToken(result.getNextToken());
+			} while (result.getNextToken() != null);
+		}
+
 		throw new ManagerException("Instance with id %s not found", id);
 	}
 
@@ -127,9 +144,9 @@ public class AwsService {
 		return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
 	}
 
-	public Instance createInstance() {
+	public Instance createInstance(AwsRegion region) {
 		log.info("Creating new aws instance...");
-		String instanceId = createEC2();
+		String instanceId = createEC2(region);
 		Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
 		String publicIpAddress = instance.getPublicIpAddress();
 		log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
@@ -142,7 +159,7 @@ public class AwsService {
 		return instance;
 	}
 
-	private String createEC2() {
+	private String createEC2(AwsRegion region) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
 			.withImageId(awsInstanceAmi)
 			.withInstanceType(awsInstanceType)
@@ -150,19 +167,20 @@ public class AwsService {
 			.withMaxCount(1)
 			.withSecurityGroups(awsInstanceSecurityGroup)
 			.withKeyName(awsInstanceKeyPair);
-		RunInstancesResult result = ec2.runInstances(runInstancesRequest);
+		AmazonEC2 amazonEC2 = getEC2Client(region);
+		RunInstancesResult result = amazonEC2.runInstances(runInstancesRequest);
 		Instance instance = result.getReservation().getInstances().get(0);
 		String instanceId = instance.getInstanceId();
 		String instanceName = String.format("ubuntu-%d", System.currentTimeMillis());
 		CreateTagsRequest createTagsRequest = new CreateTagsRequest().withResources(instanceId)
 			.withTags(new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"));
-		ec2.createTags(createTagsRequest);
+		amazonEC2.createTags(createTagsRequest);
 		return instanceId;
 	}
 
-	public Instance startInstance(String instanceId) {
+	public Instance startInstance(String instanceId, AwsRegion region) {
 		log.info("Starting instance {}", instanceId);
-		Instance instance = setInstanceState(instanceId, AwsInstanceState.RUNNING);
+		Instance instance = setInstanceState(instanceId, AwsInstanceState.RUNNING, region);
 		try {
 			waitToBoot(instance);
 		}
@@ -172,77 +190,80 @@ public class AwsService {
 		return instance;
 	}
 
-	private void startInstanceById(String instanceId) {
+	private void startInstanceById(String instanceId, AwsRegion region) {
 		DryRunSupportedRequest<StartInstancesRequest> dryRequest = () ->
 			new StartInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
-		DryRunResult<StartInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
+		AmazonEC2 amazonEC2 = getEC2Client(region);
+		DryRunResult<StartInstancesRequest> dryResponse = amazonEC2.dryRun(dryRequest);
 		if (!dryResponse.isSuccessful()) {
 			throw new ManagerException(dryResponse.getDryRunResponse().getErrorMessage());
 		}
 		StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instanceId);
-		ec2.startInstances(request);
+		amazonEC2.startInstances(request);
 	}
 
-	public Instance stopInstance(String instanceId) {
+	public Instance stopInstance(String instanceId, AwsRegion region) {
 		log.info("Stopping instance {}", instanceId);
-		return setInstanceState(instanceId, AwsInstanceState.STOPPED);
+		return setInstanceState(instanceId, AwsInstanceState.STOPPED, region);
 	}
 
-	private void stopInstanceById(String instanceId) {
+	private void stopInstanceById(String instanceId, AwsRegion region) {
 		DryRunSupportedRequest<StopInstancesRequest> dryRequest = () ->
 			new StopInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
-		DryRunResult<StopInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
+		AmazonEC2 amazonEC2 = getEC2Client(region);
+		DryRunResult<StopInstancesRequest> dryResponse = amazonEC2.dryRun(dryRequest);
 		if (!dryResponse.isSuccessful()) {
 			throw new ManagerException(dryResponse.getDryRunResponse().getErrorMessage());
 		}
 		StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instanceId);
-		ec2.stopInstances(request);
+		amazonEC2.stopInstances(request);
 	}
 
-	public Instance terminateInstance(String instanceId) {
+	public Instance terminateInstance(String instanceId, AwsRegion region) {
 		log.info("Terminating instance {}", instanceId);
-		return setInstanceState(instanceId, AwsInstanceState.TERMINATED);
+		return setInstanceState(instanceId, AwsInstanceState.TERMINATED, region);
 	}
 
-	private void terminateInstanceById(String instanceId) {
+	private void terminateInstanceById(String instanceId, AwsRegion region) {
 		DryRunSupportedRequest<TerminateInstancesRequest> dryRequest = () ->
 			new TerminateInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
-		DryRunResult<TerminateInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
+		AmazonEC2 amazonEC2 = getEC2Client(region);
+		DryRunResult<TerminateInstancesRequest> dryResponse = amazonEC2.dryRun(dryRequest);
 		if (!dryResponse.isSuccessful()) {
 			throw new ManagerException(dryResponse.getDryRunResponse().getErrorMessage());
 		}
 		TerminateInstancesRequest request = new TerminateInstancesRequest().withInstanceIds(instanceId);
-		ec2.terminateInstances(request);
+		amazonEC2.terminateInstances(request);
 	}
 
-	private Instance setInstanceState(String hostname, AwsInstanceState state) {
+	private Instance setInstanceState(String id, AwsInstanceState state, AwsRegion region) {
 		for (int tries = 0; tries < awsMaxRetries; tries++) {
-			Instance instance = getInstance(hostname);
+			Instance instance = getInstance(id);
 			int instanceState = instance.getState().getCode();
 			if (instanceState == state.getCode()) {
-				log.info("Instance {} is already on state {}", hostname, state.getState());
+				log.info("Instance {} is already on state {}", id, state.getState());
 				return instance;
 			}
 			try {
 				switch (state) {
 					case RUNNING:
-						startInstanceById(hostname);
+						startInstanceById(id, region);
 						break;
 					case STOPPED:
-						stopInstanceById(hostname);
+						stopInstanceById(id, region);
 						break;
 					case TERMINATED:
-						terminateInstanceById(hostname);
+						terminateInstanceById(id, region);
 						break;
 					default:
 						throw new UnsupportedOperationException();
 				}
-				instance = waitInstanceState(hostname, state);
-				log.info("Setting instance {} to {} state", hostname, state.getState());
+				instance = waitInstanceState(id, state);
+				log.info("Setting instance {} to {} state", id, state.getState());
 				return instance;
 			}
 			catch (ManagerException e) {
-				log.info("Failed to set instance {} to {} state: {}", hostname, state.getState(), e.getMessage());
+				log.info("Failed to set instance {} to {} state: {}", id, state.getState(), e.getMessage());
 			}
 			Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
 		}

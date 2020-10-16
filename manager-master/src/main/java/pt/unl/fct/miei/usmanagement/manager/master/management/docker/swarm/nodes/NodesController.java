@@ -82,9 +82,7 @@ public class NodesController {
 			List<Coordinates> coordinates = addNode.getCoordinates();
 			for (Coordinates coordinate : coordinates) {
 				SimpleNode node = hostsService.addHost(coordinate, role);
-				if (node != null) { // TODO
-					nodes.add(node);
-				}
+				nodes.add(node);
 			}
 		}
 		return nodes;

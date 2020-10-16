@@ -63,7 +63,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		servicesMonitoringService.stopServiceMonitoring();
 		containersService.stopContainers();
 		dockerSwarmService.destroySwarm();
-		cloudHostsService.terminateCloudHosts();
+		cloudHostsService.terminateInstances();
 	}
 
 }

@@ -28,6 +28,7 @@ import {ICoordinates} from "./LocationMap";
 
 export interface IMarker extends ICoordinates {
     title: string,
+    color?: string,
 }
 
 interface Props {

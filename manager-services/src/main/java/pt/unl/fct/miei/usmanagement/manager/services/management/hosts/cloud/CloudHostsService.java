@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -41,14 +42,15 @@ import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsInstanceState;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,7 @@ public class CloudHostsService {
 	private final HostRulesService hostRulesService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final HostsService hostsService;
+	private final NodesService nodesService;
 
 	private final CloudHostRepository cloudHosts;
 
@@ -69,16 +72,24 @@ public class CloudHostsService {
 							 @Lazy HostRulesService hostRulesService,
 							 @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							 @Lazy HostsService hostsService,
+							 @Lazy NodesService nodesService,
 							 CloudHostRepository cloudHosts) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.hostsService = hostsService;
+		this.nodesService = nodesService;
 		this.cloudHosts = cloudHosts;
 	}
 
 	public List<CloudHostEntity> getCloudHosts() {
 		return cloudHosts.findAll();
+	}
+
+	public List<CloudHostEntity> getInactiveCloudHosts() {
+		return getCloudHosts().stream()
+			.filter(host -> !nodesService.isPartOfSwarm(host.getAddress()))
+			.collect(Collectors.toList());
 	}
 
 	public CloudHostEntity getCloudHostById(String id) {
@@ -125,7 +136,7 @@ public class CloudHostsService {
 			.publicDnsName(instance.getPublicDnsName())
 			.publicIpAddress(instance.getPublicIpAddress())
 			.privateIpAddress(instance.getPrivateIpAddress())
-			.coordinates(this.getPlacementCoordinates(instance.getPlacement()))
+			.region(this.getPlacementRegion(instance.getPlacement()))
 			.placement(instance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
@@ -140,40 +151,51 @@ public class CloudHostsService {
 			.publicDnsName(simpleInstance.getPublicDnsName())
 			.publicIpAddress(simpleInstance.getPublicIpAddress())
 			.privateIpAddress(simpleInstance.getPrivateIpAddress())
-			.coordinates(this.getPlacementCoordinates(simpleInstance.getPlacement()))
+			.region(this.getPlacementRegion(simpleInstance.getPlacement()))
 			.placement(simpleInstance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
 	}
 
-	public CloudHostEntity startCloudHost() {
-		Instance instance = awsService.createInstance();
+	public CloudHostEntity launchInstance(Coordinates coordinates) {
+		List<AwsRegion> regions = AwsRegion.getAwsRegions();
+		regions.sort((oneRegion, anotherRegion) -> {
+			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		AwsRegion region = regions.get(0);
+		return launchInstance(region);
+	}
+
+	public CloudHostEntity launchInstance(AwsRegion region) {
+		Instance instance = awsService.createInstance(region);
 		CloudHostEntity cloudHost = saveCloudHostFromInstance(instance);
 		hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
 		return cloudHost;
 	}
 
-	public CloudHostEntity startCloudHost(CloudHostEntity cloudHost, boolean addToSwarm) {
-		return startCloudHost(cloudHost.getInstanceId(), addToSwarm);
+	public CloudHostEntity startInstance(String id, boolean addToSwarm) {
+		CloudHostEntity cloudHost = getCloudHostById(id);
+		return startInstance(cloudHost, addToSwarm);
 	}
 
-	public CloudHostEntity startCloudHost(String hostname, boolean addToSwarm) {
-		CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
+	public CloudHostEntity startInstance(CloudHostEntity cloudHost, boolean addToSwarm) {
 		InstanceState state = new InstanceState()
 			.withCode(AwsInstanceState.PENDING.getCode())
 			.withName(AwsInstanceState.PENDING.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		Instance instance = awsService.startInstance(cloudHost.getInstanceId());
+		Instance instance = awsService.startInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
 		cloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
 		if (addToSwarm) {
-			hostsService.addHost(hostname, NodeRole.WORKER);
+			hostsService.addHost(cloudHost.getInstanceId(), NodeRole.WORKER);
 		}
 		return cloudHost;
 	}
 
-	public CloudHostEntity stopCloudHost(String hostname) {
-		CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
+	public CloudHostEntity stopInstance(String id) {
+		CloudHostEntity cloudHost = getCloudHostById(id);
 		try {
 			hostsService.removeHost(cloudHost.getAddress());
 		}
@@ -185,12 +207,12 @@ public class CloudHostsService {
 			.withName(AwsInstanceState.STOPPING.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		Instance instance = awsService.stopInstance(cloudHost.getInstanceId());
+		Instance instance = awsService.stopInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
 		return saveCloudHostFromInstance(cloudHost.getId(), instance);
 	}
 
-	public void terminateCloudHost(String hostname) {
-		CloudHostEntity cloudHost = getCloudHostByIdOrIp(hostname);
+	public void terminateInstance(String id) {
+		CloudHostEntity cloudHost = getCloudHostById(id);
 		try {
 			hostsService.removeHost(cloudHost.getAddress());
 		}
@@ -202,15 +224,15 @@ public class CloudHostsService {
 			.withName(AwsInstanceState.SHUTTING_DOWN.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		awsService.terminateInstance(cloudHost.getInstanceId());
+		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
 		cloudHosts.delete(cloudHost);
 	}
 
-	public void terminateCloudHosts() {
-		getCloudHosts().parallelStream().forEach(instance -> terminateCloudHost(instance.getInstanceId()));
+	public void terminateInstances() {
+		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId()));
 	}
 
-	public List<CloudHostEntity> syncCloudInstances() {
+	public List<CloudHostEntity> syncCloudHosts() {
 		List<CloudHostEntity> cloudHosts = getCloudHosts();
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
@@ -249,69 +271,68 @@ public class CloudHostsService {
 	}
 
 	public List<HostRuleEntity> getRules(String hostname) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		return cloudHosts.getRules(hostname);
 	}
 
 	public HostRuleEntity getRule(String hostname, String ruleName) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		return cloudHosts.getRule(hostname, ruleName).orElseThrow(() ->
 			new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
 		);
 	}
 
 	public void addRule(String hostname, String ruleName) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		hostRulesService.addCloudHost(ruleName, hostname);
 	}
 
 	public void addRules(String hostname, List<String> ruleNames) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		ruleNames.forEach(rule -> hostRulesService.addCloudHost(rule, hostname));
 	}
 
 	public void removeRule(String hostname, String ruleName) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		hostRulesService.removeCloudHost(ruleName, hostname);
 	}
 
 	public void removeRules(String hostname, List<String> ruleNames) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, hostname));
 	}
 
 	public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		return cloudHosts.getSimulatedMetrics(hostname);
 	}
 
 	public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
-		assertHostExists(hostname);
+		checkCloudHostExists(hostname);
 		return cloudHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
 			new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
-	public void addSimulatedMetric(String hostname, String simulatedMetricName) {
-		assertHostExists(hostname);
-		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, hostname);
+	public void addSimulatedMetric(String instanceId, String simulatedMetricName) {
+		checkCloudHostExists(instanceId);
+		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
 	}
 
-	public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-		assertHostExists(hostname);
+	public void addSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
+		checkCloudHostExists(instanceId);
 		simulatedMetricNames.forEach(simulatedMetric ->
-			hostSimulatedMetricsService.addCloudHost(simulatedMetric, hostname));
+			hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
 	}
 
-	public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
-		assertHostExists(hostname);
-		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, hostname);
+	public void removeSimulatedMetric(String instanceId, String simulatedMetricName) {
+		checkCloudHostExists(instanceId);
+		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
 	}
 
-	public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-		assertHostExists(hostname);
-		simulatedMetricNames.forEach(simulatedMetric ->
-			hostSimulatedMetricsService.addCloudHost(simulatedMetric, hostname));
+	public void removeSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
+		checkCloudHostExists(instanceId);
+		simulatedMetricNames.forEach(simulatedMetric -> hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
 	}
 
 	public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String hostname) {
@@ -333,19 +354,19 @@ public class CloudHostsService {
 		return cloudHosts.hasCloudHost(hostname);
 	}
 
-	private void assertHostExists(String hostname) {
+	private void checkCloudHostExists(String hostname) {
 		if (!hasCloudHost(hostname)) {
 			throw new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname);
 		}
 	}
 
-	private Coordinates getPlacementCoordinates(Placement placement) {
+	private AwsRegion getPlacementRegion(Placement placement) {
 		String availabilityZone = placement.getAvailabilityZone();
 		while (!Character.isDigit(availabilityZone.charAt(availabilityZone.length() - 1))) {
 			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
 		}
 		AwsRegion awsRegion = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
 		log.info("Instance placement {} is on aws region {}", placement, awsRegion);
-		return awsRegion.getCoordinates();
+		return awsRegion;
 	}
 }

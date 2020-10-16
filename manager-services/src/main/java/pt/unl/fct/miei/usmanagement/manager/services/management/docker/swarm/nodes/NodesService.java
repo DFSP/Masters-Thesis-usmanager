@@ -142,8 +142,8 @@ public class NodesService {
 		}
 	}
 
-	public boolean isPartOfSwarm(String hostname) {
-		return getNodes(n -> Objects.equals(n.status().addr(), hostname)).size() > 0;
+	public boolean isPartOfSwarm(HostAddress hostAddress) {
+		return getNodes(n -> Objects.equals(n.status().addr(), hostAddress.getPublicIpAddress())).size() > 0;
 	}
 
 	public boolean isManager(String nodeId) {

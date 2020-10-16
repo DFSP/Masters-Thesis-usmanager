@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
@@ -59,8 +60,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud")
-	public CloudHostEntity startCloudHost() {
-		return cloudHostsService.startCloudHost();
+	public CloudHostEntity startCloudHost(@RequestBody Coordinates coordinates) {
+		return cloudHostsService.launchInstance(coordinates);
 	}
 
 	@GetMapping("/cloud")
@@ -69,8 +70,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud/sync")
-	public List<CloudHostEntity> syncCloudInstances() {
-		return cloudHostsService.syncCloudInstances();
+	public List<CloudHostEntity> syncCloudHosts() {
+		return cloudHostsService.syncCloudHosts();
 	}
 
 	@GetMapping("/cloud/{id}")
@@ -78,13 +79,13 @@ public class HostsController {
 		return cloudHostsService.getCloudHostByIdOrIp(id);
 	}
 
-	@PostMapping("/cloud/{hostname}/state")
-	public CloudHostEntity changeCloudHostState(@PathVariable String hostname, @RequestBody String action) {
+	@PostMapping("/cloud/{id}/state")
+	public CloudHostEntity changeCloudHostState(@PathVariable String id, @RequestBody String action) {
 		switch (action) {
 			case "start":
-				return cloudHostsService.startCloudHost(hostname, true);
+				return cloudHostsService.startInstance(id, true);
 			case "stop":
-				return cloudHostsService.stopCloudHost(hostname);
+				return cloudHostsService.stopInstance(id);
 			default:
 				throw new BadRequestException("Invalid request body: expected 'start' or 'stop'");
 		}
@@ -92,7 +93,7 @@ public class HostsController {
 
 	@DeleteMapping("/cloud/{hostname}")
 	public void terminateCloudInstance(@PathVariable String hostname) {
-		cloudHostsService.terminateCloudHost(hostname);
+		cloudHostsService.terminateInstance(hostname);
 	}
 
 	@GetMapping("/cloud/{hostname}/rules/{ruleName}")
@@ -144,6 +145,11 @@ public class HostsController {
 	@DeleteMapping("/cloud/{hostname}/simulated-metrics/{simulatedMetricName}")
 	public void removeCloudHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
 		cloudHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
+	}
+
+	@GetMapping("/cloud/regions")
+	public AwsRegion[] getCloudRegions() {
+		return AwsRegion.values();
 	}
 
 	@GetMapping("/edge")

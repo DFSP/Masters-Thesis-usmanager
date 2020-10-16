@@ -72,7 +72,7 @@ public class ContainerSimulatedMetricsService {
 
 	public ContainerSimulatedMetricEntity addContainerSimulatedMetric(
 		ContainerSimulatedMetricEntity containerSimulatedMetric) {
-		assertContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
+		checkContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
 		log.info("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
@@ -103,12 +103,12 @@ public class ContainerSimulatedMetricsService {
 	}
 
 	public List<ContainerEntity> getContainers(String simulatedMetricName) {
-		assertContainerSimulatedMetricExists(simulatedMetricName);
+		checkContainerSimulatedMetricExists(simulatedMetricName);
 		return containerSimulatedMetrics.getContainers(simulatedMetricName);
 	}
 
 	public ContainerEntity getContainer(String simulatedMetricName, String containerId) {
-		assertContainerSimulatedMetricExists(simulatedMetricName);
+		checkContainerSimulatedMetricExists(simulatedMetricName);
 		return containerSimulatedMetrics.getContainer(simulatedMetricName, containerId).orElseThrow(() ->
 			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
 	}
@@ -139,13 +139,13 @@ public class ContainerSimulatedMetricsService {
 		containerSimulatedMetrics.save(containerMetric);
 	}
 
-	private void assertContainerSimulatedMetricExists(String name) {
+	private void checkContainerSimulatedMetricExists(String name) {
 		if (!containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
 			throw new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "name", name);
 		}
 	}
 
-	private void assertContainerSimulatedMetricDoesntExist(ContainerSimulatedMetricEntity containerSimulatedMetric) {
+	private void checkContainerSimulatedMetricDoesntExist(ContainerSimulatedMetricEntity containerSimulatedMetric) {
 		String name = containerSimulatedMetric.getName();
 		if (containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated container metric '" + name + "' already exists");

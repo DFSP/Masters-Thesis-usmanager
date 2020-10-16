@@ -60,7 +60,7 @@ public class ConditionsService {
 	}
 
 	public ConditionEntity addCondition(ConditionEntity condition) {
-		assertConditionDoesntExist(condition);
+		checkConditionDoesntExist(condition);
 		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
 		return conditions.save(condition);
 	}
@@ -77,7 +77,7 @@ public class ConditionsService {
 		conditions.delete(condition);
 	}
 
-	private void assertConditionDoesntExist(ConditionEntity condition) {
+	private void checkConditionDoesntExist(ConditionEntity condition) {
 		String name = condition.getName();
 		if (conditions.hasCondition(name)) {
 			throw new DataIntegrityViolationException("Condition '" + name + "' already exists");

@@ -60,7 +60,7 @@ public class RegionsService {
 	}
 
 	public RegionEntity addRegion(RegionEntity region) {
-		assertRegionDoesntExist(region);
+		checkRegionDoesntExist(region);
 		log.info("Saving region {}", ToStringBuilder.reflectionToString(region));
 		return regions.save(region);
 	}
@@ -82,7 +82,7 @@ public class RegionsService {
 		regions.delete(region);
 	}
 
-	private void assertRegionDoesntExist(RegionEntity region) {
+	private void checkRegionDoesntExist(RegionEntity region) {
 		String name = region.getName();
 		if (regions.hasRegion(name)) {
 			throw new DataIntegrityViolationException("Region '" + name + "' already exists");

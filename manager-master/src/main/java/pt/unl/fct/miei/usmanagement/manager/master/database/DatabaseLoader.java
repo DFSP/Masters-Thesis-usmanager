@@ -735,7 +735,7 @@ public class DatabaseLoader {
 			}
 
 			// cloud hosts
-			cloudHostsService.syncCloudInstances();
+			cloudHostsService.syncCloudHosts();
 
 			// component types
 			ComponentTypeEntity host;

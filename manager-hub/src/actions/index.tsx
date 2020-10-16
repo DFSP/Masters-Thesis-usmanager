@@ -525,6 +525,7 @@ const fetchCloudHosts = (instanceId?: string) => ({
                 entity: 'cloudHosts'
             }
 });
+
 export const syncCloudHosts = () => ({
     [CALL_API]: {
         types: [CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE],
@@ -534,8 +535,8 @@ export const syncCloudHosts = () => ({
         method: 'post'
     }
 });
-export const ADD_CLOUD_HOST = 'ADD_CLOUD_HOST';
 
+export const ADD_CLOUD_HOST = 'ADD_CLOUD_HOST';
 export function addCloudHost(cloudHost: ICloudHost): EntitiesAction {
     return {
         type: ADD_CLOUD_HOST,
@@ -628,6 +629,19 @@ export function removeCloudHostSimulatedMetrics(cloudHost: string, simulatedMetr
         data: {simulatedMetricNames: simulatedMetrics}
     }
 }
+
+export const CLOUD_REGIONS_REQUEST = 'CLOUD_REGIONS_REQUEST';
+export const CLOUD_REGIONS_SUCCESS = 'CLOUD_REGIONS_SUCCESS';
+export const CLOUD_REGIONS_FAILURE = 'CLOUD_REGIONS_FAILURE';
+export const loadCloudRegions = () => (dispatch: any) => {
+    return dispatch(fetchCloudRegions());
+};
+const fetchCloudRegions = () => ({
+    [CALL_API]: {
+        types: [CLOUD_REGIONS_REQUEST, CLOUD_REGIONS_SUCCESS, CLOUD_REGIONS_FAILURE],
+        endpoint: `hosts/cloud/regions`,
+    }
+});
 
 export const EDGE_HOSTS_REQUEST = 'EDGE_HOSTS_REQUEST';
 export const EDGE_HOSTS_SUCCESS = 'EDGE_HOSTS_SUCCESS';

@@ -62,7 +62,7 @@ public class ComponentTypesService {
 	}
 
 	public ComponentTypeEntity addComponentType(ComponentTypeEntity componentType) {
-		assertComponentTypeDoesntExist(componentType);
+		checkComponentTypeDoesntExist(componentType);
 		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
 		return componentTypes.save(componentType);
 	}
@@ -85,7 +85,7 @@ public class ComponentTypesService {
 		componentTypes.delete(componentType);
 	}
 
-	private void assertComponentTypeDoesntExist(ComponentTypeEntity componentType) {
+	private void checkComponentTypeDoesntExist(ComponentTypeEntity componentType) {
 		String componentTypeName = componentType.getType().name();
 		if (componentTypes.hasComponentType(componentTypeName)) {
 			throw new DataIntegrityViolationException("Component type '" + componentTypeName + "' already exists");

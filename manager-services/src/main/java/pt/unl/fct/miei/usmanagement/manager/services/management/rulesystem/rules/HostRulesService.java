@@ -105,7 +105,7 @@ public class HostRulesService {
 	}
 
 	public HostRuleEntity addRule(HostRuleEntity rule) {
-		assertRuleDoesntExist(rule);
+		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		setLastUpdateHostRules();
 		return rules.save(rule);
@@ -138,13 +138,13 @@ public class HostRulesService {
 	}
 
 	public ConditionEntity getCondition(String ruleName, String conditionName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
 			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
 	}
 
 	public List<ConditionEntity> getConditions(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
@@ -177,13 +177,13 @@ public class HostRulesService {
 	}
 
 	public CloudHostEntity getCloudHost(String ruleName, String instanceId) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getCloudHost(ruleName, instanceId).orElseThrow(() ->
 			new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
 	}
 
 	public List<CloudHostEntity> getCloudHosts(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getCloudHosts(ruleName);
 	}
 
@@ -215,13 +215,13 @@ public class HostRulesService {
 	}
 
 	public EdgeHostEntity getEdgeHost(String ruleName, String hostname) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getEdgeHost(ruleName, hostname).orElseThrow(() ->
 			new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
 	}
 
 	public List<EdgeHostEntity> getEdgeHosts(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getEdgeHosts(ruleName);
 	}
 
@@ -252,13 +252,13 @@ public class HostRulesService {
 		setLastUpdateHostRules();
 	}
 
-	private void assertRuleExists(String ruleName) {
+	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
 			throw new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName);
 		}
 	}
 
-	private void assertRuleDoesntExist(HostRuleEntity hostRule) {
+	private void checkRuleDoesntExist(HostRuleEntity hostRule) {
 		String name = hostRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Host rule '" + name + "' already exists");

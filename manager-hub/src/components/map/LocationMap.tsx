@@ -82,7 +82,7 @@ export default class LocationMap extends React.Component<Props, State> {
             marker: <Marker key={key} setTooltipContent={this.setTooltip}
                             title={location.title} label={marker?.labeled ? location.label : undefined}
                             location={[location.longitude, location.latitude]}
-                            color={marker?.color || "#2196F3"} size={markerSize}
+                            color={location.color || marker?.color || "#2196F3"} size={markerSize}
                             onRemove={() => {
                                 this.setTooltip("");
                                 onDeselect?.({

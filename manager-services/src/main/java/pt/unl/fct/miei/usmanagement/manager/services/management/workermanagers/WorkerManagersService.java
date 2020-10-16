@@ -112,7 +112,7 @@ public class WorkerManagersService {
 	}
 
 	public List<String> getAssignedHosts(String workerManagerId) {
-		assertWorkerManagerExists(workerManagerId);
+		checkWorkerManagerExists(workerManagerId);
 		List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
 			.map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
 		List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
@@ -153,7 +153,7 @@ public class WorkerManagersService {
 		workerManagers.save(workerManager);
 	}
 
-	private void assertWorkerManagerExists(String id) {
+	private void checkWorkerManagerExists(String id) {
 		if (!workerManagers.hasWorkerManager(id)) {
 			throw new EntityNotFoundException(WorkerManagerEntity.class, "id", id);
 		}

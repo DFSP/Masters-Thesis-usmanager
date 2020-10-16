@@ -64,6 +64,11 @@ docker run --rm -p 8080:8080 usmanager/manager-master
 
 >Docker version 19.03.5, build 633a0ea838
 
+## Cloud
+
+Lançar a aplicação na cloud (aws):
+- https://aws.amazon.com/pt/blogs/devops/deploying-a-spring-boot-application-on-aws-using-aws-elastic-beanstalk/
+
 ## Ferramentas
 
 [<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business OldRules Management System (BRMS) solution

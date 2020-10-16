@@ -109,7 +109,7 @@ public class ContainersService {
 	}
 
 	public ContainerEntity addContainer(ContainerEntity container) {
-		assertContainerDoesntExist(container);
+		checkContainerDoesntExist(container);
 		log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
 		return containers.save(container);
 	}
@@ -354,60 +354,60 @@ public class ContainersService {
 	}
 
 	public List<ContainerRuleEntity> getRules(String containerId) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		return containers.getRules(containerId);
 	}
 
 	public void addRule(String containerId, String ruleName) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		containerRulesService.addContainer(ruleName, containerId);
 	}
 
 	public void addRules(String containerId, List<String> ruleNames) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		ruleNames.forEach(rule -> containerRulesService.addContainer(rule, containerId));
 	}
 
 	public void removeRule(String containerId, String ruleName) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		containerRulesService.removeContainer(ruleName, containerId);
 	}
 
 	public void removeRules(String containerId, List<String> ruleNames) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		ruleNames.forEach(rule -> containerRulesService.removeContainer(rule, containerId));
 	}
 
 	public List<ContainerSimulatedMetricEntity> getSimulatedMetrics(String containerId) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		return containers.getSimulatedMetrics(containerId);
 	}
 
 	public ContainerSimulatedMetricEntity getSimulatedMetric(String containerId, String simulatedMetricName) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		return containers.getSimulatedMetric(containerId, simulatedMetricName).orElseThrow(() ->
 			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
 	public void addSimulatedMetric(String containerId, String simulatedMetricName) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		containerSimulatedMetricsService.addContainer(simulatedMetricName, containerId);
 	}
 
 	public void addSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		simulatedMetricNames.forEach(simulatedMetric ->
 			containerSimulatedMetricsService.addContainer(simulatedMetric, containerId));
 	}
 
 	public void removeSimulatedMetric(String containerId, String simulatedMetricName) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		containerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
 	}
 
 	public void removeSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
-		assertContainerExists(containerId);
+		checkContainerExists(containerId);
 		simulatedMetricNames.forEach(simulatedMetric ->
 			containerSimulatedMetricsService.removeContainer(simulatedMetric, containerId));
 	}
@@ -432,13 +432,13 @@ public class ContainersService {
 		return containers.hasContainer(containerId);
 	}
 
-	private void assertContainerExists(String containerId) {
+	private void checkContainerExists(String containerId) {
 		if (!hasContainer(containerId)) {
 			throw new EntityNotFoundException(ContainerEntity.class, "containerId", containerId);
 		}
 	}
 
-	private void assertContainerDoesntExist(ContainerEntity container) {
+	private void checkContainerDoesntExist(ContainerEntity container) {
 		String containerId = container.getContainerId();
 		if (containers.hasContainer(containerId)) {
 			throw new DataIntegrityViolationException("Container '" + containerId + "' already exists");

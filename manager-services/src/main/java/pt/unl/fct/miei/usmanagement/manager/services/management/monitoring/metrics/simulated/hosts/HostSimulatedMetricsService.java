@@ -75,7 +75,7 @@ public class HostSimulatedMetricsService {
 	}
 
 	public HostSimulatedMetricEntity addHostSimulatedMetric(HostSimulatedMetricEntity simulatedHostMetric) {
-		assertHostSimulatedMetricDoesntExist(simulatedHostMetric);
+		checkHostSimulatedMetricDoesntExist(simulatedHostMetric);
 		log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
 		return hostSimulatedMetrics.save(simulatedHostMetric);
 	}
@@ -106,12 +106,12 @@ public class HostSimulatedMetricsService {
 	}
 
 	public List<CloudHostEntity> getCloudHosts(String simulatedMetricName) {
-		assertHostSimulatedMetricExists(simulatedMetricName);
+		checkHostSimulatedMetricExists(simulatedMetricName);
 		return hostSimulatedMetrics.getCloudHosts(simulatedMetricName);
 	}
 
 	public CloudHostEntity getCloudHost(String simulatedMetricName, String instanceId) {
-		assertHostSimulatedMetricExists(simulatedMetricName);
+		checkHostSimulatedMetricExists(simulatedMetricName);
 		return hostSimulatedMetrics.getCloudHost(simulatedMetricName, instanceId).orElseThrow(() ->
 			new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
 	}
@@ -142,12 +142,12 @@ public class HostSimulatedMetricsService {
 	}
 
 	public List<EdgeHostEntity> getEdgeHosts(String simulatedMetricName) {
-		assertHostSimulatedMetricExists(simulatedMetricName);
+		checkHostSimulatedMetricExists(simulatedMetricName);
 		return hostSimulatedMetrics.getEdgeHosts(simulatedMetricName);
 	}
 
 	public EdgeHostEntity getEdgeHost(String simulatedMetricName, String hostname) {
-		assertHostSimulatedMetricExists(simulatedMetricName);
+		checkHostSimulatedMetricExists(simulatedMetricName);
 		return hostSimulatedMetrics.getEdgeHost(simulatedMetricName, hostname).orElseThrow(() ->
 			new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
 	}
@@ -177,13 +177,13 @@ public class HostSimulatedMetricsService {
 		hostSimulatedMetrics.save(hostMetric);
 	}
 
-	private void assertHostSimulatedMetricExists(String simulatedMetricName) {
+	private void checkHostSimulatedMetricExists(String simulatedMetricName) {
 		if (!hostSimulatedMetrics.hasHostSimulatedMetric(simulatedMetricName)) {
 			throw new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
 		}
 	}
 
-	private void assertHostSimulatedMetricDoesntExist(HostSimulatedMetricEntity simulatedHostMetric) {
+	private void checkHostSimulatedMetricDoesntExist(HostSimulatedMetricEntity simulatedHostMetric) {
 		String name = simulatedHostMetric.getName();
 		if (hostSimulatedMetrics.hasHostSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated host metric '" + name + "' already exists");

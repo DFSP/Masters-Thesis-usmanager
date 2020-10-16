@@ -90,7 +90,7 @@ public class ServicesService {
 	}
 
 	public ServiceEntity addService(ServiceEntity service) {
-		assertServiceDoesntExist(service);
+		checkServiceDoesntExist(service);
 		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 		return services.save(service);
 	}
@@ -113,13 +113,13 @@ public class ServicesService {
 	}
 
 	public AppEntity getApp(String serviceName, String appName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getApp(serviceName, appName).orElseThrow(() ->
 			new EntityNotFoundException(AppEntity.class, "appName", appName));
 	}
 
 	public List<AppEntity> getApps(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getApps(serviceName);
 	}
 
@@ -154,18 +154,18 @@ public class ServicesService {
 	}
 
 	public List<ServiceEntity> getDependencies(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getDependencies(serviceName);
 	}
 
 	public List<ServiceEntity> getDependenciesByType(String serviceName, ServiceType type) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getDependenciesByType(serviceName, type);
 	}
 
 	public boolean serviceDependsOn(String serviceName, String otherServiceName) {
-		assertServiceExists(serviceName);
-		assertServiceExists(otherServiceName);
+		checkServiceExists(serviceName);
+		checkServiceExists(otherServiceName);
 		return services.dependsOn(serviceName, otherServiceName);
 	}
 
@@ -194,12 +194,12 @@ public class ServicesService {
 	}
 
 	public List<ServiceEntity> getDependents(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getDependents(serviceName);
 	}
 
 	public List<ServiceEventPredictionEntity> getPredictions(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getPredictions(serviceName);
 	}
 
@@ -232,7 +232,7 @@ public class ServicesService {
 
 	public ServiceEventPredictionEntity getEventPrediction(String serviceName,
 														   String predictionsName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getPrediction(serviceName, predictionsName).orElseThrow(() ->
 			new EntityNotFoundException(
 				ServiceEventPredictionEntity.class, "predictionsName", predictionsName)
@@ -240,67 +240,67 @@ public class ServicesService {
 	}
 
 	public List<ServiceRuleEntity> getRules(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getRules(serviceName);
 	}
 
 	public ServiceRuleEntity getRule(String serviceName, String ruleName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getRule(serviceName, ruleName).orElseThrow(() ->
 			new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName)
 		);
 	}
 
 	public void addRule(String serviceName, String ruleName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		serviceRulesService.addService(ruleName, serviceName);
 	}
 
 	public void addRules(String serviceName, List<String> ruleNames) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		ruleNames.forEach(rule -> serviceRulesService.addService(rule, serviceName));
 	}
 
 	public void removeRule(String serviceName, String ruleName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		serviceRulesService.removeService(ruleName, serviceName);
 	}
 
 	public void removeRules(String serviceName, List<String> ruleNames) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		ruleNames.forEach(rule -> serviceRulesService.removeService(rule, serviceName));
 	}
 
 	public List<ServiceSimulatedMetricEntity> getSimulatedMetrics(String serviceName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getSimulatedMetrics(serviceName);
 	}
 
 	public ServiceSimulatedMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
 			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
 	public void addSimulatedMetric(String serviceName, String simulatedMetricName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		serviceSimulatedMetricsService.addService(simulatedMetricName, serviceName);
 	}
 
 	public void addSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		simulatedMetricNames.forEach(simulatedMetric ->
 			serviceSimulatedMetricsService.addService(simulatedMetric, serviceName));
 	}
 
 	public void removeSimulatedMetric(String serviceName, String simulatedMetricName) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		serviceSimulatedMetricsService.removeService(simulatedMetricName, serviceName);
 	}
 
 	public void removeSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
-		assertServiceExists(serviceName);
+		checkServiceExists(serviceName);
 		simulatedMetricNames.forEach(simulatedMetric ->
 			serviceSimulatedMetricsService.removeService(simulatedMetric, serviceName));
 	}
@@ -318,19 +318,19 @@ public class ServicesService {
 		return services.getMaxReplicas(serviceName);
 	}
 
-	private void assertServiceExists(Long serviceId) {
+	private void checkServiceExists(Long serviceId) {
 		if (!services.hasService(serviceId)) {
 			throw new EntityNotFoundException(ServiceEntity.class, "id", serviceId.toString());
 		}
 	}
 
-	private void assertServiceExists(String serviceName) {
+	private void checkServiceExists(String serviceName) {
 		if (!services.hasService(serviceName)) {
 			throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
 		}
 	}
 
-	private void assertServiceDoesntExist(ServiceEntity service) {
+	private void checkServiceDoesntExist(ServiceEntity service) {
 		String name = service.getServiceName();
 		if (services.hasService(name)) {
 			throw new DataIntegrityViolationException("Service '" + name + "' already exists");

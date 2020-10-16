@@ -95,7 +95,7 @@ public class ServiceRulesService {
 	}
 
 	public ServiceRuleEntity addRule(ServiceRuleEntity rule) {
-		assertRuleDoesntExist(rule);
+		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		setLastUpdateServiceRules();
 		return rules.save(rule);
@@ -127,13 +127,13 @@ public class ServiceRulesService {
 	}
 
 	public ConditionEntity getCondition(String ruleName, String conditionName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
 			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
 	}
 
 	public List<ConditionEntity> getConditions(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
@@ -166,13 +166,13 @@ public class ServiceRulesService {
 	}
 
 	public ServiceEntity getService(String ruleName, String serviceName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getService(ruleName, serviceName).orElseThrow(() ->
 			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
 	}
 
 	public List<ServiceEntity> getServices(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getServices(ruleName);
 	}
 
@@ -203,13 +203,13 @@ public class ServiceRulesService {
 		setLastUpdateServiceRules();
 	}
 
-	private void assertRuleExists(String ruleName) {
+	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
 			throw new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName);
 		}
 	}
 
-	private void assertRuleDoesntExist(ServiceRuleEntity serviceRule) {
+	private void checkRuleDoesntExist(ServiceRuleEntity serviceRule) {
 		String name = serviceRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Service rule '" + name + "' already exists");

@@ -85,7 +85,7 @@ public class ContainerRulesService {
 	}
 
 	public ContainerRuleEntity addRule(ContainerRuleEntity rule) {
-		assertRuleDoesntExist(rule);
+		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		//setLastUpdateContainerRules();
 		return rules.save(rule);
@@ -118,13 +118,13 @@ public class ContainerRulesService {
 	}
 
 	public ConditionEntity getCondition(String ruleName, String conditionName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
 			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
 	}
 
 	public List<ConditionEntity> getConditions(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
@@ -157,13 +157,13 @@ public class ContainerRulesService {
 	}
 
 	public ContainerEntity getContainer(String ruleName, String containerId) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getContainer(ruleName, containerId).orElseThrow(() ->
 			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
 	}
 
 	public List<ContainerEntity> getContainers(String ruleName) {
-		assertRuleExists(ruleName);
+		checkRuleExists(ruleName);
 		return rules.getContainers(ruleName);
 	}
 
@@ -194,13 +194,13 @@ public class ContainerRulesService {
 		//setLastUpdateContainerRules();
 	}
 
-	private void assertRuleExists(String ruleName) {
+	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
 			throw new EntityNotFoundException(ContainerRuleEntity.class, "ruleName", ruleName);
 		}
 	}
 
-	private void assertRuleDoesntExist(ContainerRuleEntity containerRule) {
+	private void checkRuleDoesntExist(ContainerRuleEntity containerRule) {
 		String name = containerRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");

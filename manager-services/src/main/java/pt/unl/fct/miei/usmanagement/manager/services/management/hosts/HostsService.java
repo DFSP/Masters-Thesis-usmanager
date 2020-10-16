@@ -243,9 +243,37 @@ public class HostsService {
 			.collect(Collectors.toList());
 	}
 
-	public HostAddress getClosestHost(Coordinates coordinates) {
+	public HostAddress getClosestInactiveHost(Coordinates coordinates) {
+		List<EdgeHostEntity> edgeHosts = edgeHostsService.getInactiveEdgeHosts();
+		edgeHosts.sort((oneEdgeHost, anotherEdgeHost) -> {
+			double oneDistance = oneEdgeHost.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherEdgeHost.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
 
-		return edgeHostsService.getEdgeHosts().get(0).getAddress();
+		List<CloudHostEntity> cloudHosts = cloudHostsService.getInactiveCloudHosts();
+		cloudHosts.sort((oneCloudHost, anotherCloudHost) -> {
+			double oneDistance = oneCloudHost.getRegion().getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherCloudHost.getRegion().getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+
+		final HostAddress hostAddress;
+		if (!edgeHosts.isEmpty() && !cloudHosts.isEmpty()) {
+			EdgeHostEntity edgeHost = edgeHosts.get(0);
+			double distanceToEdgeHost = edgeHost.getCoordinates().distanceTo(coordinates);
+			CloudHostEntity cloudHost = cloudHosts.get(0);
+			double distanceToCloudHost = cloudHost.getRegion().getCoordinates().distanceTo(coordinates);
+			hostAddress = distanceToEdgeHost <= distanceToCloudHost ? edgeHost.getAddress() : cloudHost.getAddress();
+		} else if (!edgeHosts.isEmpty()) {
+			hostAddress = edgeHosts.get(0).getAddress();
+		} else if (!cloudHosts.isEmpty()) {
+			hostAddress = cloudHosts.get(0).getAddress();
+		} else {
+			hostAddress = cloudHostsService.launchInstance(coordinates).getAddress();
+		}
+
+		return hostAddress;
 	}
 
 	public HostAddress getAvailableHost(double expectedMemoryConsumption, Coordinates coordinates) {
@@ -377,7 +405,7 @@ public class HostsService {
 		try {
 			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
 			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
-				cloudHost = cloudHostsService.startCloudHost(host, false);
+				cloudHost = cloudHostsService.startInstance(host, false);
 			}
 			hostAddress = cloudHost.getAddress();
 		}
@@ -389,22 +417,8 @@ public class HostsService {
 	}
 
 	public SimpleNode addHost(Coordinates coordinates, NodeRole role) {
-		getClosestHost(coordinates)
-		/*HostAddress hostAddress;
-		try {
-			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
-			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
-				cloudHost = cloudHostsService.startCloudHost(host, false);
-			}
-			hostAddress = cloudHost.getAddress();
-		}
-		catch (EntityNotFoundException e) {
-			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
-			hostAddress = edgeHost.getAddress();
-		}
-		return setupHost(hostAddress, role);*/
-		// TODO
-		return null;
+		HostAddress hostAddress = getClosestInactiveHost(coordinates);
+		return setupHost(hostAddress, role);
 	}
 
 	public void removeHost(HostAddress hostAddress) {
@@ -431,26 +445,26 @@ public class HostsService {
 			edgeHosts = edgeHostsService.getHostsByRegion(region);
 		}
 		return edgeHosts.stream()
-			.filter(edgeHost -> !nodesService.isPartOfSwarm(edgeHost.getHostname()))
+			.filter(edgeHost -> !nodesService.isPartOfSwarm(edgeHost.getAddress()))
 			.filter(this::isEdgeHostRunning)
 			.findFirst();
 	}
 
-	//TODO choose cloud host based on region
 	private CloudHostEntity chooseCloudHost() {
 		for (CloudHostEntity cloudHost : cloudHostsService.getCloudHosts()) {
 			int stateCode = cloudHost.getState().getCode();
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
-				String hostname = cloudHost.getPublicIpAddress();
-				if (!nodesService.isPartOfSwarm(hostname)) {
+				HostAddress hostAddress = cloudHost.getAddress();
+				if (!nodesService.isPartOfSwarm(hostAddress)) {
 					return cloudHost;
 				}
 			}
 			else if (stateCode == AwsInstanceState.STOPPED.getCode()) {
-				return cloudHostsService.startCloudHost(cloudHost, false);
+				return cloudHostsService.startInstance(cloudHost, false);
 			}
 		}
-		return cloudHostsService.startCloudHost();
+		Coordinates myCoordinates = hostAddress.getCoordinates();
+		return cloudHostsService.launchInstance(myCoordinates);
 	}
 
 	public List<String> executeCommand(String command, HostAddress hostAddress) {

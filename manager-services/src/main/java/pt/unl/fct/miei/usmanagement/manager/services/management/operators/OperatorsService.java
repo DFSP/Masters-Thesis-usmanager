@@ -62,7 +62,7 @@ public class OperatorsService {
 	}
 
 	public OperatorEntity addOperator(OperatorEntity operator) {
-		assertOperatorDoesntExist(operator);
+		checkOperatorDoesntExist(operator);
 		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
 		return operators.save(operator);
 	}
@@ -85,7 +85,7 @@ public class OperatorsService {
 		operators.delete(operator);
 	}
 
-	private void assertOperatorDoesntExist(OperatorEntity operator) {
+	private void checkOperatorDoesntExist(OperatorEntity operator) {
 		Operator op = operator.getOperator();
 		if (operators.hasOperator(op)) {
 			throw new DataIntegrityViolationException("Operator '" + op.getSymbol() + "' already exists");

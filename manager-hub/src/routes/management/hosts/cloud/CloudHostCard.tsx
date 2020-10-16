@@ -247,7 +247,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
                       value={`${cloudHost.placement.availabilityZone}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
-                      value={`(${cloudHost.coordinates.latitude.toFixed(3)}, ${cloudHost.coordinates.longitude.toFixed(3)})`}/>
+                      value={`(${cloudHost.region.coordinates.latitude.toFixed(3)}, ${cloudHost.region.coordinates.longitude.toFixed(3)})`}/>
             {cloudHost.managedByWorker &&
             <CardItem key={'managedByWorker'}
                       label={'Managed by worker'}

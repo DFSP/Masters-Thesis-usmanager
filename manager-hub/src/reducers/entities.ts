@@ -84,7 +84,7 @@ import {
     CLOUD_HOST_SUCCESS,
     CLOUD_HOSTS_FAILURE,
     CLOUD_HOSTS_REQUEST,
-    CLOUD_HOSTS_SUCCESS,
+    CLOUD_HOSTS_SUCCESS, CLOUD_REGIONS_FAILURE, CLOUD_REGIONS_REQUEST, CLOUD_REGIONS_SUCCESS,
     CONDITION_FAILURE,
     CONDITION_REQUEST,
     CONDITION_SUCCESS,
@@ -325,7 +325,7 @@ import {IDependent} from "../routes/management/services/ServiceDependentList";
 import {IPrediction} from "../routes/management/services/ServicePredictionList";
 import {IRuleService} from "../routes/management/rules/services/RuleService";
 import {IContainer} from "../routes/management/containers/Container";
-import {ICloudHost} from "../routes/management/hosts/cloud/CloudHost";
+import {ICloudHost, ICloudRegion} from "../routes/management/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/management/hosts/edge/EdgeHost";
 import {INode} from "../routes/management/nodes/Node";
 import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
@@ -386,6 +386,11 @@ export type EntitiesState = {
             loadRulesError: null,
             isLoadingSimulatedMetrics: boolean,
             loadSimulatedMetricsError?: string | null,
+            regions: {
+                data: ICloudRegion[],
+                isLoadingRegions: boolean,
+                loadRegionsError?: string | null,
+            }
         },
         edge: {
             data: { [key: string]: IEdgeHost },
@@ -561,7 +566,8 @@ export type EntitiesAction = {
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
-        scripts?: string[],
+        //scripts?: string[],
+        //cloudRegions?: ICloudRegion[],
     },
 };
 
@@ -610,6 +616,11 @@ const entities = (state: EntitiesState = {
                               loadRulesError: null,
                               isLoadingSimulatedMetrics: false,
                               loadSimulatedMetricsError: null,
+                              regions: {
+                                  data: [],
+                                  isLoadingRegions: false,
+                                  loadRegionsError: null,
+                              }
                           },
                           edge: {
                               data: {},
@@ -1509,6 +1520,26 @@ const entities = (state: EntitiesState = {
                 return merge({}, state, {hosts: {cloud: {data: {...normalizedCloudHost}}}});
             }
             break;
+        case CLOUD_REGIONS_REQUEST:
+            return merge({}, state, {hosts: {cloud: {regions: {isLoadingRegions: true, loadRegionsError: null}}}});
+        case CLOUD_REGIONS_FAILURE:
+            return merge({}, state, {hosts: {cloud: {regions: {isLoadingRegions: false, loadRegionsError: error}}}});
+        case CLOUD_REGIONS_SUCCESS:
+            return {
+                ...state,
+                hosts: {
+                    ...state.hosts,
+                    cloud: {
+                        ...state.hosts.cloud,
+                        regions: {
+                            data: merge([], pick(state.hosts.cloud.regions.data, keys(data)), data),
+                            isLoadingRegions: false,
+                            loadRegionsError: null,
+                        }
+                    }
+                }
+            };
+
         case EDGE_HOSTS_REQUEST:
         case EDGE_HOST_REQUEST:
             return merge({}, state, {hosts: {edge: {isLoadingHosts: true, loadHostsError: null}}});

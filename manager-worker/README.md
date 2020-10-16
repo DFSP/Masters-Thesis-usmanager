@@ -46,3 +46,12 @@ docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 manager-worker
 ```shell script
 docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 usmanager/manager-worker
 ```
+
+## Cloud
+
+Lançar a aplicação na cloud (aws):
+- https://aws.amazon.com/pt/blogs/devops/deploying-a-spring-boot-application-on-aws-using-aws-elastic-beanstalk/
+
+## Licença
+
+Worker manager está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

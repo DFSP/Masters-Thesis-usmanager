@@ -37,8 +37,6 @@ import {CheckboxList} from "./CheckboxList";
 import checkboxListStyles from "./CheckboxList.module.css";
 import {Link} from "react-router-dom";
 import LocationMap from "../map/LocationMap";
-import {Point} from "react-simple-maps";
-import Dialog from "../dialogs/Dialog";
 import {IMarker} from "../map/Marker";
 
 export interface IValidation {
@@ -58,7 +56,7 @@ export interface FieldProps<T = string> {
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
     disabled?: boolean;
     hidden?: boolean;
-    map?: {editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean}
+    map?: { editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[] }
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -213,8 +211,9 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                 <LocationMap
                                     onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
                                     onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
-                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id] : [formContext.values[id]]) : []}
-                                    marker={{size: 5, labeled: map?.labeled}} hover clickHighlight zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
+                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id].concat(map?.markers) : [formContext.values[id]].concat(map?.markers)) : map?.markers || []}
+                                    marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
+                                    zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
                                     resizable/>
                             )}
                             {getError(formContext.errors) && (

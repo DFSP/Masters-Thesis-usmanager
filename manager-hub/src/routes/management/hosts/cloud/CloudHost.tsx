@@ -25,7 +25,7 @@
 import {RouteComponentProps} from "react-router";
 import IDatabaseData from "../../../../components/IDatabaseData";
 import BaseComponent from "../../../../components/BaseComponent";
-import Form, {ICustomButton, IFormLoading} from "../../../../components/form/Form";
+import Form, {ICustomButton, IFields, IFormLoading, required} from "../../../../components/form/Form";
 import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
@@ -37,6 +37,7 @@ import {
     addCloudHostRule,
     addCloudHostSimulatedMetrics,
     loadCloudHosts,
+    loadCloudRegions,
     updateCloudHost
 } from "../../../../actions";
 import {connect} from "react-redux";
@@ -66,7 +67,7 @@ export interface ICloudHost extends IDatabaseData {
     publicIpAddress: string;
     privateIpAddress: string;
     placement: IPlacement;
-    coordinates: ICoordinates;
+    region: ICloudRegion;
     worker: IWorkerManager
     managedByWorker: IWorkerManager;
     hostRules?: string[];
@@ -87,7 +88,13 @@ export interface IPlacement {
     tenancy: string;
 }
 
-const buildNewCloudHost = (): Partial<ICloudHost> => ({});
+interface INewCloudHost {
+    coordinates?: ICoordinates,
+}
+
+const buildNewCloudHost = (): INewCloudHost => ({
+    coordinates: undefined,
+});
 
 export const awsInstanceStates = {
     PENDING: {name: "pending", code: 0},
@@ -98,15 +105,25 @@ export const awsInstanceStates = {
     STOPPED: {name: "stopped", code: 80}
 };
 
+export interface ICloudRegion {
+    zone: string,
+    name: string,
+    coordinates: ICoordinates,
+    available?: boolean,
+}
+
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
-    cloudHost: Partial<ICloudHost>;
+    cloudHost?: Partial<ICloudHost>;
     formCloudHost?: Partial<ICloudHost>;
+    newCloudHost?: INewCloudHost;
+    cloudRegions: ICloudRegion[];
 }
 
 interface DispatchToProps {
     loadCloudHosts: (instanceId: string) => void;
+    loadCloudRegions: () => void;
     addCloudHost: (cloudHost: ICloudHost) => void;
     updateCloudHost: (previousCloudHost: ICloudHost, currentCloudHost: ICloudHost) => void;
     addCloudHostRule: (cloudHost: string, ruleName: string) => void;
@@ -143,6 +160,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
     public componentDidMount(): void {
         this.loadCloudHost();
+        this.props.loadCloudRegions();
         this.mounted = true;
     };
 
@@ -169,7 +187,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private getCloudHost = () =>
-        this.state.cloudHost || this.props.cloudHost;
+        this.state.cloudHost || this.props.cloudHost || {};
 
     private getFormCloudHost = () =>
         this.state.formCloudHost || this.props.formCloudHost;
@@ -265,7 +283,7 @@ class CloudHost extends BaseComponent<Props, State> {
     private startStopTerminateButtons = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
         const cloudHost = this.getCloudHost();
-        const state = this.getCloudHost().state?.name;
+        const state = this.getCloudHost()?.state?.name;
         if (state?.includes(awsInstanceStates.STOPPED.name)) {
             buttons.push({
                 button:
@@ -295,7 +313,7 @@ class CloudHost extends BaseComponent<Props, State> {
                     </button>,
                 confirm: {
                     id: 'terminate-cloudHost',
-                    message: `terminate instance ${cloudHost.instanceId}`,
+                    message: `terminate instance ${cloudHost?.instanceId}`,
                     onClickConfirm: this.terminateCloudHost
                 }
             });
@@ -387,6 +405,22 @@ class CloudHost extends BaseComponent<Props, State> {
         this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, loading: undefined});
     };
 
+    private getFields = (cloudHost: Partial<ICloudHost> | INewCloudHost): IFields =>
+        Object.entries(cloudHost).map(([key, _]) => {
+            return {
+                [key]: {
+                    id: key,
+                    label: key,
+                    validation: {rule: required}
+                }
+            };
+        }).reduce((fields, field) => {
+            for (let key in field) {
+                fields[key] = field[key];
+            }
+            return fields;
+        }, {});
+
     private cloudHostState = (state: IState) =>
         state.name;
 
@@ -397,20 +431,20 @@ class CloudHost extends BaseComponent<Props, State> {
         worker.id.toString();
 
     private cloudHost = () => {
-        const {isLoading, error} = this.props;
-        const cloudHost = this.getCloudHost();
+        const {isLoading, error, newCloudHost} = this.props;
+        const isNewCloudHost = this.isNew();
+        const cloudHost = isNewCloudHost ? newCloudHost : this.getCloudHost();
         const formCloudHost = this.getFormCloudHost();
         // @ts-ignore
         const cloudHostKey: (keyof ICloudHost) = formCloudHost && Object.keys(formCloudHost)[0];
-        const isNewCloudHost = this.isNew();
         return (
             <>
                 {!isNewCloudHost && isLoading && <ListLoadingSpinner/>}
                 {!isNewCloudHost && !isLoading && error && <Error message={error}/>}
-                {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && formCloudHost && (
+                {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && cloudHost && (
                     /*@ts-ignore*/
                     <Form id={cloudHostKey}
-                          fields={{}}
+                          fields={this.getFields(cloudHost)}
                           values={cloudHost}
                           isNew={isNewCloudHost}
                           showSaveButton={this.shouldShowSaveButton()}
@@ -423,20 +457,31 @@ class CloudHost extends BaseComponent<Props, State> {
                           customButtons={this.startStopTerminateButtons()}
                           saveEntities={this.saveEntities}
                           loading={this.state.loading}>
-                        {Object.keys(formCloudHost).map((key, index) =>
-                            key === 'state'
-                                ? <Field<IState> key={index}
-                                                 id={key}
-                                                 label={key}
-                                                 valueToString={this.cloudHostState}/>
-                                : key === 'placement'
-                                ? <Field<IPlacement> key={index}
+                        {isNewCloudHost ?
+                            <Field key='coordinates' id='coordinates' type='map'
+                                   map={{
+                                       editable: this.isNew(),
+                                       singleMarker: true,
+                                       zoomable: true,
+                                       labeled: true,
+                                       markers: this.props.cloudRegions.map(region => ({
+                                           title: region.zone + " | " + region.name,
+                                           latitude: region.coordinates.latitude,
+                                           longitude: region.coordinates.longitude,
+                                           color: 'red'
+                                       }))
+                                   }}/>
+                            : formCloudHost && Object.keys(formCloudHost).map((key, index) =>
+                                key === 'state'
+                                    ? <Field<IState> key={index}
                                                      id={key}
                                                      label={key}
-                                                     valueToString={this.cloudHostPlacement}/>
-                                : key === 'coordinates'
-                                    ? <Field key='coordinates' id='coordinates' label='position' type='map'
-                                             map={{editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
+                                                     valueToString={this.cloudHostState}/>
+                                    : key === 'placement'
+                                    ? <Field<IPlacement> key={index}
+                                                         id={key}
+                                                         label={key}
+                                                         valueToString={this.cloudHostPlacement}/>
                                     : key === 'managedByWorker'
                                         ? <Field<IWorkerManager> key={index}
                                                                  id={key}
@@ -531,7 +576,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.hosts.cloud.isLoadingHosts;
     const error = state.entities.hosts.cloud.loadHostsError;
     const instanceId = props.match.params.instanceId;
-    const cloudHost = isNew(props.location.search) ? buildNewCloudHost() : state.entities.hosts.cloud.data[instanceId];
+    const cloudHost = !isNew(props.location.search) ? state.entities.hosts.cloud.data[instanceId] : undefined;
+    const newCloudHost = isNew(props.location.search) ? buildNewCloudHost() : undefined;
     let formCloudHost;
     if (cloudHost) {
         formCloudHost = {...cloudHost};
@@ -541,12 +587,15 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         isLoading,
         error,
         cloudHost,
-        formCloudHost
+        newCloudHost,
+        formCloudHost,
+        cloudRegions: state.entities.hosts.cloud.regions.data,
     }
 }
 
 const mapDispatchToProps: DispatchToProps = {
     loadCloudHosts,
+    loadCloudRegions,
     addCloudHost,
     updateCloudHost,
     addCloudHostRule,

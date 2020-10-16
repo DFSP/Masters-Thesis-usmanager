@@ -71,7 +71,7 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	public ServiceSimulatedMetricEntity addServiceSimulatedMetric(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
-		assertServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
+		checkServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
 		log.info("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
@@ -102,12 +102,12 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	public List<ServiceEntity> getServices(String simulatedMetricName) {
-		assertServiceSimulatedMetricExists(simulatedMetricName);
+		checkServiceSimulatedMetricExists(simulatedMetricName);
 		return serviceSimulatedMetrics.getServices(simulatedMetricName);
 	}
 
 	public ServiceEntity getService(String simulatedMetricName, String serviceName) {
-		assertServiceSimulatedMetricExists(simulatedMetricName);
+		checkServiceSimulatedMetricExists(simulatedMetricName);
 		return serviceSimulatedMetrics.getService(simulatedMetricName, serviceName).orElseThrow(() ->
 			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
 	}
@@ -138,13 +138,13 @@ public class ServiceSimulatedMetricsService {
 		serviceSimulatedMetrics.save(serviceMetric);
 	}
 
-	private void assertServiceSimulatedMetricExists(String simulatedMetricName) {
+	private void checkServiceSimulatedMetricExists(String simulatedMetricName) {
 		if (!serviceSimulatedMetrics.hasServiceSimulatedMetric(simulatedMetricName)) {
 			throw new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
 		}
 	}
 
-	private void assertServiceSimulatedMetricDoesntExist(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+	private void checkServiceSimulatedMetricDoesntExist(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
 		String name = serviceSimulatedMetric.getName();
 		if (serviceSimulatedMetrics.hasServiceSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated service metric '" + name + "' already exists");

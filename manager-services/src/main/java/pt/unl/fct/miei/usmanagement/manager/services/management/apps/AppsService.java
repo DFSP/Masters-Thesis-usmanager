@@ -74,7 +74,7 @@ public class AppsService {
 	}
 
 	public AppEntity addApp(AppEntity app) {
-		assertAppDoesntExist(app);
+		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
 		return apps.save(app);
 	}
@@ -97,7 +97,7 @@ public class AppsService {
 	}
 
 	public List<AppServiceEntity> getServices(String appName) {
-		assertAppExists(appName);
+		checkAppExists(appName);
 		return apps.getServices(appName);
 	}
 
@@ -137,13 +137,13 @@ public class AppsService {
 		return containersService.launchApp(services, coordinates);
 	}
 
-	private void assertAppExists(String appName) {
+	private void checkAppExists(String appName) {
 		if (!apps.hasApp(appName)) {
 			throw new EntityNotFoundException(AppEntity.class, "name", appName);
 		}
 	}
 
-	private void assertAppDoesntExist(AppEntity app) {
+	private void checkAppDoesntExist(AppEntity app) {
 		String name = app.getName();
 		if (apps.hasApp(name)) {
 			throw new DataIntegrityViolationException("App '" + name + "' already exists");

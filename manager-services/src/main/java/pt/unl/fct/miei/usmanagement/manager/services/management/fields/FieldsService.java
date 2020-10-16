@@ -60,7 +60,7 @@ public class FieldsService {
 	}
 
 	public FieldEntity addField(FieldEntity field) {
-		assertFieldDoesntExist(field);
+		checkFieldDoesntExist(field);
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		return fields.save(field);
 	}
@@ -83,7 +83,7 @@ public class FieldsService {
 		fields.delete(field);
 	}
 
-	private void assertFieldDoesntExist(FieldEntity field) {
+	private void checkFieldDoesntExist(FieldEntity field) {
 		String fieldName = field.getName();
 		if (fields.hasField(fieldName)) {
 			throw new DataIntegrityViolationException("Field '" + fieldName + "' already exists");
