@@ -22,19 +22,14 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master.exceptions;
+package pt.unl.fct.miei.usmanagement.manager.master.management.workermanagers;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public final class NotFoundException extends RuntimeException {
+@Data
+final class LaunchWorkerManager {
 
-	public NotFoundException() {
-	}
-
-	public NotFoundException(String s, Object... args) {
-		super(String.format(s, args));
-	}
+	private HostAddress hostAddress;
 
 }

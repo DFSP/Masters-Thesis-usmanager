@@ -51,6 +51,9 @@ import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
 import {Point} from "react-simple-maps";
+import {ICoordinates} from "../../../components/map/LocationMap";
+import {IMarker} from "../../../components/map/Marker";
+import {IContainer} from "../containers/Container";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
@@ -99,7 +102,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-    loadNodes: (nodeId: string) => void;
+    loadNodes: (nodeId?: string) => void;
     addNode: (node: INode) => void;
     updateNode: (previousNode: INode, currentNode: INode) => void;
     loadEdgeHosts: () => void;
@@ -138,6 +141,7 @@ class Node extends BaseComponent<Props, State> {
 
     public componentDidMount(): void {
         this.loadNode();
+        this.props.loadNodes();
         this.props.loadEdgeHosts();
         this.props.loadCloudHosts();
         this.props.loadRegions();
@@ -316,12 +320,35 @@ class Node extends BaseComponent<Props, State> {
         return cloudHosts.concat(edgeHosts);
     };
 
-    private hostnameLink = (hostname: string) => {
-        if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
-            return '/hosts/cloud';
+    private getNodesMarkers = (): IMarker[] => {
+        const nodes: INode[] = Object.values(this.props.nodes);
+        const markers = new Map<string, IMarker>();
+        nodes
+            .forEach(node => {
+                const id = node.id.toString();
+                const markerId = node.labels['coordinates'];
+                const coordinates = JSON.parse(node.labels['coordinates']) as ICoordinates;
+                const marker = markers.get(markerId) || { title: '', label: '', latitude: 0, longitude: 0 };
+                if (marker.title === '') {
+                    marker.title += coordinates.label + '<br/>';
+                }
+                marker.title += id + ' - ' + node.publicIpAddress + '/' + node.labels['privateIpAddress'] + '<br/>';
+                marker.label = id;
+                marker.latitude = coordinates.latitude;
+                marker.longitude = coordinates.longitude;
+                markers.set(markerId, marker);
+            });
+        return Array.from(markers.values());
+    }
+
+    private hostLink = (publicIpAddress: string) => {
+        const cloudHost = Object.values(this.props.cloudHosts).filter(c => c.publicIpAddress === publicIpAddress)[0];
+        if (cloudHost) {
+            return '/hosts/cloud/' + cloudHost.instanceId;
         }
-        if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname)) {
-            return '/hosts/edge';
+        const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
+        if (edgeHost) {
+            return '/hosts/edge/' + edgeHost.publicIpAddress;
         }
         return null;
     }
@@ -362,7 +389,12 @@ class Node extends BaseComponent<Props, State> {
                                    values: ['MANAGER', 'WORKER']
                                }}/>
                         <Field key='coordinates' id='coordinates' label='select position(s)' type='map'
-                               map={{loading: this.props.isLoading, editable: true, labeled: false}}/>
+                               map={{
+                                   loading: this.props.isLoading,
+                                   editable: true,
+                                   labeled: false,
+                                   markers: this.getNodesMarkers()
+                               }}/>
                     </>
                 :
                 formNode && Object.entries(formNode).map(([key, value], index) =>
@@ -386,11 +418,11 @@ class Node extends BaseComponent<Props, State> {
                                  }}
                                  disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'
                                  || (node && 'labels' in node && (node as INode).labels?.['masterManager'] === 'true')}/>
-                        : key === 'hostname'
+                        : key === 'publicIpAddress'
                             ? <Field key={index}
                                      id={key}
                                      label={key}
-                                     icon={{linkedTo: this.hostnameLink}}/>
+                                     icon={{linkedTo: this.hostLink}}/>
                             : <Field key={index}
                                      id={key}
                                      label={key}

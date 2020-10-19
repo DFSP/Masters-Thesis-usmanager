@@ -60,8 +60,8 @@ public class WorkerManagersController {
 	}
 
 	@PostMapping
-	public WorkerManagerEntity launchWorkerManager(@RequestBody HostAddress hostAddress) {
-		return workerManagersService.launchWorkerManager(hostAddress);
+	public WorkerManagerEntity launchWorkerManager(@RequestBody LaunchWorkerManager launchWorkerManager) {
+		return workerManagersService.launchWorkerManager(launchWorkerManager.getHostAddress());
 	}
 
 	@DeleteMapping("/{workerManagerId}")

@@ -133,7 +133,7 @@ class EurekaServerCard extends BaseComponent<Props, State> {
                                          state: eurekaServer
                                      }
                                  }}
-                                 height={'90px'}
+                                 height={'85px'}
                                  margin={'10px 0'}
                                  hoverable
                                  delete={{
@@ -144,8 +144,8 @@ class EurekaServerCard extends BaseComponent<Props, State> {
                                  }}
                                  loading={loading}
                                  bottomContextMenuItems={this.contextMenu()}>
-            <CardItem key={'hostname'}
-                      label={'Hostname'}
+            <CardItem key={'host'}
+                      label={'Host'}
                       value={eurekaServer.publicIpAddress}/>
             <CardItem key={'ports'}
                       label={'Ports'}

@@ -40,6 +40,7 @@ import {isNew} from "../../../utils/router";
 import {IContainer} from "../containers/Container";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {ILoadBalancer} from "../loadBalancers/LoadBalancer";
 
 export interface IEurekaServer extends IContainer {
 }
@@ -215,6 +216,16 @@ class EurekaServer extends BaseComponent<Props, State> {
                                              label={key}
                                              type={'list'}
                                              value={value}/>
+                                    : key === 'containerId'
+                                    ? <Field key={index}
+                                             id={key}
+                                             label={key}
+                                             icon={{linkedTo: '/containers/' + (formEurekaServer as Partial<IEurekaServer>).containerId}}/>
+                                    : key === 'created'
+                                        ? <Field key={index}
+                                                 id={key}
+                                                 label={key}
+                                                 type={"date"}/>
                                     : <Field key={index}
                                              id={key}
                                              label={key}/>
@@ -241,6 +252,7 @@ function removeFields(eurekaServer: Partial<IEurekaServer>) {
     delete eurekaServer["ports"];
     delete eurekaServer["labels"];
     delete eurekaServer["logs"];
+    delete eurekaServer["coordinates"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

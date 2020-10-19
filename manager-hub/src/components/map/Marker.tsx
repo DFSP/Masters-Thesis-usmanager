@@ -29,11 +29,13 @@ import {ICoordinates} from "./LocationMap";
 export interface IMarker extends ICoordinates {
     title: string,
     color?: string,
+    titleCoordinates?: boolean,
 }
 
 interface Props {
     setTooltipContent: (tooltip: string) => void;
     title: string;
+    titleCoordinates: boolean;
     label?: string;
     location: Point;
     color: string;
@@ -41,12 +43,25 @@ interface Props {
     onRemove?: () => void;
 }
 
-export default function Marker({setTooltipContent, title, label, location, color, size, onRemove}: Props) {
+export default function Marker({setTooltipContent, title, titleCoordinates, label, location, color, size, onRemove}: Props) {
+    let tooltip = "";
+    if (title) {
+        tooltip += title;
+        if (titleCoordinates) {
+            tooltip +=  ' (';
+        }
+    }
+    if (titleCoordinates) {
+        tooltip += `Lat: ${location[1].toFixed(2)}, Lon: ${location[0].toFixed(2)}`;
+        if (title) {
+            tooltip += ')';
+        }
+    }
     return (
         <>
             <circle r={size}
                     fill={color}
-                    onMouseEnter={() => setTooltipContent(`${title ? title + ' (' : ''}Lat: ${location[1].toFixed(2)}, Lon: ${location[0].toFixed(2)}${title ? ')' : ''}`)}
+                    onMouseEnter={() => setTooltipContent(tooltip)}
                     onMouseLeave={() => setTooltipContent("")}
                     onClick={onRemove}/>
             {label &&

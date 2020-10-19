@@ -237,9 +237,19 @@ class LoadBalancer extends BaseComponent<Props, State> {
                                              label={key}
                                              type={'list'}
                                              value={value}/>
-                                    : <Field key={index}
-                                             id={key}
-                                             label={key}/>
+                                    : key === 'containerId'
+                                        ? <Field key={index}
+                                                 id={key}
+                                                 label={key}
+                                                 icon={{linkedTo: '/containers/' + (formLoadBalancer as Partial<ILoadBalancer>).containerId}}/>
+                                        :  key === 'created'
+                                            ? <Field key={index}
+                                                     id={key}
+                                                     label={key}
+                                                     type={"date"}/>
+                                            : <Field key={index}
+                                                     id={key}
+                                                     label={key}/>
                         ))}
                     </Form>
                 )}
@@ -263,6 +273,7 @@ function removeFields(loadBalancer: Partial<ILoadBalancer>) {
     delete loadBalancer["ports"];
     delete loadBalancer["labels"];
     delete loadBalancer["logs"];
+    delete loadBalancer["coordinates"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

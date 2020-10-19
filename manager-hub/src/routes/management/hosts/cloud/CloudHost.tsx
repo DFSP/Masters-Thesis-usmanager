@@ -495,6 +495,7 @@ class CloudHost extends BaseComponent<Props, State> {
                                                                valueToMarkers: (regions: ICloudRegion[]): IMarker[] =>
                                                                    regions.map(region => ({
                                                                        title: region.zone + " | " + region.name,
+                                                                       label: formCloudHost?.instanceId,
                                                                        latitude: region.coordinates.latitude,
                                                                        longitude: region.coordinates.longitude,
                                                                    }))

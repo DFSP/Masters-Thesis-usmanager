@@ -28,21 +28,41 @@ import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
 import M from "materialize-css";
+import {RouteComponentProps, withRouter} from "react-router";
+import {UnregisterCallback} from "history";
+import {bindActionCreators} from "redux";
+import {updateSearch} from "../../actions";
 
 interface StateToProps {
     sidenavVisible: boolean;
+}
+
+interface DispatchToProps {
+    updateSearch: (search: string) => void;
 }
 
 interface IMainLayout {
     children?: React.ReactNode;
 }
 
-type Props = IMainLayout & StateToProps;
+type Props = IMainLayout & StateToProps & DispatchToProps & RouteComponentProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
+    private historyChangeUnlisten: UnregisterCallback | null = null;
+
     public componentDidMount(): void {
         M.AutoInit();
+    }
+
+    componentWillMount() {
+        this.historyChangeUnlisten = this.props.history.listen((location, action) => {
+            this.props.updateSearch('');
+        });
+    }
+
+    componentWillUnmount() {
+        this.historyChangeUnlisten?.();
     }
 
     public render() {
@@ -72,4 +92,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     }
 );
 
-export default connect(mapStateToProps)(MainLayout);
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({updateSearch}, dispatch);
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MainLayout));

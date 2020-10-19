@@ -112,9 +112,6 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                                   }}
                                   loading={loading}
                                   bottomContextMenuItems={this.contextMenu()}>
-            <CardItem key={'startedAt'}
-                      label={'Started at'}
-                      value={workerManager.startedAt}/>
             <CardItem key={'container'}
                       label={'Container'}
                       value={workerManager.container.containerId}/>

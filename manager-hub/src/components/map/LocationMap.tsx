@@ -64,7 +64,7 @@ export default class LocationMap extends React.Component<Props, State> {
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         if (prevProps.zoomable !== this.props.zoomable) {
-            this.resizeMarkers({ coordinates: [0, 0], zoom: 1 });
+            this.resizeMarkers({coordinates: [0, 0], zoom: 1});
         }
     }
 
@@ -81,6 +81,7 @@ export default class LocationMap extends React.Component<Props, State> {
             coordinates: [location.longitude, location.latitude],
             marker: <Marker key={key} setTooltipContent={this.setTooltip}
                             title={location.title} label={marker?.labeled ? location.label : undefined}
+                            titleCoordinates={location.titleCoordinates === undefined ? true : location.titleCoordinates}
                             location={[location.longitude, location.latitude]}
                             color={location.color || marker?.color || "#2196F3"} size={markerSize}
                             onRemove={() => {
@@ -97,7 +98,9 @@ export default class LocationMap extends React.Component<Props, State> {
             <MapChart setTooltipContent={this.setTooltip} onClick={onSelect} markers={markers} hover={hover}
                       clickHighlight={clickHighlight} zoomable={zoomable} position={position} center={center}
                       onZoom={this.resizeMarkers}/>
-            <ReactTooltip>{tooltip}</ReactTooltip>
+            <ReactTooltip html multiline>
+                {tooltip}
+            </ReactTooltip>
         </>;
         return <>
             {resizable &&

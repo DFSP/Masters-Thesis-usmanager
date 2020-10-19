@@ -48,6 +48,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.MethodNotAllowedException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -242,6 +243,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleDeleteFailure(ObjectOptimisticLockingFailureException ex) {
 		ApiError apiError = new ApiError(HttpStatus.GONE);
 		apiError.setMessage("entity is not available anymore");
+		return buildResponseEntity(apiError);
+	}
+
+	@ExceptionHandler(MethodNotAllowedException.class)
+	protected ResponseEntity<Object> handleMethodNotAllowed(MethodNotAllowedException ex) {
+		ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED);
+		apiError.setMessage(ex.getMessage());
 		return buildResponseEntity(apiError);
 	}
 

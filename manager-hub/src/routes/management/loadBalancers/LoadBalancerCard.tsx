@@ -133,7 +133,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
                                          state: loadBalancer
                                      }
                                  }}
-                                 height={'125px'}
+                                 height={'85px'}
                                  margin={'10px 0'}
                                  hoverable
                                  delete={{
@@ -144,8 +144,8 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
                                  }}
                                  loading={loading}
                                  bottomContextMenuItems={this.contextMenu()}>
-            <CardItem key={'hostname'}
-                      label={'Hostname'}
+            <CardItem key={'host'}
+                      label={'Host'}
                       value={loadBalancer.publicIpAddress}/>
             <CardItem key={'ports'}
                       label={'Ports'}

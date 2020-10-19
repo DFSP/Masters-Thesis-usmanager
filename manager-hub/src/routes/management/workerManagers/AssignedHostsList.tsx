@@ -93,8 +93,8 @@ class AssignedHostsList extends BaseComponent<Props, State> {
             data={this.props.assignedHosts}
             dropdown={{
                 id: 'workerManagerHosts',
-                title: 'Add host',
-                empty: 'No hosts to add',
+                title: 'Assign host',
+                empty: 'No hosts to assign',
                 data: this.getSelectableHosts(),
             }}
             show={this.assignedHost}

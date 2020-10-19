@@ -40,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.Mode;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
@@ -143,7 +144,7 @@ public class HostsService {
 
 	public HostAddress getHostAddress() {
 		if (hostAddress == null) {
-			throw new ManagerException("host address is not set yet");
+			throw new MethodNotAllowedException("manager initialization did not finish");
 		}
 		return hostAddress;
 	}

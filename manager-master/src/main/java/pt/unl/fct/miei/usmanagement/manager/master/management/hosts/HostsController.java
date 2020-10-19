@@ -74,77 +74,77 @@ public class HostsController {
 		return cloudHostsService.syncCloudHosts();
 	}
 
-	@GetMapping("/cloud/{id}")
-	public CloudHostEntity getCloudHost(@PathVariable String id) {
-		return cloudHostsService.getCloudHostByIdOrIp(id);
+	@GetMapping("/cloud/{instanceId}")
+	public CloudHostEntity getCloudHost(@PathVariable String instanceId) {
+		return cloudHostsService.getCloudHostById(instanceId);
 	}
 
-	@PostMapping("/cloud/{id}/state")
-	public CloudHostEntity changeCloudHostState(@PathVariable String id, @RequestBody String action) {
+	@PostMapping("/cloud/{instanceId}/state")
+	public CloudHostEntity changeCloudHostState(@PathVariable String instanceId, @RequestBody String action) {
 		switch (action) {
 			case "start":
-				return cloudHostsService.startInstance(id, true);
+				return cloudHostsService.startInstance(instanceId, true);
 			case "stop":
-				return cloudHostsService.stopInstance(id);
+				return cloudHostsService.stopInstance(instanceId);
 			default:
 				throw new BadRequestException("Invalid request body: expected 'start' or 'stop'");
 		}
 	}
 
-	@DeleteMapping("/cloud/{hostname}")
-	public void terminateCloudInstance(@PathVariable String hostname) {
-		cloudHostsService.terminateInstance(hostname, true);
+	@DeleteMapping("/cloud/{instanceId}")
+	public void terminateCloudInstance(@PathVariable String instanceId) {
+		cloudHostsService.terminateInstance(instanceId, true);
 	}
 
-	@GetMapping("/cloud/{hostname}/rules/{ruleName}")
-	public HostRuleEntity getCloudHostRule(@PathVariable String hostname, String ruleName) {
-		return cloudHostsService.getRule(hostname, ruleName);
+	@GetMapping("/cloud/{instanceId}/rules/{ruleName}")
+	public HostRuleEntity getCloudHostRule(@PathVariable String instanceId, String ruleName) {
+		return cloudHostsService.getRule(instanceId, ruleName);
 	}
 
-	@GetMapping("/cloud/{hostname}/rules")
-	public List<HostRuleEntity> getCloudHostRules(@PathVariable String hostname) {
-		return cloudHostsService.getRules(hostname);
+	@GetMapping("/cloud/{instanceId}/rules")
+	public List<HostRuleEntity> getCloudHostRules(@PathVariable String instanceId) {
+		return cloudHostsService.getRules(instanceId);
 	}
 
-	@PostMapping("/cloud/{hostname}/rules")
-	public void addCloudHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
-		cloudHostsService.addRules(hostname, Arrays.asList(rules));
+	@PostMapping("/cloud/{instanceId}/rules")
+	public void addCloudHostRules(@PathVariable String instanceId, @RequestBody String[] rules) {
+		cloudHostsService.addRules(instanceId, Arrays.asList(rules));
 	}
 
-	@DeleteMapping("/cloud/{hostname}/rules")
-	public void removeCloudHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
-		cloudHostsService.removeRules(hostname, Arrays.asList(rules));
+	@DeleteMapping("/cloud/{instanceId}/rules")
+	public void removeCloudHostRules(@PathVariable String instanceId, @RequestBody String[] rules) {
+		cloudHostsService.removeRules(instanceId, Arrays.asList(rules));
 	}
 
-	@DeleteMapping("/cloud/{hostname}/rules/{ruleName}")
-	public void removeCloudHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
-		cloudHostsService.removeRule(hostname, ruleName);
+	@DeleteMapping("/cloud/{instanceId}/rules/{ruleName}")
+	public void removeCloudHostRule(@PathVariable String instanceId, @PathVariable String ruleName) {
+		cloudHostsService.removeRule(instanceId, ruleName);
 	}
 
-	@GetMapping("/cloud/{hostname}/simulated-metrics")
-	public List<HostSimulatedMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String hostname) {
-		return cloudHostsService.getSimulatedMetrics(hostname);
+	@GetMapping("/cloud/{instanceId}/simulated-metrics")
+	public List<HostSimulatedMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
+		return cloudHostsService.getSimulatedMetrics(instanceId);
 	}
 
-	@GetMapping("/cloud/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public HostSimulatedMetricEntity getCloudHostSimulatedMetric(@PathVariable String hostname,
+	@GetMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
+	public HostSimulatedMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
 																 @PathVariable String simulatedMetricName) {
-		return cloudHostsService.getSimulatedMetric(hostname, simulatedMetricName);
+		return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
 	}
 
-	@PostMapping("/cloud/{hostname}/simulated-metrics")
-	public void addCloudHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
-		cloudHostsService.addSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+	@PostMapping("/cloud/{instanceId}/simulated-metrics")
+	public void addCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
+		cloudHostsService.addSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
 	}
 
-	@DeleteMapping("/cloud/{hostname}/simulated-metrics")
-	public void removeCloudHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
-		cloudHostsService.removeSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+	@DeleteMapping("/cloud/{instanceId}/simulated-metrics")
+	public void removeCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
+		cloudHostsService.removeSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
 	}
 
-	@DeleteMapping("/cloud/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public void removeCloudHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
-		cloudHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
+	@DeleteMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
+	public void removeCloudHostSimulatedMetric(@PathVariable String instanceId, @PathVariable String simulatedMetricName) {
+		cloudHostsService.removeSimulatedMetric(instanceId, simulatedMetricName);
 	}
 
 	@GetMapping("/cloud/regions")

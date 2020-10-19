@@ -80,18 +80,10 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
         this.updateField();
     }
 
-    private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any, valueToString: ((v: T) => string) | undefined): JSX.Element => {
+    private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any): JSX.Element => {
         const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
-        const valueString = value === undefined ? '' : (valueToString ? valueToString(value) : value);
-        let link;
-        if (typeof linkedTo === 'string') {
-            link = `${linkedTo}/${valueString}`;
-        } else if (linkedTo(value) !== null) {
-            link = `${linkedTo(value)}/${valueString}`;
-        } else {
-            return icon;
-        }
-        return <Link to={link}>{icon}</Link>;
+        const link = typeof linkedTo === 'string' ? linkedTo : linkedTo(value)
+        return link ? <Link to={link}>{icon}</Link> : icon;
     }
 
     public render() {
@@ -119,7 +111,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                     {(icon?.include === undefined || icon?.include) &&
                                     <i className="material-icons prefix">
                                         {icon?.linkedTo
-                                            ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id], valueToString)
+                                            ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id])
                                             : icon?.name ? icon.name : mapLabelToMaterialIcon(label, formContext.values[id])}
                                     </i>}
                                     <label className="active" htmlFor={id}>

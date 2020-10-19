@@ -47,19 +47,19 @@ import {INode} from "../nodes/Node";
 import AssignedHostsList from "./AssignedHostsList";
 import SshCommand from "../ssh/SshCommand";
 import {ILoadBalancer} from "../loadBalancers/LoadBalancer";
+import {IHostAddress} from "../hosts/Hosts";
 
 export interface IWorkerManager extends IDatabaseData {
-    startedAt: string,
     container: IContainer,
     assignedHosts?: string[],
 }
 
 interface INewWorkerManager {
-    host: IEdgeHost | ICloudHost | undefined,
+    hostAddress: IHostAddress | undefined,
 }
 
 const buildNewWorkerManager = (): INewWorkerManager => ({
-    host: undefined,
+    hostAddress: undefined,
 });
 
 interface StateToProps {
@@ -227,15 +227,24 @@ class WorkerManager extends BaseComponent<Props, State> {
             return fields;
         }, {});
 
-    private getSelectableHosts = () =>
+    private getSelectableHosts = (): Partial<IHostAddress>[] =>
         Object.entries(this.props.nodes)
             .filter(([_, node]) => node.state === 'ready')
-            .map(([_, node]) => node.publicIpAddress)
+            .map(([_, node]) =>
+                ({
+                    username: node.labels['username'],
+                    publicIpAddress: node.publicIpAddress,
+                    privateIpAddress: node.labels['privateIpAddress'],
+                    coordinates: node.labels['coordinates'] ? JSON.parse(node.labels['coordinates']) : undefined,
+                }))
+
+    private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
 
     private containerIdField = (container: IContainer) =>
         container.containerId;
 
-    private containerHostnameField = (container: IContainer) =>
+    private containerPublicIpAddressField = (container: IContainer) =>
         container.publicIpAddress;
 
     private workerManager = () => {
@@ -270,28 +279,29 @@ class WorkerManager extends BaseComponent<Props, State> {
                           }}
                           saveEntities={this.saveEntities}>
                         {Object.entries(formWorkerManager).map((([key, value], index) =>
-                                key === 'host'
-                                    ? <Field key={index}
-                                             id={key}
-                                             label={key}
-                                             type={'dropdown'}
-                                             dropdown={{
-                                                 defaultValue: "Select host",
-                                                 values: this.getSelectableHosts(),
-                                                 emptyMessage: 'No hosts available'
-                                             }}/>
+                                key === 'hostAddress'
+                                    ?  <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                                                     id={'hostAddress'}
+                                                                     label={'hostAddress'}
+                                                                     type={'dropdown'}
+                                                                     dropdown={{
+                                                                         defaultValue: "Select host address",
+                                                                         values: this.getSelectableHosts(),
+                                                                         optionToString: this.hostAddressesDropdown,
+                                                                         emptyMessage: 'No hosts available'
+                                                                     }}/>
                                     : key === 'container'
                                     ? <>
                                         <Field<IContainer> key={index}
                                                            id={key}
                                                            label={key + " id"}
                                                            valueToString={this.containerIdField}
-                                                           icon={{linkedTo: `/containers`}}/>
+                                                           icon={{linkedTo: `/containers/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
                                         <Field<IContainer>
                                             key={index + 1} // index + 1 is ok unless there are more fields after this one
                                             id={key}
-                                            label={"hostname"}
-                                            valueToString={this.containerHostnameField}/>
+                                            label={"host"}
+                                            valueToString={this.containerPublicIpAddressField}/>
                                     </>
                                     : <Field key={index}
                                              id={key}

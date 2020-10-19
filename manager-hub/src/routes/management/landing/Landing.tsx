@@ -32,6 +32,8 @@ import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
 import {IMarker} from "../../../components/map/Marker";
+import UnsavedChanges from "../../../components/form/UnsavedChanges";
+import {Error} from "../../../components/errors/Error";
 
 interface StateToProps {
     isLoading: boolean;
@@ -73,15 +75,28 @@ class Landing extends React.Component<Props, State> {
     private handleCenter = () =>
         this.setState({center: !this.state.center})
 
-    private getContainers = (): IMarker[] =>
-        Object.values(this.props.containers).map((container, index) => ({
-            title: container.publicIpAddress,
-            label: container.containerId.substr(0, 5),
-            latitude: 10 * index,
-            longitude: 10 * index,
-        }))
+    private getContainersMarkers = (): IMarker[] => {
+        const containers: IContainer[] = Object.values(this.props.containers);
+        const markers = new Map<String, IMarker>();
+        containers
+            .forEach(container => {
+                const publicIpAddress = container.publicIpAddress;
+                const marker = markers.get(publicIpAddress) || { title: '', label: '', latitude: 0, longitude: 0 };
+                if (marker.title === '') {
+                    marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
+                }
+                marker.title += container.containerId.substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+                marker.label = publicIpAddress;
+                marker.latitude = container.coordinates.latitude;
+                marker.longitude = container.coordinates.longitude;
+                markers.set(publicIpAddress, marker);
+            });
+        return Array.from(markers.values());
+    }
 
     public render() {
+        const {error} = this.props;
+        const {center} = this.state;
         const centerButton =
             <button className={`btn-floating btn-flat right tooltipped ${styles.centerButton}`}
                     data-position={'bottom'}
@@ -90,9 +105,11 @@ class Landing extends React.Component<Props, State> {
                     type='button'>
                 <i className="material-icons">center_focus_weak</i>;
             </button>;
-        const map =
-            <LocationMap locations={this.getContainers()} zoomable center={this.state.center} hover
-                         marker={{labeled: true}}/>;
+        const map = <>
+            {error && <Error message={error}/>}
+            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover
+                                    marker={{labeled: true}}/>}
+        </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
                 <button className={`modal-trigger btn-floating btn-flat right tooltipped`}

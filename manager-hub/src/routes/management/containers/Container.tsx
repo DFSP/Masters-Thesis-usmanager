@@ -467,12 +467,14 @@ class Container extends BaseComponent<Props, State> {
         });
     };
 
-    private hostnameLink = (hostname: string) => {
-        if (Object.values(this.props.cloudHosts).map(c => c.publicIpAddress).includes(hostname)) {
-            return '/hosts/cloud';
+    private hostLink = (publicIpAddress: string) => {
+        const cloudHost = Object.values(this.props.cloudHosts).filter(c => c.publicIpAddress === publicIpAddress)[0];
+        if (cloudHost) {
+            return '/hosts/cloud/' + cloudHost.instanceId;
         }
-        if (Object.values(this.props.edgeHosts).map(e => e.publicIpAddress).includes(hostname)) {
-            return '/hosts/edge';
+        const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
+        if (edgeHost) {
+            return '/hosts/edge/' + edgeHost.publicIpAddress;
         }
         return null;
     }
@@ -521,7 +523,7 @@ class Container extends BaseComponent<Props, State> {
                         ? <Field key={index}
                                  id={key}
                                  label={key}
-                                 icon={{linkedTo: this.hostnameLink}}/>
+                                 icon={{linkedTo: this.hostLink}}/>
                         : key === 'coordinates'
                             ? <Field key='coordinates' id='coordinates' label='location' type='map'
                                      map={{loading: this.props.isLoading, editable: false, zoomable: true, labeled: true}}/>
