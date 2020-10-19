@@ -36,6 +36,8 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [registration-client-go](registration-client-go)
 
+- [request-location-monitor](request-location-monitor)
+
 - microserviços
   - sock-shop
     - [carts](microservices/sock-shop/carts)

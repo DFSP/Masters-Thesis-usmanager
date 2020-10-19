@@ -20,16 +20,42 @@ docker build -f docker/Dockerfile . -t request-location-monitor
 docker run --rm -p 1919:1919 request-location-monitor
 ```
 
-#### API Endpoints
+## API Endpoints
 
 Os URIs são relativos a *http://localhost:1919/api*
 
 HTTP request | Description
 ------------ | -------------
-**Get** /monitoringinfo | List all monitoring info
-**Get** /monitoringinfo/{serviceName} | List monitoring info by service
-**Get** /monitoringinfo/{serviceName}/top | List monitoring info by service, with top location requests
+**Get** /monitoring | Lista toda a monitorização registada
+**Get** /monitoring?aggregation | Lista toda a monitorização registada agregada por serviço, nos últimos 60 segundos
+**Get** /monitoring?aggregation&interval={seconds} | Lista toda a monitorização registada agregada por serviço, nos últimos {seconds} segundos
+**Post** /monitoring | Adiciona uma nova monitorização: `{service, continent, region, country, city}`
 
-#### License
+## Exemplo
+
+Regista uma nova monitorização de um serviço:
+```shell script
+curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"service":"app","continent":"eu","region":"eu-central","country":"pt","city":"lisbon"}' \
+     http://localhost:1919/api/monitoring
+```
+
+Ver todas as monitorizações:
+```shell script
+curl http://localhost:1919/api/monitoring
+```
+
+Ver todas as monitorizações, no últimos 60 segundos, agregadas por serviço:
+```shell script
+curl http://localhost:1919/api/monitoring?aggregation
+```
+
+Ver todas as monitorizações, no últimos 120 segundos, agregadas por serviço:
+```shell script
+curl http://localhost:1919/api/monitoring?aggregation&interval=120
+```
+
+## License
 
 Request-location-monitor está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

@@ -40,12 +40,27 @@ func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/api/monitoringinfo/all", api.ListAllMonitoring).Methods("GET")
-	router.HandleFunc("/api/monitoringinfo/all/top", api.ListAllMonitoringTop).Methods("GET")
-	router.HandleFunc("/api/monitoringinfo/all/top/{seconds}", api.ListAllMonitoringTop).Methods("GET")
-	//router.HandleFunc("/api/monitoringinfo/service/{serviceName}", api.AddServer).Methods("GET")
-	//router.HandleFunc("/api/monitoringinfo/service/{serviceName}/top", api.DeleteServer).Methods("GET")
-	router.HandleFunc("/api/monitoringinfo/add", api.AddMonitoringData).Methods("POST")
-	log.Printf("-> request-location-monitor is listening on port %s.", *port)
+
+	router.Methods("GET").
+		Path("/api/monitoring").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("GET").
+		Path("/api/monitoring").
+		Queries("aggregation", "").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("GET").
+		Path("/api/monitoring").
+		Queries(
+			"interval", "",
+			"interval", "{[0-9]+}").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("POST").
+		Path("/api/monitoring").
+		HandlerFunc(api.AddMonitoring)
+
+	log.Printf("Request-location-monitor is listening on port %s.", *port)
 	log.Fatal(http.ListenAndServe(":"+*port, router))
 }
