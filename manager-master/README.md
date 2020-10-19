@@ -90,6 +90,7 @@ Lançar a aplicação na cloud (aws):
 
 [<img src="https://i.imgur.com/qFZtEoa.png" alt="" width="48" height="24"> Maven](http://maven.apache.org/guides/getting-started/) - Maven is essentially a project management and comprehension tool and as such provides a way to help with managing: Builds, Documentation, Reporting, Dependencies, SCMs, Release, Distribution and Documentation
 
+
 ## Troubleshooting
 
 - Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:

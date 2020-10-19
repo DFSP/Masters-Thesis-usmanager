@@ -32,7 +32,7 @@ import Form, {
     requiredAndTrimmed
 } from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -167,8 +167,6 @@ class Container extends BaseComponent<Props, State> {
         unsavedSimulatedMetrics: [],
     };
     private mounted = false;
-    private replicateDropdown = createRef<HTMLButtonElement>();
-    private migrateDropdown = createRef<HTMLButtonElement>();
     private scrollbar: (ScrollBar | null) = null;
 
     public componentDidMount(): void {
@@ -177,10 +175,6 @@ class Container extends BaseComponent<Props, State> {
         this.props.loadServices();
         this.mounted = true;
     };
-
-    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        this.init();
-    }
 
     componentWillUnmount(): void {
         this.mounted = false;
@@ -197,15 +191,13 @@ class Container extends BaseComponent<Props, State> {
         );
     }
 
-    private init = () => {
-        M.Dropdown.init(this.replicateDropdown.current as Element,
-            {
-                onOpenEnd: this.onOpenDropdown
-            });
-        M.Dropdown.init(this.migrateDropdown.current as Element,
-            {
-                onOpenEnd: this.onOpenDropdown
-            });
+    private initDropdown = (dropdown: HTMLButtonElement | null) => {
+        if (dropdown) {
+            M.Dropdown.init(dropdown,
+                {
+                    onOpenEnd: this.onOpenDropdown
+                });
+        }
     };
 
     private onOpenDropdown = () =>
@@ -251,34 +243,51 @@ class Container extends BaseComponent<Props, State> {
     private onDeleteFailure = (reason: string, container: IContainer): void =>
         super.toast(`Unable to stop ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
 
-    private replicateMigrateButtons = (): ICustomButton[] => {
-        const buttons: ICustomButton[] = [];
-        buttons.push({
-                button:
-                    <>
-                        <button
-                            className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                            data-target={`replicate-dropdown-host-address`}
-                            ref={this.replicateDropdown}>
-                            Replicate
-                        </button>
-                        {this.chooseHostAddressDropdown('replicate-dropdown-host-address', this.replicate)}
-                    </>
-            },
-            {
-                button:
-                    <>
-                        <button
-                            className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
-                            data-target={`migrate-dropdown-host-address`}
-                            ref={this.migrateDropdown}>
-                            Migrate
-                        </button>
-                        {this.chooseHostAddressDropdown('migrate-dropdown-host-address', this.migrate)}
-                    </>
-            });
-        return buttons;
-    };
+    private replicateButton = () =>
+        <>
+            <button
+                className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+                data-target={`replicate-dropdown-host-address`}
+                ref={(ref) => this.initDropdown(ref)}>
+                Replicate
+            </button>
+            {this.chooseHostAddressDropdown('replicate-dropdown-host-address', this.replicate)}
+        </>
+
+    private migrateButton = () =>
+        <>
+            <button
+                className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+                data-target={`migrate-dropdown-host-address`}
+                ref={(ref) => this.initDropdown(ref)}>
+                Migrate
+            </button>
+            {this.chooseHostAddressDropdown('migrate-dropdown-host-address', this.migrate)}
+        </>
+
+    private chooseHostAddressDropdown = (id: string, onClick: (event: any) => void) => {
+        const nodes = Object.values(this.props.nodes)
+            .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress != this.getContainer()?.publicIpAddress));
+        return <ul id={id}
+                   className={`dropdown-content ${styles.dropdown}`}>
+            <li className={`${styles.disabled}`}>
+                <a className={`${!nodes.length ? 'dropdown-empty' : ''}`}>
+                    {!nodes.length ? 'No nodes to select' : 'Choose host address'}
+                </a>
+            </li>
+            <PerfectScrollbar ref={(ref) => {
+                this.scrollbar = ref;
+            }}>
+                {nodes.map((node, index) =>
+                    <li key={index} onClick={onClick}>
+                        <a>
+                            {`${node.publicIpAddress + (node.labels['privateIpAddress'] ? " (" + node.labels['privateIpAddress'] + ")" : '')}`}
+                        </a>
+                    </li>
+                )}
+            </PerfectScrollbar>
+        </ul>;
+    }
 
     private replicate = (event: any) => {
         const container = this.getContainer();
@@ -287,7 +296,7 @@ class Container extends BaseComponent<Props, State> {
         const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
         const url = `containers/${container?.containerId}/replicate`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, {hostAddress: {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress}},
+        postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
             (reason: string) => this.onReplicateFailure(reason, container));
     };
@@ -313,7 +322,7 @@ class Container extends BaseComponent<Props, State> {
         const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
         const url = `containers/${container?.containerId}/migrate`;
         this.setState({loading: {method: 'post', url: url}});
-        postData(url, {hostAddress: {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress}},
+        postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
             (reason) => this.onMigrateFailure(reason, container));
     };
@@ -404,30 +413,6 @@ class Container extends BaseComponent<Props, State> {
         this.saveContainerSimulatedMetrics(container);
     };
 
-    private chooseHostAddressDropdown = (id: string, onClick: (event: any) => void) => {
-        const nodes = Object.values(this.props.nodes)
-            .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress != this.getContainer()?.publicIpAddress));
-        return <ul id={id}
-                   className={`dropdown-content ${styles.dropdown}`}>
-            <li className={`${styles.disabled}`}>
-                <a className={`${!nodes.length ? 'dropdown-empty' : ''}`}>
-                    {!nodes.length ? 'No nodes to select' : 'Choose host address'}
-                </a>
-            </li>
-            <PerfectScrollbar ref={(ref) => {
-                this.scrollbar = ref;
-            }}>
-                {nodes.map((node, index) =>
-                    <li key={index} onClick={onClick}>
-                        <a>
-                            {`${node.publicIpAddress + (node.labels['privateIpAddress'] ? " (" + node.labels['privateIpAddress'] + ")" : '')}`}
-                        </a>
-                    </li>
-                )}
-            </PerfectScrollbar>
-        </ul>;
-    }
-
     private updateContainer = (container: IContainer) => {
         container = Object.values(normalize(container, Schemas.CONTAINER).entities.containers || {})[0];
         const formContainer = {...container};
@@ -460,7 +445,8 @@ class Container extends BaseComponent<Props, State> {
                 ({
                     username: node.labels['username'],
                     publicIpAddress: node.publicIpAddress,
-                    privateIpAddress: node.labels['privateIpAddress']
+                    privateIpAddress: node.labels['privateIpAddress'],
+                    coordinates: node.labels['coordinates'] ? JSON.parse(node.labels['coordinates']) : undefined,
                 }))
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
@@ -468,9 +454,10 @@ class Container extends BaseComponent<Props, State> {
 
     //TODO get apps' services instead (in case a service is associated to more than 1 app)
     private getSelectableServices = () =>
-        Object.entries(this.props.services)
-            .filter(([_, service]) => service.serviceType.toLowerCase() !== 'system')
-            .map(([serviceName, _]) => serviceName);
+        Object.keys(this.props.services)
+    /*Object.entries(this.props.services)
+        .filter(([_, service]) => service.serviceType.toLowerCase() !== 'system')
+        .map(([serviceName, _]) => serviceName);*/
 
     private setDefaultPorts = (serviceName: string) => {
         const service = this.props.services[serviceName];
@@ -537,7 +524,7 @@ class Container extends BaseComponent<Props, State> {
                                  icon={{linkedTo: this.hostnameLink}}/>
                         : key === 'coordinates'
                             ? <Field key='coordinates' id='coordinates' label='location' type='map'
-                                     map={{editable: false, zoomable: true}}/>
+                                     map={{loading: this.props.isLoading, editable: false, zoomable: true, labeled: true}}/>
                             : <Field key={index}
                                      id={key}
                                      label={key}/>
@@ -558,10 +545,9 @@ class Container extends BaseComponent<Props, State> {
             : formContainer;
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
-        console.log(containerValues, formContainer, container)
         return (
             <>
-                {!isNewContainer && isLoading && <ListLoadingSpinner/>}
+                {!isNewContainer && isLoading && <LoadingSpinner/>}
                 {!isNewContainer && !isLoading && error && <Error message={error}/>}
                 {(isNewContainer || !isLoading) && (isNewContainer || !error) && containerValues && (
                     /*@ts-ignore*/
@@ -576,7 +562,7 @@ class Container extends BaseComponent<Props, State> {
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
-                          delete={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')
+                          delete={container && container.labels['serviceType'] !== 'SYSTEM'
                               ? {
                                   textButton: 'Stop',
                                   url: `containers/${container.containerId}`,
@@ -584,8 +570,8 @@ class Container extends BaseComponent<Props, State> {
                                   failureCallback: this.onDeleteFailure
                               }
                               : undefined}
-                          customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
-                              ? this.replicateMigrateButtons()
+                          customButtons={container && container.labels['serviceType'] !== 'SYSTEM'
+                              ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
                           loading={this.state.loading}
                           saveEntities={this.saveEntities}>

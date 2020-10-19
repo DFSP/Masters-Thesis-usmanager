@@ -34,6 +34,7 @@ import {deleteData} from "../../utils/api";
 import {RestOperation} from "../form/Form";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import LinkedContextMenuItem from "../contextmenu/LinkedContextMenuItem";
+import DividerContextMenuItem from "../contextmenu/DividerContextMenuItem";
 
 interface CardProps<T> {
     id: string;
@@ -108,31 +109,39 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                             : {cardElement}}
                     </div>
                 </ContextMenuTrigger>
-                <ContextMenu id={`contextMenu-${id}`} className="custom-context-menu">
+                <ContextMenu id={`contextMenu-${id}`}>
                     {topContextMenuItems?.map((menuItem, index) =>
                         <div key={index}>
-                            {index > 0 && <MenuItem className="custom-context-menu-item-divider"/>}
+                            {index > 0 && <MenuItem className="react-contextmenu-item--divider"/>}
                             {menuItem}
                         </div>
                     )}
                     {link &&
                     <>
-                    {topContextMenuItems?.length && <MenuItem className="custom-context-menu-item-divider"/>}
+                        {topContextMenuItems?.length
+                            ?
+                            <>
+                                <DividerContextMenuItem/>
+                                <DividerContextMenuItem/>
+                                <DividerContextMenuItem/>
+                                <DividerContextMenuItem/>
+                            </>
+                            : undefined}
                         <LinkedContextMenuItem option={'Details'}
                                                pathname={link?.to.pathname}
                                                state={{ data: link?.to.state }}/>
                     </>}
                     {bottomContextMenuItems?.map((menuItem, index) =>
                         <div key={index}>
-                            {(topContextMenuItems?.length || link) && <MenuItem className="custom-context-menu-item-divider"/>}
+                            {(topContextMenuItems?.length || link) && <DividerContextMenuItem/>}
                             {menuItem}
                         </div>
                     )}
                     {this.props.delete !== undefined
                     && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id}>
-                        {(topContextMenuItems?.length || link || bottomContextMenuItems?.length) && <MenuItem className="custom-context-menu-item-divider"/>}
+                        {(topContextMenuItems?.length || link || bottomContextMenuItems?.length) && <DividerContextMenuItem/>}
                         <MenuItem
-                            className={`${loading ? 'custom-context-menu-item-disable' : 'custom-context-menu-item'} red-text`}
+                            className={`${loading ? 'react-contextmenu-item--disabled' : undefined} red-text`}
                             data={this.props.link?.to.state}
                             disabled={loading}
                             onClick={confirmationDialog ? undefined : this.onDelete}>

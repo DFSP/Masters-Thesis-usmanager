@@ -24,20 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.docker.swarm.nodes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
 
 import java.util.List;
 
-@AllArgsConstructor
-@Getter
+@Data
 final class AddNode {
 
-	private final String host;
-	private final NodeRole role;
-	private final List<Coordinates> coordinates;
+	private String host;
+	private NodeRole role;
+	private List<Coordinates> coordinates;
 
 }

@@ -91,7 +91,7 @@ public class SshService {
 		try {
 			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			hostAddress = edgeHost.getAddress();
-			publicKeyFile = edgeHostsService.getKeyFilePath(edgeHost);
+			publicKeyFile = edgeHostsService.buildKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
 			try {
@@ -100,7 +100,7 @@ public class SshService {
 			} catch (EntityNotFoundException ignored) { }
 			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
 		}
-		return initClient(hostAddress.getUsername(), hostAddress.getHostname(), new File(publicKeyFile));
+		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), new File(publicKeyFile));
 	}
 
 	private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {

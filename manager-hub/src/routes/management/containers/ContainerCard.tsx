@@ -28,19 +28,25 @@ import React from "react";
 import {IContainer} from "./Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteContainer} from "../../../actions";
+import {addContainer, deleteContainer} from "../../../actions";
 import {connect} from "react-redux";
+import ContextSubMenuItem from "../../../components/contextmenu/ContextSubMenuItem";
+import {INode} from "../nodes/Node";
+import {IReply, postData} from "../../../utils/api";
 
 interface State {
     loading: boolean;
+    container?: IContainer,
 }
 
 interface ContainerCardProps {
     container: IContainer;
+    nodes: { data: INode[], isLoading: boolean, error?: string | null },
 }
 
 interface DispatchToProps {
     deleteContainer: (container: IContainer) => void;
+    addContainer: (container: IContainer) => void;
 }
 
 type Props = DispatchToProps & ContainerCardProps;
@@ -64,6 +70,9 @@ class ContainerCard extends BaseComponent<Props, State> {
         this.mounted = false;
     }
 
+    private getContainer = () =>
+        this.state.container || this.props.container;
+
     private onDeleteSuccess = (container: IContainer): void => {
         super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
         if (this.mounted) {
@@ -79,8 +88,93 @@ class ContainerCard extends BaseComponent<Props, State> {
         }
     }
 
-    private contextMenu = (): JSX.Element[] => {
-        const {container} = this.props;
+    private topContextMenu = (): JSX.Element[] => {
+        const container = this.getContainer();
+        const menus = [];
+        if (container.labels['serviceType'] !== 'SYSTEM') {
+            menus.push(
+                <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
+                                                       menu={'Replicate'}
+                                                       state={container}
+                                                       header={'Choose host address'}
+                                                       emptyMessage={'No hosts to select'}
+                                                       submenus={Object.values(this.props.nodes.data)}
+                                                       error={this.props.nodes.error}
+                                                       menuToString={(option: INode) => `${option.publicIpAddress + (option.labels['privateIpAddress'] ? " (" + option.labels['privateIpAddress'] + ")" : '')}`}
+                                                       onClick={this.migrate}/>,
+                <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
+                                                       menu={'Migrate'}
+                                                       state={container}
+                                                       header={'Choose host address'}
+                                                       emptyMessage={'No hosts to select'}
+                                                       submenus={Object.entries(this.props.nodes.data)
+                                                           .filter(([_, node]) => node.publicIpAddress !== container.publicIpAddress && node.labels['privateIpAddress'] !== container.privateIpAddress)
+                                                           .map(([_, node]) => node)}
+                                                       error={this.props.nodes.error}
+                                                       menuToString={(option: INode) => `${option.publicIpAddress + (option.labels['privateIpAddress'] ? " (" + option.labels['privateIpAddress'] + ")" : '')}`}
+                                                       onClick={this.replicate}/>
+            );
+        }
+        return menus;
+    }
+
+    private replicate = (event: React.MouseEvent, data: {state: IContainer, submenu: INode}) => {
+        const container = data.state;
+        const node = data.submenu;
+        const publicIpAddress = node.publicIpAddress;
+        const privateIpAddress = node.labels['privateIpAddress'];
+        const url = `containers/${container?.containerId}/replicate`;
+        this.setState({loading: true});
+        postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
+            (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
+            (reason: string) => this.onReplicateFailure(reason, container));
+    }
+
+    private onReplicateSuccess = (container: IContainer) => {
+        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.addContainer(container);
+    };
+
+    private onReplicateFailure = (reason: string, container?: IContainer) => {
+        super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    };
+
+    private migrate = (event: React.MouseEvent, data: {state: IContainer, submenu: INode}) => {
+        const container = data.state;
+        const node = data.submenu;
+        const publicIpAddress = node.publicIpAddress;
+        const privateIpAddress = node.labels['privateIpAddress'];
+        const url = `containers/${container?.containerId}/migrate`;
+        this.setState({loading: true});
+        postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
+            (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
+            (reason) => this.onMigrateFailure(reason, container));
+    }
+
+    private onMigrateSuccess = (container: IContainer) => {
+        const parentContainer = this.getContainer();
+        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/containers/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+        this.props.addContainer(container);
+    };
+
+    private onMigrateFailure = (reason: string, container?: IContainer) => {
+        super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    };
+
+    private bottomContextMenu = (): JSX.Element[] => {
+        const container = this.getContainer();
         return [
             <LinkedContextMenuItem
                 option={'View ports'}
@@ -121,7 +215,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     public render() {
-        const {container} = this.props;
+        const container = this.getContainer();
         const {loading} = this.state;
         const CardContainer = Card<IContainer>();
         return <CardContainer id={`container-${container.containerId}`}
@@ -138,7 +232,8 @@ class ContainerCard extends BaseComponent<Props, State> {
                                   failureCallback: this.onDeleteFailure
                               }}
                               loading={loading}
-                              bottomContextMenuItems={this.contextMenu()}>
+                              topContextMenuItems={this.topContextMenu()}
+                              bottomContextMenuItems={this.bottomContextMenu()}>
             <CardItem key={'names'}
                       label={'Names'}
                       value={container.names.join(', ')}/>
@@ -162,7 +257,8 @@ class ContainerCard extends BaseComponent<Props, State> {
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    deleteContainer
+    deleteContainer,
+    addContainer,
 };
 
 export default connect(null, mapDispatchToProps)(ContainerCard);

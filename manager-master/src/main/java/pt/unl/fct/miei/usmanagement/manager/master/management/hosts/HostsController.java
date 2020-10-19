@@ -60,8 +60,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud")
-	public CloudHostEntity startCloudHost(@RequestBody Coordinates coordinates) {
-		return cloudHostsService.launchInstance(coordinates);
+	public CloudHostEntity startCloudHost(@RequestBody AddInstance addInstance) {
+		return cloudHostsService.launchInstance(addInstance.getCoordinates());
 	}
 
 	@GetMapping("/cloud")
@@ -93,7 +93,7 @@ public class HostsController {
 
 	@DeleteMapping("/cloud/{hostname}")
 	public void terminateCloudInstance(@PathVariable String hostname) {
-		cloudHostsService.terminateInstance(hostname);
+		cloudHostsService.terminateInstance(hostname, true);
 	}
 
 	@GetMapping("/cloud/{hostname}/rules/{ruleName}")

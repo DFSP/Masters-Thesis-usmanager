@@ -30,31 +30,10 @@ export interface IReply<T> extends AxiosResponse<T> {
 
 }
 
-export const API_URL = 'http://localhost:8080';
+export const API_URL = 'http://localhost:8080/api';
 export const REQUEST_TIMEOUT = 300000;
 const CancelToken = axios.CancelToken;
 export const cancelRequests: { [key: string]: CancelTokenSource } = {};
-
-//TODO delete
-export function getData<T>(url: string, callback: (data: T) => void): any {
-    fetch(url, {
-        method: 'GET',
-        headers: new Headers({
-            'Authorization': 'Basic YWRtaW46YWRtaW4=',
-            'Content-type': 'application/json;charset=UTF-8',
-            'Accept': 'application/json;charset=UTF-8',
-        }),
-    }).then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(`${response.status} ${response.statusText}`);
-    }).then(json => {
-        callback(json);
-    }).catch(e => {
-        console.log(e);
-    });
-}
 
 export function postData<T>(url: string, requestBody: any,
                             successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void): void {

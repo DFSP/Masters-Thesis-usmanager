@@ -74,7 +74,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
         isLoading: state.entities.simulatedMetrics.services.isLoadingSimulatedServiceMetrics,
         error: state.entities.simulatedMetrics.services.loadSimulatedServiceMetricsError,
         simulatedServiceMetrics: (state.entities.simulatedMetrics.services.data
-            && Object.values(state.entities.simulatedMetrics.services.data)) || [],
+            && Object.values(state.entities.simulatedMetrics.services.data).reverse()) || [],
     }
 );
 

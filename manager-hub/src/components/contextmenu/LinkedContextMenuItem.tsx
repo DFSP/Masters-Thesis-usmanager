@@ -35,7 +35,7 @@ interface Props<T> {
 
 const LinkedContextMenuItem = <T extends object>({option, pathname, state, selected}: Props<T>) => (
     <Link to={ { pathname: pathname, state: { data: state, selected } } }>
-        <MenuItem className='custom-context-menu-item' data={state}>
+        <MenuItem data={state}>
             {option}
         </MenuItem>
     </Link>

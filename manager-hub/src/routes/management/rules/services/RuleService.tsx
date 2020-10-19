@@ -26,7 +26,7 @@ import {componentTypes, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../../components/form/Form";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
@@ -307,7 +307,7 @@ class RuleService extends BaseComponent<Props, State> {
         const isNewRuleService = this.isNew();
         return (
             <>
-                {!isNewRuleService && isLoading && <ListLoadingSpinner/>}
+                {!isNewRuleService && isLoading && <LoadingSpinner/>}
                 {!isNewRuleService && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleService || !isLoading) && (isNewRuleService || !error) && formRuleService && (
                     /*@ts-ignore*/

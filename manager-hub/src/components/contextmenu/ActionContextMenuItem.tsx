@@ -33,7 +33,7 @@ interface Props<T> {
 }
 
 const ActionContextMenuItem = <T extends object>({option, state, onClick, className}: Props<T>) => (
-    <MenuItem className={`custom-context-menu-item ${className ? className : ''}`} data={state} onClick={onClick}>
+    <MenuItem className={`${className ? className : ''}`} data={state} onClick={onClick}>
         {option}
     </MenuItem>
 );

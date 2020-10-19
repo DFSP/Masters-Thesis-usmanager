@@ -31,7 +31,7 @@ import Form, {
     required,
     requireGreaterOrEqualSize
 } from "../../../components/form/Form";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -361,7 +361,8 @@ class Node extends BaseComponent<Props, State> {
                                    defaultValue: "Select role",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
-                        <Field key='coordinates' id='coordinates' label='select position(s)' type='map' map={{editable: true, labeled: false}}/>
+                        <Field key='coordinates' id='coordinates' label='select position(s)' type='map'
+                               map={{loading: this.props.isLoading, editable: true, labeled: false}}/>
                     </>
                 :
                 formNode && Object.entries(formNode).map(([key, value], index) =>
@@ -418,7 +419,7 @@ class Node extends BaseComponent<Props, State> {
         const nodeKey: (keyof INode) = node && Object.keys(node)[0];
         return (
             <>
-                {!isNewNode && isLoading && <ListLoadingSpinner/>}
+                {!isNewNode && isLoading && <LoadingSpinner/>}
                 {!isNewNode && !isLoading && error && <Error message={error}/>}
                 {(isNewNode || !isLoading) && (isNewNode || !error) && node && (
                     <>

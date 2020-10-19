@@ -117,7 +117,7 @@ class Navbar extends React.Component<Props, State> {
                                 <li style={logoStyle} className={'hide-on-med-and-down'}>
                                     <Link className="transparent brand-logo" to={"/home"}>
                                         <img src={logo} alt=""/>
-                                        Web Manager
+                                        Manager hub
                                     </Link>
                                 </li>
                             </ul>

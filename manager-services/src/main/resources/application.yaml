@@ -19,8 +19,7 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-05ae3ee68e1579013
-    security-group: us-manager-security-group
+    security-group: default
     key-pair: ec2
     type: t2.micro
     tag: us-manager
@@ -45,7 +44,7 @@ docker:
   hub:
     username: usmanager
   swarm:
-    manager: ${dockerManager:daniel@dpimenta.ddns.net}
+    manager: ${dockerManager:dpimenta.ddns.net}
     initial-max-workers: 1
 eureka:
   port: 8761

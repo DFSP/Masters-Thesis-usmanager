@@ -161,17 +161,14 @@ class CloudHostCard extends BaseComponent<Props, State> {
         const cloudHost = this.getCloudHost();
         const menus = [];
         if (cloudHost.state.name === awsInstanceStates.STOPPED.name) {
-            menus.push(<ActionContextMenuItem className={'green-text'} option={'Start'} state={cloudHost} onClick={this.startCloudHost}/>);
+            menus.push(<ActionContextMenuItem className='green-text' option='Start' state={cloudHost} onClick={this.startCloudHost}/>);
         }
         if (cloudHost.state.name === awsInstanceStates.RUNNING.name) {
-            menus.push(<ActionContextMenuItem className={'blue-text'} option={'Stop'} state={cloudHost} onClick={this.stopCloudHost}/>);
+            menus.push(<ActionContextMenuItem className='blue-text' option='Stop' state={cloudHost} onClick={this.stopCloudHost}/>);
         }
         if (!cloudHost.state.name.includes(awsInstanceStates.TERMINATED.name)
             && !cloudHost.state.name.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
-            menus.push(<ActionContextMenuItem className={'red-text'} option={'Terminate'} state={cloudHost} onClick={this.terminateCloudHost}/>);
-        }
-        if (menus.length) {
-            menus.push(<DividerContextMenuItem/>, <DividerContextMenuItem/>);
+            menus.push(<ActionContextMenuItem className='red-text' option='Terminate' state={cloudHost} onClick={this.terminateCloudHost}/>);
         }
         return menus;
     }

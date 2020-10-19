@@ -93,14 +93,14 @@ aws:
   access:
     key: AKIAS5UBHWDI3WO52EV5
     secret-key: ${secret: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}
-    key-file-path: /aws/ec2.pem
+    key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
     ami: ami-05ae3ee68e1579013
-    security-group: us-worker-security-group
+    security-group: default
     key-pair: ec2
     type: t2.micro
-    tag: us-worker
+    tag: us-manager
 container:
   database:
     deploy-delay: 5000
@@ -120,7 +120,7 @@ docker:
   hub:
     username: usmanager
   swarm:
-    manager: ${dockerManager:daniel@dpimenta.ddns.net}
+    manager: ${dockerManager:dpimenta.ddns.net}
     max-workers: 1
 eureka:
   port: 8761

@@ -2,7 +2,7 @@
   "name": "manager-hub",
   "version": "0.1.0",
   "private": true,
-  "description": "Web manager to visually manage a Microservices Dynamic Management System",
+  "description": "Manager hub to visually manage the Microservices Dynamic Management System",
   "homepage" : "http://usmanager.github.io/manager-hub",
   "contributors": [
     {

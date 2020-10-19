@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/apps")
-public final class AppsController {
+public class AppsController {
 
 	private final AppsService appsService;
 

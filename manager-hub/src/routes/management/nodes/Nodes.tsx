@@ -85,7 +85,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.nodes.isLoadingNodes,
         error: state.entities.nodes.loadNodesError,
-        nodes: (state.entities.nodes.data && Object.values(state.entities.nodes.data)) || [],
+        nodes: (state.entities.nodes.data && Object.values(state.entities.nodes.data).reverse()) || [],
     }
 );
 

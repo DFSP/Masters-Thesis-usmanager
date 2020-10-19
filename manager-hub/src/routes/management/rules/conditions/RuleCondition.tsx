@@ -29,7 +29,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../../components/form/Field";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
 import MainLayout from "../../../../views/mainLayout/MainLayout";
@@ -226,7 +226,7 @@ class RuleCondition extends BaseComponent<Props, State> {
         const isNewRuleCondition = this.isNew();
         return (
             <>
-                {!isNewRuleCondition && isLoading && <ListLoadingSpinner/>}
+                {!isNewRuleCondition && isLoading && <LoadingSpinner/>}
                 {!isNewRuleCondition && !isLoading && error && <Error message={error}/>}
                 {(isNewRuleCondition || !isLoading) && (isNewRuleCondition || !error) && formCondition && (
                     /*@ts-ignore*/

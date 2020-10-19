@@ -26,7 +26,7 @@ import IDatabaseData from "../../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
@@ -305,7 +305,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
         const isNewSimulatedHostMetric = this.isNew();
         return (
             <>
-                {!isNewSimulatedHostMetric && isLoading && <ListLoadingSpinner/>}
+                {!isNewSimulatedHostMetric && isLoading && <LoadingSpinner/>}
                 {!isNewSimulatedHostMetric && !isLoading && error && <Error message={error}/>}
                 {(isNewSimulatedHostMetric || !isLoading) && (isNewSimulatedHostMetric || !error) && formSimulatedHostMetric && (
                     /*@ts-ignore*/

@@ -90,7 +90,6 @@ public class HostsService {
 	private final int maxWorkers;
 	private final int maxInstances;
 	private final Mode mode;
-	@Getter
 	private HostAddress hostAddress;
 
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
@@ -139,6 +138,13 @@ public class HostsService {
 			this.hostAddress = new HostAddress(username, publicIp, privateIp);
 		}
 		log.info("Setting local address: {}", hostAddress.toString());
+		return hostAddress;
+	}
+
+	public HostAddress getHostAddress() {
+		if (hostAddress == null) {
+			throw new ManagerException("host address is not set yet");
+		}
 		return hostAddress;
 	}
 

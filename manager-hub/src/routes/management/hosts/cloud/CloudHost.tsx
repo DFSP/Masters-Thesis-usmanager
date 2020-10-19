@@ -26,7 +26,7 @@ import {RouteComponentProps} from "react-router";
 import IDatabaseData from "../../../../components/IDatabaseData";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {ICustomButton, IFields, IFormLoading, required} from "../../../../components/form/Form";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
@@ -54,6 +54,7 @@ import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../../components/form/Form.module.css";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
 import {ICoordinates} from "../../../../components/map/LocationMap";
+import {IMarker} from "../../../../components/map/Marker";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -439,7 +440,7 @@ class CloudHost extends BaseComponent<Props, State> {
         const cloudHostKey: (keyof ICloudHost) = formCloudHost && Object.keys(formCloudHost)[0];
         return (
             <>
-                {!isNewCloudHost && isLoading && <ListLoadingSpinner/>}
+                {!isNewCloudHost && isLoading && <LoadingSpinner/>}
                 {!isNewCloudHost && !isLoading && error && <Error message={error}/>}
                 {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && cloudHost && (
                     /*@ts-ignore*/
@@ -464,6 +465,7 @@ class CloudHost extends BaseComponent<Props, State> {
                                        singleMarker: true,
                                        zoomable: true,
                                        labeled: true,
+                                       loading: isLoading,
                                        markers: this.props.cloudRegions.filter(region => region.available).map(region => ({
                                            title: region.zone + " | " + region.name,
                                            latitude: region.coordinates.latitude,
@@ -472,16 +474,31 @@ class CloudHost extends BaseComponent<Props, State> {
                                        }))
                                    }}/>
                             : formCloudHost && Object.keys(formCloudHost).map((key, index) =>
-                                key === 'state'
-                                    ? <Field<IState> key={index}
+                            key === 'state'
+                                ? <Field<IState> key={index}
+                                                 id={key}
+                                                 label={key}
+                                                 valueToString={this.cloudHostState}/>
+                                : key === 'placement'
+                                ? <Field<IPlacement> key={index}
                                                      id={key}
                                                      label={key}
-                                                     valueToString={this.cloudHostState}/>
-                                    : key === 'placement'
-                                    ? <Field<IPlacement> key={index}
-                                                         id={key}
-                                                         label={key}
-                                                         valueToString={this.cloudHostPlacement}/>
+                                                     valueToString={this.cloudHostPlacement}/>
+                                : key === 'region'
+                                    ? <Field<ICloudRegion> key='region' id='region' type='map'
+                                                           map={{
+                                                               editable: false,
+                                                               singleMarker: true,
+                                                               zoomable: true,
+                                                               labeled: true,
+                                                               loading: isLoading,
+                                                               valueToMarkers: (regions: ICloudRegion[]): IMarker[] =>
+                                                                   regions.map(region => ({
+                                                                       title: region.zone + " | " + region.name,
+                                                                       latitude: region.coordinates.latitude,
+                                                                       longitude: region.coordinates.longitude,
+                                                                   }))
+                                                           }}/>
                                     : key === 'managedByWorker'
                                         ? <Field<IWorkerManager> key={index}
                                                                  id={key}
@@ -573,8 +590,8 @@ function removeFields(cloudHost: Partial<ICloudHost>) {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-    const isLoading = state.entities.hosts.cloud.isLoadingHosts;
-    const error = state.entities.hosts.cloud.loadHostsError;
+    const isLoading = state.entities.hosts.cloud.isLoadingHosts || state.entities.hosts.cloud.regions.isLoadingRegions;
+    const error = state.entities.hosts.cloud.loadHostsError || state.entities.hosts.cloud.regions.loadRegionsError;
     const instanceId = props.match.params.instanceId;
     const cloudHost = !isNew(props.location.search) ? state.entities.hosts.cloud.data[instanceId] : undefined;
     const newCloudHost = isNew(props.location.search) ? buildNewCloudHost() : undefined;

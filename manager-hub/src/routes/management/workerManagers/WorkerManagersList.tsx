@@ -73,7 +73,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.workerManagers.isLoadingWorkerManagers,
         error: state.entities.workerManagers.loadWorkerManagersError,
-        workerManagers: (state.entities.workerManagers.data && Object.values(state.entities.workerManagers.data)) || [],
+        workerManagers: (state.entities.workerManagers.data && Object.values(state.entities.workerManagers.data).reverse()) || [],
     }
 );
 

@@ -73,7 +73,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.rules.services.isLoadingRules,
         error: state.entities.rules.services.loadRulesError,
-        serviceRules: Object.values(state.entities.rules.services.data)
+        serviceRules: (state.entities.rules.services.data && Object.values(state.entities.rules.services.data).reverse()) || []
     }
 );
 

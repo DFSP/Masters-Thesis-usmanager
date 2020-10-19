@@ -32,18 +32,23 @@ import CardList from "../../../components/list/CardList";
 import {IContainer} from "./Container";
 import styles from './Containers.module.css'
 import BaseComponent from "../../../components/BaseComponent";
-import {loadContainers, reloadContainers} from "../../../actions";
+import {loadContainers, loadNodes, reloadContainers} from "../../../actions";
 import ActionButton from "../../../components/list/ActionButton";
+import {INode} from "../nodes/Node";
 
 interface StateToProps {
     isLoading: boolean
     error?: string | null;
     containers: IContainer[];
+    isLoadingNodes: boolean;
+    loadNodesError?: string | null;
+    nodes: { [key: string]: INode };
 }
 
 interface DispatchToProps {
     loadContainers: () => void;
     reloadContainers: () => void;
+    loadNodes: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -52,6 +57,7 @@ class Containers extends BaseComponent<Props, {}> {
 
     public componentDidMount(): void {
         this.props.loadContainers();
+        this.props.loadNodes();
     }
 
     public render() {
@@ -78,7 +84,8 @@ class Containers extends BaseComponent<Props, {}> {
     }
 
     private container = (container: IContainer): JSX.Element =>
-        <ContainerCard key={container.containerId} container={container}/>;
+        <ContainerCard key={container.containerId} container={container}
+                       nodes={{data: Object.values(this.props.nodes), isLoading: this.props.isLoadingNodes, error: this.props.loadNodesError}}/>;
 
     private predicate = (container: IContainer, search: string): boolean =>
         container.containerId.toString().toLowerCase().includes(search)
@@ -96,13 +103,17 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.containers.isLoadingContainers,
         error: state.entities.containers.loadContainersError,
-        containers: (state.entities.containers.data && Object.values(state.entities.containers.data)) || [],
+        containers: (state.entities.containers.data && Object.values(state.entities.containers.data).reverse()) || [],
+        nodes: state.entities.nodes.data,
+        isLoadingNodes: state.entities.nodes.isLoadingNodes,
+        loadNodesError: state.entities.nodes.loadNodesError,
     }
 );
 
 const mapDispatchToProps: DispatchToProps = {
     loadContainers,
-    reloadContainers
+    reloadContainers,
+    loadNodes,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Containers);

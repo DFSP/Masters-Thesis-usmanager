@@ -22,20 +22,14 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes;
+package pt.unl.fct.miei.usmanagement.manager.master.management.hosts;
 
-public final class NodeConstants {
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 
-	private NodeConstants() {
-	}
+@Data
+final class AddInstance {
 
-	public static final class Label {
-
-		public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
-		public static final String USERNAME = "username";
-		public static final String COORDINATES = "coordinates";
-		public static final String MASTER_MANAGER = "masterManager";
-
-	}
+	private Coordinates coordinates;
 
 }

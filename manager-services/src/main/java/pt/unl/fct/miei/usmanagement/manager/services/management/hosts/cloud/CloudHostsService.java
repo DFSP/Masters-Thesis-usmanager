@@ -158,6 +158,7 @@ public class CloudHostsService {
 	}
 
 	public CloudHostEntity launchInstance(Coordinates coordinates) {
+		log.info("Looking for the best aws region to start a cloud instance close to {}", coordinates);
 		List<AwsRegion> regions = AwsRegion.getAwsRegions();
 		regions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
@@ -165,6 +166,8 @@ public class CloudHostsService {
 			return Double.compare(oneDistance, anotherDistance);
 		});
 		AwsRegion region = regions.get(0);
+		log.info("{} - {} is the closest aws region with a distance of {} km", region.getZone(), region.getName(),
+			(int) region.getCoordinates().distanceTo(coordinates)/1000);
 		return launchInstance(region);
 	}
 
@@ -186,7 +189,7 @@ public class CloudHostsService {
 			.withName(AwsInstanceState.PENDING.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		Instance instance = awsService.startInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
+		Instance instance = awsService.startInstance(cloudHost.getInstanceId(), cloudHost.getRegion(), true);
 		cloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
 		if (addToSwarm) {
 			hostsService.addHost(cloudHost.getInstanceId(), NodeRole.WORKER);
@@ -207,11 +210,11 @@ public class CloudHostsService {
 			.withName(AwsInstanceState.STOPPING.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		Instance instance = awsService.stopInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
+		Instance instance = awsService.stopInstance(cloudHost.getInstanceId(), cloudHost.getRegion(), true);
 		return saveCloudHostFromInstance(cloudHost.getId(), instance);
 	}
 
-	public void terminateInstance(String id) {
+	public void terminateInstance(String id, boolean wait) {
 		CloudHostEntity cloudHost = getCloudHostById(id);
 		try {
 			hostsService.removeHost(cloudHost.getAddress());
@@ -224,12 +227,12 @@ public class CloudHostsService {
 			.withName(AwsInstanceState.SHUTTING_DOWN.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
-		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getRegion());
+		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getRegion(), wait);
 		cloudHosts.delete(cloudHost);
 	}
 
 	public void terminateInstances() {
-		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId()));
+		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId(), false));
 	}
 
 	public List<CloudHostEntity> syncCloudHosts() {

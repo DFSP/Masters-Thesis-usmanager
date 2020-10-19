@@ -38,7 +38,7 @@ import {
 } from "../../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../../views/mainLayout/MainLayout";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {ReduxState} from "../../../reducers";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import BaseComponent from "../../../components/BaseComponent";
@@ -430,7 +430,7 @@ class Service extends BaseComponent<Props, State> {
         const isNewService = this.isNew();
         return (
             <>
-                {!isNewService && isLoading && <ListLoadingSpinner/>}
+                {!isNewService && isLoading && <LoadingSpinner/>}
                 {!isNewService && !isLoading && error && <Error message={error}/>}
                 {(isNewService || !isLoading) && (isNewService || !error) && formService && (
                     /*@ts-ignore*/

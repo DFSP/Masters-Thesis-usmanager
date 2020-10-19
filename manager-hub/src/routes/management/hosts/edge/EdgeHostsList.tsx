@@ -74,7 +74,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.hosts.edge.isLoadingHosts,
         error: state.entities.hosts.edge.loadHostsError,
-        edgeHosts: (state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data)) || [],
+        edgeHosts: (state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data).reverse()) || [],
     }
 );
 

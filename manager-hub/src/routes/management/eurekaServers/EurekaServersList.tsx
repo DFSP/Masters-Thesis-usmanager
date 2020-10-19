@@ -73,7 +73,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.eurekaServers.isLoadingEurekaServers,
         error: state.entities.eurekaServers.loadEurekaServersError,
-        eurekaServers: (state.entities.eurekaServers.data && Object.values(state.entities.eurekaServers.data)) || [],
+        eurekaServers: (state.entities.eurekaServers.data && Object.values(state.entities.eurekaServers.data).reverse()) || [],
     }
 );
 

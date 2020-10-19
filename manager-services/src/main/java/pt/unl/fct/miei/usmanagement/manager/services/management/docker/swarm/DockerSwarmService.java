@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm;
 
+import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
@@ -111,6 +112,7 @@ public class DockerSwarmService {
 		String nodeId = nodeIdRegexExpression.group(0);
 		nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
 		nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
+		nodesService.addLabel(nodeId, NodeConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 		nodesService.addLabel(nodeId, NodeConstants.Label.MASTER_MANAGER, String.valueOf(true));
 		return nodesService.getNode(nodeId);
 	}
@@ -158,6 +160,7 @@ public class DockerSwarmService {
 			log.info("Host {} ({}) has joined the swarm as node {}", publicIpAddress, privateIpAddress, nodeId);
 			nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);
 			nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
+			nodesService.addLabel(nodeId, NodeConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 			return nodesService.getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {

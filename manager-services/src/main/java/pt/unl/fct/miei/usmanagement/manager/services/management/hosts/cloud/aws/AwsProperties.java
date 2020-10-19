@@ -66,7 +66,6 @@ public class AwsProperties {
 	@Setter
 	public static final class Instance {
 
-		private String ami;
 		private String securityGroup;
 		private String keyPair;
 		private String type;

@@ -30,7 +30,7 @@ interface Props {
 }
 
 const DividerContextMenuItem = ({className}: Props) => (
-    <MenuItem className={`${className} custom-context-menu-item-divider`}/>
+    <MenuItem className={`${className ? className + ' ' : ''}react-contextmenu-item--divider`}/>
 );
 
 export default DividerContextMenuItem;

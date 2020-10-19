@@ -111,6 +111,17 @@ public class DatabaseLoader {
 					.build();
 				usersService.addUser(sysAdmin);
 			}
+			if (!usersService.hasUser("danielfct")) {
+				UserEntity sysAdmin = UserEntity.builder()
+					.firstName("daniel")
+					.lastName("pimenta")
+					.username("danielfct")
+					.password("danielfct")
+					.email("d.pimenta@campus.fct.unl.pt")
+					.role(UserRole.ROLE_SYS_ADMIN)
+					.build();
+				usersService.addUser(sysAdmin);
+			}
 			// services
 			ServiceEntity frontend;
 			try {
@@ -372,26 +383,6 @@ public class DatabaseLoader {
 					.build();
 				rabbitmq = servicesService.addService(rabbitmq);
 			}
-			ServiceEntity eurekaServer;
-			try {
-				eurekaServer = servicesService.getService(EurekaService.EUREKA_SERVER);
-			}
-			catch (EntityNotFoundException ignored) {
-				eurekaServer = ServiceEntity.builder()
-					.serviceName(EurekaService.EUREKA_SERVER)
-					.dockerRepository(dockerHubUsername + "/registration-server")
-					.defaultExternalPort("8761")
-					.defaultInternalPort("8761")
-					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${externalPort} ${internalPort} ${hostname} ${zone}")
-					.minReplicas(1)
-					.maxReplicas(0)
-					.outputLabel("${eurekaHost}")
-					.serviceType(ServiceType.SYSTEM)
-					.expectedMemoryConsumption(262144000d)
-					.build();
-				eurekaServer = servicesService.addService(eurekaServer);
-			}
 			ServiceEntity loadBalancer;
 			try {
 				loadBalancer = servicesService.getService(NginxLoadBalancerService.LOAD_BALANCER);
@@ -411,46 +402,6 @@ public class DatabaseLoader {
 					.expectedMemoryConsumption(10485760d)
 					.build();
 				loadBalancer = servicesService.addService(loadBalancer);
-			}
-			ServiceEntity dockerApiProxy;
-			try {
-				dockerApiProxy = servicesService.getService(DockerApiProxyService.DOCKER_API_PROXY);
-			}
-			catch (EntityNotFoundException ignored) {
-				dockerApiProxy = ServiceEntity.builder()
-					.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
-					.dockerRepository(dockerHubUsername + "/nginx-basic-auth-proxy")
-					.defaultExternalPort(String.valueOf(dockerProperties.getApiProxy().getPort()))
-					.defaultInternalPort("80")
-					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("")
-					.minReplicas(1)
-					.maxReplicas(0)
-					.outputLabel("${dockerApiProxyHost}")
-					.serviceType(ServiceType.SYSTEM)
-					.expectedMemoryConsumption(10485760d)
-					.build();
-				dockerApiProxy = servicesService.addService(dockerApiProxy);
-			}
-			ServiceEntity prometheus;
-			try {
-				prometheus = servicesService.getService(PrometheusService.PROMETHEUS);
-			}
-			catch (EntityNotFoundException ignored) {
-				prometheus = ServiceEntity.builder()
-					.serviceName(PrometheusService.PROMETHEUS)
-					.dockerRepository(dockerHubUsername + "/prometheus")
-					.defaultExternalPort("9090")
-					.defaultInternalPort("9090")
-					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("")
-					.minReplicas(1)
-					.maxReplicas(0)
-					.outputLabel("${prometheusHost}")
-					.serviceType(ServiceType.SYSTEM)
-					.expectedMemoryConsumption(52428800d)
-					.build();
-				prometheus = servicesService.addService(prometheus);
 			}
 			ServiceEntity requestLocationMonitor;
 			try {
@@ -472,25 +423,65 @@ public class DatabaseLoader {
 					.build();
 				requestLocationMonitor = servicesService.addService(requestLocationMonitor);
 			}
-			ServiceEntity masterManager;
+			ServiceEntity eurekaServer;
 			try {
-				masterManager = servicesService.getService(MasterManagerProperties.MASTER_MANAGER);
+				eurekaServer = servicesService.getService(EurekaService.EUREKA_SERVER);
 			}
 			catch (EntityNotFoundException ignored) {
-				masterManager = ServiceEntity.builder()
-					.serviceName(MasterManagerProperties.MASTER_MANAGER)
-					.dockerRepository(dockerHubUsername + "/manager-master")
-					.defaultExternalPort("8080")
-					.defaultInternalPort("8080")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+				eurekaServer = ServiceEntity.builder()
+					.serviceName(EurekaService.EUREKA_SERVER)
+					.dockerRepository(dockerHubUsername + "/registration-server")
+					.defaultExternalPort("8761")
+					.defaultInternalPort("8761")
+					.defaultDb("NOT_APPLICABLE")
+					.launchCommand("${externalPort} ${internalPort} ${hostname} ${zone}")
 					.minReplicas(1)
-					.maxReplicas(1)
-					.outputLabel("${masterManagerHost}")
+					.maxReplicas(0)
+					.outputLabel("${eurekaHost}")
 					.serviceType(ServiceType.SYSTEM)
-					// TODO
-					.expectedMemoryConsumption(256901152d)
+					.expectedMemoryConsumption(262144000d)
 					.build();
-				masterManager = servicesService.addService(masterManager);
+				eurekaServer = servicesService.addService(eurekaServer);
+			}
+			ServiceEntity prometheus;
+			try {
+				prometheus = servicesService.getService(PrometheusService.PROMETHEUS);
+			}
+			catch (EntityNotFoundException ignored) {
+				prometheus = ServiceEntity.builder()
+					.serviceName(PrometheusService.PROMETHEUS)
+					.dockerRepository(dockerHubUsername + "/prometheus")
+					.defaultExternalPort("9090")
+					.defaultInternalPort("9090")
+					.defaultDb("NOT_APPLICABLE")
+					.launchCommand("")
+					.minReplicas(1)
+					.maxReplicas(0)
+					.outputLabel("${prometheusHost}")
+					.serviceType(ServiceType.SYSTEM)
+					.expectedMemoryConsumption(52428800d)
+					.build();
+				prometheus = servicesService.addService(prometheus);
+			}
+			ServiceEntity dockerApiProxy;
+			try {
+				dockerApiProxy = servicesService.getService(DockerApiProxyService.DOCKER_API_PROXY);
+			}
+			catch (EntityNotFoundException ignored) {
+				dockerApiProxy = ServiceEntity.builder()
+					.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
+					.dockerRepository(dockerHubUsername + "/nginx-basic-auth-proxy")
+					.defaultExternalPort(String.valueOf(dockerProperties.getApiProxy().getPort()))
+					.defaultInternalPort("80")
+					.defaultDb("NOT_APPLICABLE")
+					.launchCommand("")
+					.minReplicas(1)
+					.maxReplicas(0)
+					.outputLabel("${dockerApiProxyHost}")
+					.serviceType(ServiceType.SYSTEM)
+					.expectedMemoryConsumption(10485760d)
+					.build();
+				dockerApiProxy = servicesService.addService(dockerApiProxy);
 			}
 			ServiceEntity workerManager;
 			try {
@@ -511,7 +502,37 @@ public class DatabaseLoader {
 					.build();
 				workerManager = servicesService.addService(workerManager);
 			}
+			ServiceEntity masterManager;
+			try {
+				masterManager = servicesService.getService(MasterManagerProperties.MASTER_MANAGER);
+			}
+			catch (EntityNotFoundException ignored) {
+				masterManager = ServiceEntity.builder()
+					.serviceName(MasterManagerProperties.MASTER_MANAGER)
+					.dockerRepository(dockerHubUsername + "/manager-master")
+					.defaultExternalPort("8080")
+					.defaultInternalPort("8080")
+					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.minReplicas(1)
+					.maxReplicas(1)
+					.outputLabel("${masterManagerHost}")
+					.serviceType(ServiceType.SYSTEM)
+					// TODO
+					.expectedMemoryConsumption(256901152d)
+					.build();
+				masterManager = servicesService.addService(masterManager);
+			}
 			//apps
+			AppEntity mixal;
+			try {
+				mixal = appsService.getApp("Mixal");
+			}
+			catch (EntityNotFoundException ignored) {
+				mixal = AppEntity.builder()
+					.name("Mixal")
+					.build();
+				mixal = appsService.addApp(mixal);
+			}
 			AppEntity sockShop;
 			try {
 				sockShop = appsService.getApp("Sock Shop");
@@ -535,16 +556,6 @@ public class DatabaseLoader {
 					AppServiceEntity.builder().app(sockShop).service(shipping).launchOrder(15).build(),
 					AppServiceEntity.builder().app(sockShop).service(queueMaster).launchOrder(15).build(),
 					AppServiceEntity.builder().app(sockShop).service(rabbitmq).launchOrder(5).build()));
-			}
-			AppEntity mixal;
-			try {
-				mixal = appsService.getApp("Mixal");
-			}
-			catch (EntityNotFoundException ignored) {
-				mixal = AppEntity.builder()
-					.name("Mixal")
-					.build();
-				mixal = appsService.addApp(mixal);
 			}
 
 			// service dependencies

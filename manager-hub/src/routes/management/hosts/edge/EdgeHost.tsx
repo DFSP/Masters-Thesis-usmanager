@@ -30,7 +30,7 @@ import Form, {
     requiredAndTrimmed,
     requiredAndTrimmedAndNotValidIpAddress
 } from "../../../../components/form/Form";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
@@ -176,7 +176,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
         super.toast(`Unable to save <b>${edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
 
-    private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
+    /*private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
         const edgeHost = reply.data;
         const hostname = edgeHost.publicIpAddress;
         super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
@@ -189,10 +189,10 @@ class EdgeHost extends BaseComponent<Props, State> {
             this.updateEdgeHost(edgeHost);
             this.props.history.replace(edgeHost.publicIpAddress);
         }
-    };
+    };*/
 
-    private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+    /*private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
+        super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);*/
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
         super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
@@ -313,7 +313,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         const isNewEdgeHost = this.isNew();
         return (
             <>
-                {!isNewEdgeHost && isLoading && <ListLoadingSpinner/>}
+                {!isNewEdgeHost && isLoading && <LoadingSpinner/>}
                 {!isNewEdgeHost && !isLoading && error && <Error message={error}/>}
                 {(isNewEdgeHost || !isLoading) && (isNewEdgeHost || !error) && formEdgeHost && (
                     /*@ts-ignore*/
@@ -327,11 +327,11 @@ class EdgeHost extends BaseComponent<Props, State> {
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
-                          put={{
+                          /*put={{
                               url: `hosts/edge/${edgeHost.publicIpAddress}`,
                               successCallback: this.onPutSuccess,
                               failureCallback: this.onPutFailure
-                          }}
+                          }}*/
                           delete={{
                               confirmMessage: `to delete ${edgeHost.publicIpAddress}`,
                               url: `hosts/edge/${edgeHost.publicIpAddress}`,
@@ -342,7 +342,7 @@ class EdgeHost extends BaseComponent<Props, State> {
                         {Object.keys(formEdgeHost).map((key, index) =>
                             key === 'coordinates'
                                 ? <Field key='coordinates' id='coordinates' label='position' type='map'
-                                         map={{editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
+                                         map={{loading: isLoading, editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
                                 : key === 'local'
                                 ? <Field<boolean> key={index}
                                                   id={key}

@@ -78,7 +78,7 @@ public class EdgeHostsService {
 		this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
 	}
 
-	public String getKeyFilePath(EdgeHostEntity edgeHostEntity) {
+	public String buildKeyFilePath(EdgeHostEntity edgeHostEntity) {
 		String username = edgeHostEntity.getUsername();
 		String hostname = edgeHostEntity.getHostname();
 		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
@@ -131,7 +131,7 @@ public class EdgeHostsService {
 
 	private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
 		HostAddress hostAddress = edgeHost.getAddress();
-		String keyFilePath = getKeyFilePath(edgeHost);
+		String keyFilePath = buildKeyFilePath(edgeHost);
 		log.info("Generating keys for edge host {}", hostAddress);
 		String generateKeysCommand = String.format("echo y | ssh-keygen -b 2048 -t rsa -f '%s' -q -N \"\" &&"
 			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostAddress.getPublicIpAddress());
@@ -269,7 +269,7 @@ public class EdgeHostsService {
 	}
 
 	private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
-		String privateKeyFilePath = getKeyFilePath(edgeHost);
+		String privateKeyFilePath = buildKeyFilePath(edgeHost);
 		String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
 		bashService.cleanup(privateKeyFilePath, publicKeyFilePath);
 	}

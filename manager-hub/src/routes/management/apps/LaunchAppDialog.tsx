@@ -25,7 +25,6 @@
 import React from "react";
 import LocationMap from "../../../components/map/LocationMap";
 import Dialog from "../../../components/dialogs/Dialog";
-import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
 
 interface Props {
@@ -51,7 +50,7 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
 
     private launchAppConfirm = () => {
         if (!this.state.selectedPosition) {
-            M.toast({html:'<div class="red-text">Error</div><div style="margin-left: 3px"> - location not selected</div>'});
+            M.toast({html: '<div class="red-text">Error</div><div style="margin-left: 3px"> - location not selected</div>'});
         } else {
             this.props.launchAppCallback(this.state.selectedPosition);
         }
@@ -64,7 +63,8 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
                        fullscreen={true}
                        locked={true}
                        confirmCallback={this.launchAppConfirm}>
-            <LocationMap onSelect={this.onSelectCoordinates} onDeselect={this.onDeselectCoordinates} locations={location}
+            <LocationMap onSelect={this.onSelectCoordinates} onDeselect={this.onDeselectCoordinates}
+                         locations={location}
                          hover clickHighlight/>
         </Dialog>;
     }

@@ -27,7 +27,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndSizeRestriction} from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -196,7 +196,7 @@ class Region extends BaseComponent<Props, State> {
         const isNewRegion = this.isNew();
         return (
             <>
-                {!isNewRegion && isLoading && <ListLoadingSpinner/>}
+                {!isNewRegion && isLoading && <LoadingSpinner/>}
                 {!isNewRegion && !isLoading && error && <Error message={error}/>}
                 {(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (
                     /*@ts-ignore*/

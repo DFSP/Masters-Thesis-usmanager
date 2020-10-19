@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.containers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {
@@ -94,6 +96,7 @@ public class ContainersController {
 
 	@PostMapping("/{id}/migrate")
 	public ContainerEntity migrateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
+		log.info("{}", hostAddress);
 		return containersService.migrateContainer(id, hostAddress);
 	}
 

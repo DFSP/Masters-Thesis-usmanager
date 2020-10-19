@@ -88,3 +88,7 @@ ul.dropdown li.disabled a:hover {
 .customButton {
     display: inline;
 }
+
+.formButton {
+    margin-right: 5px;
+}

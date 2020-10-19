@@ -123,7 +123,7 @@ class Ssh extends React.Component<Props, State> {
                         }}>
                             <button className='btn-floating btn-flat btn-small tooltipped'
                                     onClick={this.clearCommands}
-                                    data-position={'right'}
+                                    data-position={'top'}
                                     data-tooltip={'Clear'}>
                                 <i className="material-icons grey-text">delete_sweep</i>
                             </button>

@@ -244,6 +244,9 @@ public class DockerContainersService {
 		String serviceType = service.getServiceType().name();
 		String internalPort = service.getDefaultInternalPort();
 		String externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
+		String containerName = global
+			? serviceName
+			: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
 		String serviceAddr = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
 		String dockerRepository = service.getDockerRepository();
 		HostLocation hostLocation = hostsService.getHostLocation(hostAddress);
@@ -297,7 +300,7 @@ public class DockerContainersService {
 		}
 		log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
 				+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
-			hostAddress, internalPort, externalPort, serviceName, dockerRepository, launchCommand, containerEnvironment,
+			hostAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
 			containerLabels);
 		HostConfig hostConfig = HostConfig.builder()
 			.autoRemove(true)
@@ -314,7 +317,7 @@ public class DockerContainersService {
 			: containerBuilder.cmd(launchCommand.split(" ")).build();
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
 			dockerClient.pull(dockerRepository);
-			ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, serviceName);
+			ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 			String containerId = containerCreation.id();
 			dockerClient.startContainer(containerId);
 			if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
@@ -372,6 +375,9 @@ public class DockerContainersService {
 	}
 
 	public Optional<DockerContainer> replicateContainer(ContainerEntity container, HostAddress toHostAddress) {
+		if (toHostAddress.isIncomplete()) {
+			toHostAddress = hostsService.getHostDetails(toHostAddress).getAddress();
+		}
 		return replicateContainer(container.getContainerId(), container.getHostAddress(), toHostAddress);
 	}
 
@@ -405,7 +411,9 @@ public class DockerContainersService {
 	}
 
 	public Optional<DockerContainer> migrateContainer(ContainerEntity container, HostAddress toHostAddress) {
-		String containerId = container.getContainerId();
+		if (toHostAddress.isIncomplete()) {
+			toHostAddress = hostsService.getHostDetails(toHostAddress).getAddress();
+		}
 		Optional<DockerContainer> replicaContainer = replicateContainer(container, toHostAddress);
 		new Timer("StopContainerTimer").schedule(new TimerTask() {
 			@Override

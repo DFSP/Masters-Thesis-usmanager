@@ -69,4 +69,4 @@ Por exemplo, ao remover/adicionar novos elementos a uma lista, ou ao mudar de p�
 
 ### Licença
 
-Web manager está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+Manager hub está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

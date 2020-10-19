@@ -27,7 +27,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {ICustomButton, IFields, IFormLoading, requiredAndTrimmed} from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -299,7 +299,7 @@ class App extends BaseComponent<Props, State> {
         const isNewApp = this.isNew();
         return (
             <>
-                {!isNewApp && isLoading && <ListLoadingSpinner/>}
+                {!isNewApp && isLoading && <LoadingSpinner/>}
                 {!isNewApp && !isLoading && error && <Error message={error}/>}
                 {(isNewApp || !isLoading) && (isNewApp || !error) && formApp && (
                     <>

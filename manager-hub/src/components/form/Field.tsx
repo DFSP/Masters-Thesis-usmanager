@@ -38,6 +38,7 @@ import checkboxListStyles from "./CheckboxList.module.css";
 import {Link} from "react-router-dom";
 import LocationMap from "../map/LocationMap";
 import {IMarker} from "../map/Marker";
+import LoadingSpinner from "../list/LoadingSpinner";
 
 export interface IValidation {
     rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -56,7 +57,8 @@ export interface FieldProps<T = string> {
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
     disabled?: boolean;
     hidden?: boolean;
-    map?: { editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[] }
+    map?: { loading: boolean, editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[],
+        valueToMarkers?: (v: T[]) => IMarker[]}
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -208,13 +210,15 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                               onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
                             )}
                             {(type && type.toLowerCase() === "map") && (
-                                <LocationMap
-                                    onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
-                                    onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
-                                    locations={formContext.values[id] ? (Array.isArray(formContext.values[id]) ? formContext.values[id].concat(map?.markers || []) : [formContext.values[id]].concat(map?.markers || [])) : map?.markers || []}
-                                    marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
-                                    zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
-                                    resizable/>
+                                map?.loading
+                                    ? <LoadingSpinner/>
+                                    : <LocationMap
+                                        onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
+                                        onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
+                                        locations={this.getMapFieldMarkers(formContext.values[id], map?.markers, map?.valueToMarkers)}
+                                        marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
+                                        zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
+                                        resizable/>
                             )}
                             {getError(formContext.errors) && (
                                 <span className="helper-text red-text darken-3">
@@ -226,6 +230,20 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                 )}
             </FormContext.Consumer>
         )
+    }
+
+    private getMapFieldMarkers = (values: any, markers?: IMarker[], valueToMarkers?: (v: T[]) => IMarker[]) => {
+        markers = markers || [];
+        if (!values) {
+            return markers;
+        }
+        if (!Array.isArray(values)) {
+            values = [values];
+        }
+        if (valueToMarkers) {
+            values = valueToMarkers(values);
+        }
+        return values.concat(markers);
     }
 
     private updateField = () =>

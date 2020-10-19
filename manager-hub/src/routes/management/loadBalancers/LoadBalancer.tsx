@@ -26,7 +26,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
 import {RouteComponentProps} from "react-router";
 import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
-import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -200,7 +200,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
         const isNewLoadBalancer = this.isNew();
         return (
             <>
-                {!isNewLoadBalancer && isLoading && <ListLoadingSpinner/>}
+                {!isNewLoadBalancer && isLoading && <LoadingSpinner/>}
                 {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
                 {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && formLoadBalancer && (
                     /*@ts-ignore*/

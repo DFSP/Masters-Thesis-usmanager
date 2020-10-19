@@ -73,7 +73,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         isLoading: state.entities.loadBalancers.isLoadingLoadBalancers,
         error: state.entities.loadBalancers.loadLoadBalancersError,
-        loadBalancers: (state.entities.loadBalancers.data && Object.values(state.entities.loadBalancers.data)) || [],
+        loadBalancers: (state.entities.loadBalancers.data && Object.values(state.entities.loadBalancers.data).reverse()) || [],
     }
 );
 

@@ -108,7 +108,7 @@ export default class LocationMap extends React.Component<Props, State> {
                     <i className="material-icons">fullscreen</i>
                 </button>
                 <Dialog id={'fullscreen-modal'}
-                        title={'Select position'}
+                        title={'Position'}
                         fullscreen
                         locked
                         footer={false}>

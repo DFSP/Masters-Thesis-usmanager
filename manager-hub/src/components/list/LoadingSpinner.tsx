@@ -23,9 +23,9 @@
  */
 
 import React from "react";
-import styles from './ListLoadingSpinner.module.css';
+import styles from './LoadingSpinner.module.css';
 
-const ListLoadingSpinner: React.FC = () =>
+const LoadingSpinner: React.FC = () =>
     <div className={styles.container}>
         <div className="preloader-wrapper active">
             <div className="spinner-layer spinner-white-only">
@@ -42,4 +42,4 @@ const ListLoadingSpinner: React.FC = () =>
         </div>
     </div>;
 
-export default ListLoadingSpinner;
+export default LoadingSpinner;

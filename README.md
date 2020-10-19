@@ -10,7 +10,6 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 ### Organização do projeto (módulos)
 
-
 - [master-manager](manager-master)
 
 - [worker-manager](manager-worker)
@@ -84,6 +83,8 @@ Substituir o id da ami no application.yaml, propriedade aws.instance.ami.
 
 - [Criar](https://console.aws.amazon.com/iam/home#/users) um utilizador *iam* para aceder aos recursos aws através, 
 com tipo de acesso Programmatic access, e política AdministratorAccess. Substituir os valores da access key e secret access key no application.yaml, propriedades aws.access.key e aws.access.secret-key, respetivamente.
+
+- [Configurar chaves](https://aws.amazon.com/pt/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) em todas as regiões disponíveis.
 
 ##### Go
 

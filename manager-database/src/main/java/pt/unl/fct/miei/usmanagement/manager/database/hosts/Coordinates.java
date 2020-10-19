@@ -38,15 +38,28 @@ import java.io.Serializable;
 public class Coordinates implements Serializable {
 
 	private final String label;
+	private final String title;
 	private final double latitude;
 	private final double longitude;
+
+	public Coordinates() {
+		this(null, null, 0, 0);
+	}
+
+	public Coordinates(double latitude, double longitude) {
+		this(null, null, latitude, longitude);
+	}
+
+	public Coordinates(String label, double latitude, double longitude) {
+		this(label, null, latitude, longitude);
+	}
 
 	public double distanceTo(Coordinates coordinates) {
 		// Spherical Law of Cosines formula
 		// d = acos( sin φ1 ⋅ sin φ2 + cos φ1 ⋅ cos φ2 ⋅ cos Δλ ) ⋅ R
-		double ph1 = this.latitude * Math.PI/180;
-		double ph2 = coordinates.latitude * Math.PI/180;
-		double deltaY = (coordinates.longitude - this.longitude) * Math.PI/180;
+		double ph1 = this.latitude * Math.PI / 180;
+		double ph2 = coordinates.latitude * Math.PI / 180;
+		double deltaY = (coordinates.longitude - this.longitude) * Math.PI / 180;
 		double r = 6371e3;
 		return Math.acos(Math.sin(ph1) * Math.sin(ph2) + Math.cos(ph1) * Math.cos(ph2) * Math.cos(deltaY)) * r;
 	}

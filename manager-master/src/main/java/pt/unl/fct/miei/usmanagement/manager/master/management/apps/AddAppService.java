@@ -24,11 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.apps;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 
-@Data
-public class AddAppService {
+@AllArgsConstructor
+@Getter
+final class AddAppService {
 
 	private final ServiceEntity service;
 	private final int launchOrder;

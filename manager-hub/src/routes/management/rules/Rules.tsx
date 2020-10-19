@@ -37,7 +37,7 @@ const Rules = () =>
         <AddButton tooltip={{text: 'Add condition or rule', position: 'left'}}
                    dropdown={{
                        id: 'addRuleOrCondition',
-                       title: 'Select option',
+                       title: 'Select menu',
                        data: [
                            {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
                            {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new=true'},

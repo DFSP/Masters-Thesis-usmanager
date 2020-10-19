@@ -29,12 +29,14 @@ import styles from './Hosts.module.css'
 import CloudHostsList from "./cloud/CloudHostsList";
 import EdgeHostsList from "./edge/EdgeHostsList";
 import Collapsible from "../../../components/collapsible/Collapsible";
+import {ICoordinates} from "../../../components/map/LocationMap";
 
 export interface IHostAddress {
     username: string | undefined;
     publicDnsName: string | undefined;
     publicIpAddress: string;
     privateIpAddress: string | undefined;
+    coordinates: ICoordinates;
 }
 
 const Hosts = () =>

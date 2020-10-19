@@ -1,0 +1,3 @@
+GROUP	sg-0ea91222	201060757713	default	default VPC security group	vpc-c689c5be
+PERMISSION	201060757713	default	ALLOWS	all			FROM	USER	201060757713		ID sg-0ea91222	ingress
+PERMISSION	201060757713	default	ALLOWS	all			TO	CIDR	0.0.0.0/0	egress

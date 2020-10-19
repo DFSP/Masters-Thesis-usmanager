@@ -75,6 +75,10 @@ public class HostAddress implements Serializable {
 		return publicDnsName != null ? publicDnsName : publicIpAddress;
 	}
 
+	public boolean isIncomplete() {
+		return username == null || publicIpAddress == null || privateIpAddress == null || coordinates == null;
+	}
+
 	@Override
 	public String toString() {
 		return (username == null ? "" : username + "@")
@@ -104,4 +108,5 @@ public class HostAddress implements Serializable {
 	public int hashCode() {
 		return Objects.hash(username, publicDnsName, publicIpAddress, privateIpAddress);
 	}
+
 }

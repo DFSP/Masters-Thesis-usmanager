@@ -26,7 +26,7 @@ import IDatabaseData from "../../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
-import ListLoadingSpinner from "../../../../components/list/ListLoadingSpinner";
+import LoadingSpinner from "../../../../components/list/LoadingSpinner";
 import {Error} from "../../../../components/errors/Error";
 import Field from "../../../../components/form/Field";
 import Tabs, {Tab} from "../../../../components/tabs/Tabs";
@@ -270,7 +270,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
         const isNewSimulatedServiceMetric = this.isNew();
         return (
             <>
-                {!isNewSimulatedServiceMetric && isLoading && <ListLoadingSpinner/>}
+                {!isNewSimulatedServiceMetric && isLoading && <LoadingSpinner/>}
                 {!isNewSimulatedServiceMetric && !isLoading && error && <Error message={error}/>}
                 {(isNewSimulatedServiceMetric || !isLoading) && (isNewSimulatedServiceMetric || !error) && formSimulatedServiceMetric && (
                     /*@ts-ignore*/
