@@ -25,8 +25,10 @@
 package pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 
 import java.util.Map;
@@ -54,10 +56,16 @@ public final class SimpleNode {
 	}
 
 	@JsonIgnore
+	public String getCoordinates() {
+		return labels.get(NodeConstants.Label.COORDINATES);
+	}
+
+	@JsonIgnore
 	public HostAddress getHostAddress() {
 		final String username = getUsername();
 		final String privateIpAddress = getPrivateIpAddress();
-		return new HostAddress(username, publicIpAddress, privateIpAddress);
+		final Coordinates coordinates = new Gson().fromJson(getCoordinates(), Coordinates.class);
+		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates);
 	}
 
 }
