@@ -163,7 +163,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication</mainClass>
+					<mainClass>pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterApplication</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>
