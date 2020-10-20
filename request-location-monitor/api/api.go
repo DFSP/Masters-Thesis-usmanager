@@ -27,7 +27,7 @@ package api
 import (
 	"encoding/json"
 	"flag"
-	"log"
+	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"net/http"
 	"strconv"
 	"sync"
@@ -37,16 +37,11 @@ import (
 	"github.com/usmanager/manager/request-location-monitor/utils"
 )
 
-var defaultInterval = 60
+var interval int
 var lock sync.Mutex
 
 func init() {
-	var defaultIntervalParam string
-	flag.StringVar(&defaultIntervalParam, "interval", "60", "Default interval on list top monitoring")
-	intervalParam, err := strconv.Atoi(defaultIntervalParam)
-	if err == nil {
-		defaultInterval = intervalParam
-	}
+	flag.IntVar(&interval, "interval", 60000, "Default interval (in ms) on list top monitoring")
 }
 
 func ListMonitoring(w http.ResponseWriter, r *http.Request) {
@@ -77,13 +72,13 @@ func listMonitoring(w http.ResponseWriter) {
 func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
 
-	interval, err := strconv.Atoi(vars.Get("interval"))
+	intervalQuery, err := strconv.Atoi(vars.Get("interval"))
 	if err != nil {
-		interval = defaultInterval
+		interval = intervalQuery
 	}
 
 	maxTime := time.Now()
-	minTime := maxTime.Add(time.Duration(-interval) * time.Second)
+	minTime := maxTime.Add(time.Duration(-interval))
 
 	serviceLocationMonitoring := make(map[string]map[string]data.ServiceLocationMonitoring)
 
@@ -148,11 +143,11 @@ func AddMonitoring(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		serviceMonitoringDataSlice.(*utils.ConcurrentSlice).Append(monitoringData)
 		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		log.Printf("Added location monitoring to existing service %s: %s", service, string(monitoringDataJson))
+		reglog.Logger.Infof("Added location monitoring to existing service %s: %s", service, string(monitoringDataJson))
 	} else {
 		serviceMonitoringDataSlice := utils.NewConcurrentSlice()
 		serviceMonitoringDataSlice.Append(monitoringData)
 		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		log.Printf("Added location monitoring to new service %s: %s", service, string(monitoringDataJson))
+		reglog.Logger.Infof("Added location monitoring to new service %s: %s", service, string(monitoringDataJson))
 	}
 }

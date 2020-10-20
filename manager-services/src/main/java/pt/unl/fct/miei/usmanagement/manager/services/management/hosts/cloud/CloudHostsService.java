@@ -43,14 +43,13 @@ import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundEx
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

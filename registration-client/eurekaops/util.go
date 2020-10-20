@@ -25,24 +25,23 @@
 package eurekaops
 
 import (
+	"github.com/usmanager/manager/registration-client/data"
 	"math/rand"
 	"strings"
-
-	"github.com/usmanager/manager/registration-client/api"
 )
 
 //GetBestInstance returns the best app instance
-func GetBestInstance(thisInstance *Instance, instances []*Instance) api.App {
-	var app api.App
+func GetBestInstance(thisInstance *Instance, instances []*Instance) data.InstanceEndpoint {
+	var app data.InstanceEndpoint
 	thisContinent, thisRegion, thisCountry, thisCity := getInstanceLocationInfo(*thisInstance)
 
-	var instancesAll []api.App
-	var instancesContinent []api.App
-	var instancesRegion []api.App
-	var instancesCountry []api.App
-	var instancesCity []api.App
+	var instancesAll []data.InstanceEndpoint
+	var instancesContinent []data.InstanceEndpoint
+	var instancesRegion []data.InstanceEndpoint
+	var instancesCountry []data.InstanceEndpoint
+	var instancesCity []data.InstanceEndpoint
 	for _, appInstance := range instances {
-		app = api.App{
+		app = data.InstanceEndpoint{
 			InstanceId: appInstance.InstanceId,
 			Endpoint:   appInstance.HomePageUrl,
 		}
@@ -80,19 +79,6 @@ func GetBestInstance(thisInstance *Instance, instances []*Instance) api.App {
 		app = instancesAll[randomIndex(maxIndex)]
 	}
 	return app
-}
-
-//GetApps returns apps instances
-func GetApps(instances []*Instance) []api.App {
-	var apps []api.App
-	for _, appInstance := range instances {
-		app := api.App{
-			InstanceId: appInstance.InstanceId,
-			Endpoint:   appInstance.HomePageUrl,
-		}
-		apps = append(apps, app)
-	}
-	return apps
 }
 
 //Returns serviceContinent, serviceRegion, serviceCountry, serviceCity

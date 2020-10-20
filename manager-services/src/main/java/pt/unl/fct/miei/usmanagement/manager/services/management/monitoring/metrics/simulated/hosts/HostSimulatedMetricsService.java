@@ -34,9 +34,9 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostSimulatedMetricsRepository;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Map;

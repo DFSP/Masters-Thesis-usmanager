@@ -31,17 +31,16 @@ import (
 	"github.com/usmanager/manager/registration-client/reglog"
 )
 
-// FindProcess : Find system process
 func FindProcess(key string) (int, string, bool) {
 	pname := ""
 	pid := 0
 	found := false
-	ps, _ := ps.Processes()
-	for i := range ps {
-		reglog.Logger.Debugf("Process #%d in list -> PID: %d; Name: %s", i, ps[i].Pid(), ps[i].Executable())
-		if strings.Contains(ps[i].Executable(), key) {
-			pid = ps[i].Pid()
-			pname = ps[i].Executable()
+	processes, _ := ps.Processes()
+	for i := range processes {
+		reglog.Logger.Debugf("Process #%d in list -> PID: %d; Name: %s", i, processes[i].Pid(), processes[i].Executable())
+		if strings.Contains(processes[i].Executable(), key) {
+			pid = processes[i].Pid()
+			pname = processes[i].Executable()
 			found = true
 			break
 		}

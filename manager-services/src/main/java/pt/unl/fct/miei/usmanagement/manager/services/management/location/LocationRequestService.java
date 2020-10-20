@@ -39,10 +39,10 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostLocation;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.ServiceDecisionResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;

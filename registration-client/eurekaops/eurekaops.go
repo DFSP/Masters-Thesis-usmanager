@@ -2,6 +2,7 @@
  * MIT License
  *
  * Copyright (c) 2020 manager
+ * Copyright (c) 2013 Hudl <@Hudl>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +24,6 @@
  */
 
 package eurekaops
-
-// MIT Licensed (see README.md) - Copyright (c) 2013 Hudl <@Hudl>
 
 import (
 	"encoding/json"

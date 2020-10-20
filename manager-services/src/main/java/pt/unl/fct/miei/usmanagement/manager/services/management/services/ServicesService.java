@@ -40,10 +40,10 @@ import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.database.services.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.services.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.apps.AppsService;
 
 import java.sql.Timestamp;
 import java.time.Instant;

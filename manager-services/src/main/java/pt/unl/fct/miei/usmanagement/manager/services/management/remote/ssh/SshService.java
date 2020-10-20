@@ -38,11 +38,11 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus.PrometheusProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus.PrometheusProperties;
 
 import java.io.File;
 import java.io.IOException;

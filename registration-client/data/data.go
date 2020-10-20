@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master;
+package data
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+type InstanceEndpoint struct {
+	InstanceId string `json:"instanceId,omitempty"`
+	Endpoint   string `json:"endpoint,omitempty"`
+}
 
-@SpringBootTest
-public class RegistrationServerApplicationTests {
-
-	@Test
-	public void contextLoads() {
-	}
-
+type LocationMonitoring struct {
+	Service   string `json:"service,omitempty"`
+	Latitude  string `json:"latitude,omitempty"`
+	Longitude string `json:"longitude,omitempty"`
+	Count     int    `json:"count,omitempty"`
 }

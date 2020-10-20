@@ -4,7 +4,7 @@
 externalPort=$1
 internalPort=$2
 hostname=$3
-exec java -Djava.security.egd=file:/dev/urandom -jar ./app.jar \
+exec java -Djava.security.egd=file:/dev/urandom -jar ./registration-server.jar \
   --port="$internalPort" \
   --host="$hostname" \
   --ip="$hostname" \

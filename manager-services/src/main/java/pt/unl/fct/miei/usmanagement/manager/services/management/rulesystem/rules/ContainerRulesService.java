@@ -35,9 +35,9 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerR
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleRepository;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 
 import java.util.List;
 

@@ -138,11 +138,11 @@ org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "SYMNODESEC0_.FAILED_LOGINS" not
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
 	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212)
 	at com.sun.proxy.$Proxy143.deleteAll(Unknown Source)
-	at pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService.clearSymmetricDS(SymService.java:262)
-	at pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService.loadSymmetricDS(SymService.java:137)
-	at pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService.startSymmetricDSServer(SymService.java:132)
-	at pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:84)
-	at pt.unl.fct.miei.usmanagement.manager.master.ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:54)
+	at SymService.clearSymmetricDS(SymService.java:262)
+	at SymService.loadSymmetricDS(SymService.java:137)
+	at SymService.startSymmetricDSServer(SymService.java:132)
+	at ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:84)
+	at ManagerMasterStartup.onApplicationEvent(ManagerMasterStartup.java:54)
 	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:172)
 	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:165)
 	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:139)
@@ -153,7 +153,7 @@ org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "SYMNODESEC0_.FAILED_LOGINS" not
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:326)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
-	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+	at ManagerMasterApplication.main(ManagerMasterApplication.java:37)
 2020-08-08 13:53:18 jdbc[199]: exception
 org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "'org.springframework.dao.InvalidDataAccessResourceUsageException: could not prepare statement; SQL [/* select generatedAlias0 fr... (1009)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
@@ -181,7 +181,7 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:329)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
-	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+	at ManagerMasterApplication.main(ManagerMasterApplication.java:37)
 org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "STRINGDECODE('Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Column \""SYMNODESEC0_.FAILED_LOGINS\"" not found; SQL statement... (941)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:455)
@@ -212,6 +212,6 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:329)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1213)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1202)
-	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+	at ManagerMasterApplication.main(ManagerMasterApplication.java:37)
 org.h2.jdbc.JdbcSQLDataException: Value too long for column """TRACE_LINE"" VARCHAR(256) NOT NULL": "'org.springframework.dao.InvalidDataAccessResourceUsageException: could not prepare statement; SQL [/* select generatedAlias0 fr... (1009)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-199]

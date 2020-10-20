@@ -26,6 +26,7 @@ package main
 
 import (
 	"flag"
+	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"log"
 	"net/http"
 
@@ -35,7 +36,6 @@ import (
 )
 
 func main() {
-
 	var port = flag.String("port", "1919", "Port to bind HTTP listener")
 	flag.Parse()
 
@@ -61,6 +61,6 @@ func main() {
 		Path("/api/monitoring").
 		HandlerFunc(api.AddMonitoring)
 
-	log.Printf("Request-location-monitor is listening on port %s.", *port)
+	reglog.Logger.Infof("Request-location-monitor is listening on port %s.", *port)
 	log.Fatal(http.ListenAndServe(":"+*port, router))
 }

@@ -1,6 +1,6 @@
 # Registration-client
 
-Regista um serviço no [Servidor Eureka](../registration-server), e obtém o endpoints dos outros serviços, registados no servidor.
+Regista o serviço no [Servidor Eureka](../registration-server), e obtém o endpoints dos outros serviços, também registados no servidor.
 
 ## Executar
 
@@ -11,6 +11,7 @@ cd cmd
 go build -o registration-client
 ./registration-client
 ```
+O resultado é o ficheiro binário `registration-client`, gerado na diretoria atual.
 
 #### Docker
 
@@ -19,17 +20,18 @@ docker build -f docker/Dockerfile . -t registration-client
 docker run -p 1906:1906 registration-client
 ```
 
-O resultado é o ficheiro binário `registration-client`, gerado na diretoria `cmd`.
+## API Endpoints
 
-#### API Endpoints
+Os URIs são relativos a *http://localhost:1906/api*
 
-Os URIs são relativos a *http://localhost:1906/api/apps*
+HTTP request | Description
+------------ | -------------
+**Post** /api/register | Regista o endpoint no servidor eureka
+**Get** /services/{service}/endpoint | Obtém o melhor endpoint para o serviço {service}
+**Get** /services/{service}/endpoints | Obtém todos os endpoints registados em nome do serviço {service}
+**Post** /api/metrics | Adiciona uma nova monitorização deste endpoint
 
-Class | Method | HTTP request | Description
------------- | ------------- | ------------- | -------------
-*AppsApi* | **GetAllAppsByName** | **Get** /{appName}/all | Get all apps endpoints by app name
-*AppsApi* | **GetAppsByName** | **Get** /{appName} | Get an app endpoint by app name
 
-#### Licença
+## Licença
 
 Registration-client está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

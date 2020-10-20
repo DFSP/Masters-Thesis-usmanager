@@ -32,8 +32,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

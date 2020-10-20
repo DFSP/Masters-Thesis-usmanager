@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagersService;
 
 import java.util.Arrays;

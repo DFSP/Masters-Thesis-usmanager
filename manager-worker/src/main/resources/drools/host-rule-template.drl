@@ -8,7 +8,7 @@ priority
 
 package pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem;
 
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision.*;
+import RuleDecision.*;
 
 global RuleDecision hostDecision;
 

@@ -23,7 +23,7 @@
  *//*
 
 
-package pt.unl.fct.miei.usmanagement.manager.master.kafka;
+package pt.unl.fct.miei.usmanagement.manager.master.management.kafka;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

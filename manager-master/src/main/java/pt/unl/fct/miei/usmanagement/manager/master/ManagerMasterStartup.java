@@ -32,13 +32,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
-
-import java.sql.SQLException;
 
 @Slf4j
 @Component

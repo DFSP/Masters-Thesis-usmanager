@@ -1,15 +1,15 @@
 /*
  * MIT License
- *
+ *  
  * Copyright (c) 2020 manager
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -38,13 +38,13 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulat
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.containers.DockerContainer;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.containers.DockerContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.containers.DockerContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.proxy.DockerApiProxyService;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -33,8 +33,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricsRepository;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 
 import java.util.List;
 import java.util.Map;

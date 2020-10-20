@@ -23,7 +23,7 @@
  *//*
 
 
-package pt.unl.fct.miei.usmanagement.manager.master.kafka;
+package pt.unl.fct.miei.usmanagement.manager.master.management.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

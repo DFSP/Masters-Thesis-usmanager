@@ -31,7 +31,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.DecisionEntity;
 
 import javax.persistence.Entity;

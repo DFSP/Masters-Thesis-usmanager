@@ -32,12 +32,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.database.valuemodes.ValueModeEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

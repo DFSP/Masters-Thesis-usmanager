@@ -39,13 +39,13 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManagerEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
 
 import java.util.List;
 import java.util.stream.Collectors;

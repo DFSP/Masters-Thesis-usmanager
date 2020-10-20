@@ -33,8 +33,8 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulated
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceSimulatedMetricsRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 
 import java.util.List;
 import java.util.Map;

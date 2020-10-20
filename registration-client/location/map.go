@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package locationutils
+package location
 
 import "sync"
 

@@ -39,13 +39,13 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleEn
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.HostRuleRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostEvent;
 
 import java.util.ArrayList;
 import java.util.List;

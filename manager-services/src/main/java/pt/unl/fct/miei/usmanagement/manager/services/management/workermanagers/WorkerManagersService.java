@@ -36,8 +36,6 @@ import pt.unl.fct.miei.usmanagement.manager.database.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
@@ -57,20 +55,15 @@ public class WorkerManagersService {
 	private final EdgeHostsService edgeHostsService;
 	private final ContainersService containersService;
 	private final HostsService hostsService;
-	private final NodesService nodesService;
 
-	public WorkerManagersService(WorkerManagerRepository workerManagers,
-								 CloudHostsService cloudHostsService,
-								 EdgeHostsService edgeHostsService,
-								 @Lazy ContainersService containersService,
-								 HostsService hostsService,
-								 NodesService nodesService) {
+	public WorkerManagersService(WorkerManagerRepository workerManagers, CloudHostsService cloudHostsService,
+								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
+								 HostsService hostsService) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
-		this.nodesService = nodesService;
 	}
 
 	public List<WorkerManagerEntity> getWorkerManagers() {

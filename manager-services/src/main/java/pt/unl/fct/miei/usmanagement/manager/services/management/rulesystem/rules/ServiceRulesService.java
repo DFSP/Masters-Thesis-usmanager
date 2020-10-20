@@ -38,12 +38,12 @@ import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRul
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ServiceRuleRepository;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 
 import java.util.ArrayList;
 import java.util.List;

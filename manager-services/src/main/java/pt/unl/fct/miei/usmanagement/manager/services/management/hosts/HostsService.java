@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.services.management.hosts;
 
 import com.google.common.base.Strings;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -41,8 +40,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.Mode;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.MethodNotAllowedException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerProperties;
@@ -61,6 +58,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metri
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

@@ -50,13 +50,13 @@ import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.discovery.eureka.EurekaService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.services.discovery.eureka.EurekaService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

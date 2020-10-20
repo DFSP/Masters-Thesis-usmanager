@@ -40,13 +40,9 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostMonitoringRe
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.HostMetricsService;
@@ -55,7 +51,11 @@ import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.decis
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
 import java.sql.Timestamp;
 import java.time.Instant;

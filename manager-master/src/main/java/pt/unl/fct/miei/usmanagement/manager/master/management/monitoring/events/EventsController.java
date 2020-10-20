@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostDetails;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.HostEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ServiceEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.events.HostsEventsService;

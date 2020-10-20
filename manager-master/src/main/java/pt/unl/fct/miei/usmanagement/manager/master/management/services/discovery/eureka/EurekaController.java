@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.master.util.Json;
+import pt.unl.fct.miei.usmanagement.manager.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.services.management.services.discovery.eureka.EurekaService;
 
 import java.util.Arrays;

@@ -32,9 +32,9 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.services.ServicesService;
 
 import java.util.List;
 

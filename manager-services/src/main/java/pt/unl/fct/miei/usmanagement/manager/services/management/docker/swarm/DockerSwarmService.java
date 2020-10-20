@@ -33,12 +33,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.services.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
 import java.util.List;

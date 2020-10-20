@@ -27,10 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metr
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostProperties;
 
 import java.util.HashMap;
 import java.util.Map;

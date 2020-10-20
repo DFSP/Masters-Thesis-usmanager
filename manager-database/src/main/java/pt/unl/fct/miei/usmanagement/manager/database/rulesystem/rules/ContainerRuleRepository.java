@@ -28,8 +28,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 
 import java.util.List;
 import java.util.Optional;
