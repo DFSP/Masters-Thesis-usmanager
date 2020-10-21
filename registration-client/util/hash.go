@@ -22,45 +22,17 @@
  * SOFTWARE.
  */
 
-package main
+package ps
 
 import (
-	"flag"
-	"github.com/usmanager/manager/request-location-monitor/reglog"
-	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
-
-	"github.com/usmanager/manager/request-location-monitor/api"
+	"crypto/sha1"
+	"fmt"
 )
 
-func main() {
-	var port = flag.String("port", "1919", "Port to bind HTTP listener")
-	flag.Parse()
-
-	router := mux.NewRouter()
-
-	router.Methods("GET").
-		Path("/api/monitoring").
-		HandlerFunc(api.ListMonitoring)
-
-	router.Methods("GET").
-		Path("/api/monitoring").
-		Queries("aggregation", "").
-		HandlerFunc(api.ListMonitoring)
-
-	router.Methods("GET").
-		Path("/api/monitoring").
-		Queries(
-			"interval", "",
-			"interval", "{[0-9]+}").
-		HandlerFunc(api.ListMonitoring)
-
-	router.Methods("POST").
-		Path("/api/monitoring").
-		HandlerFunc(api.AddMonitoring)
-
-	reglog.Logger.Infof("Request-location-monitor is listening on port %s.", *port)
-	log.Fatal(http.ListenAndServe(":"+*port, router))
+func Sha1(str string) string {
+	// hash id (non secure)
+	h := sha1.New()
+	h.Write([]byte(str))
+	hash := h.Sum(nil)
+	return fmt.Sprintf("%x", hash)
 }

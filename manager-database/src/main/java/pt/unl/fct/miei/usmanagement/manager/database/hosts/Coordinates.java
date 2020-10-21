@@ -55,7 +55,7 @@ public class Coordinates implements Serializable {
 	}
 
 	public double distanceTo(Coordinates coordinates) {
-		// Spherical Law of Cosines formula
+		// Spherical Law of Cosines formula. Great-circle distance
 		// d = acos( sin φ1 ⋅ sin φ2 + cos φ1 ⋅ cos φ2 ⋅ cos Δλ ) ⋅ R
 		double ph1 = this.latitude * Math.PI / 180;
 		double ph2 = coordinates.latitude * Math.PI / 180;

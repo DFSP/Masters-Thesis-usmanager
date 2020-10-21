@@ -39,7 +39,7 @@ import org.jumpmind.symmetric.web.WebConstants;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.worker.services.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.worker.util.Timing;
 
 import javax.servlet.ServletContext;

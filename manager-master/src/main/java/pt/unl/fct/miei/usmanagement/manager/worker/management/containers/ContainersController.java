@@ -100,8 +100,8 @@ public class ContainersController {
 	}
 
 	@PostMapping("/reload")
-	public List<ContainerEntity> reloadContainers() {
-		return containersService.reloadContainers();
+	public List<ContainerEntity> syncDatabaseContainers() {
+		return containersService.syncDatabaseContainers();
 	}
 
 	@GetMapping("/{containerId}/logs")

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package util
+package ps
 
 import (
 	"strings"
@@ -32,7 +32,7 @@ import (
 )
 
 func FindProcess(key string) (int, string, bool) {
-	pname := ""
+	processName := ""
 	pid := 0
 	found := false
 	processes, _ := ps.Processes()
@@ -40,10 +40,10 @@ func FindProcess(key string) (int, string, bool) {
 		reglog.Logger.Debugf("Process #%d in list -> PID: %d; Name: %s", i, processes[i].Pid(), processes[i].Executable())
 		if strings.Contains(processes[i].Executable(), key) {
 			pid = processes[i].Pid()
-			pname = processes[i].Executable()
+			processName = processes[i].Executable()
 			found = true
 			break
 		}
 	}
-	return pid, pname, found
+	return pid, processName, found
 }

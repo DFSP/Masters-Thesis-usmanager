@@ -27,7 +27,6 @@ package location
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/usmanager/manager/registration-client/data"
 	"github.com/usmanager/manager/registration-client/instance"
@@ -42,11 +41,9 @@ import (
 var lock sync.Mutex
 var locationMonitoringData *ConcurrentMap
 
+
 func init() {
 	locationMonitoringData = NewConcurrentMap()
-
-	interval := flag.Int("interval", 5000, "Interval time (in ms) to send location data")
-	go sendTimer(time.Duration(*interval))
 }
 
 func RegisterRequest(service string) {
@@ -54,7 +51,7 @@ func RegisterRequest(service string) {
 	defer lock.Unlock()
 	serviceData, hasServiceData := locationMonitoringData.Get(service)
 	count := 1
-	if hasServiceData {
+	if hasServiceData && serviceData != nil {
 		count += serviceData.(data.LocationMonitoring).Count
 	}
 	newServiceData := data.LocationMonitoring{
@@ -90,35 +87,41 @@ func clear(serviceKey string) {
 	locationMonitoringData.Set(serviceKey, nil)
 }
 
-func sendTimer(sendInterval time.Duration) {
-	time.Sleep(sendInterval)
-
+func SendLocationTimer(sendInterval time.Duration) chan bool {
 	sendTicker := time.NewTicker(sendInterval)
-	defer sendTicker.Stop()
 
-	go func() {
+	stopChan := make(chan bool)
+	go func(ticker *time.Ticker) {
+		defer sendTicker.Stop()
+
 		for {
 			select {
-			case timer := <-sendTicker.C:
-				sendAllData(timer)
+			case <-ticker.C:
+				sendAllData()
+			case stop := <-stopChan:
+				if stop {
+					return
+				}
 			}
 		}
-	}()
+
+	}(sendTicker)
+
+	return stopChan
 }
 
-func sendAllData(timer time.Time) {
-	count := 0
+func sendAllData() {
 	for mapItem := range locationMonitoringData.Iter() {
 		serviceKey := mapItem.Key
-		serviceData := mapItem.Value.(data.LocationMonitoring)
-		if serviceData.Count > 0 {
-			count = count + serviceData.Count
-			go sendData(serviceData)
-			go clear(serviceKey)
+		value := mapItem.Value
+		if value != nil {
+			serviceData := value.(data.LocationMonitoring)
+			if serviceData.Count > 0 {
+				go sendData(serviceData)
+				go clear(serviceKey)
+			}
 		}
-	}
-	if count > 0 {
-		reglog.Logger.Infof("Sent all location data. Started at %s and finished at %s", timer.String(), time.Now().String())
+
 	}
 }
 
@@ -133,6 +136,6 @@ func sendData(data data.LocationMonitoring) {
 			panic(err)
 		}
 		defer resp.Body.Close()
-		reglog.Logger.Infof("Sent location data %s", data)
+		reglog.Logger.Infof("Sent location data %s", jsonValue)
 	}
 }

@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulat
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.workermanagers.WorkerManagerProperties;
@@ -56,11 +57,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class ContainersService {
+
+	private final static int CONTAINERS_DATABASE_SYNC_INTERVAL = 15000;
 
 	private final DockerContainersService dockerContainersService;
 	private final ContainerRulesService containerRulesService;
@@ -69,6 +74,8 @@ public class ContainersService {
 
 	private final ContainerRepository containers;
 	private final WorkerManagersService workerManagersService;
+
+	private Timer syncDatabaseContainersTimer;
 
 	public ContainersService(DockerContainersService dockerContainersService,
 							 ContainerRulesService containerRulesService,
@@ -156,7 +163,7 @@ public class ContainersService {
 			.collect(Collectors.toList());
 	}
 
-	public List<ContainerEntity> reloadContainers() {
+	public List<ContainerEntity> syncDatabaseContainers() {
 		List<ContainerEntity> containers = getContainers();
 		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
 		List<String> dockerContainerIds = dockerContainers
@@ -445,4 +452,26 @@ public class ContainersService {
 		}
 	}
 
+	public void initSyncDatabaseContainersTimer() {
+		syncDatabaseContainersTimer = new Timer("SyncDatabaseContainersTimer", true);
+		syncDatabaseContainersTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					syncDatabaseContainers();
+				}
+				catch (ManagerException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
+	}
+
+
+	public void stopSyncDatabaseContainersTimer() {
+		if (syncDatabaseContainersTimer != null) {
+			syncDatabaseContainersTimer.cancel();
+			log.info("Stopped containers database synchronization");
+		}
+	}
 }

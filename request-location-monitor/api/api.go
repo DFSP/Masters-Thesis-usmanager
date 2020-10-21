@@ -41,7 +41,7 @@ var interval int
 var lock sync.Mutex
 
 func init() {
-	flag.IntVar(&interval, "interval", 60000, "Default interval (in ms) on list top monitoring")
+	flag.IntVar(&interval, "interval", 60000, "Default interval (in seconds) to include instances on data aggregation")
 }
 
 func ListMonitoring(w http.ResponseWriter, r *http.Request) {
@@ -74,11 +74,11 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 
 	intervalQuery, err := strconv.Atoi(vars.Get("interval"))
 	if err != nil {
-		interval = intervalQuery
+		interval = intervalQuery * 1000
 	}
 
 	maxTime := time.Now()
-	minTime := maxTime.Add(time.Duration(-interval))
+	minTime := maxTime.Add(time.Duration(-interval) * time.Millisecond)
 
 	serviceLocationMonitoring := make(map[string]map[string]data.ServiceLocationMonitoring)
 

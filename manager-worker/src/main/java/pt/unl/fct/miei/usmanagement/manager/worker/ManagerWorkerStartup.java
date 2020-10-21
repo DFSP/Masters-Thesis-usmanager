@@ -22,54 +22,42 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.master;
+package pt.unl.fct.miei.usmanagement.manager.worker;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 
 @Slf4j
 @Component
-public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
+public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
+	private final SymService symService;
 	private final HostsService hostsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
-	private final SymService symService;
 
-	public ManagerMasterStartup(@Lazy HostsService hostsService,
-								@Lazy ServicesMonitoringService servicesMonitoringService,
-								@Lazy HostsMonitoringService hostsMonitoringService,
-								SymService symService) {
+	public ManagerWorkerStartup(SymService symService, HostsService hostsService,
+								ServicesMonitoringService servicesMonitoringService,
+								HostsMonitoringService hostsMonitoringService) {
+		this.symService = symService;
 		this.hostsService = hostsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
-		this.symService = symService;
 	}
 
-	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		HostAddress hostAddress = hostsService.setHostAddress();
-		try {
-			hostsService.clusterHosts();
-		}
-		catch (ManagerException e) {
-			e.printStackTrace();
-		}
+		hostsService.setHostAddress();
+		symService.startSymmetricDSServer();
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
-		symService.startSymmetricDSServer(hostAddress);
 	}
 
 }

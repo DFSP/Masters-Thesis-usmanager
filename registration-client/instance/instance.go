@@ -30,6 +30,7 @@ import (
 	eureka "github.com/usmanager/manager/registration-client/eurekaops"
 	"github.com/usmanager/manager/registration-client/heartbeat"
 	"github.com/usmanager/manager/registration-client/reglog"
+	hash "github.com/usmanager/manager/registration-client/util"
 	"os"
 	"strconv"
 	"strings"
@@ -41,30 +42,36 @@ var Port int
 var Latitude float64
 var Longitude float64
 
+var eurekaAddress string
 var EurekaServer eureka.EurekaConnection
 var RequestLocationMonitorUrl string
 var Instance eureka.Instance
 
+var StopHeartbeatChan chan bool
+
 func init() {
-	flag.StringVar(&Service, "service", "", "Service name")
-	Service = strings.ToLower(Service)
+	flag.StringVar(&Service, "service", os.Getenv("service"), "Service name")
 	flag.StringVar(&Hostname, "hostname", "localhost", "Service Hostname")
-	flag.IntVar(&Port, "port", 80, "Service Port")
-	lat, _ := strconv.ParseFloat(os.Getenv("Latitude"), 64)
+	flag.IntVar(&Port, "port", 1906, "Service Port")
+	lat, _ := strconv.ParseFloat(os.Getenv("latitude"), 64)
 	flag.Float64Var(&Latitude, "latitude", lat, "Service Latitude")
-	lon, _ := strconv.ParseFloat(os.Getenv("Longitude"), 64)
+	lon, _ := strconv.ParseFloat(os.Getenv("longitude"), 64)
 	flag.Float64Var(&Longitude, "longitude", lon, "Service Longitude")
-	eurekaAddress := flag.String("eureka-server", "127.0.0.1:8761", "Eureka server")
-
-	eurekaUrl := fmt.Sprintf("http://%s/eureka", *eurekaAddress)
-	EurekaServer = eureka.NewConn(eurekaUrl)
-
-	RequestLocationMonitorUrl = fmt.Sprintf("http://%s:%d/api/monitoring", Hostname, 1919)
+	flag.StringVar(&eurekaAddress, "eureka", os.Getenv("eureka"), "Eureka server")
 }
 
 func Register() {
+	Service = strings.ToLower(Service)
+	eurekaUrl := fmt.Sprintf("http://%s/eureka", eurekaAddress)
+	EurekaServer = eureka.NewConn(eurekaUrl)
+
+	RequestLocationMonitorUrl = fmt.Sprintf("http://%s:%d/api/monitoring", Hostname, 1919)
+
+	id := fmt.Sprintf("%s_%s_%d", Service, Hostname, Port)
+	instanceId := hash.Sha1(id)
+
 	Instance = eureka.Instance{
-		InstanceId:       fmt.Sprintf("%s_%s_%d", Service, Hostname, Port),
+		InstanceId:       instanceId,
 		HostName:         Hostname,
 		App:              Service,
 		IPAddr:           Hostname,
@@ -81,17 +88,25 @@ func Register() {
 		HomePageUrl:    fmt.Sprintf("http://%s:%d", Hostname, Port),
 		StatusPageUrl:  fmt.Sprintf("http://%s:%d/health", Hostname, Port),
 		HealthCheckUrl: fmt.Sprintf("http://%s:%d/health", Hostname, Port),
+
+		CountryId: 1,
+		DataCenterInfo: eureka.DataCenterInfo{
+			Name: "Amazon",
+			Metadata: eureka.AmazonMetadataType{
+				InstanceID: instanceId,
+			},
+		},
 	}
-	Instance.SetMetadataString("management.Port", strconv.Itoa(Port))
-	Instance.SetMetadataString("Latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
-	Instance.SetMetadataString("Longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
+	Instance.SetMetadataString("management.port", strconv.Itoa(Port))
+	Instance.SetMetadataString("latitude", strconv.FormatFloat(Latitude, 'f', -1, 64))
+	Instance.SetMetadataString("longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
 
 	err := EurekaServer.ReregisterInstance(&Instance)
 	if err == nil {
-		go heartbeat.Heartbeat(EurekaServer, Instance)
+		reglog.Logger.Infof("Instance registered as %s", Instance.InstanceId)
+		StopHeartbeatChan = heartbeat.Ticker(EurekaServer, Instance)
 	}
 
-	reglog.Logger.Infof("Instance registered as %s", Instance.InstanceId)
 }
 
 func Deregister() {
@@ -99,13 +114,9 @@ func Deregister() {
 	if err != nil {
 		reglog.Logger.Errorf("Update instance status error: %s", err.Error())
 	}
-	reglog.Logger.Info("Registration-client is finishing app de-registering before exit")
-	// TODO wtf
-	/*time.Sleep(20 * time.Second)*/
+
 	err = EurekaServer.DeregisterInstance(&Instance)
 	if err != nil {
 		reglog.Logger.Errorf("Deregister instance error: %s", err.Error())
 	}
-	reglog.Logger.Info("Exit registration-client")
-	os.Exit(0)
 }

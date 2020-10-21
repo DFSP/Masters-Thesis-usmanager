@@ -70,8 +70,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud/sync")
-	public List<CloudHostEntity> syncCloudHosts() {
-		return cloudHostsService.syncCloudHosts();
+	public List<CloudHostEntity> syncDatabaseCloudHosts() {
+		return cloudHostsService.syncDatabaseCloudHosts();
 	}
 
 	@GetMapping("/cloud/{instanceId}")

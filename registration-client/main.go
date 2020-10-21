@@ -30,17 +30,26 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/usmanager/manager/registration-client/api"
 	"github.com/usmanager/manager/registration-client/instance"
+	"github.com/usmanager/manager/registration-client/location"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/usmanager/manager/registration-client/reglog"
 )
 
+var register bool
+var interval int
+
+func init()  {
+	flag.BoolVar(&register, "register", true, "True: registration-client will register service on Eureka; False: service will manually trigger the register")
+	flag.IntVar(&interval, "interval", 5000, "Interval time (in ms) to send location data")
+}
+
 func main() {
-	register := flag.Bool("register", true, "True: registration-client will register service on Eureka; False: service will manually trigger the register")
 	flag.Parse()
 
 	address := fmt.Sprintf(":%d", instance.Port)
@@ -50,7 +59,7 @@ func main() {
 	}
 	reglog.Logger.Infof("Registration-client is listening on port %d", instance.Port)
 
-	if *register {
+	if register {
 		go func() {
 			instance.Register()
 		}()
@@ -58,12 +67,15 @@ func main() {
 
 	go func() {
 		router := mux.NewRouter()
-		router.HandleFunc("/api/metrics", api.RegisterLocationMonitoring).Methods("POST")
+		router.HandleFunc("/api/register", api.RegisterServiceEndpoint).Methods("POST")
 		router.HandleFunc("/api/services/{service}/endpoint", api.GetServiceEndpoint).Methods("GET")
 		router.HandleFunc("/api/services/{service}/endpoints", api.GetServiceEndpoints).Methods("GET")
-		router.HandleFunc("/api/services/register", api.RegisterServiceEndpoint).Methods("POST")
+		router.HandleFunc("/api/metrics", api.RegisterLocationMonitoring).Methods("POST")
 		reglog.Logger.Fatal(http.Serve(listen, router))
 	}()
+
+
+	sendLocationTimerStopChan := location.SendLocationTimer(time.Duration(interval) * time.Millisecond)
 
 	interrupt := make(chan error)
 	go func() {
@@ -72,6 +84,12 @@ func main() {
 		interrupt <- fmt.Errorf("%s", <-c)
 	}()
 	<-interrupt
+
+	instance.StopHeartbeatChan <- true
+	close(instance.StopHeartbeatChan)
+
+	sendLocationTimerStopChan <- true
+	close(sendLocationTimerStopChan)
 
 	instance.Deregister()
 }

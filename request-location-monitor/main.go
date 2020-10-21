@@ -22,30 +22,47 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.worker;
+package main
 
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
+import (
+	"flag"
+	"github.com/usmanager/manager/request-location-monitor/reglog"
+	"log"
+	"net/http"
+	"strconv"
 
-@Component
-public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
+	"github.com/gorilla/mux"
 
-	private final DockerSwarmService dockerSwarmService;
-	private final SymService symService;
+	"github.com/usmanager/manager/request-location-monitor/api"
+)
 
-	public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
-		this.dockerSwarmService = dockerSwarmService;
-		this.symService = symService;
-	}
+func main() {
+	var port int
+	flag.IntVar(&port, "port", 1919, "Port to bind HTTP listener")
+	flag.Parse()
 
-	@Override
-	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
-		dockerSwarmService.destroySwarm();
-		symService.stopSymmetricDSServer();
-	}
+	router := mux.NewRouter()
 
+	router.Methods("GET").
+		Path("/api/monitoring").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("GET").
+		Path("/api/monitoring").
+		Queries("aggregation", "").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("GET").
+		Path("/api/monitoring").
+		Queries(
+			"interval", "",
+			"interval", "{[0-9]+}").
+		HandlerFunc(api.ListMonitoring)
+
+	router.Methods("POST").
+		Path("/api/monitoring").
+		HandlerFunc(api.AddMonitoring)
+
+	reglog.Logger.Infof("Request-location-monitor is listening on port %d", port)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 }

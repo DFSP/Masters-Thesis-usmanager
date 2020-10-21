@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2013 Hudl <@Hudl>
  * Copyright (c) 2020 manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,8 +24,6 @@
  */
 
 package eurekaops
-
-// MIT Licensed (see README.md) - Copyright (c) 2013 Hudl <@Hudl>
 
 import (
 	"time"

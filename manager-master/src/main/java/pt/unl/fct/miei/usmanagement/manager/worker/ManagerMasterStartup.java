@@ -24,46 +24,61 @@
 
 package pt.unl.fct.miei.usmanagement.manager.master;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.master.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.master.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 
+@Slf4j
 @Component
-public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {
+public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-	private final ContainersService containersService;
-	private final DockerSwarmService dockerSwarmService;
+	private final HostsService hostsService;
 	private final CloudHostsService cloudHostsService;
-	private final SymService symService;
-	private final HostsMonitoringService hostsMonitoringService;
+	private final ContainersService containersService;
 	private final ServicesMonitoringService servicesMonitoringService;
+	private final HostsMonitoringService hostsMonitoringService;
+	private final SymService symService;
 
-	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 SymService symService, CloudHostsService cloudHostsService,
-								 HostsMonitoringService hostsMonitoringService,
-								 ServicesMonitoringService servicesMonitoringService) {
-		this.containersService = containersService;
-		this.dockerSwarmService = dockerSwarmService;
-		this.symService = symService;
+	public ManagerMasterStartup(@Lazy HostsService hostsService, @Lazy CloudHostsService cloudHostsService,
+								@Lazy ContainersService containersService,
+								@Lazy ServicesMonitoringService servicesMonitoringService,
+								@Lazy HostsMonitoringService hostsMonitoringService,
+								SymService symService) {
+		this.hostsService = hostsService;
 		this.cloudHostsService = cloudHostsService;
-		this.hostsMonitoringService = hostsMonitoringService;
+		this.containersService = containersService;
 		this.servicesMonitoringService = servicesMonitoringService;
+		this.hostsMonitoringService = hostsMonitoringService;
+		this.symService = symService;
 	}
 
+	@SneakyThrows
 	@Override
-	public void onApplicationEvent(ContextClosedEvent event) {
-		symService.stopSymmetricDSServer();
-		hostsMonitoringService.stopHostMonitoring();
-		servicesMonitoringService.stopServiceMonitoring();
-		containersService.stopContainers();
-		dockerSwarmService.destroySwarm();
-		cloudHostsService.terminateInstances();
+	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		HostAddress hostAddress = hostsService.setHostAddress();
+		try {
+			hostsService.clusterHosts();
+		}
+		catch (ManagerException e) {
+			e.printStackTrace();
+		}
+		servicesMonitoringService.initServiceMonitorTimer();
+		hostsMonitoringService.initHostMonitorTimer();
+		cloudHostsService.initSyncDatabaseCloudHostsTimer();
+		containersService.initSyncDatabaseContainersTimer();
+		symService.startSymmetricDSServer(hostAddress);
 	}
 
 }

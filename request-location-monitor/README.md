@@ -2,16 +2,25 @@
 
 Guarda o número de pedidos de um serviço, com os detalhes da localização.
 
+## Argumentos
+
+Usage of ./request-location-monitor:
+
+  - port (int)
+  
+    Port to bind HTTP listener (default 1919)
+
+  - interval (int)
+  
+    Default interval (in ms) to include instances on data aggregation (default 60000)
+
 ## Executar
 
 #### Local
 ```shell script
-cd request-location-monitor/cmd
 go build -o request-location-monitor
 ./request-location-monitor
 ```
-
-O resultado é o ficheiro binário `request-location-monitor`, gerado na diretoria atual.
 
 #### Docker
 
@@ -45,7 +54,7 @@ curl http://localhost:1919/api/monitoring?aggregation
 
 Ver todas as monitorizações, no últimos 120 segundos, agregadas por serviço:
 ```shell script
-curl http://localhost:1919/api/monitoring?aggregation&interval=120000
+curl http://localhost:1919/api/monitoring?aggregation&interval=120
 ```
 
 Regista uma nova monitorização de um serviço:

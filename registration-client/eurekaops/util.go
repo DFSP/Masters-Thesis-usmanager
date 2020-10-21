@@ -26,82 +26,45 @@ package eurekaops
 
 import (
 	"github.com/usmanager/manager/registration-client/data"
-	"math/rand"
-	"strings"
+	"math"
+	"sort"
+	"strconv"
 )
 
-//GetBestInstance returns the best app instance
+func distanceBetween(oneInstance *Instance, anotherInstance *Instance) float64 {
+	oneLat, _ := oneInstance.Metadata.GetString("latitude")
+	oneLatitude, _ := strconv.ParseFloat(oneLat, 64)
+	oneLon, _ := oneInstance.Metadata.GetString("longitude")
+	oneLongitude, _ := strconv.ParseFloat(oneLon, 64)
+
+	anotherLat, _ := anotherInstance.Metadata.GetString("latitude")
+	anotherLatitude, _ := strconv.ParseFloat(anotherLat, 64)
+	anotherLon, _ := anotherInstance.Metadata.GetString("longitude")
+	anotherLongitude, _ := strconv.ParseFloat(anotherLon, 64)
+
+	ph1 := oneLatitude * math.Pi / 180
+	ph2 := anotherLatitude * math.Pi / 180
+	deltaY := (anotherLongitude - oneLongitude) * math.Pi / 180
+	r := 6371e3
+
+	return math.Acos(math.Sin(ph1) * math.Sin(ph2) + math.Cos(ph1) * math.Cos(ph2) * math.Cos(deltaY)) * r
+}
+
 func GetBestInstance(thisInstance *Instance, instances []*Instance) data.InstanceEndpoint {
-	var app data.InstanceEndpoint
-	thisContinent, thisRegion, thisCountry, thisCity := getInstanceLocationInfo(*thisInstance)
+	// sort instances by distance
+	sort.Slice(instances, func(i, j int) bool {
+		distanceToOne := distanceBetween(thisInstance, instances[i])
+		distanceToAnother := distanceBetween(thisInstance, instances[j])
+		return distanceToOne < distanceToAnother
+	})
 
-	var instancesAll []data.InstanceEndpoint
-	var instancesContinent []data.InstanceEndpoint
-	var instancesRegion []data.InstanceEndpoint
-	var instancesCountry []data.InstanceEndpoint
-	var instancesCity []data.InstanceEndpoint
-	for _, appInstance := range instances {
-		app = data.InstanceEndpoint{
-			InstanceId: appInstance.InstanceId,
-			Endpoint:   appInstance.HomePageUrl,
-		}
-		instancesAll = append(instancesAll, app)
+	// always choose closest?
+	// randomize between the x closest?
+	// randomize between the instances within a distance range? 100 km?
 
-		appContinent, appRegion, appCountry, appCity := getInstanceLocationInfo(*appInstance)
-		if strings.EqualFold(thisContinent, appContinent) {
-			instancesContinent = append(instancesContinent, app)
-		}
-		if strings.EqualFold(thisRegion, appRegion) {
-			instancesRegion = append(instancesRegion, app)
-		}
-		if strings.EqualFold(thisCountry, appCountry) && thisCountry != "" && appCountry != "" {
-			instancesCountry = append(instancesCountry, app)
-		}
-		if strings.EqualFold(thisCity, appCity) && thisCity != "" && appCity != "" {
-			instancesCity = append(instancesCity, app)
-		}
+	instance := instances[0]
+	return data.InstanceEndpoint{
+		InstanceId: instance.InstanceId,
+		Endpoint:   instance.HomePageUrl,
 	}
-
-	if len(instancesCity) > 0 {
-		maxIndex := len(instancesCity)
-		app = instancesCity[randomIndex(maxIndex)]
-	} else if len(instancesCountry) > 0 {
-		maxIndex := len(instancesCountry)
-		app = instancesCountry[randomIndex(maxIndex)]
-	} else if len(instancesRegion) > 0 {
-		maxIndex := len(instancesRegion)
-		app = instancesRegion[randomIndex(maxIndex)]
-	} else if len(instancesContinent) > 0 {
-		maxIndex := len(instancesContinent)
-		app = instancesContinent[randomIndex(maxIndex)]
-	} else {
-		maxIndex := len(instancesAll)
-		app = instancesAll[randomIndex(maxIndex)]
-	}
-	return app
-}
-
-//Returns serviceContinent, serviceRegion, serviceCountry, serviceCity
-func getInstanceLocationInfo(instance Instance) (string, string, string, string) {
-	serviceContinent, err := instance.Metadata.GetString("serviceContinent")
-	if err != nil {
-		serviceContinent = ""
-	}
-	serviceRegion, err := instance.Metadata.GetString("serviceRegion")
-	if err != nil {
-		serviceRegion = ""
-	}
-	serviceCountry, err := instance.Metadata.GetString("serviceCountry")
-	if err != nil {
-		serviceCountry = ""
-	}
-	serviceCity, err := instance.Metadata.GetString("serviceCity")
-	if err != nil {
-		serviceCity = ""
-	}
-	return serviceContinent, serviceRegion, serviceCountry, serviceCity
-}
-
-func randomIndex(max int) int {
-	return rand.Intn(max)
 }

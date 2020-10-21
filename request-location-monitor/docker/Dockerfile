@@ -8,19 +8,17 @@ go env -w GOPRIVATE=github.com/usmanager/*
 
 # Build request-location-monitor binary
 COPY . /go/src/github.com/usmanager/manager/request-location-monitor
-WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor/cmd
+WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor
 RUN go mod vendor && \
 go build -o request-location-monitor && \
 mkdir /app && \
-mv /go/src/github.com/usmanager/manager/request-location-monitor/cmd/request-location-monitor /app/request-location-monitor
+mv /go/src/github.com/usmanager/manager/request-location-monitor/request-location-monitor /app/request-location-monitor
 
 # Build final image
-FROM alpine:3.12.0
+FROM alpine
 RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/request-location-monitor request-location-monitor
-COPY scripts/docker-init.sh docker-init.sh
-RUN ["chmod", "+x", "docker-init.sh"]
-ENTRYPOINT ["./docker-init.sh"]
-# internalPort, interval
-CMD ["1919", "60"]
+ENV port 1919
+ENV interval 60000
+CMD ./request-location-monitor -port $port -interval $interval

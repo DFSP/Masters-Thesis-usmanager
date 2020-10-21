@@ -24,40 +24,28 @@
 
 package pt.unl.fct.miei.usmanagement.manager.worker;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.worker.services.management.docker.swarm.DockerSwarmService;
 
-@Slf4j
 @Component
-public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
+public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
+	private final DockerSwarmService dockerSwarmService;
 	private final SymService symService;
-	private final HostsService hostsService;
-	private final ServicesMonitoringService servicesMonitoringService;
-	private final HostsMonitoringService hostsMonitoringService;
 
-	public ManagerWorkerStartup(SymService symService, HostsService hostsService,
-								ServicesMonitoringService servicesMonitoringService,
-								HostsMonitoringService hostsMonitoringService) {
+	public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
+		this.dockerSwarmService = dockerSwarmService;
 		this.symService = symService;
-		this.hostsService = hostsService;
-		this.servicesMonitoringService = servicesMonitoringService;
-		this.hostsMonitoringService = hostsMonitoringService;
 	}
 
 	@Override
-	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		hostsService.setHostAddress();
-		symService.startSymmetricDSServer();
-		servicesMonitoringService.initServiceMonitorTimer();
-		hostsMonitoringService.initHostMonitorTimer();
+	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
+		dockerSwarmService.destroySwarm();
+		symService.stopSymmetricDSServer();
 	}
 
 }

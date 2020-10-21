@@ -53,11 +53,15 @@ import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsServi
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class CloudHostsService {
+
+	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 15000;
 
 	private final AwsService awsService;
 	private final HostRulesService hostRulesService;
@@ -66,6 +70,8 @@ public class CloudHostsService {
 	private final NodesService nodesService;
 
 	private final CloudHostRepository cloudHosts;
+
+	private Timer syncDatabaseCloudHostsTimer;
 
 	public CloudHostsService(@Lazy AwsService awsService,
 							 @Lazy HostRulesService hostRulesService,
@@ -234,7 +240,7 @@ public class CloudHostsService {
 		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId(), false));
 	}
 
-	public List<CloudHostEntity> syncCloudHosts() {
+	public List<CloudHostEntity> syncDatabaseCloudHosts() {
 		List<CloudHostEntity> cloudHosts = getCloudHosts();
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
@@ -370,5 +376,27 @@ public class CloudHostsService {
 		AwsRegion awsRegion = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
 		log.info("Instance placement {} is on aws region {}", placement, awsRegion);
 		return awsRegion;
+	}
+
+	public void initSyncDatabaseCloudHostsTimer() {
+		syncDatabaseCloudHostsTimer = new Timer("SyncDatabaseCloudHostsTimer", true);
+		syncDatabaseCloudHostsTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					syncDatabaseCloudHosts();
+				}
+				catch (ManagerException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL);
+	}
+
+	public void stopSyncDatabaseCloudHostsTimer() {
+		if (syncDatabaseCloudHostsTimer != null) {
+			syncDatabaseCloudHostsTimer.cancel();
+			log.info("Stopped cloud hosts database synchronization");
+		}
 	}
 }

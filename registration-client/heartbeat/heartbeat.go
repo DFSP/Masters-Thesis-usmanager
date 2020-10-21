@@ -28,7 +28,7 @@ import (
 	"flag"
 	eureka "github.com/usmanager/manager/registration-client/eurekaops"
 	"github.com/usmanager/manager/registration-client/reglog"
-	"github.com/usmanager/manager/registration-client/util"
+	ps "github.com/usmanager/manager/registration-client/util"
 	"os"
 	"time"
 )
@@ -42,56 +42,71 @@ func init() {
 	flag.StringVar(&process, "process", "", "Process name to monitor")
 }
 
-func Heartbeat(eurekaServer eureka.EurekaConnection, instance eureka.Instance) {
-	time.Sleep(heartbeatInterval)
-
-	var retries = 0
-	var heartbeatError = false
-	var foundProcess = false
-
+func Ticker(eurekaServer eureka.EurekaConnection, instance eureka.Instance) chan bool {
 	heartbeatTicker := time.NewTicker(heartbeatInterval)
-	defer heartbeatTicker.Stop()
 
-	var monitoringProcess = len(process) > 0
-	go func() {
+	stopChan := make(chan bool)
+	go func(ticker *time.Ticker) {
+		defer heartbeatTicker.Stop()
+
+		var retry int
+
 		for {
 			select {
-			case t := <-heartbeatTicker.C:
-				if monitoringProcess {
-					pid, processName, found := util.FindProcess(process)
-					foundProcess = found
-					reglog.Logger.Infof("PID: %d | Process: %s | Found: %t", pid, processName, found)
+			case t := <-ticker.C:
+				if heartbeat(eurekaServer, instance, t, retry) {
+					retry = 0
+				} else {
+					retry++
 				}
-				if foundProcess || !monitoringProcess {
-					err := eurekaServer.HeartBeatInstance(&instance)
-					if err != nil {
-						heartbeatError = true
-						reglog.Logger.Errorf("Heartbeat error: %s", err.Error())
-					} else {
-						retries = 0
-						heartbeatError = false
-						reglog.Logger.Infof("Heartbeat to eureka server at: %v", t)
-					}
-				}
-				if (!foundProcess && monitoringProcess) || heartbeatError {
-					if retries < maxHeartbeatTries {
-						retries++
-						reglog.Logger.Errorf("Heartbeat not sent, retry #%s...", retries)
-						err := eurekaServer.UpdateInstanceStatus(&instance, eureka.DOWN)
-						if err != nil {
-							reglog.Logger.Errorf("Update instance status error: %s", err.Error())
-						}
-					} else {
-						reglog.Logger.Infof("Max heartbeat retries, de-registering instance...")
-						err := eurekaServer.DeregisterInstance(&instance)
-						if err != nil {
-							reglog.Logger.Errorf("Deregister instance error: %s", err.Error())
-						}
-						os.Exit(0)
-					}
+			case stop := <-stopChan:
+				if stop {
+					return
 				}
 			}
 		}
-	}()
 
+	}(heartbeatTicker)
+
+	return stopChan
+}
+
+
+func heartbeat(eurekaServer eureka.EurekaConnection, instance eureka.Instance, t time.Time, retry int) bool {
+	var success bool
+	var foundProcess bool
+
+	var monitoringProcess = len(process) > 0
+	if monitoringProcess {
+		pid, processName, found := ps.FindProcess(process)
+		foundProcess = found
+		reglog.Logger.Infof("PID: %d | Process: %s | Found: %t", pid, processName, found)
+	}
+	if foundProcess || !monitoringProcess {
+		err := eurekaServer.HeartBeatInstance(&instance)
+		if err != nil {
+			reglog.Logger.Errorf("Heartbeat error: %s", err.Error())
+		} else {
+			reglog.Logger.Infof("Heartbeat to eureka server at: %v", t)
+			success = true
+		}
+	}
+	if !success {
+		if retry < maxHeartbeatTries {
+			reglog.Logger.Errorf("Heartbeat not sent, retry #%d...", retry)
+			err := eurekaServer.UpdateInstanceStatus(&instance, eureka.DOWN)
+			if err != nil {
+				reglog.Logger.Errorf("Update instance status error: %s", err.Error())
+			}
+		} else {
+			reglog.Logger.Infof("Max heartbeat retries, de-registering instance...")
+			err := eurekaServer.DeregisterInstance(&instance)
+			if err != nil {
+				reglog.Logger.Errorf("Deregister instance error: %s", err.Error())
+			}
+			os.Exit(0)
+		}
+	}
+
+	return success
 }
