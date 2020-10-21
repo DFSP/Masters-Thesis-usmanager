@@ -34,10 +34,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.worker.services.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.worker.services.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.services.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.worker.services.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.edge.EdgeHostsService;
 
 @Slf4j
 @Service

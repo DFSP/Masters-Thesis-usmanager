@@ -29,7 +29,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.worker.services.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
