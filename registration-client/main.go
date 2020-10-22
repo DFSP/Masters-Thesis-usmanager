@@ -74,7 +74,6 @@ func main() {
 		reglog.Logger.Fatal(http.Serve(listen, router))
 	}()
 
-
 	sendLocationTimerStopChan := location.SendLocationTimer(time.Duration(interval) * time.Millisecond)
 
 	interrupt := make(chan error)

@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 # install
 COPY src ./src
 COPY pom.xml .
-RUN mvn -DskipTests -f pom.xml clean package
+RUN mvn -DskipTests clean package
 RUN mv target/*.jar ./manager-worker.jar
 
 # cleanup

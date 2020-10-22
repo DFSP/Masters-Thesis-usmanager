@@ -31,7 +31,6 @@ import (
 	"github.com/usmanager/manager/registration-client/heartbeat"
 	"github.com/usmanager/manager/registration-client/reglog"
 	hash "github.com/usmanager/manager/registration-client/util"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -50,14 +49,12 @@ var Instance eureka.Instance
 var StopHeartbeatChan chan bool
 
 func init() {
-	flag.StringVar(&Service, "service", os.Getenv("service"), "Service name")
-	flag.StringVar(&Hostname, "hostname", "localhost", "Service Hostname")
+	flag.StringVar(&Service, "service", "", "Service name")
+	flag.StringVar(&Hostname, "hostname", "127.0.0.1", "Service Hostname")
 	flag.IntVar(&Port, "port", 1906, "Service Port")
-	lat, _ := strconv.ParseFloat(os.Getenv("latitude"), 64)
-	flag.Float64Var(&Latitude, "latitude", lat, "Service Latitude")
-	lon, _ := strconv.ParseFloat(os.Getenv("longitude"), 64)
-	flag.Float64Var(&Longitude, "longitude", lon, "Service Longitude")
-	flag.StringVar(&eurekaAddress, "eureka", os.Getenv("eureka"), "Eureka server")
+	flag.Float64Var(&Latitude, "latitude", 0, "Service Latitude")
+	flag.Float64Var(&Longitude, "longitude", 0, "Service Longitude")
+	flag.StringVar(&eurekaAddress, "eureka", "127.0.0.1:8761", "Eureka server")
 }
 
 func Register() {

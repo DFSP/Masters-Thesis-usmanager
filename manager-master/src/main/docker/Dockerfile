@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 # install
 COPY src ./src
 COPY pom.xml .
-RUN mvn clean package -DskipTests
+RUN mvn -DskipTests clean package
 RUN mv target/*.jar ./manager-master.jar
 
 # cleanup

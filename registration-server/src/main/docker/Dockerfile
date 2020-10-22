@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 # install
 COPY src ./src
 COPY pom.xml .
-RUN mvn clean package -DskipTests
+RUN mvn -DskipTests clean package
 RUN mv target/*.jar ./registration-server.jar
 
 # cleanup
@@ -14,7 +14,8 @@ RUN rm -rf /root/.m2 src pom.xml target
 # execution
 COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
-EXPOSE 8761
-ENTRYPOINT ["./docker-init.sh"]
-# externalPort, internalPort, hostname
-CMD ["8761", "8761", "127.0.0.1"]
+ENTRYPOINT ["/bin/bash", "-c", "./docker-init.sh"]
+ENV internalPort 8761
+ENV externalPort 8761
+ENV hostname 127.0.0.1
+CMD ${internalPort} ${externalPort} ${hostname}

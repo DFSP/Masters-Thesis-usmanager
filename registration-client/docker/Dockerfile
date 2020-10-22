@@ -20,7 +20,14 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/registration-client registration-client
 ENV service ""
-ENV latitude ""
-ENV longitude ""
+ENV latitude 0
+ENV longitude 0
+ENV hostname "localhost"
+ENV port 1906
+ENV process ""
+ENV cache 10000
 ENV eureka "127.0.0.1:8761"
-CMD ./registration-client -service $service -latitude $latitude -longitude $longitude -eureka $eureka
+ENV interval 5000
+ENV register true
+CMD ./registration-client -service $service -latitude $latitude -longitude $longitude -hostname $hostname -port $port \
+-process $process -cache $cache -eureka $eureka -interval $interval -register=$register

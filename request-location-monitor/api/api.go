@@ -27,6 +27,7 @@ package api
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"net/http"
 	"strconv"
@@ -72,13 +73,17 @@ func listMonitoring(w http.ResponseWriter) {
 func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
 
-	intervalQuery, err := strconv.Atoi(vars.Get("interval"))
-	if err != nil {
-		interval = intervalQuery * 1000
+	aggregationInterval := interval
+	intervalQuery := vars.Get("interval")
+	if len(intervalQuery) > 0 {
+		overwrittenInterval, err := strconv.Atoi(intervalQuery)
+		if err == nil {
+			aggregationInterval = overwrittenInterval * 1000
+		}
 	}
 
 	maxTime := time.Now()
-	minTime := maxTime.Add(time.Duration(-interval) * time.Millisecond)
+	minTime := maxTime.Add(time.Duration(-aggregationInterval) * time.Millisecond)
 
 	serviceLocationMonitoring := make(map[string]map[string]data.ServiceLocationMonitoring)
 
@@ -91,21 +96,17 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 			if monitoringData.Timestamp.Before(minTime) || monitoringData.Timestamp.After(maxTime) {
 				continue
 			}
-			continent := monitoringData.Continent
-			region := monitoringData.Region
-			country := monitoringData.Country
-			city := monitoringData.City
+			latitude := monitoringData.Latitude
+			longitude := monitoringData.Longitude
 			count := monitoringData.Count
-			locationKey := continent + "_" + region + "_" + country + "_" + city
+			locationKey := fmt.Sprintf("%s_%s", latitude, longitude)
 			serviceData, hasLocation := serviceLocationMonitoring[serviceName][locationKey]
 			if hasLocation {
 				count += serviceData.Count
 			}
 			serviceLocationMonitoring[serviceName][locationKey] = data.ServiceLocationMonitoring{
-				Continent: continent,
-				Region:    region,
-				Country:   country,
-				City:      city,
+				Latitude:  latitude,
+				Longitude: longitude,
 				Service:   serviceName,
 				Count:     count,
 			}
@@ -126,11 +127,9 @@ func AddMonitoring(w http.ResponseWriter, r *http.Request) {
 	var requestMonitoringData data.ServiceLocationMonitoring
 	_ = json.NewDecoder(r.Body).Decode(&requestMonitoringData)
 	monitoringData := data.LocationMonitoring{
-		Continent: requestMonitoringData.Continent,
-		Region:    requestMonitoringData.Region,
-		Country:   requestMonitoringData.Country,
-		City:      requestMonitoringData.City,
 		Service:   requestMonitoringData.Service,
+		Latitude:  requestMonitoringData.Latitude,
+		Longitude: requestMonitoringData.Longitude,
 		Count:     requestMonitoringData.Count,
 		Timestamp: time.Now(),
 	}

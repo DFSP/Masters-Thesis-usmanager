@@ -34,7 +34,6 @@ import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMo
 import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.worker.symmetricds.SymService;
 
-@Slf4j
 @Component
 public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 

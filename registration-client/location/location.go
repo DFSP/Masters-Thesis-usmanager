@@ -31,7 +31,6 @@ import (
 	"github.com/usmanager/manager/registration-client/data"
 	"github.com/usmanager/manager/registration-client/instance"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
@@ -56,8 +55,8 @@ func RegisterRequest(service string) {
 	}
 	newServiceData := data.LocationMonitoring{
 		Service:   service,
-		Latitude:  strconv.FormatFloat(instance.Latitude, 'f', -1, 64),
-		Longitude: strconv.FormatFloat(instance.Longitude, 'f', -1, 64),
+		Latitude:  instance.Latitude,
+		Longitude: instance.Longitude,
 		Count:     count,
 	}
 	locationMonitoringData.Set(service, newServiceData)
@@ -66,7 +65,7 @@ func RegisterRequest(service string) {
 func AddRequest(locationMonitoring data.LocationMonitoring) {
 	lock.Lock()
 	defer lock.Unlock()
-	serviceKey := fmt.Sprintf("%s_%s_%s", locationMonitoring.Service, locationMonitoring.Latitude, locationMonitoring.Longitude)
+	serviceKey := fmt.Sprintf("%s_%f_%f", locationMonitoring.Service, locationMonitoring.Latitude, locationMonitoring.Longitude)
 	serviceData, hasServiceData := locationMonitoringData.Get(serviceKey)
 	count := 1
 	if hasServiceData && serviceData != nil {

@@ -29,7 +29,7 @@ eureka:
   instance:
     appname: eureka-server
     hostname: ${host:localhost}
-    instance-id: ${id:eureka-server_localhost_8761}
+    instance-id: ${id:30b5f1e3d8cb54b548dae75d3a97e6a7f0657257} #sha1(eureka-server_127.0.0.1_8761)
     ip-address: ${ip:localhost}
 server:
   port: ${port:8761}

@@ -38,13 +38,13 @@ import (
 	"time"
 )
 
-var cacheTime time.Duration
+var cache time.Duration
 
 var serviceInstances map[string][]*eureka.Instance
 var serviceInstancesUpdate map[string]time.Time
 
 func init() {
-	cacheTime = time.Duration(*flag.Int("cache-time", 10000, "Time (in ms) to cache instances endpoints before contacting Eureka"))
+	cache = time.Duration(*flag.Int("cache", 10000, "Time (in ms) to cache instances endpoints before contacting Eureka"))
 
 	serviceInstances = make(map[string][]*eureka.Instance)
 	serviceInstancesUpdate = make(map[string]time.Time)
@@ -63,7 +63,7 @@ func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	instances, hasServiceInstances := serviceInstances[service]
 	if hasServiceInstances {
-		if serviceInstancesUpdate[service].Add(cacheTime).After(time.Now()) {
+		if serviceInstancesUpdate[service].Add(cache).After(time.Now()) {
 			instanceEndpoint = eureka.GetBestInstance(&instance.Instance, instances)
 		} else {
 			instances, err := instance.EurekaServer.GetInstancesByVIPAddress(service, false, eureka.ThatAreUp)

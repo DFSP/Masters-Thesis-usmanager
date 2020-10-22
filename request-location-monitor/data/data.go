@@ -34,21 +34,17 @@ var LocationMonitoringData *utils.ConcurrentMap
 
 type LocationMonitoring struct {
 	Service   string    `json:"service"`
-	Continent string    `json:"continent"`
-	Region    string    `json:"region"`
-	Country   string    `json:"country"`
-	City      string    `json:"city"`
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
 	Count     int       `json:"count"`
 	Timestamp time.Time `json:"timestamp"`
 }
 
 type ServiceLocationMonitoring struct {
-	Service   string `json:"service"`
-	Continent string `json:"continent"`
-	Region    string `json:"region"`
-	Country   string `json:"country"`
-	City      string `json:"city"`
-	Count     int    `json:"count"`
+	Service   string  `json:"service"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Count     int     `json:"count"`
 }
 
 func init() {

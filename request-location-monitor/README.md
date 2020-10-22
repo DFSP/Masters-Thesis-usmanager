@@ -60,7 +60,7 @@ curl http://localhost:1919/api/monitoring?aggregation&interval=120
 Regista uma nova monitorização de um serviço:
 ```shell script
 curl --header "Content-Type: application/json" \
-     --data '{"service":"app","latitude":"39.575097","longitude":"-8.909794","count":"1"}' \
+     --data '{"service":"app","latitude":39.575097,"longitude":-8.909794,"count":1}' \
      http://localhost:1919/api/monitoring
 ```
 

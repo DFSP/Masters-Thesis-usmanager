@@ -36,9 +36,13 @@ import (
 	"github.com/usmanager/manager/request-location-monitor/api"
 )
 
-func main() {
-	var port int
+var port int
+
+func init()  {
 	flag.IntVar(&port, "port", 1919, "Port to bind HTTP listener")
+}
+
+func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
@@ -63,6 +67,6 @@ func main() {
 		Path("/api/monitoring").
 		HandlerFunc(api.AddMonitoring)
 
-	reglog.Logger.Infof("Request-location-monitor is listening on port %d", port)
+	reglog.Logger.Infof("Request-location-monitor is listening at http://127.0.0.1:%d", port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 }
