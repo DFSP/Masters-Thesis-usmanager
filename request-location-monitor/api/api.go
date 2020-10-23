@@ -27,7 +27,6 @@ package api
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/usmanager/manager/request-location-monitor/reglog"
 	"net/http"
 	"strconv"
@@ -58,12 +57,12 @@ func ListLocationRequests(w http.ResponseWriter, r *http.Request) {
 }
 
 func listMonitoring(w http.ResponseWriter) {
-	locationMonitoring := []data.LocationMonitoring{}
+	locationMonitoring := []data.LocationRequest{}
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
 		serviceData := mapItem.Value.(*utils.ConcurrentSlice)
 		for sliceItem := range serviceData.Iter() {
-			monitoringData := sliceItem.Value.(data.LocationMonitoring)
+			monitoringData := sliceItem.Value.(data.LocationRequest)
 			locationMonitoring = append(locationMonitoring, monitoringData)
 		}
 	}
@@ -86,59 +85,33 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	maxTime := time.Now()
 	minTime := maxTime.Add(time.Duration(-aggregationInterval) * time.Millisecond)
 
-	serviceLocationMonitoring := make(map[string]map[string]data.Location)
+	serviceLocationMonitoring := make(map[string]int)
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
 		serviceName := mapItem.Key
 		serviceData := mapItem.Value.(*utils.ConcurrentSlice)
-		serviceLocationMonitoring[serviceName] = make(map[string]data.Location)
 		for sliceItem := range serviceData.Iter() {
-			monitoringData := sliceItem.Value.(data.LocationMonitoring)
+			monitoringData := sliceItem.Value.(data.LocationRequest)
 			if monitoringData.Timestamp.Before(minTime) || monitoringData.Timestamp.After(maxTime) {
 				continue
 			}
-			latitude := monitoringData.Latitude
-			longitude := monitoringData.Longitude
 			count := monitoringData.Count
-			locationKey := fmt.Sprintf("%f_%f", latitude, longitude)
-			serviceData, hasLocation := serviceLocationMonitoring[serviceName][locationKey]
-			if hasLocation {
-				count += serviceData.Count
+			serviceCount, hasService := serviceLocationMonitoring[serviceName]
+			if hasService {
+				count += serviceCount
 			}
-			serviceLocationMonitoring[serviceName][locationKey] = data.Location{
-				Latitude:  latitude,
-				Longitude: longitude,
-				Count:     count,
-			}
+			serviceLocationMonitoring[serviceName] = count
 		}
 	}
 
-
-	services := map[string]data.LocationMonitoringAggregation{}
-	for serviceName, locations := range serviceLocationMonitoring {
-		locationsList := []data.Location{}
-		var count int
-		for _, location := range locations {
-			count += location.Count
-			locationsList = append(locationsList, location)
-		}
-		locationMonitoringAggregation := data.LocationMonitoringAggregation{
-			Requests: locationsList,
-			Count:    count,
-		}
-		services[serviceName] = locationMonitoringAggregation
-	}
-
-	json.NewEncoder(w).Encode(services)
+	json.NewEncoder(w).Encode(serviceLocationMonitoring)
 }
 
 func AddLocationRequest(w http.ResponseWriter, r *http.Request) {
-	var requestMonitoringData data.LocationMonitoring
+	var requestMonitoringData data.LocationRequest
 	_ = json.NewDecoder(r.Body).Decode(&requestMonitoringData)
-	monitoringData := data.LocationMonitoring{
+	monitoringData := data.LocationRequest{
 		Service:   requestMonitoringData.Service,
-		Latitude:  requestMonitoringData.Latitude,
-		Longitude: requestMonitoringData.Longitude,
 		Count:     requestMonitoringData.Count,
 		Timestamp: time.Now(),
 	}

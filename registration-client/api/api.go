@@ -132,7 +132,7 @@ func RegisterServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterLocationMonitoring(w http.ResponseWriter, r *http.Request) {
-	var locationMonitoring data.LocationMonitoring
+	var locationMonitoring data.LocationRequest
 	_ = json.NewDecoder(r.Body).Decode(&locationMonitoring)
 	go location.AddRequest(locationMonitoring)
 }

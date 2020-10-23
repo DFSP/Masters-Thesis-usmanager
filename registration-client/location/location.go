@@ -27,7 +27,6 @@ package location
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/usmanager/manager/registration-client/data"
 	"github.com/usmanager/manager/registration-client/instance"
 	"net/http"
@@ -38,52 +37,40 @@ import (
 )
 
 var lock sync.Mutex
-var locationMonitoringData *ConcurrentMap
+var locationRequests *ConcurrentMap
 
 
 func init() {
-	locationMonitoringData = NewConcurrentMap()
+	locationRequests = NewConcurrentMap()
 }
 
 func RegisterRequest(service string) {
-	lock.Lock()
-	defer lock.Unlock()
-	serviceData, hasServiceData := locationMonitoringData.Get(service)
-	count := 1
-	if hasServiceData && serviceData != nil {
-		count += serviceData.(data.LocationMonitoring).Count
+	locationRequest := data.LocationRequest{
+		Service: service,
+		Count: 1,
 	}
-	newServiceData := data.LocationMonitoring{
-		Service:   service,
-		Latitude:  instance.Latitude,
-		Longitude: instance.Longitude,
-		Count:     count,
-	}
-	locationMonitoringData.Set(service, newServiceData)
+	AddRequest(locationRequest)
 }
 
-func AddRequest(locationMonitoring data.LocationMonitoring) {
+func AddRequest(locationRequest data.LocationRequest) {
 	lock.Lock()
 	defer lock.Unlock()
-	serviceKey := fmt.Sprintf("%s_%f_%f", locationMonitoring.Service, locationMonitoring.Latitude, locationMonitoring.Longitude)
-	serviceData, hasServiceData := locationMonitoringData.Get(serviceKey)
+	serviceRequests, hasRequests := locationRequests.Get(locationRequest.Service)
 	count := 1
-	if hasServiceData && serviceData != nil {
-		count += serviceData.(data.LocationMonitoring).Count
+	if hasRequests && serviceRequests != nil {
+		count += serviceRequests.(data.LocationRequest).Count
 	}
-	newServiceData := data.LocationMonitoring{
-		Service:   locationMonitoring.Service,
-		Latitude:  locationMonitoring.Latitude,
-		Longitude: locationMonitoring.Longitude,
+	newServiceRequests := data.LocationRequest{
+		Service:   locationRequest.Service,
 		Count:     count,
 	}
-	locationMonitoringData.Set(serviceKey, newServiceData)
+	locationRequests.Set(locationRequest.Service, newServiceRequests)
 }
 
 func clear(serviceKey string) {
 	lock.Lock()
 	defer lock.Unlock()
-	locationMonitoringData.Set(serviceKey, nil)
+	locationRequests.Set(serviceKey, nil)
 }
 
 func SendLocationTimer(sendInterval time.Duration) chan bool {
@@ -110,13 +97,13 @@ func SendLocationTimer(sendInterval time.Duration) chan bool {
 }
 
 func sendAllData() {
-	for mapItem := range locationMonitoringData.Iter() {
+	for mapItem := range locationRequests.Iter() {
 		serviceKey := mapItem.Key
 		value := mapItem.Value
 		if value != nil {
-			serviceData := value.(data.LocationMonitoring)
-			if serviceData.Count > 0 {
-				go sendData(serviceData)
+			serviceRequests := value.(data.LocationRequest)
+			if serviceRequests.Count > 0 {
+				go sendData(serviceRequests)
 				go clear(serviceKey)
 			}
 		}
@@ -124,7 +111,7 @@ func sendAllData() {
 	}
 }
 
-func sendData(data data.LocationMonitoring) {
+func sendData(data data.LocationRequest) {
 	jsonValue, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", instance.RequestLocationMonitorUrl, bytes.NewBuffer(jsonValue))
 	if err == nil {

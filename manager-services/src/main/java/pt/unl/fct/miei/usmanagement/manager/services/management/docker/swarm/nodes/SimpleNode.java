@@ -56,15 +56,15 @@ public final class SimpleNode {
 	}
 
 	@JsonIgnore
-	public String getCoordinates() {
-		return labels.get(NodeConstants.Label.COORDINATES);
+	public Coordinates getCoordinates() {
+		return new Gson().fromJson(labels.get(NodeConstants.Label.COORDINATES), Coordinates.class);
 	}
 
 	@JsonIgnore
 	public HostAddress getHostAddress() {
 		final String username = getUsername();
 		final String privateIpAddress = getPrivateIpAddress();
-		final Coordinates coordinates = new Gson().fromJson(getCoordinates(), Coordinates.class);
+		final Coordinates coordinates = getCoordinates();
 		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates);
 	}
 

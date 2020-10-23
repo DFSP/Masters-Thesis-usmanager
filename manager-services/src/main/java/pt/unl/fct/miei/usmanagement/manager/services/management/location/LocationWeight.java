@@ -27,11 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.services.management.location;
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
 
-import java.util.Map;
-
 @Data
-public class NodeLocationMonitoring {
+public class LocationWeight {
 
 	private final SimpleNode node;
-	private final Map<String, LocationMonitoring> locationMonitoring;
+	private final int weight;
+
 }

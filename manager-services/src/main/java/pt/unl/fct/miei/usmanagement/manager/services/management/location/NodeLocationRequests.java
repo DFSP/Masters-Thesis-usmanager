@@ -22,14 +22,16 @@
  * SOFTWARE.
  */
 
-package data
+package pt.unl.fct.miei.usmanagement.manager.services.management.location;
 
-type InstanceEndpoint struct {
-	InstanceId string `json:"instanceId,omitempty"`
-	Endpoint   string `json:"endpoint,omitempty"`
-}
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
 
-type LocationRequest struct {
-	Service   string `json:"service,omitempty"`
-	Count     int    `json:"count,omitempty"`
+import java.util.Map;
+
+@Data
+public class NodeLocationRequests {
+
+	private final SimpleNode node;
+	private final Map<String, Integer> locationRequests;
 }

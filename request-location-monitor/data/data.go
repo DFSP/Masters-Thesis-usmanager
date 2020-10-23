@@ -32,23 +32,10 @@ import (
 
 var LocationMonitoringData *utils.ConcurrentMap
 
-type LocationMonitoring struct {
+type LocationRequest struct {
 	Service   string    `json:"service"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
 	Count     int       `json:"count"`
 	Timestamp time.Time `json:"timestamp,omitempty"`
-}
-
-type LocationMonitoringAggregation struct {
-	Requests []Location `json:"locations"`
-	Count    int        `json:"count"`
-}
-
-type Location struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Count     int     `json:"count"`
 }
 
 func init() {
