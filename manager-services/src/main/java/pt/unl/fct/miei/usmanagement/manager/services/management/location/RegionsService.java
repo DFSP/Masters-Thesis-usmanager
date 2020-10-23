@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionRepository;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
@@ -57,6 +58,19 @@ public class RegionsService {
 	public RegionEntity getRegion(String name) {
 		return regions.findByNameIgnoreCase(name).orElseThrow(() ->
 			new EntityNotFoundException(RegionEntity.class, "name", name));
+	}
+
+	public RegionEntity getClosestRegion(Coordinates coordinates) {
+		List<RegionEntity> regions = getRegions();
+		if (regions.size() < 1) {
+			throw new EntityNotFoundException(RegionEntity.class);
+		}
+		regions.sort((oneRegion, anotherRegion) -> {
+			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		return regions.get(0);
 	}
 
 	public RegionEntity addRegion(RegionEntity region) {

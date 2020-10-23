@@ -41,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundEx
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.management.docker.proxy.DockerApiProxyService;
@@ -210,8 +211,8 @@ public class HostsService {
 				throw new UnsupportedOperationException();
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
-		prometheusService.launchPrometheus(hostAddress);
-		locationRequestService.launchRequestLocationMonitor(hostAddress);
+		containersService.launchContainer(hostAddress, LocationRequestService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
+		containersService.launchContainer(hostAddress, PrometheusService.PROMETHEUS, ContainerType.SINGLETON);
 		return node;
 	}
 

@@ -27,11 +27,11 @@ docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR
 
 ### Ambiente
  
-> Ubuntu 18.04.4 LTS  
+> Ubuntu 20.04.1 LTS
  
-> Chrome browser 84.0.4147.89
+> Chrome browser 85.0.4183.121
 
-### Ferramentas usadas
+### Ferramentas
 
 [<img src="https://i.imgur.com/LGowRP4.png" alt="" width="48" height="40">React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) - Adds React debugging tools to the Chrome Developer Tools
 

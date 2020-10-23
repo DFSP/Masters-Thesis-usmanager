@@ -24,13 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.management.location;
 
-
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.services.management.docker.swarm.nodes.SimpleNode;
+
+import java.util.Map;
 
 @Data
-class LocationMonitoringResponse {
+public class NodeLocationMonitoring {
 
-	private final String toService;
-	private final LocationMonitoringSimple locationData;
-
+	private final SimpleNode node;
+	private final Map<String, LocationMonitoring> locationMonitoring;
 }

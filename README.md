@@ -10,13 +10,13 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 ### Organização do projeto (módulos)
 
-- [master-manager](manager-master)
+- [manager-database](manager-database)
 
-- [worker-manager](manager-worker)
+- [manager-services](manager-services)
 
-- [database-manager](manager-database)
+- [manager-master](manager-master)
 
-- [services-manager](manager-services)
+- [manager-worker](manager-worker)
 
 - [manager-hub](manager-hub)
 
@@ -52,15 +52,19 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 ### Ferramentas usadas
 
-[<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://docs.npmjs.com/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
-
+[<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://www.jetbrains.com/idea/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
+  
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
-> [Manager master](manager-master/README.md#ferramentas-usadas)  
+> [Manager master](manager-master/README.md#ferramentas)  
 
-> [Local manager](local-manager/README.md#ferramentas-usadas)  
+> [Manager worker](manager-worker/README.md#ferramentas)  
 
-> [Web manager](manager-hub/README.md#ferramentas-usadas)  
+> [Manager hub](manager-hub/README.md#ferramentas)  
+
+> [Request location monitor](request-location-monitor/README.md#ferramentas)  
+
+> [Registration client](registration-client/README.md#ferramentas)  
 
 ### Configuração
 

@@ -48,24 +48,24 @@ func main() {
 	router := mux.NewRouter()
 
 	router.Methods("GET").
-		Path("/api/monitoring").
-		HandlerFunc(api.ListMonitoring)
+		Path("/api/location/requests").
+		HandlerFunc(api.ListLocationRequests)
 
 	router.Methods("GET").
-		Path("/api/monitoring").
+		Path("/api/location/requests").
 		Queries("aggregation", "").
-		HandlerFunc(api.ListMonitoring)
+		HandlerFunc(api.ListLocationRequests)
 
 	router.Methods("GET").
-		Path("/api/monitoring").
+		Path("/api/location").
 		Queries(
 			"interval", "",
 			"interval", "{[0-9]+}").
-		HandlerFunc(api.ListMonitoring)
+		HandlerFunc(api.ListLocationRequests)
 
 	router.Methods("POST").
-		Path("/api/monitoring").
-		HandlerFunc(api.AddMonitoring)
+		Path("/api/location/requests").
+		HandlerFunc(api.AddLocationRequest)
 
 	reglog.Logger.Infof("Request-location-monitor is listening at http://127.0.0.1:%d", port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))

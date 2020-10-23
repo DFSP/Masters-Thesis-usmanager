@@ -99,6 +99,11 @@ curl --header "Content-Type: application/json" \
      http://localhost:2525/api/metrics
 ```
 
+## Ferramentas
+
+[<img src="https://i.imgur.com/DBrGTaL.png" alt="" width="48" height="48"> Postman](https://www.postman.com/) - The Collaboration Platform for API Development
+
+[<img src="https://i.imgur.com/M7dKRag.png" alt="" width="48" height="48"> Json Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) - Chrome extension for printing JSON and JSONP nicely when you visit it 'directly' in a browser tab
 
 ## Licença
 

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.edge.EdgeHostEntity;
 
 import javax.persistence.CascadeType;
@@ -68,10 +69,9 @@ public class RegionEntity {
 	@Column(columnDefinition = "boolean default true")
 	private boolean active = true;
 
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<EdgeHostEntity> edgeHosts;
+	@NotNull
+	@Column(unique = true)
+	private Coordinates coordinates;
 
 	@Override
 	public int hashCode() {

@@ -20,7 +20,7 @@ Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/
 mvn clean install -DskipTests -U
 ```
 
-## Para incluir a dependência 
+## Incluir a dependência 
 ##### Maven
 ```xml
 <dependency>

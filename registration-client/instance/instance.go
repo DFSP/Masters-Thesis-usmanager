@@ -62,7 +62,7 @@ func Register() {
 	eurekaUrl := fmt.Sprintf("http://%s/eureka", eurekaAddress)
 	EurekaServer = eureka.NewConn(eurekaUrl)
 
-	RequestLocationMonitorUrl = fmt.Sprintf("http://%s:%d/api/monitoring", Hostname, 1919)
+	RequestLocationMonitorUrl = fmt.Sprintf("http://%s:%d/api/location/requests", Hostname, 1919)
 
 	id := fmt.Sprintf("%s_%s_%d", Service, Hostname, Port)
 	instanceId := hash.Sha1(id)

@@ -54,15 +54,15 @@ docker run --rm -p 8080:8080 usmanager/manager-master
 
 ## Ambiente
 
->Ubuntu 18.04.4 LTS
+> Ubuntu 20.04.1 LTS
 
->Apache Maven 3.6.0  
- Maven home: /usr/share/maven  
- Java version: 11.0.6, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64  
- Default locale: pt_PT, platform encoding: UTF-8  
- OS name: "linux", version: "5.3.0-28-generic", arch: "amd64", family: "unix"
+> Apache Maven 3.6.0  
+  Maven home: /usr/share/maven  
+  Java version: 11.0.6, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64  
+  Default locale: pt_PT, platform encoding: UTF-8  
+  OS name: "linux", version: "5.3.0-28-generic", arch: "amd64", family: "unix"
 
->Docker version 19.03.5, build 633a0ea838
+> Docker version 19.03.13, build 4484c46d9d
 
 ## Cloud
 
@@ -75,7 +75,7 @@ Lançar a aplicação na cloud (aws):
 
 [<img src="https://i.imgur.com/DBrGTaL.png" alt="" width="48" height="48"> Postman](https://www.postman.com/) - The Collaboration Platform for API Development
 
-[<img src="https://i.imgur.com/M7dKRag.png" alt="" width="48" height="48"> Json Formatter](https://github.com/callumlocke/json-formatter) - Chrome extension for printing JSON and JSONP nicely when you visit it 'directly' in a browser tab
+[<img src="https://i.imgur.com/M7dKRag.png" alt="" width="48" height="48"> Json Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) - Chrome extension for printing JSON and JSONP nicely when you visit it 'directly' in a browser tab
 
 [<img src="https://i.imgur.com/JCWN9oL.png" alt="" width="48" height="48"> Project Lombok](https://projectlombok.org/) - Project Lombok is a java library that automatically plugs into your editor and build tools, spicing up your java
 

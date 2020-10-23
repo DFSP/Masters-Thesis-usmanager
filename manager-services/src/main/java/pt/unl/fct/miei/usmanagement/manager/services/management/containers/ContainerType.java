@@ -22,35 +22,9 @@
  * SOFTWARE.
  */
 
-package data
+package pt.unl.fct.miei.usmanagement.manager.services.management.containers;
 
-import (
-	"time"
-
-	"github.com/usmanager/manager/request-location-monitor/utils"
-)
-
-var LocationMonitoringData *utils.ConcurrentMap
-
-type LocationMonitoring struct {
-	Service   string    `json:"service"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
-	Count     int       `json:"count"`
-	Timestamp time.Time `json:"timestamp,omitempty"`
-}
-
-type LocationMonitoringAggregation struct {
-	Requests []Location `json:"locations"`
-	Count    int        `json:"count"`
-}
-
-type Location struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Count     int     `json:"count"`
-}
-
-func init() {
-	LocationMonitoringData = utils.NewConcurrentMap()
+public enum ContainerType {
+	SINGLETON, // one instance running on each host
+	BY_REQUEST
 }

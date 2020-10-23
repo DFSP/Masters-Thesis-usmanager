@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.database.monitoring.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
@@ -60,6 +61,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
+
+import static pt.unl.fct.miei.usmanagement.manager.services.management.location.LocationRequestService.REQUEST_LOCATION_MONITOR;
+import static pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus.PrometheusService.PROMETHEUS;
 
 @Service
 @Slf4j
@@ -199,8 +203,8 @@ public class ContainersService {
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean global) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, global);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
@@ -209,10 +213,8 @@ public class ContainersService {
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
-										   List<String> environment) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
-			environment);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, List<String> environment) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, environment);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
@@ -221,10 +223,8 @@ public class ContainersService {
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName,
-										   boolean singleton, Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
-			labels);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, Map<String, String> labels) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
@@ -242,17 +242,17 @@ public class ContainersService {
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
 										   List<String> environment, Map<String, String> labels) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
 										   List<String> environment, Map<String, String> labels,
 										   Map<String, String> dynamicLaunchParams) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
@@ -264,9 +264,9 @@ public class ContainersService {
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, boolean singleton, String internalPort,
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, String internalPort,
 										   String externalPort) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, singleton,
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			internalPort, externalPort);
 		return container.map(this::addContainerFromDockerContainer).orElse(null);
 	}
@@ -419,10 +419,6 @@ public class ContainersService {
 			containerSimulatedMetricsService.removeContainer(simulatedMetric, containerId));
 	}
 
-	public String launchDockerApiProxy(HostAddress hostAddress) {
-		return launchDockerApiProxy(hostAddress, true);
-	}
-
 	public String launchDockerApiProxy(HostAddress hostAddress, boolean insertIntoDatabase) {
 		String containerId = dockerApiProxyService.launchDockerApiProxy(hostAddress);
 		if (insertIntoDatabase) {
@@ -467,11 +463,11 @@ public class ContainersService {
 		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
 	}
 
-
 	public void stopSyncDatabaseContainersTimer() {
 		if (syncDatabaseContainersTimer != null) {
 			syncDatabaseContainersTimer.cancel();
 			log.info("Stopped containers database synchronization");
 		}
 	}
+
 }

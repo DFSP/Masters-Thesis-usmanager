@@ -75,7 +75,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -214,14 +213,14 @@ public class ServicesMonitoringService {
 	public void initServiceMonitorTimer() {
 		serviceMonitoringTimer = new Timer("MonitorServicesTimer", true);
 		serviceMonitoringTimer.schedule(new TimerTask() {
-			private long lastRun = System.currentTimeMillis();
+			private long previousTime = System.currentTimeMillis();
 			@Override
 			public void run() {
-				long currRun = System.currentTimeMillis();
-				int diffSeconds = (int) ((currRun - lastRun) / TimeUnit.SECONDS.toMillis(1));
-				lastRun = currRun;
+				long currentTime = System.currentTimeMillis();
+				int interval = (int) (currentTime - previousTime);
+				previousTime = currentTime;
 				try {
-					monitorServicesTask(diffSeconds);
+					monitorServicesTask(interval);
 				}
 				catch (ManagerException e) {
 					log.error(e.getMessage());
@@ -230,7 +229,7 @@ public class ServicesMonitoringService {
 		}, monitorPeriod, monitorPeriod);
 	}
 
-	private void monitorServicesTask(int secondsFromLastRun) {
+	private void monitorServicesTask(int interval) {
 		log.info("Starting service monitoring task...");
 		Map<String, List<ServiceDecisionResult>> servicesDecisions = new HashMap<>();
 		List<ContainerEntity> containers = containersService.getAppContainers();
@@ -250,25 +249,25 @@ public class ServicesMonitoringService {
 			String containerId = container.getContainerId();
 			String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 			HostAddress hostAddress = container.getHostAddress();
-			Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
+			Map<String, Double> newFields = getContainerStats(container, interval);
 			newFields.forEach((field, value) -> {
 				saveServiceMonitoring(containerId, serviceName, field, value);
 			});
 			for (AppEntity app : servicesService.getApps(serviceName)) {
 				String appName = app.getName();
-				ServiceDecisionResult serviceDecisionResult = runAppRules(appName, hostAddress, containerId,
-					serviceName, newFields);
+				ServiceDecisionResult serviceDecisionResult = runAppRules(appName, hostAddress, containerId, serviceName, newFields);
 				List<ServiceDecisionResult> serviceDecisions = servicesDecisions.get(serviceName);
 				if (serviceDecisions != null) {
 					serviceDecisions.add(serviceDecisionResult);
 				}
 				else {
-					serviceDecisions = new LinkedList<>(List.of(serviceDecisionResult));
+					serviceDecisions = new LinkedList<>();
+					serviceDecisions.add(serviceDecisionResult);
 					servicesDecisions.put(serviceName, serviceDecisions);
 				}
 			}
 		}
-		processContainerDecisions(servicesDecisions, secondsFromLastRun);
+		processContainerDecisions(servicesDecisions);
 	}
 
 	private ServiceDecisionResult runAppRules(String appName, HostAddress hostAddress, String containerId,
@@ -303,8 +302,7 @@ public class ServicesMonitoringService {
 			: serviceRulesService.processServiceEvent(appName, hostDetails, containerEvent);
 	}
 
-	private void processContainerDecisions(Map<String, List<ServiceDecisionResult>> servicesDecisions,
-										   int secondsFromLastRun) {
+	private void processContainerDecisions(Map<String, List<ServiceDecisionResult>> servicesDecisions) {
 		log.info("Processing container decisions...");
 		Map<String, List<ServiceDecisionResult>> relevantServicesDecisions = new HashMap<>();
 		for (List<ServiceDecisionResult> serviceDecisions : servicesDecisions.values()) {
@@ -331,15 +329,14 @@ public class ServicesMonitoringService {
 			}
 		}
 		if (!relevantServicesDecisions.isEmpty()) {
-			processRelevantContainerDecisions(relevantServicesDecisions, servicesDecisions, secondsFromLastRun);
+			processRelevantContainerDecisions(relevantServicesDecisions, servicesDecisions);
 		}
 	}
 
 	private void processRelevantContainerDecisions(Map<String, List<ServiceDecisionResult>> relevantServicesDecisions,
-												   Map<String, List<ServiceDecisionResult>> allServicesDecisions,
-												   int secondsFromLastRun) {
+												   Map<String, List<ServiceDecisionResult>> allServicesDecisions) {
 		Map<String, HostDetails> servicesHosts =
-			requestLocationMonitoringService.findHostsToStartServices(allServicesDecisions, secondsFromLastRun);
+			requestLocationMonitoringService.findHostsToStartServices(allServicesDecisions);
 		for (Entry<String, List<ServiceDecisionResult>> servicesDecisions : allServicesDecisions.entrySet()) {
 			String serviceName = servicesDecisions.getKey();
 			List<ServiceDecisionResult> containerDecisions = servicesDecisions.getValue();

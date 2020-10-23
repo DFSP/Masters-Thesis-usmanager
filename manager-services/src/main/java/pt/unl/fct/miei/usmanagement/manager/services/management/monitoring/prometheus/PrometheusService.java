@@ -24,13 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.management.monitoring.prometheus;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import pt.unl.fct.miei.usmanagement.manager.database.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.management.containers.ContainersService;
 
 import java.util.List;
 import java.util.Map;
@@ -47,17 +44,10 @@ public class PrometheusService {
 	private static final String HOST_AVAILABLE_MEMORY = "node_memory_MemAvailable_bytes";
 	private static final String HOST_TOTAL_MEMORY = "node_memory_MemTotal_bytes";
 
-	private final ContainersService containersService;
 	private final RestTemplate restTemplate;
 
-	public PrometheusService(@Lazy ContainersService containersService) {
-		this.containersService = containersService;
+	public PrometheusService() {
 		this.restTemplate = new RestTemplate();
-	}
-
-	//TODO move to containerService, removing dependency?
-	public ContainerEntity launchPrometheus(HostAddress hostAddress) {
-		return containersService.launchContainer(hostAddress, PROMETHEUS, true);
 	}
 
 	public double getAvailableMemory(HostAddress hostAddress) {

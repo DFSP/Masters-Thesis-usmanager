@@ -27,14 +27,12 @@ package pt.unl.fct.miei.usmanagement.manager.services.management.location;
 
 import lombok.Data;
 
-@Data
-class LocationMonitoringSimple {
+import java.util.List;
 
-	private final String fromContinent;
-	private final String fromRegion;
-	private final String fromCountry;
-	private final String fromCity;
-	private final String toService;
+@Data
+class LocationMonitoring {
+
+	private final List<Location> requests;
 	private final int count;
 
 }

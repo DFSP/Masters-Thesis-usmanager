@@ -39,13 +39,14 @@ import (
 )
 
 var interval int
+
 var lock sync.Mutex
 
 func init() {
 	flag.IntVar(&interval, "interval", 60000, "Default interval (in seconds) to include instances on data aggregation")
 }
 
-func ListMonitoring(w http.ResponseWriter, r *http.Request) {
+func ListLocationRequests(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := r.URL.Query()
@@ -78,19 +79,19 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 	if len(intervalQuery) > 0 {
 		overwrittenInterval, err := strconv.Atoi(intervalQuery)
 		if err == nil {
-			aggregationInterval = overwrittenInterval * 1000
+			aggregationInterval = overwrittenInterval
 		}
 	}
 
 	maxTime := time.Now()
 	minTime := maxTime.Add(time.Duration(-aggregationInterval) * time.Millisecond)
 
-	serviceLocationMonitoring := make(map[string]map[string]data.ServiceLocationMonitoring)
+	serviceLocationMonitoring := make(map[string]map[string]data.Location)
 
 	for mapItem := range data.LocationMonitoringData.Iter() {
 		serviceName := mapItem.Key
 		serviceData := mapItem.Value.(*utils.ConcurrentSlice)
-		serviceLocationMonitoring[serviceName] = make(map[string]data.ServiceLocationMonitoring)
+		serviceLocationMonitoring[serviceName] = make(map[string]data.Location)
 		for sliceItem := range serviceData.Iter() {
 			monitoringData := sliceItem.Value.(data.LocationMonitoring)
 			if monitoringData.Timestamp.Before(minTime) || monitoringData.Timestamp.After(maxTime) {
@@ -99,32 +100,40 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 			latitude := monitoringData.Latitude
 			longitude := monitoringData.Longitude
 			count := monitoringData.Count
-			locationKey := fmt.Sprintf("%s_%s", latitude, longitude)
+			locationKey := fmt.Sprintf("%f_%f", latitude, longitude)
 			serviceData, hasLocation := serviceLocationMonitoring[serviceName][locationKey]
 			if hasLocation {
 				count += serviceData.Count
 			}
-			serviceLocationMonitoring[serviceName][locationKey] = data.ServiceLocationMonitoring{
+			serviceLocationMonitoring[serviceName][locationKey] = data.Location{
 				Latitude:  latitude,
 				Longitude: longitude,
-				Service:   serviceName,
 				Count:     count,
 			}
 		}
 	}
 
-	servicesLocationMonitoring := []data.ServiceLocationMonitoring{}
-	for _, serviceData := range serviceLocationMonitoring {
-		for _, serviceMonitoring := range serviceData {
-			servicesLocationMonitoring = append(servicesLocationMonitoring, serviceMonitoring)
+
+	services := map[string]data.LocationMonitoringAggregation{}
+	for serviceName, locations := range serviceLocationMonitoring {
+		locationsList := []data.Location{}
+		var count int
+		for _, location := range locations {
+			count += location.Count
+			locationsList = append(locationsList, location)
 		}
+		locationMonitoringAggregation := data.LocationMonitoringAggregation{
+			Requests: locationsList,
+			Count:    count,
+		}
+		services[serviceName] = locationMonitoringAggregation
 	}
 
-	json.NewEncoder(w).Encode(servicesLocationMonitoring)
+	json.NewEncoder(w).Encode(services)
 }
 
-func AddMonitoring(w http.ResponseWriter, r *http.Request) {
-	var requestMonitoringData data.ServiceLocationMonitoring
+func AddLocationRequest(w http.ResponseWriter, r *http.Request) {
+	var requestMonitoringData data.LocationMonitoring
 	_ = json.NewDecoder(r.Body).Decode(&requestMonitoringData)
 	monitoringData := data.LocationMonitoring{
 		Service:   requestMonitoringData.Service,
@@ -142,11 +151,11 @@ func AddMonitoring(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		serviceMonitoringDataSlice.(*utils.ConcurrentSlice).Append(monitoringData)
 		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		reglog.Logger.Infof("Added location monitoring to existing service %s: %s", service, string(monitoringDataJson))
+		reglog.Logger.Infof("Added location request to existing service: %s = %s", service, string(monitoringDataJson))
 	} else {
 		serviceMonitoringDataSlice := utils.NewConcurrentSlice()
 		serviceMonitoringDataSlice.Append(monitoringData)
 		data.LocationMonitoringData.Set(service, serviceMonitoringDataSlice)
-		reglog.Logger.Infof("Added location monitoring to new service %s: %s", service, string(monitoringDataJson))
+		reglog.Logger.Infof("Added location request to new service: %s = %s", service, string(monitoringDataJson))
 	}
 }

@@ -19,7 +19,7 @@ Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/
 mvn clean install -DskipTests -U
 ```
 
-## Para incluir a dependência 
+## Incluir a dependência  
 ##### Maven
 ```xml
 <dependency>
@@ -32,4 +32,4 @@ mvn clean install -DskipTests -U
 
 ## Licença
 
-Manager database está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
+Manager services está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
