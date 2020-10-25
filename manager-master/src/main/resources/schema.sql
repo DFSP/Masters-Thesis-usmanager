@@ -34,11 +34,7 @@
 --
 -- It is intended for H2 databases.
 
-DROP TABLE logging_event_exception IF EXISTS;
-DROP TABLE logging_event_property IF EXISTS;
-DROP TABLE logging_event IF EXISTS;
-
-CREATE TABLE logging_event
+CREATE TABLE IF NOT EXISTS LOGGING_EVENT
 (
     timestmp          BIGINT       NOT NULL,
     formatted_message LONGVARCHAR  NOT NULL,
@@ -57,7 +53,7 @@ CREATE TABLE logging_event
     event_id          IDENTITY     NOT NULL
 );
 
-CREATE TABLE logging_event_property
+CREATE TABLE IF NOT EXISTS LOGGING_EVENT_PROPERTY
 (
     event_id     BIGINT       NOT NULL,
     mapped_key   VARCHAR(254) NOT NULL,
@@ -66,7 +62,7 @@ CREATE TABLE logging_event_property
     FOREIGN KEY (event_id) REFERENCES logging_event (event_id)
 );
 
-CREATE TABLE logging_event_exception
+CREATE TABLE IF NOT EXISTS LOGGING_EVENT_EXCEPTION
 (
     event_id   BIGINT       NOT NULL,
     i          SMALLINT     NOT NULL,
@@ -74,3 +70,8 @@ CREATE TABLE logging_event_exception
     PRIMARY KEY (event_id, i),
     FOREIGN KEY (event_id) REFERENCES logging_event (event_id)
 );
+
+// Dont swap. Order of deletes matters
+DELETE FROM LOGGING_EVENT;
+DELETE FROM LOGGING_EVENT_PROPERTY;
+DELETE FROM LOGGING_EVENT_EXCEPTION;

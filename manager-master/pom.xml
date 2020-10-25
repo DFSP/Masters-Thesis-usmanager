@@ -35,7 +35,7 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>pt.unl.fct.usmanagement.manager</groupId>
+	<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
 	<artifactId>manager-master</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
@@ -69,13 +69,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>pt.unl.fct.usmanagement.manager</groupId>
+			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
 			<artifactId>manager-database</artifactId>
 			<version>0.0.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>pt.unl.fct.usmanagement.manager</groupId>
+			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
 			<artifactId>manager-services</artifactId>
 			<version>0.0.1</version>
 			<scope>compile</scope>

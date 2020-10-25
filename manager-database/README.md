@@ -24,7 +24,7 @@ mvn clean install -DskipTests -U
 ##### Maven
 ```xml
 <dependency>
-    <groupId>pt.unl.fct.usmanagement.manager</groupId>
+    <groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
     <artifactId>manager-database</artifactId>
     <version>0.0.1</version>
     <scope>compile</scope>

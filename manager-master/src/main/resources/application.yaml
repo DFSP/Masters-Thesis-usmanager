@@ -5,8 +5,8 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
-    #url: jdbc:h2:file:./manager-master/db/manager-master-db
-    url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
+    url: jdbc:h2:file:./manager-master/db/manager-master-db
+    #url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
     username: sa
     password: admin
     platform: h2
@@ -90,8 +90,8 @@ prometheus:
     install-script: node-exporter-install.sh
     install-script-path: src/main/resources/scripts/node-exporter-install.sh
 decision:
-  start-host-on-events-count: 3
-  stop-host-on-events-count: 3
+  resolve-overworked-host-on-events-count: 3
+  resolve-underworked-host-on-events-count: 3
   replicate-container-on-event-count: 2
   migrate-container-on-event-count: 2
   stop-container-on-event-count: 3

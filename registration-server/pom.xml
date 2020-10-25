@@ -33,7 +33,7 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>pt.unl.fct.usmanagement.manager</groupId>
+	<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
 	<artifactId>registration-server</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
