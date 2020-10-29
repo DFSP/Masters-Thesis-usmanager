@@ -127,7 +127,7 @@ public class ContainersService {
 	}
 
 	public ContainerEntity getContainer(String containerId) {
-		return containers.findByContainerId(containerId).orElseThrow(() ->
+		return containers.findByContainerIdStartingWith(containerId).orElseThrow(() ->
 			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
 	}
 

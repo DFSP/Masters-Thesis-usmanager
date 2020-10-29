@@ -85,7 +85,7 @@ class RegionCard extends BaseComponent<Props, State> {
         return <CardRegion id={`region-${region.name}`}
                            title={region.name}
                            link={{to: {pathname: `/regions/${region.name}`, state: region}}}
-                           height={'115px'}
+                           height={'85px'}
                            margin={'10px 0'}
                            hoverable
             /*delete={{

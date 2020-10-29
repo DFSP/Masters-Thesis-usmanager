@@ -50,6 +50,7 @@ const sidenavManagementLinks: ILink[] = [
         link: '/rules', name: 'Rules', sub: [
             {link: '/conditions', name: 'Conditions'},
             {link: '/hosts', name: 'Host rules'},
+            {link: '/apps', name: 'App rules'},
             {link: '/services', name: 'Service rules'},
             {link: '/containers', name: 'Container rules'},
         ]
@@ -57,6 +58,7 @@ const sidenavManagementLinks: ILink[] = [
     {
         link: '/simulated-metrics', name: 'Simulated metrics', sub: [
             {link: '/hosts', name: 'Host metrics'},
+            {link: '/apps', name: 'App metrics'},
             {link: '/services', name: 'Service metrics'},
             {link: '/containers', name: 'Container metrics'}
         ]

@@ -215,7 +215,7 @@ public class ServicesMonitoringService {
 	}
 
 	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByContainerId(String containerId) {
-		return serviceMonitoringLogs.findByContainerId(containerId);
+		return serviceMonitoringLogs.findByContainerIdStartingWith(containerId);
 	}
 
 	public void initServiceMonitorTimer() {

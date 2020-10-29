@@ -47,7 +47,7 @@ import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
-import SimulatedAppMetricAppList from "./SimulatedAppMetricAppList";
+import SimulatedAppMetricAppsList from "./SimulatedAppMetricAppsList";
 
 export interface ISimulatedAppMetric extends IDatabaseData {
     name: string;
@@ -80,7 +80,7 @@ interface DispatchToProps {
     loadSimulatedAppMetrics: (name: string) => void;
     addSimulatedAppMetric: (simulatedAppMetric: ISimulatedAppMetric) => void;
     updateSimulatedAppMetric: (previousSimulatedAppMetric: ISimulatedAppMetric,
-                                     currentSimulatedAppMetric: ISimulatedAppMetric) => void;
+                               currentSimulatedAppMetric: ISimulatedAppMetric) => void;
     loadFields: () => void;
     addSimulatedAppMetricApps: (name: string, apps: string[]) => void;
 }
@@ -123,7 +123,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
         return (
             <MainLayout>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="app">
+                <div className="container">
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -148,7 +148,6 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedAppMetric>): void => {
         const simulatedMetric = reply.data;
-        console.log(simulatedMetric)
         super.toast(`<span class="green-text">Simulated app metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
         this.props.addSimulatedAppMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
@@ -307,7 +306,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
                                                   label={key}
                                                   type="dropdown"
                                                   dropdown={{
-                                                      defaultValue: "Override true metrics?",
+                                                      defaultValue: "Override real metrics?",
                                                       values: [true, false]
                                                   }}/>
                                 : key === 'active'
@@ -335,12 +334,12 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
     };
 
     private apps = (): JSX.Element =>
-        <SimulatedAppMetricAppList isLoadingSimulatedAppMetric={this.props.isLoading}
-                                               loadSimulatedAppMetricError={!this.isNew() ? this.props.error : undefined}
-                                               simulatedAppMetric={this.getSimulatedAppMetric()}
-                                               unsavedApps={this.state.unsavedApps}
-                                               onAddApp={this.addSimulatedAppMetricApp}
-                                               onRemoveApps={this.removeSimulatedAppMetricApps}/>;
+        <SimulatedAppMetricAppsList isLoadingSimulatedAppMetric={this.props.isLoading}
+                                    loadSimulatedAppMetricError={!this.isNew() ? this.props.error : undefined}
+                                    simulatedAppMetric={this.getSimulatedAppMetric()}
+                                    unsavedApps={this.state.unsavedApps}
+                                    onAddApp={this.addSimulatedAppMetricApp}
+                                    onRemoveApps={this.removeSimulatedAppMetricApps}/>;
 
     private tabs = (): Tab[] => [
         {

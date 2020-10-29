@@ -52,6 +52,7 @@ interface ContainerRuleContainersListProps {
     isLoadingRuleContainer: boolean;
     loadRuleContainerError?: string | null;
     ruleContainer: IRuleContainer | Partial<IRuleContainer> | null;
+    unsavedContainersIds: string[];
     unsavedContainers: string[];
     onAddRuleContainer: (container: string) => void;
     onRemoveRuleContainers: (containers: string[]) => void;
@@ -92,7 +93,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
                 id: 'containers',
                 title: 'Add container',
                 empty: 'No containers to add',
-                data: this.getSelectableContainerNames()
+                data: this.getSelectableContainers()
             }}
             show={this.container}
             onAdd={this.onAdd}
@@ -102,7 +103,8 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}
-            entitySaved={this.state.entitySaved}/>;
+            entitySaved={this.state.entitySaved}
+            invalidate={this.invalidate}/>;
     }
 
     private loadEntities = () => {
@@ -118,7 +120,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     private container = (index: number, container: string, separate: boolean, checked: boolean,
                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
         const isNew = this.isNew();
-        const unsaved = this.props.unsavedContainers.includes(container);
+        const unsaved = this.props.unsavedContainersIds.includes(container);
         return (
             <ListItem key={index} separate={separate}>
                 <div className={styles.linkedItemContent}>
@@ -160,11 +162,15 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     private onDeleteFailure = (reason: string): void =>
         super.toast(`Unable to remove container`, 10000, reason, true);
 
-    private getSelectableContainerNames = () => {
-        const {containers, ruleContainers, unsavedContainers} = this.props;
-        return Object.keys(containers)
-            .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
+    private getSelectableContainers = () => {
+        const {containers, ruleContainers, unsavedContainersIds} = this.props;
+        return Object.entries(containers).filter(([containerId, _]) => !ruleContainers.includes(containerId)
+            && !unsavedContainersIds.includes(containerId))
+            .map(([_, container]) => container.names[0].replace('/', '') + " - " + container.containerId);
     };
+
+    private invalidate = (data: string): string | undefined =>
+        this.props.unsavedContainers.find(container => container.split(" - ")[1] === data)
 
 }
 

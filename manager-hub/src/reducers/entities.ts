@@ -367,7 +367,7 @@ import {IDecision, IField, IOperator, IValueMode} from "../routes/management/rul
 import {IRuleCondition} from "../routes/management/rules/conditions/RuleCondition";
 import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
-import {IRegion} from "../routes/management/region/Region";
+import {IRegion} from "../routes/management/regions/Region";
 import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
 import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
 import {ILogs} from "../routes/management/logs/ManagementLogs";

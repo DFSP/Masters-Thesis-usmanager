@@ -107,7 +107,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
         return <CardRuleService id={`service-rule-${rule.id}`}
                                 title={rule.name}
                                 link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
-                                height={'125px'}
+                                height={'120px'}
                                 margin={'10px 0'}
                                 hoverable
                                 delete={{

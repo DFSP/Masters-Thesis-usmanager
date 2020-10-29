@@ -127,9 +127,6 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
             <CardItem key={'Active'}
                       label='Active'
                       value={`${simulatedContainerMetric.active}`}/>
-            {/*<CardItem key={'Generic'}
-                      label='Generic'
-                      value={`${simulatedContainerMetric.generic}`}/>*/}
         </CardSimulatedContainerMetric>;
     }
 }

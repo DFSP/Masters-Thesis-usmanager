@@ -108,15 +108,6 @@ public class ContainerRulesService {
 		//setLastUpdateContainerRules();
 	}
 
-	public List<ContainerRuleEntity> getGenericContainerRules() {
-		return rules.findGenericContainerRules();
-	}
-
-	public ContainerRuleEntity getGenericContainerRule(String ruleName) {
-		return rules.findGenericContainerRule(ruleName).orElseThrow(() ->
-			new EntityNotFoundException(ContainerRuleEntity.class, "ruleName", ruleName));
-	}
-
 	public ConditionEntity getCondition(String ruleName, String conditionName) {
 		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->

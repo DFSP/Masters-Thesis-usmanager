@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React, {createRef} from "react";
 import ListItem from "../list/ListItem";
 import listItemStyles from "../../components/list/ListItem.module.css";
 import styles from "./CheckboxList.module.css";
@@ -42,6 +42,8 @@ interface State {
 
 export class CheckboxList extends React.Component<Props, State> {
 
+    private globalCheckbox = createRef<HTMLInputElement>();
+
     state: State = {
         values: [],
     };
@@ -54,6 +56,19 @@ export class CheckboxList extends React.Component<Props, State> {
         if (prevProps.values !== this.props.values) {
             this.setState({values: this.getCheckboxValues()});
         }
+        if (this.globalCheckbox.current) {
+            this.globalCheckbox.current.checked = Object.values(this.state.values).every(data => data.checked);
+        }
+    }
+
+    private handleGlobalCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const {checked} = event.target;
+        this.state.values.forEach(value => {
+            if (checked !== value.checked) {
+                this.props.onCheck(this.props.id, value.value, checked);
+            }
+        });
+        this.setState({values: Object.values(this.state.values).map(v => ({value: v.value, checked: checked}))});
     }
 
     public render() {
@@ -61,7 +76,18 @@ export class CheckboxList extends React.Component<Props, State> {
         const {values} = this.state;
         return (
             <div id={id} className='noMargin'>
-                <h6 className={`white-text ${styles.title}`}>{camelCaseToSentenceCase(name)}</h6>
+                <div>
+                    <h6 className={`white-text ${styles.title} left`}>{camelCaseToSentenceCase(name)}</h6>
+                    <p className={`${styles.globalCheckbox}`}>
+                        <label>
+                            <input type="checkbox"
+                                   onChange={this.handleGlobalCheckbox}
+                                   ref={this.globalCheckbox}/>
+                            <span/>
+                        </label>
+                    </p>
+                </div>
+
                 {values.map((value, index) =>
                     this.item(index, value.value, value.checked)
                 )}
@@ -92,8 +118,8 @@ export class CheckboxList extends React.Component<Props, State> {
                                onChange={this.handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-                 {option}
-            </span>
+                            {option}
+                        </span>
                     </label>
                 </div>
             </ListItem>

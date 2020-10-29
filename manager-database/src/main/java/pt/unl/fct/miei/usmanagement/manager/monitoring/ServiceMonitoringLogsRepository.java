@@ -35,6 +35,6 @@ public interface ServiceMonitoringLogsRepository extends JpaRepository<ServiceMo
 
 	List<ServiceMonitoringLogEntity> findByServiceName(@Param("serviceName") String serviceName);
 
-	List<ServiceMonitoringLogEntity> findByContainerId(@Param("containerId") String containerId);
+	List<ServiceMonitoringLogEntity> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
 }

@@ -359,9 +359,9 @@ class Form extends BaseComponent<Props, State> {
                                                 <button
                                                     className={`btn-flat btn-small waves-effect waves-light green-text slide inline-button`}
                                                     /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
-                                                    style={editable === undefined ? {visibility: 'hidden'} : undefined}
+                                                    /*style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}*/
                                                     disabled={!saveRequired}>
-                                                    {this.props.post?.textButton || 'Save'}
+                                                    {(editable !== undefined && this.props.post?.textButton) || 'Save'}
                                                 </button>)}
                                         </div>
                                         {editable !== undefined && !loading && (
@@ -595,26 +595,31 @@ class Form extends BaseComponent<Props, State> {
     };
 
     private setValue = (id: keyof IValues, value: IValues, validate?: boolean) => {
-        const values = {[id]: value};
         if (validate === undefined || validate) {
-            this.setState({values: {...this.state.values, ...values}}, () => this.validate(id as string));
+            this.setState(state => ({values: {...state.values, [id]: value}}), () => this.validate(id as string));
         } else {
-            this.setState({values: {...this.state.values, ...values}});
+            this.setState(state => ({values: {...state.values, [id]: value}}));
         }
     };
 
-    private addValue = (id: keyof IValues, value: any) =>
-        this.setValue(id, this.state.values[id] ? [...this.state.values[id], value] : [value]);
+    private addValue = (id: keyof IValues, value: any) => {
+        this.setState(state => {
+            let values = state.values[id] ? [...state.values[id], value] : [value];
+            return {values: {...state.values, [id]: values}}
+        });
+    }
 
     private removeValue = (id: keyof IValues, value?: any) => {
-        let values = undefined;
-        if (value && Array.isArray(this.state.values[id])) {
-            values = this.state.values[id]?.filter((v: any) => !isEqual(v, value));
-            if (!values.length) {
-                values = undefined;
+        this.setState(state => {
+            let values = undefined;
+            if (value && Array.isArray(state.values[id])) {
+                values = state.values[id]?.filter((v: any) => !isEqual(v, value));
+                if (!values.length) {
+                    values = undefined;
+                }
             }
-        }
-        this.setValue(id, values, false);
+            return {values: {...state.values, [id]: values}};
+        });
     };
 
     private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {

@@ -49,7 +49,6 @@ import RuleAppAppsList from "./RuleAppAppsList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleCondition} from "../conditions/RuleCondition";
 
 export interface IRuleApp extends IRule {
     apps?: string[]
@@ -59,7 +58,6 @@ const buildNewAppRule = (): Partial<IRuleApp> => ({
     name: undefined,
     priority: 0,
     decision: undefined,
-    generic: undefined,
 });
 
 
@@ -96,7 +94,6 @@ type State = {
     formRuleApp?: IRuleApp,
     unsavedConditions: string[],
     unsavedApps: string[],
-    isGeneric: boolean,
 }
 
 class RuleApp extends BaseComponent<Props, State> {
@@ -104,7 +101,6 @@ class RuleApp extends BaseComponent<Props, State> {
     state: State = {
         unsavedConditions: [],
         unsavedApps: [],
-        isGeneric: this.props.ruleApp?.generic || false,
     };
     private mounted = false;
 
@@ -114,21 +110,15 @@ class RuleApp extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
-    }
-
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        if (prevProps.ruleApp?.generic !== this.props.ruleApp?.generic) {
-            this.setState({isGeneric: this.props.ruleApp?.generic || false})
-        }
     }
 
     public render() {
         return (
             <MainLayout>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="app">
+                <div className="container">
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -291,9 +281,6 @@ class RuleApp extends BaseComponent<Props, State> {
     private decisionDropdownOption = (decision: IDecision): string =>
         decision.ruleDecision;
 
-    private isGenericSelected = (generic: boolean) =>
-        this.setState({isGeneric: generic});
-
     private getSelectableDecisions = () =>
         Object.values(this.props.decisions)
             .filter(decision => decision.componentType.type.toLowerCase() === componentTypes.SERVICE.type.toLowerCase());
@@ -344,16 +331,6 @@ class RuleApp extends BaseComponent<Props, State> {
                                                         optionToString: this.decisionDropdownOption,
                                                         emptyMessage: 'No decisions available'
                                                     }}/>
-                                : key === 'generic'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      selectCallback: this.isGenericSelected,
-                                                      defaultValue: "Apply to all apps?",
-                                                      values: [true, false]
-                                                  }}/>
                                 : <Field key={index}
                                          id={key}
                                          label={key}
@@ -398,7 +375,6 @@ class RuleApp extends BaseComponent<Props, State> {
             title: 'Apps',
             id: 'apps',
             content: () => this.apps(),
-            disabled: this.state.isGeneric,
             active: this.props.location.state?.selected === 'apps'
         }
     ];

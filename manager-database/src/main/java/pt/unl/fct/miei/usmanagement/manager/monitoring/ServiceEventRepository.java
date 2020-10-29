@@ -33,7 +33,7 @@ import java.util.List;
 @Repository
 public interface ServiceEventRepository extends JpaRepository<ServiceEventEntity, Long> {
 
-	List<ServiceEventEntity> findByContainerId(@Param("containerId") String containerId);
+	List<ServiceEventEntity> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
 	List<ServiceEventEntity> findByServiceName(@Param("serviceName") String serviceName);
 

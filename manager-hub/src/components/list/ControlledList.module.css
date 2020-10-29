@@ -47,12 +47,12 @@ ul.dropdown li.disabled a:hover {
     cursor: default;
 }
 
-.nolabelCheckbox {
+.noLabelCheckbox {
     display: inline-block;
     text-align: center;
 }
 
-.nolabelCheckbox label span {
+.noLabelCheckbox label span {
     margin-bottom: -7.5px;
 }
 

@@ -35,6 +35,6 @@ public interface ServiceDecisionRepository extends JpaRepository<ServiceDecision
 
 	List<ServiceDecisionEntity> findByServiceName(String serviceName);
 
-	List<ServiceDecisionEntity> findByContainerId(String containerId);
+	List<ServiceDecisionEntity> findByContainerIdStartingWith(String containerId);
 
 }

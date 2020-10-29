@@ -30,3 +30,8 @@
 .listWrapper {
     margin-top: 0;
 }
+
+.globalCheckbox label span {
+    margin-left: 15px;
+    margin-top: -3px;
+}

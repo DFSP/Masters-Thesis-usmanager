@@ -36,8 +36,8 @@ import {connect, Provider} from "react-redux";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
 import ManagementLogs from "../routes/management/logs/ManagementLogs";
-import Region from "../routes/management/region/Region";
-import Regions from "../routes/management/region/Regions";
+import Region from "../routes/management/regions/Region";
+import Regions from "../routes/management/regions/Regions";
 import Nodes from "../routes/management/nodes/Nodes";
 import Node from "../routes/management/nodes/Node";
 import CloudHost from "../routes/management/hosts/cloud/CloudHost";
@@ -78,6 +78,10 @@ import MonitoringSettings from "../routes/monitoring/settings/Settings";
 import DataManagementSettings from "../routes/dataManagement/settings/Settings";
 import WorkerManager from "../routes/management/workerManagers/WorkerManager";
 import WorkerManagers from "../routes/management/workerManagers/WorkerManagers";
+import RuleApp from "../routes/management/rules/apps/RuleApp";
+import RulesApp from "../routes/management/rules/apps/RulesApp";
+import SimulatedAppMetrics from "../routes/management/metrics/apps/SimulatedAppMetrics";
+import SimulatedAppMetric from "../routes/management/metrics/apps/SimulatedAppMetric";
 
 interface RootContainerProps {
     store: any;
@@ -108,6 +112,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/rules": {component: Rules, search: true},
     "/rules/hosts": {component: RulesHost, search: true},
     "/rules/hosts/:name": {component: RuleHost},
+    "/rules/apps": {component: RulesApp, search: true},
+    "/rules/apps/:name": {component: RuleApp},
     "/rules/services": {component: RulesService, search: true},
     "/rules/services/:name": {component: RuleService},
     "/rules/containers": {component: RulesContainer, search: true},
@@ -117,6 +123,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/simulated-metrics": {component: SimulatedMetrics, search: true},
     "/simulated-metrics/hosts": {component: SimulatedHostMetrics, search: true},
     "/simulated-metrics/hosts/:name": {component: SimulatedHostMetric},
+    "/simulated-metrics/apps": {component: SimulatedAppMetrics, search: true},
+    "/simulated-metrics/apps/:name": {component: SimulatedAppMetric},
     "/simulated-metrics/services": {component: SimulatedServiceMetrics, search: true},
     "/simulated-metrics/services/:name": {component: SimulatedServiceMetric},
     "/simulated-metrics/containers": {component: SimulatedContainerMetrics, search: true},

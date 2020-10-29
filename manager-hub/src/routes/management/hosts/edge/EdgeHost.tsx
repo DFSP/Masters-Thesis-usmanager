@@ -54,7 +54,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
-import {IRegion} from "../../region/Region";
+import {IRegion} from "../../regions/Region";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
 import {ICoordinates} from "../../../../components/map/LocationMap";
 

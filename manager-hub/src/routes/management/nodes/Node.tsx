@@ -40,7 +40,7 @@ import {ReduxState} from "../../../reducers";
 import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
-import {IRegion} from "../region/Region";
+import {IRegion} from "../regions/Region";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IReply, postData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";

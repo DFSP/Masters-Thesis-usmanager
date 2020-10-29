@@ -58,7 +58,7 @@ import {
     FaToolbox
 } from "react-icons/all";
 import React from "react";
-import {IRegion} from "../routes/management/region/Region";
+import {IRegion} from "../routes/management/regions/Region";
 import {IState} from "../routes/management/hosts/cloud/CloudHost";
 
 // https://fontawesome.com/icons?d=gallery&m=free

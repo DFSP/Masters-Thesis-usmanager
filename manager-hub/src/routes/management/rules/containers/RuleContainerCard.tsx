@@ -81,23 +81,18 @@ class RuleContainerCard extends BaseComponent<Props, State> {
 
     private contextMenu = (): JSX.Element[] => {
         const {rule} = this.props;
-        const menuItems = [
+        return [
             <LinkedContextMenuItem
                 option={'Modify conditions'}
                 pathname={`/rules/containers/${rule.name}`}
                 selected={'ruleConditions'}
+                state={rule}/>,
+            <LinkedContextMenuItem
+                option={'Modify containers'}
+                pathname={`/rules/containers/${rule.name}`}
+                selected={'containers'}
                 state={rule}/>
         ];
-        if (!rule.generic) {
-            menuItems.push(
-                <LinkedContextMenuItem
-                    option={'Modify containers'}
-                    pathname={`/rules/containers/${rule.name}`}
-                    selected={'containers'}
-                    state={rule}/>
-            );
-        }
-        return menuItems;
     }
 
     public render() {
@@ -107,7 +102,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
         return <CardRuleContainer id={`container-rule-${rule.id}`}
                                   title={rule.name}
                                   link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
-                                  height={'125px'}
+                                  height={'85px'}
                                   margin={'10px 0'}
                                   hoverable
                                   delete={{
@@ -123,9 +118,6 @@ class RuleContainerCard extends BaseComponent<Props, State> {
             <CardItem key={'decision'}
                       label={'Decision'}
                       value={`${rule.decision.ruleDecision}`}/>
-            <CardItem key={'generic'}
-                      label={'Generic'}
-                      value={`${rule.generic}`}/>
         </CardRuleContainer>
     }
 }

@@ -34,7 +34,7 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {addEurekaServer, loadEurekaServers, loadRegions,} from "../../../actions";
 import {connect} from "react-redux";
-import {IRegion} from "../region/Region";
+import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {IContainer} from "../containers/Container";

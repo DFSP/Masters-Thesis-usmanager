@@ -59,7 +59,8 @@ interface ControlledListProps<T> {
     onDelete?: RestOperation;
     removeButtonText?: string;
     entitySaved?: boolean;
-    sort?: (a: T, b: T) => number
+    sort?: (a: T, b: T) => number;
+    invalidate?: (key: string) => string | undefined;
 }
 
 type Props<T> = ControlledListProps<T>;
@@ -124,7 +125,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
             <div>
                 <div className='controlsContainer'>
                     {!error && data.length > 0 && (
-                        <p className={`${styles.nolabelCheckbox}`}>
+                        <p className={`${styles.noLabelCheckbox}`}>
                             <label>
                                 <input type="checkbox"
                                        onChange={this.handleGlobalCheckbox}
@@ -154,7 +155,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                 }}>
                                     {dropdown.data.map((data, index) =>
                                         <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                                            <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
+                                            <a className={dropdown?.formModal ? 'modal-trigger' : ''} data-target={dropdown.formModal?.id}>
                                                 {data}
                                             </a>
                                         </li>
@@ -317,11 +318,17 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
         this.props.onDelete?.successCallback(data);
     };
 
-    private invalidateStateData = (data: string[]): void =>
+    private invalidateStateData = (data: string[]): void => {
         this.setState(data.reduce((state: State<T>, data: string) => {
             state[data] = undefined;
+            const key = this.props.invalidate?.(data);
+            if (key) {
+                state[key] = undefined
+            }
             return state;
         }, {}));
+    }
+
 
     private onDeleteFailure = (reason: string, args: any): void =>
         this.props.onDelete?.failureCallback(reason, args);

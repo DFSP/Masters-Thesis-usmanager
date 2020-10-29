@@ -51,7 +51,6 @@ import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleHost extends IRule {
     cloudHosts?: string[],

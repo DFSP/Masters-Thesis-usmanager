@@ -265,6 +265,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
         formContext.validate(id);
 
     private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
+        console.log(listId, itemId, checked)
         if (checked) {
             formContext.addValue(listId, itemId);
         } else {

@@ -357,7 +357,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                                       label={key}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          defaultValue: "Override true metrics?",
+                                                          defaultValue: "Override real metrics?",
                                                           values: [true, false]
                                                       }}/>
                                     : key === 'generic'

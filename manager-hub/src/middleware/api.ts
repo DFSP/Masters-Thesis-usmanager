@@ -29,7 +29,7 @@ import {IServiceDependency} from "../routes/management/services/ServiceDependenc
 import axios, {Method} from "axios";
 import {API_URL, REQUEST_TIMEOUT} from "../utils/api";
 import {ILogs} from "../routes/management/logs/ManagementLogs";
-import {IRegion} from "../routes/management/region/Region";
+import {IRegion} from "../routes/management/regions/Region";
 import {IDependent} from "../routes/management/services/ServiceDependentList";
 import {IPrediction} from "../routes/management/services/ServicePredictionList";
 import {INode} from "../routes/management/nodes/Node";

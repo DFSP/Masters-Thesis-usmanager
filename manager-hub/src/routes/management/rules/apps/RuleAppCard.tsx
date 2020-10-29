@@ -81,23 +81,18 @@ class RuleAppCard extends BaseComponent<Props, State> {
 
     private contextMenu = (): JSX.Element[] => {
         const {rule} = this.props;
-        const menuItems = [
+        return [
             <LinkedContextMenuItem
                 option={'Modify conditions'}
                 pathname={`/rules/apps/${rule.name}`}
                 selected={'ruleConditions'}
+                state={rule}/>,
+            <LinkedContextMenuItem
+                option={'Modify apps'}
+                pathname={`/rules/apps/${rule.name}`}
+                selected={'apps'}
                 state={rule}/>
         ];
-        if (!rule.generic) {
-            menuItems.push(
-                <LinkedContextMenuItem
-                    option={'Modify apps'}
-                    pathname={`/rules/apps/${rule.name}`}
-                    selected={'apps'}
-                    state={rule}/>
-            );
-        }
-        return menuItems;
     }
 
     public render() {
@@ -105,27 +100,24 @@ class RuleAppCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardRuleApp = Card<IRuleApp>();
         return <CardRuleApp id={`app-rule-${rule.id}`}
-                                  title={rule.name}
-                                  link={{to: {pathname: `/rules/apps/${rule.name}`, state: rule}}}
-                                  height={'125px'}
-                                  margin={'10px 0'}
-                                  hoverable
-                                  delete={{
-                                      url: `rules/apps/${rule.name}`,
-                                      successCallback: this.onDeleteSuccess,
-                                      failureCallback: this.onDeleteFailure,
-                                  }}
-                                  loading={loading}
-                                  bottomContextMenuItems={this.contextMenu()}>
+                            title={rule.name}
+                            link={{to: {pathname: `/rules/apps/${rule.name}`, state: rule}}}
+                            height={'85px'}
+                            margin={'10px 0'}
+                            hoverable
+                            delete={{
+                                url: `rules/apps/${rule.name}`,
+                                successCallback: this.onDeleteSuccess,
+                                failureCallback: this.onDeleteFailure,
+                            }}
+                            loading={loading}
+                            bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'priority'}
                       label={'Priority'}
                       value={`${rule.priority}`}/>
             <CardItem key={'decision'}
                       label={'Decision'}
                       value={`${rule.decision.ruleDecision}`}/>
-            <CardItem key={'generic'}
-                      label={'Generic'}
-                      value={`${rule.generic}`}/>
         </CardRuleApp>
     }
 }

@@ -37,7 +37,7 @@ import java.util.Optional;
 @Repository
 public interface ContainerRepository extends JpaRepository<ContainerEntity, Long> {
 
-	Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
+	Optional<ContainerEntity> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
 	List<ContainerEntity> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 

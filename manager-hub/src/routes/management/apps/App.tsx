@@ -49,7 +49,7 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {isNew} from "../../../utils/router";
-import {IRegion} from "../region/Region";
+import {IRegion} from "../regions/Region";
 import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
 import LaunchAppDialog from "./LaunchAppDialog";

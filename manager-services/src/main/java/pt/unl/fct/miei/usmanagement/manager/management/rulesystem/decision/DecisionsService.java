@@ -182,7 +182,7 @@ public class DecisionsService {
 	}
 
 	public List<ServiceDecisionEntity> getContainerDecisions(String containerId) {
-		return serviceDecisions.findByContainerId(containerId);
+		return serviceDecisions.findByContainerIdStartingWith(containerId);
 	}
 
 	public List<HostDecisionEntity> getHostDecisions(HostAddress hostAddress) {

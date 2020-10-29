@@ -55,7 +55,7 @@ public class ServicesEventsService {
 	}
 
 	public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
-		return serviceEvents.findByContainerId(containerId);
+		return serviceEvents.findByContainerIdStartingWith(containerId);
 	}
 
 	public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {

@@ -41,18 +41,8 @@ public interface ContainerRuleRepository extends JpaRepository<ContainerRuleEnti
 
 	@Query("select r "
 		+ "from ContainerRuleEntity r join r.containers c "
-		+ "where c.containerId = :containerId")
-	List<ContainerRuleEntity> findByContainerId(@Param("containerId") String containerId);
-
-	@Query("select r "
-		+ "from ContainerRuleEntity r "
-		+ "where r.generic = true")
-	List<ContainerRuleEntity> findGenericContainerRules();
-
-	@Query("select r "
-		+ "from ContainerRuleEntity r "
-		+ "where r.generic = true and r.name = :ruleName")
-	Optional<ContainerRuleEntity> findGenericContainerRule(@Param("ruleName") String ruleName);
+		+ "where c.containerId like concat(:containerId, '%')")
+	List<ContainerRuleEntity> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
 	@Query("select case when count(r) > 0 then true else false end "
 		+ "from ContainerRuleEntity r "

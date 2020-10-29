@@ -1135,7 +1135,7 @@ const fetchRuleAppApps = (ruleName: string) => ({
     [CALL_API]: {
         types: [RULE_APP_APPS_REQUEST, RULE_APP_APPS_SUCCESS, RULE_APP_APPS_FAILURE],
         endpoint: `rules/apps/${ruleName}/apps`,
-        schema: Schemas.RULE_CONDITION_ARRAY,
+        schema: Schemas.APP_ARRAY,
         entity: ruleName
     }
 });
@@ -1375,7 +1375,7 @@ const fetchRuleContainerContainers = (ruleName: string) => ({
     [CALL_API]: {
         types: [RULE_CONTAINER_CONTAINERS_REQUEST, RULE_CONTAINER_CONTAINERS_SUCCESS, RULE_CONTAINER_CONTAINERS_FAILURE],
         endpoint: `rules/containers/${ruleName}/containers`,
-        schema: Schemas.RULE_CONDITION_ARRAY,
+        schema: Schemas.CONTAINER_ARRAY,
         entity: ruleName
     }
 });

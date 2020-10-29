@@ -26,7 +26,7 @@ import React from "react";
 import MainLayout from "../../../../views/mainLayout/MainLayout";
 import AddButton from "../../../../components/form/AddButton";
 import styles from './SimulatedAppMetrics.module.css'
-import SimulatedContainerMetricsList from "./SimulatedAppMetricsList";
+import SimulatedAppMetricsList from "./SimulatedAppMetricsList";
 
 const SimulatedAppMetrics: React.FC = () =>
     <MainLayout>

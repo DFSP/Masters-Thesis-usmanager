@@ -71,7 +71,7 @@ public class AppRulesService {
 		this.droolsService = droolsService;
 		this.appsService = appsService;
 		this.rules = rules;
-		this.appRuleTemplateFile = rulesProperties.getAppRuleTemplateFile();
+		this.appRuleTemplateFile = rulesProperties.getServiceRuleTemplateFile();
 		this.lastUpdateAppRules = new AtomicLong(0);
 	}
 
@@ -212,13 +212,14 @@ public class AppRulesService {
 		}
 	}
 
-	public AppDecisionResult processAppEvent(HostAddress hostAddress, ContainerEvent containerEvent) {
-		String appName = containerEvent.getAppName();
+	public ServiceDecisionResult processAppEvent(HostAddress hostAddress, ContainerEvent containerEvent) {
+		/*String appName = containerEvent.getAppName();
 		if (droolsService.shouldCreateNewAppRuleSession(appName, lastUpdateAppRules.get())) {
 			List<Rule> rules = generateAppRules(appName);
 			Map<Long, String> drools = droolsService.executeDroolsRules(containerEvent, rules, appRuleTemplateFile);
 			droolsService.createNewAppRuleSession(appName, drools);
-		}
+			TODO
+		}*/
 		return droolsService.evaluate(hostAddress, containerEvent);
 	}
 

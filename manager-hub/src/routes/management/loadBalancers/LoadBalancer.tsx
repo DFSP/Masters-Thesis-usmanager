@@ -35,7 +35,7 @@ import {ReduxState} from "../../../reducers";
 import {addLoadBalancer, loadLoadBalancers, loadRegions, loadServices} from "../../../actions";
 import {connect} from "react-redux";
 import {IService} from "../services/Service";
-import {IRegion} from "../region/Region";
+import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {IContainer} from "../containers/Container";

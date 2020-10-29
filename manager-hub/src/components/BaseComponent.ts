@@ -33,7 +33,7 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
         this.toasts.forEach(toast => toast.toast.timeRemaining = 1000);
     }
 
-    removeToast = (id: number) => () =>
+    private removeToast = (id: number) => () =>
         this.toasts.forEach((toast, index) => {
                 if (toast.id === id) {
                     return delete this.toasts[index];
@@ -41,7 +41,15 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
             }
         );
 
-    toast(message: string, displayLength: number = 6000, error?: string,
+    private getToastId = (): number => {
+        for (let i = 0; ; i++) {
+            if (!this.toasts[i]) {
+                return i;
+            }
+        }
+    }
+
+    public toast(message: string, displayLength: number = 6000, error?: string,
           instance?: boolean, unique?: boolean): void {
         const id = this.getToastId();
         const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;
@@ -52,13 +60,5 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
             }
         }
     };
-
-    private getToastId = (): number => {
-        for (let i = 0; ; i++) {
-            if (!this.toasts[i]) {
-                return i;
-            }
-        }
-    }
 
 }

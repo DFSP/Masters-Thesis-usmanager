@@ -55,7 +55,7 @@ const SimulatedMetrics = () =>
                 <SimulatedHostMetricsList/>
             </Collapsible>
         </div>
-        <div className={`${styles.app}`}>
+        <div className={`${styles.container}`}>
             <Collapsible id={"appsCollapsible"}
                          title={'Apps'}
                          active

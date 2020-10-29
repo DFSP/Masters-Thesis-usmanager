@@ -166,8 +166,7 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
 
     private getSelectableApps = () => {
         const {apps, simulatedMetricApps, unsavedApps} = this.props;
-        return Object.keys(apps).filter(app => !simulatedMetricApps.includes(app)
-            && !unsavedApps.includes(app));
+        return Object.keys(apps).filter(app => !simulatedMetricApps.includes(app) && !unsavedApps.includes(app));
     };
 
 }

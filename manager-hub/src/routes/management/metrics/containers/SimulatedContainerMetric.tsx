@@ -99,12 +99,14 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 interface State {
     simulatedContainerMetric?: ISimulatedContainerMetric,
     formSimulatedContainerMetric?: ISimulatedContainerMetric,
+    unsavedContainersIds: string[],
     unsavedContainers: string[],
 }
 
 class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     state: State = {
+        unsavedContainersIds: [],
         unsavedContainers: [],
     };
     private mounted = false;
@@ -189,37 +191,41 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
         super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
-        !!this.state.unsavedContainers.length;
+        !!this.state.unsavedContainersIds.length;
 
     private saveEntities = (simulatedMetric: ISimulatedContainerMetric) => {
         this.saveSimulatedContainerMetricContainers(simulatedMetric);
     };
 
     private addSimulatedContainerMetricContainer = (container: string): void => {
+        const containerId = container.split(" - ")[1]
         this.setState({
+            unsavedContainersIds: this.state.unsavedContainersIds.concat(containerId),
             unsavedContainers: this.state.unsavedContainers.concat(container)
         });
     };
 
     private removeSimulatedContainerMetricContainers = (containers: string[]): void => {
+        const containersIds = containers.map(container => container.split(" - ")[1])
         this.setState({
+            unsavedContainersIds: this.state.unsavedContainersIds.filter(container => !containersIds.includes(container)),
             unsavedContainers: this.state.unsavedContainers.filter(container => !containers.includes(container))
         });
     };
 
     private saveSimulatedContainerMetricContainers = (simulatedMetric: ISimulatedContainerMetric): void => {
-        const {unsavedContainers} = this.state;
-        if (unsavedContainers.length) {
-            postData(`simulated-metrics/containers/${simulatedMetric.name}/containers`, unsavedContainers,
+        const {unsavedContainersIds} = this.state;
+        if (unsavedContainersIds.length) {
+            postData(`simulated-metrics/containers/${simulatedMetric.name}/containers`, unsavedContainersIds,
                 () => this.onSaveContainersSuccess(simulatedMetric),
                 (reason) => this.onSaveContainersFailure(simulatedMetric, reason));
         }
     };
 
     private onSaveContainersSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
-        this.props.addSimulatedContainerMetricContainers(simulatedMetric.name, this.state.unsavedContainers);
+        this.props.addSimulatedContainerMetricContainers(simulatedMetric.name, this.state.unsavedContainersIds);
         if (this.mounted) {
-            this.setState({unsavedContainers: []});
+            this.setState({unsavedContainersIds: []});
         }
     };
 
@@ -338,6 +344,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
         <SimulatedContainerMetricContainerList isLoadingSimulatedContainerMetric={this.props.isLoading}
                                                loadSimulatedContainerMetricError={!this.isNew() ? this.props.error : undefined}
                                                simulatedContainerMetric={this.getSimulatedContainerMetric()}
+                                               unsavedContainersIds={this.state.unsavedContainersIds}
                                                unsavedContainers={this.state.unsavedContainers}
                                                onAddContainer={this.addSimulatedContainerMetricContainer}
                                                onRemoveContainers={this.removeSimulatedContainerMetricContainers}/>;

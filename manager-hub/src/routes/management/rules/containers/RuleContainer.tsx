@@ -50,6 +50,7 @@ import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IRuleCondition} from "../conditions/RuleCondition";
+import SimulatedContainerMetricContainerList from "../../metrics/containers/SimulatedContainerMetricContainerList";
 
 export interface IRuleContainer extends IRule {
     containers?: string[]
@@ -95,6 +96,7 @@ type State = {
     ruleContainer?: IRuleContainer,
     formRuleContainer?: IRuleContainer,
     unsavedConditions: string[],
+    unsavedContainersIds: string[],
     unsavedContainers: string[],
     isGeneric: boolean,
 }
@@ -103,6 +105,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     state: State = {
         unsavedConditions: [],
+        unsavedContainersIds: [],
         unsavedContainers: [],
         isGeneric: this.props.ruleContainer?.generic || false,
     };
@@ -194,7 +197,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
-        || !!this.state.unsavedContainers.length;
+        || !!this.state.unsavedContainersIds.length;
 
     private saveEntities = (rule: IRuleContainer) => {
         this.saveRuleConditions(rule);
@@ -232,30 +235,35 @@ class RuleContainer extends BaseComponent<Props, State> {
     private onSaveConditionsFailure = (ruleContainer: IRuleContainer, reason: string): void =>
         super.toast(`Unable to save conditions of container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
-    private addRuleContainer = (container: string): void =>
+    private addRuleContainer = (container: string): void => {
+        const containerId = container.split(" - ")[1]
         this.setState({
+            unsavedContainersIds: this.state.unsavedContainersIds.concat(containerId),
             unsavedContainers: this.state.unsavedContainers.concat(container)
         });
+    };
 
     private removeRuleContainers = (containers: string[]): void => {
+        const containersIds = containers.map(container => container.split(" - ")[1])
         this.setState({
+            unsavedContainersIds: this.state.unsavedContainersIds.filter(container => !containersIds.includes(container)),
             unsavedContainers: this.state.unsavedContainers.filter(container => !containers.includes(container))
         });
     };
 
     private saveRuleContainers = (rule: IRuleContainer): void => {
-        const {unsavedContainers} = this.state;
-        if (unsavedContainers.length) {
-            postData(`rules/containers/${rule.name}/containers`, unsavedContainers,
+        const {unsavedContainersIds} = this.state;
+        if (unsavedContainersIds.length) {
+            postData(`rules/containers/${rule.name}/containers`, unsavedContainersIds,
                 () => this.onSaveContainersSuccess(rule),
                 (reason) => this.onSaveContainersFailure(rule, reason));
         }
     };
 
     private onSaveContainersSuccess = (rule: IRuleContainer): void => {
-        this.props.addRuleContainers(rule.name, this.state.unsavedContainers);
+        this.props.addRuleContainers(rule.name, this.state.unsavedContainersIds);
         if (this.mounted) {
-            this.setState({unsavedContainers: []});
+            this.setState({unsavedContainersIds: []});
         }
     };
 
@@ -377,6 +385,7 @@ class RuleContainer extends BaseComponent<Props, State> {
         <RuleContainerContainersList isLoadingRuleContainer={this.props.isLoading}
                                      loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
                                      ruleContainer={this.getRuleContainer()}
+                                     unsavedContainersIds={this.state.unsavedContainersIds}
                                      unsavedContainers={this.state.unsavedContainers}
                                      onAddRuleContainer={this.addRuleContainer}
                                      onRemoveRuleContainers={this.removeRuleContainers}/>;

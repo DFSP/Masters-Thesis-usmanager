@@ -56,6 +56,7 @@ interface SimulatedContainerMetricContainerListProps {
     isLoadingSimulatedContainerMetric: boolean;
     loadSimulatedContainerMetricError?: string | null;
     simulatedContainerMetric: ISimulatedContainerMetric | Partial<ISimulatedContainerMetric> | null;
+    unsavedContainersIds: string[];
     unsavedContainers: string[];
     onAddContainer: (container: string) => void;
     onRemoveContainers: (container: string[]) => void;
@@ -106,7 +107,8 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}
-            entitySaved={this.state.entitySaved}/>;
+            entitySaved={this.state.entitySaved}
+            invalidate={this.invalidate}/>;
     }
 
     private loadEntities = () => {
@@ -122,7 +124,7 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
     private container = (index: number, container: string, separate: boolean, checked: boolean,
                          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
         const isNew = this.isNew();
-        const unsaved = this.props.unsavedContainers.includes(container);
+        const unsaved = this.props.unsavedContainersIds.includes(container);
         return (
             <ListItem key={index} separate={separate}>
                 <div className={`${styles.linkedItemContent}`}>
@@ -132,10 +134,10 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                 {container}
-               </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {container}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (
@@ -165,10 +167,14 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
         super.toast(`Unable to remove container`, 10000, reason, true);
 
     private getSelectableContainers = () => {
-        const {containers, simulatedMetricContainers, unsavedContainers} = this.props;
-        return Object.keys(containers).filter(container => !simulatedMetricContainers.includes(container)
-            && !unsavedContainers.includes(container));
+        const {containers, simulatedMetricContainers, unsavedContainersIds} = this.props;
+        return Object.entries(containers).filter(([containerId, _]) => !simulatedMetricContainers.includes(containerId)
+            && !unsavedContainersIds.includes(containerId))
+            .map(([_, container]) => container.names[0].replace('/', '') + " - " + container.containerId);
     };
+
+    private invalidate = (data: string): string | undefined =>
+        this.props.unsavedContainers.find(container => container.split(" - ")[1] === data)
 
 }
 
