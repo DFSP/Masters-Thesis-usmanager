@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -56,14 +58,16 @@ public class HostMonitoringLogEntity {
 	@GeneratedValue
 	private Long id;
 
+	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
 	@NotNull
-	private HostAddress hostAddress;
+	@Lob
+	private HostAddress host;
 
 	@NotNull
 	private String field;
 
 	@NotNull
-	private double effectiveValue;
+	private double value;
 
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

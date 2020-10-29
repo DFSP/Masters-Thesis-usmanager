@@ -117,10 +117,10 @@ class EurekaServer extends BaseComponent<Props, State> {
     };
 
     private getEurekaServer = () =>
-        this.state.eurekaServer || this.props.eurekaServer;
+        this.props.eurekaServer || this.state.eurekaServer;
 
     private getFormEurekaServer = () =>
-        this.state.formEurekaServer || this.props.formEurekaServer;
+        this.props.formEurekaServer || this.state.formEurekaServer;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -153,7 +153,7 @@ class EurekaServer extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, eurekaServer: IEurekaServer): void =>
-        super.toast(`Unable to stop ${this.mounted ? `<b>${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} eureka server`, 10000, reason, true);
+        super.toast(`Unable to stop eureka-server ${this.mounted ? `<b>${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`}`, 10000, reason, true);
 
     private updateEurekaServer = (eurekaServer: IEurekaServer) => {
         eurekaServer = Object.values(normalize(eurekaServer, Schemas.EUREKA_SERVER).entities.eurekaServers || {})[0];

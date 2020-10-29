@@ -21,7 +21,6 @@ HTTP request | Description
 **POST** /servers | Add new servers. Request example : [{"hostname" : "server1:8080"}]
 **DELETE** /servers | Deletes a server. Request example : {"hostname" : "server1:8080"} <!---TODO fix delete-->
 
-
-## License
+## Licença
 
 Nginx-load-balancer-api está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

@@ -163,7 +163,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to save <b>${ruleContainer.name}</b> container rule`, 10000, reason, true);
+        super.toast(`Unable to save container rule <b>${ruleContainer.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleContainer>): void => {
         const ruleContainer = reply.data;
@@ -180,7 +180,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule`, 10000, reason, true);
+        super.toast(`Unable to update container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleContainer: IRuleContainer): void => {
         super.toast(`<span class="green-text">Container rule <b class="white-text">${ruleContainer.name}</b> successfully removed</span>`);
@@ -190,7 +190,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule`, 10000, reason, true);
+        super.toast(`Unable to delete container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -230,7 +230,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleContainer: IRuleContainer, reason: string): void =>
-        super.toast(`Unable to save conditions of ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule`, 10000, reason, true);
+        super.toast(`Unable to save conditions of container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleContainer = (container: string): void =>
         this.setState({
@@ -260,7 +260,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onSaveContainersFailure = (ruleContainer: IRuleContainer, reason: string): void =>
-        super.toast(`Unable to save containers of ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule`, 10000, reason, true);
+        super.toast(`Unable to save containers of container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleContainer = (ruleContainer: IRuleContainer) => {
         ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];

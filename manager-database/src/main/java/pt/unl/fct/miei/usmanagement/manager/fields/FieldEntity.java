@@ -32,8 +32,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValueEntity;
 
@@ -64,6 +65,8 @@ public class FieldEntity {
 	@NotNull
 	@Column(unique = true)
 	private String name;
+
+	private PrometheusQuery query;
 
 	@Singular
 	@JsonIgnore

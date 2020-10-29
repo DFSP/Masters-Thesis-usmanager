@@ -76,9 +76,6 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.ruleHost?.name !== this.props.ruleHost?.name) {
-            this.loadEntities();
-        }
         if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
             this.setState({entitySaved: true});
         }

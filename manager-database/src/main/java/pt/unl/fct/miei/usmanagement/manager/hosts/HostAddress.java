@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.hosts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
@@ -71,10 +72,12 @@ public class HostAddress implements Serializable {
 		this.region = null;
 	}
 
+	@JsonIgnore
 	public String getHostname() {
 		return publicDnsName != null ? publicDnsName : publicIpAddress;
 	}
 
+	@JsonIgnore
 	public boolean isComplete() {
 		return username != null && publicIpAddress != null && privateIpAddress != null && coordinates != null && region != null;
 	}
@@ -85,7 +88,7 @@ public class HostAddress implements Serializable {
 			+ publicIpAddress
 			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
 			+ (publicDnsName == null ? "" : "/" + publicDnsName)
-			+ (region == null ? "" : " (" + region + ")");
+			+ (region == null ? "" : "/" + region.getName());
 	}
 
 	@Override

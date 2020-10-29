@@ -24,7 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.regions;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @AllArgsConstructor
@@ -58,6 +61,20 @@ public enum Region {
 			return Double.compare(oneDistance, anotherDistance);
 		});
 		return regions.get(0);
+	}
+
+	public static Region getRegion(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
+
+	@JsonCreator
+	public static Region forValues(@JsonProperty("name") String name, @JsonProperty("coordinates") Coordinates coordinates) {
+		for (Region region : Region.values()) {
+			if (region.name.equalsIgnoreCase(name) && Objects.equals(region.coordinates, coordinates)) {
+				return region;
+			}
+		}
+		return null;
 	}
 
 }

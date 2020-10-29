@@ -80,9 +80,6 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.simulatedServiceMetric === undefined && this.props.simulatedServiceMetric?.name !== undefined) {
-            this.loadEntities();
-        }
         if (!prevProps.simulatedServiceMetric?.name && this.props.simulatedServiceMetric?.name) {
             this.setState({entitySaved: true});
         }

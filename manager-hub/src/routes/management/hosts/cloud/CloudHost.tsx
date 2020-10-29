@@ -42,7 +42,7 @@ import {
 } from "../../../../actions";
 import {connect} from "react-redux";
 import React from "react";
-import {deleteData, IReply, postData} from "../../../../utils/api";
+import {deleteData, IReply, postData, putData} from "../../../../utils/api";
 import GenericHostRuleList from "../GenericHostRuleList";
 import CloudHostRuleList from "./CloudHostRuleList";
 import UnsavedChanged from "../../../../components/form/UnsavedChanges";
@@ -68,7 +68,7 @@ export interface ICloudHost extends IDatabaseData {
     publicIpAddress: string;
     privateIpAddress: string;
     placement: IPlacement;
-    region: ICloudRegion;
+    awsRegion: IAwsRegion;
     worker: IWorkerManager
     managedByWorker: IWorkerManager;
     hostRules?: string[];
@@ -106,7 +106,7 @@ export const awsInstanceStates = {
     STOPPED: {name: "stopped", code: 80}
 };
 
-export interface ICloudRegion {
+export interface IAwsRegion {
     zone: string,
     name: string,
     coordinates: ICoordinates,
@@ -119,7 +119,7 @@ interface StateToProps {
     cloudHost?: Partial<ICloudHost>;
     formCloudHost?: Partial<ICloudHost>;
     newCloudHost?: INewCloudHost;
-    cloudRegions: ICloudRegion[];
+    cloudRegions: IAwsRegion[];
 }
 
 interface DispatchToProps {
@@ -188,10 +188,10 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private getCloudHost = () =>
-        this.state.cloudHost || this.props.cloudHost || {};
+        this.props.cloudHost || this.state.cloudHost || {};
 
     private getFormCloudHost = () =>
-        this.state.formCloudHost || this.props.formCloudHost;
+        this.props.formCloudHost || this.state.formCloudHost;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -248,7 +248,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (cloudHost: ICloudHost, reason: string): void =>
-        super.toast(`Unable to save rules of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+        super.toast(`Unable to save rules of instance ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} `, 10000, reason, true);
 
     private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
         this.setState({
@@ -279,7 +279,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (cloudHost: ICloudHost, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} cloud host`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of instance ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
 
     private startStopTerminateButtons = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -324,9 +324,9 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private startCloudHost = () => {
         const cloudHost = this.getCloudHost();
-        const url = `hosts/cloud/${cloudHost.instanceId}/state`;
-        this.setState({loading: {method: 'post', url: url}});
-        postData(url, 'start',
+        const url = `hosts/cloud/${cloudHost.instanceId}/start`;
+        this.setState({loading: {method: 'put', url: url}});
+        putData(url, undefined,
             (reply: IReply<ICloudHost>) => this.onStartSuccess(reply.data),
             (reason) => this.onStartFailure(reason, cloudHost));
     };
@@ -351,9 +351,9 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private stopCloudHost = () => {
         const cloudHost = this.getCloudHost();
-        const url = `hosts/cloud/${cloudHost.instanceId}/state`;
-        this.setState({loading: {method: 'post', url: url}});
-        postData(url, 'stop',
+        const url = `hosts/cloud/${cloudHost.instanceId}/stop`;
+        this.setState({loading: {method: 'put', url: url}});
+        putData(url, undefined,
             (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
             (reason) => this.onStopFailure(reason, cloudHost));
     };
@@ -484,15 +484,15 @@ class CloudHost extends BaseComponent<Props, State> {
                                                      id={key}
                                                      label={key}
                                                      valueToString={this.cloudHostPlacement}/>
-                                : key === 'region'
-                                    ? <Field<ICloudRegion> key='region' id='region' type='map'
-                                                           map={{
+                                : key === 'awsRegion'
+                                    ? <Field<IAwsRegion> key='awsRegion' id='awsRegion' type='map'
+                                                         map={{
                                                                editable: false,
                                                                singleMarker: true,
                                                                zoomable: true,
                                                                labeled: true,
                                                                loading: isLoading,
-                                                               valueToMarkers: (regions: ICloudRegion[]): IMarker[] =>
+                                                               valueToMarkers: (regions: IAwsRegion[]): IMarker[] =>
                                                                    regions.map(region => ({
                                                                        title: region.zone + " | " + region.name,
                                                                        label: formCloudHost?.instanceId,

@@ -35,7 +35,7 @@ import lombok.Setter;
 import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
@@ -78,10 +78,10 @@ public class EdgeHostEntity {
 	private String publicDnsName;
 
 	@NotNull
-	private Coordinates coordinates;
+	private Region region;
 
 	@NotNull
-	private Region region;
+	private Coordinates coordinates;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne

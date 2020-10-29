@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogEntity;
 
@@ -55,13 +55,13 @@ public class ServiceMonitoringController {
 	}
 
 	@GetMapping("/{serviceName}/avg")
-	public List<ServiceFieldAvg> getServiceFieldsAvg(@PathVariable String serviceName) {
+	public List<ServiceFieldAverage> getServiceFieldsAvg(@PathVariable String serviceName) {
 		return servicesMonitoringService.getServiceFieldsAvg(serviceName);
 	}
 
 	@GetMapping("/{serviceName}/fields/{field}/avg")
-	public ServiceFieldAvg getServiceFieldAvg(@PathVariable String serviceName, @PathVariable String field) {
-		return servicesMonitoringService.getServiceFieldAvg(serviceName, field);
+	public ServiceFieldAverage getServiceFieldAverage(@PathVariable String serviceName, @PathVariable String field) {
+		return servicesMonitoringService.getServiceFieldAverage(serviceName, field);
 	}
 
 	@GetMapping("/logs")

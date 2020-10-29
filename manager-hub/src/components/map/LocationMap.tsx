@@ -28,6 +28,7 @@ import ReactTooltip from "react-tooltip";
 import {Point} from "react-simple-maps";
 import Marker, {IMarker} from "./Marker";
 import Dialog from "../dialogs/Dialog";
+import styles from "../../routes/management/landing/Landing.module.css";
 
 export interface ICoordinates {
     label?: string,
@@ -51,6 +52,7 @@ interface Props {
 interface State {
     tooltip: string;
     markerSize: number;
+    center: boolean;
 }
 
 export default class LocationMap extends React.Component<Props, State> {
@@ -59,7 +61,11 @@ export default class LocationMap extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {tooltip: "", markerSize: this.props.marker?.size || this.DEFAULT_MARKER_SIZE}
+        this.state = {
+            tooltip: "",
+            markerSize: this.props.marker?.size || this.DEFAULT_MARKER_SIZE,
+            center: this.props.center || true
+        }
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
@@ -74,8 +80,14 @@ export default class LocationMap extends React.Component<Props, State> {
     private resizeMarkers = (position: { coordinates: Point, zoom: number }) =>
         this.setState({markerSize: (this.props.marker?.size || this.DEFAULT_MARKER_SIZE) / position.zoom})
 
+    private handleCenter = () =>
+        this.setState({center: !this.center()})
+
+    private center = () =>
+        this.props.center === undefined ? this.state.center : this.props.center && this.state.center;
+
     public render() {
-        const {onSelect, onDeselect, locations, marker, hover, clickHighlight, zoomable, position, center, resizable} = this.props;
+        const {onSelect, onDeselect, locations, marker, hover, clickHighlight, zoomable, position, resizable} = this.props;
         const {tooltip, markerSize} = this.state;
         const markers = locations.map((location, key): { coordinates: Point, marker: JSX.Element } => ({
             coordinates: [location.longitude, location.latitude],
@@ -94,9 +106,17 @@ export default class LocationMap extends React.Component<Props, State> {
                                 });
                             }}/>
         }));
+        const centerButton =
+            <button className={`btn-floating btn-flat right tooltipped ${styles.centerButton}`}
+                    data-position={'bottom'}
+                    data-tooltip={'Center'}
+                    onClick={this.handleCenter}
+                    type='button'>
+                <i className="material-icons">center_focus_weak</i>;
+            </button>;
         const map = <>
             <MapChart setTooltipContent={this.setTooltip} onClick={onSelect} markers={markers} hover={hover}
-                      clickHighlight={clickHighlight} zoomable={zoomable} position={position} center={center}
+                      clickHighlight={clickHighlight} zoomable={zoomable} position={position} center={this.center()}
                       onZoom={this.resizeMarkers}/>
             <ReactTooltip html multiline>
                 {tooltip}
@@ -105,16 +125,20 @@ export default class LocationMap extends React.Component<Props, State> {
         return <>
             {resizable &&
             <>
-                <button className='modal-trigger btn-floating btn-flat right'
+                <button className={`modal-trigger btn-floating btn-flat right tooltipped`}
+                        data-position={'bottom'}
+                        data-tooltip={'Fullscreen'}
                         data-target={'fullscreen-modal'}
-                        type={"button"}>
+                        type='button'>
                     <i className="material-icons">fullscreen</i>
                 </button>
+                {centerButton}
                 <Dialog id={'fullscreen-modal'}
-                        title={'Position'}
+                        title={'Location'}
                         fullscreen
                         locked
-                        footer={false}>
+                        footer={false}
+                        titleButtons={centerButton}>
                     {map}
                 </Dialog>
             </>}

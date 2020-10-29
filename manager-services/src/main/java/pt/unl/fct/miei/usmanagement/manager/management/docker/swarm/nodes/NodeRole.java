@@ -27,6 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes;
 public enum NodeRole {
 
 	MANAGER,
-	WORKER;
+	WORKER
 
 }

@@ -80,9 +80,6 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.simulatedContainerMetric === undefined && this.props.simulatedContainerMetric?.name !== undefined) {
-            this.loadEntities();
-        }
         if (!prevProps.simulatedContainerMetric?.name && this.props.simulatedContainerMetric?.name) {
             this.setState({entitySaved: true});
         }

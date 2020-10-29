@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager;
 
 public enum Mode {
 
-	LOCAL, GLOBAL
+	LOCAL,
+	GLOBAL
 
 }

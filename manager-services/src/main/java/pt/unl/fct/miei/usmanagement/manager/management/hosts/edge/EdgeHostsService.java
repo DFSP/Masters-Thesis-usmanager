@@ -36,11 +36,11 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
@@ -104,13 +104,13 @@ public class EdgeHostsService {
 			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
 	}
 
-	public EdgeHostEntity addEdgeHost(String username, String password, String publicDnsName, String publicIpAddress,
-									  String privateIpAddress, Coordinates coordinates) {
+	public EdgeHostEntity addEdgeHost(String username, String password, String publicIpAddress, String privateIpAddress,
+									  String publicDnsName, Coordinates coordinates) {
 		EdgeHostEntity edgeHost = EdgeHostEntity.builder()
 			.username(username)
-			.publicDnsName(publicDnsName)
 			.publicIpAddress(publicIpAddress)
 			.privateIpAddress(privateIpAddress)
+			.publicDnsName(publicDnsName)
 			.coordinates(coordinates)
 			.region(Region.getClosestRegion(coordinates))
 			.build();

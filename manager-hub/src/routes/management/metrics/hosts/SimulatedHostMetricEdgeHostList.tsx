@@ -79,9 +79,6 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.simulatedHostMetric?.name !== this.props.simulatedHostMetric?.name) {
-            this.loadEntities();
-        }
         if (!prevProps.simulatedHostMetric?.name && this.props.simulatedHostMetric?.name) {
             this.setState({entitySaved: true});
         }

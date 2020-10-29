@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
@@ -108,15 +109,19 @@ public class AwsService {
 	public List<Instance> getInstances() {
 		List<Instance> instances = new ArrayList<>();
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		DescribeInstancesResult result;
-		for (AwsRegion region : AwsRegion.getAWS_REGIONS()) {
-			do {
-				result = getEC2Client(region).describeInstances(request);
-				result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
-					.filter(this::isManagerInstance).forEach(instances::add);
-				request.setNextToken(result.getNextToken());
-			} while (result.getNextToken() != null);
-		}
+		AwsRegion.getAwsRegions().parallelStream().forEach(region -> {
+			try {
+				DescribeInstancesResult result;
+				do {
+					result = getEC2Client(region).describeInstances(request);
+					result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
+						.filter(this::isUsManagerInstance).forEach(instances::add);
+					request.setNextToken(result.getNextToken());
+				} while (result.getNextToken() != null);
+			} catch (SdkClientException e) {
+				log.error(e.getMessage());
+			}
+		});
 		return instances;
 	}
 
@@ -126,7 +131,7 @@ public class AwsService {
 		do {
 			result = getEC2Client(region).describeInstances(request);
 			Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
-				.flatMap(List::stream).filter(this::isManagerInstance).findFirst();
+				.flatMap(List::stream).filter(this::isUsManagerInstance).findFirst();
 			if (instance.isPresent()) {
 				return instance.get();
 			}
@@ -141,7 +146,7 @@ public class AwsService {
 	}
 
 	public Instance createInstance(AwsRegion region) {
-		log.info("Launching new instance at region {} - {}", region.getZone(), region.getName());
+		log.info("Launching new instance at region {} {}", region.getZone(), region.getName());
 		String instanceId = createEC2Instance(region);
 		Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING, region);
 		String publicIpAddress = instance.getPublicIpAddress();
@@ -290,7 +295,7 @@ public class AwsService {
 		Timing.wait(() -> sshService.hasConnection(hostAddress), 1000, awsConnectionTimeout);
 	}
 
-	private boolean isManagerInstance(Instance instance) {
+	private boolean isUsManagerInstance(Instance instance) {
 		return instance.getTags().stream().anyMatch(tag ->
 			Objects.equals(tag.getKey(), awsInstanceTag) && Objects.equals(tag.getValue(), "true"));
 	}

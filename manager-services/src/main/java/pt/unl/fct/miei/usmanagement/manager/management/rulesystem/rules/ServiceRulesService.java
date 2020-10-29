@@ -40,7 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleRepository;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
@@ -216,17 +216,17 @@ public class ServiceRulesService {
 		}
 	}
 
-	public ServiceDecisionResult processServiceEvent(String appName, HostAddress hostAddress, ContainerEvent containerEvent) {
+	public ServiceDecisionResult processServiceEvent(HostAddress hostAddress, ContainerEvent containerEvent) {
 		String serviceName = containerEvent.getServiceName();
 		if (droolsService.shouldCreateNewServiceRuleSession(serviceName, lastUpdateServiceRules.get())) {
-			List<Rule> rules = generateServiceRules(appName, serviceName);
+			List<Rule> rules = generateServiceRules(serviceName);
 			Map<Long, String> drools = droolsService.executeDroolsRules(containerEvent, rules, serviceRuleTemplateFile);
 			droolsService.createNewServiceRuleSession(serviceName, drools);
 		}
 		return droolsService.evaluate(hostAddress, containerEvent);
 	}
 
-	private List<Rule> generateServiceRules(String appName, String serviceName) {
+	private List<Rule> generateServiceRules(String serviceName) {
 		List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
 		List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
 		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size());

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogEntity;
 
@@ -55,14 +55,14 @@ public class HostMonitoringController {
 		return hostsMonitoringService.getHostMonitoring(new HostAddress(hostname));
 	}
 
-	@GetMapping("/{hostname}/avg")
-	public List<HostFieldAvg> getHostMonitoringAvg(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostFieldsAvg(new HostAddress(hostname));
+	@GetMapping("/{hostname}/fields?average")
+	public List<HostFieldAverage> getHostMonitoringFieldsAverage(@PathVariable String hostname) {
+		return hostsMonitoringService.getHostMonitoringFieldsAverage(new HostAddress(hostname));
 	}
 
-	@GetMapping("/{hostname}/fields/{field}/avg")
-	public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field) {
-		return hostsMonitoringService.getHostFieldAvg(new HostAddress(hostname), field);
+	@GetMapping("/{hostname}/fields/{field}?average")
+	public HostFieldAverage getHostMonitoringFieldAverage(@PathVariable String hostname, @PathVariable String field) {
+		return hostsMonitoringService.getHostMonitoringFieldAverage(new HostAddress(hostname), field);
 	}
 
 	@GetMapping("/logs")
@@ -70,9 +70,9 @@ public class HostMonitoringController {
 		return hostsMonitoringService.getHostMonitoringLogs();
 	}
 
-	@GetMapping("/logs/hosts/{hostname}")
+	@GetMapping("/{hostname}/logs")
 	public List<HostMonitoringLogEntity> getHostMonitoringLogs(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostMonitoringLogsByAddress(new HostAddress(hostname));
+		return hostsMonitoringService.getHostMonitoringLogs(new HostAddress(hostname));
 	}
 
 }

@@ -24,6 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum AwsInstanceState {
 
 	PENDING("pending", 0),
@@ -47,6 +50,16 @@ public enum AwsInstanceState {
 
 	public int getCode() {
 		return code;
+	}
+
+	@JsonCreator
+	public static AwsInstanceState forValues(@JsonProperty("state") String state, @JsonProperty("code") int code) {
+		for (AwsInstanceState awsInstanceState : AwsInstanceState.values()) {
+			if (awsInstanceState.state.equalsIgnoreCase(state) && awsInstanceState.code == code) {
+				return awsInstanceState;
+			}
+		}
+		return null;
 	}
 
 }

@@ -44,28 +44,28 @@ public interface ServiceMonitoringRepository extends JpaRepository<ServiceMonito
 	long countByContainerIdAndFieldIgnoreCase(@Param("containerId") String containerId, @Param("field") String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring"
-		+ ".ServiceFieldAvg(m.serviceName, m.field, m.sumValue / m.count, m.count) "
+		+ ".ServiceFieldAverage(m.serviceName, m.field, m.sumValue / m.count, m.count) "
 		+ "from ServiceMonitoringEntity m "
 		+ "where m.serviceName = :serviceName")
-	List<ServiceFieldAvg> getServiceFieldsAvg(@Param("serviceName") String serviceName);
+	List<ServiceFieldAverage> getServiceFieldsAvg(@Param("serviceName") String serviceName);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring"
-		+ ".ServiceFieldAvg(m.serviceName, m.field, m.sumValue / m.count, m.count) "
+		+ ".ServiceFieldAverage(m.serviceName, m.field, m.sumValue / m.count, m.count) "
 		+ "from ServiceMonitoringEntity m "
 		+ "where m.serviceName = :serviceName and m.field = :field")
-	ServiceFieldAvg getServiceFieldAvg(@Param("serviceName") String serviceName, @Param("field") String field);
+	ServiceFieldAverage getServiceFieldAverage(@Param("serviceName") String serviceName, @Param("field") String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring"
-		+ ".ContainerFieldAvg(m.containerId, m.field, m.sumValue / m.count, m.count) "
+		+ ".ContainerFieldAverage(m.containerId, m.field, m.sumValue / m.count, m.count) "
 		+ "from ServiceMonitoringEntity m "
 		+ "where m.containerId = :containerId")
-	List<ContainerFieldAvg> getContainerFieldsAvg(@Param("containerId") String containerId);
+	List<ContainerFieldAverage> getContainerFieldsAvg(@Param("containerId") String containerId);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring"
-		+ ".ContainerFieldAvg(m.containerId, m.field, m.sumValue / m.count, m.count) "
+		+ ".ContainerFieldAverage(m.containerId, m.field, m.sumValue / m.count, m.count) "
 		+ "from ServiceMonitoringEntity m "
 		+ "where m.containerId = :containerId and m.field = :field")
-	ContainerFieldAvg getContainerFieldAvg(@Param("containerId") String containerId, @Param("field") String field);
+	ContainerFieldAverage getContainerFieldAverage(@Param("containerId") String containerId, @Param("field") String field);
 
 	@Query("select m "
 		+ "from ServiceMonitoringEntity m "

@@ -74,7 +74,7 @@ class EurekaServerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, eurekaServer: IEurekaServer): void => {
-        super.toast(`Unable to stop <a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a> eureka server`, 10000, reason, true);
+        super.toast(`Unable to stop eureka-server <a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

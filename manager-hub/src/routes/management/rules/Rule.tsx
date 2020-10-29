@@ -53,6 +53,11 @@ export interface IValueMode extends IDatabaseData {
 
 export interface IField extends IDatabaseData {
     name: string;
+    query: IPrometheusQuery;
+}
+
+export interface IPrometheusQuery {
+    query: string;
 }
 
 export interface IOperator extends IDatabaseData {

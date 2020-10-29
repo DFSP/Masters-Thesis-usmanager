@@ -31,7 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

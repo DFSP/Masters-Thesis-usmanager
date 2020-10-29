@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -33,6 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.FieldRepository;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -83,10 +84,14 @@ public class FieldsService {
 		fields.delete(field);
 	}
 
+	public boolean hasField(String fieldName) {
+		return fields.hasField(fieldName);
+	}
+
 	private void checkFieldDoesntExist(FieldEntity field) {
 		String fieldName = field.getName();
 		if (fields.hasField(fieldName)) {
-			throw new DataIntegrityViolationException("Field '" + fieldName + "' already exists");
+			throw new DataIntegrityViolationException("Field " + fieldName + " already exists");
 		}
 	}
 

@@ -27,8 +27,11 @@ package pt.unl.fct.miei.usmanagement.manager;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
@@ -43,17 +46,22 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final SymService symService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final ServicesMonitoringService servicesMonitoringService;
+	private final HostsEventsService hostsEventsService;
+	private final ServicesEventsService servicesEventsService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
 								 SymService symService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService,
-								 ServicesMonitoringService servicesMonitoringService) {
+								 ServicesMonitoringService servicesMonitoringService, HostsEventsService hostsEventsService,
+								 ServicesEventsService servicesEventsService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.symService = symService;
 		this.cloudHostsService = cloudHostsService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.servicesMonitoringService = servicesMonitoringService;
+		this.hostsEventsService = hostsEventsService;
+		this.servicesEventsService = servicesEventsService;
 	}
 
 	@Override
@@ -63,9 +71,19 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		servicesMonitoringService.stopServiceMonitoring();
 		/*cloudHostsService.stopSyncDatabaseCloudHostsTimer();
 		containersService.stopSyncDatabaseContainersTimer();*/
-		containersService.stopContainers();
-		dockerSwarmService.destroySwarm();
-		cloudHostsService.terminateInstances();
+		try {
+			containersService.stopContainers();
+		} catch (Exception ignored) { }
+		try {
+			dockerSwarmService.destroySwarm();
+		} catch (Exception ignored) { }
+		try {
+			cloudHostsService.terminateInstances();
+		} catch (Exception ignored) { }
+		hostsEventsService.reset();
+		servicesEventsService.reset();
+		hostsMonitoringService.reset();
+		servicesMonitoringService.reset();
 	}
 
 }

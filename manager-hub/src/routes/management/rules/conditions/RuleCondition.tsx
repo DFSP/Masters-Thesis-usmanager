@@ -135,10 +135,10 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private getCondition = () =>
-        this.state.condition || this.props.condition;
+        this.props.condition || this.state.condition;
 
     private getFormCondition = () =>
-        this.state.formCondition || this.props.formCondition;
+        this.props.formCondition || this.state.formCondition;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -154,7 +154,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to save <b>${condition.name}</b> condition`, 10000, reason, true);
+        super.toast(`Unable to save condition <b>${condition.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleCondition>): void => {
         const condition = reply.data;
@@ -170,7 +170,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
+        super.toast(`Unable to update condition ${this.mounted ? `<b>${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (condition: IRuleCondition): void => {
         super.toast(`<span class="green-text">Condition <b class="white-text">${condition.name}</b> successfully removed</span>`);
@@ -180,8 +180,8 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to delete ${this.mounted ?
-            <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
+        super.toast(`Unable to delete condition ${this.mounted ?
+            <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private updateCondition = (condition: IRuleCondition) => {
         condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];

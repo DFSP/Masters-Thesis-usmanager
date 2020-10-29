@@ -24,42 +24,40 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
-import com.spotify.docker.client.messages.ContainerStats;
-import com.spotify.docker.client.messages.CpuStats;
-import com.spotify.docker.client.messages.MemoryStats;
-import com.spotify.docker.client.messages.NetworkStats;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.ServiceMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogsRepository;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -94,6 +92,8 @@ public class ServicesMonitoringService {
 	private final HostsService hostsService;
 	private final LocationRequestsService requestLocationMonitoringService;
 	private final DecisionsService decisionsService;
+	private final ServiceMetricsService serviceMetricsService;
+	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 
 	private final long monitorPeriod;
@@ -109,10 +109,10 @@ public class ServicesMonitoringService {
 									 ServicesService servicesService, ServiceRulesService serviceRulesService,
 									 ServicesEventsService servicesEventsService, HostsService hostsService,
 									 LocationRequestsService requestLocationMonitoringService,
-									 DecisionsService decisionsService,
+									 DecisionsService decisionsService, ServiceMetricsService serviceMetricsService,
+									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ContainerProperties containerProperties,
-									 MasterManagerProperties masterManagerProperties) {
+									 ContainerProperties containerProperties, MasterManagerProperties masterManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;
@@ -122,6 +122,8 @@ public class ServicesMonitoringService {
 		this.hostsService = hostsService;
 		this.requestLocationMonitoringService = requestLocationMonitoringService;
 		this.decisionsService = decisionsService;
+		this.serviceMetricsService = serviceMetricsService;
+		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
 		this.monitorPeriod = containerProperties.getMonitorPeriod();
 		this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
@@ -160,7 +162,7 @@ public class ServicesMonitoringService {
 				.build();
 		}
 		else {
-			serviceMonitoring.logValue(value, updateTime);
+			serviceMonitoring.update(value, updateTime);
 		}
 		servicesMonitoring.save(serviceMonitoring);
 		if (isTestEnable) {
@@ -168,20 +170,20 @@ public class ServicesMonitoringService {
 		}
 	}
 
-	public List<ServiceFieldAvg> getServiceFieldsAvg(String serviceName) {
+	public List<ServiceFieldAverage> getServiceFieldsAvg(String serviceName) {
 		return servicesMonitoring.getServiceFieldsAvg(serviceName);
 	}
 
-	public ServiceFieldAvg getServiceFieldAvg(String serviceName, String field) {
-		return servicesMonitoring.getServiceFieldAvg(serviceName, field);
+	public ServiceFieldAverage getServiceFieldAverage(String serviceName, String field) {
+		return servicesMonitoring.getServiceFieldAverage(serviceName, field);
 	}
 
-	public List<ContainerFieldAvg> getContainerFieldsAvg(String containerId) {
+	public List<ContainerFieldAverage> getContainerFieldsAvg(String containerId) {
 		return servicesMonitoring.getContainerFieldsAvg(containerId);
 	}
 
-	public ContainerFieldAvg getContainerFieldAvg(String containerId, String field) {
-		return servicesMonitoring.getContainerFieldAvg(containerId, field);
+	public ContainerFieldAverage getContainerFieldAverage(String containerId, String field) {
+		return servicesMonitoring.getContainerFieldAverage(containerId, field);
 	}
 
 	public List<ServiceMonitoringEntity> getTopContainersByField(List<String> containerIds, String field) {
@@ -194,7 +196,7 @@ public class ServicesMonitoringService {
 			.serviceName(serviceName)
 			.field(field)
 			.timestamp(LocalDateTime.now())
-			.effectiveValue(effectiveValue)
+			.value(effectiveValue)
 			.build();
 		serviceMonitoringLogs.save(serviceMonitoringLogEntity);
 	}
@@ -212,7 +214,7 @@ public class ServicesMonitoringService {
 	}
 
 	public void initServiceMonitorTimer() {
-		serviceMonitoringTimer = new Timer(true);
+		serviceMonitoringTimer = new Timer("master-manager-services-monitoring", true);
 		serviceMonitoringTimer.schedule(new TimerTask() {
 			private long previousTime = System.currentTimeMillis();
 
@@ -232,31 +234,69 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
-		List<ContainerEntity> containers = containersService.getAppContainers();
+		List<ContainerEntity> monitoringContainers = containersService.getAppContainers();
 		if (isTestEnable) {
 			List<ContainerEntity> systemContainers = containersService.getContainersWithLabels(
 				Set.of(
 					Pair.of(ContainerConstants.Label.SERVICE_NAME, MasterManagerProperties.MASTER_MANAGER),
 					Pair.of(ContainerConstants.Label.SERVICE_NAME, WorkerManagerProperties.WORKER_MANAGER)
 				));
-			containers.addAll(systemContainers);
+			monitoringContainers.addAll(systemContainers);
 		}
-		List<ContainerEntity> syncContainers = containersService.syncDatabaseContainers();
-		for (ContainerEntity container : containers) {
-			if (syncContainers.stream().noneMatch(c -> Objects.equals(c.getId(), container.getId()))) {
-				restartContainer(container);
+
+		List<ContainerEntity> systemContainers = containersService.getSystemContainers();
+		List<ContainerEntity> synchronizedContainers = containersService.synchronizeDatabaseContainers();
+		restoreCrashedSystemContainers(systemContainers, synchronizedContainers);
+
+		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
+
+		monitoringContainers.parallelStream().forEach(container -> {
+			if (synchronizedContainers.stream().noneMatch(c ->
+				Objects.equals(c.getContainerId(), container.getContainerId()) && Objects.equals(c.getHostAddress(), container.getHostAddress()))) {
+				containersService.launchContainer(container.getHostAddress(), container.getServiceName(), ContainerType.SINGLETON);
 			}
 			else {
+				HostAddress hostAddress = container.getHostAddress();
 				String containerId = container.getContainerId();
 				String serviceName = container.getServiceName();
-				HostAddress hostAddress = container.getHostAddress();
-				Map<String, Double> stats = getContainerStats(container, interval);
+
+				// Metrics from docker
+				Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
+
+				// Simulated service metrics
+				Map<String, Double> serviceSimulatedFields = serviceSimulatedMetricsService.getServiceSimulatedMetricByService(serviceName)
+					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+					.collect(Collectors.toMap(metric -> metric.getField().getName(), serviceSimulatedMetricsService::randomizeFieldValue));
+				stats.putAll(serviceSimulatedFields);
+
+				// Simulated container metrics
+				Map<String, Double> containerSimulatedFields = containerSimulatedMetricsService.getServiceSimulatedMetricByContainer(containerId)
+					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+					.collect(Collectors.toMap(metric -> metric.getField().getName(), containerSimulatedMetricsService::randomizeFieldValue));
+				stats.putAll(containerSimulatedFields);
+
+				// Calculated metrics
+				Map<String, Double> calculatedMetrics = new HashMap<>(2);
+				if (!serviceSimulatedFields.containsKey("rx-bytes-per-sec")
+					&& !containerSimulatedFields.containsKey("rx-bytes-per-sec")) {
+					calculatedMetrics.put("rx-bytes", stats.get("rx-bytes"));
+				}
+				if (!serviceSimulatedFields.containsKey("tx-bytes-per-sec")
+					&& !containerSimulatedFields.containsKey("tx-bytes-per-sec")) {
+					calculatedMetrics.put("tx-bytes", stats.get("tx-bytes"));
+				}
+				calculatedMetrics.forEach((field, value) -> {
+					ServiceMonitoringEntity monitoring = getContainerMonitoring(containerId, field);
+					double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
+					double bytesPerSec = Math.max(0, (value - lastValue) / interval);
+					stats.put(field + "-per-sec", bytesPerSec);
+				});
+
 				stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, stat, value));
 
-				for (AppEntity app : servicesService.getApps(serviceName)) {
-					String appName = app.getName();
-					ServiceDecisionResult containerDecisionResult = runAppRules(appName, hostAddress, containerId, serviceName, stats);
+				if (!serviceName.equals(MasterManagerProperties.MASTER_MANAGER)
+					&& !serviceName.equals(WorkerManagerProperties.WORKER_MANAGER)) {
+					ServiceDecisionResult containerDecisionResult = runRules(hostAddress, containerId, serviceName, stats);
 					List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);
 					if (containerDecisions != null) {
 						containerDecisions.add(containerDecisionResult);
@@ -268,13 +308,20 @@ public class ServicesMonitoringService {
 					}
 				}
 			}
-		}
+		});
+
 		if (!containersDecisions.isEmpty()) {
 			processContainerDecisions(containersDecisions);
 		}
 		else {
-			log.info("No services decisions to process");
+			log.info("No service decisions to process");
 		}
+	}
+
+	private void restoreCrashedSystemContainers(List<ContainerEntity> systemContainers, List<ContainerEntity> synchronizedContainers) {
+		systemContainers.parallelStream()
+			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
+			.forEach(this::restartContainer);
 	}
 
 	// Restarts the container on a host close to where it used to be running
@@ -287,34 +334,28 @@ public class ServicesMonitoringService {
 		containersService.launchContainer(hostAddress, serviceName);
 	}
 
-	private ServiceDecisionResult runAppRules(String appName, HostAddress hostAddress, String containerId,
-											  String serviceName, Map<String, Double> newFields) {
-		List<ServiceMonitoringEntity> loggedFields = getContainerMonitoring(containerId);
+	private ServiceDecisionResult runRules(HostAddress hostAddress, String containerId, String serviceName, Map<String, Double> newFields) {
+
 		ContainerEvent containerEvent = new ContainerEvent(containerId, serviceName);
 		Map<String, Double> containerEventFields = containerEvent.getFields();
-		for (ServiceMonitoringEntity loggedField : loggedFields) {
-			long count = loggedField.getCount();
-			if (count < CONTAINER_MINIMUM_LOGS_COUNT) {
-				continue;
-			}
-			String field = loggedField.getField();
-			Double newValue = newFields.get(field);
-			if (newValue == null) {
-				continue;
-			}
-			containerEventFields.put(field + "-effective-val", newValue);
-			double sumValue = loggedField.getSumValue() + newValue;
-			double average = sumValue / (double) (count + 1);
-			containerEventFields.put(field + "-avg-val", average);
-			double deviationFromAvgValue = ((newValue - average) / average) * 100;
-			containerEventFields.put(field + "-deviation-%-on-avg-val", deviationFromAvgValue);
-			double lastValue = loggedField.getLastValue();
-			double deviationFromLastValue = ((newValue - lastValue) / lastValue) * 100;
-			containerEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
-		}
-		return containerEventFields.isEmpty()
-			? new ServiceDecisionResult(hostAddress, containerId, serviceName)
-			: serviceRulesService.processServiceEvent(appName, hostAddress, containerEvent);
+
+		getContainerMonitoring(containerId)
+			.stream()
+			.filter(loggedField -> loggedField.getCount() >= CONTAINER_MINIMUM_LOGS_COUNT && newFields.get(loggedField.getField()) != null)
+			.forEach(loggedField -> {
+				String field = loggedField.getField();
+				Double newValue = newFields.get(field);
+				containerEventFields.put(field + "-effective-val", newValue);
+				double average = loggedField.getSumValue() / loggedField.getCount();
+				containerEventFields.put(field + "-avg-val", average);
+				double deviationFromAverageValue = ((newValue - average) / average) * 100;
+				containerEventFields.put(field + "-deviation-%-on-avg-val", deviationFromAverageValue);
+				double lastValue = loggedField.getLastValue();
+				double deviationFromLastValue = ((newValue - lastValue) / lastValue) * 100;
+				containerEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
+			});
+
+		return serviceRulesService.processServiceEvent(hostAddress, containerEvent);
 	}
 
 	private void processContainerDecisions(Map<String, List<ServiceDecisionResult>> servicesDecisions) {
@@ -418,66 +459,15 @@ public class ServicesMonitoringService {
 		decisionsService.addServiceDecisionValueFromFields(serviceDecision, fields);
 	}
 
-	private Map<String, Double> getContainerStats(ContainerEntity container, double secondsInterval) {
-		String containerId = container.getContainerId();
-		HostAddress hostAddress = container.getHostAddress();
-		ContainerStats containerStats = containersService.getContainerStats(containerId, hostAddress);
-		CpuStats cpuStats = containerStats.cpuStats();
-		CpuStats preCpuStats = containerStats.precpuStats();
-		double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();
-		double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats);
-		MemoryStats memoryStats = containerStats.memoryStats();
-		double ram = memoryStats.usage().doubleValue();
-		double ramPercent = getContainerRamPercent(memoryStats);
-		double rxBytes = 0;
-		double txBytes = 0;
-		for (NetworkStats stats : containerStats.networks().values()) {
-			rxBytes += stats.rxBytes().doubleValue();
-			txBytes += stats.txBytes().doubleValue();
-		}
-		// Metrics from docker
-		Map<String, Double> fields = new HashMap<>(Map.of(
-			"cpu", cpu,
-			"ram", ram,
-			"cpu-%", cpuPercent,
-			"ram-%", ramPercent,
-			"rx-bytes", rxBytes,
-			"tx-bytes", txBytes));
-		// Simulated metrics
-		if (container.getLabels().containsKey(ContainerConstants.Label.SERVICE_NAME)) {
-			Map<String, Double> simulatedFields = containerSimulatedMetricsService.getSimulatedFieldsValues(containerId);
-			fields.putAll(simulatedFields);
-		}
-		// Calculated metrics
-		Map.of("rx-bytes", rxBytes, "tx-bytes", txBytes).forEach((field, value) -> {
-			ServiceMonitoringEntity monitoring = getContainerMonitoring(containerId, field);
-			double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
-			double bytesPerSec = Math.max(0, (value - lastValue) / secondsInterval);
-			fields.put(field + "-per-sec", bytesPerSec);
-		});
-		return fields;
-	}
-
-	private double getContainerCpuPercent(CpuStats preCpuStats, CpuStats cpuStats) {
-		double systemDelta = cpuStats.systemCpuUsage().doubleValue() - preCpuStats.systemCpuUsage().doubleValue();
-		double cpuDelta = cpuStats.cpuUsage().totalUsage().doubleValue() - preCpuStats.cpuUsage().totalUsage().doubleValue();
-		double cpuPercent = 0.0;
-		if (systemDelta > 0.0 && cpuDelta > 0.0) {
-			double onlineCpus = cpuStats.cpuUsage().percpuUsage().stream().filter(cpuUsage -> cpuUsage >= 1).count();
-			cpuPercent = (cpuDelta / systemDelta) * onlineCpus * 100.0;
-		}
-		return cpuPercent;
-	}
-
-
-	private double getContainerRamPercent(MemoryStats memStats) {
-		return memStats.limit() < 1 ? 0.0 : (memStats.usage().doubleValue() / memStats.limit().doubleValue()) * 100.0;
-	}
-
 	public void stopServiceMonitoring() {
 		if (serviceMonitoringTimer != null) {
 			serviceMonitoringTimer.cancel();
 			log.info("Stopped service monitoring");
 		}
+	}
+
+	public void reset() {
+		log.info("Clearing all service monitoring");
+		servicesMonitoring.deleteAll();
 	}
 }

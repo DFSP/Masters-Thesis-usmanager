@@ -73,7 +73,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleContainer: IRuleContainer): void => {
-        super.toast(`Unable to delete <a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a> container rule`, 10000, reason, true);
+        super.toast(`Unable to delete container rule <a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

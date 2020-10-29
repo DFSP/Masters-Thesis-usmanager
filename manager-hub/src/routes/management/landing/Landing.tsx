@@ -32,7 +32,6 @@ import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
 import {IMarker} from "../../../components/map/Marker";
-import UnsavedChanges from "../../../components/form/UnsavedChanges";
 import {Error} from "../../../components/errors/Error";
 
 interface StateToProps {
@@ -81,7 +80,7 @@ class Landing extends React.Component<Props, State> {
         containers
             .forEach(container => {
                 const publicIpAddress = container.publicIpAddress;
-                const marker = markers.get(publicIpAddress) || { title: '', label: '', latitude: 0, longitude: 0 };
+                const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
                 if (marker.title === '') {
                     marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
                 }
@@ -107,8 +106,7 @@ class Landing extends React.Component<Props, State> {
             </button>;
         const map = <>
             {error && <Error message={error}/>}
-            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover
-                                    marker={{labeled: true}}/>}
+            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover/>}
         </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>

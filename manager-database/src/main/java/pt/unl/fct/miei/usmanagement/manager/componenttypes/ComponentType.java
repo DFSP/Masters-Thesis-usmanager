@@ -27,8 +27,8 @@ package pt.unl.fct.miei.usmanagement.manager.componenttypes;
 public enum ComponentType {
 
 	HOST,
+	APP,
 	SERVICE,
-	CONTAINER,
-	TEST
+	CONTAINER
 
 }

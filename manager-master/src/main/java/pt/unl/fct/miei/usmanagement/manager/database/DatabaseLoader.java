@@ -28,41 +28,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceRepository;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.users.UserRole;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyRepository;
-import pt.unl.fct.miei.usmanagement.manager.users.UserEntity;
-import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
@@ -73,6 +65,23 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionRepository;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionRepository;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.users.UserEntity;
+import pt.unl.fct.miei.usmanagement.manager.users.UserRole;
+import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
 
 import java.util.List;
 
@@ -85,14 +94,17 @@ public class DatabaseLoader {
 								   ServicesService servicesService,
 								   AppsService appsService, AppServiceRepository appsServices,
 								   ServiceDependencyRepository servicesDependencies, /*RegionsService regionsService,*/
-								   CloudHostsService cloudHostsService, ComponentTypesService componentTypesService,
+								   EdgeHostsService edgeHostsService, CloudHostsService cloudHostsService,
+								   ComponentTypesService componentTypesService,
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
 								   HostRuleConditionRepository hostRuleConditions,
 								   ServiceRulesService serviceRulesService,
 								   ServiceRuleConditionRepository serviceRuleConditions,
-								   DockerProperties dockerProperties) {
+								   DockerProperties dockerProperties, HostsEventsService hostsEventsService,
+								   ServicesEventsService servicesEventsService, HostsMonitoringService hostsMonitoringService,
+								   ServicesMonitoringService servicesMonitoringService) {
 		return args -> {
 
 			String dockerHubUsername = dockerProperties.getHub().getUsername();
@@ -710,13 +722,28 @@ public class DatabaseLoader {
 				if (!regionsService.hasRegion(region)) {
 					RegionEntity regionEntity = RegionEntity.builder()
 						.region(region)
+						.active(true)
 						.build();
 					regionsService.addRegion(regionEntity);
 				}
 			}*/
 
+			// edge hosts
+			if (!edgeHostsService.hasEdgeHost("dpimenta.ddns.net")) {
+				Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
+				Region region = Region.getClosestRegion(coordinates);
+				edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
+					.username("daniel")
+					.publicIpAddress("2.82.208.89")
+					.privateIpAddress("192.168.1.83")
+					.publicDnsName("dpimenta.ddns.net")
+					.region(region)
+					.coordinates(coordinates)
+					.build());
+			}
+
 			// cloud hosts
-			cloudHostsService.syncDatabaseCloudHosts();
+			cloudHostsService.synchronizeDatabaseCloudHosts();
 
 			// component types
 			ComponentTypeEntity host;
@@ -917,6 +944,7 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				ram = FieldEntity.builder()
 					.name("ram")
+					.query(PrometheusQuery.MEMORY_USAGE)
 					.build();
 				ram = fieldsService.addField(ram);
 			}
@@ -927,6 +955,7 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				cpuPercentage = FieldEntity.builder()
 					.name("cpu-%")
+					.query(PrometheusQuery.CPU_USAGE_PERCENTAGE)
 					.build();
 				cpuPercentage = fieldsService.addField(cpuPercentage);
 			}
@@ -937,6 +966,7 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				ramPercentage = FieldEntity.builder()
 					.name("ram-%")
+					.query(PrometheusQuery.MEMORY_USAGE_PERCENTAGE)
 					.build();
 				ramPercentage = fieldsService.addField(ramPercentage);
 			}
@@ -1000,6 +1030,18 @@ public class DatabaseLoader {
 					.build();
 				bandwidthPercentage = fieldsService.addField(bandwidthPercentage);
 			}
+			FieldEntity filesystemAvailableSpace;
+			try {
+				filesystemAvailableSpace = fieldsService.getField("filesystem-available-space");
+			}
+			catch (EntityNotFoundException ignored) {
+				latency = FieldEntity.builder()
+					.name("filesystem-available-space")
+					.query(PrometheusQuery.FILESYSTEM_AVAILABLE_SPACE)
+					.build();
+				filesystemAvailableSpace = fieldsService.addField(latency);
+			}
+
 
 			// value modes
 			ValueModeEntity effectiveValue;
@@ -1145,6 +1187,12 @@ public class DatabaseLoader {
 					.build();
 				serviceRuleConditions.save(rxOver500000Condition);
 			}
+
+			hostsEventsService.reset();
+			servicesEventsService.reset();
+
+			hostsMonitoringService.reset();
+			servicesMonitoringService.reset();
 		};
 	}
 

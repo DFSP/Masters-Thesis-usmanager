@@ -176,11 +176,14 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                         </>
                     )}
                     <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
-                            style={!error && Object.values(this.state)
+                            /*style={!error && Object.values(this.state)
                                 .map(item => item?.isChecked || false)
                                 .some(checked => checked)
                                 ? {transform: "scale(1)"}
-                                : {transform: "scale(0)"}}
+                                : {transform: "scale(0)"}}*/
+                        disabled={!!error || Object.values(this.state)
+                            .map(item => item?.isChecked || false)
+                            .every(checked => !checked)}
                             onClick={this.onRemove}>
                         {removeButtonText || 'Remove'}
                     </button>

@@ -32,14 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.util.Json;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
@@ -60,8 +58,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud")
-	public CloudHostEntity startCloudHost(@RequestBody AddInstance addInstance) {
-		return cloudHostsService.launchInstance(addInstance.getCoordinates());
+	public CloudHostEntity startCloudHost(@RequestBody AddCloudInstance addCloudInstance) {
+		return cloudHostsService.launchInstance(addCloudInstance.getCoordinates());
 	}
 
 	@GetMapping("/cloud")
@@ -70,8 +68,8 @@ public class HostsController {
 	}
 
 	@PostMapping("/cloud/sync")
-	public List<CloudHostEntity> syncDatabaseCloudHosts() {
-		return cloudHostsService.syncDatabaseCloudHosts();
+	public List<CloudHostEntity> synchronizeDatabaseCloudHosts() {
+		return cloudHostsService.synchronizeDatabaseCloudHosts();
 	}
 
 	@GetMapping("/cloud/{instanceId}")
@@ -79,16 +77,14 @@ public class HostsController {
 		return cloudHostsService.getCloudHostById(instanceId);
 	}
 
-	@PostMapping("/cloud/{instanceId}/state")
-	public CloudHostEntity changeCloudHostState(@PathVariable String instanceId, @RequestBody String action) {
-		switch (action) {
-			case "start":
-				return cloudHostsService.startInstance(instanceId, true);
-			case "stop":
-				return cloudHostsService.stopInstance(instanceId);
-			default:
-				throw new BadRequestException("Invalid request body: expected 'start' or 'stop'");
-		}
+	@PutMapping("/cloud/{instanceId}/start")
+	public CloudHostEntity startCloudInstance(@PathVariable String instanceId) {
+		return cloudHostsService.startInstance(instanceId, true);
+	}
+
+	@PutMapping("/cloud/{instanceId}/stop")
+	public CloudHostEntity stopCloudInstance(@PathVariable String instanceId) {
+		return cloudHostsService.stopInstance(instanceId);
 	}
 
 	@DeleteMapping("/cloud/{instanceId}")
@@ -163,10 +159,9 @@ public class HostsController {
 	}
 
 	@PostMapping("/edge")
-	public EdgeHostEntity addEdgeHost(@Json String username, @Json String password, @Json String publicDnsName,
-									  @Json String privateIpAddress, @Json String publicIpAddress,
-									  @Json Coordinates coordinates) {
-		return edgeHostsService.addEdgeHost(username, password, publicDnsName, privateIpAddress, publicIpAddress, coordinates);
+	public EdgeHostEntity addEdgeHost(@RequestBody AddEdgeHost addEdgeHost) {
+		return edgeHostsService.addEdgeHost(addEdgeHost.getUsername(), addEdgeHost.getPassword(), addEdgeHost.getPublicIpAddress(),
+			addEdgeHost.getPrivateIpAddress(), addEdgeHost.getPublicDnsName(), addEdgeHost.getCoordinates());
 	}
 
 	@PutMapping("/edge/{hostname}")

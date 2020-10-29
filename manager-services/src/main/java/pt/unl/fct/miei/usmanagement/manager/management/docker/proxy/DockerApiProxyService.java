@@ -30,8 +30,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
@@ -74,11 +74,12 @@ public class DockerApiProxyService {
 				+ "docker pull %s && "
 				+ "docker run -itd --name=%s -p %s:%s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-				+ "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%b -l %s=%b %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%b -l %s=%b %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, internalPort,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
 			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
+			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
 			ContainerConstants.Label.SERVICE_TYPE, serviceType,
 			ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,

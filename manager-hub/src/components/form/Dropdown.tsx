@@ -53,26 +53,30 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
         const {className, id, name, value, disabled, onChange, onBlur, dropdown} = this.props;
         let valueString = value === undefined ? "" : value;
         valueString = typeof valueString === 'object' ? JSON.stringify(valueString) : valueString.toString();
+        const values = dropdown.values;
+        if (!values.length && value) {
+            values.push(value);
+        }
         return (
             <select
                 className={className}
                 id={id}
                 name={name}
                 value={valueString}
-                disabled={disabled || dropdown.values.length === 0}
+                disabled={disabled || values.length === 0}
                 onChange={onChange}
                 onBlur={onBlur}
                 ref={this.dropdown}>
                 {<>
-                    {dropdown.values.length > 0 && dropdown.defaultValue &&
+                    {values.length > 0 && dropdown.defaultValue &&
                     <option key={dropdown.defaultValue} value="" disabled hidden>
                         {dropdown.defaultValue}
                     </option>}
-                    {dropdown.values.length === 0 && dropdown.emptyMessage &&
+                    {values.length === 0 && dropdown.emptyMessage &&
                     <option value="" disabled hidden>
                         {dropdown.emptyMessage}
                     </option>}
-                    {dropdown.values.map((option, index) =>
+                    {values.map((option, index) =>
                         <option key={index}
                                 value={typeof option === 'string' || typeof option === 'boolean' ? option.toString() : JSON.stringify(option)}>
                             {typeof option === 'string' || typeof option === 'boolean' ? option.toString() : dropdown.optionToString?.(option)}

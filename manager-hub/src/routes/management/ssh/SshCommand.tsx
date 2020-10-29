@@ -29,7 +29,6 @@ import Field from "../../../components/form/Field";
 import React from "react";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {ReduxState} from "../../../reducers";
-import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IHostAddress} from "../hosts/Hosts";
@@ -86,8 +85,7 @@ class SshCommand extends BaseComponent<Props, {}> {
                                               }}/>
                 <Field key='command'
                        id='command'
-                       label='command'
-                       type={'multilinetext'}/>
+                       label='command'/>
             </Form>
         );
     }
@@ -118,9 +116,12 @@ class SshCommand extends BaseComponent<Props, {}> {
     private getSelectableHosts = (): (Partial<IHostAddress>)[] => {
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
-            .map(instance => ({ publicIpAddress: instance.publicIpAddress, privateIpAddress: instance.privateIpAddress }));
+            .map(instance => ({
+                publicIpAddress: instance.publicIpAddress,
+                privateIpAddress: instance.privateIpAddress
+            }));
         const edgeHosts = Object.values(this.props.edgeHosts)
-            .map(host => ({ publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress }));
+            .map(host => ({publicIpAddress: host.publicIpAddress, privateIpAddress: host.privateIpAddress}));
         return [...cloudHosts, ...edgeHosts];
     };
 

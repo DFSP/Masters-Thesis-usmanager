@@ -65,7 +65,7 @@ public class ServiceMonitoringLogEntity {
 	private String field;
 
 	@NotNull
-	private double effectiveValue;
+	private double value;
 
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

@@ -29,7 +29,6 @@ import {connect} from "react-redux";
 import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
 import M from "materialize-css";
 import {RouteComponentProps, withRouter} from "react-router";
-import {UnregisterCallback} from "history";
 import {bindActionCreators} from "redux";
 import {updateSearch} from "../../actions";
 
@@ -49,20 +48,9 @@ type Props = IMainLayout & StateToProps & DispatchToProps & RouteComponentProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
-    private historyChangeUnlisten: UnregisterCallback | null = null;
-
     public componentDidMount(): void {
         M.AutoInit();
-    }
-
-    componentWillMount() {
-        this.historyChangeUnlisten = this.props.history.listen((location, action) => {
-            this.props.updateSearch('');
-        });
-    }
-
-    componentWillUnmount() {
-        this.historyChangeUnlisten?.();
+        this.props.updateSearch('');
     }
 
     public render() {

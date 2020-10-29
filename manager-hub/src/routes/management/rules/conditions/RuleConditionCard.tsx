@@ -73,7 +73,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, condition: IRuleCondition): void => {
-        super.toast(`Unable to delete <a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a> condition`, 10000, reason, true);
+        super.toast(`Unable to delete condition <a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

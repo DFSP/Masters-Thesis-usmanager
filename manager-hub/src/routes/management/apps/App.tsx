@@ -132,10 +132,10 @@ class App extends BaseComponent<Props, State> {
     };
 
     private getApp = () =>
-        this.state.app || this.props.app;
+        this.props.app || this.state.app;
 
     private getFormApp = () =>
-        this.state.formApp || this.props.formApp;
+        this.props.formApp || this.state.formApp;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -152,7 +152,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to save <b>${app.name}</b> app`, 10000, reason, true);
+        super.toast(`Unable to save app <b>${app.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
@@ -169,7 +169,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
+        super.toast(`Unable to update app ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (app: IApp): void => {
         super.toast(`<span class="green-text">App <b class="white-text">${app.name}</b> successfully removed</span>`);
@@ -179,7 +179,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
+        super.toast(`Unable to delete app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedServices.length;
@@ -217,7 +217,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save services of ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
+        super.toast(`Unable to save services of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
 
     private launchButton = (): ICustomButton[] => {

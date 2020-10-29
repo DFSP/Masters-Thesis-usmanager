@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.regions;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
@@ -36,6 +37,11 @@ public class RegionsController {
 	@GetMapping
 	public Region[] getRegions() {
 		return Region.values();
+	}
+
+	@GetMapping("/{name}")
+	public Region getRegion(@PathVariable String name) {
+		return Region.getRegion(name);
 	}
 
 	/*private final RegionsService regionsService;

@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.miei.usmanagement.manager.ServiceOrder;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public interface AppRepository extends JpaRepository<AppEntity, Long> {
 		+ "where lower(a.name) = lower(:appName)")
 	boolean hasApp(@Param("appName") String appName);
 
-	@Query("select new pt.unl.fct.miei.usmanagement.manager"
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.services"
 		+ ".ServiceOrder(s.service, s.launchOrder) "
 		+ "from AppEntity a join a.appServices s "
 		+ "where lower(a.name) = lower(:appName) order by s.launchOrder")

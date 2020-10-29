@@ -73,7 +73,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, workerManager: IWorkerManager): void => {
-        super.toast(`Unable to stop <a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a> worker-manager`, 10000, reason, true);
+        super.toast(`Unable to stop worker-manager <a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

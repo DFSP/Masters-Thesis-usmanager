@@ -50,7 +50,6 @@ import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedHostMetricCloudHostList from "./SimulatedHostMetricCloudHostList";
 import SimulatedHostMetricEdgeHostList from "./SimulatedHostMetricEdgeHostList";
-import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 export interface ISimulatedHostMetric extends IDatabaseData {
     name: string;
@@ -59,6 +58,7 @@ export interface ISimulatedHostMetric extends IDatabaseData {
     maximumValue: number;
     override: boolean;
     generic: boolean;
+    active: boolean;
     cloudHosts?: string[];
     edgeHosts?: string[];
 }
@@ -69,6 +69,7 @@ const buildNewSimulatedHostMetric = (): Partial<ISimulatedHostMetric> => ({
     minimumValue: undefined,
     maximumValue: undefined,
     override: undefined,
+    active: true,
     generic: undefined,
 });
 
@@ -124,7 +125,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -140,17 +141,17 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     }
 
     private loadSimulatedHostMetric = () => {
-        if (!isNew(this.props.location.search)) {
+        if (!this.isNew()) {
             const name = this.props.match.params.name;
             this.props.loadSimulatedHostMetrics(name);
         }
     };
 
     private getSimulatedHostMetric = () =>
-        this.state.simulatedHostMetric || this.props.simulatedHostMetric;
+        this.props.simulatedHostMetric || this.state.simulatedHostMetric;
 
     private getFormSimulatedHostMetric = () =>
-        this.state.formSimulatedHostMetric || this.props.formSimulatedHostMetric;
+        this.props.formSimulatedHostMetric || this.state.formSimulatedHostMetric;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -167,7 +168,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedHostMetric: ISimulatedHostMetric): void =>
-        super.toast(`Unable to save <b>${simulatedHostMetric.name}</b> simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to save simulated host metric <b>${simulatedHostMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedHostMetric>): void => {
         const simulatedMetric = reply.data;
@@ -175,7 +176,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
         this.saveEntities(simulatedMetric);
         const previousSimulatedHostMetric = this.getSimulatedHostMetric();
         if (previousSimulatedHostMetric.id) {
-            this.props.updateSimulatedHostMetric(previousSimulatedHostMetric as ISimulatedContainerMetric, simulatedMetric);
+            this.props.updateSimulatedHostMetric(previousSimulatedHostMetric as ISimulatedHostMetric, simulatedMetric);
         }
         if (this.mounted) {
             this.updateSimulatedHostMetric(simulatedMetric);
@@ -184,7 +185,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to update simulated host metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
         super.toast(`<span class="green-text">Simulated host metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
@@ -194,7 +195,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to delete simulated host metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedCloudHosts.length
@@ -234,7 +235,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveCloudHostsFailure = (simulatedMetric: ISimulatedHostMetric, reason: string): void =>
-        super.toast(`Unable to save cloud hosts of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to save cloud hosts of simulated host metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private addSimulatedHostMetricEdgeHost = (edgeHost: string): void => {
         this.setState({
@@ -265,13 +266,16 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveEdgeHostsFailure = (simulatedMetric: ISimulatedHostMetric, reason: string): void =>
-        super.toast(`Unable to save edge hosts of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Unable to save edge hosts of simulated host metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
 
     private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
         simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
         const formSimulatedHostMetric = {...simulatedHostMetric};
         removeFields(formSimulatedHostMetric);
-        this.setState({simulatedHostMetric: simulatedHostMetric, formSimulatedHostMetric: formSimulatedHostMetric});
+        this.setState({
+            simulatedHostMetric: {...this.getSimulatedHostMetric(), ...simulatedHostMetric},
+            formSimulatedHostMetric: formSimulatedHostMetric
+        });
     };
 
     private getFields = (simulatedHostMetric: Partial<ISimulatedHostMetric>): IFields =>
@@ -312,7 +316,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                     <Form id={simulatedHostMetricKey}
                           fields={this.getFields(formSimulatedHostMetric)}
                           values={simulatedHostMetric}
-                          isNew={isNew(this.props.location.search)}
+                          isNew={isNewSimulatedHostMetric}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
                               url: 'simulated-metrics/hosts',
@@ -342,33 +346,43 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                                      optionToString: this.fieldOption,
                                                      emptyMessage: 'No fields available'
                                                  }}/>
+                                : key === 'minimumValue' || key === 'maximumValue'
+                                ? <Field key={index}
+                                         id={key}
+                                         label={key}
+                                         type={'number'}/>
                                 : key === 'override'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      defaultValue: "Override true metrics?",
-                                                      values: [true, false]
-                                                  }}/>
-                                : key === 'generic'
                                     ? <Field<boolean> key={index}
                                                       id={key}
                                                       label={key}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          selectCallback: this.isGenericSelected,
-                                                          defaultValue: "Apply to all hosts?",
+                                                          defaultValue: "Override true metrics?",
                                                           values: [true, false]
                                                       }}/>
-                                    : key === 'minimumValue' || key === 'maximumValue'
-                                        ? <Field key={index}
-                                                 id={key}
-                                                 label={key}
-                                                 type={'number'}/>
-                                        : <Field key={index}
-                                                 id={key}
-                                                 label={key}/>
+                                    : key === 'generic'
+                                        ? <Field<boolean> key={index}
+                                                          id={key}
+                                                          label={key}
+                                                          type="dropdown"
+                                                          dropdown={{
+                                                              selectCallback: this.isGenericSelected,
+                                                              defaultValue: "Apply to all hosts?",
+                                                              values: [true, false]
+                                                          }}/>
+
+                                        : key === 'active'
+                                            ? <Field<boolean> key={index}
+                                                              id={key}
+                                                              label={key}
+                                                              type="dropdown"
+                                                              dropdown={{
+                                                                  defaultValue: "Active?",
+                                                                  values: [true, false]
+                                                              }}/>
+                                            : <Field key={index}
+                                                     id={key}
+                                                     label={key}/>
                         )}
                     </Form>
                 )}

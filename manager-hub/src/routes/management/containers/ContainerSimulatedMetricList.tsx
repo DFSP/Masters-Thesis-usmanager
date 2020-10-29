@@ -80,9 +80,6 @@ class ContainerSimulatedMetricList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.container?.containerId !== this.props.container?.containerId) {
-            this.loadEntities();
-        }
         if (!prevProps.container?.containerId && this.props.container?.containerId) {
             this.setState({entitySaved: true});
         }
@@ -181,7 +178,6 @@ function mapStateToProps(state: ReduxState, ownProps: ContainerSimulatedMetricLi
         isLoading: state.entities.containers.isLoadingSimulatedMetrics,
         error: state.entities.containers.loadSimulatedMetricsError,
         simulatedMetrics: Object.entries(state.entities.simulatedMetrics.containers.data)
-            .filter(([_, simulatedMetric]) => !simulatedMetric.generic)
             .map(([key, value]) => ({[key]: value}))
             .reduce((fields, field) => {
                 for (let key in field) {

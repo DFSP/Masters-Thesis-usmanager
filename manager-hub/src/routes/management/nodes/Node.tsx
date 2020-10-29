@@ -170,10 +170,10 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private getNode = () =>
-        this.state.node || this.props.node;
+        this.props.node || this.state.node;
 
     private getFormNode = () =>
-        this.state.formNode || this.props.formNode;
+        this.props.formNode || this.state.formNode;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -422,7 +422,8 @@ class Node extends BaseComponent<Props, State> {
                             ? <Field key={index}
                                      id={key}
                                      label={key}
-                                     icon={{linkedTo: this.hostLink}}/>
+                                     icon={{linkedTo: this.hostLink}}
+                                     disabled={true}/>
                             : <Field key={index}
                                      id={key}
                                      label={key}

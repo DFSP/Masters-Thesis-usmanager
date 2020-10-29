@@ -24,6 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +38,9 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -53,29 +57,39 @@ public class HostMonitoringEntity {
 	@GeneratedValue
 	private Long id;
 
-	private HostAddress hostAddress;
+	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
+	@NotNull
+	@Lob
+	private HostAddress host;
 
+	@NotNull
 	private String field;
 
+	@NotNull
 	private double minValue;
 
+	@NotNull
 	private double maxValue;
 
+	@NotNull
 	private double sumValue;
 
+	@NotNull
 	private double lastValue;
 
+	@NotNull
 	private long count;
 
+	@NotNull
 	@Basic
 	private Timestamp lastUpdate;
 
-	public void logValue(double value, Timestamp updateTime) {
-		setMinValue(Math.min(value, getMinValue()));
-		setMaxValue(Math.max(value, getMaxValue()));
+	public void update(double value, Timestamp updateTime) {
+		setMinValue(Math.min(value, minValue));
+		setMaxValue(Math.max(value, maxValue));
 		setLastValue(value);
-		setSumValue(getSumValue() + value);
-		setCount(getCount() + 1);
+		setSumValue(sumValue + value);
+		setCount(count + 1);
 		setLastUpdate(updateTime);
 	}
 

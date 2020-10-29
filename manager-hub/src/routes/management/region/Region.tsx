@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndSizeRestriction} from "../../../components/form/Form";
+import Form from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -33,37 +32,34 @@ import React from "react";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addRegion, loadRegions, updateRegion} from "../../../actions";
+import {loadRegions} from "../../../actions";
 import {connect} from "react-redux";
-import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
-import {normalize} from "normalizr";
-import {Schemas} from "../../../middleware/api";
-import {IApp} from "../apps/App";
 
-export interface IRegion extends IDatabaseData {
+export interface IRegion /*extends IDatabaseData*/
+{
     name: string;
-    description: string;
-    active: boolean;
+    coordinates: Coordinates;
+    /*active: boolean;*/
 }
 
 const buildNewRegion = (): Partial<IRegion> => ({
     name: undefined,
-    description: undefined,
-    active: true,
+    coordinates: undefined,
+    /*active: true,*/
 });
 
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
     region: Partial<IRegion>;
-    formRegion?: Partial<IRegion>,
+    /*formRegion?: Partial<IRegion>,*/
 }
 
 interface DispatchToProps {
     loadRegions: (name: string) => void;
-    addRegion: (region: IRegion) => void;
-    updateRegion: (previousRegion: IRegion, currentRegion: IRegion) => void;
+    /*addRegion: (awsRegion: IRegion) => void;
+    updateRegion: (previousRegion: IRegion, currentRegion: IRegion) => void;*/
 }
 
 interface MatchParams {
@@ -79,7 +75,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 
 interface State {
     region?: IRegion,
-    formRegion?: IRegion,
+    /*formRegion?: IRegion,*/
 }
 
 class Region extends BaseComponent<Props, State> {
@@ -116,68 +112,67 @@ class Region extends BaseComponent<Props, State> {
     private getRegion = () =>
         this.state.region || this.props.region;
 
-    private getFormRegion = () =>
-        this.state.formRegion || this.props.formRegion;
+    /*private getFormRegion = () =>
+        this.state.formRegion || this.props.formRegion;*/
 
-    private isNew = () =>
-        isNew(this.props.location.search);
+    /*private isNew = () =>
+        isNew(this.props.location.search);*/
 
-    private onPostSuccess = (reply: IReply<IRegion>): void => {
-        const region = reply.data;
-        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} saved</span>`);
-        this.props.addRegion(region);
+    /*private onPostSuccess = (reply: IReply<IRegion>): void => {
+        const awsRegion = reply.data;
+        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${awsRegion.name}</b>` : `<a href=/regions/${awsRegion.name}><b>${awsRegion.name}</b></a>`} saved</span>`);
+        this.props.addRegion(awsRegion);
         if (this.mounted) {
-            this.updateRegion(region);
-            this.props.history.replace(region.name);
+            this.updateRegion(awsRegion);
+            this.props.history.replace(awsRegion.name);
         }
-    };
+    };*/
 
-    private onPostFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to save <b>${region.name}</b> region`, 10000, reason, true);
+    /*private onPostFailure = (reason: string, region: IRegion): void =>
+        super.toast(`Unable to save region <b>${region.name}</b>`, 10000, reason, true);*/
 
-    private onPutSuccess = (reply: IReply<IRegion>): void => {
-        const region = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region have been saved</span>`);
+    /*private onPutSuccess = (reply: IReply<IRegion>): void => {
+        const awsRegion = reply.data;
+        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${awsRegion.name}</b>` : `<a href=/regions/${awsRegion.name}><b>${awsRegion.name}</b></a>`} awsRegion have been saved</span>`);
         const previousRegion = this.getRegion();
         if (previousRegion?.id) {
-            this.props.updateRegion(previousRegion as IRegion, region)
+            this.props.updateRegion(previousRegion as IRegion, awsRegion)
         }
         if (this.mounted) {
-            this.updateRegion(region);
-            this.props.history.replace(region.name);
+            this.updateRegion(awsRegion);
+            this.props.history.replace(awsRegion.name);
         }
-    };
+    };*/
 
-    private onPutFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
+    /*private onPutFailure = (reason: string, region: IRegion): void =>
+        super.toast(`Unable to update region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
-    private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
+    /*private onDeleteSuccess = (awsRegion: IRegion): void => {
+        super.toast(`<span class="green-text">Region <b class="white-text">${awsRegion.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.props.history.push(`/regions`);
         }
-    };
+    };*/
 
-    private onDeleteFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
+    /*private onDeleteFailure = (reason: string, region: IRegion): void =>
+        super.toast(`Unable to delete region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
-    private updateRegion = (region: IRegion) => {
-        region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
-        const formRegion = {...region};
+    /*private updateRegion = (awsRegion: IRegion) => {
+        awsRegion = Object.values(normalize(awsRegion, Schemas.REGION).entities.regions || {})[0];
+        const formRegion = {...awsRegion};
         removeFields(formRegion);
-        this.setState({region: region, formRegion: formRegion});
-    };
+        this.setState({awsRegion: awsRegion, formRegion: formRegion});
+    };*/
 
-    private getFields = (region: Partial<IRegion>): IFields =>
-        Object.keys(region).map(key => {
+    /*private getFields = (awsRegion: Partial<IRegion>): IFields =>
+        Object.keys(awsRegion).map(key => {
             return {
                 [key]: {
                     id: key,
                     label: key,
-                    validation:
-                        key === 'description'
-                            ? {rule: requiredAndTrimmedAndSizeRestriction, args: 255}
-                            : {rule: requiredAndTrimmed}
+                    validation: key === 'coordinates'
+                        ? {rule: requireGreaterOrEqualSize, args: 1}
+                        : {rule: required}
                 }
             };
         }).reduce((fields, field) => {
@@ -185,58 +180,60 @@ class Region extends BaseComponent<Props, State> {
                 fields[key] = field[key];
             }
             return fields;
-        }, {});
+        }, {});*/
 
     private region = () => {
         const {isLoading, error} = this.props;
         const region = this.getRegion();
-        const formRegion = this.getFormRegion();
+        /*const formRegion = this.getFormRegion();*/
         // @ts-ignore
-        const regionKey: (keyof IRegion) = formRegion && Object.keys(formRegion)[0];
-        const isNewRegion = this.isNew();
+        const regionKey: (keyof IRegion) = region && Object.keys(region)[0];
+        /*const isNewRegion = this.isNew();*/
         return (
             <>
-                {!isNewRegion && isLoading && <LoadingSpinner/>}
-                {!isNewRegion && !isLoading && error && <Error message={error}/>}
-                {(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (
+                {/*{!isNewRegion && isLoading && <LoadingSpinner/>}*/}
+                {isLoading && <LoadingSpinner/>}
+                {/*{!isNewRegion && !isLoading && error && <Error message={error}/>}*/}
+                {!isLoading && error && <Error message={error}/>}
+                {/*{(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (*/}
+                {!isLoading && !error && region && (
                     /*@ts-ignore*/
                     <Form id={regionKey}
-                          fields={this.getFields(formRegion)}
+                        /*fields={this.getFields(formRegion)}*/
+                        /*fields={this.getFields(awsRegion)}*/
                           values={region}
-                          isNew={isNew(this.props.location.search)}
-                          post={{
-                              url: 'regions',
-                              successCallback: this.onPostSuccess,
-                              failureCallback: this.onPostFailure
-                          }}
-                          put={{
-                              url: `regions/${region.name}`,
-                              successCallback: this.onPutSuccess,
-                              failureCallback: this.onPutFailure
-                          }}
-                          delete={{
-                              url: `regions/${region.name}`,
-                              successCallback: this.onDeleteSuccess,
-                              failureCallback: this.onDeleteFailure
-                          }}>
-                        {Object.keys(formRegion).map((key, index) =>
-                            key === 'active'
+                        /*isNew={isNew(this.props.location.search)}*/
+                        /*post={{
+                            url: 'regions',
+                            successCallback: this.onPostSuccess,
+                            failureCallback: this.onPostFailure
+                        }}*/
+                        /*put={{
+                            url: `regions/${awsRegion.name}`,
+                            successCallback: this.onPutSuccess,
+                            failureCallback: this.onPutFailure
+                        }}*/
+                        /*delete={{
+                            url: `regions/${awsRegion.name}`,
+                            successCallback: this.onDeleteSuccess,
+                            failureCallback: this.onDeleteFailure
+                        }}*/>
+                        {Object.keys(region).map((key, index) =>
+                            /*key === 'active'
                                 ? <Field<boolean> key={index}
                                                   id={key}
                                                   label={key}
                                                   type="dropdown"
                                                   dropdown={{
-                                                      defaultValue: "Is region active?",
+                                                      defaultValue: "Is awsRegion active?",
                                                       values: [true, false]
                                                   }}/>
-                                : key === 'description'
-                                ? <Field key={index}
-                                         id={key}
-                                         label={key}
-                                         type={'multilinetext'}/>
-                                : <Field key={index}
-                                         id={key}
-                                         label={key}/>
+                                :*/ key === 'coordinates'
+                            ? <Field key={index} id='coordinates' label='location' type='map'
+                                     map={{loading: isLoading, editable: false, zoomable: true, labeled: true}}/>
+                            : <Field key={index}
+                                     id={key}
+                                     label={key}/>
                         )}
                     </Form>
                 )}
@@ -255,32 +252,32 @@ class Region extends BaseComponent<Props, State> {
 
 }
 
-function removeFields(region: Partial<IRegion>) {
-    delete region["id"];
-}
+/*function removeFields(awsRegion: Partial<IRegion>) {
+    delete awsRegion["id"];
+}*/
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.regions.isLoadingRegions;
     const error = state.entities.regions.loadRegionsError;
     const name = props.match.params.name;
     const region = isNew(props.location.search) ? buildNewRegion() : state.entities.regions.data[name];
-    let formRegion;
-    if (region) {
-        formRegion = {...region};
+    /*let formRegion;
+    if (awsRegion) {
+        formRegion = {...awsRegion};
         removeFields(formRegion);
-    }
+    }*/
     return {
         isLoading,
         error,
         region,
-        formRegion,
+        /*formRegion,*/
     }
 }
 
 const mapDispatchToProps: DispatchToProps = {
     loadRegions,
-    addRegion,
-    updateRegion,
+    /*addRegion,
+    updateRegion,*/
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Region);

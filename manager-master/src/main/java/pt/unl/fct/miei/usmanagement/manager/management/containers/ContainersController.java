@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 
@@ -100,7 +100,7 @@ public class ContainersController {
 
 	@PostMapping("/reload")
 	public List<ContainerEntity> syncDatabaseContainers() {
-		return containersService.syncDatabaseContainers();
+		return containersService.synchronizeDatabaseContainers();
 	}
 
 	@GetMapping("/{containerId}/logs")

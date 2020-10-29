@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -25,58 +25,52 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics;
 
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class HostMetricsService {
 
 	private final PrometheusService prometheusService;
-	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final FieldsService fieldsService;
 	private final double maximumRamPercentage;
 
-	public HostMetricsService(PrometheusService prometheusService,
-							  HostSimulatedMetricsService hostSimulatedMetricsService,
-							  FieldsService fieldsService,
-							  HostProperties hostProperties) {
+	public HostMetricsService(PrometheusService prometheusService, FieldsService fieldsService, HostProperties hostProperties) {
 		this.prometheusService = prometheusService;
-		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.fieldsService = fieldsService;
 		this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
 	}
 
 	public boolean hostHasEnoughMemory(HostAddress hostAddress, double expectedMemoryConsumption) {
-		double totalRam = prometheusService.getTotalMemory(hostAddress);
-		double availableRam = prometheusService.getAvailableMemory(hostAddress);
-		//double cpuUsagePerc = prometheusService.getCpuUsagePercent(hostname);
-		double predictedRamUsage = (1.0 - ((availableRam - expectedMemoryConsumption) / totalRam)) * 100.0;
-		//TODO Ignoring CPU: cpuUsagePerc < maxCpuPerc
-		return predictedRamUsage < maximumRamPercentage;
+		Optional<Double> totalRam = prometheusService.getStat(hostAddress, PrometheusQuery.TOTAL_MEMORY);
+		Optional<Double> availableRam = prometheusService.getStat(hostAddress, PrometheusQuery.AVAILABLE_MEMORY);
+		if (totalRam.isPresent() && availableRam.isPresent()) {
+			double totalRamValue = totalRam.get();
+			double availableRamValue = availableRam.get();
+			double predictedRamUsage = (1.0 - ((availableRamValue - expectedMemoryConsumption) / totalRamValue)) * 100.0;
+			return predictedRamUsage < maximumRamPercentage;
+		}
+		return false;
 	}
 
 	public Map<String, Double> getHostStats(HostAddress hostAddress) {
 		Map<String, Double> fieldsValues = new HashMap<>();
-		double cpuPercentage = prometheusService.getCpuUsagePercent(hostAddress);
-		if (cpuPercentage != -1) {
-			// just to make sure cpu-% is a valid field name
-			FieldEntity field = fieldsService.getField("cpu-%");
-			fieldsValues.put(field.getName(), cpuPercentage);
-		}
-		double ramPercentage = prometheusService.getMemoryUsagePercent(hostAddress);
-		if (ramPercentage != -1) {
-			// just to make sure ram-% is a valid field name
-			FieldEntity field = fieldsService.getField("ram-%");
-			fieldsValues.put(field.getName(), ramPercentage);
-		}
-		fieldsValues.putAll(hostSimulatedMetricsService.getSimulatedFieldsValues(hostAddress));
+
+		// Stats from prometheus (node exporter)
+		fieldsService.getFields().parallelStream()
+			.filter(field -> field.getQuery() != null)
+			.forEach(field -> {
+				Optional<Double> value = prometheusService.getStat(hostAddress, field.getQuery());
+				value.ifPresent(v -> fieldsValues.put(field.getName(), v));
+			});
+
 		return fieldsValues;
 	}
 

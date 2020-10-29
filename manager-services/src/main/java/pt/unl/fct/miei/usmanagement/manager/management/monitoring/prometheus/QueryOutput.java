@@ -25,8 +25,10 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 class QueryOutput {
 
 	private String status;

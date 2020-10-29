@@ -29,7 +29,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import {isEqualWith, isEqual} from "lodash";
+import {isEqual, isEqualWith} from "lodash";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
@@ -232,7 +232,7 @@ class Form extends BaseComponent<Props, State> {
             values: props.values,
             savedValues: props.values,
             errors: {},
-            isEditing: props.isNew === undefined || props.isNew,
+            isEditing: props.isNew || false,
             saveRequired: false,
             loading: props.loading,
         }
@@ -268,7 +268,7 @@ class Form extends BaseComponent<Props, State> {
         this.initDropdown();
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -280,7 +280,7 @@ class Form extends BaseComponent<Props, State> {
             setValue: this.setValue,
             addValue: this.addValue,
             removeValue: this.removeValue,
-            validate: this.validate
+            validate: this.validate,
         };
         const {saveRequired, loading} = this.state;
         const {
@@ -358,7 +358,9 @@ class Form extends BaseComponent<Props, State> {
                                             {!loading && (
                                                 <button
                                                     className={`btn-flat btn-small waves-effect waves-light green-text slide inline-button`}
-                                                    style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}>
+                                                    /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
+                                                    style={editable === undefined ? {visibility: 'hidden'} : undefined}
+                                                    disabled={!saveRequired}>
                                                     {this.props.post?.textButton || 'Save'}
                                                 </button>)}
                                         </div>

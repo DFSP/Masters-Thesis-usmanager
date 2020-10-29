@@ -30,6 +30,7 @@ import Collapsible from "../../../components/collapsible/Collapsible";
 import SimulatedHostMetricsList from "./hosts/SimulatedHostMetricsList";
 import SimulatedServiceMetricsList from "./services/SimulatedServiceMetricsList";
 import SimulatedContainerMetricsList from "./containers/SimulatedContainerMetricsList";
+import IDatabaseData from "../../../components/IDatabaseData";
 
 const SimulatedMetrics = () =>
     <MainLayout>

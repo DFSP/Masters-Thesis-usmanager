@@ -40,7 +40,7 @@ import {
     addEdgeHost,
     addEdgeHostRules,
     addEdgeHostSimulatedMetrics,
-    loadEdgeHosts,
+    loadEdgeHosts, loadRegions,
     updateEdgeHost
 } from "../../../../actions";
 import {connect} from "react-redux";
@@ -63,6 +63,7 @@ export interface IEdgeHost extends IDatabaseData {
     publicIpAddress: string;
     privateIpAddress: string;
     publicDnsName: string;
+    region: IRegion;
     coordinates: ICoordinates;
     worker: IWorkerManager;
     managedByWorker: IWorkerManager;
@@ -97,6 +98,7 @@ interface DispatchToProps {
     updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
     addEdgeHostRules: (hostname: string, rules: string[]) => void;
     addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
+    loadRegions: () => void;
 }
 
 interface MatchParams {
@@ -127,6 +129,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
     public componentDidMount(): void {
         this.loadEdgeHost();
+        this.props.loadRegions();
         this.mounted = true;
     };
 
@@ -153,10 +156,10 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private getEdgeHost = () =>
-        this.state.edgeHost || this.props.edgeHost;
+        this.props.edgeHost || this.state.edgeHost;
 
     private getFormEdgeHost = () =>
-        this.state.formEdgeHost || this.props.formEdgeHost;
+        this.props.formEdgeHost || this.state.formEdgeHost;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -242,7 +245,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
-        super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+        super.toast(`Unable to save rules of edge host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
 
     private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
         this.setState({
@@ -273,7 +276,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of edge host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
 
     private updateEdgeHost = (edgeHost: IEdgeHost) => {
         edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
@@ -304,6 +307,9 @@ class EdgeHost extends BaseComponent<Props, State> {
     private managedByWorker = (worker: IWorkerManager) =>
         worker.id.toString();
 
+    private regionOption = (region: IRegion) =>
+        region.name;
+
     private edgeHost = () => {
         const {isLoading, error} = this.props;
         const edgeHost = this.getEdgeHost();
@@ -311,6 +317,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         // @ts-ignore
         const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
         const isNewEdgeHost = this.isNew();
+        console.log(formEdgeHost)
         return (
             <>
                 {!isNewEdgeHost && isLoading && <LoadingSpinner/>}
@@ -327,11 +334,11 @@ class EdgeHost extends BaseComponent<Props, State> {
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
-                          /*put={{
-                              url: `hosts/edge/${edgeHost.publicIpAddress}`,
-                              successCallback: this.onPutSuccess,
-                              failureCallback: this.onPutFailure
-                          }}*/
+                        /*put={{
+                            url: `hosts/edge/${edgeHost.publicIpAddress}`,
+                            successCallback: this.onPutSuccess,
+                            failureCallback: this.onPutFailure
+                        }}*/
                           delete={{
                               confirmMessage: `to delete ${edgeHost.publicIpAddress}`,
                               url: `hosts/edge/${edgeHost.publicIpAddress}`,
@@ -340,23 +347,32 @@ class EdgeHost extends BaseComponent<Props, State> {
                           }}
                           saveEntities={this.saveEntities}>
                         {Object.keys(formEdgeHost).map((key, index) =>
-                            key === 'coordinates'
-                                ? <Field key='coordinates' id='coordinates' label='position' type='map'
-                                         map={{loading: isLoading, editable: this.isNew(), singleMarker: true, zoomable: true, labeled: true}}/>
-                                : key === 'local'
-                                ? <Field<boolean> key={index}
+                            key === 'password'
+                                ? <Field key={index}
+                                         id={key}
+                                         label={key}
+                                         hidden={true}/>
+                                : key === 'region'
+                                ? <Field<IRegion> key={index}
                                                   id={key}
                                                   type="dropdown"
                                                   label={key}
+                                                  valueToString={this.regionOption}
                                                   dropdown={{
-                                                      defaultValue: "Is a local machine?",
-                                                      values: [true, false]
+                                                      defaultValue: "Select awsRegion",
+                                                      emptyMessage: "No regions to select",
+                                                      values: Object.values(this.props.regions),
+                                                      optionToString: this.regionOption
                                                   }}/>
-                                : key === 'password'
-                                    ? <Field key={index}
-                                             id={key}
-                                             label={key}
-                                             hidden={true}/>
+                                : key === 'coordinates'
+                                    ? <Field key={index} id='coordinates' label='position' type='map'
+                                             map={{
+                                                 loading: isLoading,
+                                                 editable: this.isNew(),
+                                                 singleMarker: true,
+                                                 zoomable: true,
+                                                 labeled: true
+                                             }}/>
                                     : key === 'managedByWorker'
                                         ? <Field<IWorkerManager> key={index}
                                                                  id={key}
@@ -464,6 +480,7 @@ const mapDispatchToProps: DispatchToProps = {
     updateEdgeHost,
     addEdgeHostRules,
     addEdgeHostSimulatedMetrics,
+    loadRegions
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);

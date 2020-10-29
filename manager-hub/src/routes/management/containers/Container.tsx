@@ -24,13 +24,7 @@
 
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {
-    ICustomButton,
-    IFields,
-    IFormLoading,
-    requiredAndNumberAndMin,
-    requiredAndTrimmed
-} from "../../../components/form/Form";
+import Form, {IFields, IFormLoading, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -46,7 +40,7 @@ import {
     loadServices
 } from "../../../actions";
 import {connect} from "react-redux";
-import React, {createRef} from "react";
+import React from "react";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
@@ -63,15 +57,15 @@ import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import IDatabaseData from "../../../components/IDatabaseData";
-import GenericContainerRuleList from "./GenericContainerRuleList";
 import ContainerRuleList from "./ContainerRuleList";
 import ContainerSimulatedMetricList from "./ContainerSimulatedMetricList";
-import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetricList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import formStyles from "../../../components/form/Form.module.css";
 import {INode} from "../nodes/Node";
 import {IHostAddress} from "../hosts/Hosts";
 import {ICoordinates} from "../../../components/map/LocationMap";
+import GenericSimulatedServiceMetricList from "../services/GenericSimulatedServiceMetricList";
+import GenericServiceRuleList from "../services/GenericServiceRuleList";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -141,7 +135,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IContainer,
-    selected: 'container' | 'ports' | 'containerLabels' | 'logs' | 'rules' | 'genericContainerRules'
+    selected: 'container' | 'ports' | 'containerLabels' | 'logs' | 'rules' | 'genericServiceRules'
         | 'simulatedMetrics' | 'genericSimulatedMetrics';
 }
 
@@ -211,10 +205,10 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private getContainer = () =>
-        this.state.container || this.props.container;
+        this.props.container || this.state.container;
 
     private getFormContainer = () =>
-        this.state.formContainer || this.props.formContainer;
+        this.props.formContainer || this.state.formContainer;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -241,7 +235,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Unable to stop ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to stop container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private replicateButton = () =>
         <>
@@ -309,7 +303,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to replicate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -319,7 +313,7 @@ class Container extends BaseComponent<Props, State> {
         const container = this.getContainer();
         const hostAddress = decodeHTML((event.target as HTMLLIElement).innerHTML).split(' (');
         const publicIpAddress = hostAddress[0];
-        const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
+        const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1)
         const url = `containers/${container?.containerId}/migrate`;
         this.setState({loading: {method: 'post', url: url}});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
@@ -336,7 +330,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to migrate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -371,7 +365,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Unable to save rules of ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to save rules of container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private addContainerSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -402,7 +396,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -525,8 +519,13 @@ class Container extends BaseComponent<Props, State> {
                                  label={key}
                                  icon={{linkedTo: this.hostLink}}/>
                         : key === 'coordinates'
-                            ? <Field key='coordinates' id='coordinates' label='location' type='map'
-                                     map={{loading: this.props.isLoading, editable: false, zoomable: true, labeled: true}}/>
+                            ? <Field key={index} id='coordinates' label='location' type='map'
+                                     map={{
+                                         loading: this.props.isLoading,
+                                         editable: false,
+                                         zoomable: true,
+                                         labeled: true
+                                     }}/>
                             : <Field key={index}
                                      id={key}
                                      label={key}/>
@@ -608,7 +607,7 @@ class Container extends BaseComponent<Props, State> {
                            onRemoveContainerRules={this.removeContainerRules}/>;
 
     private genericRules = (): JSX.Element =>
-        <GenericContainerRuleList/>;
+        <GenericServiceRuleList/>;
 
     private simulatedMetrics = (): JSX.Element =>
         <ContainerSimulatedMetricList isLoadingContainer={this.props.isLoading}
@@ -619,7 +618,7 @@ class Container extends BaseComponent<Props, State> {
                                       onRemoveSimulatedContainerMetrics={this.removeContainerSimulatedMetrics}/>;
 
     private genericSimulatedMetrics = (): JSX.Element =>
-        <GenericSimulatedContainerMetricList/>;
+        <GenericSimulatedServiceMetricList/>;
 
     private tabs = (): Tab[] => ([
         {
@@ -659,7 +658,7 @@ class Container extends BaseComponent<Props, State> {
             title: 'Generic rules',
             id: 'genericContainerRules',
             content: () => this.genericRules(),
-            active: this.props.location.state?.selected === 'genericContainerRules'
+            active: this.props.location.state?.selected === 'genericServiceRules'
         },
         {
             title: 'Simulated metrics',

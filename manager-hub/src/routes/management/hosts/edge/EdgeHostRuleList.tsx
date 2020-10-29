@@ -78,9 +78,6 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
         const previousHostname = prevProps.edgeHost?.publicIpAddress;
         const currentHostname = this.props.edgeHost?.publicIpAddress;
-        if (previousHostname !== currentHostname) {
-            this.loadEntities();
-        }
         if (!previousHostname && currentHostname) {
             this.setState({entitySaved: true});
         }

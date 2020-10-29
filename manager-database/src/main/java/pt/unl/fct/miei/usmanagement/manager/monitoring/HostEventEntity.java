@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,9 +56,11 @@ public class HostEventEntity {
 	@GeneratedValue
 	private Long id;
 
+	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
 	@Lob
 	private HostAddress hostAddress;
 
+	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private DecisionEntity decision;

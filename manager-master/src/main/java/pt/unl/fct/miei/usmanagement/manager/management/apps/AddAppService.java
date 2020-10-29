@@ -26,7 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.apps;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 
 @AllArgsConstructor
 @Getter

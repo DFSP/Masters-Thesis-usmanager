@@ -47,6 +47,7 @@ public final class ContainerConstants {
 	}
 
 	public static final class Label {
+		public static final String US_MANAGER = "us-manager";
 		public static final String SERVICE_NAME = "serviceName";
 		public static final String SERVICE_TYPE = "serviceType";
 		public static final String SERVICE_ADDRESS = "serviceAddress";

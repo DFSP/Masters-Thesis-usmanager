@@ -176,10 +176,10 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private getService = () =>
-        this.state.service || this.props.service;
+        this.props.service || this.state.service;
 
     private getFormService = () =>
-        this.state.formService || this.props.formService;
+        this.props.formService || this.state.formService;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -196,7 +196,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, service: IService): void =>
-        super.toast(`Unable to save <b>${service.serviceName}</b> service`, 10000, reason, true);
+        super.toast(`Unable to save service <b>${service.serviceName}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IService>): void => {
         const service = reply.data;
@@ -269,7 +269,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save apps of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to save apps of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceDependency = (dependency: string): void => {
         this.setState({
@@ -300,7 +300,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveDependenciesFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save dependencies of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to save dependencies of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServicePrediction = (prediction: IPrediction): void => {
         this.setState({
@@ -331,7 +331,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSavePredictionsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save predictions of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to save predictions of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceRule = (rule: string): void => {
         this.setState({
@@ -362,7 +362,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save rules of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to save rules of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -393,7 +393,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private updateService = (service: IService) => {
         service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];

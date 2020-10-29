@@ -76,9 +76,6 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.ruleContainer?.name !== this.props.ruleContainer?.name) {
-            this.loadEntities();
-        }
         if (!prevProps.ruleContainer?.name && this.props.ruleContainer?.name) {
             this.setState({entitySaved: true});
         }

@@ -36,6 +36,8 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -54,8 +56,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.Pro
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
-import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -106,21 +106,7 @@ public class HostsService {
 		String username = bashService.getUsername();
 		String publicIp = bashService.getPublicIp();
 		String privateIp = bashService.getPrivateIp();
-		if ((mode == null || mode == Mode.LOCAL) && !edgeHostsService.hasEdgeHost(localMachineDns)) {
-			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
-			edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
-				.username(username)
-				.publicIpAddress(publicIp)
-				.privateIpAddress(privateIp)
-				.publicDnsName(localMachineDns)
-				.coordinates(coordinates)
-				.region(Region.EUROPE)
-				.build());
-			this.hostAddress = new HostAddress(username, localMachineDns, publicIp, privateIp, coordinates, Region.EUROPE);
-		}
-		else {
-			this.hostAddress = new HostAddress(username, publicIp, privateIp);
-		}
+		this.hostAddress = getFullHostAddress(new HostAddress(username, publicIp, privateIp));
 		log.info("Setting local address: {}", hostAddress.toString());
 		return hostAddress;
 	}
@@ -250,7 +236,8 @@ public class HostsService {
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
 	}
 
-	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHostEntity> edgeHosts, List<CloudHostEntity> cloudHosts) {
+	public HostAddress getClosestHost(Coordinates
+										  coordinates, List<EdgeHostEntity> edgeHosts, List<CloudHostEntity> cloudHosts) {
 		edgeHosts.sort((oneEdgeHost, anotherEdgeHost) -> {
 			double oneDistance = oneEdgeHost.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherEdgeHost.getCoordinates().distanceTo(coordinates);

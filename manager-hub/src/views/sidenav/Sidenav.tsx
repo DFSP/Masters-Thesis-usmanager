@@ -45,6 +45,7 @@ const sidenavManagementLinks: ILink[] = [
         ]
     },
     {link: '/nodes', name: 'Nodes'},
+    {link: '/regions', name: 'Regions'},
     {
         link: '/rules', name: 'Rules', sub: [
             {link: '/conditions', name: 'Conditions'},
@@ -60,7 +61,6 @@ const sidenavManagementLinks: ILink[] = [
             {link: '/containers', name: 'Container metrics'}
         ]
     },
-    {link: '/regions', name: 'Regions'},
     {link: '/load-balancers', name: 'Load balancers'},
     {link: '/eureka-servers', name: 'Eureka servers'},
     {link: '/worker-managers', name: 'Worker managers'},

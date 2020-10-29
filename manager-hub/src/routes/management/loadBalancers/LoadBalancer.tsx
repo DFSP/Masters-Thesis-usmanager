@@ -123,10 +123,10 @@ class LoadBalancer extends BaseComponent<Props, State> {
     };
 
     private getLoadBalancer = () =>
-        this.state.loadBalancer || this.props.loadBalancer;
+        this.props.loadBalancer || this.state.loadBalancer;
 
     private getFormLoadBalancer = () =>
-        this.state.formLoadBalancer || this.props.formLoadBalancer;
+        this.props.formLoadBalancer || this.state.formLoadBalancer;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -159,7 +159,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
-        super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
+        super.toast(`Unable to stop load-balancer ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`}`, 10000, reason, true);
 
     private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
         loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];

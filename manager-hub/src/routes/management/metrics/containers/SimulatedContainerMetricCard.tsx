@@ -73,7 +73,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void => {
-        super.toast(`Unable to delete <a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a> simulated container metric`, 10000, reason, true);
+        super.toast(`Unable to delete simulated container metric <a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -102,7 +102,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
                                                      state: simulatedContainerMetric
                                                  }
                                              }}
-                                             height={'180px'}
+                                             height={'185px'}
                                              margin={'10px 0'}
                                              hoverable
                                              delete={{
@@ -124,9 +124,12 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
             <CardItem key={'Override'}
                       label='Override'
                       value={`${simulatedContainerMetric.override}`}/>
-            <CardItem key={'Generic'}
+            <CardItem key={'Active'}
+                      label='Active'
+                      value={`${simulatedContainerMetric.active}`}/>
+            {/*<CardItem key={'Generic'}
                       label='Generic'
-                      value={`${simulatedContainerMetric.generic}`}/>
+                      value={`${simulatedContainerMetric.generic}`}/>*/}
         </CardSimulatedContainerMetric>;
     }
 }

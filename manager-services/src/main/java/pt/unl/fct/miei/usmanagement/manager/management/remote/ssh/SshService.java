@@ -171,8 +171,10 @@ public class SshService {
 	}
 
 	private SshCommandResult executeCommand(Session session, HostAddress hostAddress, String command) throws IOException {
-
-		log.info("Executing: {}, at host {}", command, hostAddress);
+		if (!command.contains("sshpass")) {
+			// to avoid logging passwords
+			log.info("Executing: {}, at host {}", command, hostAddress);
+		}
 		Session.Command cmd = session.exec(command);
 		cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
 		int exitStatus = cmd.getExitStatus();

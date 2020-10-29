@@ -32,7 +32,9 @@ import {
     FaDoorClosed,
     FaDoorOpen,
     FaGlobe,
+    FaGlobeAfrica,
     FaGlobeAmericas,
+    FaGlobeAsia,
     FaGlobeEurope,
     FaGreaterThanEqual,
     FaHdd,
@@ -42,7 +44,6 @@ import {
     FaList,
     FaListUl,
     FaMapMarkedAlt,
-    FaMapMarkerAlt,
     FaMapPin,
     FaMinus,
     FaPowerOff,
@@ -85,14 +86,21 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     }
     if (label === 'region') {
         if (value === undefined) {
-            return <FaMapMarkerAlt/>;
+            return <FaMapMarkedAlt/>;
         }
         const region = value as IRegion;
-        if (region.name.includes('us')) {
+        const regionName = region.name.toLowerCase();
+        if (regionName.includes('america')) {
             return <FaGlobeAmericas/>;
         }
-        if (region.name.includes('eu')) {
+        if (regionName.includes('europe')) {
             return <FaGlobeEurope/>;
+        }
+        if (regionName.includes('asia')) {
+            return <FaGlobeAsia/>;
+        }
+        if (regionName.includes('africa') || regionName.includes('middle east')) {
+            return <FaGlobeAfrica/>;
         }
     }
     if (label === 'country' || label === 'placement') {
@@ -222,6 +230,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
                 case 'stopped':
                     return <FaBan/>;
                 case 'shutting-down':
+                case 'terminated':
                     return 'clear';
             }
         }

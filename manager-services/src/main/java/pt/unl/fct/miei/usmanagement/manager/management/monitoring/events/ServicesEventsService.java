@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventEntity;
@@ -33,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class ServicesEventsService {
 
@@ -42,6 +44,10 @@ public class ServicesEventsService {
 	public ServicesEventsService(ServiceEventRepository serviceEvents, DecisionsService decisionsService) {
 		this.serviceEvents = serviceEvents;
 		this.decisionsService = decisionsService;
+	}
+
+	public List<ServiceEventEntity> getServiceEvents() {
+		return serviceEvents.findAll();
 	}
 
 	public List<ServiceEventEntity> getServiceEventsByServiceName(String serviceName) {
@@ -76,4 +82,8 @@ public class ServicesEventsService {
 		});
 	}
 
+	public void reset() {
+		log.info("Clearing all service events");
+		serviceEvents.deleteAll();
+	}
 }

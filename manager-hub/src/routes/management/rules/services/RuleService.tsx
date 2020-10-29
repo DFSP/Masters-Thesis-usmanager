@@ -163,7 +163,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to save <b>${ruleService.name}</b> service rule`, 10000, reason, true);
+        super.toast(`Unable to save service rule<b>${ruleService.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
@@ -180,7 +180,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+        super.toast(`Unable to update service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
         super.toast(`<span class="green-text">Service rule <b class="white-text">${ruleService.name}</b> successfully removed</span>`);
@@ -190,7 +190,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+        super.toast(`Unable to delete service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -230,7 +230,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Unable to save conditions of ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+        super.toast(`Unable to save conditions of service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleService = (service: string): void =>
         this.setState({
@@ -260,7 +260,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Unable to save services of ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+        super.toast(`Unable to save services of service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleService = (ruleService: IRuleService) => {
         ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];

@@ -164,7 +164,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, assignedHosts?: string[]): void =>
-        super.toast(`Unable to unassign ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'} from <b>${this.props.workerManager?.id}</b> worker-manager`, 10000, reason, true);
+        super.toast(`Unable to unassign worker-manager <b>${this.props.workerManager?.id}</b> from ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'}`, 10000, reason, true);
 
     private getSelectableHosts = () => {
         const {assignedHosts, nodes, unSavedHosts} = this.props;

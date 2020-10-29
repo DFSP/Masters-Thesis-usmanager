@@ -207,7 +207,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     };
 
     private onSaveHostsFailure = (workerManager: IWorkerManager, reason: string): void =>
-        super.toast(`Unable to save assigned hosts of ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} worker-manager`, 10000, reason, true);
+        super.toast(`Unable to save assigned hosts of worker-manager ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`}`, 10000, reason, true);
 
     private getFields = (workerManager: Partial<IWorkerManager> | INewWorkerManager): IFields =>
         Object.entries(workerManager).map(([key, value]) => {

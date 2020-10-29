@@ -56,7 +56,8 @@ export interface ISimulatedContainerMetric extends IDatabaseData {
     minimumValue: number;
     maximumValue: number;
     override: boolean;
-    generic: boolean;
+    active: boolean;
+    /*generic: boolean;*/
     containers?: string[];
 }
 
@@ -65,8 +66,9 @@ const buildNewSimulatedContainerMetric = (): Partial<ISimulatedContainerMetric> 
     field: undefined,
     minimumValue: undefined,
     maximumValue: undefined,
+    active: true,
     override: undefined,
-    generic: undefined,
+    /*generic: undefined,*/
 });
 
 interface StateToProps {
@@ -101,14 +103,14 @@ interface State {
     simulatedContainerMetric?: ISimulatedContainerMetric,
     formSimulatedContainerMetric?: ISimulatedContainerMetric,
     unsavedContainers: string[],
-    isGeneric: boolean,
+    /*isGeneric: boolean,*/
 }
 
 class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     state: State = {
         unsavedContainers: [],
-        isGeneric: this.props.simulatedContainerMetric?.generic || false,
+        /*isGeneric: this.props.simulatedContainerMetric?.generic || false,*/
     };
     private mounted = false;
 
@@ -141,10 +143,10 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private getSimulatedContainerMetric = () =>
-        this.state.simulatedContainerMetric || this.props.simulatedContainerMetric;
+        this.props.simulatedContainerMetric || this.state.simulatedContainerMetric;
 
     private getFormSimulatedContainerMetric = () =>
-        this.state.formSimulatedContainerMetric || this.props.formSimulatedContainerMetric;
+        this.props.formSimulatedContainerMetric || this.state.formSimulatedContainerMetric;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -162,7 +164,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedContainerMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Unable to save <b>${simulatedContainerMetric.name}</b> simulated container metric`, 10000, reason, true);
+        super.toast(`Unable to save simulated container metric <b>${simulatedContainerMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
@@ -227,7 +229,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveContainersFailure = (simulatedMetric: ISimulatedContainerMetric, reason: string): void =>
-        super.toast(`Unable to save containers of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
+        super.toast(`Unable to save containers of simulated container metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
         simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
@@ -258,8 +260,8 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     private fieldOption = (field: IField): string =>
         field.name;
 
-    private isGenericSelected = (generic: boolean) =>
-        this.setState({isGeneric: generic});
+    /*private isGenericSelected = (generic: boolean) =>
+        this.setState({isGeneric: generic});*/
 
     private simulatedContainerMetric = () => {
         const {isLoading, error} = this.props;
@@ -316,7 +318,16 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                       defaultValue: "Override true metrics?",
                                                       values: [true, false]
                                                   }}/>
-                                : key === 'generic'
+                                : key === 'active'
+                                    ? <Field<boolean> key={index}
+                                                      id={key}
+                                                      label={key}
+                                                      type="dropdown"
+                                                      dropdown={{
+                                                          defaultValue: "Active?",
+                                                          values: [true, false]
+                                                      }}/>
+                                /*: key === 'generic'
                                     ? <Field<boolean> key={index}
                                                       id={key}
                                                       label={key}
@@ -325,7 +336,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                           selectCallback: this.isGenericSelected,
                                                           defaultValue: "Apply to all containers?",
                                                           values: [true, false]
-                                                      }}/>
+                                                      }}/>*/
                                     : key === 'minimumValue' || key === 'maximumValue'
                                         ? <Field key={index}
                                                  id={key}
@@ -360,7 +371,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
-            disabled: this.state.isGeneric,
+            /*disabled: this.state.isGeneric,*/
             active: this.props.location.state?.selected === 'containers'
         },
     ];

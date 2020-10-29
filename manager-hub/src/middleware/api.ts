@@ -109,6 +109,8 @@ interface ISchemas {
     EDGE_HOST_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
     NODE: schema.Entity<INode>;
     NODE_ARRAY: schema.Entity<INode>[];
+    REGION: schema.Entity<IRegion>;
+    REGION_ARRAY: schema.Entity<IRegion>[];
     RULE_HOST: schema.Entity<IRuleHost>;
     RULE_HOST_ARRAY: schema.Entity<IRuleHost>[];
     RULE_SERVICE: schema.Entity<IRuleService>;
@@ -128,8 +130,6 @@ interface ISchemas {
     SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
     SIMULATED_CONTAINER_METRIC: schema.Entity<ISimulatedContainerMetric>;
     SIMULATED_CONTAINER_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
-    REGION: schema.Entity<IRegion>;
-    REGION_ARRAY: schema.Entity<IRegion>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
     LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
     EUREKA_SERVER: schema.Entity<IEurekaServer>;
@@ -191,6 +191,10 @@ const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
     idAttribute: (node: INode) => node.id.toString()
 });
 
+const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
+    idAttribute: (region: IRegion) => region.name
+});
+
 const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefined, {
     idAttribute: (hostRule: IRuleHost) => hostRule.name
 });
@@ -244,10 +248,6 @@ const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new s
     idAttribute: (simulatedContainerMetric: ISimulatedContainerMetric) => simulatedContainerMetric.name
 });
 const containerSimulatedMetrics = new schema.Array(simulatedContainerMetric);
-
-const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
-    idAttribute: (region: IRegion) => region.name
-});
 
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
     idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.containerId
@@ -316,6 +316,8 @@ export const Schemas: ISchemas = {
     EDGE_HOST_SIMULATED_METRIC_ARRAY: [simulatedHostMetric],
     NODE: node,
     NODE_ARRAY: [node],
+    REGION: region,
+    REGION_ARRAY: [region],
     RULE_HOST: ruleHost,
     RULE_HOST_ARRAY: [ruleHost],
     RULE_SERVICE: ruleService,
@@ -335,8 +337,6 @@ export const Schemas: ISchemas = {
     SIMULATED_SERVICE_METRIC_ARRAY: [simulatedServiceMetric],
     SIMULATED_CONTAINER_METRIC: simulatedContainerMetric,
     SIMULATED_CONTAINER_METRIC_ARRAY: [simulatedContainerMetric],
-    REGION: region,
-    REGION_ARRAY: [region],
     LOAD_BALANCER: loadBalancer,
     LOAD_BALANCER_ARRAY: [loadBalancer],
     EUREKA_SERVER: eurekaServer,

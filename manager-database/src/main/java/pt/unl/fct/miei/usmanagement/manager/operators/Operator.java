@@ -24,6 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.operators;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum Operator {
 
 	NOT_EQUAL_TO("!="),
@@ -41,6 +44,16 @@ public enum Operator {
 
 	public String getSymbol() {
 		return symbol;
+	}
+
+	@JsonCreator
+	public static Operator forValues(@JsonProperty("symbol") String symbol) {
+		for (Operator operator : Operator.values()) {
+			if (operator.symbol.equalsIgnoreCase(symbol)) {
+				return operator;
+			}
+		}
+		return null;
 	}
 
 }

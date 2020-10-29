@@ -28,7 +28,7 @@ import React from "react";
 import {awsInstanceStates, ICloudHost} from "./CloudHost";
 import BaseComponent from "../../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteData, IReply, postData} from "../../../../utils/api";
+import {deleteData, IReply, postData, putData} from "../../../../utils/api";
 import ActionContextMenuItem from "../../../../components/contextmenu/ActionContextMenuItem";
 import DividerContextMenuItem from "../../../../components/contextmenu/DividerContextMenuItem";
 import {deleteCloudHost, updateCloudHost} from "../../../../actions";
@@ -73,13 +73,13 @@ class CloudHostCard extends BaseComponent<Props, State> {
     }
 
     private getCloudHost = () =>
-        this.state.cloudHost || this.props.cloudHost;
+        this.props.cloudHost || this.state.cloudHost;
 
     private startCloudHost = () => {
         const cloudHost = this.getCloudHost();
-        const url = `hosts/cloud/${cloudHost.instanceId}/state`;
+        const url = `hosts/cloud/${cloudHost.instanceId}/start`;
         this.setState({loading: true});
-        postData(url, 'start',
+        putData(url, undefined,
             (reply: IReply<ICloudHost>) => this.onStartSuccess(reply.data),
             (reason) => this.onStartFailure(reason, cloudHost));
     };
@@ -104,9 +104,9 @@ class CloudHostCard extends BaseComponent<Props, State> {
 
     private stopCloudHost = () => {
          const cloudHost = this.getCloudHost();
-         const url = `hosts/cloud/${cloudHost.instanceId}/state`;
+         const url = `hosts/cloud/${cloudHost.instanceId}/stop`;
          this.setState({loading: true});
-         postData(url, 'stop',
+         putData(url, undefined,
              (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
              (reason) => this.onStopFailure(reason, cloudHost));
     };
@@ -244,7 +244,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
                       value={`${cloudHost.placement.availabilityZone}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
-                      value={`(${cloudHost.region.coordinates.latitude.toFixed(3)}, ${cloudHost.region.coordinates.longitude.toFixed(3)})`}/>
+                      value={`(${cloudHost.awsRegion.coordinates.latitude.toFixed(3)}, ${cloudHost.awsRegion.coordinates.longitude.toFixed(3)})`}/>
             {cloudHost.managedByWorker &&
             <CardItem key={'managedByWorker'}
                       label={'Managed by worker'}

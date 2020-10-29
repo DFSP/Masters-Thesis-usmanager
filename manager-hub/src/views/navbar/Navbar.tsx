@@ -33,7 +33,6 @@ import './Navbar.css';
 import {ReduxState} from "../../reducers";
 import {components, IComponent, managementAuthenticatedRoutes} from "../../containers/Root.dev";
 import {getLoggedInUser, logout} from "../../utils/auth";
-import {capitalize} from "../../utils/text";
 import {Dropdown} from "../../components/form/Dropdown";
 
 const logo = require("../../resources/images/logo.png");
@@ -101,7 +100,6 @@ class Navbar extends React.Component<Props, State> {
                 logoStyle = {...logoStyle, transition: "padding-left .25s margin-right .25s"}
             }
         }
-        loggedInUser = loggedInUser && capitalize(loggedInUser);
         return (
             <header role="navigation">
                 <div className="navbar-fixed">

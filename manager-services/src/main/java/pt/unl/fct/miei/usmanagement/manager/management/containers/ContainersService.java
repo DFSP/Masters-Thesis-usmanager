@@ -30,6 +30,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerRepository;
@@ -37,16 +39,15 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.containers.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -163,8 +164,11 @@ public class ContainersService {
 			.collect(Collectors.toList());
 	}
 
-	public List<ContainerEntity> syncDatabaseContainers() {
+	public List<ContainerEntity> synchronizeDatabaseContainers() {
 		List<ContainerEntity> containers = getContainers();
+		if (dockerContainersService.isLaunchingContainer()) {
+			return containers;
+		}
 		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
 		List<String> dockerContainerIds = dockerContainers
 			.stream().map(DockerContainer::getId).collect(Collectors.toList());
@@ -304,25 +308,36 @@ public class ContainersService {
 
 	public List<ContainerEntity> getAppContainers() {
 		return getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "backend"))
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.BACKEND.name()))
 		);
 	}
 
 	public List<ContainerEntity> getAppContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "backend")));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.BACKEND.name())));
+	}
+
+	public List<ContainerEntity> getDatabaseContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.DATABASE.name())));
 	}
 
 	public List<ContainerEntity> getDatabaseContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "database")));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.DATABASE.name())));
+	}
+
+	public List<ContainerEntity> getSystemContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.SYSTEM.name()))
+		);
 	}
 
 	public List<ContainerEntity> getSystemContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, "system")));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.SYSTEM.name())));
 	}
 
 	public ContainerStats getContainerStats(String containerId, HostAddress hostAddress) {
@@ -442,7 +457,7 @@ public class ContainersService {
 			@Override
 			public void run() {
 				try {
-					syncDatabaseContainers();
+					synchronizeDatabaseContainers();
 				}
 				catch (ManagerException e) {
 					log.error(e.getMessage());

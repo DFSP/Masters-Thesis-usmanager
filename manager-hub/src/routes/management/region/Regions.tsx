@@ -26,7 +26,6 @@ import BaseComponent from "../../../components/BaseComponent";
 import {IRegion} from "./Region";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import React from "react";
-import AddButton from "../../../components/form/AddButton";
 import styles from "./Regions.module.css";
 import CardList from "../../../components/list/CardList";
 import RegionCard from "./RegionCard";
@@ -55,8 +54,8 @@ class Regions extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Add region', position: 'left'}}
-                           pathname={'/regions/new_region?new=true'}/>
+                {/*<AddButton tooltip={{text: 'Add awsRegion', position: 'left'}}
+                           pathname={'/regions/new_region?new=true'}/>*/}
                 <div className={`${styles.container}`}>
                     <CardList<IRegion>
                         isLoading={this.props.isLoading}
@@ -71,11 +70,10 @@ class Regions extends BaseComponent<Props, {}> {
     }
 
     private region = (region: IRegion): JSX.Element =>
-        <RegionCard key={region.id} region={region}/>;
+        <RegionCard key={region.name} region={region}/>;
 
     private predicate = (region: IRegion, search: string): boolean =>
-        region.name.toLowerCase().includes(search)
-        || region.description.toLowerCase().includes(search);
+        region.name.toLowerCase().includes(search);
 
 }
 

@@ -26,33 +26,34 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAvg;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogsRepository;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringRepository;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -65,6 +66,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -86,8 +88,9 @@ public class HostsMonitoringService {
 	private final HostsEventsService hostsEventsService;
 	private final DecisionsService decisionsService;
 	private final CloudHostsService cloudHostsService;
+	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 
-	private final long monitorInterval;
+	private final long monitorPeriod;
 	private final int resolveOverworkedHostOnEventsCount;
 	private final int resolveUnderworkedHostOnEventsCount;
 	private final int maximumHosts;
@@ -100,7 +103,8 @@ public class HostsMonitoringService {
 								  ContainersService containersService, HostRulesService hostRulesService,
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
-								  DecisionsService decisionsService, CloudHostsService cloudHostsService, HostProperties hostProperties,
+								  DecisionsService decisionsService, CloudHostsService cloudHostsService,
+								  HostSimulatedMetricsService hostSimulatedMetricsService, HostProperties hostProperties,
 								  MasterManagerProperties masterManagerProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
@@ -113,7 +117,8 @@ public class HostsMonitoringService {
 		this.hostsEventsService = hostsEventsService;
 		this.decisionsService = decisionsService;
 		this.cloudHostsService = cloudHostsService;
-		this.monitorInterval = hostProperties.getMonitorPeriod();
+		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
+		this.monitorPeriod = hostProperties.getMonitorPeriod();
 		this.resolveOverworkedHostOnEventsCount = hostProperties.getResolveOverworkedHostOnEventsCount();
 		this.resolveUnderworkedHostOnEventsCount = hostProperties.getResolveUnderworkedHostOnEventsCount();
 		this.maximumHosts = hostProperties.getMaximumHosts();
@@ -126,27 +131,22 @@ public class HostsMonitoringService {
 	}
 
 	public List<HostMonitoringEntity> getHostMonitoring(HostAddress hostAddress) {
-		return hostsMonitoring.getByHostAddress(hostAddress);
+		return hostsMonitoring.getByHost(hostAddress);
 	}
 
 	public HostMonitoringEntity getHostMonitoring(HostAddress hostAddress, String field) {
-		return hostsMonitoring.getByHostAddressAndFieldIgnoreCase(hostAddress, field);
+		return hostsMonitoring.getByHostAndFieldIgnoreCase(hostAddress, field);
 	}
 
 	public void saveHostMonitoring(HostAddress hostAddress, String field, double value) {
 		HostMonitoringEntity hostMonitoring = getHostMonitoring(hostAddress, field);
 		Timestamp updateTime = Timestamp.from(Instant.now());
 		if (hostMonitoring == null) {
-			hostMonitoring = HostMonitoringEntity.builder()
-				.hostAddress(hostAddress)
-				.field(field)
-				.minValue(value).maxValue(value).sumValue(value).lastValue(value)
-				.count(1)
-				.lastUpdate(updateTime)
-				.build();
+			hostMonitoring = HostMonitoringEntity.builder().host(hostAddress).field(field)
+				.minValue(value).maxValue(value).sumValue(value).lastValue(value).count(1).lastUpdate(updateTime).build();
 		}
 		else {
-			hostMonitoring.logValue(value, updateTime);
+			hostMonitoring.update(value, updateTime);
 		}
 		hostsMonitoring.save(hostMonitoring);
 		if (isTestEnable) {
@@ -154,20 +154,20 @@ public class HostsMonitoringService {
 		}
 	}
 
-	public List<HostFieldAvg> getHostFieldsAvg(HostAddress hostAddress) {
-		return hostsMonitoring.getHostFieldsAvg(hostAddress);
+	public List<HostFieldAverage> getHostMonitoringFieldsAverage(HostAddress hostAddress) {
+		return hostsMonitoring.getHostMonitoringFieldsAverage(hostAddress);
 	}
 
-	public HostFieldAvg getHostFieldAvg(HostAddress hostAddress, String field) {
-		return hostsMonitoring.getHostFieldAvg(hostAddress, field);
+	public HostFieldAverage getHostMonitoringFieldAverage(HostAddress hostAddress, String field) {
+		return hostsMonitoring.getHostMonitoringFieldAverage(hostAddress, field);
 	}
 
 	public void saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
 		HostMonitoringLogEntity hostMonitoringLogEntity = HostMonitoringLogEntity.builder()
-			.hostAddress(hostAddress)
+			.host(hostAddress)
 			.field(field)
 			.timestamp(LocalDateTime.now())
-			.effectiveValue(effectiveValue)
+			.value(effectiveValue)
 			.build();
 		hostMonitoringLogs.save(hostMonitoringLogEntity);
 	}
@@ -176,12 +176,12 @@ public class HostsMonitoringService {
 		return hostMonitoringLogs.findAll();
 	}
 
-	public List<HostMonitoringLogEntity> getHostMonitoringLogsByAddress(HostAddress hostAddress) {
-		return hostMonitoringLogs.findByHostAddress(hostAddress);
+	public List<HostMonitoringLogEntity> getHostMonitoringLogs(HostAddress hostAddress) {
+		return hostMonitoringLogs.findByHost(hostAddress);
 	}
 
 	public void initHostMonitorTimer() {
-		hostMonitoringTimer = new Timer(true);
+		hostMonitoringTimer = new Timer("master-manager-hosts-monitoring", true);
 		hostMonitoringTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -192,20 +192,32 @@ public class HostsMonitoringService {
 					log.error(e.getMessage());
 				}
 			}
-		}, monitorInterval, monitorInterval);
+		}, monitorPeriod, monitorPeriod);
 	}
 
 	private void monitorHostsTask() {
-		cloudHostsService.syncDatabaseCloudHosts();
+		cloudHostsService.synchronizeDatabaseCloudHosts();
+
 		List<HostDecisionResult> hostDecisions = new LinkedList<>();
+
 		List<SimpleNode> nodes = nodesService.getReadyNodes();
-		for (SimpleNode node : nodes) {
+		nodes.parallelStream().forEach(node -> {
 			HostAddress hostAddress = node.getHostAddress();
+			
+			// Metrics from prometheus (node_exporter)
 			Map<String, Double> stats = hostMetricsService.getHostStats(hostAddress);
+
+			// Simulated host metrics
+			Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
+				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+				.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue));
+			stats.putAll(hostSimulatedFields);
+
 			stats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
-			HostDecisionResult hostDecisionResult = runHostRules(hostAddress, stats);
+
+			HostDecisionResult hostDecisionResult = runRules(hostAddress, stats);
 			hostDecisions.add(hostDecisionResult);
-		}
+		});
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);
 		}
@@ -214,31 +226,28 @@ public class HostsMonitoringService {
 		}
 	}
 
-	private HostDecisionResult runHostRules(HostAddress hostAddress, Map<String, Double> newFields) {
+	private HostDecisionResult runRules(HostAddress hostAddress, Map<String, Double> newFields) {
+
 		HostEvent hostEvent = new HostEvent(hostAddress);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
+
 		getHostMonitoring(hostAddress)
 			.stream()
-			.filter(loggedField -> loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT
-				&& newFields.get(loggedField.getField()) != null)
+			.filter(loggedField -> loggedField.getCount() >= HOST_MINIMUM_LOGS_COUNT && newFields.get(loggedField.getField()) != null)
 			.forEach(loggedField -> {
-				long count = loggedField.getCount();
 				String field = loggedField.getField();
-				//TODO conta com este newValue?
-				double sumValue = loggedField.getSumValue();
-				double lastValue = loggedField.getLastValue();
-				double newValue = newFields.get(field);
+				Double newValue = newFields.get(field);
 				hostEventFields.put(field + "-effective-val", newValue);
-				double average = sumValue / (count * 1.0);
+				double average = loggedField.getSumValue() / loggedField.getCount();
 				hostEventFields.put(field + "-avg-val", average);
-				double deviationFromAvgValue = ((newValue - average) / average) / PERCENTAGE;
-				hostEventFields.put(field + "-deviation-%-on-avg-val", deviationFromAvgValue);
+				double deviationFromAverageValue = ((newValue - average) / average) / PERCENTAGE;
+				hostEventFields.put(field + "-deviation-%-on-avg-val", deviationFromAverageValue);
+				double lastValue = loggedField.getLastValue();
 				double deviationFromLastValue = ((newValue - lastValue) / lastValue) / PERCENTAGE;
 				hostEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 			});
-		return hostEventFields.isEmpty()
-			? new HostDecisionResult(hostAddress)
-			: hostRulesService.processHostEvent(hostAddress, hostEvent);
+
+		return hostRulesService.processHostEvent(hostAddress, hostEvent);
 	}
 
 	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<SimpleNode> nodes) {
@@ -318,9 +327,8 @@ public class HostsMonitoringService {
 			containersService.migrateContainer(containerId, toHostAddress);
 		});
 		hostsService.removeHost(hostAddress);
-		log.info("Resolved underworked host: Stopped {} and migrated containers {} new hosts", hostAddress, containers);
+		log.info("Resolved underworked host: Stopped {} and migrated containers {} to new hosts", hostAddress, containers);
 	}
-
 
 	private Optional<ContainerEntity> getRandomContainerToMigrateFrom(HostAddress hostAddress) {
 		List<ContainerEntity> containers = containersService.getAppContainers(hostAddress);
@@ -332,5 +340,10 @@ public class HostsMonitoringService {
 			hostMonitoringTimer.cancel();
 			log.info("Stopped host monitoring");
 		}
+	}
+
+	public void reset() {
+		log.info("Clearing all host monitoring");
+		hostsMonitoring.deleteAll();
 	}
 }

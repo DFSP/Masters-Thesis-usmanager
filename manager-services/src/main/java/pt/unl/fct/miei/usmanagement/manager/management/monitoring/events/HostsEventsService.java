@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
@@ -34,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class HostsEventsService {
 
@@ -43,6 +45,10 @@ public class HostsEventsService {
 	public HostsEventsService(HostEventRepository hostEvents, DecisionsService decisionsService) {
 		this.hostEvents = hostEvents;
 		this.decisionsService = decisionsService;
+	}
+
+	public List<HostEventEntity> getHostEvents() {
+		return hostEvents.findAll();
 	}
 
 	public List<HostEventEntity> getHostEventsByHostAddress(HostAddress hostAddress) {
@@ -61,6 +67,11 @@ public class HostsEventsService {
 			hostEvent.setCount(hostEvent.getCount() + 1);
 		}
 		return this.hostEvents.save(hostEvent);
+	}
+
+	public void reset() {
+		log.info("Clearing all host events");
+		hostEvents.deleteAll();
 	}
 
 }

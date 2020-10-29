@@ -26,11 +26,9 @@
 import Card from "../../../components/cards/Card";
 import React from "react";
 import BaseComponent from "../../../components/BaseComponent";
-import {EntitiesAction} from "../../../reducers/entities";
 import {connect} from "react-redux";
 import {IRegion} from "./Region";
 import CardItem from "../../../components/list/CardItem";
-import {deleteRegion} from "../../../actions";
 
 interface State {
     loading: boolean;
@@ -41,7 +39,7 @@ interface RegionCardProps {
 }
 
 interface DispatchToProps {
-    deleteRegion: (region: IRegion) => EntitiesAction;
+    /*deleteRegion: (awsRegion: IRegion) => EntitiesAction;*/
 }
 
 type Props = DispatchToProps & RegionCardProps;
@@ -65,53 +63,53 @@ class RegionCard extends BaseComponent<Props, State> {
         this.mounted = false;
     }
 
-    private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
+    /*private onDeleteSuccess = (awsRegion: IRegion): void => {
+        super.toast(`<span class="green-text">Region <b class="white-text">${awsRegion.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteRegion(region);
-    }
+        this.props.deleteRegion(awsRegion);
+    }*/
 
-    private onDeleteFailure = (reason: string, region: IRegion): void => {
-        super.toast(`Unable to delete <a href=/regions/${region.name}><b>${region.name}</b></a> region`, 10000, reason, true);
+    /*private onDeleteFailure = (reason: string, region: IRegion): void => {
+        super.toast(`Unable to delete region <a href=/regions/${region.name}><b>${region.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
-    }
+    }*/
 
     public render() {
         const {region} = this.props;
         const {loading} = this.state;
         const CardRegion = Card<IRegion>();
-        return <CardRegion id={`region-${region.id}`}
+        return <CardRegion id={`region-${region.name}`}
                            title={region.name}
                            link={{to: {pathname: `/regions/${region.name}`, state: region}}}
-                           height={'125px'}
+                           height={'115px'}
                            margin={'10px 0'}
                            hoverable
-                           delete={{
-                               url: `regions/${region.name}`,
-                               successCallback: this.onDeleteSuccess,
-                               failureCallback: this.onDeleteFailure
-                           }}
+            /*delete={{
+                url: `regions/${awsRegion.name}`,
+                successCallback: this.onDeleteSuccess,
+                failureCallback: this.onDeleteFailure
+            }}*/
                            loading={loading}>
             <CardItem key={'name'}
                       label={'Name'}
                       value={`${region.name}`}/>
-            <CardItem key={'description'}
-                      label={'Description'}
-                      value={`${region.description}`}/>
-            <CardItem key={'active'}
+            {/*<CardItem key={'active'}
                       label={'Active'}
-                      value={`${region.active}`}/>
+                      value={`${awsRegion.active}`}/>*/}
+            <CardItem key={'coordinates'}
+                      label={'Coordinates'}
+                      value={`(${region.coordinates.latitude.toFixed(3)}, ${region.coordinates.longitude.toFixed(3)})`}/>
         </CardRegion>
     }
 
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    deleteRegion
+    /*deleteRegion*/
 };
 
 export default connect(null, mapDispatchToProps)(RegionCard);

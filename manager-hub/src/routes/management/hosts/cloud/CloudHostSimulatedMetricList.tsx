@@ -80,9 +80,6 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.cloudHost?.instanceId !== this.props.cloudHost?.instanceId) {
-            this.loadEntities();
-        }
         if (!prevProps.cloudHost?.instanceId && this.props.cloudHost?.instanceId) {
             this.setState({entitySaved: true});
         }

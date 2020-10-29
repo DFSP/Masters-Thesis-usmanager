@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +58,7 @@ public class ServiceEventEntity {
 
 	private String serviceName;
 
+	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private DecisionEntity decision;

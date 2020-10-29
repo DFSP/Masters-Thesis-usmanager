@@ -40,8 +40,8 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class HostDecisionResult extends DecisionResult {
 
-	public HostDecisionResult(HostAddress hostAddress) {
-		this(hostAddress, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
+	public HostDecisionResult(HostAddress hostAddress, Map<String, Double> fields) {
+		this(hostAddress, RuleDecision.NONE, 0, fields, 0);
 	}
 
 	public HostDecisionResult(HostAddress hostAddress, RuleDecision decision, long ruleId,

@@ -34,6 +34,6 @@ import java.util.List;
 @Repository
 public interface HostMonitoringLogsRepository extends JpaRepository<HostMonitoringLogEntity, Long> {
 
-	List<HostMonitoringLogEntity> findByHostAddress(@Param("hostAddress") HostAddress hostAddress);
+	List<HostMonitoringLogEntity> findByHost(@Param("hostAddress") HostAddress hostAddress);
 
 }

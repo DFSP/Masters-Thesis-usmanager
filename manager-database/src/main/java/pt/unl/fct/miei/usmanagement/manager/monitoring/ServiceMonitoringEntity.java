@@ -36,6 +36,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -52,28 +53,38 @@ public class ServiceMonitoringEntity {
 	@GeneratedValue
 	private Long id;
 
+	@NotNull
 	private String containerId;
 
+	@NotNull
 	private String serviceName;
 
+	@NotNull
 	private String hostname;
 
+	@NotNull
 	private String field;
 
+	@NotNull
 	private double minValue;
 
+	@NotNull
 	private double maxValue;
 
+	@NotNull
 	private double sumValue;
 
+	@NotNull
 	private double lastValue;
 
-	private long count;
+	@NotNull
+	private int count;
 
+	@NotNull
 	@Basic
 	private Timestamp lastUpdate;
 
-	public void logValue(double value, Timestamp updateTime) {
+	public void update(double value, Timestamp updateTime) {
 		setMinValue(Math.min(value, getMinValue()));
 		setMaxValue(Math.max(value, getMaxValue()));
 		setLastValue(value);

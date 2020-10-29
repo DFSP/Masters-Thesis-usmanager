@@ -40,15 +40,15 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostRepository;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsSimpleInstance;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.hosts.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 
 import java.util.Iterator;
 import java.util.List;
@@ -72,6 +72,7 @@ public class CloudHostsService {
 	private final CloudHostRepository cloudHosts;
 
 	private Timer syncDatabaseCloudHostsTimer;
+	private boolean launchingInstance;
 
 	public CloudHostsService(@Lazy AwsService awsService,
 							 @Lazy HostRulesService hostRulesService,
@@ -85,6 +86,7 @@ public class CloudHostsService {
 		this.hostsService = hostsService;
 		this.nodesService = nodesService;
 		this.cloudHosts = cloudHosts;
+		this.launchingInstance = false;
 	}
 
 	public List<CloudHostEntity> getCloudHosts() {
@@ -164,23 +166,29 @@ public class CloudHostsService {
 
 	public CloudHostEntity launchInstance(Coordinates coordinates) {
 		log.info("Looking for the best aws region to start a cloud instance close to {}", coordinates);
-		List<AwsRegion> regions = AwsRegion.getAWS_REGIONS();
+		List<AwsRegion> regions = AwsRegion.getAwsRegions();
 		regions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
 		AwsRegion region = regions.get(0);
-		log.info("{} - {} is the closest aws region with a distance of {} km", region.getZone(), region.getName(),
+		log.info("{} {} is the closest aws region with a distance of {} km", region.getZone(), region.getName(),
 			(int) region.getCoordinates().distanceTo(coordinates) / 1000);
 		return launchInstance(region);
 	}
 
 	public CloudHostEntity launchInstance(AwsRegion region) {
-		Instance instance = awsService.createInstance(region);
-		CloudHostEntity cloudHost = saveCloudHostFromInstance(instance);
-		hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
-		return cloudHost;
+		launchingInstance = true;
+		try {
+			Instance instance = awsService.createInstance(region);
+			CloudHostEntity cloudHost = saveCloudHostFromInstance(instance);
+			hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
+			return cloudHost;
+		}
+		finally {
+			launchingInstance = false;
+		}
 	}
 
 	public CloudHostEntity startInstance(String id, boolean addToSwarm) {
@@ -240,8 +248,11 @@ public class CloudHostsService {
 		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId(), false));
 	}
 
-	public List<CloudHostEntity> syncDatabaseCloudHosts() {
+	public List<CloudHostEntity> synchronizeDatabaseCloudHosts() {
 		List<CloudHostEntity> cloudHosts = getCloudHosts();
+		if (launchingInstance) {
+			return cloudHosts;
+		}
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
 			.collect(Collectors.toMap(Instance::getInstanceId, instance -> instance));
@@ -261,8 +272,7 @@ public class CloudHostsService {
 				InstanceState savedState = cloudHost.getState();
 				if (currentState != savedState) {
 					CloudHostEntity newCloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
-					log.info("Updating cloud host {} from {} to {}", instanceId, ToStringBuilder.reflectionToString(cloudHost),
-						ToStringBuilder.reflectionToString(newCloudHost));
+					log.info("Updating state of cloud host {}", newCloudHost.getInstanceId());
 				}
 			}
 		}
@@ -384,7 +394,7 @@ public class CloudHostsService {
 			@Override
 			public void run() {
 				try {
-					syncDatabaseCloudHosts();
+					synchronizeDatabaseCloudHosts();
 				}
 				catch (ManagerException e) {
 					log.error(e.getMessage());

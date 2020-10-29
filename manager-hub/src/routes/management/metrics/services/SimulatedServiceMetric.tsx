@@ -48,8 +48,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedServiceMetricServiceList from "./SimulatedServiceMetricServiceList";
-import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
-import {ISimulatedHostMetric} from "../hosts/SimulatedHostMetric";
 
 export interface ISimulatedServiceMetric extends IDatabaseData {
     name: string;
@@ -58,6 +56,7 @@ export interface ISimulatedServiceMetric extends IDatabaseData {
     maximumValue: number;
     override: boolean;
     generic: boolean;
+    active: boolean;
     services?: string[];
 }
 
@@ -68,6 +67,7 @@ const buildNewSimulatedServiceMetric = (): Partial<ISimulatedServiceMetric> => (
     maximumValue: undefined,
     override: undefined,
     generic: undefined,
+    active: true,
 });
 
 interface StateToProps {
@@ -142,10 +142,10 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private getSimulatedServiceMetric = () =>
-        this.state.simulatedServiceMetric || this.props.simulatedServiceMetric;
+        this.props.simulatedServiceMetric || this.state.simulatedServiceMetric;
 
     private getFormSimulatedServiceMetric = () =>
-        this.state.formSimulatedServiceMetric || this.props.formSimulatedServiceMetric;
+        this.props.formSimulatedServiceMetric || this.state.formSimulatedServiceMetric;
 
     private isNew = () =>
         isNew(this.props.location.search);
@@ -162,7 +162,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedServiceMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to save <b>${simulatedServiceMetric.name}</b> simulated service metric`, 10000, reason, true);
+        super.toast(`Unable to save simulated service metric <b>${simulatedServiceMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
         const simulatedMetric = reply.data;
@@ -179,7 +179,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
+        super.toast(`Unable to update simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
         super.toast(`<span class="green-text">Simulated service metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
@@ -189,7 +189,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
+        super.toast(`Unable to delete simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedServices.length;
@@ -227,7 +227,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (simulatedMetric: ISimulatedServiceMetric, reason: string): void =>
-        super.toast(`Unable to save services of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
+        super.toast(`Unable to save services of simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
         simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
@@ -307,6 +307,11 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                                      optionToString: this.fieldOption,
                                                      emptyMessage: 'No fields available'
                                                  }}/>
+                                : key === 'minimumValue' || key === 'maximumValue'
+                                ? <Field key={index}
+                                         id={key}
+                                         label={key}
+                                         type={'number'}/>
                                 : key === 'override'
                                 ? <Field<boolean> key={index}
                                                   id={key}
@@ -326,11 +331,15 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                                           defaultValue: "Apply to all services?",
                                                           values: [true, false]
                                                       }}/>
-                                    : key === 'minimumValue' || key === 'maximumValue'
-                                        ? <Field key={index}
-                                                 id={key}
-                                                 label={key}
-                                                 type={'number'}/>
+                                    : key === 'active'
+                                        ? <Field<boolean> key={index}
+                                                          id={key}
+                                                          label={key}
+                                                          type="dropdown"
+                                                          dropdown={{
+                                                              defaultValue: "Active?",
+                                                              values: [true, false]
+                                                          }}/>
                                         : <Field key={index}
                                                  id={key}
                                                  label={key}/>

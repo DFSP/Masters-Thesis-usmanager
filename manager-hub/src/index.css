@@ -961,3 +961,32 @@ select.no-validation-field ~ input.select-dropdown {
     top: -3px !important;
 }
 
+#toast-container {
+    min-width: 100%;
+    top: 0;
+    display: block;
+    position: fixed;
+    z-index: 10000;
+}
+
+.toast {
+    margin-top: 0;
+    min-height: 56px;
+}
+
+@media only screen and (min-width: 993px) {
+    #toast-container {
+        /*top: unset;*/
+        right: unset;
+        max-width: unset;
+    }
+}
+
+
+.btn.disabled, .disabled.btn-large, .disabled.btn-small, .btn-floating.disabled, .btn-large.disabled,
+.btn-small.disabled, .btn-flat.disabled, .btn:disabled, .btn-large:disabled, .btn-small:disabled, .btn-floating:disabled,
+.btn-large:disabled, .btn-small:disabled, .btn-flat:disabled, .btn[disabled], [disabled].btn-large, [disabled].btn-small,
+.btn-floating[disabled], .btn-large[disabled], .btn-small[disabled], .btn-flat[disabled] {
+    background-color: unset !important;
+    text-decoration: line-through;
+}

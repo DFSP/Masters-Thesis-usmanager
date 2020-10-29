@@ -71,7 +71,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private getContainer = () =>
-        this.state.container || this.props.container;
+        this.props.container || this.state.container;
 
     private onDeleteSuccess = (container: IContainer): void => {
         super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
@@ -82,7 +82,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Unable to stop <a href=/containers/${container.containerId}><b>${container.containerId}</b></a> container`, 10000, reason, true);
+        super.toast(`Unable to stop container <a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -139,7 +139,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to replicate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -167,7 +167,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
+        super.toast(`Unable to migrate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -199,7 +199,7 @@ class ContainerCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'View generic rules'}
                 pathname={`/containers/${container.containerId}`}
-                selected={'genericContainerRules'}
+                selected={'genericServiceRules'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}

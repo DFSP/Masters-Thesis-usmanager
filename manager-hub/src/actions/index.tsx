@@ -37,7 +37,6 @@ import {IRuleService} from "../routes/management/rules/services/RuleService";
 import {IRuleCondition} from "../routes/management/rules/conditions/RuleCondition";
 import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
-import {IRegion} from "../routes/management/region/Region";
 import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
 import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
@@ -537,6 +536,7 @@ export const syncCloudHosts = () => ({
 });
 
 export const ADD_CLOUD_HOST = 'ADD_CLOUD_HOST';
+
 export function addCloudHost(cloudHost: ICloudHost): EntitiesAction {
     return {
         type: ADD_CLOUD_HOST,
@@ -1652,32 +1652,30 @@ const fetchRegions = (name?: string) => ({
                 entity: 'regions'
             }
 });
-export const ADD_REGION = 'ADD_REGION';
 
-export function addRegion(region: IRegion): EntitiesAction {
+/*export const ADD_REGION = 'ADD_REGION';
+export function addRegion(awsRegion: IRegion): EntitiesAction {
     return {
         type: ADD_REGION,
-        data: {regions: new Array(region)}
+        data: {regions: new Array(awsRegion)}
     }
-}
+}*/
 
-export const UPDATE_REGION = 'UPDATE_REGION';
-
+/*export const UPDATE_REGION = 'UPDATE_REGION';
 export function updateRegion(previousRegion: IRegion, currentRegion: IRegion): EntitiesAction {
     return {
         type: UPDATE_REGION,
         data: {regions: [previousRegion, currentRegion]}
     }
-}
+}*/
 
-export const DELETE_REGION = 'DELETE_REGION';
-
-export function deleteRegion(region: IRegion): EntitiesAction {
+/*export const DELETE_REGION = 'DELETE_REGION';
+export function deleteRegion(awsRegion: IRegion): EntitiesAction {
     return {
         type: DELETE_REGION,
-        data: {regions: [region]}
+        data: {regions: [awsRegion]}
     }
-}
+}*/
 
 export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
 export const LOAD_BALANCER_REQUEST = 'LOAD_BALANCER_REQUEST';

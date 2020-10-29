@@ -38,7 +38,6 @@ import {
     ADD_EUREKA_SERVER,
     ADD_LOAD_BALANCER,
     ADD_NODE,
-    ADD_REGION,
     ADD_RULE_CONTAINER,
     ADD_RULE_CONTAINER_CONDITIONS,
     ADD_RULE_CONTAINER_CONTAINERS,
@@ -84,7 +83,10 @@ import {
     CLOUD_HOST_SUCCESS,
     CLOUD_HOSTS_FAILURE,
     CLOUD_HOSTS_REQUEST,
-    CLOUD_HOSTS_SUCCESS, CLOUD_REGIONS_FAILURE, CLOUD_REGIONS_REQUEST, CLOUD_REGIONS_SUCCESS,
+    CLOUD_HOSTS_SUCCESS,
+    CLOUD_REGIONS_FAILURE,
+    CLOUD_REGIONS_REQUEST,
+    CLOUD_REGIONS_SUCCESS,
     CONDITION_FAILURE,
     CONDITION_REQUEST,
     CONDITION_SUCCESS,
@@ -118,7 +120,6 @@ import {
     DELETE_CONTAINER,
     DELETE_EDGE_HOST,
     DELETE_NODE,
-    DELETE_REGION,
     DELETE_RULE_CONTAINER,
     DELETE_RULE_HOST,
     DELETE_RULE_SERVICE,
@@ -233,7 +234,10 @@ import {
     RULES_HOST_SUCCESS,
     RULES_SERVICE_FAILURE,
     RULES_SERVICE_REQUEST,
-    RULES_SERVICE_SUCCESS, SCRIPTS_FAILURE, SCRIPTS_REQUEST, SCRIPTS_SUCCESS,
+    RULES_SERVICE_SUCCESS,
+    SCRIPTS_FAILURE,
+    SCRIPTS_REQUEST,
+    SCRIPTS_SUCCESS,
     SERVICE_APPS_FAILURE,
     SERVICE_APPS_REQUEST,
     SERVICE_APPS_SUCCESS,
@@ -294,7 +298,6 @@ import {
     UPDATE_CONDITION,
     UPDATE_EDGE_HOST,
     UPDATE_NODE,
-    UPDATE_REGION,
     UPDATE_RULE_CONTAINER,
     UPDATE_RULE_HOST,
     UPDATE_RULE_SERVICE,
@@ -325,7 +328,7 @@ import {IDependent} from "../routes/management/services/ServiceDependentList";
 import {IPrediction} from "../routes/management/services/ServicePredictionList";
 import {IRuleService} from "../routes/management/rules/services/RuleService";
 import {IContainer} from "../routes/management/containers/Container";
-import {ICloudHost, ICloudRegion} from "../routes/management/hosts/cloud/CloudHost";
+import {ICloudHost, IAwsRegion} from "../routes/management/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/management/hosts/edge/EdgeHost";
 import {INode} from "../routes/management/nodes/Node";
 import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
@@ -387,7 +390,7 @@ export type EntitiesState = {
             isLoadingSimulatedMetrics: boolean,
             loadSimulatedMetricsError?: string | null,
             regions: {
-                data: ICloudRegion[],
+                data: IAwsRegion[],
                 isLoadingRegions: boolean,
                 loadRegionsError?: string | null,
             }
@@ -546,6 +549,7 @@ export type EntitiesAction = {
         edgeHosts?: IEdgeHost[],
         edgeHostsHostname?: string[],
         nodes?: INode[],
+        regions?: IRegion[],
         hostRules?: IRuleHost[],
         serviceRules?: IRuleService[],
         containerRules?: IRuleContainer[],
@@ -560,14 +564,13 @@ export type EntitiesAction = {
         simulatedServiceMetrics?: ISimulatedServiceMetric[],
         simulatedContainerMetrics?: ISimulatedContainerMetric[],
         simulatedMetricNames?: string[],
-        regions?: IRegion[],
         loadBalancers?: ILoadBalancer[],
         eurekaServers?: ILoadBalancer[],
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
         //scripts?: string[],
-        //cloudRegions?: ICloudRegion[],
+        //cloudRegions?: IAwsRegion[],
     },
 };
 
@@ -1788,6 +1791,67 @@ const entities = (state: EntitiesState = {
                 }
             }
             break;
+        case REGIONS_REQUEST:
+        case REGION_REQUEST:
+            return merge({}, state, {regions: {isLoadingRegions: true, loadRegionsError: null}});
+        case REGIONS_FAILURE:
+        case REGION_FAILURE:
+            return merge({}, state, {regions: {isLoadingRegions: false, loadRegionsError: error}});
+        case REGIONS_SUCCESS:
+            return {
+                ...state,
+                regions: {
+                    ...state.regions,
+                    data: merge({}, pick(state.regions.data, keys(data?.regions)), data?.regions),
+                    isLoadingRegions: false,
+                    loadRegionsError: null,
+                }
+            };
+        case REGION_SUCCESS:
+            return {
+                ...state,
+                regions: {
+                    data: merge({}, state.regions.data, data?.regions),
+                    isLoadingRegions: false,
+                    loadRegionsError: null,
+                }
+            };
+        /*case ADD_REGION:
+            if (data?.regions?.length) {
+                const regions = normalize(data?.regions, Schemas.REGION_ARRAY).entities.regions;
+                return merge({}, state, {regions: {data: regions, isLoadingRegions: false, loadRegionsError: null}});
+            }
+            break;
+        case UPDATE_REGION:
+            if (data?.regions && data.regions?.length > 1) {
+                const previousRegion = data.regions[0];
+                const filteredRegions = Object.values(state.regions.data).filter(awsRegion => awsRegion.id !== previousRegion.id);
+                const currentRegion = {...previousRegion, ...data.regions[1]};
+                filteredRegions.push(currentRegion);
+                const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
+                return {
+                    ...state,
+                    regions: {
+                        ...state.regions,
+                        data: regions,
+                    }
+                }
+            }
+            break;
+        case DELETE_REGION:
+            if (data?.regions?.length) {
+                const regionToDelete = data.regions[0];
+                const filteredRegions = Object.values(state.regions.data).filter(awsRegion => awsRegion.id !== regionToDelete.id);
+                const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
+                return {
+                    ...state,
+                    regions: {
+                        ...state.regions,
+                        data: regions,
+                    }
+                }
+            }
+            break;*/
         case RULES_HOST_REQUEST:
         case RULE_HOST_REQUEST:
             return merge({}, state, {rules: {hosts: {isLoadingRules: true, loadRulesError: null}}});
@@ -3089,67 +3153,6 @@ const entities = (state: EntitiesState = {
                 });
             }
             return state;
-        case REGIONS_REQUEST:
-        case REGION_REQUEST:
-            return merge({}, state, {regions: {isLoadingRegions: true, loadRegionsError: null}});
-        case REGIONS_FAILURE:
-        case REGION_FAILURE:
-            return merge({}, state, {regions: {isLoadingRegions: false, loadRegionsError: error}});
-        case REGIONS_SUCCESS:
-            return {
-                ...state,
-                regions: {
-                    ...state.regions,
-                    data: merge({}, pick(state.regions.data, keys(data?.regions)), data?.regions),
-                    isLoadingRegions: false,
-                    loadRegionsError: null,
-                }
-            };
-        case REGION_SUCCESS:
-            return {
-                ...state,
-                regions: {
-                    data: merge({}, state.regions.data, data?.regions),
-                    isLoadingRegions: false,
-                    loadRegionsError: null,
-                }
-            };
-        case ADD_REGION:
-            if (data?.regions?.length) {
-                const regions = normalize(data?.regions, Schemas.REGION_ARRAY).entities.regions;
-                return merge({}, state, {regions: {data: regions, isLoadingRegions: false, loadRegionsError: null}});
-            }
-            break;
-        case UPDATE_REGION:
-            if (data?.regions && data.regions?.length > 1) {
-                const previousRegion = data.regions[0];
-                const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== previousRegion.id);
-                const currentRegion = {...previousRegion, ...data.regions[1]};
-                filteredRegions.push(currentRegion);
-                const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
-                return {
-                    ...state,
-                    regions: {
-                        ...state.regions,
-                        data: regions,
-                    }
-                }
-            }
-            break;
-        case DELETE_REGION:
-            if (data?.regions?.length) {
-                const regionToDelete = data.regions[0];
-                const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== regionToDelete.id);
-                const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
-                return {
-                    ...state,
-                    regions: {
-                        ...state.regions,
-                        data: regions,
-                    }
-                }
-            }
-            break;
         case LOAD_BALANCERS_REQUEST:
         case LOAD_BALANCER_REQUEST:
             return merge({}, state, {loadBalancers: {isLoadingLoadBalancers: true, loadLoadBalancersError: null}});

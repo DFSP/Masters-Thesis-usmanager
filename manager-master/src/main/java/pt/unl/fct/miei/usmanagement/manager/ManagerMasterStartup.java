@@ -68,9 +68,10 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
 		HostAddress hostAddress = hostsService.setHostAddress();
+		log.info("{}", hostAddress);
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
-		cloudHostsService.syncDatabaseCloudHosts();
-		containersService.syncDatabaseContainers();
+		cloudHostsService.synchronizeDatabaseCloudHosts();
+		containersService.synchronizeDatabaseContainers();
 		hostsService.clusterHosts();
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();

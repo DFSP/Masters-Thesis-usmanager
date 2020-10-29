@@ -37,7 +37,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
 

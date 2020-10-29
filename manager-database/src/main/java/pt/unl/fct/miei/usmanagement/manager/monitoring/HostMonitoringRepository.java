@@ -35,23 +35,20 @@ import java.util.List;
 @Repository
 public interface HostMonitoringRepository extends JpaRepository<HostMonitoringEntity, Long> {
 
-	List<HostMonitoringEntity> getByHostAddress(@Param("hostAddress") HostAddress hostAddress);
+	List<HostMonitoringEntity> getByHost(@Param("host") HostAddress hostAddress);
 
-	HostMonitoringEntity getByHostAddressAndFieldIgnoreCase(@Param("hostAddress") HostAddress hostAddress,
-															@Param("field") String field);
-
-	long countByHostAddressAndFieldIgnoreCase(@Param("hostAddress") HostAddress hostAddress, @Param("field") String field);
+	HostMonitoringEntity getByHostAndFieldIgnoreCase(@Param("host") HostAddress hostAddress, @Param("field") String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
-		+ "HostFieldAvg(m.hostAddress, m.field, m.sumValue / m.count, m.count) "
+		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
 		+ "from HostMonitoringEntity m "
-		+ "where m.hostAddress = :hostAddress")
-	List<HostFieldAvg> getHostFieldsAvg(@Param("hostAddress") HostAddress hostAddress);
+		+ "where m.host = :host")
+	List<HostFieldAverage> getHostMonitoringFieldsAverage(@Param("host") HostAddress hostAddress);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
-		+ "HostFieldAvg(m.hostAddress, m.field, m.sumValue / m.count, m.count) "
+		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
 		+ "from HostMonitoringEntity m "
-		+ "where m.hostAddress = :hostAddress and m.field = :field")
-	HostFieldAvg getHostFieldAvg(@Param("hostAddress") HostAddress hostAddress, @Param("field") String field);
+		+ "where m.host = :host and m.field = :field")
+	HostFieldAverage getHostMonitoringFieldAverage(@Param("host") HostAddress hostAddress, @Param("field") String field);
 
 }

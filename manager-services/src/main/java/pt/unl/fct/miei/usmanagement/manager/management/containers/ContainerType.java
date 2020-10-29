@@ -25,6 +25,8 @@
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
 public enum ContainerType {
+
 	SINGLETON, // one instance running on each host
 	BY_REQUEST
+
 }

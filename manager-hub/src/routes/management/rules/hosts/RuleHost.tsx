@@ -168,7 +168,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to save <b>${ruleHost.name}</b> host rule`, 10000, reason, true);
+        super.toast(`Unable to save host rule <b>${ruleHost.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleHost>): void => {
         const ruleHost = reply.data;
@@ -185,7 +185,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to update host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleHost: IRuleHost): void => {
         super.toast(`<span class="green-text">Host rule <b class="white-text">${ruleHost.name}</b> successfully removed</span>`);
@@ -195,7 +195,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to delete host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -237,7 +237,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save conditions of ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to save conditions of host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleCloudHost = (cloudHost: string): void =>
         this.setState({
@@ -267,7 +267,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveCloudHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save cloud hosts of ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to save cloud hosts of host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleEdgeHost = (edgeHost: string): void =>
         this.setState({
@@ -297,8 +297,8 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveEdgeHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save edge hosts of ${this.mounted ?
-            <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
+        super.toast(`Unable to save edge hosts of host rule ${this.mounted ?
+            <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleHost = (ruleHost: IRuleHost) => {
         ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];

@@ -25,10 +25,12 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 class QueryResult {
 
 	private QueryMetric metric;

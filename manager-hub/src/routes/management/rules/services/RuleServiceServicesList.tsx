@@ -76,9 +76,6 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.ruleService?.name !== this.props.ruleService?.name) {
-            this.loadEntities();
-        }
         if (!prevProps.ruleService?.name && this.props.ruleService?.name) {
             this.setState({entitySaved: true});
         }

@@ -73,7 +73,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
-        super.toast(`Unable to delete <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a> edge host`, 10000, reason, true);
+        super.toast(`Unable to delete edge host <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -117,7 +117,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                                      state: edgeHost
                                  }
                              }}
-                             height={'185px'}
+                             height={'213px'}
                              margin={'10px 0'}
                              hoverable
                              delete={{
@@ -140,6 +140,9 @@ class EdgeHostCard extends BaseComponent<Props, State> {
             <CardItem key={'publicDnsName'}
                       label={'Public dns name'}
                       value={`${edgeHost.publicDnsName}`}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={`${edgeHost.region.name}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
                       value={`(${edgeHost.coordinates.latitude.toFixed(3)}, ${edgeHost.coordinates.longitude.toFixed(3)})`}/>
