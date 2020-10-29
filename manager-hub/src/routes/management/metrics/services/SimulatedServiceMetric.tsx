@@ -119,7 +119,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -313,36 +313,36 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                          label={key}
                                          type={'number'}/>
                                 : key === 'override'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      defaultValue: "Override real metrics?",
-                                                      values: [true, false]
-                                                  }}/>
-                                : key === 'generic'
                                     ? <Field<boolean> key={index}
                                                       id={key}
                                                       label={key}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          selectCallback: this.isGenericSelected,
-                                                          defaultValue: "Apply to all services?",
+                                                          defaultValue: "Override real metrics?",
                                                           values: [true, false]
                                                       }}/>
-                                    : key === 'active'
+                                    : key === 'generic'
                                         ? <Field<boolean> key={index}
                                                           id={key}
                                                           label={key}
                                                           type="dropdown"
                                                           dropdown={{
-                                                              defaultValue: "Active?",
+                                                              selectCallback: this.isGenericSelected,
+                                                              defaultValue: "Apply to all services?",
                                                               values: [true, false]
                                                           }}/>
-                                        : <Field key={index}
-                                                 id={key}
-                                                 label={key}/>
+                                        : key === 'active'
+                                            ? <Field<boolean> key={index}
+                                                              id={key}
+                                                              label={key}
+                                                              type="dropdown"
+                                                              dropdown={{
+                                                                  defaultValue: "Active?",
+                                                                  values: [true, false]
+                                                              }}/>
+                                            : <Field key={index}
+                                                     id={key}
+                                                     label={key}/>
                         )}
                     </Form>
                 )}

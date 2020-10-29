@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -24,13 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
-import net.minidev.json.JSONArray;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.util.Json;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,11 +48,20 @@ public class NginxLoadBalancerController {
 	}
 
 	@PostMapping
-	public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
-		List<Region> regionsList = Arrays.stream(regions.toArray(new String[0]))
-			.map(region -> Region.valueOf(region.toUpperCase().replace(" ", "_")))
-			.collect(Collectors.toList());
-		return nginxLoadBalancerService.launchLoadBalancers(service, regionsList);
+	public List<ContainerEntity> launchLoadBalancer(@RequestBody LaunchNginxLoadBalancer launchNginxLoadBalancer) {
+		String service = launchNginxLoadBalancer.getService();
+		HostAddress hostAddress = launchNginxLoadBalancer.getHostAddress();
+		List<String> regions = launchNginxLoadBalancer.getRegions();
+		if (hostAddress != null) {
+			return List.of(nginxLoadBalancerService.launchLoadBalancer(service, hostAddress));
+		}
+		else if (regions != null) {
+			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
+			return nginxLoadBalancerService.launchLoadBalancers(service, regionsList);
+		}
+		else {
+			throw new BadRequestException("Expected host address or regions to start load balancer");
+		}
 	}
 
 }

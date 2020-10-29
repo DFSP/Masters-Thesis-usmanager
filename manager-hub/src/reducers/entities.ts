@@ -23,8 +23,10 @@
  */
 
 import {
-    ADD_APP, ADD_APP_RULES,
-    ADD_APP_SERVICES, ADD_APP_SIMULATED_METRICS,
+    ADD_APP,
+    ADD_APP_RULES,
+    ADD_APP_SERVICES,
+    ADD_APP_SIMULATED_METRICS,
     ADD_CLOUD_HOST,
     ADD_CLOUD_HOST_RULE,
     ADD_CLOUD_HOST_SIMULATED_METRICS,
@@ -57,7 +59,8 @@ import {
     ADD_SERVICE_PREDICTIONS,
     ADD_SERVICE_RULES,
     ADD_SERVICE_SIMULATED_METRICS,
-    ADD_SIMULATED_APP_METRIC, ADD_SIMULATED_APP_METRIC_APPS,
+    ADD_SIMULATED_APP_METRIC,
+    ADD_SIMULATED_APP_METRIC_APPS,
     ADD_SIMULATED_CONTAINER_METRIC,
     ADD_SIMULATED_CONTAINER_METRIC_CONTAINERS,
     ADD_SIMULATED_HOST_METRIC,
@@ -67,10 +70,16 @@ import {
     ADD_SIMULATED_SERVICE_METRIC_SERVICES,
     ADD_WORKER_MANAGER,
     APP_FAILURE,
-    APP_REQUEST, APP_RULES_FAILURE, APP_RULES_REQUEST, APP_RULES_SUCCESS,
+    APP_REQUEST,
+    APP_RULES_FAILURE,
+    APP_RULES_REQUEST,
+    APP_RULES_SUCCESS,
     APP_SERVICES_FAILURE,
     APP_SERVICES_REQUEST,
-    APP_SERVICES_SUCCESS, APP_SIMULATED_METRICS_FAILURE, APP_SIMULATED_METRICS_REQUEST, APP_SIMULATED_METRICS_SUCCESS,
+    APP_SERVICES_SUCCESS,
+    APP_SIMULATED_METRICS_FAILURE,
+    APP_SIMULATED_METRICS_REQUEST,
+    APP_SIMULATED_METRICS_SUCCESS,
     APP_SUCCESS,
     APPS_FAILURE,
     APPS_REQUEST,
@@ -178,8 +187,10 @@ import {
     REGION_SUCCESS,
     REGIONS_FAILURE,
     REGIONS_REQUEST,
-    REGIONS_SUCCESS, REMOVE_APP_RULES,
-    REMOVE_APP_SERVICES, REMOVE_APP_SIMULATED_METRICS,
+    REGIONS_SUCCESS,
+    REMOVE_APP_RULES,
+    REMOVE_APP_SERVICES,
+    REMOVE_APP_SIMULATED_METRICS,
     REMOVE_CLOUD_HOST_RULES,
     REMOVE_CLOUD_HOST_SIMULATED_METRICS,
     REMOVE_CONTAINER_RULES,
@@ -199,7 +210,8 @@ import {
     REMOVE_SERVICE_DEPENDENCIES,
     REMOVE_SERVICE_PREDICTIONS,
     REMOVE_SERVICE_RULES,
-    REMOVE_SERVICE_SIMULATED_METRICS, REMOVE_SIMULATED_APP_METRIC_APPS,
+    REMOVE_SERVICE_SIMULATED_METRICS,
+    REMOVE_SIMULATED_APP_METRIC_APPS,
     REMOVE_SIMULATED_CONTAINER_METRIC_CONTAINERS,
     REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
     REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS,
@@ -359,7 +371,7 @@ import {IDependent} from "../routes/management/services/ServiceDependentList";
 import {IPrediction} from "../routes/management/services/ServicePredictionList";
 import {IRuleService} from "../routes/management/rules/services/RuleService";
 import {IContainer} from "../routes/management/containers/Container";
-import {ICloudHost, IAwsRegion} from "../routes/management/hosts/cloud/CloudHost";
+import {IAwsRegion, ICloudHost} from "../routes/management/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/management/hosts/edge/EdgeHost";
 import {INode} from "../routes/management/nodes/Node";
 import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
@@ -1029,7 +1041,7 @@ const entities = (state: EntitiesState = {
                     }
                 });
             }
-            break;   
+            break;
         case SERVICES_REQUEST:
         case SERVICE_REQUEST:
             return merge({}, state, {services: {isLoadingServices: true, loadServicesError: null}});
@@ -3343,7 +3355,7 @@ const entities = (state: EntitiesState = {
                     }
                 });
             }
-            return state;    
+            return state;
         case SIMULATED_SERVICE_METRICS_REQUEST:
         case SIMULATED_SERVICE_METRIC_REQUEST:
             return merge({}, state, {

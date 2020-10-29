@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addEurekaServer, loadEurekaServers, loadRegions,} from "../../../actions";
+import {addEurekaServer, loadEurekaServers, loadNodes, loadRegions,} from "../../../actions";
 import {connect} from "react-redux";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
@@ -40,32 +40,44 @@ import {isNew} from "../../../utils/router";
 import {IContainer} from "../containers/Container";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import {ILoadBalancer} from "../loadBalancers/LoadBalancer";
+import {IHostAddress} from "../hosts/Hosts";
+import {INode} from "../nodes/Node";
 
 export interface IEurekaServer extends IContainer {
 }
 
-interface INewEurekaServer {
+interface INewEurekaServerRegion {
     regions: string[] | undefined
 }
 
-const buildNewEurekaServer = (): INewEurekaServer => ({
+interface INewEurekaServerHost {
+    hostAddress: IHostAddress | undefined
+}
+
+const buildNewEurekaServerRegion = (): INewEurekaServerRegion => ({
     regions: undefined
+});
+
+const buildNewEurekaServerHost = (): INewEurekaServerHost => ({
+    hostAddress: undefined
 });
 
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
-    newEurekaServer?: INewEurekaServer;
+    newEurekaServerHost?: INewEurekaServerHost;
+    newEurekaServerRegion?: INewEurekaServerRegion;
     eurekaServer?: IEurekaServer;
-    formEurekaServer?: Partial<IEurekaServer> | INewEurekaServer;
+    formEurekaServer?: Partial<IEurekaServer>;
     regions: { [key: string]: IRegion };
+    nodes: { [key: string]: INode };
 }
 
 interface DispatchToProps {
     loadEurekaServers: (id: string) => void;
     addEurekaServer: (eurekaServer: IContainer) => void;
     loadRegions: () => void;
+    loadNodes: () => void;
 }
 
 interface MatchParams {
@@ -82,20 +94,24 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 interface State {
     eurekaServer?: IEurekaServer,
     formEurekaServer?: IEurekaServer,
+    currentForm: 'On regions' | 'On host',
 }
 
 class EurekaServer extends BaseComponent<Props, State> {
 
-    state: State = {};
+    state: State = {
+        currentForm: 'On regions'
+    };
     private mounted = false;
 
     public componentDidMount(): void {
         this.loadEurekaServer();
         this.props.loadRegions();
+        this.props.loadNodes();
         this.mounted = true;
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -162,7 +178,7 @@ class EurekaServer extends BaseComponent<Props, State> {
         this.setState({eurekaServer: eurekaServer, formEurekaServer: formEurekaServer});
     };
 
-    private getFields = (eurekaServer: Partial<IEurekaServer> | INewEurekaServer): IFields =>
+    private getFields = (eurekaServer: INewEurekaServerRegion | INewEurekaServerHost | IEurekaServer): IFields =>
         Object.entries(eurekaServer).map(([key, value]) => {
             return {
                 [key]: {
@@ -180,22 +196,81 @@ class EurekaServer extends BaseComponent<Props, State> {
             return fields;
         }, {});
 
+    private getSelectableHosts = (): Partial<IHostAddress>[] =>
+        Object.entries(this.props.nodes)
+            .filter(([_, node]) => node.state === 'ready')
+            .map(([_, node]) =>
+                ({
+                    username: node.labels['username'],
+                    publicIpAddress: node.publicIpAddress,
+                    privateIpAddress: node.labels['privateIpAddress'],
+                    coordinates: node.labels['coordinates'] ? JSON.parse(node.labels['coordinates']) : undefined,
+                }))
+
+    private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
+
+    private formFields = (isNew: boolean, formEurekaServer?: Partial<IEurekaServer>) => {
+        const {currentForm} = this.state;
+        return (
+            isNew ?
+                currentForm === 'On regions'
+                    ?
+                    <Field key={'regions'}
+                           id={'regions'}
+                           label={'regions'}
+                           type={'list'}
+                           value={Object.keys(this.props.regions)}/>
+                    :
+                    <>
+                        <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                                      id={'hostAddress'}
+                                                      label={'hostAddress'}
+                                                      type="dropdown"
+                                                      dropdown={{
+                                                          defaultValue: "Select host address",
+                                                          values: this.getSelectableHosts(),
+                                                          optionToString: this.hostAddressesDropdown,
+                                                          emptyMessage: 'No hosts to select'
+                                                      }}/>
+                    </>
+                : formEurekaServer && Object.entries(formEurekaServer).map((([key, value], index) =>
+                key === 'containerId'
+                    ? <Field key={index}
+                             id={key}
+                             label={key}
+                             icon={{linkedTo: '/containers/' + (formEurekaServer as Partial<IEurekaServer>).containerId}}/>
+                    : key === 'created'
+                    ? <Field key={index}
+                             id={key}
+                             label={key}
+                             type={"date"}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>))
+        );
+    };
+
+    private switchForm = (formId: 'On regions' | 'On host') =>
+        this.setState({currentForm: formId});
+
     private eurekaServer = () => {
-        const {isLoading, error, newEurekaServer} = this.props;
-        const eurekaServer = this.getEurekaServer();
+        const {isLoading, error, newEurekaServerRegion, newEurekaServerHost} = this.props;
+        const {currentForm} = this.state;
+        const isNewEurekaServer = this.isNew();
+        const eurekaServer = isNewEurekaServer ? (currentForm === 'On regions' ? newEurekaServerRegion : newEurekaServerHost) : this.getEurekaServer();
         const formEurekaServer = this.getFormEurekaServer();
         // @ts-ignore
         const eurekaServerKey: (keyof IEurekaServer) = formEurekaServer && Object.keys(formEurekaServer)[0];
-        const isNewEurekaServer = this.isNew();
         return (
             <>
                 {!isNewEurekaServer && isLoading && <LoadingSpinner/>}
                 {!isNewEurekaServer && !isLoading && error && <Error message={error}/>}
-                {(isNewEurekaServer || !isLoading) && (isNewEurekaServer || !error) && formEurekaServer && (
+                {(isNewEurekaServer || !isLoading) && (isNewEurekaServer || !error) && eurekaServer && (
                     /*@ts-ignore*/
                     <Form id={eurekaServerKey}
-                          fields={this.getFields(formEurekaServer || {})}
-                          values={eurekaServer || newEurekaServer || {}}
+                          fields={this.getFields(eurekaServer)}
+                          values={eurekaServer}
                           isNew={isNew(this.props.location.search)}
                           post={{
                               textButton: 'launch',
@@ -205,31 +280,15 @@ class EurekaServer extends BaseComponent<Props, State> {
                           }}
                           delete={{
                               textButton: 'Stop',
-                              url: `containers/${eurekaServer?.containerId}`,
+                              url: `containers/${(eurekaServer as IEurekaServer).containerId}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
-                          }}>
-                        {Object.entries(formEurekaServer).map((([key, value], index) =>
-                                key === 'regions'
-                                    ? <Field key={index}
-                                             id={key}
-                                             label={key}
-                                             type={'list'}
-                                             value={value}/>
-                                    : key === 'containerId'
-                                    ? <Field key={index}
-                                             id={key}
-                                             label={key}
-                                             icon={{linkedTo: '/containers/' + (formEurekaServer as Partial<IEurekaServer>).containerId}}/>
-                                    : key === 'created'
-                                        ? <Field key={index}
-                                                 id={key}
-                                                 label={key}
-                                                 type={"date"}/>
-                                    : <Field key={index}
-                                             id={key}
-                                             label={key}/>
-                        ))}
+                          }}
+                          switchDropdown={isNewEurekaServer ? {
+                              options: currentForm === 'On regions' ? ['On host'] : ['On regions'],
+                              onSwitch: this.switchForm
+                          } : undefined}>
+                        {this.formFields(isNewEurekaServer, formEurekaServer)}
                     </Form>
                 )}
             </>
@@ -259,24 +318,26 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.eurekaServers.isLoadingEurekaServers;
     const error = state.entities.eurekaServers.loadEurekaServersError;
     const id = props.match.params.id;
-    const newEurekaServer = isNew(props.location.search) ? buildNewEurekaServer() : undefined;
-    const eurekaServer = !isNew(props.location.search) ? state.entities.eurekaServers.data[id] : undefined;
-    const regions = state.entities.regions.data;
+    const newEurekaServer = isNew(props.location.search);
+    const newEurekaServerRegion = newEurekaServer ? buildNewEurekaServerRegion() : undefined;
+    const newEurekaServerHost = newEurekaServer ? buildNewEurekaServerHost() : undefined;
+    const eurekaServer = !newEurekaServer ? state.entities.eurekaServers.data[id] : undefined;
     let formEurekaServer;
-    if (newEurekaServer) {
-        formEurekaServer = {...newEurekaServer, regions: Object.keys(regions)};
-    }
     if (eurekaServer) {
         formEurekaServer = {...eurekaServer};
         removeFields(formEurekaServer);
     }
+    const regions = state.entities.regions.data;
+    const nodes = state.entities.nodes.data;
     return {
         isLoading,
         error,
-        newEurekaServer,
+        newEurekaServerRegion,
+        newEurekaServerHost,
         eurekaServer,
         formEurekaServer,
-        regions
+        regions,
+        nodes
     }
 }
 
@@ -284,6 +345,7 @@ const mapDispatchToProps: DispatchToProps = {
     loadEurekaServers,
     addEurekaServer,
     loadRegions,
+    loadNodes,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EurekaServer);

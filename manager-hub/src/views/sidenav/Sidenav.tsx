@@ -108,7 +108,7 @@ class Sidenav extends React.Component<Props, {}> {
         this.scrollbar?.updateScroll();
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         window.removeEventListener('resize', this.handleResize);
     }
 

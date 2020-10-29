@@ -344,19 +344,19 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private conditions = (): JSX.Element =>
         <RuleAppConditionList isLoadingRuleApp={this.props.isLoading}
-                                    loadRuleAppError={!this.isNew() ? this.props.error : undefined}
-                                    ruleApp={this.getRuleApp()}
-                                    unsavedConditions={this.state.unsavedConditions}
-                                    onAddRuleCondition={this.addRuleCondition}
-                                    onRemoveRuleConditions={this.removeRuleConditions}/>;
+                              loadRuleAppError={!this.isNew() ? this.props.error : undefined}
+                              ruleApp={this.getRuleApp()}
+                              unsavedConditions={this.state.unsavedConditions}
+                              onAddRuleCondition={this.addRuleCondition}
+                              onRemoveRuleConditions={this.removeRuleConditions}/>;
 
     private apps = (): JSX.Element =>
         <RuleAppAppsList isLoadingRuleApp={this.props.isLoading}
-                                     loadRuleAppError={!this.isNew() ? this.props.error : undefined}
-                                     ruleApp={this.getRuleApp()}
-                                     unsavedApps={this.state.unsavedApps}
-                                     onAddRuleApp={this.addRuleApp}
-                                     onRemoveRuleApps={this.removeRuleApps}/>;
+                         loadRuleAppError={!this.isNew() ? this.props.error : undefined}
+                         ruleApp={this.getRuleApp()}
+                         unsavedApps={this.state.unsavedApps}
+                         onAddRuleApp={this.addRuleApp}
+                         onRemoveRuleApps={this.removeRuleApps}/>;
 
     private tabs = (): Tab[] => [
         {

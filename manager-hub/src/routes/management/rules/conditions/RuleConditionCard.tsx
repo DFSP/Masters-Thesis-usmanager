@@ -28,7 +28,6 @@ import React from "react";
 import {deleteCondition} from "../../../../actions";
 import {IRuleCondition} from "./RuleCondition";
 import BaseComponent from "../../../../components/BaseComponent";
-import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
 import {connect} from "react-redux";
 
 interface State {

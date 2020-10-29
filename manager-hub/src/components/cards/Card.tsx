@@ -129,7 +129,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                             : undefined}
                         <LinkedContextMenuItem option={'Details'}
                                                pathname={link?.to.pathname}
-                                               state={{ data: link?.to.state }}/>
+                                               state={{data: link?.to.state}}/>
                     </>}
                     {bottomContextMenuItems?.map((menuItem, index) =>
                         <div key={index}>
@@ -139,7 +139,8 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                     )}
                     {this.props.delete !== undefined
                     && <div className={`${loading || !confirmationDialog ? '' : 'modal-trigger'}`} data-target={id}>
-                        {(topContextMenuItems?.length || link || bottomContextMenuItems?.length) && <DividerContextMenuItem/>}
+                        {(topContextMenuItems?.length || link || bottomContextMenuItems?.length) &&
+                        <DividerContextMenuItem/>}
                         <MenuItem
                             className={`${loading ? 'react-contextmenu-item--disabled' : undefined} red-text`}
                             data={this.props.link?.to.state}

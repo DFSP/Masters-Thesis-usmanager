@@ -89,11 +89,12 @@ public class NginxLoadBalancerService {
 		double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
 		return regions.stream()
 			.map(region -> hostsService.getClosestCapableHost(expectedMemoryConsumption, region))
-			.map(hostAddress -> launchLoadBalancer(hostAddress, serviceName))
+			.distinct()
+			.map(hostAddress -> launchLoadBalancer(serviceName, hostAddress))
 			.collect(Collectors.toList());
 	}
 
-	private ContainerEntity launchLoadBalancer(HostAddress hostAddress, String serviceName) {
+	public ContainerEntity launchLoadBalancer(String serviceName, HostAddress hostAddress) {
 		//TODO get port from properties
 		return launchLoadBalancer(hostAddress, serviceName, "127.0.0.1:1906");
 	}

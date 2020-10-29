@@ -30,7 +30,6 @@ import Collapsible from "../../../components/collapsible/Collapsible";
 import SimulatedHostMetricsList from "./hosts/SimulatedHostMetricsList";
 import SimulatedServiceMetricsList from "./services/SimulatedServiceMetricsList";
 import SimulatedContainerMetricsList from "./containers/SimulatedContainerMetricsList";
-import IDatabaseData from "../../../components/IDatabaseData";
 import SimulatedAppMetricsList from "./apps/SimulatedAppMetricsList";
 
 const SimulatedMetrics = () =>
@@ -40,10 +39,10 @@ const SimulatedMetrics = () =>
                        id: 'simulatedMetrics',
                        title: 'Simulated metric',
                        data: [
-                           {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new=true'},
-                           {text: 'App', pathname: '/simulated-metrics/apps/new_metric?new=true'},
-                           {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new=true'},
-                           {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new=true'},
+                           {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new'},
+                           {text: 'App', pathname: '/simulated-metrics/apps/new_metric?new'},
+                           {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new'},
+                           {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new'},
                        ],
                    }}/>
         <div className={`${styles.container}`}>

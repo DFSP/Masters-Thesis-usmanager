@@ -53,7 +53,6 @@ import IDatabaseData from "../../../components/IDatabaseData";
 import {Point} from "react-simple-maps";
 import {ICoordinates} from "../../../components/map/LocationMap";
 import {IMarker} from "../../../components/map/Marker";
-import {IContainer} from "../containers/Container";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
@@ -116,7 +115,7 @@ interface MatchParams {
 
 interface LocationState {
     data: INode,
-    selected: 'newNode' | 'node' | 'nodeLabels'
+    selected: 'node' | 'nodeLabels'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -148,7 +147,7 @@ class Node extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -328,7 +327,7 @@ class Node extends BaseComponent<Props, State> {
                 const id = node.id.toString();
                 const markerId = node.labels['coordinates'];
                 const coordinates = JSON.parse(node.labels['coordinates']) as ICoordinates;
-                const marker = markers.get(markerId) || { title: '', label: '', latitude: 0, longitude: 0 };
+                const marker = markers.get(markerId) || {title: '', label: '', latitude: 0, longitude: 0};
                 if (marker.title === '') {
                     marker.title += coordinates.label + '<br/>';
                 }
@@ -505,16 +504,8 @@ class Node extends BaseComponent<Props, State> {
     private tabs = (): Tab[] => ([
         {
             title: 'Node',
-            id: 'newNode',
-            content: () => this.node(),
-            hidden: !this.isNew(),
-            active: this.props.location.state?.selected === 'newNode'
-        },
-        {
-            title: 'Node',
             id: 'node',
             content: () => this.node(),
-            hidden: this.isNew(),
             active: this.props.location.state?.selected === 'node'
         },
         {
@@ -530,9 +521,7 @@ class Node extends BaseComponent<Props, State> {
 
 
 function removeFields(node: Partial<INode>) {
-    if (node) {
-        delete node["labels"];
-    }
+    delete node["labels"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

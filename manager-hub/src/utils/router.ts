@@ -24,5 +24,4 @@
 
 import {Search} from "history";
 
-export const isNew = (search: Search) =>
-    new URLSearchParams(search).get('new') === 'true';
+export const isNew = (search: Search) => new URLSearchParams(search).get('new') !== null

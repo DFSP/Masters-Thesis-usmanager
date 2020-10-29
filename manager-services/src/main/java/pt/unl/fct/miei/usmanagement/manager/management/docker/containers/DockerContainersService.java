@@ -49,7 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerPrope
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaServerService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
@@ -87,7 +87,7 @@ public class DockerContainersService {
 	private final NodesService nodesService;
 	private final ServicesService servicesService;
 	private final NginxLoadBalancerService nginxLoadBalancerService;
-	private final EurekaService eurekaService;
+	private final EurekaServerService eurekaServerService;
 	private final HostsService hostsService;
 
 	private final int dockerDelayBeforeStopContainer;
@@ -98,14 +98,14 @@ public class DockerContainersService {
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService,
 								   ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
-								   EurekaService eurekaService, HostsService hostsService,
+								   EurekaServerService eurekaServerService, HostsService hostsService,
 								   ContainerProperties containerProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
 		this.servicesService = servicesService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
-		this.eurekaService = eurekaService;
+		this.eurekaServerService = eurekaServerService;
 		this.hostsService = hostsService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.launchingContainer = false;
@@ -270,11 +270,11 @@ public class DockerContainersService {
 			log.info("{}", launchCommand);
 
 			Region region = hostAddress.getRegion();
-			if (servicesService.serviceDependsOn(serviceName, EurekaService.EUREKA_SERVER)) {
-				String outputLabel = servicesService.getService(EurekaService.EUREKA_SERVER).getOutputLabel();
-				String eurekaAddress = eurekaService
+			if (servicesService.serviceDependsOn(serviceName, EurekaServerService.EUREKA_SERVER)) {
+				String outputLabel = servicesService.getService(EurekaServerService.EUREKA_SERVER).getOutputLabel();
+				String eurekaAddress = eurekaServerService
 					.getEurekaServerAddress(region)
-					.orElse(eurekaService.launchEurekaServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+					.orElse(eurekaServerService.launchEurekaServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
 				launchCommand = launchCommand.replace(outputLabel, eurekaAddress);
 			}
 

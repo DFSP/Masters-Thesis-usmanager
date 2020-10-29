@@ -64,7 +64,7 @@ class Containers extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 <AddButton tooltip={{text: 'Start container', position: 'bottom'}}
-                           pathname={'/containers/start_container?new=true'}
+                           pathname={'/containers/start_container?new'}
                            offset={0}/>
                 <ActionButton icon={'sync'}
                               tooltip={{text: 'Sync containers', position: 'left'}}
@@ -85,7 +85,11 @@ class Containers extends BaseComponent<Props, {}> {
 
     private container = (container: IContainer): JSX.Element =>
         <ContainerCard key={container.containerId} container={container}
-                       nodes={{data: Object.values(this.props.nodes), isLoading: this.props.isLoadingNodes, error: this.props.loadNodesError}}/>;
+                       nodes={{
+                           data: Object.values(this.props.nodes),
+                           isLoading: this.props.isLoadingNodes,
+                           error: this.props.loadNodesError
+                       }}/>;
 
     private predicate = (container: IContainer, search: string): boolean =>
         container.containerId.toString().toLowerCase().includes(search)

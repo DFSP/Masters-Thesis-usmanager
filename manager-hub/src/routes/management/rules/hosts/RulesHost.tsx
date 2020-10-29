@@ -31,7 +31,7 @@ import RulesHostList from "./RulesHostList";
 const RulesHost: React.FC = () =>
     <MainLayout>
         <AddButton tooltip={{text: 'Add host rule', position: 'left'}}
-                   pathname={'/rules/hosts/new_host_rule?new=true'}/>
+                   pathname={'/rules/hosts/new_host_rule?new'}/>
         <div className={`${styles.container}`}>
             <RulesHostList/>
         </div>

@@ -170,7 +170,7 @@ class Container extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 

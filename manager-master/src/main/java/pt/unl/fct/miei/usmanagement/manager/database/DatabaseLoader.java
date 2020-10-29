@@ -62,7 +62,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decis
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
@@ -435,11 +435,11 @@ public class DatabaseLoader {
 			}
 			ServiceEntity eurekaServer;
 			try {
-				eurekaServer = servicesService.getService(EurekaService.EUREKA_SERVER);
+				eurekaServer = servicesService.getService(EurekaServerService.EUREKA_SERVER);
 			}
 			catch (EntityNotFoundException ignored) {
 				eurekaServer = ServiceEntity.builder()
-					.serviceName(EurekaService.EUREKA_SERVER)
+					.serviceName(EurekaServerService.EUREKA_SERVER)
 					.dockerRepository(dockerHubUsername + "/registration-server")
 					.defaultExternalPort("8761")
 					.defaultInternalPort("8761")

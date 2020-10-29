@@ -27,18 +27,20 @@ package pt.unl.fct.miei.usmanagement.manager.management.workermanagers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerRepository;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerRepository;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -55,15 +57,17 @@ public class WorkerManagersService {
 	private final EdgeHostsService edgeHostsService;
 	private final ContainersService containersService;
 	private final HostsService hostsService;
+	private final ServicesService servicesService;
 
 	public WorkerManagersService(WorkerManagerRepository workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
-								 HostsService hostsService) {
+								 HostsService hostsService, ServicesService servicesService) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
+		this.servicesService = servicesService;
 	}
 
 	public List<WorkerManagerEntity> getWorkerManagers() {
@@ -90,6 +94,16 @@ public class WorkerManagersService {
 		ContainerEntity container = launchWorkerManager(hostAddress, id);
 		WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
 		return workerManagers.save(workerManagerEntity);
+	}
+
+	public List<WorkerManagerEntity> launchWorkerManagers(List<Region> regions) {
+		double expectedMemoryConsumption = servicesService
+			.getService(WorkerManagerProperties.WORKER_MANAGER).getExpectedMemoryConsumption();
+
+		return regions.stream()
+			.map(region -> hostsService.getClosestCapableHost(expectedMemoryConsumption, region))
+			.distinct()
+			.map(this::launchWorkerManager).collect(Collectors.toList());
 	}
 
 	private ContainerEntity launchWorkerManager(HostAddress hostAddress, String id) {

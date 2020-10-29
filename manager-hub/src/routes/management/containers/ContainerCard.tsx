@@ -118,7 +118,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         return menus;
     }
 
-    private replicate = (event: React.MouseEvent, data: {state: IContainer, submenu: INode}) => {
+    private replicate = (event: React.MouseEvent, data: { state: IContainer, submenu: INode }) => {
         const container = data.state;
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;
@@ -145,7 +145,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         }
     };
 
-    private migrate = (event: React.MouseEvent, data: {state: IContainer, submenu: INode}) => {
+    private migrate = (event: React.MouseEvent, data: { state: IContainer, submenu: INode }) => {
         const container = data.state;
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;

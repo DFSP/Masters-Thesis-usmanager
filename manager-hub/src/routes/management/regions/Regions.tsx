@@ -55,7 +55,7 @@ class Regions extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 {/*<AddButton tooltip={{text: 'Add awsRegion', position: 'left'}}
-                           pathname={'/regions/new_region?new=true'}/>*/}
+                           pathname={'/regions/new_region?new'}/>*/}
                 <div className={`${styles.container}`}>
                     <CardList<IRegion>
                         isLoading={this.props.isLoading}

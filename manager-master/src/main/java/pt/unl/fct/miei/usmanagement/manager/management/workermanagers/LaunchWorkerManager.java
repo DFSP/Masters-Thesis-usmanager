@@ -27,9 +27,12 @@ package pt.unl.fct.miei.usmanagement.manager.management.workermanagers;
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
+import java.util.List;
+
 @Data
 final class LaunchWorkerManager {
 
 	private HostAddress hostAddress;
+	private List<String> regions;
 
 }

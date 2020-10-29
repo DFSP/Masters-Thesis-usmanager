@@ -851,7 +851,7 @@ select.no-validation-field ~ input.select-dropdown {
 .react-contextmenu {
     background: #282828;
     background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
+    border: 1px solid rgba(0, 0, 0, .15);
     border-radius: .25rem;
     color: #373a3c;
     font-size: 15px;
@@ -944,7 +944,7 @@ select.no-validation-field ~ input.select-dropdown {
     width: auto;
 }
 
-.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item{
+.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item {
     margin: 0;
     padding: 0;
 }

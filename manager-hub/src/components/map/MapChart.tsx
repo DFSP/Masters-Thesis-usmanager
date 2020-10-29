@@ -32,7 +32,7 @@ const {geoPath} = d3Geo
 type Props = {
     setTooltipContent: (tooltip: string) => void;
     onClick?: (marker: IMarker) => void;
-    markers?: {coordinates: Point, marker: JSX.Element}[];
+    markers?: { coordinates: Point, marker: JSX.Element }[];
     hover?: boolean;
     clickHighlight?: boolean;
     zoomable?: boolean;
@@ -54,7 +54,7 @@ class MapChart extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = { scale: 1.0, position: { coordinates: [0, 0], zoom: 1 } };
+        this.state = {scale: 1.0, position: {coordinates: [0, 0], zoom: 1}};
     }
 
     public componentDidMount() {
@@ -103,7 +103,12 @@ class MapChart extends React.Component<Props, State> {
         const [orgX, orgY] = gp.bounds(geography)[0];
         const {scale} = this.state;
         const coordinates = projection.invert([orgX + cx / scale, orgY + cy / scale]);
-        this.props.onClick?.({label: geography.properties.NAME, title: geography.properties.NAME, longitude: coordinates[0], latitude: coordinates[1]});
+        this.props.onClick?.({
+            label: geography.properties.NAME,
+            title: geography.properties.NAME,
+            longitude: coordinates[0],
+            latitude: coordinates[1]
+        });
     }
 
     private handleMoveEnd = (position: { coordinates: Point, zoom: number }) => {
@@ -120,7 +125,8 @@ class MapChart extends React.Component<Props, State> {
                 <ComposableMap data-tip="" projectionConfig={{scale: 315, rotate: [-11, 0, 0]}}
                                width={this.MAP_MAX_WIDTH} height={this.MAP_MAX_HEIGHT}
                                style={{width: '100%', height: 'auto'}}>
-                    <ZoomableGroup zoom={position.zoom} maxZoom={!zoomable ? 1 : 5} center={position.coordinates} onMoveEnd={this.handleMoveEnd}>
+                    <ZoomableGroup zoom={position.zoom} maxZoom={!zoomable ? 1 : 5} center={position.coordinates}
+                                   onMoveEnd={this.handleMoveEnd}>
                         <Geographies geography={geoUrl}>
                             {({geographies, projection}) =>
                                 geographies.map(geo => (

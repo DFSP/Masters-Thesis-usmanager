@@ -40,11 +40,11 @@ const Rules = () =>
                        id: 'addRuleOrCondition',
                        title: 'Select menu',
                        data: [
-                           {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
-                           {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new=true'},
-                           {text: 'App rule', pathname: '/rules/apps/new_app_rule?new=true'},
-                           {text: 'Service rule', pathname: '/rules/services/new_service_rule?new=true'},
-                           {text: 'Container rule', pathname: '/rules/containers/new_container_rule?new=true'},
+                           {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new'},
+                           {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new'},
+                           {text: 'App rule', pathname: '/rules/apps/new_app_rule?new'},
+                           {text: 'Service rule', pathname: '/rules/services/new_service_rule?new'},
+                           {text: 'Container rule', pathname: '/rules/containers/new_container_rule?new'},
                        ],
                    }}/>
         <div className={`${styles.collapsibleContainer}`}>

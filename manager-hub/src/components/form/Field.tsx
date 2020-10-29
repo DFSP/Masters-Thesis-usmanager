@@ -57,8 +57,10 @@ export interface FieldProps<T = string> {
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
     disabled?: boolean;
     hidden?: boolean;
-    map?: { loading: boolean, editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[],
-        valueToMarkers?: (v: T[]) => IMarker[]}
+    map?: {
+        loading: boolean, editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[],
+        valueToMarkers?: (v: T[]) => IMarker[]
+    }
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -265,7 +267,6 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
         formContext.validate(id);
 
     private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
-        console.log(listId, itemId, checked)
         if (checked) {
             formContext.addValue(listId, itemId);
         } else {

@@ -145,7 +145,8 @@ class Navbar extends React.Component<Props, State> {
                                 </li>
                                 <li>
                                     <a className="tooltipped" data-tooltip="DockerHub" data-position="bottom"
-                                       href="https://hub.docker.com/orgs/usmanager" target="_blank" rel="noopener noreferrer">
+                                       href="https://hub.docker.com/orgs/usmanager" target="_blank"
+                                       rel="noopener noreferrer">
                                         <i className="material-icons"><FaDocker/></i>
                                     </a>
                                 </li>

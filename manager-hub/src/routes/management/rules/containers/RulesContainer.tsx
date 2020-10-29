@@ -31,7 +31,7 @@ import RulesContainerList from "./RulesContainerList";
 const RulesContainer: React.FC = () =>
     <MainLayout>
         <AddButton tooltip={{text: 'Add container rule', position: 'left'}}
-                   pathname={'/rules/containers/new_container_rule?new=true'}/>
+                   pathname={'/rules/containers/new_container_rule?new'}/>
         <div className={`${styles.container}`}>
             <RulesContainerList/>
         </div>

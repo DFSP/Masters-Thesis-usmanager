@@ -31,11 +31,7 @@ import {ReduxState} from "../../../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
-import {
-    loadApps,
-    loadSimulatedAppMetricApps,
-    removeSimulatedAppMetricApps,
-} from "../../../../actions";
+import {loadApps, loadSimulatedAppMetricApps, removeSimulatedAppMetricApps,} from "../../../../actions";
 import {IApp} from "../../apps/App";
 import {ISimulatedAppMetric} from "./SimulatedAppMetric";
 
@@ -120,7 +116,7 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
         this.props.simulatedAppMetric?.name === undefined;
 
     private app = (index: number, app: string, separate: boolean, checked: boolean,
-                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
         const isNew = this.isNew();
         const unsaved = this.props.unsavedApps.includes(app);
         return (

@@ -56,7 +56,7 @@ class Services extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 <AddButton tooltip={{text: 'Add service', position: 'left'}}
-                           pathname={'/services/new_service?new=true'}/>
+                           pathname={'/services/new_service?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<IService>
                         isLoading={this.props.isLoading}

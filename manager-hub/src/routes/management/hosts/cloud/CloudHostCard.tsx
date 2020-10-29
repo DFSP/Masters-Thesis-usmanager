@@ -28,9 +28,8 @@ import React from "react";
 import {awsInstanceStates, ICloudHost} from "./CloudHost";
 import BaseComponent from "../../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteData, IReply, postData, putData} from "../../../../utils/api";
+import {deleteData, IReply, putData} from "../../../../utils/api";
 import ActionContextMenuItem from "../../../../components/contextmenu/ActionContextMenuItem";
-import DividerContextMenuItem from "../../../../components/contextmenu/DividerContextMenuItem";
 import {deleteCloudHost, updateCloudHost} from "../../../../actions";
 import {connect} from "react-redux";
 import {normalize} from "normalizr";
@@ -103,12 +102,12 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private stopCloudHost = () => {
-         const cloudHost = this.getCloudHost();
-         const url = `hosts/cloud/${cloudHost.instanceId}/stop`;
-         this.setState({loading: true});
-         putData(url, undefined,
-             (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
-             (reason) => this.onStopFailure(reason, cloudHost));
+        const cloudHost = this.getCloudHost();
+        const url = `hosts/cloud/${cloudHost.instanceId}/stop`;
+        this.setState({loading: true});
+        putData(url, undefined,
+            (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
+            (reason) => this.onStopFailure(reason, cloudHost));
     };
 
     private onStopSuccess = (cloudHost: ICloudHost) => {
@@ -161,14 +160,17 @@ class CloudHostCard extends BaseComponent<Props, State> {
         const cloudHost = this.getCloudHost();
         const menus = [];
         if (cloudHost.state.name === awsInstanceStates.STOPPED.name) {
-            menus.push(<ActionContextMenuItem className='green-text' option='Start' state={cloudHost} onClick={this.startCloudHost}/>);
+            menus.push(<ActionContextMenuItem className='green-text' option='Start' state={cloudHost}
+                                              onClick={this.startCloudHost}/>);
         }
         if (cloudHost.state.name === awsInstanceStates.RUNNING.name) {
-            menus.push(<ActionContextMenuItem className='blue-text' option='Stop' state={cloudHost} onClick={this.stopCloudHost}/>);
+            menus.push(<ActionContextMenuItem className='blue-text' option='Stop' state={cloudHost}
+                                              onClick={this.stopCloudHost}/>);
         }
         if (!cloudHost.state.name.includes(awsInstanceStates.TERMINATED.name)
             && !cloudHost.state.name.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
-            menus.push(<ActionContextMenuItem className='red-text' option='Terminate' state={cloudHost} onClick={this.terminateCloudHost}/>);
+            menus.push(<ActionContextMenuItem className='red-text' option='Terminate' state={cloudHost}
+                                              onClick={this.terminateCloudHost}/>);
         }
         return menus;
     }

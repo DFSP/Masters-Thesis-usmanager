@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Manager hub to visually manage the Microservices Dynamic Management System",
-  "homepage" : "http://usmanager.github.io/manager-hub",
+  "homepage": "http://usmanager.github.io/manager-hub",
   "contributors": [
     {
       "name": "André Carrusca",

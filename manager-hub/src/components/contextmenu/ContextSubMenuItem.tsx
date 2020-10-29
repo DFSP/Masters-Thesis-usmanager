@@ -22,12 +22,8 @@
  * SOFTWARE.
  */
 
-import {ContextMenuTrigger, MenuItem, SubMenu} from "react-contextmenu";
+import {MenuItem, SubMenu} from "react-contextmenu";
 import React from "react";
-import M from "materialize-css";
-import styles from "../list/ControlledList.module.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import ScrollBar from "react-perfect-scrollbar";
 import DividerContextMenuItem from "./DividerContextMenuItem";
 
 interface Props<T, V> {

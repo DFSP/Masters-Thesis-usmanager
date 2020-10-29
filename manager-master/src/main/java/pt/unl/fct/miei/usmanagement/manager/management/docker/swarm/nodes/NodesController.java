@@ -70,17 +70,19 @@ public class NodesController {
 	public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
 		NodeRole role = addNode.getRole();
 		String host = addNode.getHost();
+		List<Coordinates> coordinates = addNode.getCoordinates();
 		List<SimpleNode> nodes = new ArrayList<>();
 		if (host != null) {
 			SimpleNode node = hostsService.addHost(host, role);
 			nodes.add(node);
 		}
-		else {
-			List<Coordinates> coordinates = addNode.getCoordinates();
+		else if (coordinates != null) {
 			for (Coordinates coordinate : coordinates) {
 				SimpleNode node = hostsService.addHost(coordinate, role);
 				nodes.add(node);
 			}
+		} else {
+			throw new BadRequestException("Expected host address or coordinates to start nodes");
 		}
 		return nodes;
 	}

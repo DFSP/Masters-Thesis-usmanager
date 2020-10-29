@@ -49,8 +49,6 @@ import RuleContainerContainersList from "./RuleContainerContainersList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleCondition} from "../conditions/RuleCondition";
-import SimulatedContainerMetricContainerList from "../../metrics/containers/SimulatedContainerMetricContainerList";
 
 export interface IRuleContainer extends IRule {
     containers?: string[]
@@ -117,7 +115,7 @@ class RuleContainer extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 

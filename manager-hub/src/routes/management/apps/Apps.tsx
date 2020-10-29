@@ -56,7 +56,7 @@ class Apps extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 <AddButton tooltip={{text: 'Add app', position: 'left'}}
-                           pathname={'/apps/new_app?new=true'}/>
+                           pathname={'/apps/new_app?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<IApp>
                         isLoading={this.props.isLoading}

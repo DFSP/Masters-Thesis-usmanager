@@ -95,23 +95,23 @@ class SimulatedAppMetricCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardSimulatedAppMetric = Card<ISimulatedAppMetric>();
         return <CardSimulatedAppMetric id={`simulated-app-metric-${simulatedAppMetric.id}`}
-                                             title={simulatedAppMetric.name}
-                                             link={{
-                                                 to: {
-                                                     pathname: `/simulated-metrics/apps/${simulatedAppMetric.name}`,
-                                                     state: simulatedAppMetric
-                                                 }
-                                             }}
-                                             height={'185px'}
-                                             margin={'10px 0'}
-                                             hoverable
-                                             delete={{
-                                                 url: `simulated-metrics/apps/${simulatedAppMetric.name}`,
-                                                 successCallback: this.onDeleteSuccess,
-                                                 failureCallback: this.onDeleteFailure,
-                                             }}
-                                             loading={loading}
-                                             bottomContextMenuItems={this.contextMenu()}>
+                                       title={simulatedAppMetric.name}
+                                       link={{
+                                           to: {
+                                               pathname: `/simulated-metrics/apps/${simulatedAppMetric.name}`,
+                                               state: simulatedAppMetric
+                                           }
+                                       }}
+                                       height={'185px'}
+                                       margin={'10px 0'}
+                                       hoverable
+                                       delete={{
+                                           url: `simulated-metrics/apps/${simulatedAppMetric.name}`,
+                                           successCallback: this.onDeleteSuccess,
+                                           failureCallback: this.onDeleteFailure,
+                                       }}
+                                       loading={loading}
+                                       bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'Field'}
                       label={'Field'}
                       value={`${simulatedAppMetric.field.name}`}/>

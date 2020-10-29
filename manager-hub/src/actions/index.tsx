@@ -1680,7 +1680,7 @@ export function addSimulatedAppMetric(simulatedAppMetric: ISimulatedAppMetric): 
 export const UPDATE_SIMULATED_APP_METRIC = 'UPDATE_SIMULATED_APP_METRIC';
 
 export function updateSimulatedAppMetric(previousSimulatedAppMetric: ISimulatedAppMetric,
-                                               currentSimulatedAppMetric: ISimulatedAppMetric): EntitiesAction {
+                                         currentSimulatedAppMetric: ISimulatedAppMetric): EntitiesAction {
     return {
         type: UPDATE_SIMULATED_APP_METRIC,
         data: {simulatedAppMetrics: [previousSimulatedAppMetric, currentSimulatedAppMetric]}

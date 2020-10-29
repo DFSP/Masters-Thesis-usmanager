@@ -32,48 +32,56 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addWorkerManager, assignWorkerManagerHosts, loadNodes, loadWorkerManagers} from "../../../actions";
+import {addWorkerManager, assignWorkerManagerHosts, loadNodes, loadRegions, loadWorkerManagers} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply, postData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import {IEdgeHost} from "../hosts/edge/EdgeHost";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
 import IDatabaseData from "../../../components/IDatabaseData";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {IContainer} from "../containers/Container";
 import {INode} from "../nodes/Node";
 import AssignedHostsList from "./AssignedHostsList";
-import SshCommand from "../ssh/SshCommand";
-import {ILoadBalancer} from "../loadBalancers/LoadBalancer";
 import {IHostAddress} from "../hosts/Hosts";
+import {IRegion} from "../regions/Region";
 
 export interface IWorkerManager extends IDatabaseData {
     container: IContainer,
     assignedHosts?: string[],
 }
 
-interface INewWorkerManager {
-    hostAddress: IHostAddress | undefined,
+interface INewWorkerManagerRegion {
+    regions: string[] | undefined
 }
 
-const buildNewWorkerManager = (): INewWorkerManager => ({
+interface INewWorkerManagerHost {
+    hostAddress: IHostAddress | undefined
+}
+
+const buildNewWorkerManagerRegion = (): INewWorkerManagerRegion => ({
+    regions: undefined
+});
+
+const buildNewWorkerManagerHost = (): INewWorkerManagerHost => ({
     hostAddress: undefined,
 });
 
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
-    newWorkerManager?: INewWorkerManager;
+    newWorkerManagerRegion?: INewWorkerManagerRegion;
+    newWorkerManagerHost?: INewWorkerManagerHost;
     workerManager?: IWorkerManager;
-    formWorkerManager?: Partial<IWorkerManager> | INewWorkerManager;
+    formWorkerManager?: Partial<IWorkerManager>;
+    regions: { [key: string]: IRegion };
     nodes: { [key: string]: INode };
 }
 
 interface DispatchToProps {
     loadWorkerManagers: (id: string) => void;
     addWorkerManager: (workerManager: IWorkerManager) => void;
+    loadRegions: () => void;
     loadNodes: () => void;
     assignWorkerManagerHosts: (id: string, Hosts: string[]) => void;
 }
@@ -93,22 +101,25 @@ interface State {
     workerManager?: IWorkerManager,
     formWorkerManager?: IWorkerManager,
     unsavedHosts: string[],
+    currentForm: 'On regions' | 'On host',
 }
 
 class WorkerManager extends BaseComponent<Props, State> {
 
     state: State = {
         unsavedHosts: [],
+        currentForm: 'On regions'
     };
     private mounted = false;
 
     public componentDidMount(): void {
         this.loadWorkerManager();
+        this.props.loadRegions();
         this.props.loadNodes();
         this.mounted = true;
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -209,7 +220,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     private onSaveHostsFailure = (workerManager: IWorkerManager, reason: string): void =>
         super.toast(`Unable to save assigned hosts of worker-manager ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`}`, 10000, reason, true);
 
-    private getFields = (workerManager: Partial<IWorkerManager> | INewWorkerManager): IFields =>
+    private getFields = (workerManager: INewWorkerManagerRegion | INewWorkerManagerHost | IWorkerManager): IFields =>
         Object.entries(workerManager).map(([key, value]) => {
             return {
                 [key]: {
@@ -247,22 +258,70 @@ class WorkerManager extends BaseComponent<Props, State> {
     private containerPublicIpAddressField = (container: IContainer) =>
         container.publicIpAddress;
 
+    private formFields = (isNew: boolean, formWorkerManager?: Partial<IWorkerManager>) => {
+        const {currentForm} = this.state;
+        return (
+            isNew ?
+                currentForm === 'On regions'
+                    ?
+                    <Field key={'regions'}
+                           id={'regions'}
+                           label={'regions'}
+                           type={'list'}
+                           value={Object.keys(this.props.regions)}/>
+                    :
+                    <>
+                        <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                                      id={'hostAddress'}
+                                                      label={'hostAddress'}
+                                                      type="dropdown"
+                                                      dropdown={{
+                                                          defaultValue: "Select host address",
+                                                          values: this.getSelectableHosts(),
+                                                          optionToString: this.hostAddressesDropdown,
+                                                          emptyMessage: 'No hosts to select'
+                                                      }}/>
+                    </>
+                : formWorkerManager && Object.entries(formWorkerManager).map((([key, value], index) =>
+                key === 'container'
+                    ? <>
+                        <Field<IContainer> key={index}
+                                           id={key}
+                                           label={key + " id"}
+                                           valueToString={this.containerIdField}
+                                           icon={{linkedTo: `/containers/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
+                        <Field<IContainer>
+                            key={index + 1} // index + 1 is ok unless there are more fields after this one
+                            id={key}
+                            label={"host"}
+                            valueToString={this.containerPublicIpAddressField}/>
+                    </>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>))
+        );
+    };
+
+    private switchForm = (formId: 'On regions' | 'On host') =>
+        this.setState({currentForm: formId});
+
     private workerManager = () => {
-        const {isLoading, error, newWorkerManager} = this.props;
-        const workerManager = this.getWorkerManager();
+        const {isLoading, error, newWorkerManagerRegion, newWorkerManagerHost} = this.props;
+        const {currentForm} = this.state;
+        const isNewWorkerManager = this.isNew();
+        const workerManager = isNewWorkerManager ? (currentForm === 'On regions' ? newWorkerManagerRegion : newWorkerManagerHost) : this.getWorkerManager();
         const formWorkerManager = this.getFormWorkerManager();
         // @ts-ignore
         const workerManagerKey: (keyof IWorkerManager) = workerManager && Object.keys(workerManager)[0];
-        const isNewWorkerManager = this.isNew();
         return (
             <>
                 {!isNewWorkerManager && isLoading && <LoadingSpinner/>}
                 {!isNewWorkerManager && !isLoading && error && <Error message={error}/>}
-                {(isNewWorkerManager || !isLoading) && (isNewWorkerManager || !error) && formWorkerManager && (
+                {(isNewWorkerManager || !isLoading) && (isNewWorkerManager || !error) && workerManager && (
                     /*@ts-ignore*/
                     <Form id={workerManagerKey}
-                          fields={this.getFields(formWorkerManager || {})}
-                          values={workerManager || newWorkerManager || {}}
+                          fields={this.getFields(workerManager)}
+                          values={workerManager}
                           isNew={isNew(this.props.location.search)}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
@@ -273,40 +332,16 @@ class WorkerManager extends BaseComponent<Props, State> {
                           }}
                           delete={{
                               textButton: 'Stop',
-                              url: `worker-managers/${workerManager?.id}`,
+                              url: `worker-managers/${(workerManager as IWorkerManager).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
-                          saveEntities={this.saveEntities}>
-                        {Object.entries(formWorkerManager).map((([key, value], index) =>
-                                key === 'hostAddress'
-                                    ?  <Field<Partial<IHostAddress>> key={'hostAddress'}
-                                                                     id={'hostAddress'}
-                                                                     label={'hostAddress'}
-                                                                     type={'dropdown'}
-                                                                     dropdown={{
-                                                                         defaultValue: "Select host address",
-                                                                         values: this.getSelectableHosts(),
-                                                                         optionToString: this.hostAddressesDropdown,
-                                                                         emptyMessage: 'No hosts available'
-                                                                     }}/>
-                                    : key === 'container'
-                                    ? <>
-                                        <Field<IContainer> key={index}
-                                                           id={key}
-                                                           label={key + " id"}
-                                                           valueToString={this.containerIdField}
-                                                           icon={{linkedTo: `/containers/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
-                                        <Field<IContainer>
-                                            key={index + 1} // index + 1 is ok unless there are more fields after this one
-                                            id={key}
-                                            label={"host"}
-                                            valueToString={this.containerPublicIpAddressField}/>
-                                    </>
-                                    : <Field key={index}
-                                             id={key}
-                                             label={key}/>
-                        ))}
+                          saveEntities={this.saveEntities}
+                          switchDropdown={isNewWorkerManager ? {
+                              options: currentForm === 'On regions' ? ['On host'] : ['On regions'],
+                              onSwitch: this.switchForm
+                          } : undefined}>
+                        {this.formFields(isNewWorkerManager, formWorkerManager)}
                     </Form>
                 )}
             </>
@@ -347,23 +382,25 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.workerManagers.isLoadingWorkerManagers;
     const error = state.entities.workerManagers.loadWorkerManagersError;
     const id = props.match.params.id;
-    const newWorkerManager = isNew(props.location.search) ? buildNewWorkerManager() : undefined;
-    const workerManager = !isNew(props.location.search) ? state.entities.workerManagers.data[id] : undefined;
+    const newWorkerManager = isNew(props.location.search);
+    const newWorkerManagerRegion = newWorkerManager ? buildNewWorkerManagerRegion() : undefined;
+    const newWorkerManagerHost = newWorkerManager ? buildNewWorkerManagerHost() : undefined;
+    const workerManager = !newWorkerManager ? state.entities.workerManagers.data[id] : undefined;
     let formWorkerManager;
-    if (newWorkerManager) {
-        formWorkerManager = {...newWorkerManager};
-    }
     if (workerManager) {
         formWorkerManager = {...workerManager};
         removeFields(formWorkerManager);
     }
+    const regions = state.entities.regions.data;
     const nodes = state.entities.nodes.data;
     return {
         isLoading,
         error,
-        newWorkerManager,
+        newWorkerManagerRegion,
+        newWorkerManagerHost,
         workerManager,
         formWorkerManager,
+        regions,
         nodes
     }
 }
@@ -371,8 +408,9 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
     loadWorkerManagers,
     addWorkerManager,
+    loadRegions,
     loadNodes,
-    assignWorkerManagerHosts
+    assignWorkerManagerHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WorkerManager);

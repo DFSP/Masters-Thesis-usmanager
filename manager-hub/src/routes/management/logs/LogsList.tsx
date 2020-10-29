@@ -53,7 +53,7 @@ class LogsList extends React.Component<Props, {}> {
         this.props.loadLogs();
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         if (this.reloadLogs) {
             clearTimeout(this.reloadLogs);
             this.reloadLogs = null;

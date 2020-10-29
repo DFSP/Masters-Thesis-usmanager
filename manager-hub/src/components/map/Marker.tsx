@@ -48,7 +48,7 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
     if (title) {
         tooltip += title;
         if (titleCoordinates) {
-            tooltip +=  ' (';
+            tooltip += ' (';
         }
     }
     if (titleCoordinates) {
@@ -68,7 +68,7 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
             <text
                 textAnchor="middle"
                 y={size * 3.7}
-                style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3 }}>
+                style={{fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3}}>
                 {label}
             </text>}
         </>

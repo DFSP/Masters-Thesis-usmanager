@@ -85,7 +85,7 @@ class Tabs extends React.Component<Props, State> {
         }
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         window.removeEventListener('resize', this.handleResize);
     }
 

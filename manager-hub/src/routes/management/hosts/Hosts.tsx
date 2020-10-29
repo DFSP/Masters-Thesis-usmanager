@@ -46,8 +46,8 @@ const Hosts = () =>
                        id: 'hosts',
                        title: 'Host type',
                        data: [
-                           {text: 'Cloud', pathname: '/hosts/cloud/new_instance?new=true'},
-                           {text: 'Edge', pathname: '/hosts/edge/add_machine?new=true'}
+                           {text: 'Cloud', pathname: '/hosts/cloud/new_instance?new'},
+                           {text: 'Edge', pathname: '/hosts/edge/add_machine?new'}
                        ],
                    }}/>
         <div className={`${styles.container}`}>

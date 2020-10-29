@@ -30,11 +30,7 @@ import styles from "../../../components/list/ListItem.module.css";
 import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
-import {
-    loadAppSimulatedMetrics,
-    loadSimulatedAppMetrics,
-    removeAppSimulatedMetrics
-} from "../../../actions";
+import {loadAppSimulatedMetrics, loadSimulatedAppMetrics, removeAppSimulatedMetrics} from "../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {ISimulatedAppMetric} from "../metrics/apps/SimulatedAppMetric";

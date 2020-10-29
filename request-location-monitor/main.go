@@ -38,7 +38,7 @@ import (
 
 var port int
 
-func init()  {
+func init() {
 	flag.IntVar(&port, "port", 1919, "Port to bind HTTP listener")
 }
 

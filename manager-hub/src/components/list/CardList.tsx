@@ -51,7 +51,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
         window.addEventListener('resize', this.handleResize);
     }
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         window.removeEventListener('resize', this.handleResize);
     }
 

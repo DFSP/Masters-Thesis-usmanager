@@ -40,7 +40,8 @@ import {
     addEdgeHost,
     addEdgeHostRules,
     addEdgeHostSimulatedMetrics,
-    loadEdgeHosts, loadRegions,
+    loadEdgeHosts,
+    loadRegions,
     updateEdgeHost
 } from "../../../../actions";
 import {connect} from "react-redux";
@@ -133,7 +134,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 

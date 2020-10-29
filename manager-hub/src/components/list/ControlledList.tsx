@@ -155,7 +155,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                 }}>
                                     {dropdown.data.map((data, index) =>
                                         <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                                            <a className={dropdown?.formModal ? 'modal-trigger' : ''} data-target={dropdown.formModal?.id}>
+                                            <a className={dropdown?.formModal ? 'modal-trigger' : ''}
+                                               data-target={dropdown.formModal?.id}>
                                                 {data}
                                             </a>
                                         </li>
@@ -177,14 +178,14 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                         </>
                     )}
                     <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
-                            /*style={!error && Object.values(this.state)
-                                .map(item => item?.isChecked || false)
-                                .some(checked => checked)
-                                ? {transform: "scale(1)"}
-                                : {transform: "scale(0)"}}*/
-                        disabled={!!error || Object.values(this.state)
+                        /*style={!error && Object.values(this.state)
                             .map(item => item?.isChecked || false)
-                            .every(checked => !checked)}
+                            .some(checked => checked)
+                            ? {transform: "scale(1)"}
+                            : {transform: "scale(0)"}}*/
+                            disabled={!!error || Object.values(this.state)
+                                .map(item => item?.isChecked || false)
+                                .every(checked => !checked)}
                             onClick={this.onRemove}>
                         {removeButtonText || 'Remove'}
                     </button>

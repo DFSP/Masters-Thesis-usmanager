@@ -31,7 +31,7 @@ import EurekaServersList from "./EurekaServersList";
 const EurekaServers: React.FC = () =>
     <MainLayout>
         <AddButton tooltip={{text: 'Launch eureka server', position: 'left'}}
-                   pathname={'/eureka-servers/launch?new=true'}/>
+                   pathname={'/eureka-servers/launch?new'}/>
         <div className={`${styles.container}`}>
             <EurekaServersList/>
         </div>

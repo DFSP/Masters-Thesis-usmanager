@@ -47,7 +47,6 @@ import {IReply} from "../../../../utils/api";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IApp} from "../../apps/App";
 
 export interface IRuleCondition extends IDatabaseData {
     name: string;
@@ -113,7 +112,7 @@ class RuleCondition extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 

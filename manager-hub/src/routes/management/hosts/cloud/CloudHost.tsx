@@ -165,7 +165,7 @@ class CloudHost extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
@@ -487,19 +487,19 @@ class CloudHost extends BaseComponent<Props, State> {
                                 : key === 'awsRegion'
                                     ? <Field<IAwsRegion> key='awsRegion' id='awsRegion' type='map'
                                                          map={{
-                                                               editable: false,
-                                                               singleMarker: true,
-                                                               zoomable: true,
-                                                               labeled: true,
-                                                               loading: isLoading,
-                                                               valueToMarkers: (regions: IAwsRegion[]): IMarker[] =>
-                                                                   regions.map(region => ({
-                                                                       title: region.zone + " | " + region.name,
-                                                                       label: formCloudHost?.instanceId,
-                                                                       latitude: region.coordinates.latitude,
-                                                                       longitude: region.coordinates.longitude,
-                                                                   }))
-                                                           }}/>
+                                                             editable: false,
+                                                             singleMarker: true,
+                                                             zoomable: true,
+                                                             labeled: true,
+                                                             loading: isLoading,
+                                                             valueToMarkers: (regions: IAwsRegion[]): IMarker[] =>
+                                                                 regions.map(region => ({
+                                                                     title: region.zone + " | " + region.name,
+                                                                     label: formCloudHost?.instanceId,
+                                                                     latitude: region.coordinates.latitude,
+                                                                     longitude: region.coordinates.longitude,
+                                                                 }))
+                                                         }}/>
                                     : key === 'managedByWorker'
                                         ? <Field<IWorkerManager> key={index}
                                                                  id={key}

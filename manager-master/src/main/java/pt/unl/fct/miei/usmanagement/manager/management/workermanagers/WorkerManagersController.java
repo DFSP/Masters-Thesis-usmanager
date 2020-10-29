@@ -31,10 +31,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/worker-managers")
@@ -57,8 +61,19 @@ public class WorkerManagersController {
 	}
 
 	@PostMapping
-	public WorkerManagerEntity launchWorkerManager(@RequestBody LaunchWorkerManager launchWorkerManager) {
-		return workerManagersService.launchWorkerManager(launchWorkerManager.getHostAddress());
+	public List<WorkerManagerEntity> launchWorkerManagers(@RequestBody LaunchWorkerManager launchWorkerManager) {
+		HostAddress hostAddress = launchWorkerManager.getHostAddress();
+		List<String> regions = launchWorkerManager.getRegions();
+		if (hostAddress != null) {
+			return List.of(workerManagersService.launchWorkerManager(hostAddress));
+		}
+		else if (regions != null) {
+			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
+			return workerManagersService.launchWorkerManagers(regionsList);
+		}
+		else {
+			throw new BadRequestException("Expected host address or regions to start eureka server");
+		}
 	}
 
 	@DeleteMapping("/{workerManagerId}")

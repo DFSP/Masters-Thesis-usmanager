@@ -49,7 +49,6 @@ import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
-import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleService extends IRule {
     services?: string[]
@@ -114,7 +113,7 @@ class RuleService extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 

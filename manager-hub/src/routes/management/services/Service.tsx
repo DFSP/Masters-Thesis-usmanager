@@ -57,7 +57,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
 import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
-import {IApp} from "../apps/App";
 
 export interface IService extends IDatabaseData {
     serviceName: string;
@@ -153,7 +152,7 @@ class Service extends BaseComponent<Props, State> {
         this.mounted = true;
     };
 
-    componentWillUnmount(): void {
+    public componentWillUnmount(): void {
         this.mounted = false;
     }
 
