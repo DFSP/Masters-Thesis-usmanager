@@ -22,44 +22,19 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
+import React from "react";
+import MainLayout from "../../../../views/mainLayout/MainLayout";
+import AddButton from "../../../../components/form/AddButton";
+import styles from './SimulatedAppMetrics.module.css'
+import SimulatedContainerMetricsList from "./SimulatedAppMetricsList";
 
-export interface IRule extends IDatabaseData {
-    name: string;
-    priority: number;
-    generic: boolean;
-    decision: IDecision;
-    conditions: string[];
-}
+const SimulatedAppMetrics: React.FC = () =>
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add simulated app metric', position: 'left'}}
+                   pathname={'/simulated-metrics/apps/add_simulated_metric?new=true'}/>
+        <div className={`${styles.app}`}>
+            <SimulatedAppMetricsList/>
+        </div>
+    </MainLayout>;
 
-export interface IDecision extends IDatabaseData {
-    ruleDecision: string;
-    componentType: IComponentType;
-}
-
-interface IComponentType extends IDatabaseData {
-    type: string;
-}
-
-export const componentTypes = {
-    HOST: {type: "host"},
-    SERVICE: {type: "service"},
-};
-
-export interface IValueMode extends IDatabaseData {
-    name: string;
-}
-
-export interface IField extends IDatabaseData {
-    name: string;
-    query: IPrometheusQuery;
-}
-
-export interface IPrometheusQuery {
-    query: string;
-}
-
-export interface IOperator extends IDatabaseData {
-    operator: string;
-    symbol: string;
-}
+export default SimulatedAppMetrics;

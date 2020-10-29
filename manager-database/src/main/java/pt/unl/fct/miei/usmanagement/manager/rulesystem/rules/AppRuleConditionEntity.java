@@ -24,31 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -56,41 +46,20 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "container_rules")
-public class ContainerRuleEntity {
+@Table(name = "app_rule_conditions")
+public class AppRuleConditionEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@NotNull
-	@Column(unique = true)
-	private String name;
-
-	private int priority;
+	@ManyToOne
+	@JoinColumn(name = "app_rule_id")
+	private AppRuleEntity appRule;
 
 	@ManyToOne
-	@JoinColumn(name = "decision_id")
-	private DecisionEntity decision;
-
-	@Singular
-	@JsonIgnore
-	@ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ContainerEntity> containers;
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleConditionEntity> conditions;
-
-	public void removeAssociations() {
-		Iterator<ContainerEntity> containersIterator = containers.iterator();
-		while (containersIterator.hasNext()) {
-			ContainerEntity container = containersIterator.next();
-			containersIterator.remove();
-			container.getContainerRules().remove(this);
-		}
-	}
+	@JoinColumn(name = "condition_id")
+	private ConditionEntity appCondition;
 
 	@Override
 	public int hashCode() {
@@ -102,10 +71,10 @@ public class ContainerRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ContainerRuleEntity)) {
+		if (!(o instanceof AppRuleConditionEntity)) {
 			return false;
 		}
-		ContainerRuleEntity other = (ContainerRuleEntity) o;
+		AppRuleConditionEntity other = (AppRuleConditionEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 

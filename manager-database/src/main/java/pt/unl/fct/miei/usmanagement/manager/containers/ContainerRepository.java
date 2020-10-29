@@ -43,13 +43,12 @@ public interface ContainerRepository extends JpaRepository<ContainerEntity, Long
 
 	@Query("select r "
 		+ "from ContainerEntity c join c.containerRules r "
-		+ "where r.generic = false and c.containerId = :containerId")
+		+ "where c.containerId = :containerId")
 	List<ContainerRuleEntity> getRules(@Param("containerId") String containerId);
-
 
 	@Query("select r "
 		+ "from ContainerEntity c join c.containerRules r "
-		+ "where r.generic = false and c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
+		+ "where c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
 	List<ContainerRuleEntity> getRule(@Param("containerId") String containerId,
 									  @Param("ruleName") String ruleName);
 
@@ -63,7 +62,6 @@ public interface ContainerRepository extends JpaRepository<ContainerEntity, Long
 		+ "where c.containerId = :containerId and lower(m.name) = lower(:simulatedMetricName)")
 	Optional<ContainerSimulatedMetricEntity> getSimulatedMetric(@Param("containerId") String containerId,
 																@Param("simulatedMetricName") String simulatedMetricName);
-
 
 	@Query("select case when count(c) > 0 then true else false end "
 		+ "from ContainerEntity c "

@@ -31,6 +31,7 @@ import SimulatedHostMetricsList from "./hosts/SimulatedHostMetricsList";
 import SimulatedServiceMetricsList from "./services/SimulatedServiceMetricsList";
 import SimulatedContainerMetricsList from "./containers/SimulatedContainerMetricsList";
 import IDatabaseData from "../../../components/IDatabaseData";
+import SimulatedAppMetricsList from "./apps/SimulatedAppMetricsList";
 
 const SimulatedMetrics = () =>
     <MainLayout>
@@ -40,6 +41,7 @@ const SimulatedMetrics = () =>
                        title: 'Simulated metric',
                        data: [
                            {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new=true'},
+                           {text: 'App', pathname: '/simulated-metrics/apps/new_metric?new=true'},
                            {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new=true'},
                            {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new=true'},
                        ],
@@ -51,6 +53,15 @@ const SimulatedMetrics = () =>
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
                 <SimulatedHostMetricsList/>
+            </Collapsible>
+        </div>
+        <div className={`${styles.app}`}>
+            <Collapsible id={"appsCollapsible"}
+                         title={'Apps'}
+                         active
+                         headerClassname={styles.collapsibleSubtitle}
+                         bodyClassname={styles.collapsibleCardList}>
+                <SimulatedAppMetricsList/>
             </Collapsible>
         </div>
         <div className={`${styles.container}`}>

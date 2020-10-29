@@ -32,12 +32,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -66,6 +73,44 @@ public class AppEntity {
 	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppServiceEntity> appServices;
 
+	@Singular
+	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "app_rule",
+		joinColumns = @JoinColumn(name = "app_id"),
+		inverseJoinColumns = @JoinColumn(name = "rule_id")
+	)
+	private Set<AppRuleEntity> appRules;
+
+	@Singular
+	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name = "app_simulated_metric",
+		joinColumns = @JoinColumn(name = "app_id"),
+		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+	)
+	private Set<AppSimulatedMetricEntity> simulatedAppMetrics;
+
+	public void addRule(AppRuleEntity rule) {
+		appRules.add(rule);
+		rule.getApps().add(this);
+	}
+
+	public void removeRule(AppRuleEntity rule) {
+		appRules.remove(rule);
+		rule.getApps().remove(this);
+	}
+
+	public void addAppSimulatedMetric(AppSimulatedMetricEntity appMetric) {
+		simulatedAppMetrics.add(appMetric);
+		appMetric.getApps().add(this);
+	}
+
+	public void removeAppSimulatedMetric(AppSimulatedMetricEntity appMetric) {
+		simulatedAppMetrics.remove(appMetric);
+		appMetric.getApps().remove(this);
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

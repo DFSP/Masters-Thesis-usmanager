@@ -23,8 +23,8 @@
  */
 
 import {
-    ADD_APP,
-    ADD_APP_SERVICES,
+    ADD_APP, ADD_APP_RULES,
+    ADD_APP_SERVICES, ADD_APP_SIMULATED_METRICS,
     ADD_CLOUD_HOST,
     ADD_CLOUD_HOST_RULE,
     ADD_CLOUD_HOST_SIMULATED_METRICS,
@@ -38,6 +38,9 @@ import {
     ADD_EUREKA_SERVER,
     ADD_LOAD_BALANCER,
     ADD_NODE,
+    ADD_RULE_APP,
+    ADD_RULE_APP_APPS,
+    ADD_RULE_APP_CONDITIONS,
     ADD_RULE_CONTAINER,
     ADD_RULE_CONTAINER_CONDITIONS,
     ADD_RULE_CONTAINER_CONTAINERS,
@@ -54,6 +57,7 @@ import {
     ADD_SERVICE_PREDICTIONS,
     ADD_SERVICE_RULES,
     ADD_SERVICE_SIMULATED_METRICS,
+    ADD_SIMULATED_APP_METRIC, ADD_SIMULATED_APP_METRIC_APPS,
     ADD_SIMULATED_CONTAINER_METRIC,
     ADD_SIMULATED_CONTAINER_METRIC_CONTAINERS,
     ADD_SIMULATED_HOST_METRIC,
@@ -63,10 +67,10 @@ import {
     ADD_SIMULATED_SERVICE_METRIC_SERVICES,
     ADD_WORKER_MANAGER,
     APP_FAILURE,
-    APP_REQUEST,
+    APP_REQUEST, APP_RULES_FAILURE, APP_RULES_REQUEST, APP_RULES_SUCCESS,
     APP_SERVICES_FAILURE,
     APP_SERVICES_REQUEST,
-    APP_SERVICES_SUCCESS,
+    APP_SERVICES_SUCCESS, APP_SIMULATED_METRICS_FAILURE, APP_SIMULATED_METRICS_REQUEST, APP_SIMULATED_METRICS_SUCCESS,
     APP_SUCCESS,
     APPS_FAILURE,
     APPS_REQUEST,
@@ -120,10 +124,12 @@ import {
     DELETE_CONTAINER,
     DELETE_EDGE_HOST,
     DELETE_NODE,
+    DELETE_RULE_APP,
     DELETE_RULE_CONTAINER,
     DELETE_RULE_HOST,
     DELETE_RULE_SERVICE,
     DELETE_SERVICE,
+    DELETE_SIMULATED_APP_METRIC,
     DELETE_SIMULATED_CONTAINER_METRIC,
     DELETE_SIMULATED_HOST_METRIC,
     DELETE_SIMULATED_SERVICE_METRIC,
@@ -172,14 +178,16 @@ import {
     REGION_SUCCESS,
     REGIONS_FAILURE,
     REGIONS_REQUEST,
-    REGIONS_SUCCESS,
-    REMOVE_APP_SERVICES,
+    REGIONS_SUCCESS, REMOVE_APP_RULES,
+    REMOVE_APP_SERVICES, REMOVE_APP_SIMULATED_METRICS,
     REMOVE_CLOUD_HOST_RULES,
     REMOVE_CLOUD_HOST_SIMULATED_METRICS,
     REMOVE_CONTAINER_RULES,
     REMOVE_CONTAINER_SIMULATED_METRICS,
     REMOVE_EDGE_HOST_RULES,
     REMOVE_EDGE_HOST_SIMULATED_METRICS,
+    REMOVE_RULE_APP_APPS,
+    REMOVE_RULE_APP_CONDITIONS,
     REMOVE_RULE_CONTAINER_CONDITIONS,
     REMOVE_RULE_CONTAINER_CONTAINERS,
     REMOVE_RULE_HOST_CLOUD_HOSTS,
@@ -191,11 +199,20 @@ import {
     REMOVE_SERVICE_DEPENDENCIES,
     REMOVE_SERVICE_PREDICTIONS,
     REMOVE_SERVICE_RULES,
-    REMOVE_SERVICE_SIMULATED_METRICS,
+    REMOVE_SERVICE_SIMULATED_METRICS, REMOVE_SIMULATED_APP_METRIC_APPS,
     REMOVE_SIMULATED_CONTAINER_METRIC_CONTAINERS,
     REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
     REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS,
     REMOVE_SIMULATED_SERVICE_METRIC_SERVICES,
+    RULE_APP_APPS_FAILURE,
+    RULE_APP_APPS_REQUEST,
+    RULE_APP_APPS_SUCCESS,
+    RULE_APP_CONDITIONS_FAILURE,
+    RULE_APP_CONDITIONS_REQUEST,
+    RULE_APP_CONDITIONS_SUCCESS,
+    RULE_APP_FAILURE,
+    RULE_APP_REQUEST,
+    RULE_APP_SUCCESS,
     RULE_CONTAINER_CONDITIONS_FAILURE,
     RULE_CONTAINER_CONDITIONS_REQUEST,
     RULE_CONTAINER_CONDITIONS_SUCCESS,
@@ -226,6 +243,9 @@ import {
     RULE_SERVICE_SERVICES_REQUEST,
     RULE_SERVICE_SERVICES_SUCCESS,
     RULE_SERVICE_SUCCESS,
+    RULES_APP_FAILURE,
+    RULES_APP_REQUEST,
+    RULES_APP_SUCCESS,
     RULES_CONTAINER_FAILURE,
     RULES_CONTAINER_REQUEST,
     RULES_CONTAINER_SUCCESS,
@@ -262,6 +282,15 @@ import {
     SERVICES_FAILURE,
     SERVICES_REQUEST,
     SERVICES_SUCCESS,
+    SIMULATED_APP_METRIC_APPS_FAILURE,
+    SIMULATED_APP_METRIC_APPS_REQUEST,
+    SIMULATED_APP_METRIC_APPS_SUCCESS,
+    SIMULATED_APP_METRIC_FAILURE,
+    SIMULATED_APP_METRIC_REQUEST,
+    SIMULATED_APP_METRIC_SUCCESS,
+    SIMULATED_APP_METRICS_FAILURE,
+    SIMULATED_APP_METRICS_REQUEST,
+    SIMULATED_APP_METRICS_SUCCESS,
     SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE,
     SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST,
     SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS,
@@ -298,10 +327,12 @@ import {
     UPDATE_CONDITION,
     UPDATE_EDGE_HOST,
     UPDATE_NODE,
+    UPDATE_RULE_APP,
     UPDATE_RULE_CONTAINER,
     UPDATE_RULE_HOST,
     UPDATE_RULE_SERVICE,
     UPDATE_SERVICE,
+    UPDATE_SIMULATED_APP_METRIC,
     UPDATE_SIMULATED_CONTAINER_METRIC,
     UPDATE_SIMULATED_HOST_METRIC,
     UPDATE_SIMULATED_SERVICE_METRIC,
@@ -343,6 +374,8 @@ import {ILogs} from "../routes/management/logs/ManagementLogs";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
+import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
+import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 
 export type EntitiesState = {
     apps: {
@@ -351,6 +384,10 @@ export type EntitiesState = {
         loadAppsError: string | null,
         isLoadingServices: boolean,
         loadServicesError: string | null,
+        isLoadingRules: boolean,
+        loadRulesError?: string | null,
+        isLoadingSimulatedMetrics: boolean,
+        loadSimulatedMetricsError?: string | null,
     },
     services: {
         data: { [key: string]: IService },
@@ -422,6 +459,15 @@ export type EntitiesState = {
             isLoadingEdgeHosts: boolean,
             loadEdgeHostsError: string | null,
         },
+        apps: {
+            data: { [key: string]: IRuleApp },
+            isLoadingRules: boolean,
+            loadRulesError: string | null,
+            isLoadingConditions: boolean,
+            loadConditionsError: string | null,
+            isLoadingApps: boolean,
+            loadAppsError: string | null,
+        },
         services: {
             data: { [key: string]: IRuleService },
             isLoadingRules: boolean,
@@ -476,6 +522,13 @@ export type EntitiesState = {
             isLoadingEdgeHosts: boolean,
             loadEdgeHostsError: string | null,
         },
+        apps: {
+            data: { [key: string]: ISimulatedAppMetric },
+            isLoadingSimulatedAppMetrics: boolean,
+            loadSimulatedAppMetricsError: string | null,
+            isLoadingApps: boolean,
+            loadAppsError: string | null,
+        }
         services: {
             data: { [key: string]: ISimulatedServiceMetric },
             isLoadingSimulatedServiceMetrics: boolean,
@@ -551,6 +604,7 @@ export type EntitiesAction = {
         nodes?: INode[],
         regions?: IRegion[],
         hostRules?: IRuleHost[],
+        appRules?: IRuleApp[],
         serviceRules?: IRuleService[],
         containerRules?: IRuleContainer[],
         rulesNames?: string[],
@@ -561,6 +615,7 @@ export type EntitiesAction = {
         conditionsNames?: string[],
         decisions?: IDecision[],
         simulatedHostMetrics?: ISimulatedHostMetric[],
+        simulatedAppMetrics?: ISimulatedAppMetric[],
         simulatedServiceMetrics?: ISimulatedServiceMetric[],
         simulatedContainerMetrics?: ISimulatedContainerMetric[],
         simulatedMetricNames?: string[],
@@ -569,8 +624,6 @@ export type EntitiesAction = {
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
-        //scripts?: string[],
-        //cloudRegions?: IAwsRegion[],
     },
 };
 
@@ -581,6 +634,10 @@ const entities = (state: EntitiesState = {
                           loadAppsError: null,
                           isLoadingServices: false,
                           loadServicesError: null,
+                          isLoadingRules: false,
+                          loadRulesError: null,
+                          isLoadingSimulatedMetrics: false,
+                          loadSimulatedMetricsError: null,
                       },
                       services: {
                           data: {},
@@ -652,6 +709,15 @@ const entities = (state: EntitiesState = {
                               isLoadingEdgeHosts: false,
                               loadEdgeHostsError: null,
                           },
+                          apps: {
+                              data: {},
+                              isLoadingRules: false,
+                              loadRulesError: null,
+                              isLoadingConditions: false,
+                              loadConditionsError: null,
+                              isLoadingApps: false,
+                              loadAppsError: null,
+                          },
                           services: {
                               data: {},
                               isLoadingRules: false,
@@ -705,6 +771,13 @@ const entities = (state: EntitiesState = {
                               loadCloudHostsError: null,
                               isLoadingEdgeHosts: false,
                               loadEdgeHostsError: null,
+                          },
+                          apps: {
+                              data: {},
+                              isLoadingSimulatedAppMetrics: false,
+                              loadSimulatedAppMetricsError: null,
+                              isLoadingApps: false,
+                              loadAppsError: null,
                           },
                           services: {
                               data: {},
@@ -869,6 +942,94 @@ const entities = (state: EntitiesState = {
                 });
             }
             break;
+        case APP_RULES_REQUEST:
+            return merge({}, state, {apps: {isLoadingRules: true, loadRulesError: null}});
+        case APP_RULES_FAILURE:
+            return merge({}, state, {apps: {isLoadingRules: false, loadRulesError: error}});
+        case APP_RULES_SUCCESS: {
+            const app = entity && state.apps.data[entity];
+            const rules = {appRules: data?.appRules || []};
+            const appWithRules = Object.assign(app ? app : [entity], rules);
+            const normalizedApp = normalize(appWithRules, Schemas.APP).entities;
+            return merge({}, state, {
+                apps: {
+                    data: normalizedApp.apps,
+                    isLoadingRules: false,
+                    loadRulesError: null
+                }
+            });
+        }
+        case ADD_APP_RULES:
+            if (entity) {
+                const app = state.apps.data[entity];
+                if (data?.rulesNames?.length) {
+                    if (app.appRules) {
+                        app.appRules.unshift(...data.rulesNames);
+                    } else {
+                        app.appRules = data.rulesNames;
+                    }
+                    return merge({}, state, {apps: {data: {[app.name]: {...app}}}});
+                }
+            }
+            break;
+        case REMOVE_APP_RULES:
+            if (entity) {
+                const app = state.apps.data[entity];
+                const filteredRules = app.appRules?.filter(rule => !data?.rulesNames?.includes(rule));
+                const appWithRules = Object.assign(app, {rules: filteredRules});
+                const normalizeApp = normalize(appWithRules, Schemas.APP).entities;
+                return merge({}, state, {
+                    apps: {
+                        ...state.apps,
+                        data: normalizeApp.apps,
+                    }
+                });
+            }
+            break;
+        case APP_SIMULATED_METRICS_REQUEST:
+            return merge({}, state, {apps: {isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null}});
+        case APP_SIMULATED_METRICS_FAILURE:
+            return merge({}, state, {apps: {isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error}});
+        case APP_SIMULATED_METRICS_SUCCESS: {
+            const app = entity && state.apps.data[entity];
+            const simulatedMetrics = {appSimulatedMetrics: data?.simulatedAppMetrics || []};
+            const appWithSimulatedMetrics = Object.assign(app ? app : [entity], simulatedMetrics);
+            const normalizedApp = normalize(appWithSimulatedMetrics, Schemas.APP).entities;
+            return merge({}, state, {
+                apps: {
+                    data: normalizedApp.apps,
+                    isLoadingSimulatedMetrics: false,
+                    loadSimulatedMetricsError: null
+                }
+            });
+        }
+        case ADD_APP_SIMULATED_METRICS:
+            if (entity) {
+                const app = state.apps.data[entity];
+                if (data?.simulatedMetricNames?.length) {
+                    if (app.appSimulatedMetrics) {
+                        app.appSimulatedMetrics.unshift(...data.simulatedMetricNames);
+                    } else {
+                        app.appSimulatedMetrics = data.simulatedMetricNames;
+                    }
+                    return merge({}, state, {apps: {data: {[app.name]: {...app}}}});
+                }
+            }
+            break;
+        case REMOVE_APP_SIMULATED_METRICS:
+            if (entity) {
+                const app = state.apps.data[entity];
+                const filteredSimulatedMetrics = app.appSimulatedMetrics?.filter(simulatedMetric => !data?.simulatedMetricNames?.includes(simulatedMetric));
+                const appWithSimulatedMetrics = Object.assign(app, {appSimulatedMetrics: filteredSimulatedMetrics});
+                const normalizeApp = normalize(appWithSimulatedMetrics, Schemas.APP).entities;
+                return merge({}, state, {
+                    apps: {
+                        ...state.apps,
+                        data: normalizeApp.apps,
+                    }
+                });
+            }
+            break;   
         case SERVICES_REQUEST:
         case SERVICE_REQUEST:
             return merge({}, state, {services: {isLoadingServices: true, loadServicesError: null}});
@@ -2091,6 +2252,192 @@ const entities = (state: EntitiesState = {
                 });
             }
             break;
+        case RULES_APP_REQUEST:
+        case RULE_APP_REQUEST:
+            return merge({}, state, {rules: {apps: {isLoadingRules: true, loadRulesError: null}}});
+        case RULES_APP_FAILURE:
+        case RULE_APP_FAILURE:
+            return merge({}, state, {rules: {apps: {isLoadingRules: false, loadRulesError: error}}});
+        case RULES_APP_SUCCESS:
+            return {
+                ...state,
+                rules: {
+                    ...state.rules,
+                    apps: {
+                        ...state.rules.apps,
+                        data: merge({}, pick(state.rules.apps.data, keys(data?.appRules)), data?.appRules),
+                        isLoadingRules: false,
+                        loadRulesError: null,
+                    }
+                }
+            };
+        case RULE_APP_SUCCESS:
+            return {
+                ...state,
+                rules: {
+                    ...state.rules,
+                    apps: {
+                        ...state.rules.apps,
+                        data: merge({}, state.rules.apps.data, data?.appRules),
+                        isLoadingRules: false,
+                        loadRulesError: null,
+                    }
+                }
+            };
+        case ADD_RULE_APP:
+            if (data?.appRules?.length) {
+                const appRules = normalize(data?.appRules, Schemas.RULE_APP_ARRAY).entities.appRules;
+                return merge({}, state, {
+                    rules: {
+                        apps: {
+                            data: appRules,
+                            isLoadingRules: false,
+                            loadRulesError: null
+                        }
+                    }
+                });
+            }
+            break;
+        case UPDATE_RULE_APP:
+            if (data?.appRules && data.appRules?.length > 1) {
+                const previousAppRule = data.appRules[0];
+                const filteredAppRules = Object.values(state.rules.apps.data)
+                    .filter(appRule => appRule.id !== previousAppRule.id);
+                const currentAppRule = {...previousAppRule, ...data.appRules[1]};
+                filteredAppRules.push(currentAppRule);
+                const appRules = normalize(filteredAppRules, Schemas.RULE_APP_ARRAY).entities.appRules || {};
+                return {
+                    ...state,
+                    rules: {
+                        ...state.rules,
+                        apps: {
+                            ...state.rules.apps,
+                            data: appRules,
+                        }
+                    }
+                }
+            }
+            break;
+        case DELETE_RULE_APP:
+            if (data?.appRules?.length) {
+                const appRulesToDelete = data.appRules[0];
+                const filteredAppRules = Object.values(state.rules.apps.data).filter(appRule => appRule.id !== appRulesToDelete.id);
+                const appRules = normalize(filteredAppRules, Schemas.RULE_APP_ARRAY).entities.appRules || {};
+                return {
+                    ...state,
+                    rules: {
+                        ...state.rules,
+                        apps: {
+                            ...state.rules.apps,
+                            data: appRules,
+                        }
+                    }
+                }
+            }
+            break;
+        case RULE_APP_CONDITIONS_REQUEST:
+            return merge({}, state, {rules: {apps: {isLoadingConditions: true, loadConditionsError: null}}});
+        case RULE_APP_CONDITIONS_FAILURE:
+            return merge({}, state, {rules: {apps: {isLoadingConditions: false, loadConditionsError: error}}});
+        case RULE_APP_CONDITIONS_SUCCESS: {
+            const rule = entity && state.rules.apps.data[entity];
+            const conditions = {conditions: data?.conditions || []};
+            const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+            const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_APP).entities;
+            return merge({}, state, {
+                rules: {
+                    ...state.rules,
+                    apps: {
+                        ...state.rules.apps,
+                        data: normalizedRule.appRules,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
+                    }
+                }
+            });
+        }
+        case ADD_RULE_APP_CONDITIONS:
+            if (entity && data?.conditionsNames?.length) {
+                const rule = state.rules.apps.data[entity];
+                if (rule) {
+                    if (rule.conditions) {
+                        rule.conditions.unshift(...data.conditionsNames);
+                    } else {
+                        rule.conditions = data.conditionsNames;
+                    }
+                    return merge({}, state, {rules: {apps: {data: {[rule.name]: {...rule}}}}});
+                }
+            }
+            break;
+        case REMOVE_RULE_APP_CONDITIONS:
+            if (entity) {
+                const rule = state.rules.apps.data[entity];
+                const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+                const ruleWithConditions = Object.assign(rule, {conditions: filteredConditions});
+                const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_APP).entities;
+                return merge({}, state, {
+                    rules: {
+                        ...state.rules,
+                        apps: {
+                            ...state.rules.apps,
+                            data: normalizeRule.appRules,
+                        }
+                    }
+                });
+            }
+            return state;
+        case RULE_APP_APPS_REQUEST:
+            return merge({}, state, {rules: {apps: {isLoadingApps: true, loadAppsError: null}}});
+        case RULE_APP_APPS_FAILURE:
+            return merge({}, state, {rules: {apps: {isLoadingApps: false, loadAppsError: error}}});
+        case RULE_APP_APPS_SUCCESS: {
+            const rule = entity && state.rules.apps.data[entity];
+            const apps = {apps: data?.apps || []};
+            const ruleWithApps = Object.assign(rule ? rule : [entity], apps);
+            const normalizedRule = normalize(ruleWithApps, Schemas.RULE_APP).entities;
+            return merge({}, state, {
+                rules: {
+                    ...state.rules,
+                    apps: {
+                        ...state.rules.apps,
+                        data: normalizedRule.appRules,
+                        isLoadingApps: false,
+                        loadAppsError: null,
+                    },
+                }
+            });
+        }
+        case ADD_RULE_APP_APPS:
+            if (entity && data?.appsNames?.length) {
+                const rule = state.rules.apps.data[entity];
+                if (rule) {
+                    if (rule.apps) {
+                        rule.apps.unshift(...data.appsNames);
+                    } else {
+                        rule.apps = data?.appsNames;
+                    }
+                    return merge({}, state, {rules: {apps: {data: {[rule.name]: {...rule}}}}});
+                }
+                return state;
+            }
+            break;
+        case REMOVE_RULE_APP_APPS:
+            if (entity) {
+                const rule = state.rules.apps.data[entity];
+                const filteredApps = rule.apps?.filter(app => !data?.appsNames?.includes(app));
+                const ruleWithApps = Object.assign(rule, {apps: filteredApps});
+                const normalizeRule = normalize(ruleWithApps, Schemas.RULE_APP).entities;
+                return merge({}, state, {
+                    rules: {
+                        ...state.rules,
+                        apps: {
+                            ...state.rules.apps,
+                            data: normalizeRule.appRules,
+                        }
+                    }
+                });
+            }
+            break;
         case RULES_SERVICE_REQUEST:
         case RULE_SERVICE_REQUEST:
             return merge({}, state, {rules: {services: {isLoadingRules: true, loadRulesError: null}}});
@@ -2834,6 +3181,169 @@ const entities = (state: EntitiesState = {
                 });
             }
             return state;
+        case SIMULATED_APP_METRICS_REQUEST:
+        case SIMULATED_APP_METRIC_REQUEST:
+            return merge({}, state, {
+                simulatedMetrics: {
+                    apps: {
+                        isLoadingSimulatedAppMetrics: true,
+                        loadSimulatedAppMetricsError: null
+                    }
+                }
+            });
+        case SIMULATED_APP_METRICS_FAILURE:
+        case SIMULATED_APP_METRIC_FAILURE:
+            return merge({}, state, {
+                simulatedMetrics: {
+                    apps: {
+                        isLoadingSimulatedAppMetrics: false,
+                        loadSimulatedAppMetricsError: error
+                    }
+                }
+            });
+        case SIMULATED_APP_METRICS_SUCCESS:
+            return {
+                ...state,
+                simulatedMetrics: {
+                    ...state.simulatedMetrics,
+                    apps: {
+                        ...state.simulatedMetrics.apps,
+                        data: merge({}, pick(state.simulatedMetrics.apps.data, keys(data?.simulatedAppMetrics)), data?.simulatedAppMetrics),
+                        isLoadingSimulatedAppMetrics: false,
+                        loadSimulatedAppMetricsError: null,
+                    }
+                }
+            };
+        case SIMULATED_APP_METRIC_SUCCESS:
+            return {
+                ...state,
+                simulatedMetrics: {
+                    ...state.simulatedMetrics,
+                    apps: {
+                        ...state.simulatedMetrics.apps,
+                        data: merge({}, state.simulatedMetrics.apps.data, data?.simulatedAppMetrics),
+                        isLoadingSimulatedAppMetrics: false,
+                        loadSimulatedAppMetricsError: null,
+                    }
+                }
+            };
+        case ADD_SIMULATED_APP_METRIC:
+            if (data?.simulatedAppMetrics?.length) {
+                const simulatedAppMetrics = normalize(data?.simulatedAppMetrics, Schemas.SIMULATED_APP_METRIC_ARRAY).entities.simulatedAppMetrics;
+                return merge({}, state, {
+                    simulatedMetrics: {
+                        apps: {
+                            data: simulatedAppMetrics,
+                            isLoadingSimulatedAppMetrics: false,
+                            loadSimulatedAppMetricsError: null
+                        }
+                    }
+                });
+            }
+            break;
+        case UPDATE_SIMULATED_APP_METRIC:
+            if (data?.simulatedAppMetrics && data.simulatedAppMetrics?.length > 1) {
+                const previousSimulatedAppMetric = data.simulatedAppMetrics[0];
+                const filteredSimulatedAppMetrics = Object.values(state.simulatedMetrics.apps.data)
+                    .filter(simulatedAppMetric => simulatedAppMetric.id !== previousSimulatedAppMetric.id);
+                const currentSimulatedAppMetric = {...previousSimulatedAppMetric, ...data.simulatedAppMetrics[1]};
+                filteredSimulatedAppMetrics.push(currentSimulatedAppMetric);
+                const simulatedAppMetrics = normalize(filteredSimulatedAppMetrics, Schemas.SIMULATED_APP_METRIC_ARRAY).entities.simulatedAppMetrics || {};
+                return {
+                    ...state,
+                    simulatedMetrics: {
+                        ...state.simulatedMetrics,
+                        apps: {
+                            ...state.simulatedMetrics.apps,
+                            data: simulatedAppMetrics,
+                        }
+                    }
+                }
+            }
+            break;
+        case DELETE_SIMULATED_APP_METRIC:
+            if (data?.simulatedAppMetrics?.length) {
+                const simulatedMetricToDelete = data.simulatedAppMetrics[0];
+                const filteredSimulatedAppMetrics = Object.values(state.simulatedMetrics.apps.data)
+                    .filter(simulatedMetric => simulatedMetric.id !== simulatedMetricToDelete.id);
+                const simulatedAppMetrics = normalize(filteredSimulatedAppMetrics, Schemas.SIMULATED_APP_METRIC_ARRAY).entities.simulatedAppMetrics || {};
+                return {
+                    ...state,
+                    simulatedMetrics: {
+                        ...state.simulatedMetrics,
+                        apps: {
+                            ...state.simulatedMetrics.apps,
+                            data: simulatedAppMetrics,
+                        }
+                    }
+                }
+            }
+            break;
+        case SIMULATED_APP_METRIC_APPS_REQUEST:
+            return merge({}, state, {
+                simulatedMetrics: {
+                    apps: {
+                        isLoadingApps: true,
+                        loadAppsError: null
+                    }
+                }
+            });
+        case SIMULATED_APP_METRIC_APPS_FAILURE:
+            return merge({}, state, {
+                simulatedMetrics: {
+                    apps: {
+                        isLoadingApps: false,
+                        loadAppsError: error
+                    }
+                }
+            });
+        case SIMULATED_APP_METRIC_APPS_SUCCESS: {
+            const simulatedAppMetric = entity && state.simulatedMetrics.apps.data[entity];
+            const apps = {apps: data?.apps || []};
+            const simulatedAppMetricWithApps = Object.assign(simulatedAppMetric ? simulatedAppMetric : [entity], apps);
+            const normalizedSimulatedAppMetric = normalize(simulatedAppMetricWithApps, Schemas.SIMULATED_APP_METRIC).entities;
+            return merge({}, state, {
+                simulatedMetrics: {
+                    ...state.simulatedMetrics,
+                    apps: {
+                        ...state.simulatedMetrics.apps,
+                        data: normalizedSimulatedAppMetric.simulatedAppMetrics,
+                        isLoadingApps: false,
+                        loadAppsError: null,
+                    }
+                }
+            });
+        }
+        case ADD_SIMULATED_APP_METRIC_APPS:
+            if (entity && data?.appsNames?.length) {
+                const simulatedAppMetric = state.simulatedMetrics.apps.data[entity];
+                if (simulatedAppMetric) {
+                    if (simulatedAppMetric.apps) {
+                        simulatedAppMetric.apps.unshift(...data.appsNames);
+                    } else {
+                        simulatedAppMetric.apps = data.appsNames;
+                    }
+                    return merge({}, state, {simulatedMetrics: {apps: {data: {[simulatedAppMetric.name]: {...simulatedAppMetric}}}}});
+                }
+            }
+            break;
+        case REMOVE_SIMULATED_APP_METRIC_APPS:
+            if (entity) {
+                const simulatedAppMetric = state.simulatedMetrics.apps.data[entity];
+                const filteredApps = simulatedAppMetric.apps?.filter(app => !data?.appsNames?.includes(app));
+                const simulatedAppMetricWithApps = Object.assign(simulatedAppMetric, {apps: filteredApps});
+                const normalizeSimulatedAppMetric = normalize(simulatedAppMetricWithApps, Schemas.SIMULATED_APP_METRIC).entities;
+                return merge({}, state, {
+                    simulatedMetrics: {
+                        ...state.simulatedMetrics,
+                        apps: {
+                            ...state.simulatedMetrics.apps,
+                            data: normalizeSimulatedAppMetric.simulatedAppMetrics,
+                        }
+                    }
+                });
+            }
+            return state;    
         case SIMULATED_SERVICE_METRICS_REQUEST:
         case SIMULATED_SERVICE_METRIC_REQUEST:
             return merge({}, state, {

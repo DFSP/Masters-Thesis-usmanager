@@ -1,15 +1,15 @@
 /*
  * MIT License
- *
+ *  
  * Copyright (c) 2020 manager
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.containers;
+package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,95 +33,95 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/rules")
-public class ContainerRulesController {
+@RequestMapping("/rules/services")
+public class ServiceRulesController {
 
-	private final ContainerRulesService containerRulesService;
+	private final ServiceRulesService serviceRulesService;
 
-	public ContainerRulesController(ContainerRulesService containerRulesService) {
-		this.containerRulesService = containerRulesService;
+	public ServiceRulesController(ServiceRulesService serviceRulesService) {
+		this.serviceRulesService = serviceRulesService;
 	}
 
-	@GetMapping("/containers")
-	public List<ContainerRuleEntity> getContainerRules() {
-		return containerRulesService.getRules();
+	@GetMapping
+	public List<ServiceRuleEntity> getRules() {
+		return serviceRulesService.getRules();
 	}
 
-	@GetMapping("/containers/{ruleName}")
-	public ContainerRuleEntity getContainerRule(@PathVariable String ruleName) {
-		return containerRulesService.getRule(ruleName);
+	@GetMapping("/{ruleName}")
+	public ServiceRuleEntity getRule(@PathVariable String ruleName) {
+		return serviceRulesService.getRule(ruleName);
 	}
 
-	@PostMapping("/containers")
-	public ContainerRuleEntity addRule(@RequestBody ContainerRuleEntity rule) {
+	@PostMapping
+	public ServiceRuleEntity addRule(@RequestBody ServiceRuleEntity rule) {
 		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
 		if (decisionComponentType != ComponentType.SERVICE) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
 				ComponentType.SERVICE.name(), decisionComponentType.name());
 		}
 		Validation.validatePostRequest(rule.getId());
-		return containerRulesService.addRule(rule);
+		return serviceRulesService.addRule(rule);
 	}
 
-	@PutMapping("/containers/{ruleName}")
-	public ContainerRuleEntity updateRule(@PathVariable String ruleName, @RequestBody ContainerRuleEntity rule) {
+	@PutMapping("/{ruleName}")
+	public ServiceRuleEntity updateRule(@PathVariable String ruleName, @RequestBody ServiceRuleEntity rule) {
 		Validation.validatePutRequest(rule.getId());
-		return containerRulesService.updateRule(ruleName, rule);
+		return serviceRulesService.updateRule(ruleName, rule);
 	}
 
-	@DeleteMapping("/containers/{ruleName}")
+	@DeleteMapping("/{ruleName}")
 	public void deleteRule(@PathVariable String ruleName) {
-		containerRulesService.deleteRule(ruleName);
+		serviceRulesService.deleteRule(ruleName);
 	}
 
-	@GetMapping("/containers/{ruleName}/conditions")
+	@GetMapping("/{ruleName}/conditions")
 	public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
-		return containerRulesService.getConditions(ruleName);
+		return serviceRulesService.getConditions(ruleName);
 	}
 
-	@PostMapping("/containers/{ruleName}/conditions")
+	@PostMapping("/{ruleName}/conditions")
 	public void addRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditions) {
-		containerRulesService.addConditions(ruleName, conditions);
+		serviceRulesService.addConditions(ruleName, conditions);
 	}
 
-	@DeleteMapping("/containers/{ruleName}/conditions")
+	@DeleteMapping("/{ruleName}/conditions")
 	public void removeRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditionNames) {
-		containerRulesService.removeConditions(ruleName, conditionNames);
+		serviceRulesService.removeConditions(ruleName, conditionNames);
 	}
 
-	@DeleteMapping("/containers/{ruleName}/conditions/{conditionName}")
+	@DeleteMapping("/{ruleName}/conditions/{conditionName}")
 	public void removeRuleCondition(@PathVariable String ruleName, @PathVariable String conditionName) {
-		containerRulesService.removeCondition(ruleName, conditionName);
+		serviceRulesService.removeCondition(ruleName, conditionName);
 	}
 
-	@GetMapping("/containers/{ruleName}/containers")
-	public List<ContainerEntity> getRuleContainers(@PathVariable String ruleName) {
-		return containerRulesService.getContainers(ruleName);
+	@GetMapping("/{ruleName}/services")
+	public List<ServiceEntity> getRuleServices(@PathVariable String ruleName) {
+		return serviceRulesService.getServices(ruleName);
 	}
 
-	@PostMapping("/containers/{ruleName}/containers")
-	public void addRuleContainers(@PathVariable String ruleName, @RequestBody List<String> containers) {
-		containerRulesService.addContainers(ruleName, containers);
+	@PostMapping("/{ruleName}/services")
+	public void addRuleServices(@PathVariable String ruleName, @RequestBody List<String> services) {
+		serviceRulesService.addServices(ruleName, services);
 	}
 
-	@DeleteMapping("/containers/{ruleName}/containers")
-	public void removeRuleContainers(@PathVariable String ruleName, @RequestBody List<String> containers) {
-		containerRulesService.removeContainers(ruleName, containers);
+	@DeleteMapping("/{ruleName}/services")
+	public void removeRuleServices(@PathVariable String ruleName, @RequestBody List<String> services) {
+		serviceRulesService.removeServices(ruleName, services);
 	}
 
-	@DeleteMapping("/containers/{ruleName}/containers/{containerId}")
-	public void removeRuleContainer(@PathVariable String ruleName, @PathVariable String containerId) {
-		containerRulesService.removeContainer(ruleName, containerId);
+	@DeleteMapping("/{ruleName}/services/{serviceName}")
+	public void removeRuleService(@PathVariable String ruleName, @PathVariable String serviceName) {
+		serviceRulesService.removeService(ruleName, serviceName);
 	}
 
 }

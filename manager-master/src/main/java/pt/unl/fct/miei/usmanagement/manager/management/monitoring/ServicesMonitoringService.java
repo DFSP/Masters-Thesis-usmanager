@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
@@ -93,6 +95,7 @@ public class ServicesMonitoringService {
 	private final LocationRequestsService requestLocationMonitoringService;
 	private final DecisionsService decisionsService;
 	private final ServiceMetricsService serviceMetricsService;
+	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 
@@ -110,6 +113,7 @@ public class ServicesMonitoringService {
 									 ServicesEventsService servicesEventsService, HostsService hostsService,
 									 LocationRequestsService requestLocationMonitoringService,
 									 DecisionsService decisionsService, ServiceMetricsService serviceMetricsService,
+									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 									 ContainerProperties containerProperties, MasterManagerProperties masterManagerProperties) {
@@ -123,6 +127,7 @@ public class ServicesMonitoringService {
 		this.requestLocationMonitoringService = requestLocationMonitoringService;
 		this.decisionsService = decisionsService;
 		this.serviceMetricsService = serviceMetricsService;
+		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
 		this.monitorPeriod = containerProperties.getMonitorPeriod();
@@ -263,6 +268,15 @@ public class ServicesMonitoringService {
 				// Metrics from docker
 				Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
 
+				// Simulated app metrics
+				for (AppEntity app : servicesService.getApps(serviceName)) {
+					String appName = app.getName();
+					Map<String, Double> appSimulatedFields = appSimulatedMetricsService.getAppSimulatedMetricByApp(appName)
+						.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+						.collect(Collectors.toMap(metric -> metric.getField().getName(), appSimulatedMetricsService::randomizeFieldValue));
+					stats.putAll(appSimulatedFields);
+				}
+				
 				// Simulated service metrics
 				Map<String, Double> serviceSimulatedFields = serviceSimulatedMetricsService.getServiceSimulatedMetricByService(serviceName)
 					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))

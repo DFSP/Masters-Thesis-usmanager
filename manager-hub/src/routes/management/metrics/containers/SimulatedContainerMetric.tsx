@@ -48,7 +48,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedContainerMetricContainerList from "./SimulatedContainerMetricContainerList";
-import {ILoadBalancer} from "../../loadBalancers/LoadBalancer";
 
 export interface ISimulatedContainerMetric extends IDatabaseData {
     name: string;
@@ -57,7 +56,6 @@ export interface ISimulatedContainerMetric extends IDatabaseData {
     maximumValue: number;
     override: boolean;
     active: boolean;
-    /*generic: boolean;*/
     containers?: string[];
 }
 
@@ -68,7 +66,6 @@ const buildNewSimulatedContainerMetric = (): Partial<ISimulatedContainerMetric> 
     maximumValue: undefined,
     active: true,
     override: undefined,
-    /*generic: undefined,*/
 });
 
 interface StateToProps {
@@ -103,14 +100,12 @@ interface State {
     simulatedContainerMetric?: ISimulatedContainerMetric,
     formSimulatedContainerMetric?: ISimulatedContainerMetric,
     unsavedContainers: string[],
-    /*isGeneric: boolean,*/
 }
 
 class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     state: State = {
         unsavedContainers: [],
-        /*isGeneric: this.props.simulatedContainerMetric?.generic || false,*/
     };
     private mounted = false;
 
@@ -260,9 +255,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     private fieldOption = (field: IField): string =>
         field.name;
 
-    /*private isGenericSelected = (generic: boolean) =>
-        this.setState({isGeneric: generic});*/
-
     private simulatedContainerMetric = () => {
         const {isLoading, error} = this.props;
         const simulatedContainerMetric = this.getSimulatedContainerMetric();
@@ -327,16 +319,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                           defaultValue: "Active?",
                                                           values: [true, false]
                                                       }}/>
-                                /*: key === 'generic'
-                                    ? <Field<boolean> key={index}
-                                                      id={key}
-                                                      label={key}
-                                                      type="dropdown"
-                                                      dropdown={{
-                                                          selectCallback: this.isGenericSelected,
-                                                          defaultValue: "Apply to all containers?",
-                                                          values: [true, false]
-                                                      }}/>*/
                                     : key === 'minimumValue' || key === 'maximumValue'
                                         ? <Field key={index}
                                                  id={key}
@@ -371,7 +353,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
-            /*disabled: this.state.isGeneric,*/
             active: this.props.location.state?.selected === 'containers'
         },
     ];

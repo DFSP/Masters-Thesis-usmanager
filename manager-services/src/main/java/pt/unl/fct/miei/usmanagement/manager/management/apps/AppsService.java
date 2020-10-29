@@ -28,9 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppRepository;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
@@ -38,7 +35,14 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -50,11 +54,18 @@ import java.util.stream.Collectors;
 public class AppsService {
 
 	private final ServicesService servicesService;
+	private final AppRulesService appRulesService;
+	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ContainersService containersService;
+
 	private final AppRepository apps;
 
-	public AppsService(ServicesService servicesService, ContainersService containersService, AppRepository apps) {
+	public AppsService(ServicesService servicesService, AppRulesService appRulesService,
+					   AppSimulatedMetricsService appSimulatedMetricsService, ContainersService containersService,
+					   AppRepository apps) {
 		this.servicesService = servicesService;
+		this.appRulesService = appRulesService;
+		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.containersService = containersService;
 		this.apps = apps;
 	}
@@ -135,6 +146,65 @@ public class AppsService {
 			.map(ServiceOrder::getService)
 			.collect(Collectors.toList());
 		return containersService.launchApp(services, coordinates);
+	}
+
+	public List<AppRuleEntity> getRules(String appId) {
+		checkAppExists(appId);
+		return apps.getRules(appId);
+	}
+
+	public void addRule(String appId, String ruleName) {
+		checkAppExists(appId);
+		appRulesService.addApp(ruleName, appId);
+	}
+
+	public void addRules(String appId, List<String> ruleNames) {
+		checkAppExists(appId);
+		ruleNames.forEach(rule -> appRulesService.addApp(rule, appId));
+	}
+
+	public void removeRule(String appId, String ruleName) {
+		checkAppExists(appId);
+		appRulesService.removeApp(ruleName, appId);
+	}
+
+	public void removeRules(String appId, List<String> ruleNames) {
+		checkAppExists(appId);
+		ruleNames.forEach(rule -> appRulesService.removeApp(rule, appId));
+	}
+
+	public List<AppSimulatedMetricEntity> getSimulatedMetrics(String appId) {
+		checkAppExists(appId);
+		return apps.getSimulatedMetrics(appId);
+	}
+
+	public AppSimulatedMetricEntity getSimulatedMetric(String appId, String simulatedMetricName) {
+		checkAppExists(appId);
+		return apps.getSimulatedMetric(appId, simulatedMetricName).orElseThrow(() ->
+			new EntityNotFoundException(AppSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+		);
+	}
+
+	public void addSimulatedMetric(String appId, String simulatedMetricName) {
+		checkAppExists(appId);
+		appSimulatedMetricsService.addApp(simulatedMetricName, appId);
+	}
+
+	public void addSimulatedMetrics(String appId, List<String> simulatedMetricNames) {
+		checkAppExists(appId);
+		simulatedMetricNames.forEach(simulatedMetric ->
+			appSimulatedMetricsService.addApp(simulatedMetric, appId));
+	}
+
+	public void removeSimulatedMetric(String appId, String simulatedMetricName) {
+		checkAppExists(appId);
+		appSimulatedMetricsService.removeApp(simulatedMetricName, appId);
+	}
+
+	public void removeSimulatedMetrics(String appId, List<String> simulatedMetricNames) {
+		checkAppExists(appId);
+		simulatedMetricNames.forEach(simulatedMetric ->
+			appSimulatedMetricsService.removeApp(simulatedMetric, appId));
 	}
 
 	private void checkAppExists(String appName) {

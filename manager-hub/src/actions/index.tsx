@@ -43,6 +43,8 @@ import {IRuleContainer} from "../routes/management/rules/containers/RuleContaine
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 import {IComponent} from "../containers/Root.dev";
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
+import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
+import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -127,6 +129,74 @@ export function removeAppServices(appName: string, serviceNames: string[]): Enti
         type: REMOVE_APP_SERVICES,
         entity: appName,
         data: {serviceNames: serviceNames}
+    }
+}
+
+export const APP_RULES_REQUEST = 'APP_RULES_REQUEST';
+export const APP_RULES_SUCCESS = 'APP_RULES_SUCCESS';
+export const APP_RULES_FAILURE = 'APP_RULES_FAILURE';
+export const loadAppRules = (name: string) => (dispatch: any) => {
+    return dispatch(fetchAppRules(name));
+};
+const fetchAppRules = (name: string) => ({
+    [CALL_API]: {
+        types: [APP_RULES_REQUEST, APP_RULES_SUCCESS, APP_RULES_FAILURE],
+        endpoint: `apps/${name}/rules`,
+        schema: Schemas.APP_RULE_ARRAY,
+        entity: name
+    }
+});
+export const ADD_APP_RULES = 'ADD_APP_RULES';
+
+export function addAppRules(name: string, rules: string[]): EntitiesAction {
+    return {
+        type: ADD_APP_RULES,
+        entity: name,
+        data: {rulesNames: rules}
+    }
+}
+
+export const REMOVE_APP_RULES = 'REMOVE_APP_RULES';
+
+export function removeAppRules(name: string, rules: string[]): EntitiesAction {
+    return {
+        type: REMOVE_APP_RULES,
+        entity: name,
+        data: {rulesNames: rules}
+    }
+}
+
+export const APP_SIMULATED_METRICS_REQUEST = 'APP_SIMULATED_METRICS_REQUEST';
+export const APP_SIMULATED_METRICS_SUCCESS = 'APP_SIMULATED_METRICS_SUCCESS';
+export const APP_SIMULATED_METRICS_FAILURE = 'APP_SIMULATED_METRICS_FAILURE';
+export const loadAppSimulatedMetrics = (name: string) => (dispatch: any) => {
+    return dispatch(fetchAppSimulatedMetrics(name));
+};
+const fetchAppSimulatedMetrics = (name: string) => ({
+    [CALL_API]: {
+        types: [APP_SIMULATED_METRICS_REQUEST, APP_SIMULATED_METRICS_SUCCESS, APP_SIMULATED_METRICS_FAILURE],
+        endpoint: `apps/${name}/simulated-metrics`,
+        schema: Schemas.APP_SIMULATED_METRIC_ARRAY,
+        entity: name
+    }
+});
+export const ADD_APP_SIMULATED_METRICS = 'ADD_APP_SIMULATED_METRICS';
+
+export function addAppSimulatedMetrics(name: string, simulatedMetrics: string[]): EntitiesAction {
+    return {
+        type: ADD_APP_SIMULATED_METRICS,
+        entity: name,
+        data: {simulatedMetricNames: simulatedMetrics}
+    }
+}
+
+export const REMOVE_APP_SIMULATED_METRICS = 'REMOVE_APP_SIMULATED_METRICS';
+
+export function removeAppSimulatedMetrics(name: string, simulatedMetrics: string[]): EntitiesAction {
+    return {
+        type: REMOVE_APP_SIMULATED_METRICS,
+        entity: name,
+        data: {simulatedMetricNames: simulatedMetrics}
     }
 }
 
@@ -969,6 +1039,126 @@ export function removeRuleHostEdgeHosts(ruleName: string, edgeHosts: string[]): 
     }
 }
 
+export const RULES_APP_REQUEST = 'RULES_APP_REQUEST';
+export const RULES_APP_SUCCESS = 'RULES_APP_SUCCESS';
+export const RULES_APP_FAILURE = 'RULES_APP_FAILURE';
+export const RULE_APP_REQUEST = 'RULE_APP_REQUEST';
+export const RULE_APP_SUCCESS = 'RULE_APP_SUCCESS';
+export const RULE_APP_FAILURE = 'RULE_APP_FAILURE';
+export const loadRulesApp = (name?: string) => (dispatch: any) => {
+    return dispatch(fetchRulesApp(name));
+};
+const fetchRulesApp = (name?: string) => ({
+    [CALL_API]:
+        !name
+            ? {
+                types: [RULES_APP_REQUEST, RULES_APP_SUCCESS, RULES_APP_FAILURE],
+                endpoint: `rules/apps`,
+                schema: Schemas.RULE_APP_ARRAY,
+                entity: 'rules'
+            }
+            : {
+                types: [RULE_APP_REQUEST, RULE_APP_SUCCESS, RULE_APP_FAILURE],
+                endpoint: `rules/apps/${name}`,
+                schema: Schemas.RULE_APP,
+                entity: 'rules'
+            }
+});
+export const ADD_RULE_APP = 'ADD_RULE_APP';
+
+export function addRuleApp(ruleApp: IRuleApp): EntitiesAction {
+    return {
+        type: ADD_RULE_APP,
+        data: {appRules: new Array(ruleApp)}
+    }
+}
+
+export const UPDATE_RULE_APP = 'UPDATE_RULE_APP';
+
+export function updateRuleApp(previousRuleApp: IRuleApp, currentRuleApp: IRuleApp): EntitiesAction {
+    return {
+        type: UPDATE_RULE_APP,
+        data: {appRules: [previousRuleApp, currentRuleApp]}
+    }
+}
+
+export const DELETE_RULE_APP = 'DELETE_RULE_APP';
+
+export function deleteAppRule(appRule: IRuleApp): EntitiesAction {
+    return {
+        type: DELETE_RULE_APP,
+        data: {appRules: [appRule]}
+    }
+}
+
+export const RULE_APP_CONDITIONS_REQUEST = 'RULE_APP_CONDITIONS_REQUEST';
+export const RULE_APP_CONDITIONS_SUCCESS = 'RULE_APP_CONDITIONS_SUCCESS';
+export const RULE_APP_CONDITIONS_FAILURE = 'RULE_APP_CONDITIONS_FAILURE';
+export const loadRuleAppConditions = (ruleName: string) => (dispatch: any) => {
+    return dispatch(fetchRuleAppConditions(ruleName));
+};
+const fetchRuleAppConditions = (ruleName: string) => ({
+    [CALL_API]: {
+        types: [RULE_APP_CONDITIONS_REQUEST, RULE_APP_CONDITIONS_SUCCESS, RULE_APP_CONDITIONS_FAILURE],
+        endpoint: `rules/apps/${ruleName}/conditions`,
+        schema: Schemas.RULE_CONDITION_ARRAY,
+        entity: ruleName
+    }
+});
+export const ADD_RULE_APP_CONDITIONS = 'ADD_RULE_APP_CONDITIONS';
+
+export function addRuleAppConditions(ruleName: string, conditions: string[]): EntitiesAction {
+    return {
+        type: ADD_RULE_APP_CONDITIONS,
+        entity: ruleName,
+        data: {conditionsNames: conditions}
+    }
+}
+
+export const REMOVE_RULE_APP_CONDITIONS = 'REMOVE_RULE_APP_CONDITIONS';
+
+export function removeRuleAppConditions(ruleName: string, conditions: string[]): EntitiesAction {
+    return {
+        type: REMOVE_RULE_APP_CONDITIONS,
+        entity: ruleName,
+        data: {conditionsNames: conditions}
+    }
+}
+
+export const RULE_APP_APPS_REQUEST = 'RULE_APP_APPS_REQUEST';
+export const RULE_APP_APPS_SUCCESS = 'RULE_APP_APPS_SUCCESS';
+export const RULE_APP_APPS_FAILURE = 'RULE_APP_APPS_FAILURE';
+export const loadRuleApps = (ruleName: string) => (dispatch: any) => {
+    return dispatch(fetchRuleAppApps(ruleName));
+};
+const fetchRuleAppApps = (ruleName: string) => ({
+    [CALL_API]: {
+        types: [RULE_APP_APPS_REQUEST, RULE_APP_APPS_SUCCESS, RULE_APP_APPS_FAILURE],
+        endpoint: `rules/apps/${ruleName}/apps`,
+        schema: Schemas.RULE_CONDITION_ARRAY,
+        entity: ruleName
+    }
+});
+export const ADD_RULE_APP_APPS = 'ADD_RULE_APP_APPS';
+
+export function addRuleApps(ruleName: string, apps: string[]): EntitiesAction {
+    return {
+        type: ADD_RULE_APP_APPS,
+        entity: ruleName,
+        data: {appsNames: apps}
+    }
+}
+
+export const REMOVE_RULE_APP_APPS = 'REMOVE_RULE_APP_APPS';
+
+export function removeRuleApps(ruleName: string, apps: string[]): EntitiesAction {
+    return {
+        type: REMOVE_RULE_APP_APPS,
+        entity: ruleName,
+        data: {appsNames: apps}
+    }
+}
+
 export const RULES_SERVICE_REQUEST = 'RULES_SERVICE_REQUEST';
 export const RULES_SERVICE_SUCCESS = 'RULES_SERVICE_SUCCESS';
 export const RULES_SERVICE_FAILURE = 'RULES_SERVICE_FAILURE';
@@ -1450,6 +1640,93 @@ export function removeSimulatedHostMetricEdgeHosts(simulatedHostMetricName: stri
         type: REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS,
         entity: simulatedHostMetricName,
         data: {edgeHostsHostname: edgeHosts}
+    }
+}
+
+export const SIMULATED_APP_METRICS_REQUEST = 'SIMULATED_APP_METRICS_REQUEST';
+export const SIMULATED_APP_METRIC_REQUEST = 'SIMULATED_APP_METRIC_REQUEST';
+export const SIMULATED_APP_METRICS_SUCCESS = 'SIMULATED_APP_METRICS_SUCCESS';
+export const SIMULATED_APP_METRIC_SUCCESS = 'SIMULATED_APP_METRIC_SUCCESS';
+export const SIMULATED_APP_METRICS_FAILURE = 'SIMULATED_APP_METRICS_FAILURE';
+export const SIMULATED_APP_METRIC_FAILURE = 'SIMULATED_APP_METRIC_FAILURE';
+export const loadSimulatedAppMetrics = (name?: string) => (dispatch: any) => {
+    return dispatch(fetchSimulatedAppMetrics(name));
+};
+const fetchSimulatedAppMetrics = (name?: string) => ({
+    [CALL_API]:
+        !name
+            ? {
+                types: [SIMULATED_APP_METRICS_REQUEST, SIMULATED_APP_METRICS_SUCCESS, SIMULATED_APP_METRICS_FAILURE],
+                endpoint: `simulated-metrics/apps`,
+                schema: Schemas.SIMULATED_APP_METRIC_ARRAY,
+                entity: 'simulatedAppMetrics'
+            }
+            : {
+                types: [SIMULATED_APP_METRIC_REQUEST, SIMULATED_APP_METRIC_SUCCESS, SIMULATED_APP_METRIC_FAILURE],
+                endpoint: `simulated-metrics/apps/${name}`,
+                schema: Schemas.SIMULATED_APP_METRIC,
+                entity: 'simulatedAppMetrics'
+            }
+});
+export const ADD_SIMULATED_APP_METRIC = 'ADD_SIMULATED_APP_METRIC';
+
+export function addSimulatedAppMetric(simulatedAppMetric: ISimulatedAppMetric): EntitiesAction {
+    return {
+        type: ADD_SIMULATED_APP_METRIC,
+        data: {simulatedAppMetrics: new Array(simulatedAppMetric)}
+    }
+}
+
+export const UPDATE_SIMULATED_APP_METRIC = 'UPDATE_SIMULATED_APP_METRIC';
+
+export function updateSimulatedAppMetric(previousSimulatedAppMetric: ISimulatedAppMetric,
+                                               currentSimulatedAppMetric: ISimulatedAppMetric): EntitiesAction {
+    return {
+        type: UPDATE_SIMULATED_APP_METRIC,
+        data: {simulatedAppMetrics: [previousSimulatedAppMetric, currentSimulatedAppMetric]}
+    }
+}
+
+export const DELETE_SIMULATED_APP_METRIC = 'DELETE_SIMULATED_APP_METRIC';
+
+export function deleteSimulatedAppMetric(simulatedAppMetric: ISimulatedAppMetric): EntitiesAction {
+    return {
+        type: DELETE_SIMULATED_APP_METRIC,
+        data: {simulatedAppMetrics: [simulatedAppMetric]}
+    }
+}
+
+export const SIMULATED_APP_METRIC_APPS_REQUEST = 'SIMULATED_APP_METRIC_APPS_REQUEST';
+export const SIMULATED_APP_METRIC_APPS_SUCCESS = 'SIMULATED_APP_METRIC_APPS_SUCCESS';
+export const SIMULATED_APP_METRIC_APPS_FAILURE = 'SIMULATED_APP_METRIC_APPS_FAILURE';
+export const loadSimulatedAppMetricApps = (simulatedAppMetricName: string) => (dispatch: any) => {
+    return dispatch(fetchSimulatedAppMetricApps(simulatedAppMetricName));
+};
+const fetchSimulatedAppMetricApps = (simulatedAppMetricName: string) => ({
+    [CALL_API]: {
+        types: [SIMULATED_APP_METRIC_APPS_REQUEST, SIMULATED_APP_METRIC_APPS_SUCCESS, SIMULATED_APP_METRIC_APPS_FAILURE],
+        endpoint: `simulated-metrics/apps/${simulatedAppMetricName}/apps`,
+        schema: Schemas.APP_ARRAY,
+        entity: simulatedAppMetricName
+    }
+});
+export const ADD_SIMULATED_APP_METRIC_APPS = 'ADD_SIMULATED_APP_METRIC_APPS';
+
+export function addSimulatedAppMetricApps(simulatedAppMetricName: string, apps: string[]): EntitiesAction {
+    return {
+        type: ADD_SIMULATED_APP_METRIC_APPS,
+        entity: simulatedAppMetricName,
+        data: {appsNames: apps}
+    }
+}
+
+export const REMOVE_SIMULATED_APP_METRIC_APPS = 'REMOVE_SIMULATED_APP_METRIC_APPS';
+
+export function removeSimulatedAppMetricApps(simulatedAppMetricName: string, apps: string[]): EntitiesAction {
+    return {
+        type: REMOVE_SIMULATED_APP_METRIC_APPS,
+        entity: simulatedAppMetricName,
+        data: {appsNames: apps}
     }
 }
 

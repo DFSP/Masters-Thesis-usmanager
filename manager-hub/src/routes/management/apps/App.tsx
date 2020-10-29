@@ -33,7 +33,15 @@ import React from "react";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addApp, addAppServices, loadApps, loadRegions, updateApp} from "../../../actions";
+import {
+    addApp,
+    addAppRules,
+    addAppServices,
+    addAppSimulatedMetrics,
+    loadApps,
+    loadRegions,
+    updateApp
+} from "../../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {IReply, postData} from "../../../utils/api";
@@ -45,12 +53,17 @@ import {IRegion} from "../region/Region";
 import formStyles from "../../../components/form/Form.module.css";
 import {IContainer} from "../containers/Container";
 import LaunchAppDialog from "./LaunchAppDialog";
-import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
+import GenericServiceRuleList from "../services/GenericServiceRuleList";
+import GenericSimulatedServiceMetricList from "../services/GenericSimulatedServiceMetricList";
+import AppRuleList from "./AppRuleList";
+import AppSimulatedMetricList from "./AppSimulatedMetricList";
 
 export interface IApp extends IDatabaseData {
     name: string;
     services?: { [key: string]: IAppService }
+    appRules?: string[];
+    appSimulatedMetrics?: string[];
 }
 
 const buildNewApp = (): Partial<IApp> => ({
@@ -75,6 +88,8 @@ interface DispatchToProps {
     addApp: (app: IApp) => void;
     updateApp: (previousApp: IApp, currentApp: IApp) => void;
     addAppServices: (appName: string, appServices: IAddAppService[]) => void;
+    addAppRules: (name: string, rules: string[]) => void;
+    addAppSimulatedMetrics: (name: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -83,7 +98,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IApp,
-    selected: 'app' | 'services';
+    selected: 'app' | 'services' | 'rules' | 'genericServiceRules' | 'simulatedMetrics' | 'genericSimulatedMetrics';
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -91,15 +106,19 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 interface State {
     app?: IApp,
     formApp?: IApp,
-    unsavedServices: IAddAppService[],
     loading: IFormLoading,
+    unsavedServices: IAddAppService[],
+    unsavedRules: string[],
+    unsavedSimulatedMetrics: string[],
 }
 
 class App extends BaseComponent<Props, State> {
 
     state: State = {
-        unsavedServices: [],
         loading: undefined,
+        unsavedServices: [],
+        unsavedRules: [],
+        unsavedSimulatedMetrics: [],
     };
     private mounted = false;
 
@@ -182,10 +201,14 @@ class App extends BaseComponent<Props, State> {
         super.toast(`Unable to delete app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
-        !!this.state.unsavedServices.length;
+        !!this.state.unsavedServices.length
+        || !!this.state.unsavedRules.length
+        || !!this.state.unsavedSimulatedMetrics.length;
 
     private saveEntities = (app: IApp) => {
         this.saveAppServices(app);
+        this.saveAppRules(app);
+        this.saveAppSimulatedMetrics(app);
     };
 
     private addAppService = (service: IAddAppService): void => {
@@ -219,6 +242,67 @@ class App extends BaseComponent<Props, State> {
     private onSaveServicesFailure = (app: IApp, reason: string): void =>
         super.toast(`Unable to save services of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
+    private addAppRule = (rule: string): void => {
+        this.setState({
+            unsavedRules: this.state.unsavedRules.concat(rule)
+        });
+    };
+
+    private removeAppRules = (rules: string[]): void => {
+        this.setState({
+            unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
+        });
+    };
+
+    private saveAppRules = (app: IApp): void => {
+        const {unsavedRules} = this.state;
+        if (unsavedRules.length) {
+            postData(`apps/${app.name}/rules`, unsavedRules,
+                () => this.onSaveRulesSuccess(app),
+                (reason) => this.onSaveRulesFailure(app, reason));
+        }
+    };
+
+    private onSaveRulesSuccess = (app: IApp): void => {
+        this.props.addAppRules(app.name, this.state.unsavedRules);
+        if (this.mounted) {
+            this.setState({unsavedRules: []});
+        }
+    };
+
+    private onSaveRulesFailure = (app: IApp, reason: string): void =>
+        super.toast(`Unable to save rules of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+
+    private addAppSimulatedMetric = (simulatedMetric: string): void => {
+        this.setState({
+            unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+        });
+    };
+
+    private removeAppSimulatedMetrics = (simulatedMetrics: string[]): void => {
+        this.setState({
+            unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+        });
+    };
+
+    private saveAppSimulatedMetrics = (app: IApp): void => {
+        const {unsavedSimulatedMetrics} = this.state;
+        if (unsavedSimulatedMetrics.length) {
+            postData(`apps/${app.name}/simulated-metrics`, unsavedSimulatedMetrics,
+                () => this.onSaveSimulatedMetricsSuccess(app),
+                (reason) => this.onSaveSimulatedMetricsFailure(app, reason));
+        }
+    };
+
+    private onSaveSimulatedMetricsSuccess = (app: IApp): void => {
+        this.props.addAppSimulatedMetrics(app.name, this.state.unsavedSimulatedMetrics);
+        if (this.mounted) {
+            this.setState({unsavedSimulatedMetrics: []});
+        }
+    };
+
+    private onSaveSimulatedMetricsFailure = (app: IApp, reason: string): void =>
+        super.toast(`Unable to save simulated metrics of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private launchButton = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -348,6 +432,28 @@ class App extends BaseComponent<Props, State> {
                          onAddAppService={this.addAppService}
                          onRemoveAppServices={this.removeAppServices}/>;
 
+    private rules = (): JSX.Element =>
+        <AppRuleList isLoadingApp={this.props.isLoading}
+                     loadAppError={!this.isNew() ? this.props.error : undefined}
+                     app={this.getApp()}
+                     unsavedRules={this.state.unsavedRules}
+                     onAddAppRule={this.addAppRule}
+                     onRemoveAppRules={this.removeAppRules}/>;
+
+    private genericRules = (): JSX.Element =>
+        <GenericServiceRuleList/>;
+
+    private simulatedMetrics = (): JSX.Element =>
+        <AppSimulatedMetricList isLoadingApp={this.props.isLoading}
+                                loadAppError={!this.isNew() ? this.props.error : undefined}
+                                app={this.getApp()}
+                                unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                onAddSimulatedAppMetric={this.addAppSimulatedMetric}
+                                onRemoveSimulatedAppMetrics={this.removeAppSimulatedMetrics}/>;
+
+    private genericSimulatedMetrics = (): JSX.Element =>
+        <GenericSimulatedServiceMetricList/>;
+
     private tabs = (): Tab[] => [
         {
             title: 'App',
@@ -361,6 +467,24 @@ class App extends BaseComponent<Props, State> {
             content: () => this.services(),
             active: this.props.location.state?.selected === 'services',
         },
+        {
+            title: 'Generic rules',
+            id: 'genericAppRules',
+            content: () => this.genericRules(),
+            active: this.props.location.state?.selected === 'genericServiceRules'
+        },
+        {
+            title: 'Simulated metrics',
+            id: 'simulatedMetrics',
+            content: () => this.simulatedMetrics(),
+            active: this.props.location.state?.selected === 'simulatedMetrics'
+        },
+        {
+            title: 'Generic simulated metrics',
+            id: 'genericSimulatedMetrics',
+            content: () => this.genericSimulatedMetrics(),
+            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
+        }
     ];
 
 }
@@ -368,6 +492,8 @@ class App extends BaseComponent<Props, State> {
 function removeFields(app: Partial<IApp>) {
     delete app["id"];
     delete app["services"];
+    delete app["appRules"];
+    delete app["appSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -394,7 +520,9 @@ const mapDispatchToProps: DispatchToProps = {
     loadRegions,
     addApp,
     updateApp,
-    addAppServices
+    addAppServices,
+    addAppRules,
+    addAppSimulatedMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

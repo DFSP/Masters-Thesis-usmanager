@@ -31,6 +31,7 @@ import RulesHostList from "./hosts/RulesHostList";
 import RulesServiceList from "./services/RulesServiceList";
 import RuleConditionsList from "./conditions/RuleConditionsList";
 import RulesContainerList from "./containers/RulesContainerList";
+import RulesAppList from "./apps/RulesAppList";
 
 const Rules = () =>
     <MainLayout>
@@ -41,6 +42,7 @@ const Rules = () =>
                        data: [
                            {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
                            {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new=true'},
+                           {text: 'App rule', pathname: '/rules/apps/new_app_rule?new=true'},
                            {text: 'Service rule', pathname: '/rules/services/new_service_rule?new=true'},
                            {text: 'Container rule', pathname: '/rules/containers/new_container_rule?new=true'},
                        ],
@@ -61,6 +63,15 @@ const Rules = () =>
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
                 <RulesHostList/>
+            </Collapsible>
+        </div>
+        <div className={`${styles.collapsibleContainer}`}>
+            <Collapsible id={"rulesAppCollapsible"}
+                         title={'Apps'}
+                         active
+                         headerClassname={styles.collapsibleSubtitle}
+                         bodyClassname={styles.collapsibleCardList}>
+                <RulesAppList/>
             </Collapsible>
         </div>
         <div className={`${styles.collapsibleContainer}`}>

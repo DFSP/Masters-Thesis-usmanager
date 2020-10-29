@@ -22,44 +22,12 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
-export interface IRule extends IDatabaseData {
-    name: string;
-    priority: number;
-    generic: boolean;
-    decision: IDecision;
-    conditions: string[];
-}
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-export interface IDecision extends IDatabaseData {
-    ruleDecision: string;
-    componentType: IComponentType;
-}
+@Repository
+public interface AppRuleConditionRepository extends JpaRepository<AppRuleConditionEntity, Long> {
 
-interface IComponentType extends IDatabaseData {
-    type: string;
-}
-
-export const componentTypes = {
-    HOST: {type: "host"},
-    SERVICE: {type: "service"},
-};
-
-export interface IValueMode extends IDatabaseData {
-    name: string;
-}
-
-export interface IField extends IDatabaseData {
-    name: string;
-    query: IPrometheusQuery;
-}
-
-export interface IPrometheusQuery {
-    query: string;
-}
-
-export interface IOperator extends IDatabaseData {
-    operator: string;
-    symbol: string;
 }

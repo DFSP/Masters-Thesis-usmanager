@@ -191,6 +191,7 @@ public class ServiceEntity {
 		serviceMetric.getServices().remove(this);
 	}
 
+	@JsonIgnore
 	public boolean hasLaunchCommand() {
 		return launchCommand != null && !launchCommand.isBlank();
 	}

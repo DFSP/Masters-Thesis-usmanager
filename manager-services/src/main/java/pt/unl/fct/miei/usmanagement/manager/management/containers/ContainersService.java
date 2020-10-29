@@ -72,17 +72,17 @@ public class ContainersService {
 	private final ContainerRulesService containerRulesService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 	private final DockerApiProxyService dockerApiProxyService;
+	private final WorkerManagersService workerManagersService;
 
 	private final ContainerRepository containers;
-	private final WorkerManagersService workerManagersService;
 
 	private Timer syncDatabaseContainersTimer;
 
 	public ContainersService(DockerContainersService dockerContainersService,
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-							 DockerApiProxyService dockerApiProxyService, ContainerRepository containers,
-							 WorkerManagersService workerManagersService) {
+							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
+							 ContainerRepository containers) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;

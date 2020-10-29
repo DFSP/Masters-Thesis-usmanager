@@ -36,6 +36,10 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.Arrays;
@@ -105,6 +109,46 @@ public class AppsController {
 	@PostMapping("/{appName}/launch")
 	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
 		return appsService.launch(appName, coordinates);
+	}
+
+	@GetMapping("/{appId}/rules")
+	public List<AppRuleEntity> addAppRule(@PathVariable String appId) {
+		return appsService.getRules(appId);
+	}
+
+	@PostMapping("/{appId}/rules")
+	public void addAppRules(@PathVariable String appId, @RequestBody String[] rules) {
+		appsService.addRules(appId, Arrays.asList(rules));
+	}
+
+	@DeleteMapping("/{appId}/rules")
+	public void removeAppRules(@PathVariable String appId, @RequestBody String[] rules) {
+		appsService.removeRules(appId, Arrays.asList(rules));
+	}
+
+	@DeleteMapping("/{appId}/rules/{ruleName}")
+	public void removeAppRule(@PathVariable String appId, @PathVariable String ruleName) {
+		appsService.removeRule(appId, ruleName);
+	}
+
+	@GetMapping("/{appId}/simulated-metrics")
+	public List<AppSimulatedMetricEntity> getAppSimulatedMetrics(@PathVariable String appId) {
+		return appsService.getSimulatedMetrics(appId);
+	}
+
+	@PostMapping("/{appId}/simulated-metrics")
+	public void addAppSimulatedMetrics(@PathVariable String appId, @RequestBody String[] simulatedMetrics) {
+		appsService.addSimulatedMetrics(appId, Arrays.asList(simulatedMetrics));
+	}
+
+	@DeleteMapping("/{appId}/simulated-metrics")
+	public void removeAppSimulatedMetrics(@PathVariable String appId, @RequestBody String[] simulatedMetrics) {
+		appsService.removeSimulatedMetrics(appId, Arrays.asList(simulatedMetrics));
+	}
+
+	@DeleteMapping("/{appId}/simulated-metrics/{simulatedMetricName}")
+	public void removeAppSimulatedMetric(@PathVariable String appId, @PathVariable String simulatedMetricName) {
+		appsService.removeSimulatedMetric(appId, simulatedMetricName);
 	}
 
 }

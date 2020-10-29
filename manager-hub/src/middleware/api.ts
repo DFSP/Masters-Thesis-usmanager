@@ -49,6 +49,8 @@ import {ISimulatedServiceMetric} from "../routes/management/metrics/services/Sim
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
+import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
+import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -76,6 +78,10 @@ interface ISchemas {
     APP_ARRAY: schema.Entity<IApp>[];
     APP_SERVICE: schema.Entity<IAppService>;
     APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
+    APP_RULE: schema.Entity<IRuleApp>;
+    APP_RULE_ARRAY: schema.Entity<IRuleApp>[];
+    APP_SIMULATED_METRIC: schema.Entity<ISimulatedAppMetric>;
+    APP_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedAppMetric>[];
     SERVICE: schema.Entity<IService>;
     SERVICE_ARRAY: schema.Entity<IService>[];
     SERVICE_APP: schema.Entity<IApp>;
@@ -92,6 +98,7 @@ interface ISchemas {
     SERVICE_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
+    CONTAINER_RULE: schema.Entity<IRuleContainer>;
     CONTAINER_RULE_ARRAY: schema.Entity<IRuleService>[];
     CONTAINER_SIMULATED_METRIC: schema.Entity<ISimulatedContainerMetric>;
     CONTAINER_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
@@ -113,6 +120,8 @@ interface ISchemas {
     REGION_ARRAY: schema.Entity<IRegion>[];
     RULE_HOST: schema.Entity<IRuleHost>;
     RULE_HOST_ARRAY: schema.Entity<IRuleHost>[];
+    RULE_APP: schema.Entity<IRuleApp>;
+    RULE_APP_ARRAY: schema.Entity<IRuleApp>[];
     RULE_SERVICE: schema.Entity<IRuleService>;
     RULE_SERVICE_ARRAY: schema.Entity<IRuleService>[];
     RULE_CONTAINER: schema.Entity<IRuleContainer>;
@@ -126,6 +135,8 @@ interface ISchemas {
     DECISION_ARRAY: schema.Entity<IDecision>[];
     SIMULATED_HOST_METRIC: schema.Entity<ISimulatedHostMetric>;
     SIMULATED_HOST_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
+    SIMULATED_APP_METRIC: schema.Entity<ISimulatedAppMetric>;
+    SIMULATED_APP_METRIC_ARRAY: schema.Entity<ISimulatedAppMetric>[];
     SIMULATED_SERVICE_METRIC: schema.Entity<ISimulatedServiceMetric>;
     SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
     SIMULATED_CONTAINER_METRIC: schema.Entity<ISimulatedContainerMetric>;
@@ -178,10 +189,6 @@ const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', und
 });
 const cloudHosts = new schema.Array(cloudHost);
 
-/*const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
-    idAttribute: (state: IState) => state.name
-});*/
-
 const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
     idAttribute: (host: IEdgeHost) => host.publicIpAddress
 });
@@ -199,6 +206,11 @@ const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefi
     idAttribute: (hostRule: IRuleHost) => hostRule.name
 });
 const hostRules = new schema.Array(ruleHost);
+
+const ruleApp: schema.Entity<IRuleApp> = new schema.Entity('appRules', undefined, {
+    idAttribute: (appRule: IRuleApp) => appRule.name
+});
+const appRules = new schema.Array(ruleApp);
 
 const ruleService: schema.Entity<IRuleService> = new schema.Entity('serviceRules', undefined, {
     idAttribute: (serviceRule: IRuleService) => serviceRule.name
@@ -239,6 +251,11 @@ const simulatedHostMetric: schema.Entity<ISimulatedHostMetric> = new schema.Enti
 });
 const hostSimulatedMetrics = new schema.Array(simulatedHostMetric);
 
+const simulatedAppMetric: schema.Entity<ISimulatedAppMetric> = new schema.Entity('simulatedAppMetrics', undefined, {
+    idAttribute: (simulatedAppMetric: ISimulatedAppMetric) => simulatedAppMetric.name
+});
+const appSimulatedMetrics = new schema.Array(simulatedAppMetric);
+
 const simulatedServiceMetric: schema.Entity<ISimulatedServiceMetric> = new schema.Entity('simulatedServiceMetrics', undefined, {
     idAttribute: (simulatedServiceMetric: ISimulatedServiceMetric) => simulatedServiceMetric.name
 });
@@ -265,16 +282,18 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
 
-app.define({appServices});
+app.define({appServices, appRules, appSimulatedMetrics});
 service.define({apps, dependencies, dependents, serviceRules, serviceSimulatedMetrics});
 container.define({containerRules, containerSimulatedMetrics});
-cloudHost.define({hostRules, hostSimulatedMetrics, /*state*/});
+cloudHost.define({hostRules, hostSimulatedMetrics});
 edgeHost.define({hostRules, hostSimulatedMetrics});
 ruleHost.define({conditions, edgeHosts, cloudHosts});
+ruleApp.define({conditions, apps});
 ruleService.define({conditions, services});
 ruleContainer.define({conditions, containers});
 condition.define({valueModes, fields, operators});
 simulatedHostMetric.define({edgeHosts, cloudHosts});
+simulatedAppMetric.define({apps});
 simulatedServiceMetric.define({services});
 simulatedContainerMetric.define({containers});
 
@@ -283,6 +302,10 @@ export const Schemas: ISchemas = {
     APP_ARRAY: [app],
     APP_SERVICE: appService,
     APP_SERVICE_ARRAY: [appService],
+    APP_RULE: ruleApp,
+    APP_RULE_ARRAY: [ruleApp],
+    APP_SIMULATED_METRIC: simulatedAppMetric,
+    APP_SIMULATED_METRIC_ARRAY: [simulatedAppMetric],
     SERVICE: service,
     SERVICE_ARRAY: [service],
     SERVICE_APP: app,
@@ -299,6 +322,7 @@ export const Schemas: ISchemas = {
     SERVICE_SIMULATED_METRIC_ARRAY: [simulatedServiceMetric],
     CONTAINER: container,
     CONTAINER_ARRAY: [container],
+    CONTAINER_RULE: ruleContainer,
     CONTAINER_RULE_ARRAY: [ruleContainer],
     CONTAINER_SIMULATED_METRIC: simulatedContainerMetric,
     CONTAINER_SIMULATED_METRIC_ARRAY: [simulatedContainerMetric],
@@ -320,6 +344,8 @@ export const Schemas: ISchemas = {
     REGION_ARRAY: [region],
     RULE_HOST: ruleHost,
     RULE_HOST_ARRAY: [ruleHost],
+    RULE_APP: ruleApp,
+    RULE_APP_ARRAY: [ruleApp],
     RULE_SERVICE: ruleService,
     RULE_SERVICE_ARRAY: [ruleService],
     RULE_CONTAINER: ruleContainer,
@@ -333,6 +359,8 @@ export const Schemas: ISchemas = {
     DECISION_ARRAY: [decision],
     SIMULATED_HOST_METRIC: simulatedHostMetric,
     SIMULATED_HOST_METRIC_ARRAY: [simulatedHostMetric],
+    SIMULATED_APP_METRIC: simulatedAppMetric,
+    SIMULATED_APP_METRIC_ARRAY: [simulatedAppMetric],
     SIMULATED_SERVICE_METRIC: simulatedServiceMetric,
     SIMULATED_SERVICE_METRIC_ARRAY: [simulatedServiceMetric],
     SIMULATED_CONTAINER_METRIC: simulatedContainerMetric,

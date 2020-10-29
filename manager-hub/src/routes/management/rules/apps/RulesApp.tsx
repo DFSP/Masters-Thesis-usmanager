@@ -22,44 +22,19 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
+import React from "react";
+import MainLayout from "../../../../views/mainLayout/MainLayout";
+import AddButton from "../../../../components/form/AddButton";
+import styles from './RulesApp.module.css';
+import RulesAppList from "./RulesAppList";
 
-export interface IRule extends IDatabaseData {
-    name: string;
-    priority: number;
-    generic: boolean;
-    decision: IDecision;
-    conditions: string[];
-}
+const RulesApp: React.FC = () =>
+    <MainLayout>
+        <AddButton tooltip={{text: 'Add app rule', position: 'left'}}
+                   pathname={'/rules/apps/new_app_rule?new=true'}/>
+        <div className={`${styles.app}`}>
+            <RulesAppList/>
+        </div>
+    </MainLayout>;
 
-export interface IDecision extends IDatabaseData {
-    ruleDecision: string;
-    componentType: IComponentType;
-}
-
-interface IComponentType extends IDatabaseData {
-    type: string;
-}
-
-export const componentTypes = {
-    HOST: {type: "host"},
-    SERVICE: {type: "service"},
-};
-
-export interface IValueMode extends IDatabaseData {
-    name: string;
-}
-
-export interface IField extends IDatabaseData {
-    name: string;
-    query: IPrometheusQuery;
-}
-
-export interface IPrometheusQuery {
-    query: string;
-}
-
-export interface IOperator extends IDatabaseData {
-    operator: string;
-    symbol: string;
-}
+export default RulesApp;

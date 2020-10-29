@@ -32,8 +32,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -56,8 +56,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "container_rules")
-public class ContainerRuleEntity {
+@Table(name = "app_rules")
+public class AppRuleEntity {
 
 	@Id
 	@GeneratedValue
@@ -69,26 +69,26 @@ public class ContainerRuleEntity {
 
 	private int priority;
 
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<AppEntity> apps;
+
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private DecisionEntity decision;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ContainerEntity> containers;
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleConditionEntity> conditions;
+	@OneToMany(mappedBy = "appRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AppRuleConditionEntity> conditions;
 
 	public void removeAssociations() {
-		Iterator<ContainerEntity> containersIterator = containers.iterator();
-		while (containersIterator.hasNext()) {
-			ContainerEntity container = containersIterator.next();
-			containersIterator.remove();
-			container.getContainerRules().remove(this);
+		Iterator<AppEntity> appsIterator = apps.iterator();
+		while (appsIterator.hasNext()) {
+			AppEntity app = appsIterator.next();
+			appsIterator.remove();
+			app.getAppRules().remove(this);
 		}
 	}
 
@@ -102,10 +102,10 @@ public class ContainerRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ContainerRuleEntity)) {
+		if (!(o instanceof AppRuleEntity)) {
 			return false;
 		}
-		ContainerRuleEntity other = (ContainerRuleEntity) o;
+		AppRuleEntity other = (AppRuleEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 

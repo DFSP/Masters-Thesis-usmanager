@@ -301,11 +301,11 @@ public class DockerContainersService {
 			containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 			containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 			containerLabels.put(ContainerConstants.Label.SERVICE_REGION, new Gson().toJson(region));
-			containerLabels.putAll(labels);
 			if (containerType == ContainerType.SINGLETON) {
 				containerLabels.put(ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
 				containerLabels.put(ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false));
 			}
+			containerLabels.putAll(labels);
 
 			log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
 					+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
