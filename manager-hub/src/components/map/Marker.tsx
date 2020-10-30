@@ -64,11 +64,12 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
                     onMouseEnter={() => setTooltipContent(tooltip)}
                     onMouseLeave={() => setTooltipContent("")}
                     onClick={onRemove}/>
+            <circle r={size} stroke="black" strokeWidth="1" fill="none" />
             {label &&
             <text
                 textAnchor="middle"
                 y={size * 3.7}
-                style={{fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3}}>
+                style={{fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3, pointerEvents: "none"}}>
                 {label}
             </text>}
         </>

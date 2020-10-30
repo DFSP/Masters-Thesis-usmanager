@@ -155,7 +155,7 @@ public class SshService {
 			return executeCommand(session, hostAddress, command);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed to execute command {} on host {}: {}", command, hostAddress.toSimpleString(), e.getMessage());
 			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}

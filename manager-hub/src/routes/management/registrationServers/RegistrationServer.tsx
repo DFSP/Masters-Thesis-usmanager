@@ -144,7 +144,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
     private onPostSuccess = (reply: IReply<IRegistrationServer[]>): void => {
         const registrationServers = reply.data;
         registrationServers.forEach(registrationServer => {
-            super.toast(`<span class="green-text">Registration server ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`} launched</span>`);
+            super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
             this.props.addRegistrationServer(registrationServer);
         });
         if (this.mounted) {

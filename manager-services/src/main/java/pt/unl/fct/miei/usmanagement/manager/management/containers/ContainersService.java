@@ -199,37 +199,37 @@ public class ContainersService {
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, List<String> environment) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, environment);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, labels);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, labels);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
@@ -237,7 +237,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
@@ -245,7 +245,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
@@ -253,7 +253,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
@@ -262,7 +262,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, String internalPort,
@@ -270,7 +270,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, internalPort,
 			externalPort);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, String internalPort,
@@ -278,7 +278,7 @@ public class ContainersService {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			internalPort, externalPort);
 		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Container of service %s crashed on startup", serviceName));
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
 	public ContainerEntity replicateContainer(String id, HostAddress toHostAddress) {

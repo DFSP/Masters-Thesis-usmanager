@@ -39,6 +39,7 @@ export interface ICoordinates {
 interface Props {
     onSelect?: (marker: IMarker) => void;
     onDeselect?: (marker: IMarker) => void;
+    onClear?: () => void;
     locations: IMarker[],
     marker?: { color?: string, size?: number, labeled?: boolean },
     hover?: boolean,
@@ -68,6 +69,10 @@ export default class LocationMap extends React.Component<Props, State> {
         }
     }
 
+    public componentDidMount() {
+        M.AutoInit();
+    }
+
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         if (prevProps.zoomable !== this.props.zoomable) {
             this.resizeMarkers({coordinates: [0, 0], zoom: 1});
@@ -86,6 +91,26 @@ export default class LocationMap extends React.Component<Props, State> {
     private center = () =>
         this.props.center === undefined ? this.state.center : this.props.center && this.state.center;
 
+    private buttons = (tooltipPosition: string) => (
+        <>
+            <button className={`btn-floating btn-flat right tooltipped`}
+                    data-position={tooltipPosition}
+                    data-tooltip={'Center'}
+                    onClick={this.handleCenter}
+                    type='button'>
+                <i className="material-icons">center_focus_weak</i>;
+            </button>
+            {this.props.onClear &&
+            <button className={`btn-floating btn-flat right tooltipped`}
+                    data-position={tooltipPosition}
+                    data-tooltip={'Clear'}
+                    onClick={this.props.onClear}
+                    type='button'>
+                <i className="material-icons">clear_all</i>;
+            </button>}
+        </>
+    );
+
     public render() {
         const {onSelect, onDeselect, locations, marker, hover, clickHighlight, zoomable, position, resizable} = this.props;
         const {tooltip, markerSize} = this.state;
@@ -95,7 +120,7 @@ export default class LocationMap extends React.Component<Props, State> {
                             title={location.title} label={marker?.labeled ? location.label : undefined}
                             titleCoordinates={location.titleCoordinates === undefined ? true : location.titleCoordinates}
                             location={[location.longitude, location.latitude]}
-                            color={location.color || marker?.color || "#2196F3"} size={markerSize}
+                            color={location.color || marker?.color || "red"} size={markerSize}
                             onRemove={() => {
                                 this.setTooltip("");
                                 onDeselect?.({
@@ -106,14 +131,6 @@ export default class LocationMap extends React.Component<Props, State> {
                                 });
                             }}/>
         }));
-        const centerButton =
-            <button className={`btn-floating btn-flat right tooltipped ${styles.centerButton}`}
-                    data-position={'bottom'}
-                    data-tooltip={'Center'}
-                    onClick={this.handleCenter}
-                    type='button'>
-                <i className="material-icons">center_focus_weak</i>;
-            </button>;
         const map = <>
             <MapChart setTooltipContent={this.setTooltip} onClick={onSelect} markers={markers} hover={hover}
                       clickHighlight={clickHighlight} zoomable={zoomable} position={position} center={this.center()}
@@ -126,19 +143,19 @@ export default class LocationMap extends React.Component<Props, State> {
             {resizable &&
             <>
                 <button className={`modal-trigger btn-floating btn-flat right tooltipped`}
-                        data-position={'bottom'}
+                        data-position={'top'}
                         data-tooltip={'Fullscreen'}
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className="material-icons">fullscreen</i>
                 </button>
-                {centerButton}
+                {this.buttons('top')}
                 <Dialog id={'fullscreen-modal'}
                         title={'Location'}
                         fullscreen
                         locked
                         footer={false}
-                        titleButtons={centerButton}>
+                        titleButtons={this.buttons('bottom')}>
                     {map}
                 </Dialog>
             </>}

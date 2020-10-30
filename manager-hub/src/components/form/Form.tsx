@@ -122,6 +122,7 @@ export interface IFormContext {
     setValue: (id: keyof IValues, value: any, validate?: boolean) => void;
     addValue: (id: keyof IValues, value: any) => void;
     removeValue: (id: keyof IValues, value: any) => void;
+    removeValuesExcept: (id: keyof IValues, value: any[]) => void;
     validate: (id: keyof IValues) => void;
 }
 
@@ -280,6 +281,7 @@ class Form extends BaseComponent<Props, State> {
             setValue: this.setValue,
             addValue: this.addValue,
             removeValue: this.removeValue,
+            removeValuesExcept: this.removeValuesExcept,
             validate: this.validate,
         };
         const {saveRequired, loading} = this.state;
@@ -606,6 +608,19 @@ class Form extends BaseComponent<Props, State> {
         this.setState(state => {
             let values = state.values[id] ? [...state.values[id], value] : [value];
             return {values: {...state.values, [id]: values}}
+        });
+    }
+
+    private removeValuesExcept = (id: keyof IValues, values?: any[]) => {
+        this.setState(state => {
+            let newValues: undefined | any[] = undefined;
+            if (values && Array.isArray(state.values[id])) {
+                newValues = state.values[id]?.filter((v: any) => values.includes(v))
+                if (!newValues?.length) {
+                    newValues = undefined;
+                }
+            }
+            return {values: {...state.values, [id]: newValues}};
         });
     }
 

@@ -209,6 +209,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                     : <LocationMap
                                         onSelect={(map?.editable && formContext.isEditing) ? this.onSelectCoordinates(id, formContext) : undefined}
                                         onDeselect={(map?.editable && formContext.isEditing) ? this.onDeselectCoordinates(id, formContext) : undefined}
+                                        onClear={(map?.editable && formContext.isEditing) ? this.onClearCoordinates(id, formContext) : undefined}
                                         locations={this.getMapFieldMarkers(formContext.values[id], map?.markers, map?.valueToMarkers)}
                                         marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
                                         zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
@@ -284,6 +285,9 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     private onDeselectCoordinates = (id: string, formContext: any) => (marker: IMarker): void =>
         formContext.removeValue(id, marker);
+
+    private onClearCoordinates = (id: string, formContext: any) => (): void =>
+        formContext.removeValuesExcept(id, this.props.map?.markers);
 
     private getDateStringFromTimestamp = (value: number) => {
         const date = new Date(value * 1000);
