@@ -68,13 +68,14 @@ public class DockerApiProxyService {
 		String externalPort = dockerApiProxy.getDefaultExternalPort();
 		String internalPort = dockerApiProxy.getDefaultInternalPort();
 		String dockerRepository = dockerApiProxy.getDockerRepository();
+		Gson gson = new Gson();
 		String command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
 				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
 				+ "docker pull %s && "
 				+ "docker run -itd --name=%s -p %s:%s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%b -l %s=%b %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s=%b -l %s=%b %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, internalPort,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
@@ -85,7 +86,8 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,
 			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
 			ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
-			ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()),
+			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
+			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
 			ContainerConstants.Label.IS_STOPPABLE, false,
 			ContainerConstants.Label.IS_REPLICABLE, false,
 			dockerRepository);

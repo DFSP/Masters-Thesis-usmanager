@@ -246,6 +246,9 @@ class ContainerCard extends BaseComponent<Props, State> {
             <CardItem key={'ports'}
                       label={'Ports'}
                       value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={`${container.region.name}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
                       value={`(${container.coordinates.latitude.toFixed(3)}, ${container.coordinates.longitude.toFixed(3)})`}/>

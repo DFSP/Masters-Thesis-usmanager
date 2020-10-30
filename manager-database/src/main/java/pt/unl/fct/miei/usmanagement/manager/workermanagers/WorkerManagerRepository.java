@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,4 +56,5 @@ public interface WorkerManagerRepository extends JpaRepository<WorkerManagerEnti
 		+ "where w.id = :id")
 	List<EdgeHostEntity> getEdgeHosts(@Param("id") String id);
 
+	Optional<WorkerManagerEntity> getByContainer_Region(Region region);
 }

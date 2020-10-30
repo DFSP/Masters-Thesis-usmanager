@@ -360,7 +360,7 @@ class EdgeHost extends BaseComponent<Props, State> {
                                                   label={key}
                                                   valueToString={this.regionOption}
                                                   dropdown={{
-                                                      defaultValue: "Select awsRegion",
+                                                      defaultValue: "Select region",
                                                       emptyMessage: "No regions to select",
                                                       values: Object.values(this.props.regions),
                                                       optionToString: this.regionOption

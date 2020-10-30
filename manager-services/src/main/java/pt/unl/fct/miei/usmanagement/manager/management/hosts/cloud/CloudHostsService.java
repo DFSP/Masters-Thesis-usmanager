@@ -53,6 +53,7 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -166,16 +167,16 @@ public class CloudHostsService {
 
 	public CloudHostEntity launchInstance(Coordinates coordinates) {
 		log.info("Looking for the best aws region to start a cloud instance close to {}", coordinates);
-		List<AwsRegion> regions = AwsRegion.getAwsRegions();
-		regions.sort((oneRegion, anotherRegion) -> {
+		List<AwsRegion> awsRegions = AwsRegion.getAwsRegions();
+		awsRegions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
 			return Double.compare(oneDistance, anotherDistance);
 		});
-		AwsRegion region = regions.get(0);
-		log.info("{} {} is the closest aws region with a distance of {} km", region.getZone(), region.getName(),
-			(int) region.getCoordinates().distanceTo(coordinates) / 1000);
-		return launchInstance(region);
+		AwsRegion awsRegion = awsRegions.get(0);
+		log.info("{} {} is the closest aws region with a distance of {} km", awsRegion.getZone(), awsRegion.getName(),
+			(int) awsRegion.getCoordinates().distanceTo(coordinates) / 1000);
+		return launchInstance(awsRegion);
 	}
 
 	public CloudHostEntity launchInstance(AwsRegion region) {
@@ -235,9 +236,7 @@ public class CloudHostsService {
 		catch (ManagerException e) {
 			log.error(e.getMessage());
 		}
-		InstanceState state = new InstanceState()
-			.withCode(AwsInstanceState.SHUTTING_DOWN.getCode())
-			.withName(AwsInstanceState.SHUTTING_DOWN.getState());
+		InstanceState state = new InstanceState().withCode(AwsInstanceState.SHUTTING_DOWN.getCode()).withName(AwsInstanceState.SHUTTING_DOWN.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
 		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getAwsRegion(), wait);
@@ -245,7 +244,9 @@ public class CloudHostsService {
 	}
 
 	public void terminateInstances() {
-		getCloudHosts().parallelStream().forEach(instance -> terminateInstance(instance.getInstanceId(), false));
+		awsService.getInstances().parallelStream()
+			.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
+			.forEach(instance -> terminateInstance(instance.getInstanceId(), false));
 	}
 
 	public List<CloudHostEntity> synchronizeDatabaseCloudHosts() {
@@ -270,7 +271,11 @@ public class CloudHostsService {
 				Instance instance = awsInstancesIds.get(instanceId);
 				InstanceState currentState = instance.getState();
 				InstanceState savedState = cloudHost.getState();
-				if (currentState != savedState) {
+				if (Objects.equals(currentState.getCode(), AwsInstanceState.TERMINATED.getCode())) {
+					this.cloudHosts.delete(cloudHost);
+					log.info("Removing terminated cloud host {}", instanceId);
+				}
+				else if (!Objects.equals(currentState, savedState)) {
 					CloudHostEntity newCloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
 					log.info("Updating state of cloud host {}", newCloudHost.getInstanceId());
 				}
@@ -384,7 +389,7 @@ public class CloudHostsService {
 			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
 		}
 		AwsRegion region = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
-		log.info("Instance placement {} is on aws region {}", placement, region);
+		log.info("Instance placement {} is on aws region {}", placement.getAvailabilityZone(), region.name());
 		return region;
 	}
 

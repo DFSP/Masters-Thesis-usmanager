@@ -54,7 +54,7 @@ func init() {
 	flag.IntVar(&Port, "port", 1906, "Service Port")
 	flag.Float64Var(&Latitude, "latitude", 0, "Service Latitude")
 	flag.Float64Var(&Longitude, "longitude", 0, "Service Longitude")
-	flag.StringVar(&eurekaAddress, "eureka", "127.0.0.1:8761", "Eureka server")
+	flag.StringVar(&eurekaAddress, "server", "127.0.0.1:8761", "Registration server")
 }
 
 func Register() {

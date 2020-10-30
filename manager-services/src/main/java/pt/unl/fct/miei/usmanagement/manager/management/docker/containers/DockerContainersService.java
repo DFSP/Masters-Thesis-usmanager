@@ -49,7 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerPrope
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaServerService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
@@ -87,7 +87,7 @@ public class DockerContainersService {
 	private final NodesService nodesService;
 	private final ServicesService servicesService;
 	private final NginxLoadBalancerService nginxLoadBalancerService;
-	private final EurekaServerService eurekaServerService;
+	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
 
 	private final int dockerDelayBeforeStopContainer;
@@ -98,14 +98,14 @@ public class DockerContainersService {
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService,
 								   ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
-								   EurekaServerService eurekaServerService, HostsService hostsService,
+								   RegistrationServerService registrationServerService, HostsService hostsService,
 								   ContainerProperties containerProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
 		this.servicesService = servicesService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
-		this.eurekaServerService = eurekaServerService;
+		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.launchingContainer = false;
@@ -270,12 +270,12 @@ public class DockerContainersService {
 			log.info("{}", launchCommand);
 
 			Region region = hostAddress.getRegion();
-			if (servicesService.serviceDependsOn(serviceName, EurekaServerService.EUREKA_SERVER)) {
-				String outputLabel = servicesService.getService(EurekaServerService.EUREKA_SERVER).getOutputLabel();
-				String eurekaAddress = eurekaServerService
-					.getEurekaServerAddress(region)
-					.orElse(eurekaServerService.launchEurekaServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
-				launchCommand = launchCommand.replace(outputLabel, eurekaAddress);
+			if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
+				String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
+				String registrationAddress = registrationServerService
+					.getRegistrationServerAddress(region)
+					.orElse(registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+				launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 			}
 
 			for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
@@ -300,7 +300,7 @@ public class DockerContainersService {
 			containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
 			containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 			containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
-			containerLabels.put(ContainerConstants.Label.SERVICE_REGION, new Gson().toJson(region));
+			containerLabels.put(ContainerConstants.Label.REGION, region.name());
 			if (containerType == ContainerType.SINGLETON) {
 				containerLabels.put(ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
 				containerLabels.put(ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false));
@@ -334,12 +334,10 @@ public class DockerContainersService {
 				if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
 					nginxLoadBalancerService.addServiceToLoadBalancer(hostAddress, serviceName, serviceAddr);
 				}
-				return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")
-					? Optional.empty()
-					: getContainer(containerId);
+				return getContainer(containerId);
 			}
 			catch (DockerException | InterruptedException e) {
-				e.printStackTrace();
+				log.error("Failed to start container: {}", e.getMessage());
 				throw new ManagerException(e.getMessage());
 			}
 		} finally {
@@ -498,6 +496,7 @@ public class DockerContainersService {
 	}
 
 	private DockerContainer buildDockerContainer(Container container) {
+		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
 		List<String> names = container.names();
@@ -507,13 +506,14 @@ public class DockerContainersService {
 		String status = container.status();
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
-		Coordinates coordinates = new Gson().fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
+		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
+		Region region = Region.getRegion(container.labels().get(ContainerConstants.Label.REGION));
 		List<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
 		return new DockerContainer(id, created, names, image, command, state, status, publicIpAddress, privateIpAddress,
-			coordinates, ports, labels);
+			coordinates, region, ports, labels);
 	}
 
 	public String getContainerLogs(ContainerEntity container) {

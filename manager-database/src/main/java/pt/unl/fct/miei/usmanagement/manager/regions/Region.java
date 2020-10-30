@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum Region {
+public enum Region implements Serializable {
 
 	NORTH_AMERICA("North America", new Coordinates("North America", 39.787092, -99.754244)),
 	SOUTH_AMERICA("South America", new Coordinates("South America", -14.864205, -55.902655)),

@@ -62,10 +62,10 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decis
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.eureka.EurekaServerService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
@@ -144,7 +144,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8081")
 					.defaultInternalPort("80")
 					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${front-endHost}")
@@ -164,7 +164,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8082")
 					.defaultInternalPort("80")
 					.defaultDb("user-db:27017")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${userHost}")
@@ -204,7 +204,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8083")
 					.defaultInternalPort("80")
 					.defaultDb("catalogue-db:3306")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${catalogueHost}")
@@ -244,7 +244,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8084")
 					.defaultInternalPort("80")
 					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${paymentHost}")
@@ -264,7 +264,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8085")
 					.defaultInternalPort("80")
 					.defaultDb("carts-db:27017")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${cartsHost}")
@@ -304,7 +304,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8086")
 					.defaultInternalPort("80")
 					.defaultDb("orders-db:27017")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${ordersHost}")
@@ -344,7 +344,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8087")
 					.defaultInternalPort("80")
 					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${shippingHost}")
@@ -364,7 +364,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("8088")
 					.defaultInternalPort("80")
 					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
 					.minReplicas(1)
 					.maxReplicas(0)
 					.outputLabel("${queue-masterHost}")
@@ -384,7 +384,7 @@ public class DatabaseLoader {
 					.defaultExternalPort("5672")
 					.defaultInternalPort("5672")
 					.defaultDb("NOT_APPLICABLE")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minReplicas(1)
 					.maxReplicas(1)
 					.outputLabel("${rabbitmqHost}")
@@ -433,13 +433,13 @@ public class DatabaseLoader {
 					.build();
 				requestLocationMonitor = servicesService.addService(requestLocationMonitor);
 			}
-			ServiceEntity eurekaServer;
+			ServiceEntity registrationServer;
 			try {
-				eurekaServer = servicesService.getService(EurekaServerService.EUREKA_SERVER);
+				registrationServer = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER);
 			}
 			catch (EntityNotFoundException ignored) {
-				eurekaServer = ServiceEntity.builder()
-					.serviceName(EurekaServerService.EUREKA_SERVER)
+				registrationServer = ServiceEntity.builder()
+					.serviceName(RegistrationServerService.REGISTRATION_SERVER)
 					.dockerRepository(dockerHubUsername + "/registration-server")
 					.defaultExternalPort("8761")
 					.defaultInternalPort("8761")
@@ -447,11 +447,11 @@ public class DatabaseLoader {
 					.launchCommand("${externalPort} ${internalPort} ${hostname} ${zone}")
 					.minReplicas(1)
 					.maxReplicas(0)
-					.outputLabel("${eurekaHost}")
+					.outputLabel("${registrationHost}")
 					.serviceType(ServiceType.SYSTEM)
 					.expectedMemoryConsumption(262144000d)
 					.build();
-				eurekaServer = servicesService.addService(eurekaServer);
+				registrationServer = servicesService.addService(registrationServer);
 			}
 			ServiceEntity prometheus;
 			try {
@@ -503,7 +503,7 @@ public class DatabaseLoader {
 					.dockerRepository(dockerHubUsername + "/manager-worker")
 					.defaultExternalPort("8081")
 					.defaultInternalPort("8081")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minReplicas(1)
 					.maxReplicas(1)
 					.outputLabel("${workerManagerHost}")
@@ -522,7 +522,7 @@ public class DatabaseLoader {
 					.dockerRepository(dockerHubUsername + "/manager-master")
 					.defaultExternalPort("8080")
 					.defaultInternalPort("8080")
-					.launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
+					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minReplicas(1)
 					.maxReplicas(1)
 					.outputLabel("${masterManagerHost}")
@@ -569,12 +569,12 @@ public class DatabaseLoader {
 			}
 
 			// service dependencies
-			if (!servicesDependencies.hasDependency(frontend.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity frontendEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(frontend.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity frontendRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(frontend)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(frontendEurekaServerDependency);
+				servicesDependencies.save(frontendRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), user.getServiceName())) {
 				ServiceDependencyEntity frontendUserDependency = ServiceDependencyEntity.builder()
@@ -604,12 +604,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(frontendCartsDependency);
 			}
-			if (!servicesDependencies.hasDependency(user.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity userEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(user.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity userRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(user)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(userEurekaServerDependency);
+				servicesDependencies.save(userRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(user.getServiceName(), userDb.getServiceName())) {
 				ServiceDependencyEntity userUserDbDependency = ServiceDependencyEntity.builder()
@@ -618,12 +618,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(userUserDbDependency);
 			}
-			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity catalogueEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity catalogueRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(catalogue)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(catalogueEurekaServerDependency);
+				servicesDependencies.save(catalogueRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), catalogueDb.getServiceName())) {
 				ServiceDependencyEntity catalogueCatalogueDbDependency = ServiceDependencyEntity.builder()
@@ -632,19 +632,19 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(catalogueCatalogueDbDependency);
 			}
-			if (!servicesDependencies.hasDependency(payment.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity paymentEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(payment.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity paymentRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(payment)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(paymentEurekaServerDependency);
+				servicesDependencies.save(paymentRegistrationServerDependency);
 			}
-			if (!servicesDependencies.hasDependency(carts.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity cartsEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(carts.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity cartsRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(carts)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(cartsEurekaServerDependency);
+				servicesDependencies.save(cartsRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(carts.getServiceName(), cartsDb.getServiceName())) {
 				ServiceDependencyEntity cartsCartsDbDependency = ServiceDependencyEntity.builder()
@@ -653,12 +653,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(cartsCartsDbDependency);
 			}
-			if (!servicesDependencies.hasDependency(orders.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity ordersEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(orders.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity ordersRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(orders)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(ordersEurekaServerDependency);
+				servicesDependencies.save(ordersRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), payment.getServiceName())) {
 				ServiceDependencyEntity ordersPaymentDependency = ServiceDependencyEntity.builder()
@@ -681,12 +681,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(ordersOrdersDbDependency);
 			}
-			if (!servicesDependencies.hasDependency(shipping.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity shippingEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(shipping.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity shippingRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(shipping)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(shippingEurekaServerDependency);
+				servicesDependencies.save(shippingRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(shipping.getServiceName(), rabbitmq.getServiceName())) {
 				ServiceDependencyEntity shippingRabbitmqDependency = ServiceDependencyEntity.builder()
@@ -695,12 +695,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(shippingRabbitmqDependency);
 			}
-			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity queueMasterEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity queueMasterRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(queueMaster)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(queueMasterEurekaServerDependency);
+				servicesDependencies.save(queueMasterRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), rabbitmq.getServiceName())) {
 				ServiceDependencyEntity queueMasterRabbitmqDependency = ServiceDependencyEntity.builder()
@@ -709,12 +709,12 @@ public class DatabaseLoader {
 					.build();
 				servicesDependencies.save(queueMasterRabbitmqDependency);
 			}
-			if (!servicesDependencies.hasDependency(rabbitmq.getServiceName(), eurekaServer.getServiceName())) {
-				ServiceDependencyEntity rabbitmqEurekaServerDependency = ServiceDependencyEntity.builder()
+			if (!servicesDependencies.hasDependency(rabbitmq.getServiceName(), registrationServer.getServiceName())) {
+				ServiceDependencyEntity rabbitmqRegistrationServerDependency = ServiceDependencyEntity.builder()
 					.service(rabbitmq)
-					.dependency(eurekaServer)
+					.dependency(registrationServer)
 					.build();
-				servicesDependencies.save(rabbitmqEurekaServerDependency);
+				servicesDependencies.save(rabbitmqRegistrationServerDependency);
 			}
 
 			/*// regions

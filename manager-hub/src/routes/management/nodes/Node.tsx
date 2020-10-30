@@ -93,7 +93,7 @@ interface StateToProps {
     newNodeHost?: INewNodeHost;
     newNodeLocation?: INewNodeLocation;
     node?: INode;
-    formNode?: Partial<INode>;
+    formNode?: Partial<INode> & { coordinates?: ICoordinates };
     cloudHosts: { [key: string]: ICloudHost };
     edgeHosts: { [key: string]: IEdgeHost };
     regions: { [key: string]: IRegion };
@@ -335,6 +335,7 @@ class Node extends BaseComponent<Props, State> {
                 marker.label = id;
                 marker.latitude = coordinates.latitude;
                 marker.longitude = coordinates.longitude;
+                marker.color = 'green';
                 markers.set(markerId, marker);
             });
         return Array.from(markers.values());
@@ -423,6 +424,14 @@ class Node extends BaseComponent<Props, State> {
                                      label={key}
                                      icon={{linkedTo: this.hostLink}}
                                      disabled={true}/>
+                            : key === 'coordinates'
+                                ? <Field key={index} id='coordinates' label='location' type='map'
+                                         map={{
+                                             loading: this.props.isLoading,
+                                             editable: false,
+                                             zoomable: true,
+                                             labeled: true
+                                         }}/>
                             : <Field key={index}
                                      id={key}
                                      label={key}
@@ -530,9 +539,12 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const id = props.match.params.id.split('#')[0];
     const newNodeHost = isNew(props.location.search) ? buildNewNodeHost() : undefined;
     const newNodeLocation = isNew(props.location.search) ? buildNewNodeLocation() : undefined;
-    const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
+    let node: INode & { coordinates?: ICoordinates } | undefined = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
     let formNode;
     if (node) {
+        if (node.labels['coordinates']) {
+            node = {...node, coordinates: JSON.parse(node.labels['coordinates'])};
+        }
         formNode = {...node};
         removeFields(formNode);
     }

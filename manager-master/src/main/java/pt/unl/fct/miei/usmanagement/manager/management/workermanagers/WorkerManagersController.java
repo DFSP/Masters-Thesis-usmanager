@@ -72,7 +72,7 @@ public class WorkerManagersController {
 			return workerManagersService.launchWorkerManagers(regionsList);
 		}
 		else {
-			throw new BadRequestException("Expected host address or regions to start eureka server");
+			throw new BadRequestException("Expected host address or regions to start registration server");
 		}
 	}
 

@@ -17,5 +17,5 @@ RUN ["chmod", "+x", "docker-init.sh"]
 
 ENTRYPOINT ["./docker-init.sh"]
 
-# eureka, externalPort, internalPort, hostname
+# registration-server, externalPort, internalPort, hostname
 CMD ["127.0.0.1:8761", "80", "8079", "127.0.0.1"]

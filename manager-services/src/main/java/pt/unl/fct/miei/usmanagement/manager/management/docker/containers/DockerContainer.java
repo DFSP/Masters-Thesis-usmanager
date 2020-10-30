@@ -28,6 +28,7 @@ import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public final class DockerContainer {
 	private final String publicIpAddress;
 	private final String privateIpAddress;
 	private final Coordinates coordinates;
+	private final Region region;
 	private final List<ContainerPortMapping> ports;
 	private final Map<String, String> labels;
 

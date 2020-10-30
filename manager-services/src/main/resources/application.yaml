@@ -46,7 +46,7 @@ docker:
   swarm:
     manager: ${dockerManager:dpimenta.ddns.net}
     initial-max-workers: 1
-eureka:
+registration:
   port: 8761
 prometheus:
   node-exporter:

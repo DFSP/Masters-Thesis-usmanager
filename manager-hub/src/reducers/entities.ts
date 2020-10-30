@@ -37,7 +37,7 @@ import {
     ADD_EDGE_HOST,
     ADD_EDGE_HOST_RULES,
     ADD_EDGE_HOST_SIMULATED_METRICS,
-    ADD_EUREKA_SERVER,
+    ADD_REGISTRATION_SERVER,
     ADD_LOAD_BALANCER,
     ADD_NODE,
     ADD_RULE_APP,
@@ -155,12 +155,12 @@ import {
     EDGE_HOSTS_FAILURE,
     EDGE_HOSTS_REQUEST,
     EDGE_HOSTS_SUCCESS,
-    EUREKA_SERVER_FAILURE,
-    EUREKA_SERVER_REQUEST,
-    EUREKA_SERVER_SUCCESS,
-    EUREKA_SERVERS_FAILURE,
-    EUREKA_SERVERS_REQUEST,
-    EUREKA_SERVERS_SUCCESS,
+    REGISTRATION_SERVER_FAILURE,
+    REGISTRATION_SERVER_REQUEST,
+    REGISTRATION_SERVER_SUCCESS,
+    REGISTRATION_SERVERS_FAILURE,
+    REGISTRATION_SERVERS_REQUEST,
+    REGISTRATION_SERVERS_SUCCESS,
     FIELDS_FAILURE,
     FIELDS_REQUEST,
     FIELDS_SUCCESS,
@@ -381,7 +381,7 @@ import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/Simulated
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
 import {IRegion} from "../routes/management/regions/Region";
 import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
-import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
+import {IRegistrationServer} from "../routes/management/registrationServers/RegistrationServer";
 import {ILogs} from "../routes/management/logs/ManagementLogs";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
@@ -566,10 +566,10 @@ export type EntitiesState = {
         isLoadingLoadBalancers: boolean,
         loadLoadBalancersError: string | null,
     },
-    eurekaServers: {
-        data: { [key: string]: IEurekaServer },
-        isLoadingEurekaServers: boolean,
-        loadEurekaServersError: string | null,
+    registrationServers: {
+        data: { [key: string]: IRegistrationServer },
+        isLoadingRegistrationServers: boolean,
+        loadRegistrationServersError: string | null,
     },
     workerManagers: {
         data: { [key: string]: IWorkerManager },
@@ -632,7 +632,7 @@ export type EntitiesAction = {
         simulatedContainerMetrics?: ISimulatedContainerMetric[],
         simulatedMetricNames?: string[],
         loadBalancers?: ILoadBalancer[],
-        eurekaServers?: ILoadBalancer[],
+        registrationServers?: ILoadBalancer[],
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
@@ -816,10 +816,10 @@ const entities = (state: EntitiesState = {
                           isLoadingLoadBalancers: false,
                           loadLoadBalancersError: null
                       },
-                      eurekaServers: {
+                      registrationServers: {
                           data: {},
-                          isLoadingEurekaServers: false,
-                          loadEurekaServersError: null
+                          isLoadingRegistrationServers: false,
+                          loadRegistrationServersError: null
                       },
                       workerManagers: {
                           data: {},
@@ -3712,39 +3712,39 @@ const entities = (state: EntitiesState = {
                 });
             }
             break;
-        case EUREKA_SERVERS_REQUEST:
-        case EUREKA_SERVER_REQUEST:
-            return merge({}, state, {eurekaServers: {isLoadingEurekaServers: true, loadEurekaServersError: null}});
-        case EUREKA_SERVERS_FAILURE:
-        case EUREKA_SERVER_FAILURE:
-            return merge({}, state, {eurekaServers: {isLoadingEurekaServers: false, loadEurekaServersError: error}});
-        case EUREKA_SERVERS_SUCCESS:
+        case REGISTRATION_SERVERS_REQUEST:
+        case REGISTRATION_SERVER_REQUEST:
+            return merge({}, state, {registrationServers: {isLoadingRegistrationServers: true, loadRegistrationServersError: null}});
+        case REGISTRATION_SERVERS_FAILURE:
+        case REGISTRATION_SERVER_FAILURE:
+            return merge({}, state, {registrationServers: {isLoadingRegistrationServers: false, loadRegistrationServersError: error}});
+        case REGISTRATION_SERVERS_SUCCESS:
             return {
                 ...state,
-                eurekaServers: {
-                    ...state.eurekaServers,
-                    data: merge({}, pick(state.eurekaServers.data, keys(data?.eurekaServers)), data?.eurekaServers),
-                    isLoadingEurekaServers: false,
-                    loadEurekaServersError: null,
+                registrationServers: {
+                    ...state.registrationServers,
+                    data: merge({}, pick(state.registrationServers.data, keys(data?.registrationServers)), data?.registrationServers),
+                    isLoadingRegistrationServers: false,
+                    loadRegistrationServersError: null,
                 }
             };
-        case EUREKA_SERVER_SUCCESS:
+        case REGISTRATION_SERVER_SUCCESS:
             return {
                 ...state,
-                eurekaServers: {
-                    data: merge({}, state.eurekaServers.data, data?.eurekaServers),
-                    isLoadingEurekaServers: false,
-                    loadEurekaServersError: null,
+                registrationServers: {
+                    data: merge({}, state.registrationServers.data, data?.registrationServers),
+                    isLoadingRegistrationServers: false,
+                    loadRegistrationServersError: null,
                 }
             };
-        case ADD_EUREKA_SERVER:
-            if (data?.eurekaServers?.length) {
-                const eurekaServers = normalize(data?.eurekaServers, Schemas.EUREKA_SERVER_ARRAY).entities.eurekaServers;
+        case ADD_REGISTRATION_SERVER:
+            if (data?.registrationServers?.length) {
+                const registrationServers = normalize(data?.registrationServers, Schemas.REGISTRATION_SERVER_ARRAY).entities.registrationServers;
                 return merge({}, state, {
-                    eurekaServers: {
-                        data: eurekaServers,
-                        isLoadingEurekaServers: false,
-                        loadEurekaServersError: null
+                    registrationServers: {
+                        data: registrationServers,
+                        isLoadingRegistrationServers: false,
+                        loadRegistrationServersError: null
                     }
                 });
             }

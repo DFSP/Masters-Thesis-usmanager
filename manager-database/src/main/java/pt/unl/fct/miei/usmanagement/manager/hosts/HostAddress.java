@@ -91,6 +91,12 @@ public class HostAddress implements Serializable {
 			+ (region == null ? "" : "/" + region.getName());
 	}
 
+	public String toSimpleString() {
+		return (username == null ? "" : username + "@")
+			+ publicIpAddress
+			+ (privateIpAddress == null ? "" : "/" + privateIpAddress);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

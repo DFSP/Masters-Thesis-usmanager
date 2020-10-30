@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
 import java.util.Map;
 
@@ -58,6 +59,11 @@ public final class SimpleNode {
 	@JsonIgnore
 	public Coordinates getCoordinates() {
 		return new Gson().fromJson(labels.get(NodeConstants.Label.COORDINATES), Coordinates.class);
+	}
+
+	@JsonIgnore
+	public Region getRegion() {
+		return Region.getRegion(labels.get(NodeConstants.Label.REGION));
 	}
 
 	@JsonIgnore

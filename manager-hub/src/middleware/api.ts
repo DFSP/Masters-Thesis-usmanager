@@ -43,7 +43,7 @@ import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
 import {IRuleCondition} from "../routes/management/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/management/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
-import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
+import {IRegistrationServer} from "../routes/management/registrationServers/RegistrationServer";
 import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
@@ -143,8 +143,8 @@ interface ISchemas {
     SIMULATED_CONTAINER_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
     LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
-    EUREKA_SERVER: schema.Entity<IEurekaServer>;
-    EUREKA_SERVER_ARRAY: schema.Entity<IEurekaServer>[];
+    REGISTRATION_SERVER: schema.Entity<IRegistrationServer>;
+    REGISTRATION_SERVER_ARRAY: schema.Entity<IRegistrationServer>[];
     WORKER_MANAGER: schema.Entity<IWorkerManager>;
     WORKER_MANAGER_ARRAY: schema.Entity<IWorkerManager>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
@@ -270,8 +270,8 @@ const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalanc
     idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.containerId
 });
 
-const eurekaServer: schema.Entity<IEurekaServer> = new schema.Entity('eurekaServers', undefined, {
-    idAttribute: (eurekaServer: IEurekaServer) => eurekaServer.containerId
+const registrationServer: schema.Entity<IRegistrationServer> = new schema.Entity('registrationServers', undefined, {
+    idAttribute: (registrationServer: IRegistrationServer) => registrationServer.containerId
 });
 
 const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerManagers', undefined, {
@@ -367,8 +367,8 @@ export const Schemas: ISchemas = {
     SIMULATED_CONTAINER_METRIC_ARRAY: [simulatedContainerMetric],
     LOAD_BALANCER: loadBalancer,
     LOAD_BALANCER_ARRAY: [loadBalancer],
-    EUREKA_SERVER: eurekaServer,
-    EUREKA_SERVER_ARRAY: [eurekaServer],
+    REGISTRATION_SERVER: registrationServer,
+    REGISTRATION_SERVER_ARRAY: [registrationServer],
     WORKER_MANAGER: workerManager,
     WORKER_MANAGER_ARRAY: [workerManager],
     LOGS_ARRAY: [logs],

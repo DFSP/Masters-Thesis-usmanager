@@ -27,21 +27,27 @@ package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.swarm.Node;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
-import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -110,10 +116,8 @@ public class DockerSwarmService {
 			throw new ManagerException("Unable to get docker swarm node id");
 		}
 		String nodeId = nodeIdRegexExpression.group(0);
-		nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
-		nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
-		nodesService.addLabel(nodeId, NodeConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
-		nodesService.addLabel(nodeId, NodeConstants.Label.MASTER_MANAGER, String.valueOf(true));
+		setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
+			Collections.singletonMap(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true)));
 		return nodesService.getNode(nodeId);
 	}
 
@@ -158,9 +162,7 @@ public class DockerSwarmService {
 			nodeClient.joinSwarm(swarmJoin);
 			String nodeId = nodeClient.info().swarm().nodeId();
 			log.info("Host {} ({}) has joined the swarm as node {}", publicIpAddress, privateIpAddress, nodeId);
-			nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);
-			nodesService.addLabel(nodeId, NodeConstants.Label.USERNAME, username);
-			nodesService.addLabel(nodeId, NodeConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
+			setNodeLabels(nodeId, privateIpAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion());
 			return nodesService.getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
@@ -173,6 +175,14 @@ public class DockerSwarmService {
 		try (DockerClient docker = dockerCoreService.getDockerClient(hostAddress)) {
 			leaveSwarm(docker);
 		}
+	}
+
+	public void leaveSwarm(Node node) {
+		HostAddress hostAddress = new HostAddress(
+			node.spec().labels().get(NodeConstants.Label.USERNAME),
+			node.status().addr(),
+			node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
+		leaveSwarm(hostAddress);
 	}
 
 	private void leaveSwarm(DockerClient docker) {
@@ -190,21 +200,37 @@ public class DockerSwarmService {
 			}
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Host {} failed to leave swarm: {}", docker.getHost(), e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}
 
 	public void destroySwarm() {
 		try {
-			getSwarmLeader().listNodes().parallelStream()
-				.map(node -> new HostAddress(node.spec().labels().get(NodeConstants.Label.USERNAME), node.status().addr(),
-					node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS)))
+			DockerClient swarmLeader = getSwarmLeader();
+			swarmLeader.listNodes().parallelStream()
+				.filter(node -> node.spec().labels().get(NodeConstants.Label.MASTER_MANAGER) == null)
 				.forEach(this::leaveSwarm);
+			// leader must be the last one to leave
+			leaveSwarm(swarmLeader);
 		}
 		catch (DockerException | InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, Region region) {
+		setNodeLabels(nodeId, privateIpAddress, username, coordinates, region, Collections.emptyMap());
+	}
+
+	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, Region region,
+							   Map<String, String> customLabels) {
+		Map<String, String> labels = new HashMap<>(customLabels);
+		labels.put(NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);
+		labels.put(NodeConstants.Label.USERNAME, username);
+		labels.put(NodeConstants.Label.COORDINATES, new Gson().toJson(coordinates));
+		labels.put(NodeConstants.Label.REGION, region.name());
+		nodesService.addLabels(nodeId, labels);
 	}
 
 }

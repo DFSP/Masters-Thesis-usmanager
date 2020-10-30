@@ -34,6 +34,7 @@ public final class NodeConstants {
 		public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
 		public static final String USERNAME = "username";
 		public static final String COORDINATES = "coordinates";
+		public static final String REGION = "region";
 		public static final String MASTER_MANAGER = "masterManager";
 
 	}

@@ -38,7 +38,7 @@ import {IRuleCondition} from "../routes/management/rules/conditions/RuleConditio
 import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
 import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
-import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
+import {IRegistrationServer} from "../routes/management/registrationServers/RegistrationServer";
 import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 import {IComponent} from "../containers/Root.dev";
@@ -1988,37 +1988,37 @@ export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
     }
 }
 
-export const EUREKA_SERVERS_REQUEST = 'EUREKA_SERVERS_REQUEST';
-export const EUREKA_SERVER_REQUEST = 'EUREKA_SERVER_REQUEST';
-export const EUREKA_SERVERS_SUCCESS = 'EUREKA_SERVERS_SUCCESS';
-export const EUREKA_SERVER_SUCCESS = 'EUREKA_SERVER_SUCCESS';
-export const EUREKA_SERVERS_FAILURE = 'EUREKA_SERVERS_FAILURE';
-export const EUREKA_SERVER_FAILURE = 'EUREKA_SERVER_FAILURE';
-export const loadEurekaServers = () => (dispatch: any) => {
-    return dispatch(fetchEurekaServers());
+export const REGISTRATION_SERVERS_REQUEST = 'REGISTRATION_SERVERS_REQUEST';
+export const REGISTRATION_SERVER_REQUEST = 'REGISTRATION_SERVER_REQUEST';
+export const REGISTRATION_SERVERS_SUCCESS = 'REGISTRATION_SERVERS_SUCCESS';
+export const REGISTRATION_SERVER_SUCCESS = 'REGISTRATION_SERVER_SUCCESS';
+export const REGISTRATION_SERVERS_FAILURE = 'REGISTRATION_SERVERS_FAILURE';
+export const REGISTRATION_SERVER_FAILURE = 'REGISTRATION_SERVER_FAILURE';
+export const loadRegistrationServers = () => (dispatch: any) => {
+    return dispatch(fetchRegistrationServers());
 };
-const fetchEurekaServers = (id?: string) => ({
+const fetchRegistrationServers = (id?: string) => ({
     [CALL_API]:
         !id
             ? {
-                types: [EUREKA_SERVERS_REQUEST, EUREKA_SERVERS_SUCCESS, EUREKA_SERVERS_FAILURE],
-                endpoint: `containers?serviceName=eureka-server`,
-                schema: Schemas.EUREKA_SERVER_ARRAY,
-                entity: 'eurekaServers'
+                types: [REGISTRATION_SERVERS_REQUEST, REGISTRATION_SERVERS_SUCCESS, REGISTRATION_SERVERS_FAILURE],
+                endpoint: `containers?serviceName=registration-server`,
+                schema: Schemas.REGISTRATION_SERVER_ARRAY,
+                entity: 'registrationServers'
             }
             : {
-                types: [EUREKA_SERVER_REQUEST, EUREKA_SERVER_SUCCESS, EUREKA_SERVER_FAILURE],
+                types: [REGISTRATION_SERVER_REQUEST, REGISTRATION_SERVER_SUCCESS, REGISTRATION_SERVER_FAILURE],
                 endpoint: `containers/${id}`,
-                schema: Schemas.EUREKA_SERVER,
-                entity: 'eurekaServers'
+                schema: Schemas.REGISTRATION_SERVER,
+                entity: 'registrationServers'
             }
 });
-export const ADD_EUREKA_SERVER = 'ADD_EUREKA_SERVER';
+export const ADD_REGISTRATION_SERVER = 'ADD_REGISTRATION_SERVER';
 
-export function addEurekaServer(eurekaServer: IEurekaServer): EntitiesAction {
+export function addRegistrationServer(registrationServer: IRegistrationServer): EntitiesAction {
     return {
-        type: ADD_EUREKA_SERVER,
-        data: {eurekaServers: new Array(eurekaServer)}
+        type: ADD_REGISTRATION_SERVER,
+        data: {registrationServers: new Array(registrationServer)}
     }
 }
 

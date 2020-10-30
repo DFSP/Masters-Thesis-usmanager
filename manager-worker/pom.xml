@@ -32,13 +32,13 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.3.1.RELEASE</version>
-		<relativePath/>
 	</parent>
 
-	<groupId>pt.unl.fct.usmanagement.manager.worker</groupId>
+	<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
 	<artifactId>manager-worker</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
+
 	<name>Manager Worker</name>
 	<description>Microservices worker manager. Decides to replicate and/or migrate
 		docker containered microservices between cloud and edge endpoints, based on

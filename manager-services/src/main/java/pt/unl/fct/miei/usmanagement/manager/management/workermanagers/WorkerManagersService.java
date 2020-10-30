@@ -84,6 +84,11 @@ public class WorkerManagersService {
 			new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
 	}
 
+	public WorkerManagerEntity getWorkerManager(Region region) {
+		return workerManagers.getByContainer_Region(region).orElseThrow(() ->
+			new EntityNotFoundException(WorkerManagerEntity.class, "region", region.getName()));
+	}
+
 	public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
 		return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
 	}
@@ -101,9 +106,18 @@ public class WorkerManagersService {
 			.getService(WorkerManagerProperties.WORKER_MANAGER).getExpectedMemoryConsumption();
 
 		return regions.stream()
-			.map(region -> hostsService.getClosestCapableHost(expectedMemoryConsumption, region))
+			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
 			.distinct()
-			.map(this::launchWorkerManager).collect(Collectors.toList());
+			.map(hostAddress -> {
+				// avoid launching another worker manager on the same region
+				WorkerManagerEntity workerManager;
+				try {
+					workerManager = getWorkerManager(hostAddress.getRegion());
+				} catch (EntityNotFoundException ignored) {
+					workerManager = launchWorkerManager(hostAddress);
+				}
+				return workerManager;
+			}).collect(Collectors.toList());
 	}
 
 	private ContainerEntity launchWorkerManager(HostAddress hostAddress, String id) {

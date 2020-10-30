@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
+import com.spotify.docker.client.exceptions.DockerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -56,11 +57,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.Pro
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -142,7 +146,7 @@ public class HostsService {
 		int maxInstances = Math.min(this.maxInstances, maxWorkers);
 		List<CloudHostEntity> cloudHosts = new ArrayList<>(maxInstances);
 		for (int i = 0; i < maxInstances; i++) {
-			cloudHosts.add(chooseCloudHost());
+			cloudHosts.add(chooseCloudHost(null, false));
 		}
 		return cloudHosts;
 	}
@@ -165,18 +169,29 @@ public class HostsService {
 	}
 
 	public SimpleNode setupHost(HostAddress hostAddress, NodeRole role) {
-		log.info("Setting up {} with role {}", hostAddress, role);
+		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
 		String dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
-		SimpleNode node;
-		switch (role) {
-			case MANAGER:
-				node = setupSwarmManager(hostAddress);
-				break;
-			case WORKER:
-				node = setupSwarmWorker(hostAddress);
-				break;
-			default:
-				throw new UnsupportedOperationException();
+		SimpleNode node = null;
+		int tries = 0;
+		do {
+			try {
+				switch (role) {
+					case MANAGER:
+						node = setupSwarmManager(hostAddress);
+						break;
+					case WORKER:
+						node = setupSwarmWorker(hostAddress);
+						break;
+					default:
+						throw new UnsupportedOperationException();
+				}
+			} catch (ManagerException e) {
+				log.error("Failed to setup {} with role {}: {}", hostAddress.toSimpleString(), role, e.getMessage());
+				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 second, then 2 seconds, then 3, etc
+			}
+		} while (node == null && ++tries < 5);
+		if (node == null) {
+			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
 		containersService.launchContainer(hostAddress, LocationRequestsService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
@@ -214,12 +229,31 @@ public class HostsService {
 		return getClosestCapableHost(availableMemory, region.getCoordinates());
 	}
 
+	public HostAddress getCapableNode(double availableMemory, Region region) {
+		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getName(), availableMemory);
+		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
+			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory))
+			.map(SimpleNode::getHostAddress)
+			.collect(Collectors.toList());
+		HostAddress hostAddress;
+		if (nodes.size() > 0) {
+			Random random = new Random();
+			hostAddress = nodes.get(random.nextInt(nodes.size()));
+			log.info("Found node {}", hostAddress);
+		}
+		else {
+			log.info("No nodes found, joining a new cloud node at {}", region);
+			hostAddress = chooseCloudHost(region, true).getAddress();
+		}
+		return hostAddress;
+	}
+
 	public HostAddress getClosestCapableHost(double availableMemory, Coordinates coordinates) {
 		List<EdgeHostEntity> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughMemory(hostAddress, availableMemory)
+			hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory)
 		).collect(Collectors.toList());
 		List<CloudHostEntity> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughMemory(hostAddress, availableMemory)
+			hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory)
 		).collect(Collectors.toList());
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}
@@ -236,8 +270,7 @@ public class HostsService {
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
 	}
 
-	public HostAddress getClosestHost(Coordinates
-										  coordinates, List<EdgeHostEntity> edgeHosts, List<CloudHostEntity> cloudHosts) {
+	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHostEntity> edgeHosts, List<CloudHostEntity> cloudHosts) {
 		edgeHosts.sort((oneEdgeHost, anotherEdgeHost) -> {
 			double oneDistance = oneEdgeHost.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherEdgeHost.getCoordinates().distanceTo(coordinates);
@@ -339,7 +372,7 @@ public class HostsService {
 		return sshService.hasConnection(edgeHost.getAddress());
 	}
 
-	private CloudHostEntity chooseCloudHost() {
+	private CloudHostEntity chooseCloudHost(Region region, boolean addToSwarm) {
 		for (CloudHostEntity cloudHost : cloudHostsService.getCloudHosts()) {
 			int stateCode = cloudHost.getState().getCode();
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
@@ -349,11 +382,11 @@ public class HostsService {
 				}
 			}
 			else if (stateCode == AwsInstanceState.STOPPED.getCode()) {
-				return cloudHostsService.startInstance(cloudHost, false);
+				return cloudHostsService.startInstance(cloudHost, addToSwarm);
 			}
 		}
-		Coordinates myCoordinates = hostAddress.getCoordinates();
-		return cloudHostsService.launchInstance(myCoordinates);
+		Coordinates coordinates = region == null ? hostAddress.getRegion().getCoordinates() : region.getCoordinates();
+		return cloudHostsService.launchInstance(coordinates);
 	}
 
 	public List<String> executeCommand(String command, HostAddress hostAddress) {

@@ -38,6 +38,7 @@ import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 
 import javax.persistence.CascadeType;
@@ -97,6 +98,9 @@ public class ContainerEntity {
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private Map<String, String> labels;
+
+	@NotNull
+	private Region region;
 
 	@NotNull
 	private Coordinates coordinates;

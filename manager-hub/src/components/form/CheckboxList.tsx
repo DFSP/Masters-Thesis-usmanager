@@ -27,6 +27,7 @@ import ListItem from "../list/ListItem";
 import listItemStyles from "../../components/list/ListItem.module.css";
 import styles from "./CheckboxList.module.css";
 import {camelCaseToSentenceCase} from "../../utils/text";
+import Empty from "../list/Empty";
 
 interface Props {
     id: string;
@@ -76,9 +77,9 @@ export class CheckboxList extends React.Component<Props, State> {
         const {values} = this.state;
         return (
             <div id={id} className='noMargin'>
-                <div>
-                    <h6 className={`white-text ${styles.title} left`}>{camelCaseToSentenceCase(name)}</h6>
-                    <p className={`${styles.globalCheckbox}`}>
+                <h6 className={`white-text ${styles.title} ${values.length ? 'left' : ''}`}>{camelCaseToSentenceCase(name)}</h6>
+                {values.length
+                    ? <p className={`${styles.globalCheckbox}`}>
                         <label>
                             <input type="checkbox"
                                    onChange={this.handleGlobalCheckbox}
@@ -86,8 +87,7 @@ export class CheckboxList extends React.Component<Props, State> {
                             <span/>
                         </label>
                     </p>
-                </div>
-
+                    : <Empty message={`No ${camelCaseToSentenceCase(name)} to select`}/>}
                 {values.map((value, index) =>
                     this.item(index, value.value, value.checked)
                 )}

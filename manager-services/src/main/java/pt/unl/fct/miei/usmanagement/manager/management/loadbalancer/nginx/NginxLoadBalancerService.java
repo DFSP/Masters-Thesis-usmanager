@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
@@ -33,16 +34,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
 import java.util.Base64;
 import java.util.List;
@@ -84,14 +84,32 @@ public class NginxLoadBalancerService {
 		this.restTemplate = new RestTemplate();
 	}
 
+/*	// avoid launching another registration server on the same region
+	List<ContainerEntity> containers = containersService.getContainersWithLabels(Set.of(
+		Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
+		Pair.of(ContainerConstants.Label.SERVICE_REGION, gson.toJson(hostAddress.getRegion()))
+	));
+				return !containers.isEmpty() ?
+					containers.get(0)
+					: containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);*/
+
 	public List<ContainerEntity> launchLoadBalancers(String serviceName, List<Region> regions) {
-		ServiceEntity serviceConfig = serviceService.getService(LOAD_BALANCER);
-		double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = serviceService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+
+		Gson gson = new Gson();
 		return regions.stream()
-			.map(region -> hostsService.getClosestCapableHost(expectedMemoryConsumption, region))
+			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
 			.distinct()
-			.map(hostAddress -> launchLoadBalancer(serviceName, hostAddress))
-			.collect(Collectors.toList());
+			.map(hostAddress -> {
+				// avoid launching another load balancer on the same region
+				List<ContainerEntity> containers = containersService.getContainersWithLabels(Set.of(
+					Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
+					Pair.of(ContainerConstants.Label.REGION, gson.toJson(hostAddress.getRegion()))
+				));
+				return !containers.isEmpty() ?
+					containers.get(0)
+					: launchLoadBalancer(serviceName, hostAddress);
+			}).collect(Collectors.toList());
 	}
 
 	public ContainerEntity launchLoadBalancer(String serviceName, HostAddress hostAddress) {

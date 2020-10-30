@@ -64,7 +64,7 @@ const sidenavManagementLinks: ILink[] = [
         ]
     },
     {link: '/load-balancers', name: 'Load balancers'},
-    {link: '/eureka-servers', name: 'Eureka servers'},
+    {link: '/registration-servers', name: 'Registration servers'},
     {link: '/worker-managers', name: 'Worker managers'},
     {link: '/ssh', name: 'Ssh'},
     {link: '/settings', name: 'Settings'},

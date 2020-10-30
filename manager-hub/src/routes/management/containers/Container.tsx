@@ -66,6 +66,7 @@ import {IHostAddress} from "../hosts/Hosts";
 import {ICoordinates} from "../../../components/map/LocationMap";
 import GenericSimulatedServiceMetricList from "../services/GenericSimulatedServiceMetricList";
 import GenericServiceRuleList from "../services/GenericServiceRuleList";
+import {IRegion} from "../regions/Region";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -77,6 +78,7 @@ export interface IContainer extends IDatabaseData {
     privateIpAddress: string;
     ports: IContainerPort[];
     labels: IContainerLabel;
+    region: IRegion;
     coordinates: ICoordinates;
     logs?: string;
     containerRules?: string[];
@@ -444,7 +446,7 @@ class Container extends BaseComponent<Props, State> {
                 }))
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
-        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
 
     //TODO get apps' services instead (in case a service is associated to more than 1 app)
     private getSelectableServices = () =>
@@ -472,6 +474,9 @@ class Container extends BaseComponent<Props, State> {
         }
         return null;
     }
+
+    private regionOption = (region: IRegion) =>
+        region.name;
 
     private formFields = (formContainer: INewContainer | Partial<IContainer>, isNew: boolean): JSX.Element =>
         isNew ?
@@ -518,6 +523,18 @@ class Container extends BaseComponent<Props, State> {
                                  id={key}
                                  label={key}
                                  icon={{linkedTo: this.hostLink}}/>
+                        : key === 'region'
+                            ? <Field<IRegion> key={index}
+                                              id={key}
+                                              type="dropdown"
+                                              label={key}
+                                              valueToString={this.regionOption}
+                                              dropdown={{
+                                                  defaultValue: "Select region",
+                                                  emptyMessage: "No regions to select",
+                                                  values: [(formContainer as IContainer).region],
+                                                  optionToString: this.regionOption
+                                              }}/>
                         : key === 'coordinates'
                             ? <Field key={index} id='coordinates' label='location' type='map'
                                      map={{

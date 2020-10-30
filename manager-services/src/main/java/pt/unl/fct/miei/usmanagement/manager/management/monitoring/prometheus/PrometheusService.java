@@ -31,7 +31,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -77,7 +77,7 @@ public class PrometheusService {
 			}
 		}
 		catch (RestClientException e) {
-			e.printStackTrace();
+			log.error("Failed to get stat {} from prometheus on {}: {}", prometheusQuery, hostAddress, e.getMessage());
 		}
 		return value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
 	}

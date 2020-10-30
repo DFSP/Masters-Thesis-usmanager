@@ -29,6 +29,7 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.SFTPClient;
+import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.xfer.FileSystemFile;
@@ -191,13 +192,9 @@ public class SshService {
 			log.info("Successfully connected to {}", hostAddress);
 			return true;
 		}
-		catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
-			// ignored
-		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed to connect to {}: {}", hostAddress, e.getMessage());
 		}
-		log.info("Failed to connect to {}", hostAddress);
 		return false;
 	}
 

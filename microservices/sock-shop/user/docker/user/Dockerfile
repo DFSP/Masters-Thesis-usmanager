@@ -27,5 +27,5 @@ COPY --from=registration-client /app/registration-client registration-client
 COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
 ENTRYPOINT ["./docker-init.sh"]
-# eureka, externalPort, internalPort, hostname, db
+# registration-server, externalPort, internalPort, hostname, db
 CMD ["127.0.0.1:8761", "8080", "80", "127.0.0.1", "user-db:27017"]

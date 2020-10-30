@@ -126,7 +126,7 @@ class SshCommand extends BaseComponent<Props, {}> {
     };
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
-        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? " (" + hostAddress.privateIpAddress + ")" : '');
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
 
 }
 

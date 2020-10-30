@@ -56,8 +56,8 @@ import RuleConditions from "../routes/management/rules/conditions/RuleConditions
 import Condition from "../routes/management/rules/conditions/RuleCondition";
 import LoadBalancers from "../routes/management/loadBalancers/LoadBalancers";
 import LoadBalancer from "../routes/management/loadBalancers/LoadBalancer";
-import EurekaServers from "../routes/management/eurekaServers/EurekaServers";
-import EurekaServer from "../routes/management/eurekaServers/EurekaServer";
+import RegistrationServers from "../routes/management/registrationServers/RegistrationServers";
+import RegistrationServer from "../routes/management/registrationServers/RegistrationServer";
 import SimulatedMetrics from "../routes/management/metrics/SimulatedMetrics";
 import SimulatedServiceMetric from "../routes/management/metrics/services/SimulatedServiceMetric";
 import SimulatedHostMetric from "../routes/management/metrics/hosts/SimulatedHostMetric";
@@ -123,8 +123,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/regions/:name": {component: Region},
     "/load-balancers": {component: LoadBalancers, search: true},
     "/load-balancers/:id": {component: LoadBalancer},
-    "/eureka-servers": {component: EurekaServers, search: true},
-    "/eureka-servers/:id": {component: EurekaServer},
+    "/registration-servers": {component: RegistrationServers, search: true},
+    "/registration-servers/:id": {component: RegistrationServer},
     "/ssh": {component: Ssh},
     "/settings": {component: Settings},
     "/logs": {component: ManagementLogs, search: true},

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.monitoring.metrics;
+package pt.unl.fct.miei.usmanagement.manager.metrics;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;

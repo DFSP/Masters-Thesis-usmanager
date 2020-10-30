@@ -31,6 +31,7 @@ import com.spotify.docker.client.messages.swarm.NodeInfo;
 import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -187,14 +188,18 @@ public class NodesService {
 	}
 
 	public SimpleNode addLabel(String nodeId, String label, String value) {
-		log.info("Adding label {}={} to node {}", label, value, nodeId);
+		return addLabels(nodeId, Map.of(label, value));
+	}
+
+	public SimpleNode addLabels(String nodeId, Map<String, String> labels) {
+		log.info("Adding labels {} to node {}", labels, nodeId);
 		SimpleNode node = getNode(nodeId);
-		Map<String, String> labels = new HashMap<>(node.getLabels());
-		labels.put(label, value);
+		Map<String, String> nodeLabels = new HashMap<>(node.getLabels());
+		nodeLabels.putAll(labels);
 		NodeSpec nodeSpec = NodeSpec.builder()
 			.availability(node.getAvailability().name())
 			.role(node.getRole().name())
-			.labels(labels)
+			.labels(nodeLabels)
 			.build();
 		return updateNode(node, nodeSpec);
 	}
