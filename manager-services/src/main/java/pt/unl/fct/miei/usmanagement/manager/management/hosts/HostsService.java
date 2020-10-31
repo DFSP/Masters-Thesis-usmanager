@@ -440,7 +440,6 @@ public class HostsService {
 					result = sshCommandResult.getOutput();
 				}
 			}
-
 		}
 		if (error != null) {
 			throw new ManagerException("%s", error);
@@ -451,7 +450,6 @@ public class HostsService {
 	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
 		String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
 		String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
-		String executeCommand = String.format("nohup %s %s %s", command, outputFile == null ? ">>" : ">", path);
 		Path outputFilePath = Paths.get(path);
 		try {
 			Files.createDirectories(outputFilePath.getParent());
@@ -463,7 +461,11 @@ public class HostsService {
 		catch (IOException e) {
 			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
 		}
-		executeCommandAsync(executeCommand, hostAddress);
+		if (Objects.equals(this.hostAddress, hostAddress)) {
+			bashService.executeCommandInBackground(command, outputFilePath);
+		} else {
+			sshService.executeCommandInBackground(command, hostAddress, outputFilePath);
+		}
 	}
 
 	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {

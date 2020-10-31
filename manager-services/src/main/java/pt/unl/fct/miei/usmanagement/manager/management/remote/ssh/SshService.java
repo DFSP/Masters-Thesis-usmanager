@@ -224,21 +224,24 @@ public class SshService {
 		return scriptPaths.keySet();
 	}
 
-	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
-		String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
-		String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
-		String executeCommand = String.format("nohup %s %s %s", command, outputFile == null ? ">>" : ">", path);
-		Path outputFilePath = Paths.get(path);
+	public void executeCommandInBackground(String command, HostAddress hostAddress, Path outputFilePath) {
+		String executeCommand = String.format("nohup %s > %s", command, outputFilePath.toString());
+		executeCommandAsync(executeCommand, hostAddress);
+	}
+
+	public void executeCommandInBackground(String command, HostAddress hostAddress) {
+		String filename = String.valueOf(System.currentTimeMillis());
+		String filepath = String.format("%s/logs/commands/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), filename);
+		Path path = Path.of(filepath);
 		try {
-			Files.createDirectories(outputFilePath.getParent());
-			if (outputFile == null) {
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
-				Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
-			}
+			Files.createDirectories(path.getParent());
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
+			Files.write(path, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
 		}
 		catch (IOException e) {
 			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
+			throw new ManagerException("Failed to store output of background command %s: %s", command, e.getMessage());
 		}
-		executeCommandAsync(executeCommand, hostAddress);
+		executeCommandInBackground(command, hostAddress, path);
 	}
 }

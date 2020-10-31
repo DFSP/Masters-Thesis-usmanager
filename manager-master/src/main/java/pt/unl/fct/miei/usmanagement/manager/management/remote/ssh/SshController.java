@@ -31,6 +31,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -48,7 +54,7 @@ public class SshController {
 		String command = request.getCommand();
 		HostAddress hostAddress = request.getHostAddress();
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress, null);
+			sshService.executeCommandInBackground(command, hostAddress);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

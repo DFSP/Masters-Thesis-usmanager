@@ -32,8 +32,10 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -119,4 +121,16 @@ public class BashService {
 		}
 	}
 
+	public void executeCommandInBackground(String command, Path outputFilePath) {
+		String executeCommand = String.format("nohup %s > /dev/null", command);
+		ProcessBuilder builder = new ProcessBuilder("bash", "-c", executeCommand);
+		builder.redirectOutput(outputFilePath.toFile());
+		builder.redirectError(outputFilePath.toFile());
+		try {
+			builder.start();
+		}
+		catch (IOException e) {
+			log.error("Failed to execute command {} in the background: {}", command, e.getMessage());
+		}
+	}
 }
