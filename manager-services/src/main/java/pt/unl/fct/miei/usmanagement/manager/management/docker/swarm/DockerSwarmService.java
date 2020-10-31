@@ -171,9 +171,9 @@ public class DockerSwarmService {
 		}
 	}
 
-	public void leaveSwarm(HostAddress hostAddress) {
+	public Optional<String> leaveSwarm(HostAddress hostAddress) {
 		try (DockerClient docker = dockerCoreService.getDockerClient(hostAddress)) {
-			leaveSwarm(docker);
+			return leaveSwarm(docker);
 		}
 	}
 
@@ -185,7 +185,7 @@ public class DockerSwarmService {
 		leaveSwarm(hostAddress);
 	}
 
-	private void leaveSwarm(DockerClient docker) {
+	private Optional<String> leaveSwarm(DockerClient docker) {
 		try {
 			boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
 			if (isNode) {
@@ -197,12 +197,14 @@ public class DockerSwarmService {
 				}
 				docker.leaveSwarm(true);
 				log.info("{} ({}) left the swarm", docker.getHost(), nodeId);
+				return Optional.of(nodeId);
 			}
 		}
 		catch (DockerException | InterruptedException e) {
 			log.error("Host {} failed to leave swarm: {}", docker.getHost(), e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
+		return Optional.empty();
 	}
 
 	public void destroySwarm() {

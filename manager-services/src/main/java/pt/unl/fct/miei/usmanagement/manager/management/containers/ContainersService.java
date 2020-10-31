@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
-import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.ContainerStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -363,7 +362,7 @@ public class ContainersService {
 		ContainerEntity container = getContainer(containerId);
 		String logs = dockerContainersService.getContainerLogs(container);
 		if (logs != null) {
-			String path = String.format("./logs/containers/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
+			String path = String.format("./logs/services/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
 			Path logsPath = Paths.get(path);
 			try {
 				Files.createDirectories(logsPath.getParent());

@@ -292,7 +292,7 @@ class Form extends BaseComponent<Props, State> {
         return (
             <>
                 {this.props.delete && confirmationDialog && (
-                    <ConfirmDialog id={id}
+                    <ConfirmDialog id={'confirm-delete'}
                                    message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${values[id]}`}`}
                                    confirmCallback={this.onClickDelete}/>)}
                 <form onSubmit={this.handleSubmit} noValidate>
@@ -353,7 +353,7 @@ class Form extends BaseComponent<Props, State> {
                                                 <button
                                                     className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small waves-effect waves-light red-text inline-button`}
                                                     type="button"
-                                                    data-target={id}
+                                                    data-target='confirm-delete'
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
                                                     {this.props.delete?.textButton || 'Delete'}
                                                 </button>)}

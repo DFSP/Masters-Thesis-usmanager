@@ -47,12 +47,12 @@ public class SshController {
 	public SshCommandResult execute(@RequestBody ExecuteSshRequest request) {
 		String command = request.getCommand();
 		HostAddress hostAddress = request.getHostAddress();
-		if (request.isSync()) {
-			return sshService.executeCommandSync(command, hostAddress);
+		if (request.isBackground()) {
+			sshService.executeCommandInBackground(command, hostAddress, null);
+			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {
-			sshService.executeCommandAsync(command, hostAddress);
-			return new SshCommandResult(hostAddress, command, -1, null, null);
+			return sshService.executeCommandSync(command, hostAddress);
 		}
 	}
 

@@ -488,6 +488,7 @@ class Node extends BaseComponent<Props, State> {
                                   ? undefined
                                   : {
                                       textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
+                                      confirmMessage: (node as INode).state === 'down' ? `to remove ${(node as INode).id} from the swarm` : `${(node as INode).id} to leave the swarm`,
                                       url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
                                       successCallback: this.onDeleteSuccess,
                                       failureCallback: this.onDeleteFailure

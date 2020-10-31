@@ -59,10 +59,17 @@ import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -197,7 +204,7 @@ public class HostsService {
 		containersService.addContainer(dockerApiProxyContainerId);
 		containersService.launchContainer(hostAddress, LocationRequestsService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
 		containersService.launchContainer(hostAddress, PrometheusService.PROMETHEUS, ContainerType.SINGLETON);
-		executeCommandAsync(PrometheusProperties.NODE_EXPORTER, hostAddress);
+		executeCommandInBackground(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
 
@@ -368,7 +375,8 @@ public class HostsService {
 		containersService.getSystemContainers(hostAddress).stream()
 			.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
 			.forEach(c -> containersService.stopContainer(c.getContainerId()));
-		dockerSwarmService.leaveSwarm(hostAddress);
+		Optional<String> nodeId = dockerSwarmService.leaveSwarm(hostAddress);
+		nodeId.ifPresent(nodesService::removeNode);
 	}
 
 	private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {
@@ -438,6 +446,24 @@ public class HostsService {
 			throw new ManagerException("%s", error);
 		}
 		return result;
+	}
+
+	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
+		String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
+		String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
+		String executeCommand = String.format("nohup %s %s %s", command, outputFile == null ? ">>" : ">", path);
+		Path outputFilePath = Paths.get(path);
+		try {
+			Files.createDirectories(outputFilePath.getParent());
+			if (outputFile == null) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
+				Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
+			}
+		}
+		catch (IOException e) {
+			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
+		}
+		executeCommandAsync(executeCommand, hostAddress);
 	}
 
 	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {

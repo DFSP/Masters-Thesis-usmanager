@@ -128,13 +128,8 @@ public class NodesService {
 	}
 
 	public void removeNode(String nodeId) {
-		//var node = getNode(nodeId);
 		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			swarmManager.deleteNode(nodeId);
-      /*int hostNodes = getNodes(n -> Objects.equals(n.status().addr(), node.getHostname())).size();
-      if (hostNodes == 0) {
-        hostsService.removeHost(node.getHostname());
-      }*/
+			swarmManager.deleteNode(nodeId, true);
 			log.info("Deleted node {}", nodeId);
 		}
 		catch (DockerException | InterruptedException e) {

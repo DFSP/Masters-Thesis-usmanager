@@ -65,10 +65,10 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 // https://materializecss.com/icons.html
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
     label = label.toLowerCase();
-    if (label === 'sync') {
+    if (label === 'background') {
         if (value === undefined) {
             return "sync_problem"
-        } else if (value) {
+        } else if (!value) {
             return "sync";
         } else {
             return "sync_disabled";

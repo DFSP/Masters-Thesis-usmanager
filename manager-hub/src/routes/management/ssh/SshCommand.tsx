@@ -42,13 +42,13 @@ export interface ISshCommand {
 }
 
 interface INewSshCommand {
-    sync?: boolean;
+    background?: boolean;
     hostAddress?: IHostAddress;
     command?: string;
 }
 
 const buildNewSshCommand = (): INewSshCommand => ({
-    sync: true,
+    background: false,
     hostAddress: undefined,
     command: undefined,
 });
@@ -80,12 +80,12 @@ class SshCommand extends BaseComponent<Props, {}> {
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field<boolean> key='sync'
-                                id='sync'
-                                label='sync'
+                <Field<boolean> key='background'
+                                id='background'
+                                label='background'
                                 type="dropdown"
                                 dropdown={{
-                                    defaultValue: "Wait until command finishes execution?",
+                                    defaultValue: "Execute in the background?",
                                     values: [true, false]
                                 }}/>
                 <Field<Partial<IHostAddress>> key='sshHostAddress'

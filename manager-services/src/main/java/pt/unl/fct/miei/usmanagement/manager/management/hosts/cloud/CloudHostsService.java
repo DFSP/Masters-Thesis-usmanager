@@ -234,7 +234,7 @@ public class CloudHostsService {
 			hostsService.removeHost(cloudHost.getAddress());
 		}
 		catch (ManagerException e) {
-			log.error(e.getMessage());
+			log.error("Failed to remove instance {} from the system: {}", id, e.getMessage());
 		}
 		InstanceState state = new InstanceState().withCode(AwsInstanceState.SHUTTING_DOWN.getCode()).withName(AwsInstanceState.SHUTTING_DOWN.getState());
 		cloudHost.setState(state);

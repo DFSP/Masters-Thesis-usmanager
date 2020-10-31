@@ -46,8 +46,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsServi
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Security;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,7 +167,6 @@ public class SshService {
 		}
 		catch (IOException e) {
 			log.error("Failed to execute command {} on host {}: {}", command, hostAddress.toSimpleString(), e.getMessage());
-			e.printStackTrace();
 			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}
@@ -210,12 +215,30 @@ public class SshService {
 			return true;
 		}
 		catch (IOException e) {
-			log.error("Failed to connect to {}: {}", hostAddress, e.getMessage());
+			log.info("Failed to connect to {}: {}", hostAddress, e.getMessage());
 		}
 		return false;
 	}
 
 	public Set<String> getScripts() {
 		return scriptPaths.keySet();
+	}
+
+	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
+		String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
+		String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
+		String executeCommand = String.format("nohup %s %s %s", command, outputFile == null ? ">>" : ">", path);
+		Path outputFilePath = Paths.get(path);
+		try {
+			Files.createDirectories(outputFilePath.getParent());
+			if (outputFile == null) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
+				Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
+			}
+		}
+		catch (IOException e) {
+			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
+		}
+		executeCommandAsync(executeCommand, hostAddress);
 	}
 }

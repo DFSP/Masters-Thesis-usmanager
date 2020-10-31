@@ -3,6 +3,7 @@ FROM maven:3.6.0-jdk-11-slim AS build
 WORKDIR /usr/src/app
 
 # install
+COPY scripts/docker-init.sh .
 COPY src ./src
 COPY pom.xml .
 RUN mvn -DskipTests clean package
@@ -12,7 +13,6 @@ RUN mv target/*.jar ./registration-server.jar
 RUN rm -rf /root/.m2 src pom.xml target
 
 # execution
-COPY scripts/docker-init.sh docker-init.sh
 RUN ["chmod", "+x", "docker-init.sh"]
 ENTRYPOINT ["/bin/bash", "-c", "./docker-init.sh"]
 ENV internalPort 8761

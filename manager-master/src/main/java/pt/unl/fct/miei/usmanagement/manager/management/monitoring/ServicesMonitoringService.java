@@ -250,8 +250,14 @@ public class ServicesMonitoringService {
 		}
 
 		List<ContainerEntity> systemContainers = containersService.getSystemContainers();
+
 		List<ContainerEntity> synchronizedContainers = containersService.synchronizeDatabaseContainers();
-		restoreCrashedSystemContainers(systemContainers, synchronizedContainers);
+		restoreCrashedContainers(monitoringContainers, synchronizedContainers);
+		systemContainers.parallelStream()
+			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
+			.forEach(this::restartContainer);
+
+		restoreCrashedContainers(systemContainers, synchronizedContainers);
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
@@ -332,19 +338,26 @@ public class ServicesMonitoringService {
 		}
 	}
 
-	private void restoreCrashedSystemContainers(List<ContainerEntity> systemContainers, List<ContainerEntity> synchronizedContainers) {
-		systemContainers.parallelStream()
+	private void restoreCrashedContainers(List<ContainerEntity> monitoringContainers, List<ContainerEntity> synchronizedContainers) {
+		monitoringContainers.parallelStream()
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
-			.forEach(this::restartContainer);
+			.forEach(this::restartContainerCloseTo);
 	}
 
 	// Restarts the container on a host close to where it used to be running
-	private void restartContainer(ContainerEntity container) {
+	private void restartContainerCloseTo(ContainerEntity container) {
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
 		ServiceEntity service = servicesService.getService(serviceName);
 		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
 		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
+		containersService.launchContainer(hostAddress, serviceName);
+	}
+
+	// Restarts the container on the same host
+	private void restartContainer(ContainerEntity container) {
+		HostAddress hostAddress = container.getHostAddress();
+		String serviceName = container.getServiceName();
 		containersService.launchContainer(hostAddress, serviceName);
 	}
 

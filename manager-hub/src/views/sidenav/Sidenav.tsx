@@ -106,6 +106,9 @@ class Sidenav extends React.Component<Props, {}> {
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
         this.scrollbar?.updateScroll();
+        if (prevProps.sidenav.user != this.props.sidenav.user && !this.props.sidenav.user) {
+           M.Sidenav.getInstance(this.sidenav.current as Element).close();
+        }
     }
 
     public componentWillUnmount(): void {
