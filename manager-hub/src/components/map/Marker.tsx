@@ -57,6 +57,7 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
             tooltip += ')';
         }
     }
+    console.log(size)
     return (
         <>
             <circle r={size}
@@ -64,7 +65,7 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
                     onMouseEnter={() => setTooltipContent(tooltip)}
                     onMouseLeave={() => setTooltipContent("")}
                     onClick={onRemove}/>
-            <circle r={size} stroke="black" strokeWidth="1" fill="none" />
+            <circle r={size} stroke="black" strokeWidth={size/2.5} fill="none" />
             {label &&
             <text
                 textAnchor="middle"

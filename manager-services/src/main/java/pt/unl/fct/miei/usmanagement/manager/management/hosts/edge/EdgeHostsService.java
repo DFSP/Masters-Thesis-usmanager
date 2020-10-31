@@ -81,7 +81,7 @@ public class EdgeHostsService {
 	public String buildKeyFilePath(EdgeHostEntity edgeHostEntity) {
 		String username = edgeHostEntity.getUsername();
 		String hostname = edgeHostEntity.getHostname();
-		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
+		return String.format("%s/%s/%s_%s.pub", System.getProperty("user.dir"), edgeKeyFilePath, username,
 			hostname.replace(".", "_"));
 	}
 

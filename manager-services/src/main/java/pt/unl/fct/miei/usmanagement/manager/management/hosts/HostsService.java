@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
-import com.spotify.docker.client.exceptions.DockerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -186,7 +185,8 @@ public class HostsService {
 					default:
 						throw new UnsupportedOperationException();
 				}
-			} catch (ManagerException e) {
+			}
+			catch (ManagerException e) {
 				log.error("Failed to setup {} with role {}: {}", hostAddress.toSimpleString(), role, e.getMessage());
 				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 second, then 2 seconds, then 3, etc
 			}
@@ -197,7 +197,7 @@ public class HostsService {
 		containersService.addContainer(dockerApiProxyContainerId);
 		containersService.launchContainer(hostAddress, LocationRequestsService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
 		containersService.launchContainer(hostAddress, PrometheusService.PROMETHEUS, ContainerType.SINGLETON);
-		sshService.executeCommand(hostAddress, PrometheusProperties.NODE_EXPORTER);
+		executeCommandAsync(PrometheusProperties.NODE_EXPORTER, hostAddress);
 		return node;
 	}
 
@@ -392,22 +392,35 @@ public class HostsService {
 		return cloudHostsService.launchInstance(coordinates);
 	}
 
-	public List<String> executeCommand(String command, HostAddress hostAddress) {
+	public List<String> executeCommandSync(String command, HostAddress hostAddress) {
+		return executeCommand(command, hostAddress, true);
+	}
+
+	public List<String> executeCommandAsync(String command, HostAddress hostAddress) {
+		return executeCommand(command, hostAddress, false);
+	}
+
+	private List<String> executeCommand(String command, HostAddress hostAddress, boolean wait) {
 		List<String> result = null;
 		String error = null;
 		if (Objects.equals(this.hostAddress, hostAddress)) {
 			// execute local command
-			BashCommandResult bashCommandResult = bashService.executeCommand(command);
-			if (!bashCommandResult.isSuccessful()) {
-				error = String.join("\n", bashCommandResult.getError());
+			if (wait) {
+				BashCommandResult bashCommandResult = bashService.executeCommandSync(command);
+				if (!bashCommandResult.isSuccessful()) {
+					error = String.join("\n", bashCommandResult.getError());
+				}
+				else {
+					result = bashCommandResult.getOutput();
+				}
 			}
 			else {
-				result = bashCommandResult.getOutput();
+				bashService.executeCommandAsync(command);
 			}
 		}
 		else {
 			// execute remote command
-			SshCommandResult sshCommandResult = sshService.executeCommand(hostAddress, command);
+			SshCommandResult sshCommandResult = sshService.executeCommand(command, hostAddress);
 			if (!sshCommandResult.isSuccessful()) {
 				error = String.join("\n", sshCommandResult.getError());
 			}
@@ -428,7 +441,7 @@ public class HostsService {
 	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {
 		String command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
 		try {
-			List<Integer> usedExternalPorts = executeCommand(command, hostAddress).stream()
+			List<Integer> usedExternalPorts = executeCommandSync(command, hostAddress).stream()
 				.filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
 				.map(Integer::parseInt)
 				.collect(Collectors.toList());

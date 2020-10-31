@@ -29,7 +29,6 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.xfer.FileSystemFile;
@@ -47,9 +46,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsServi
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.NoRouteToHostException;
-import java.net.SocketTimeoutException;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
@@ -149,7 +145,7 @@ public class SshService {
 		}
 	}
 
-	public SshCommandResult executeCommand(HostAddress hostAddress, String command) {
+	public SshCommandResult executeCommand(String command, HostAddress hostAddress) {
 		try (SSHClient sshClient = initClient(hostAddress);
 			 Session session = sshClient.startSession()) {
 			return executeCommand(session, hostAddress, command);

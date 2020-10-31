@@ -91,7 +91,7 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.IS_STOPPABLE, false,
 			ContainerConstants.Label.IS_REPLICABLE, false,
 			dockerRepository);
-		List<String> output = hostsService.executeCommand(command, hostAddress);
+		List<String> output = hostsService.executeCommandSync(command, hostAddress);
 		return output.get(output.size() - 1);
 	}
 

@@ -40,7 +40,7 @@ import java.util.List;
 public class BashService {
 
 	public String getUsername() {
-		BashCommandResult usernameResult = executeCommand("whoami");
+		BashCommandResult usernameResult = executeCommandSync("whoami");
 		if (!usernameResult.isSuccessful()) {
 			throw new ManagerException("Unable to get username of this machine: %s", usernameResult.getError());
 		}
@@ -48,7 +48,7 @@ public class BashService {
 	}
 
 	public String getPublicIp() {
-		BashCommandResult publicIpResult = executeCommand("curl https://ipinfo.io/ip");
+		BashCommandResult publicIpResult = executeCommandSync("curl https://ipinfo.io/ip");
 		if (!publicIpResult.isSuccessful()) {
 			throw new ManagerException("Unable to get public ip: %s", publicIpResult.getError());
 		}
@@ -56,7 +56,7 @@ public class BashService {
 	}
 
 	public String getPrivateIp() {
-		BashCommandResult privateIpResult = executeCommand("hostname -I | awk '{print $1}'");
+		BashCommandResult privateIpResult = executeCommandSync("hostname -I | awk '{print $1}'");
 		if (!privateIpResult.isSuccessful()) {
 			throw new ManagerException("Unable to get private ip: %s", privateIpResult.getError());
 		}
@@ -66,7 +66,7 @@ public class BashService {
 	public List<String> initDockerSwarm(String advertiseAddress, String listenAddress) {
 		String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
 			advertiseAddress, listenAddress);
-		BashCommandResult initDockerSwarmResult = executeCommand(command);
+		BashCommandResult initDockerSwarmResult = executeCommandSync(command);
 		if (!initDockerSwarmResult.isSuccessful()) {
 			throw new ManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, initDockerSwarmResult.getError());
 		}
@@ -75,14 +75,25 @@ public class BashService {
 
 	public void cleanup(String... files) {
 		String cleanupCommand = String.format("rm -f" + Strings.repeat(" %s", files.length), files);
-		executeCommand(cleanupCommand);
+		executeCommandSync(cleanupCommand);
 	}
 
-	public BashCommandResult executeCommand(String command) {
+	public BashCommandResult executeCommandSync(String command) {
+		return executeCommand(command, true);
+	}
+
+	public void executeCommandAsync(String command) {
+		executeCommand(command, false);
+	}
+
+	private BashCommandResult executeCommand(String command, boolean wait) {
 		Runtime r = Runtime.getRuntime();
 		String[] commands = {"bash", "-c", command};
 		try {
 			Process p = r.exec(commands);
+			if (!wait) {
+				return null;
+			}
 			p.waitFor();
 			int exitStatus = p.exitValue();
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
