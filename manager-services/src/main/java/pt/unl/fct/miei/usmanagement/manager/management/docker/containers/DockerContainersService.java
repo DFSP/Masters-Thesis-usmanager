@@ -533,7 +533,9 @@ public class DockerContainersService {
 	}
 
 	public List<DockerContainer> stopAll() {
-		return stopAllExcept(List.of(DockerApiProxyService.DOCKER_API_PROXY));
+		List<DockerContainer> containers = getContainers();
+		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
+		return containers;
 	}
 
 	public List<DockerContainer> stopAllExcept(List<String> services) {

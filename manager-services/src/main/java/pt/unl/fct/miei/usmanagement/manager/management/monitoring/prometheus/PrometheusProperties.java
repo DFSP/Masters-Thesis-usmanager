@@ -37,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("prometheus")
 public class PrometheusProperties {
 
+	public static final String NODE_EXPORTER = "node_exporter";
+
 	private final NodeExporter nodeExporter;
 
 	public PrometheusProperties() {

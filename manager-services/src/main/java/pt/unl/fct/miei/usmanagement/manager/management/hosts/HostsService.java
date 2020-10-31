@@ -53,6 +53,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsProper
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
@@ -196,6 +197,7 @@ public class HostsService {
 		containersService.addContainer(dockerApiProxyContainerId);
 		containersService.launchContainer(hostAddress, LocationRequestsService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
 		containersService.launchContainer(hostAddress, PrometheusService.PROMETHEUS, ContainerType.SINGLETON);
+		sshService.executeCommand(hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
 
