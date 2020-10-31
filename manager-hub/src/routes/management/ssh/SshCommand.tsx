@@ -73,21 +73,17 @@ class SshCommand extends BaseComponent<Props, {}> {
             <Form id={'sshCommand'}
                   fields={this.getFields()}
                   values={command}
-                  isNew={true}
+                  isNew
                   post={{
                       textButton: 'Execute',
                       url: 'ssh/execute',
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field<boolean> key='background'
-                                id='background'
-                                label='background'
-                                type="dropdown"
-                                dropdown={{
-                                    defaultValue: "Execute in the background?",
-                                    values: [true, false]
-                                }}/>
+                <Field key='background'
+                       id='background'
+                       type='checkbox'
+                       checkbox={{label: 'execute in the background'}}/>
                 <Field<Partial<IHostAddress>> key='sshHostAddress'
                                               id='hostAddress'
                                               label='hostAddress'
@@ -115,6 +111,10 @@ class SshCommand extends BaseComponent<Props, {}> {
 
     private getFields = (): IFields => (
         {
+            background: {
+                id: 'background',
+                label: 'background',
+            },
             hostAddress: {
                 id: 'hostAddress',
                 label: 'hostAddress',

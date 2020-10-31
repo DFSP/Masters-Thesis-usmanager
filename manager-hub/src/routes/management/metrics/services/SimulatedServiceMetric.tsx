@@ -313,33 +313,20 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                          label={key}
                                          type={'number'}/>
                                 : key === 'override'
-                                    ? <Field<boolean> key={index}
-                                                      id={key}
-                                                      label={key}
-                                                      type="dropdown"
-                                                      dropdown={{
-                                                          defaultValue: "Override real metrics?",
-                                                          values: [true, false]
-                                                      }}/>
+                                    ? <Field key={index}
+                                             id={key}
+                                             type='checkbox'
+                                             checkbox={{label: 'override real metrics'}}/>
                                     : key === 'generic'
-                                        ? <Field<boolean> key={index}
-                                                          id={key}
-                                                          label={key}
-                                                          type="dropdown"
-                                                          dropdown={{
-                                                              selectCallback: this.isGenericSelected,
-                                                              defaultValue: "Apply to all services?",
-                                                              values: [true, false]
-                                                          }}/>
+                                        ? <Field key={index}
+                                                 id={key}
+                                                 type='checkbox'
+                                                 checkbox={{label: 'apply to all services', checkCallback: this.isGenericSelected}}/>
                                         : key === 'active'
-                                            ? <Field<boolean> key={index}
-                                                              id={key}
-                                                              label={key}
-                                                              type="dropdown"
-                                                              dropdown={{
-                                                                  defaultValue: "Active?",
-                                                                  values: [true, false]
-                                                              }}/>
+                                            ? <Field key={index}
+                                                     id={key}
+                                                     type='checkbox'
+                                                     checkbox={{label: 'active'}}/>
                                             : <Field key={index}
                                                      id={key}
                                                      label={key}/>

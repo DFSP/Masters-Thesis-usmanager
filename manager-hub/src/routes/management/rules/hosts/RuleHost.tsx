@@ -382,15 +382,10 @@ class RuleHost extends BaseComponent<Props, State> {
                                                         emptyMessage: 'No decisions available'
                                                     }}/>
                                 : key === 'generic'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      selectCallback: this.isGenericSelected,
-                                                      defaultValue: "Apply to all hosts?",
-                                                      values: [true, false]
-                                                  }}/>
+                                ? <Field key={index}
+                                        id={key}
+                                        type='checkbox'
+                                        checkbox={{label: 'apply to all hosts', checkCallback: this.isGenericSelected}}/>
                                 : <Field key={index}
                                          id={key}
                                          label={key}

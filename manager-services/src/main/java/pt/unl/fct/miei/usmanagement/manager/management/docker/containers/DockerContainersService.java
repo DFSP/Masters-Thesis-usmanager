@@ -40,25 +40,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +89,6 @@ public class DockerContainersService {
 	private final NginxLoadBalancerService nginxLoadBalancerService;
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
-	private final DockerApiProxyService dockerApiproxyService;
 
 	private final int dockerDelayBeforeStopContainer;
 
@@ -101,7 +99,7 @@ public class DockerContainersService {
 								   NodesService nodesService, ServicesService servicesService,
 								   NginxLoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   DockerApiProxyService dockerApiproxyService, ContainerProperties containerProperties) {
+								   ContainerProperties containerProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -109,7 +107,6 @@ public class DockerContainersService {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
-		this.dockerApiproxyService = dockerApiproxyService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.launchingContainer = false;
 	}
@@ -343,7 +340,8 @@ public class DockerContainersService {
 				log.error("Failed to start container: {}", e.getMessage());
 				throw new ManagerException(e.getMessage());
 			}
-		} finally {
+		}
+		finally {
 			launchingContainer = false;
 		}
 	}

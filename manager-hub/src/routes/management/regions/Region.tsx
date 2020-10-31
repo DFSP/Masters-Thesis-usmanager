@@ -220,14 +220,10 @@ class Region extends BaseComponent<Props, State> {
                         }}*/>
                         {Object.keys(region).map((key, index) =>
                             /*key === 'active'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      defaultValue: "Is awsRegion active?",
-                                                      values: [true, false]
-                                                  }}/>
+                                ? <Field key={index}
+                                                     id={key}
+                                                     type='checkbox'
+                                                     checkbox={{label: 'region active'}}/>
                                 :*/ key === 'coordinates'
                             ? <Field key={index} id='coordinates' label='location' type='map'
                                      map={{loading: isLoading, editable: false, zoomable: true, labeled: true}}/>

@@ -39,6 +39,7 @@ import {Link} from "react-router-dom";
 import LocationMap from "../map/LocationMap";
 import {IMarker} from "../map/Marker";
 import LoadingSpinner from "../list/LoadingSpinner";
+import {Checkbox} from "./Checkbox";
 
 export interface IValidation {
     rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -47,7 +48,7 @@ export interface IValidation {
 
 export interface FieldProps<T = string> {
     id: string;
-    type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list" | "map";
+    type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list" | "map" | "checkbox";
     label?: string;
     value?: any;
     valueToString?: (v: T) => string;
@@ -61,6 +62,7 @@ export interface FieldProps<T = string> {
         loading: boolean, editable?: boolean, singleMarker?: boolean, zoomable?: boolean, labeled?: boolean, markers?: IMarker[],
         valueToMarkers?: (v: T[]) => IMarker[]
     }
+    checkbox?: { label?: string, checkCallback?: (value: any) => void }
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -89,7 +91,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     }
 
     public render() {
-        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map} = this.props;
+        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map, checkbox} = this.props;
         const getError = (errors: IErrors): string => (errors ? errors[id] : "");
         const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
             const hasErrors = getError(errors);
@@ -201,7 +203,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                               name={id}
                                               values={this.props.value}
                                               disabled={disabled || !formContext?.isEditing}
-                                              onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
+                                              onCheckList={this.onCheckList(formContext)}/>
                             )}
                             {(type && type.toLowerCase() === "map") && (
                                 map?.loading
@@ -214,6 +216,10 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                         marker={{size: 5, labeled: map?.labeled}} hover clickHighlight
                                         zoomable={!map?.editable || (map?.zoomable && !formContext.isEditing)}
                                         resizable/>
+                            )}
+                            {(type && type.toLowerCase() === "checkbox") && (
+                                <Checkbox id={id} label={checkbox?.label} checked={formContext.values[id]}
+                                          onCheck={this.onCheck(formContext, checkbox?.checkCallback)}/>
                             )}
                             {getError(formContext.errors) && (
                                 <span className="helper-text red-text darken-3">
@@ -267,13 +273,18 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     private onBlur = (id: string, formContext: IFormContext) => (): void =>
         formContext.validate(id);
 
-    private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
+    private onCheckList = (formContext: IFormContext) => (listId: keyof IValues, itemId: string, checked: boolean) => {
         if (checked) {
             formContext.addValue(listId, itemId);
         } else {
             formContext.removeValue(listId, itemId);
         }
     };
+
+    private onCheck = (formContext: IFormContext, checkCallback?: (checked: boolean) => void) => (id: keyof IValues, checked: boolean) => {
+        formContext.setValue(id, checked);
+        checkCallback?.(checked);
+    }
 
     private onSelectCoordinates = (id: string, formContext: any) => (marker: IMarker): void => {
         if (this.props.map?.singleMarker) {

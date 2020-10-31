@@ -34,7 +34,7 @@ interface Props {
     name: string;
     values: any[];
     disabled?: boolean;
-    onCheck: (listId: string, itemId: string, checked: boolean) => void;
+    onCheckList: (listId: string, itemId: string, checked: boolean) => void;
 }
 
 interface State {
@@ -66,7 +66,7 @@ export class CheckboxList extends React.Component<Props, State> {
         const {checked} = event.target;
         this.state.values.forEach(value => {
             if (checked !== value.checked) {
-                this.props.onCheck(this.props.id, value.value, checked);
+                this.props.onCheckList(this.props.id, value.value, checked);
             }
         });
         this.setState({values: Object.values(this.state.values).map(v => ({value: v.value, checked: checked}))});
@@ -103,7 +103,7 @@ export class CheckboxList extends React.Component<Props, State> {
         const stateValue = this.state.values.find(value => value.value === id);
         if (stateValue) {
             stateValue.checked = checked;
-            this.props.onCheck(this.props.id, id, checked);
+            this.props.onCheckList(this.props.id, id, checked);
         }
         this.setState({values: this.state.values});
     };

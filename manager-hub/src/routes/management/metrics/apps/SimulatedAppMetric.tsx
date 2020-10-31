@@ -301,23 +301,15 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
                                                      emptyMessage: 'No fields available'
                                                  }}/>
                                 : key === 'override'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      defaultValue: "Override real metrics?",
-                                                      values: [true, false]
-                                                  }}/>
+                                ? <Field key={index}
+                                         id={key}
+                                         type='checkbox'
+                                         checkbox={{label: 'override real metrics'}}/>
                                 : key === 'active'
-                                    ? <Field<boolean> key={index}
-                                                      id={key}
-                                                      label={key}
-                                                      type="dropdown"
-                                                      dropdown={{
-                                                          defaultValue: "Active?",
-                                                          values: [true, false]
-                                                      }}/>
+                                    ? <Field key={index}
+                                             id={key}
+                                             type='checkbox'
+                                             checkbox={{label: 'active'}}/>
                                     : key === 'minimumValue' || key === 'maximumValue'
                                         ? <Field key={index}
                                                  id={key}

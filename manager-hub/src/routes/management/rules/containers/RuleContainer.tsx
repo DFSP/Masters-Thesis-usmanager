@@ -58,9 +58,7 @@ const buildNewContainerRule = (): Partial<IRuleContainer> => ({
     name: undefined,
     priority: 0,
     decision: undefined,
-    generic: undefined,
 });
-
 
 interface StateToProps {
     isLoading: boolean;
@@ -96,7 +94,6 @@ type State = {
     unsavedConditions: string[],
     unsavedContainersIds: string[],
     unsavedContainers: string[],
-    isGeneric: boolean,
 }
 
 class RuleContainer extends BaseComponent<Props, State> {
@@ -105,7 +102,6 @@ class RuleContainer extends BaseComponent<Props, State> {
         unsavedConditions: [],
         unsavedContainersIds: [],
         unsavedContainers: [],
-        isGeneric: this.props.ruleContainer?.generic || false,
     };
     private mounted = false;
 
@@ -117,12 +113,6 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     public componentWillUnmount(): void {
         this.mounted = false;
-    }
-
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        if (prevProps.ruleContainer?.generic !== this.props.ruleContainer?.generic) {
-            this.setState({isGeneric: this.props.ruleContainer?.generic || false})
-        }
     }
 
     public render() {
@@ -297,9 +287,6 @@ class RuleContainer extends BaseComponent<Props, State> {
     private decisionDropdownOption = (decision: IDecision): string =>
         decision.ruleDecision;
 
-    private isGenericSelected = (generic: boolean) =>
-        this.setState({isGeneric: generic});
-
     private getSelectableDecisions = () =>
         Object.values(this.props.decisions)
             .filter(decision => decision.componentType.type.toLowerCase() === componentTypes.SERVICE.type.toLowerCase());
@@ -350,16 +337,6 @@ class RuleContainer extends BaseComponent<Props, State> {
                                                         optionToString: this.decisionDropdownOption,
                                                         emptyMessage: 'No decisions available'
                                                     }}/>
-                                : key === 'generic'
-                                ? <Field<boolean> key={index}
-                                                  id={key}
-                                                  label={key}
-                                                  type="dropdown"
-                                                  dropdown={{
-                                                      selectCallback: this.isGenericSelected,
-                                                      defaultValue: "Apply to all containers?",
-                                                      values: [true, false]
-                                                  }}/>
                                 : <Field key={index}
                                          id={key}
                                          label={key}
@@ -405,7 +382,6 @@ class RuleContainer extends BaseComponent<Props, State> {
             title: 'Containers',
             id: 'containers',
             content: () => this.containers(),
-            disabled: this.state.isGeneric,
             active: this.props.location.state?.selected === 'containers'
         }
     ];
