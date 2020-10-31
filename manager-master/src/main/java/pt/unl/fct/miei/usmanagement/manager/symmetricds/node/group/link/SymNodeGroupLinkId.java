@@ -39,6 +39,8 @@ import java.io.Serializable;
 @ToString
 public class SymNodeGroupLinkId implements Serializable {
 
+	private static final long serialVersionUID = -8142708534393633084L;
+
 	private String sourceNodeGroupId;
 
 	private String targetNodeGroupId;

@@ -41,7 +41,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum Region implements Serializable {
+public enum Region {
 
 	NORTH_AMERICA("North America", new Coordinates("North America", 39.787092, -99.754244)),
 	SOUTH_AMERICA("South America", new Coordinates("South America", -14.864205, -55.902655)),

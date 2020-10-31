@@ -39,6 +39,8 @@ import java.io.Serializable;
 @ToString
 public class SymTriggerRouterId implements Serializable {
 
+	private static final long serialVersionUID = -6204226752504878707L;
+
 	private String triggerId;
 
 	private String routerId;

@@ -66,7 +66,7 @@ class NodeCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">Node <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm. Takes a few seconds to update.'}</span>`);
+        super.toast(`<span class="green-text">Node <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm.'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

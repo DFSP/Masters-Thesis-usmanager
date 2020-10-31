@@ -38,6 +38,8 @@ import java.io.Serializable;
 @ToString
 public class Customer implements Serializable {
 
+	private static final long serialVersionUID = 7063865716781837630L;
+
 	@Id
 	private String id;
 

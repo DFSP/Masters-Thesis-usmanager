@@ -103,7 +103,7 @@ https://stackoverflow.com/a/48572280
 
     Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, 
 substituindo `user` pelo username da conta a usar. Isto permite executar comandos sudo sem ser pedida a password.
-O manager-master automatiza a configuração de um edge host novo (ver [ssh-keygen](https://www.ssh.com/ssh/keygen/)).
+O manager-master automatiza a configuração de um edge host novo, ao criar um par de chaves publica-privada (ver [ssh-keygen](https://www.ssh.com/ssh/keygen/)).
  
     Se protegidos pelo router (http://192.168.1.254 no caso de *meo*, 
 http://192.168.1.1 no caso de *nos* ou *vodafone*), então é preciso fazer configurações ao router para que as máquinas

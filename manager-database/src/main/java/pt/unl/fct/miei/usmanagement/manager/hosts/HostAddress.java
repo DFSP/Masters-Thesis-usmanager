@@ -36,6 +36,8 @@ import java.util.Objects;
 @Getter
 public class HostAddress implements Serializable {
 
+	private static final long serialVersionUID = -7952567936761304029L;
+
 	private final String username;
 	private final String publicDnsName;
 	private final String publicIpAddress;
@@ -64,12 +66,16 @@ public class HostAddress implements Serializable {
 	}
 
 	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates) {
+		this(username, publicIpAddress, privateIpAddress, coordinates, null);
+	}
+
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates, Region region) {
 		this.username = username;
 		this.publicDnsName = null;
 		this.privateIpAddress = privateIpAddress;
 		this.publicIpAddress = publicIpAddress;
 		this.coordinates = coordinates;
-		this.region = null;
+		this.region = region;
 	}
 
 	@JsonIgnore

@@ -39,6 +39,8 @@ import java.io.Serializable;
 @ToString
 public class SymNodeHostId implements Serializable {
 
+	private static final long serialVersionUID = -4704935299311181299L;
+
 	private String nodeId;
 
 	private String hostName;

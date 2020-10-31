@@ -31,6 +31,8 @@ import java.io.Serializable;
 @Data
 public final class ContainerPortMapping implements Serializable {
 
+	private static final long serialVersionUID = 2141637578615092539L;
+
 	private final int privatePort;
 	private final int publicPort;
 	private final String type;

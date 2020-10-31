@@ -39,6 +39,8 @@ import java.io.Serializable;
 @ToString
 public class LoggingEventPropertyId implements Serializable {
 
+	private static final long serialVersionUID = -4522953678915194181L;
+
 	private long eventId;
 
 	private String mappedKey;

@@ -71,7 +71,8 @@ public final class SimpleNode {
 		final String username = getUsername();
 		final String privateIpAddress = getPrivateIpAddress();
 		final Coordinates coordinates = getCoordinates();
-		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates);
+		final Region region = getRegion();
+		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region);
 	}
 
 }

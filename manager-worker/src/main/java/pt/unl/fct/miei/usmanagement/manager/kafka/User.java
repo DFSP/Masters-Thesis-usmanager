@@ -38,6 +38,8 @@ import java.io.Serializable;
 @ToString
 public class User implements Serializable {
 
+	private static final long serialVersionUID = -3936242022780053636L;
+
 	@Id
 	private String id;
 

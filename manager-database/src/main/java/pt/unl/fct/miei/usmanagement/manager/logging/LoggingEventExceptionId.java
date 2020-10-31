@@ -39,6 +39,8 @@ import java.io.Serializable;
 @ToString
 public class LoggingEventExceptionId implements Serializable {
 
+	private static final long serialVersionUID = 7716736141871575678L;
+
 	private long eventId;
 
 	private short i;

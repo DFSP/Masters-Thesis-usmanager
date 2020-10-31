@@ -37,6 +37,8 @@ import java.io.Serializable;
 @ToString
 public class Coordinates implements Serializable {
 
+	private static final long serialVersionUID = -3255403093528275740L;
+
 	private final String label;
 	private final String title;
 	private final double latitude;

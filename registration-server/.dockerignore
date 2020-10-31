@@ -1,4 +1,4 @@
 *
 !pom.xml
-!/src
-!/scripts
+!src
+!scripts
