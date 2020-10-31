@@ -73,6 +73,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -89,6 +90,7 @@ public class DockerContainersService {
 	private final NginxLoadBalancerService nginxLoadBalancerService;
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
+	private final DockerApiProxyService dockerApiproxyService;
 
 	private final int dockerDelayBeforeStopContainer;
 
@@ -96,10 +98,10 @@ public class DockerContainersService {
 	private boolean launchingContainer;
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
-								   NodesService nodesService,
-								   ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
+								   NodesService nodesService, ServicesService servicesService,
+								   NginxLoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   ContainerProperties containerProperties) {
+								   DockerApiProxyService dockerApiproxyService, ContainerProperties containerProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -107,6 +109,7 @@ public class DockerContainersService {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
+		this.dockerApiproxyService = dockerApiproxyService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.launchingContainer = false;
 	}
@@ -532,21 +535,9 @@ public class DockerContainersService {
 		return logs;
 	}
 
-	public List<DockerContainer> stopAll() {
-		List<DockerContainer> containers = stopAllExcept(List.of(DockerApiProxyService.DOCKER_API_PROXY));
-		List<DockerContainer> dockerApiProxyContainers = getContainers(DockerClient.ListContainersFilterParam.withLabel(
-			ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY));
-		dockerApiProxyContainers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
-		containers.addAll(dockerApiProxyContainers);
-		return containers;
-	}
-
-	public List<DockerContainer> stopAllExcept(List<String> services) {
+	public List<DockerContainer> stopAll(Predicate<DockerContainer> containersPredicate) {
 		List<DockerContainer> containers = getContainers();
-		containers.removeIf(dockerContainer -> {
-			String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
-			return services.contains(serviceName);
-		});
+		containers.removeIf(Predicate.not(containersPredicate));
 		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
 		return containers;
 	}

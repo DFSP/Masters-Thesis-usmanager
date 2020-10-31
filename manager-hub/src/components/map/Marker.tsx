@@ -57,7 +57,6 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
             tooltip += ')';
         }
     }
-    console.log(size)
     return (
         <>
             <circle r={size}

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
+import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.ContainerStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -60,6 +61,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -441,9 +443,18 @@ public class ContainersService {
 		return containerId;
 	}
 
-	public void stopContainers() {
-		List<DockerContainer> containers = dockerContainersService.stopAll();
+	public void stopContainers(Predicate<DockerContainer> containerPredicate) {
+		List<DockerContainer> containers = dockerContainersService.stopAll(containerPredicate);
 		containers.forEach(container -> deleteContainer(container.getId()));
+	}
+
+	public void stopDockerApiProxies() {
+		List<ContainerEntity> dockerApiProxies = getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY)));
+		dockerApiProxies.parallelStream().forEach(dockerApiProxy -> {
+			dockerApiProxyService.stopDockerApiProxy(dockerApiProxy.getHostAddress());
+			containers.delete(dockerApiProxy);
+		});
 	}
 
 	public boolean hasContainer(String containerId) {

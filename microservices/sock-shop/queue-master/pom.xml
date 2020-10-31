@@ -97,9 +97,10 @@
 			<version>4.5.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bitbucket.cloudedgemicroserviceteam</groupId>
-			<artifactId>java-client-register-go</artifactId>
-			<version>RELEASE-1.0.1</version>
+			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
+			<artifactId>registration-client-java</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

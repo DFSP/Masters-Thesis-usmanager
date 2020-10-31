@@ -41,7 +41,14 @@ export interface ISshCommand {
     error: string[];
 }
 
-const buildNewSshCommand = (): Partial<ISshCommand> => ({
+interface INewSshCommand {
+    sync?: boolean;
+    hostAddress?: IHostAddress;
+    command?: string;
+}
+
+const buildNewSshCommand = (): INewSshCommand => ({
+    sync: true,
     hostAddress: undefined,
     command: undefined,
 });
@@ -73,7 +80,15 @@ class SshCommand extends BaseComponent<Props, {}> {
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field<Partial<IHostAddress>> key='hostAddress'
+                <Field<boolean> key='sync'
+                                id='sync'
+                                label='sync'
+                                type="dropdown"
+                                dropdown={{
+                                    defaultValue: "Wait until command finishes execution?",
+                                    values: [true, false]
+                                }}/>
+                <Field<Partial<IHostAddress>> key='sshHostAddress'
                                               id='hostAddress'
                                               label='hostAddress'
                                               type='dropdown'

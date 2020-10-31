@@ -32,29 +32,32 @@ import {Resizable} from "re-resizable";
 import ScrollBar from "react-perfect-scrollbar";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
-import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
+import {addCommand, clearCommands, loadCloudHosts, loadEdgeHosts} from "../../../actions";
 
 interface StateToProps {
     sidenavVisible: boolean;
+    commands: (ICommand | IFileTransfer)[];
 }
 
 interface DispatchToProps {
     loadCloudHosts: () => void;
     loadEdgeHosts: () => void;
+    addCommand: (command: ICommand | IFileTransfer) => void;
+    clearCommands: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
-interface ICommand extends ISshCommand {
+export interface ICommand extends ISshCommand {
     timestamp: number;
 }
 
-interface IFileTransfer extends ISshFile {
+export interface IFileTransfer extends ISshFile {
     timestamp: number;
 }
 
 interface State {
-    commands: (ICommand | IFileTransfer)[];
+    /*commands: (ICommand | IFileTransfer)[];*/
     commandsHeight: number;
     animate: boolean;
 }
@@ -71,15 +74,10 @@ class Ssh extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            commands: [],
+            /*commands: [],*/
             commandsHeight: this.COMMANDS_DEFAULT_HEIGHT,
             animate: false,
         }
-    }
-
-
-    private static pad(n: number, width: number, padWith = 0) {
-        return (String(padWith).repeat(width) + String(n)).slice(String(n).length);
     }
 
     public componentDidMount() {
@@ -122,7 +120,7 @@ class Ssh extends React.Component<Props, State> {
                             this.leftControlsScrollbar = ref;
                         }}>
                             <button className='btn-floating btn-flat btn-small tooltipped'
-                                    onClick={this.clearCommands}
+                                    onClick={this.props.clearCommands}
                                     data-position={'top'}
                                     data-tooltip={'Clear'}>
                                 <i className="material-icons grey-text">delete_sweep</i>
@@ -143,7 +141,7 @@ class Ssh extends React.Component<Props, State> {
                             </div>
                         </div>
                         <div className={styles.commands}>
-                            {this.state.commands.map((command, index) => (
+                            {this.props.commands.map((command, index) => (
                                 <div key={index}>
                                     {'output' in command ?
                                         <>
@@ -153,14 +151,15 @@ class Ssh extends React.Component<Props, State> {
                                                 <span
                                                     className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>
                                                 <span className={styles.command}>{command.command}</span>
-                                                {command.exitStatus !== 0 &&
+                                                {command.exitStatus !== 0 && command.error !== null && command.output !== null &&
                                                 <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
                                             </div>
+                                            {command.error !== null && command.output !== null &&
                                             <div dangerouslySetInnerHTML={{
                                                 __html:
                                                     ((command.exitStatus === 0 && command.error.length && command.error[0] === "") ? command.output.join("\n") : command.error.join("\n"))
                                                         .replace(/(?:\r\n|\r|\n)/g, '<br/>')
-                                            }}/>
+                                            }}/>}
                                         </>
                                         :
                                         <>
@@ -220,37 +219,61 @@ class Ssh extends React.Component<Props, State> {
         this.setState({commandsHeight: this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? this.COMMANDS_DEFAULT_HEIGHT : this.COMMANDS_MIN_HEIGHT},
             () => setTimeout(() => this.updateScrollbars(), 500));
 
-    private clearCommands = () =>
-        this.setState({commands: []});
+    /*private clearCommands = () =>
+        this.setState({commands: []});*/
 
     private addCommand = (sshCommand: ISshCommand) => {
         const command = {...sshCommand, timestamp: Date.now()};
-        this.setState({commands: this.state.commands.concat(command)}, () => {
+        this.props.addCommand(command);
+        this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
+        /*this.setState({commands: this.state.commands.concat(command)}, () => {
             this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        });
+        });*/
     }
 
     private addFileTransfer = (fileTransfer: ISshFile) => {
         const transfer = {...fileTransfer, timestamp: Date.now()};
-        this.setState({commands: this.state.commands.concat(transfer)}, () => {
+        this.props.addCommand(transfer);
+        this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
+        /*this.setState({commands: this.state.commands.concat(transfer)}, () => {
             this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        });
+        });*/
     }
 
     private timestampToString = (timestamp: number): string => {
         const date = new Date(timestamp);
-        let millis = Ssh.pad(date.getMilliseconds(), 3);
-        return `${date.toLocaleTimeString()}.${millis}`
+        return this.dateFormat(date);
     }
+
+    private dateFormat = (date: Date) => {
+        let monthNames =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        let day = date.getDate();
+
+        let monthIndex = date.getMonth();
+        let monthName = monthNames[monthIndex];
+
+        let year = date.getFullYear().toString().substr(-2);
+
+        let millis = this.pad(date.getMilliseconds(), 3);
+
+        return `${day}/${monthName}/${year} ${date.toLocaleTimeString()}.${millis}`;
+    }
+
+    private pad = (n: number, width: number, padWith = 0) =>
+        (String(padWith).repeat(width) + String(n)).slice(String(n).length);
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+        commands: state.entities.commands
     }
 );
 
 const mapDispatchToProps: DispatchToProps = {
+    addCommand,
+    clearCommands,
     loadCloudHosts,
     loadEdgeHosts,
 };

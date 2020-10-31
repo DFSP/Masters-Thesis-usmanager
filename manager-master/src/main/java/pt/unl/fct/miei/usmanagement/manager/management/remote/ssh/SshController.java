@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.Set;
 
@@ -44,7 +45,15 @@ public class SshController {
 
 	@PostMapping("/execute")
 	public SshCommandResult execute(@RequestBody ExecuteSshRequest request) {
-		return sshService.executeCommand(request.getCommand(), request.getHostAddress());
+		String command = request.getCommand();
+		HostAddress hostAddress = request.getHostAddress();
+		if (request.isSync()) {
+			return sshService.executeCommandSync(command, hostAddress);
+		}
+		else {
+			sshService.executeCommandAsync(command, hostAddress);
+			return new SshCommandResult(hostAddress, command, -1, null, null);
+		}
 	}
 
 	@PostMapping("/upload")

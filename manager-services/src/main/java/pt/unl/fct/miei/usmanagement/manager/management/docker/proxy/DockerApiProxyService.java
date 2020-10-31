@@ -95,4 +95,10 @@ public class DockerApiProxyService {
 		return output.get(output.size() - 1);
 	}
 
+	public void stopDockerApiProxy(HostAddress hostAddress) {
+		log.info("Stopping docker api proxy on host {}", hostAddress.toSimpleString());
+		String command = String.format("docker stop $(docker ps -q -f \"name=%s\")", DOCKER_API_PROXY);
+		hostsService.executeCommandAsync(command, hostAddress);
+	}
+
 }

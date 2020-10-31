@@ -420,22 +420,24 @@ public class HostsService {
 		}
 		else {
 			// execute remote command
-			SshCommandResult sshCommandResult = sshService.executeCommand(command, hostAddress);
-			if (!sshCommandResult.isSuccessful()) {
-				error = String.join("\n", sshCommandResult.getError());
+			if (!wait) {
+				sshService.executeCommandAsync(command, hostAddress);
 			}
 			else {
-				result = sshCommandResult.getOutput();
+				SshCommandResult sshCommandResult = sshService.executeCommandSync(command, hostAddress);
+				if (!sshCommandResult.isSuccessful()) {
+					error = String.join("\n", sshCommandResult.getError());
+				}
+				else {
+					result = sshCommandResult.getOutput();
+				}
 			}
+
 		}
 		if (error != null) {
 			throw new ManagerException("%s", error);
 		}
 		return result;
-	}
-
-	public String findAvailableExternalPort(String startExternalPort) {
-		return findAvailableExternalPort(hostAddress, startExternalPort);
 	}
 
 	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {

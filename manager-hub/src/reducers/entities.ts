@@ -30,6 +30,7 @@ import {
     ADD_CLOUD_HOST,
     ADD_CLOUD_HOST_RULE,
     ADD_CLOUD_HOST_SIMULATED_METRICS,
+    ADD_COMMANDS,
     ADD_CONDITION,
     ADD_CONTAINER,
     ADD_CONTAINER_RULES,
@@ -37,9 +38,9 @@ import {
     ADD_EDGE_HOST,
     ADD_EDGE_HOST_RULES,
     ADD_EDGE_HOST_SIMULATED_METRICS,
-    ADD_REGISTRATION_SERVER,
     ADD_LOAD_BALANCER,
     ADD_NODE,
+    ADD_REGISTRATION_SERVER,
     ADD_RULE_APP,
     ADD_RULE_APP_APPS,
     ADD_RULE_APP_CONDITIONS,
@@ -85,6 +86,7 @@ import {
     APPS_REQUEST,
     APPS_SUCCESS,
     ASSIGN_WORKER_MANAGER_MACHINES,
+    CLEAR_COMMANDS,
     CLOUD_HOST_FAILURE,
     CLOUD_HOST_REQUEST,
     CLOUD_HOST_RULES_FAILURE,
@@ -155,12 +157,6 @@ import {
     EDGE_HOSTS_FAILURE,
     EDGE_HOSTS_REQUEST,
     EDGE_HOSTS_SUCCESS,
-    REGISTRATION_SERVER_FAILURE,
-    REGISTRATION_SERVER_REQUEST,
-    REGISTRATION_SERVER_SUCCESS,
-    REGISTRATION_SERVERS_FAILURE,
-    REGISTRATION_SERVERS_REQUEST,
-    REGISTRATION_SERVERS_SUCCESS,
     FIELDS_FAILURE,
     FIELDS_REQUEST,
     FIELDS_SUCCESS,
@@ -188,6 +184,12 @@ import {
     REGIONS_FAILURE,
     REGIONS_REQUEST,
     REGIONS_SUCCESS,
+    REGISTRATION_SERVER_FAILURE,
+    REGISTRATION_SERVER_REQUEST,
+    REGISTRATION_SERVER_SUCCESS,
+    REGISTRATION_SERVERS_FAILURE,
+    REGISTRATION_SERVERS_REQUEST,
+    REGISTRATION_SERVERS_SUCCESS,
     REMOVE_APP_RULES,
     REMOVE_APP_SERVICES,
     REMOVE_APP_SIMULATED_METRICS,
@@ -388,6 +390,8 @@ import {ISimulatedContainerMetric} from "../routes/management/metrics/containers
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
+import {ISshCommand} from "../routes/management/ssh/SshCommand";
+import {ICommand, IFileTransfer} from "../routes/management/ssh/Ssh";
 
 export type EntitiesState = {
     apps: {
@@ -587,7 +591,8 @@ export type EntitiesState = {
         data: string[],
         isLoadingScripts: boolean,
         loadScriptsError: string | null,
-    }
+    },
+    commands: (ICommand | IFileTransfer)[],
 }
 
 export type EntitiesAction = {
@@ -636,6 +641,7 @@ export type EntitiesAction = {
         workerManagers?: IWorkerManager[],
         assignedHosts?: string[],
         logs?: ILogs[],
+        commands?: ISshCommand[],
     },
 };
 
@@ -838,6 +844,7 @@ const entities = (state: EntitiesState = {
                           isLoadingScripts: false,
                           loadScriptsError: null
                       },
+                      commands: [],
                   },
                   action: EntitiesAction
 ): EntitiesState => {
@@ -3714,10 +3721,20 @@ const entities = (state: EntitiesState = {
             break;
         case REGISTRATION_SERVERS_REQUEST:
         case REGISTRATION_SERVER_REQUEST:
-            return merge({}, state, {registrationServers: {isLoadingRegistrationServers: true, loadRegistrationServersError: null}});
+            return merge({}, state, {
+                registrationServers: {
+                    isLoadingRegistrationServers: true,
+                    loadRegistrationServersError: null
+                }
+            });
         case REGISTRATION_SERVERS_FAILURE:
         case REGISTRATION_SERVER_FAILURE:
-            return merge({}, state, {registrationServers: {isLoadingRegistrationServers: false, loadRegistrationServersError: error}});
+            return merge({}, state, {
+                registrationServers: {
+                    isLoadingRegistrationServers: false,
+                    loadRegistrationServersError: error
+                }
+            });
         case REGISTRATION_SERVERS_SUCCESS:
             return {
                 ...state,
@@ -3870,6 +3887,17 @@ const entities = (state: EntitiesState = {
                     loadScriptsError: null,
                 }
             };
+        case ADD_COMMANDS:
+            if (data?.commands?.length) {
+                const commands = [...state.commands, ...data.commands];
+                return merge({}, state, {commands});
+            }
+            break;
+        case CLEAR_COMMANDS:
+            return {
+                ...state,
+                commands: []
+            }
         default:
             return state;
     }

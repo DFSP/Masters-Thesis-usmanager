@@ -32,5 +32,6 @@ public class ExecuteSshRequest {
 
 	private final HostAddress hostAddress;
 	private final String command;
+	private final boolean sync;
 
 }

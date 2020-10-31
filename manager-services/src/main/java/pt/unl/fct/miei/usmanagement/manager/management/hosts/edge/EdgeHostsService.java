@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
@@ -45,7 +46,6 @@ import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
-import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,10 +78,10 @@ public class EdgeHostsService {
 		this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
 	}
 
-	public String buildKeyFilePath(EdgeHostEntity edgeHostEntity) {
+	public String getPrivateKeyFilePath(EdgeHostEntity edgeHostEntity) {
 		String username = edgeHostEntity.getUsername();
 		String hostname = edgeHostEntity.getHostname();
-		return String.format("%s/%s/%s_%s.pub", System.getProperty("user.dir"), edgeKeyFilePath, username,
+		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
 			hostname.replace(".", "_"));
 	}
 
@@ -123,24 +123,42 @@ public class EdgeHostsService {
 
 	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, String password) {
 		checkHostDoesntExist(edgeHost);
-		if (password != null) {
-			setupEdgeHost(edgeHost, password);
-		}
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-		return edgeHosts.save(edgeHost);
+		EdgeHostEntity edgeHostEntity = edgeHosts.save(edgeHost);
+		if (password != null) {
+			try {
+				setupEdgeHost(edgeHost, password);
+			} catch (Exception e) {
+				edgeHosts.delete(edgeHostEntity);
+				throw e;
+			}
+		}
+		return edgeHostEntity;
 	}
 
 	private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
 		HostAddress hostAddress = edgeHost.getAddress();
-		String keyFilePath = buildKeyFilePath(edgeHost);
+		String keyFilePath = getPrivateKeyFilePath(edgeHost);
 		log.info("Generating keys for edge host {}", hostAddress);
-		String generateKeysCommand = String.format("echo y | ssh-keygen -b 2048 -t rsa -f '%s' -q -N \"\" &&"
+
+		String generateKeysCommand = String.format("echo y | ssh-keygen -m PEM -t rsa -b 4096 -f '%s' -q -N \"\" &&"
 			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostAddress.getPublicIpAddress());
-		SshCommandResult generateKeysResult = sshService.executeCommand(hostAddress, password, generateKeysCommand);
+		SshCommandResult generateKeysResult = sshService.executeCommandSync(generateKeysCommand, hostAddress, password);
 		if (!generateKeysResult.isSuccessful()) {
+			String error = generateKeysResult.getError().get(0);
+			log.error("Unable to generate public/private key pair for {}: {}", hostAddress.toSimpleString(), error);
 			deleteEdgeHostConfig(edgeHost);
-			throw new ManagerException("Unable to generate public/private key pair for '%s': %s", hostAddress,
-				generateKeysResult.getError().get(0));
+			throw new ManagerException("Unable to generate public/private key pair for %s: %s", hostAddress.toSimpleString(), error);
+		}
+
+		log.info("Protecting private key {} with chmod 400", keyFilePath);
+		String protectPrivateKeyCommand = String.format("chmod 400 %s", keyFilePath);
+		SshCommandResult protectPrivateKeyResult = sshService.executeCommandSync(protectPrivateKeyCommand, hostAddress);
+		if (!protectPrivateKeyResult.isSuccessful()) {
+			String error = protectPrivateKeyResult.getError().get(0);
+			log.error("Failed to protect private key {} on host {}: {}", keyFilePath, hostAddress.toSimpleString(), error);
+			deleteEdgeHostConfig(edgeHost);
+			throw new ManagerException("Failed to protect private key %s on host %s: %s", hostAddress.toSimpleString(), error);
 		}
 	}
 
@@ -258,7 +276,7 @@ public class EdgeHostsService {
 	}
 
 	private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
-		String privateKeyFilePath = buildKeyFilePath(edgeHost);
+		String privateKeyFilePath = getPrivateKeyFilePath(edgeHost);
 		String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
 		bashService.cleanup(privateKeyFilePath, publicKeyFilePath);
 	}

@@ -739,7 +739,7 @@ public class DatabaseLoader {
 					.publicDnsName("dpimenta.ddns.net")
 					.region(region)
 					.coordinates(coordinates)
-					.build());
+					.build(), "ubuntusoldadox3");
 			}
 
 			// cloud hosts

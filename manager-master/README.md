@@ -100,20 +100,30 @@ Configurar  encaminhamento `sudo setfacl --modify user:<user name or ID>:rw /var
 https://stackoverflow.com/a/48572280 
 
 - Utilizar computadores pessoais:  
-Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, 
-substituindo user pelo username da conta a usar. Isto permite executar comandos sudo sem ser pedida a password.  
-Normalmente protegidos pelo router (http://192.168.1.254 no caso de *meo*, 
-http://192.168.1.1 no caso de *nos* ou *vodafone*), estão apenas acessíveis na rede local.  
+
+    Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, 
+substituindo `user` pelo username da conta a usar. Isto permite executar comandos sudo sem ser pedida a password.
+O manager-master automatiza a configuração de um edge host novo (ver [ssh-keygen](https://www.ssh.com/ssh/keygen/)).
+ 
+    Se protegidos pelo router (http://192.168.1.254 no caso de *meo*, 
+http://192.168.1.1 no caso de *nos* ou *vodafone*), então é preciso fazer configurações ao router para que as máquinas
+ fiquem acessíveis fora da rede local.  
 Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) para atribuir ips dinâmicos 
 às máquinas, é preciso definir um ip estático para o host desejado, através da interface do router.  
-E por fim, configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
+E por fim, para expor as portas necessárias, configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
     - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
     - Docker Cluster management communications, porta 2377 TCP
     - Communication among docker nodes/Container network discovery, porta 7946 TCP e UDP 
     - Docker Overlay network traffic/Container ingress network, porta 4789 UDP
+    - SymmetricDS registration, porta 3145 TCP e UDP
+    - Docker api proxy, porta 2375 TCP
+    - Master-manager, porta 8080 TCP
+    - Worker-manager, porta 8081 TCP
     - Prometheus, porta 9090 TCP
+    - Registration-server, porta 8761 TCP
+    - Load-balancer, porta 1906 TCP
     
-De notar que, apenas com esta configuração, não será possível executar containers aplicacionais nesta máquina.
+De notar que, apenas com esta configuração, não será possível aceder a containers aplicacionais fora da rede local.
 
 ## Licença
 

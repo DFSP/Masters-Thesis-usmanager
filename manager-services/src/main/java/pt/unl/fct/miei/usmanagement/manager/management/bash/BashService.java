@@ -92,6 +92,7 @@ public class BashService {
 		try {
 			Process p = r.exec(commands);
 			if (!wait) {
+				log.info("Executing command: {}", command);
 				return null;
 			}
 			p.waitFor();
@@ -109,7 +110,7 @@ public class BashService {
 				error.add(s);
 			}
 			stdError.close();
-			log.info("Command: {}\nResult: {}\nError: {}", command, String.join("\n", output), String.join("\n", error));
+			log.info("Executing command: {}\nResult: {}\nError: {}", command, String.join("\n", output), String.join("\n", error));
 			return new BashCommandResult(command, exitStatus, output, error);
 		}
 		catch (InterruptedException | IOException e) {

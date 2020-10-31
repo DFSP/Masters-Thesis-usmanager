@@ -24,10 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
@@ -37,6 +41,10 @@ import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersServ
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+
+@Slf4j
 @Component
 public class ManagerMasterShutdown implements ApplicationListener<ContextClosedEvent> {
 
@@ -69,17 +77,30 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		symService.stopSymmetricDSServer();
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
-		/*cloudHostsService.stopSyncDatabaseCloudHostsTimer();
-		containersService.stopSyncDatabaseContainersTimer();*/
 		try {
-			containersService.stopContainers();
-		} catch (Exception ignored) { }
+			Predicate<DockerContainer> containersPredicate = (dockerContainer) -> {
+				String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
+				return !Objects.equals(serviceName, DockerApiProxyService.DOCKER_API_PROXY);
+			};
+			containersService.stopContainers(containersPredicate);
+		} catch (Exception e) {
+			log.error("Failed to stop all containers: {}", e.getMessage());
+		}
 		try {
 			dockerSwarmService.destroySwarm();
-		} catch (Exception ignored) { }
+		} catch (Exception e) {
+			log.error("Failed to completely destroy swarm: {}", e.getMessage());
+		}
+		try {
+			containersService.stopDockerApiProxies();
+		} catch (Exception e) {
+			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
+		}
 		try {
 			cloudHostsService.terminateInstances();
-		} catch (Exception ignored) { }
+		} catch (Exception e) {
+			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
+		}
 		hostsEventsService.reset();
 		servicesEventsService.reset();
 		hostsMonitoringService.reset();

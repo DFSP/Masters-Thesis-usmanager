@@ -45,6 +45,8 @@ import {IComponent} from "../containers/Root.dev";
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
+import {ISshCommand} from "../routes/management/ssh/SshCommand";
+import {ICommand, IFileTransfer} from "../routes/management/ssh/Ssh";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -2125,6 +2127,21 @@ const fetchScripts = () => ({
         endpoint: `ssh/scripts`
     }
 });
+
+export const ADD_COMMANDS = 'ADD_COMMANDS';
+export const addCommand = (command: ICommand | IFileTransfer) => (
+    {
+        type: ADD_COMMANDS,
+        data: { commands: [command] }
+    }
+);
+
+export const CLEAR_COMMANDS = 'CLEAR_COMMANDS';
+export const clearCommands = () => (
+    {
+        type: CLEAR_COMMANDS
+    }
+);
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 export const showSidenavByUser = (value: boolean) => (

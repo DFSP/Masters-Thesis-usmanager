@@ -80,7 +80,7 @@ class SshFile extends BaseComponent<Props, {}> {
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
                   }}>
-                <Field<Partial<IHostAddress>> key='hostAddress'
+                <Field<Partial<IHostAddress>> key='fileHostAddress'
                                               id='hostAddress'
                                               label='hostAddress'
                                               type='dropdown'
@@ -139,7 +139,7 @@ class SshFile extends BaseComponent<Props, {}> {
     };
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
-        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
+        hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '');
 
 }
 

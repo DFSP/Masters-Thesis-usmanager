@@ -88,7 +88,7 @@ public class SshService {
 		try {
 			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			hostAddress = edgeHost.getAddress();
-			publicKeyFile = edgeHostsService.buildKeyFilePath(edgeHost);
+			publicKeyFile = edgeHostsService.getPrivateKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
 			try {
@@ -140,26 +140,44 @@ public class SshService {
 			sftpClient.put(new FileSystemFile(file), filename);
 		}
 		catch (IOException e) {
+			log.error("Failed to transfer file {} to {}: {}", filename, hostAddress.toSimpleString(), e.getMessage());
 			e.printStackTrace();
 			throw new ManagerException(e.getMessage());
 		}
 	}
 
-	public SshCommandResult executeCommand(String command, HostAddress hostAddress) {
+	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress) {
+		return executeCommand(command, hostAddress, true);
+	}
+
+	public void executeCommandAsync(String command, HostAddress hostAddress) {
+		executeCommand(command, hostAddress, false);
+	}
+
+	private SshCommandResult executeCommand(String command, HostAddress hostAddress, boolean wait) {
 		try (SSHClient sshClient = initClient(hostAddress);
 			 Session session = sshClient.startSession()) {
-			return executeCommand(session, hostAddress, command);
+			return executeCommand(session, command, hostAddress, wait);
 		}
 		catch (IOException e) {
 			log.error("Failed to execute command {} on host {}: {}", command, hostAddress.toSimpleString(), e.getMessage());
+			e.printStackTrace();
 			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}
 
-	public SshCommandResult executeCommand(HostAddress hostAddress, String password, String command) {
+	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress, String password) {
+		return executeCommand(command, hostAddress, password, true);
+	}
+
+	public SshCommandResult executeCommandAsync(String command, HostAddress hostAddress, String password) {
+		return executeCommand(command, hostAddress, password, false);
+	}
+
+	private SshCommandResult executeCommand(String command, HostAddress hostAddress, String password, boolean wait) {
 		try (SSHClient sshClient = initClient(hostAddress, password);
 			 Session session = sshClient.startSession()) {
-			return executeCommand(session, hostAddress, command);
+			return executeCommand(session, command, hostAddress, wait);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -167,12 +185,15 @@ public class SshService {
 		}
 	}
 
-	private SshCommandResult executeCommand(Session session, HostAddress hostAddress, String command) throws IOException {
+	private SshCommandResult executeCommand(Session session, String command, HostAddress hostAddress, boolean wait) throws IOException {
 		if (!command.contains("sshpass")) {
 			// to avoid logging passwords
 			log.info("Executing: {}, at host {}", command, hostAddress);
 		}
 		Session.Command cmd = session.exec(command);
+		if (!wait) {
+			return null;
+		}
 		cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
 		int exitStatus = cmd.getExitStatus();
 		List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
