@@ -6,9 +6,12 @@ RUN apk add --no-cache --update apache2-utils
 RUN rm -f /etc/nginx/conf.d/*
 
 # include maxmind database to retrieve information from ip addresses
+#RUN mkdir -p /etc/nginx/geoip && \
+#wget https://dl.miyuru.lk/geoip/maxmind/city/maxmind.dat.gz -O /etc/nginx/geoip/city.dat.gz && \
+#gunzip /etc/nginx/geoip/city.dat.gz
 RUN mkdir -p /etc/nginx/geoip && \
-wget https://dl.miyuru.lk/geoip/maxmind/city/maxmind.dat.gz -O /etc/nginx/geoip/city.dat.gz && \
-gunzip /etc/nginx/geoip/city.dat.gz
+cp -f geoip/city.dat.gz /etc/nginx/geoip/city.dat.gz && \
+gunzip -f /etc/nginx/geoip/city.dat.gz
 
 # ENV ALG round-robin
 
