@@ -22,29 +22,37 @@
  * SOFTWARE.
  */
 
-package main
+package cmd
 
 import (
-	"flag"
+	"bytes"
+	"fmt"
 	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
-
-	"github.com/usmanager/manager/nginx-load-balancer-api/api"
+	"os/exec"
+	"strings"
+	"sync"
 )
 
-func main() {
+func Execute(command string, wg *sync.WaitGroup) {
+	log.Printf("Executing command: %s", command)
 
-	var port = flag.String("port", "1907", "Port to bind HTTP listener")
-	flag.Parse()
+	args := strings.Fields(command)
+	name := args[0]
+	args = args[1:]
 
-	router := mux.NewRouter()
-	router.HandleFunc("/_/nginx-load-balancer-api/api/servers", api.GetServers).Methods("GET")
-	router.HandleFunc("/_/nginx-load-balancer-api/api/sameregionservers", api.GetSameRegionServers).Methods("GET")
-	router.HandleFunc("/_/nginx-load-balancer-api/api/otherregionservers", api.GetOtherRegionsServers).Methods("GET")
-	router.HandleFunc("/_/nginx-load-balancer-api/api/servers", api.AddServer).Methods("POST")
-	router.HandleFunc("/_/nginx-load-balancer-api/api/servers", api.DeleteServer).Methods("DELETE")
-	log.Printf("-> Nginx API is listening on port %s.", *port)
-	log.Fatal(http.ListenAndServe(":"+*port, router))
+	cmd := exec.Command(name, args...)
+	var out bytes.Buffer
+	var err bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &err
+
+	e := cmd.Run()
+	if e != nil {
+		log.Printf("%s", e)
+		fmt.Printf("%s", err.String())
+	} else {
+		fmt.Printf("%s", out.String())
+	}
+
+	wg.Done() // Need to signal to waitgroup that this goroutine is done
 }

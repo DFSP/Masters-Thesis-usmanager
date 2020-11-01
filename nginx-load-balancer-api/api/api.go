@@ -26,6 +26,9 @@ package api
 
 import (
 	"encoding/json"
+	"flag"
+	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"time"
 
@@ -33,113 +36,73 @@ import (
 	"github.com/usmanager/manager/nginx-load-balancer-api/nginx"
 )
 
-const secondsDelayAddServer = 15
+var delay int
 
-// GetServers return all servers.
-func GetServers(w http.ResponseWriter, r *http.Request) {
+func init() {
+	flag.IntVar(&delay, "delay", 15, "Update delay (in seconds) of the nginx configuration after adding a new server")
+}
+
+func GetServers(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if len(data.Servers) == 0 {
 		response := make([]string, 0)
 		json.NewEncoder(w).Encode(response)
+		log.Print("Looking for servers... found none")
 	} else {
 		json.NewEncoder(w).Encode(data.Servers)
+		log.Printf("Looking for servers... found %+v", data.Servers)
 	}
 }
 
-// GetOtherRegionsServers return other regions servers.
-func GetOtherRegionsServers(w http.ResponseWriter, r *http.Request) {
+func AddServers(w http.ResponseWriter, r *http.Request) {
+	var reply []data.ServerWeight
+
+	var servers []data.Server
+	_ = json.NewDecoder(r.Body).Decode(&servers)
+
+	for _, server := range servers {
+		data.Servers = append(data.Servers, server)
+		serverWeight := CalculateWeight(server)
+		data.ServersWeight = append(data.ServersWeight, serverWeight)
+		reply = append(reply, serverWeight)
+		log.Printf("Added server %+v with weight %d", server, serverWeight.Weight)
+	}
+
+	time.AfterFunc(time.Duration(delay) * time.Second, func() {
+		nginx.UpdateNginx()
+	})
+
 	w.Header().Set("Content-Type", "application/json")
-	if len(data.OtherRegionsServers) == 0 {
-		response := make([]string, 0)
-		json.NewEncoder(w).Encode(response)
-	} else {
-		json.NewEncoder(w).Encode(data.OtherRegionsServers)
-	}
+	json.NewEncoder(w).Encode(reply)
 }
 
-// GetSameRegionServers return same region servers as load balancer.
-func GetSameRegionServers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	if len(data.SameRegionsServers) == 0 {
-		response := make([]string, 0)
-		json.NewEncoder(w).Encode(response)
-	} else {
-		json.NewEncoder(w).Encode(data.SameRegionsServers)
-	}
-}
-
-// AddServer adds a new server.
-// Request example : [{"hostname": "server1:8080"}, {"hostname": "server2:8181"}]
-func AddServer(w http.ResponseWriter, r *http.Request) {
-	var serversToAdd []data.Server
-	_ = json.NewDecoder(r.Body).Decode(&serversToAdd)
-
-	for _, item := range serversToAdd {
-		serverW := data.GetServerWeight(item)
-		if item.Region == data.LoadBalancerLocation.Region {
-			data.SameRegionsServers = append(data.SameRegionsServers, serverW)
-		} else {
-			data.OtherRegionsServers = append(data.OtherRegionsServers, serverW)
-		}
-	}
-
-	updateServers()
-
-	var msg data.Message
-	msg.Message = "success"
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(msg)
-	updateNginx()
-}
-
-// DeleteServer deletes a server.
-// Request example : {"hostname": "server1:8080"}
 func DeleteServer(w http.ResponseWriter, r *http.Request) {
-	var serverToDelete data.SimpleServer
-	_ = json.NewDecoder(r.Body).Decode(&serverToDelete)
+	vars := mux.Vars(r)
+	hostname := vars["hostname"]
 
-	var found = false
-
-	for index, item := range data.SameRegionsServers {
-		if item.Hostname == serverToDelete.Hostname {
-			data.SameRegionsServers = append(data.SameRegionsServers[:index], data.SameRegionsServers[index+1:]...)
-			found = true
+	removed := false
+	for index, server := range data.Servers {
+		if server.Hostname == hostname {
+			data.Servers = append(data.Servers[:index], data.Servers[index+1:]...)
+			log.Printf("Removed server %+v", server)
+			removed = true
 			break
 		}
 	}
 
-	if !found {
-		for index, item := range data.OtherRegionsServers {
-			if item.Hostname == serverToDelete.Hostname {
-				data.OtherRegionsServers = append(data.OtherRegionsServers[:index], data.OtherRegionsServers[index+1:]...)
-				found = true
-				break
-			}
-		}
-	}
-
-	updateServers()
-
-	var msg data.Message
-	msg.Message = "success"
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(msg)
-	go nginx.UpdateNginx()
-}
-
-func updateNginx() {
-	time.AfterFunc(secondsDelayAddServer*time.Second, func() {
+	if removed {
 		nginx.UpdateNginx()
-	})
+	} else {
+		log.Printf("Server %s not found", hostname)
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
-func updateServers() {
-	if len(data.SameRegionsServers) == 0 {
-		data.Servers = data.OtherRegionsServers
-	} else {
-		data.Servers = data.SameRegionsServers
-		if len(data.OtherRegionsServers) > 0 {
-			data.Servers = append(data.Servers, data.OtherRegionsServers...)
-		}
+func CalculateWeight(server data.Server) data.ServerWeight {
+	var distance uint16 = 0
+
+	return data.ServerWeight{
+		Hostname: server.Hostname,
+		Weight: distance,
 	}
 }

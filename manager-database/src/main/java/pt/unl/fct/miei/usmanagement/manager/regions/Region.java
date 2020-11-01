@@ -32,7 +32,6 @@ import lombok.Getter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +50,7 @@ public enum Region {
 	ASIA("Asia", new Coordinates("Asia", 35.360601, 95.728129)),
 	OCEANIA("Oceania", new Coordinates("Oceania", -13.611172, 130.755130));
 
-	private final String name;
+	private final String region;
 	private final Coordinates coordinates;
 
 	public static Region getClosestRegion(Coordinates coordinates) {
@@ -69,9 +68,9 @@ public enum Region {
 	}
 
 	@JsonCreator
-	public static Region forValues(@JsonProperty("name") String name, @JsonProperty("coordinates") Coordinates coordinates) {
+	public static Region forValues(@JsonProperty("region") String regionName, @JsonProperty("coordinates") Coordinates coordinates) {
 		for (Region region : Region.values()) {
-			if (region.name.equalsIgnoreCase(name) && Objects.equals(region.coordinates, coordinates)) {
+			if (region.region.equalsIgnoreCase(regionName) && Objects.equals(region.coordinates, coordinates)) {
 				return region;
 			}
 		}

@@ -1,25 +1,44 @@
 # Nginx load balancer API
-API to add new servers to Nginx load balancer and generate new config files
 
-#### Executar
+API para adicionar ou remover servidores ao [Nginx load balancer](../nginx-load-balancer) e atualizar os ficheiros de configuração.
 
-```
-cd nginx-load-balancer-api/cmd
+## Argumentos
+
+Usage of ./nginx-load-balancer-api:
+
+- delay (int)
+
+    Update delay (in seconds) of the nginx configuration after adding a new server (default 15)
+        
+- port (string)
+
+    Port to bind HTTP listener (default "1907")
+
+## Executar
+
+##### Local
+
+```shell script
 go build -o nginx-load-balancer-api
-./nginx-load-balancer-api
+sudo ./nginx-load-balancer-api
 ```
 
-O resultado é o ficheiro binário `nginx-load-balancer-api`, gerado na diretoria atual.
+##### Docker
 
-### API Endpoints
+```shell script
+docker build -f docker/Dockerfile . -t nginx-load-balancer-api
+docker run -p 1907:1907 nginx-load-balancer-api
+```
+
+## API Endpoints
 
 Os URIs são relativos a *http://localhost:1906/_/nginx-load-balancer-api/api*
 
 HTTP request | Description
 ------------ | -------------
-**Get** /servers | List current servers
-**POST** /servers | Add new servers. Request example : [{"hostname" : "server1:8080"}]
-**DELETE** /servers | Deletes a server. Request example : {"hostname" : "server1:8080"} <!---TODO fix delete-->
+**Get** /servers | Lista todos os servidores registados neste load balancer
+**POST** /servers | Adiciona servidores novos. Pedido: `[{hostname, latitude, longitude, region}]`
+**DELETE** /servers/{hostname} | Remove o servidor `{hostname}`
 
 ## Licença
 

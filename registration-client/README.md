@@ -49,15 +49,16 @@ Usage of ./registration-client:
 
 ## Executar
 
-#### Local
+### Local
 
 ```shell script
-cd cmd
 go build -o registration-client
 ./registration-client -service app -latitude 38.660758 -longitude -9.203568
 ```
 
-#### Docker
+O resultado é o ficheiro binário `registration-client`, gerado na diretoria atual.
+
+### Docker
 
 ```shell script
 docker build -f docker/Dockerfile . -t registration-client
@@ -70,10 +71,10 @@ Os URIs são relativos a *http://localhost:1906/api*
 
 HTTP request | Description
 ------------ | -------------
-**Post** /api/register | Regista o endpoint no servidor eureka
+**Post** /register | Regista o endpoint no servidor eureka
 **Get** /services/{service}/endpoint | Obtém o melhor endpoint para o serviço {service}
 **Get** /services/{service}/endpoints | Obtém todos os endpoints registados em nome do serviço {service}
-**Post** /api/metrics | Adiciona uma nova monitorização deste endpoint. Request body: `{service, latitude, longitude, count}`
+**Post** /metrics | Adiciona uma nova monitorização deste endpoint. Request body: `{service, latitude, longitude, count}`
 
 ## Exemplo
 

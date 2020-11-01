@@ -260,7 +260,7 @@ public class DockerContainersService {
 			String containerName = containerType == ContainerType.SINGLETON
 				? serviceName
 				: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
-			String serviceAddr = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
+			String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
 			String dockerRepository = service.getDockerRepository();
 			String launchCommand = service.getLaunchCommand();
 			launchCommand = launchCommand
@@ -296,7 +296,7 @@ public class DockerContainersService {
 			containerLabels.put(ContainerConstants.Label.US_MANAGER, String.valueOf(true));
 			containerLabels.put(ContainerConstants.Label.SERVICE_NAME, serviceName);
 			containerLabels.put(ContainerConstants.Label.SERVICE_TYPE, serviceType);
-			containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddr);
+			containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
 			containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
 			containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 			containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
@@ -332,7 +332,7 @@ public class DockerContainersService {
 				String containerId = containerCreation.id();
 				dockerClient.startContainer(containerId);
 				if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
-					nginxLoadBalancerService.addServiceToLoadBalancer(hostAddress, serviceName, serviceAddr);
+					nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
 				}
 				return getContainer(containerId);
 			}
@@ -370,13 +370,15 @@ public class DockerContainersService {
 
 	public void stopContainer(String id, HostAddress hostAddress, Integer delay) {
 		ContainerInfo containerInfo = inspectContainer(id, hostAddress);
-		String serviceType = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE);
-		if (Objects.equals(serviceType, "frontend")) {
-			nginxLoadBalancerService.removeContainerFromLoadBalancer(id);
+		String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
+		ServiceType serviceType = ServiceType.getServiceType(containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE));
+		if (serviceType == ServiceType.FRONTEND) {
+			String serviceAddress = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+			Region region = Region.getRegion(containerInfo.config().labels().get(ContainerConstants.Label.REGION));
+			nginxLoadBalancerService.removeServer(serviceName, serviceAddress, region);
 		}
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
 			//TODO espera duas vezes no caso de migração!?!?
-			String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
 			int delayBeforeStop = delay == null ? dockerDelayBeforeStopContainer : delay;
 			dockerClient.stopContainer(id, delayBeforeStop);
 			log.info("Stopped container {} ({}) on host {}", serviceName, id, hostAddress.toString());

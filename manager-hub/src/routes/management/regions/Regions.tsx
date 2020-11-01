@@ -54,7 +54,7 @@ class Regions extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                {/*<AddButton tooltip={{text: 'Add awsRegion', position: 'left'}}
+                {/*<AddButton tooltip={{text: 'Add region', position: 'left'}}
                            pathname={'/regions/new_region?new'}/>*/}
                 <div className={`${styles.container}`}>
                     <CardList<IRegion>
@@ -70,10 +70,10 @@ class Regions extends BaseComponent<Props, {}> {
     }
 
     private region = (region: IRegion): JSX.Element =>
-        <RegionCard key={region.name} region={region}/>;
+        <RegionCard key={region.region} region={region}/>;
 
     private predicate = (region: IRegion, search: string): boolean =>
-        region.name.toLowerCase().includes(search);
+        region.region.toLowerCase().includes(search);
 
 }
 

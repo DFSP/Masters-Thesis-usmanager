@@ -24,17 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
+import lombok.Data;
 import lombok.Getter;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
-@Getter
-class NginxServer extends NginxSimpleServer {
+import java.io.Serializable;
 
-	private final Region region;
+@Data
+final class NginxServer implements Serializable {
 
-	NginxServer(String hostname, Region region) {
-		super(hostname);
-		this.region = region;
-	}
+	private static final long serialVersionUID = -7203502424143183821L;
+
+	private final String hostname;
+	private final double latitude;
+	private final double longitude;
+	private final String region;
 
 }

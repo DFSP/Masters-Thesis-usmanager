@@ -37,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("nginx-load-balancer")
 public class NginxLoadBalancerProperties {
 
-	private String apiUrl;
+	private int port;
+	private int stopDelay;
+
 
 }

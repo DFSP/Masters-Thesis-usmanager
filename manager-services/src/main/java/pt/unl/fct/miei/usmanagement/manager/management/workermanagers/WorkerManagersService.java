@@ -86,7 +86,7 @@ public class WorkerManagersService {
 
 	public WorkerManagerEntity getWorkerManager(Region region) {
 		return workerManagers.getByContainer_Region(region).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManagerEntity.class, "region", region.getName()));
+			new EntityNotFoundException(WorkerManagerEntity.class, "region", region.getRegion()));
 	}
 
 	public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {

@@ -6,13 +6,13 @@ Guarda o número de pedidos de um serviço, com os detalhes da localização.
 
 Usage of ./request-location-monitor:
 
-  - port (int)
+- port (int)
   
-    Port to bind HTTP listener (default 1919)
+  Port to bind HTTP listener (default 1919)
 
-  - interval (int)
+- interval (int)
   
-    Default interval (in ms) to include instances on data aggregation (default 60000)
+  Default interval (in ms) to include instances on data aggregation (default 60000)
 
 ## Executar
 

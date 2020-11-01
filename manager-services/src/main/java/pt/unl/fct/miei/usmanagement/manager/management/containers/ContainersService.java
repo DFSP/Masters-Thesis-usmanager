@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.Containe
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
@@ -458,6 +459,17 @@ public class ContainersService {
 
 	public boolean hasContainer(String containerId) {
 		return containers.hasContainer(containerId);
+	}
+
+	public boolean hasContainers(Region region) {
+		return getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.REGION, region.name()))).size() > 0;
+	}
+
+	public boolean hasContainers(Region region, String serviceName) {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.REGION, region.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)
+		)).size() > 0;
 	}
 
 	private void checkContainerExists(String containerId) {

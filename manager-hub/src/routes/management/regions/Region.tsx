@@ -38,13 +38,13 @@ import {isNew} from "../../../utils/router";
 
 export interface IRegion /*extends IDatabaseData*/
 {
-    name: string;
+    region: string;
     coordinates: Coordinates;
     /*active: boolean;*/
 }
 
 const buildNewRegion = (): Partial<IRegion> => ({
-    name: undefined,
+    region: undefined,
     coordinates: undefined,
     /*active: true,*/
 });
@@ -58,7 +58,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadRegions: (name: string) => void;
-    /*addRegion: (awsRegion: IRegion) => void;
+    /*addRegion: (region: IRegion) => void;
     updateRegion: (previousRegion: IRegion, currentRegion: IRegion) => void;*/
 }
 
@@ -119,12 +119,12 @@ class Region extends BaseComponent<Props, State> {
         isNew(this.props.location.search);*/
 
     /*private onPostSuccess = (reply: IReply<IRegion>): void => {
-        const awsRegion = reply.data;
-        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${awsRegion.name}</b>` : `<a href=/regions/${awsRegion.name}><b>${awsRegion.name}</b></a>`} saved</span>`);
-        this.props.addRegion(awsRegion);
+        const region = reply.data;
+        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} saved</span>`);
+        this.props.addRegion(region);
         if (this.mounted) {
-            this.updateRegion(awsRegion);
-            this.props.history.replace(awsRegion.name);
+            this.updateRegion(region);
+            this.props.history.replace(region.name);
         }
     };*/
 
@@ -132,23 +132,23 @@ class Region extends BaseComponent<Props, State> {
         super.toast(`Unable to save region <b>${region.name}</b>`, 10000, reason, true);*/
 
     /*private onPutSuccess = (reply: IReply<IRegion>): void => {
-        const awsRegion = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${awsRegion.name}</b>` : `<a href=/regions/${awsRegion.name}><b>${awsRegion.name}</b></a>`} awsRegion have been saved</span>`);
+        const region = reply.data;
+        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region have been saved</span>`);
         const previousRegion = this.getRegion();
         if (previousRegion?.id) {
-            this.props.updateRegion(previousRegion as IRegion, awsRegion)
+            this.props.updateRegion(previousRegion as IRegion, region)
         }
         if (this.mounted) {
-            this.updateRegion(awsRegion);
-            this.props.history.replace(awsRegion.name);
+            this.updateRegion(region);
+            this.props.history.replace(region.name);
         }
     };*/
 
     /*private onPutFailure = (reason: string, region: IRegion): void =>
         super.toast(`Unable to update region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
-    /*private onDeleteSuccess = (awsRegion: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${awsRegion.name}</b> successfully removed</span>`);
+    /*private onDeleteSuccess = (region: IRegion): void => {
+        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.props.history.push(`/regions`);
         }
@@ -157,15 +157,15 @@ class Region extends BaseComponent<Props, State> {
     /*private onDeleteFailure = (reason: string, region: IRegion): void =>
         super.toast(`Unable to delete region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
-    /*private updateRegion = (awsRegion: IRegion) => {
-        awsRegion = Object.values(normalize(awsRegion, Schemas.REGION).entities.regions || {})[0];
-        const formRegion = {...awsRegion};
+    /*private updateRegion = (region: IRegion) => {
+        region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
+        const formRegion = {...region};
         removeFields(formRegion);
-        this.setState({awsRegion: awsRegion, formRegion: formRegion});
+        this.setState({region: region, formRegion: formRegion});
     };*/
 
-    /*private getFields = (awsRegion: Partial<IRegion>): IFields =>
-        Object.keys(awsRegion).map(key => {
+    /*private getFields = (region: Partial<IRegion>): IFields =>
+        Object.keys(region).map(key => {
             return {
                 [key]: {
                     id: key,
@@ -200,7 +200,7 @@ class Region extends BaseComponent<Props, State> {
                     /*@ts-ignore*/
                     <Form id={regionKey}
                         /*fields={this.getFields(formRegion)}*/
-                        /*fields={this.getFields(awsRegion)}*/
+                        /*fields={this.getFields(region)}*/
                           values={region}
                         /*isNew={isNew(this.props.location.search)}*/
                         /*post={{
@@ -209,12 +209,12 @@ class Region extends BaseComponent<Props, State> {
                             failureCallback: this.onPostFailure
                         }}*/
                         /*put={{
-                            url: `regions/${awsRegion.name}`,
+                            url: `regions/${region.name}`,
                             successCallback: this.onPutSuccess,
                             failureCallback: this.onPutFailure
                         }}*/
                         /*delete={{
-                            url: `regions/${awsRegion.name}`,
+                            url: `regions/${region.name}`,
                             successCallback: this.onDeleteSuccess,
                             failureCallback: this.onDeleteFailure
                         }}*/>
@@ -248,8 +248,8 @@ class Region extends BaseComponent<Props, State> {
 
 }
 
-/*function removeFields(awsRegion: Partial<IRegion>) {
-    delete awsRegion["id"];
+/*function removeFields(region: Partial<IRegion>) {
+    delete region["id"];
 }*/
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -258,8 +258,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const name = props.match.params.name;
     const region = isNew(props.location.search) ? buildNewRegion() : state.entities.regions.data[name];
     /*let formRegion;
-    if (awsRegion) {
-        formRegion = {...awsRegion};
+    if (region) {
+        formRegion = {...region};
         removeFields(formRegion);
     }*/
     return {

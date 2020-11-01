@@ -94,7 +94,7 @@ public class HostAddress implements Serializable {
 			+ publicIpAddress
 			+ (privateIpAddress == null ? "" : "/" + privateIpAddress)
 			+ (publicDnsName == null ? "" : "/" + publicDnsName)
-			+ (region == null ? "" : "/" + region.getName());
+			+ (region == null ? "" : "/" + region.getRegion());
 	}
 
 	public String toSimpleString() {

@@ -31,4 +31,8 @@ public enum ServiceType {
 	DATABASE,
 	SYSTEM;
 
+	public static ServiceType getServiceType(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
+
 }

@@ -39,7 +39,7 @@ interface RegionCardProps {
 }
 
 interface DispatchToProps {
-    /*deleteRegion: (awsRegion: IRegion) => EntitiesAction;*/
+    /*deleteRegion: (region: IRegion) => EntitiesAction;*/
 }
 
 type Props = DispatchToProps & RegionCardProps;
@@ -63,12 +63,12 @@ class RegionCard extends BaseComponent<Props, State> {
         this.mounted = false;
     }
 
-    /*private onDeleteSuccess = (awsRegion: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${awsRegion.name}</b> successfully removed</span>`);
+    /*private onDeleteSuccess = (region: IRegion): void => {
+        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteRegion(awsRegion);
+        this.props.deleteRegion(region);
     }*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void => {
@@ -84,22 +84,22 @@ class RegionCard extends BaseComponent<Props, State> {
         const CardRegion = Card<IRegion>();
         return <CardRegion id={`region-${region.name}`}
                            title={region.name}
-                           link={{to: {pathname: `/regions/${region.name}`, state: region}}}
+                           link={{to: {pathname: `/regions/${region.region}`, state: region}}}
                            height={'85px'}
                            margin={'10px 0'}
                            hoverable
             /*delete={{
-                url: `regions/${awsRegion.name}`,
+                url: `regions/${region.name}`,
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}*/
                            loading={loading}>
             <CardItem key={'name'}
                       label={'Name'}
-                      value={`${region.name}`}/>
+                      value={`${region.region}`}/>
             {/*<CardItem key={'active'}
                       label={'Active'}
-                      value={`${awsRegion.active}`}/>*/}
+                      value={`${region.active}`}/>*/}
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
                       value={`(${region.coordinates.latitude.toFixed(3)}, ${region.coordinates.longitude.toFixed(3)})`}/>

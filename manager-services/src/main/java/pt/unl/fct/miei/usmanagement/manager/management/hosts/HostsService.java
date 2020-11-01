@@ -239,7 +239,7 @@ public class HostsService {
 	}
 
 	public HostAddress getCapableNode(double availableMemory, Region region) {
-		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getName(), availableMemory);
+		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory))
 			.map(SimpleNode::getHostAddress)

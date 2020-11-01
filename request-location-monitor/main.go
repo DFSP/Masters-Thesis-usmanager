@@ -30,6 +30,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -68,5 +69,12 @@ func main() {
 		HandlerFunc(api.AddLocationRequest)
 
 	reglog.Logger.Infof("Request-location-monitor is listening at http://127.0.0.1:%d", port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), trimmingMiddleware(router)))
+}
+
+func trimmingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+		next.ServeHTTP(w, r)
+	})
 }

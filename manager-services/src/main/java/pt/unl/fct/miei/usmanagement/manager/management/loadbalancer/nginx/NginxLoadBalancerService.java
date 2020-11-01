@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
+import com.amazonaws.regions.Regions;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -31,12 +32,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -44,11 +47,16 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,11 +69,13 @@ public class NginxLoadBalancerService {
 	private final HostsService hostsService;
 	private final ServicesService serviceService;
 
-	private final String nginxApiUrl;
+	private final int stopDelay;
 	private final String dockerApiProxyUsername;
 	private final String dockerApiProxyPassword;
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
+
+	private final Map<Region, Timer> stopLoadBalancerTimers;
 
 	public NginxLoadBalancerService(@Lazy ContainersService containersService, HostsService hostsService,
 									ServicesService serviceService,
@@ -74,24 +84,16 @@ public class NginxLoadBalancerService {
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.serviceService = serviceService;
-		this.nginxApiUrl = nginxLoadBalancerProperties.getApiUrl();
-		this.headers = new HttpHeaders();
+		this.stopDelay = nginxLoadBalancerProperties.getStopDelay();
 		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
 		byte[] auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
 		String basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
+		this.headers = new HttpHeaders();
 		this.headers.add("Authorization", basicAuthorization);
 		this.restTemplate = new RestTemplate();
+		this.stopLoadBalancerTimers = new HashMap<>(Regions.values().length);
 	}
-
-/*	// avoid launching another registration server on the same region
-	List<ContainerEntity> containers = containersService.getContainersWithLabels(Set.of(
-		Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-		Pair.of(ContainerConstants.Label.SERVICE_REGION, gson.toJson(hostAddress.getRegion()))
-	));
-				return !containers.isEmpty() ?
-					containers.get(0)
-					: containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);*/
 
 	public List<ContainerEntity> launchLoadBalancers(String serviceName, List<Region> regions) {
 		double expectedMemoryConsumption = serviceService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
@@ -113,113 +115,114 @@ public class NginxLoadBalancerService {
 	}
 
 	public ContainerEntity launchLoadBalancer(String serviceName, HostAddress hostAddress) {
-		//TODO get port from properties
-		return launchLoadBalancer(hostAddress, serviceName, "127.0.0.1:1906");
+		return launchLoadBalancer(hostAddress, serviceName, null);
 	}
 
-	private ContainerEntity launchLoadBalancer(HostAddress hostAddress, String serviceName, String serverAddress) {
-		List<String> environment = List.of(
-			String.format("%s=%s", ContainerConstants.Environment.SERVER1, serverAddress),
-			String.format("%s=%s", ContainerConstants.Environment.SERVER1_REGION, hostAddress.getRegion()),
-			String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername),
-			String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword)
-		);
+	private ContainerEntity launchLoadBalancer(HostAddress hostAddress, String serviceName, NginxServer nginxServer) {
+		List<String> environment = new ArrayList<>();
+		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername));
+		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword));
+		if (nginxServer != null) {
+			environment.add(String.format("%s=%s", ContainerConstants.Environment.SERVER, new Gson().toJson(nginxServer)));
+		}
 		Map<String, String> labels = Map.of(
 			ContainerConstants.Label.SERVICE, serviceName
 		);
 		return containersService.launchContainer(hostAddress, LOAD_BALANCER, environment, labels);
 	}
 
-	private List<ContainerEntity> getLoadBalancersFromService(String serviceName) {
+	private ContainerEntity launchLoadBalancer(Region region, String serviceName, NginxServer nginxServer) {
+		double availableMemory = serviceService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+		HostAddress hostAddress = hostsService.getCapableNode(availableMemory, region);
+		return launchLoadBalancer(hostAddress, serviceName, nginxServer);
+	}
+
+	private void initStopLoadBalancerTimer(Region region) {
+		Timer currentTimer = stopLoadBalancerTimers.get(region);
+		if (currentTimer != null) {
+			currentTimer.cancel();
+		}
+
+		String timerName = String.format("stop-load-balancer-timer-%s", region.name().toLowerCase());
+		Timer stopLoadBalancerTimer = new Timer(timerName, true);
+
+		stopLoadBalancerTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					containersService.stopContainers((dockerContainer ->
+						dockerContainer.getNames().contains(LOAD_BALANCER) && dockerContainer.getRegion() == region));
+				}
+				catch (ManagerException e) {
+					log.error("Failed to stop load balancers on region {}: {}. Retrying in {} minutes", region, e.getMessage(),
+						TimeUnit.MILLISECONDS.toMinutes(stopDelay));
+					initStopLoadBalancerTimer(region);
+				}
+			}
+		}, stopDelay);
+
+		stopLoadBalancerTimers.put(region, stopLoadBalancerTimer);
+	}
+
+	private List<ContainerEntity> getLoadBalancersForService(String serviceName, Region region) {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
-			Pair.of(ContainerConstants.Label.SERVICE, serviceName)));
+			Pair.of(ContainerConstants.Label.SERVICE, serviceName),
+			Pair.of(ContainerConstants.Label.REGION, region.name())));
 	}
 
-	public void addServiceToLoadBalancer(HostAddress hostAddress, String serviceName, String serverAddress) {
-		List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
+	private List<NginxServer> getServers(String serviceName, Region region) {
+		List<NginxServer> servers = new ArrayList<>();
+		List<ContainerEntity> loadBalancers = getLoadBalancersForService(serviceName, region);
+		loadBalancers.parallelStream().forEach(loadBalancer -> {
+			String url = String.format("http://%s/servers", getLoadBalancerUrl(loadBalancer));
+			HttpEntity<String> request = new HttpEntity<>(headers);
+			ResponseEntity<NginxServer[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServer[].class);
+			NginxServer[] responseBody = response.getBody();
+			if (responseBody != null) {
+				servers.addAll(Arrays.asList(responseBody));
+			}
+		});
+		return servers;
+	}
+
+	public void addServer(String serviceName, String serverAddress, Coordinates coordinates, Region region) {
+		NginxServer nginxServer = new NginxServer(serverAddress, coordinates.getLatitude(), coordinates.getLongitude(), region.name());
+		List<ContainerEntity> loadBalancers = getLoadBalancersForService(serviceName, region);
 		if (loadBalancers.isEmpty()) {
-			ContainerEntity container = launchLoadBalancer(hostAddress, serviceName, serverAddress);
-			loadBalancers = List.of(container);
+			ContainerEntity container = launchLoadBalancer(region, serviceName, nginxServer);
+			loadBalancers.add(container);
 		}
-		loadBalancers.forEach(loadBalancer -> {
-			String loadBalancerHostname = loadBalancer.getHostAddress().getPublicIpAddress();
-			int loadBalancerPort = loadBalancer.getPorts().get(0).getPublicPort();
-			String loadBalancerUrl = String.format("%s:%s", loadBalancerHostname, loadBalancerPort);
-			NginxServer nginxServer = new NginxServer(serverAddress, hostAddress.getRegion());
-			String url = String.format("http://%s%s/servers", loadBalancerUrl, nginxApiUrl);
-			HttpEntity<NginxServer> request = new HttpEntity<>(nginxServer, headers);
-			ResponseEntity<Message> response = restTemplate.postForEntity(url, request, Message.class);
-			Message responseBody = response.getBody();
-			if (responseBody == null) {
-				throw new ManagerException("Failed to add server %s to load balancer %s: responseBody is null",
-					nginxServer, loadBalancerUrl);
+		loadBalancers.parallelStream().forEach(loadBalancer -> {
+			String url = getLoadBalancerUrl(loadBalancer);
+			HttpEntity<NginxServer[]> request = new HttpEntity<>(new NginxServer[]{nginxServer}, headers);
+			ResponseEntity<NginxServer[]> response = restTemplate.postForEntity(url, request, NginxServer[].class);
+			HttpStatus status = response.getStatusCode();
+			if (status != HttpStatus.ACCEPTED) {
+				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, status.getReasonPhrase());
 			}
-			String responseMessage = responseBody.getMessage();
-			if (!Objects.equals(responseMessage, "success")) {
-				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, loadBalancerUrl,
-					responseMessage);
+			else {
+				log.info("Added server {} to load balancer {}", nginxServer, url);
 			}
 		});
 	}
 
-	public void removeContainerFromLoadBalancer(String containerId) {
-		log.info("Removing container {} from load balancer", containerId);
-		Map<String, String> labels = containersService.getContainer(containerId).getLabels();
-		String serviceType = labels.get(ContainerConstants.Label.SERVICE_TYPE);
-		String serviceName = labels.get(ContainerConstants.Label.SERVICE_NAME);
-		String serverAddress = labels.get(ContainerConstants.Label.SERVICE_ADDRESS);
-		if (serviceType == null || serviceName == null | serverAddress == null) {
-			throw new ManagerException("Failed to remove container %s from load balancer: labels %s, %s and %s are "
-				+ "required. Current container labels = %s", containerId, ContainerConstants.Label.SERVICE_NAME,
-				ContainerConstants.Label.SERVICE_TYPE, ContainerConstants.Label.SERVICE_ADDRESS, labels);
-		}
-		if (!Objects.equals(serviceType, "frontend")) {
-			throw new ManagerException("Failed to remove container %s from load balancer: %s doesn't support load "
-				+ "balancer", containerId, serviceType);
-		}
-		List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
-		loadBalancers.forEach(loadBalancer -> {
-			String url = String.format("http://%s%s/servers",
-				loadBalancer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS), nginxApiUrl);
-			NginxSimpleServer server = new NginxSimpleServer(serverAddress);
-			HttpEntity<NginxSimpleServer> request = new HttpEntity<>(server, headers);
-			ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.DELETE, request, Message.class); // TODO
-			Message responseBody = response.getBody();
-			if (responseBody == null) {
-				throw new ManagerException("Failed to remove container %s from load balancer: responseBody is null",
-					containerId);
-			}
-			String responseMessage = responseBody.getMessage();
-			if (!Objects.equals(responseMessage, "success")) {
-				throw new ManagerException("Failed to delete server %s from load balancer %s: %s", serverAddress, url,
-					responseMessage);
-			}
+	public void removeServer(String serviceName, String serviceAddress, Region region) {
+		log.info("Removing server {} of service {} from load balancer", serviceAddress, serviceName);
+		List<ContainerEntity> loadBalancers = getLoadBalancersForService(serviceName, region);
+		loadBalancers.parallelStream().forEach(loadBalancer -> {
+			String url = String.format("%s/%s", getLoadBalancerUrl(loadBalancer), serviceAddress);
+			restTemplate.delete(url);
 		});
+		if (!containersService.hasContainers(region, serviceName)) {
+			initStopLoadBalancerTimer(region);
+		}
 	}
 
-  /*private List<NginxServer> getServers(String loadBalancerUrl) {
-    String url = String.format("http://%s%s/servers", loadBalancerUrl, nginxApiUrl);
-    HttpEntity<String> request = new HttpEntity<>(headers);
-    ResponseEntity<NginxServer[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServer[].class);
-    final var responseBody = response.getBody();
-    return responseBody == null ? Collections.emptyList() : Arrays.asList(responseBody);
-  }*/
-
-  /*private boolean addServer(String loadBalancerUrl, NginxServer server) {
-    String url = String.format("http://%s%s/servers", loadBalancerUrl, nginxApiUrl);
-    HttpEntity<NginxServer> request = new HttpEntity<>(server, headers);
-    ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.POST, request, Message.class);
-    final var responseBody = response.getBody();
-    return responseBody != null && Objects.equals(responseBody.getMessage(), "success");
-  }*/
-
-  /*private boolean deleteServer(String loadBalancerUrl, NginxServer server) {
-    String url = String.format("http://%s%s/servers", loadBalancerUrl, nginxApiUrl);
-    HttpEntity<NginxSimpleServer> request = new HttpEntity<>(server, headers);
-    ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.DELETE, request, Message.class);
-    Message responseBody = response.getBody();
-    return responseBody != null && Objects.equals(responseBody.getMessage(), "success");
-  }*/
+	private String getLoadBalancerUrl(ContainerEntity loadBalancer) {
+		String publicIpAddress = loadBalancer.getHostAddress().getPublicIpAddress();
+		int port = loadBalancer.getPorts().get(0).getPublicPort();
+		return String.format("http://%s:%s/_/nginx-load-balancer/api/servers", publicIpAddress, port);
+	}
 
 }

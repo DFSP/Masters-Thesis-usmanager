@@ -25,118 +25,54 @@
 package data
 
 import (
-	"flag"
+	"encoding/json"
+	"log"
 	"os"
 )
 
-// ServerWeight type
-type ServerWeight struct {
-	Hostname  string `json:"hostname,omitempty"`
-	Continent string `json:"continent,omitempty"`
-	Region    string `json:"region,omitempty"`
-	Country   string `json:"country,omitempty"`
-	City      string `json:"city,omitempty"`
-	Weight    string `json:"weight,omitempty"`
-}
-
-// Server type
 type Server struct {
-	Hostname  string `json:"hostname,omitempty"`
-	Continent string `json:"continent,omitempty"`
-	Region    string `json:"region,omitempty"`
-	Country   string `json:"country,omitempty"`
-	City      string `json:"city,omitempty"`
+	Hostname  string  `json:"hostname"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Region    string  `json:"region"`
 }
 
-// SimpleServer type
-type SimpleServer struct {
-	Hostname string `json:"hostname,omitempty"`
+type ServerWeight struct {
+	Hostname string `json:"server"`
+	Weight uint16 `json:"weight"`
 }
 
-// Message type
-type Message struct {
-	Message string `json:"message,omitempty"`
+type Coordinates struct {
+	Label     string  `json:"label,omitempty"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
-// Location type
 type Location struct {
-	Continent string `json:"continent,omitempty"`
-	Region    string `json:"region,omitempty"`
-	Country   string `json:"country,omitempty"`
-	City      string `json:"city,omitempty"`
+	Coordinates Coordinates `json:"coordinates"`
+	Region      string      `json:"region"`
 }
 
-//Servers list of servers
-var Servers []ServerWeight
+var Servers []Server
+var ServersWeight []ServerWeight
 
-//OtherRegionsServers other regions servers
-var OtherRegionsServers []ServerWeight
-
-//SameRegionsServers same region servers as load balancer
-var SameRegionsServers []ServerWeight
-
-// LoadBalancerLocation load balancer location
 var LoadBalancerLocation Location
 
-// LoadBalancerIsEdge load balancer is edge
-var LoadBalancerIsEdge bool
-
-// WeightSameRegion Same region servers weight
-var WeightSameRegion *string
-
-// WeightOtherRegion Other region servers weight
-var WeightOtherRegion *string
-
 func init() {
-	WeightSameRegion = flag.String("weightsameregion", "5", "Same region servers weight")
-	WeightOtherRegion = flag.String("weightotherregion", "4", "Other region servers weight")
-	flag.Parse()
-
+	// set loadbalancer location
+	var coordinates Coordinates
+	_ = json.Unmarshal([]byte(os.Getenv("coordinates")), &coordinates)
 	LoadBalancerLocation = Location{
-		Continent: os.Getenv("SERVICE_CONTINENT"),
-		Region:    os.Getenv("SERVICE_REGION"),
-		Country:   os.Getenv("SERVICE_COUNTRY"),
-		City:      os.Getenv("SERVICE_CITY"),
+		Coordinates: coordinates,
+		Region:      os.Getenv("region"),
 	}
 
-	LoadBalancerIsEdge = LoadBalancerLocation.Country != ""
-
-	server1 := Server{
-		Hostname:  os.Getenv("SERVER1"),
-		Continent: os.Getenv("SERVER1_CONTINENT"),
-		Region:    os.Getenv("SERVER1_REGION"),
-		Country:   os.Getenv("SERVER1_COUNTRY"),
-		City:      os.Getenv("SERVER1_CITY"),
+	// process initial server, if any
+	var server Server
+	var serverJson = os.Getenv("server")
+	if len(serverJson) > 0 {
+		_ = json.Unmarshal([]byte(serverJson), &coordinates)
+		Servers = append(Servers, server)
+		log.Printf("Added server %+v", server)
 	}
-
-	serverW := GetServerWeight(server1)
-
-	if server1.Region != "none" {
-		if LoadBalancerLocation.Region == server1.Region {
-			SameRegionsServers = append(SameRegionsServers, serverW)
-		} else {
-			OtherRegionsServers = append(OtherRegionsServers, serverW)
-		}
-	}
-	Servers = append(Servers, serverW)
-}
-
-// GetServerWeight result the server with weight
-func GetServerWeight(server Server) ServerWeight {
-	var weight string
-	if LoadBalancerLocation.Region == server.Region {
-		weight = *WeightSameRegion
-	} else {
-		weight = *WeightOtherRegion
-	}
-
-	serverW := ServerWeight{
-		Hostname:  server.Hostname,
-		Continent: server.Continent,
-		Region:    server.Region,
-		Country:   server.Country,
-		City:      server.City,
-		Weight:    weight,
-	}
-	return serverW
 }

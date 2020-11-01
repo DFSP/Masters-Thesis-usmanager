@@ -35,6 +35,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -71,7 +72,7 @@ func main() {
 		router.HandleFunc("/api/services/{service}/endpoint", api.GetServiceEndpoint).Methods("GET")
 		router.HandleFunc("/api/services/{service}/endpoints", api.GetServiceEndpoints).Methods("GET")
 		router.HandleFunc("/api/metrics", api.RegisterLocationMonitoring).Methods("POST")
-		reglog.Logger.Fatal(http.Serve(listen, router))
+		reglog.Logger.Fatal(http.Serve(listen, trimmingMiddleware(router)))
 	}()
 
 	sendLocationTimerStopChan := location.SendLocationTimer(time.Duration(interval) * time.Millisecond)
@@ -91,4 +92,11 @@ func main() {
 	close(sendLocationTimerStopChan)
 
 	instance.Deregister()
+}
+
+func trimmingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+		next.ServeHTTP(w, r)
+	})
 }

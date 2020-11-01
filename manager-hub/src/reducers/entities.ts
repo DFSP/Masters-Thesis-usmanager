@@ -2005,7 +2005,7 @@ const entities = (state: EntitiesState = {
         case UPDATE_REGION:
             if (data?.regions && data.regions?.length > 1) {
                 const previousRegion = data.regions[0];
-                const filteredRegions = Object.values(state.regions.data).filter(awsRegion => awsRegion.id !== previousRegion.id);
+                const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== previousRegion.id);
                 const currentRegion = {...previousRegion, ...data.regions[1]};
                 filteredRegions.push(currentRegion);
                 const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
@@ -2021,7 +2021,7 @@ const entities = (state: EntitiesState = {
         case DELETE_REGION:
             if (data?.regions?.length) {
                 const regionToDelete = data.regions[0];
-                const filteredRegions = Object.values(state.regions.data).filter(awsRegion => awsRegion.id !== regionToDelete.id);
+                const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== regionToDelete.id);
                 const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
                 return {
                     ...state,

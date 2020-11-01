@@ -1933,10 +1933,10 @@ const fetchRegions = (name?: string) => ({
 });
 
 /*export const ADD_REGION = 'ADD_REGION';
-export function addRegion(awsRegion: IRegion): EntitiesAction {
+export function addRegion(region: IRegion): EntitiesAction {
     return {
         type: ADD_REGION,
-        data: {regions: new Array(awsRegion)}
+        data: {regions: new Array(region)}
     }
 }*/
 
@@ -1949,10 +1949,10 @@ export function updateRegion(previousRegion: IRegion, currentRegion: IRegion): E
 }*/
 
 /*export const DELETE_REGION = 'DELETE_REGION';
-export function deleteRegion(awsRegion: IRegion): EntitiesAction {
+export function deleteRegion(region: IRegion): EntitiesAction {
     return {
         type: DELETE_REGION,
-        data: {regions: [awsRegion]}
+        data: {regions: [region]}
     }
 }*/
 

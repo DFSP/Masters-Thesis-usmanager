@@ -34,8 +34,9 @@ public final class ContainerConstants {
 		public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
 		public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
 		public static final String PROXY_PASS = "PROXY_PASS";
-		public static final String SERVER1 = "SERVER1";
-		public static final String SERVER1_REGION = "SERVER1_REGION";
+		public static final String SERVER = "SERVER";
+		public static final String SERVER_COORDINATES = "SERVER_COORDINATES";
+		public static final String SERVER_REGION = "SERVER_REGION";
 		public static final String ID = "ID";
 		public static final String MASTER = "MASTER";
 	}
