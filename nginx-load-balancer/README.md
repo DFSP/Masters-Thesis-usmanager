@@ -8,13 +8,14 @@ configurado com o [modulo Ngx http geoip2](http://nginx.org/en/docs/http/ngx_htt
 #### Local
 
 Garantir que o nginx é removido (irá ser re-instalado com o módulo ngx_http_geoip2):
-```console
+
+```sh
 sudo apt remove nginx
 ```
 
 Instalar e executar o [geoipupdate](https://github.com/maxmind/geoipupdate):
 
-```console
+```sh
 sudo cp geoip/GeoIP.conf /etc/GeoIP.conf
 sudo apt install geoipupdate -y
 sudo geoipupdate
@@ -22,7 +23,8 @@ sudo ls /usr/share/GeoIP/
 ```
 
 Instalar o nginx incluindo o módulo [ngx_http_geoip2](https://github.com/leev/ngx_http_geoip2_module):
-```shell script
+
+```sh
 NGINX_VERSION=1.19.4
 sudo apt install libmaxminddb0 libmaxminddb-dev mmdb-bin -y
 git clone https://github.com/leev/ngx_http_geoip2_module.git
@@ -42,7 +44,7 @@ nginx -t
 
 #### Docker
  
-```shell script
+```sh
 docker build -f docker/Dockerfile . -t nginx-load-balancer  
 docker run -p 1908:80 -p 1907:1907 \
 -e BASIC_AUTH_USERNAME=username \
@@ -70,17 +72,17 @@ geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
 ```
 
 Para ver os valores associados ao endereço ip:
-```bash
+```sh
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip)
 ```
 
 Para ver os valores de localização: 
-```bash
+```sh
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip) location
 ```
 
 Para ver um valor especifico, e.g. latitude:
-```bash
+```sh
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip) location latitude
 ```
 
