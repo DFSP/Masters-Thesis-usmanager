@@ -40,9 +40,9 @@ func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/_/nginx-load-balancer-api/servers", api.GetServers).Methods("GET")
-	router.HandleFunc("/_/nginx-load-balancer-api/servers", api.AddServers).Methods("POST")
-	router.HandleFunc("/_/nginx-load-balancer-api/servers/{hostname}", api.DeleteServer).Methods("DELETE")
+	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers", api.GetServers).Methods("GET")
+	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers", api.AddServers).Methods("POST")
+	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers/{server}", api.DeleteServer).Methods("DELETE")
 	log.Printf("Nginx API is listening on port %s", *port)
 	log.Fatal(http.ListenAndServe(":"+*port, trimmingMiddleware(router)))
 }

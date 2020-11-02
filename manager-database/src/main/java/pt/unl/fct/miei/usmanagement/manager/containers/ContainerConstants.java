@@ -34,11 +34,14 @@ public final class ContainerConstants {
 		public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
 		public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
 		public static final String PROXY_PASS = "PROXY_PASS";
-		public static final String SERVER = "SERVER";
-		public static final String SERVER_COORDINATES = "SERVER_COORDINATES";
-		public static final String SERVER_REGION = "SERVER_REGION";
 		public static final String ID = "ID";
 		public static final String MASTER = "MASTER";
+
+		public static final class LoadBalancer {
+			public static final String SERVER_NAME = "SERVER_NAME";
+			public static final String SERVER = "SERVER";
+		}
+
 	}
 
 	public static final class Label {
@@ -50,9 +53,13 @@ public final class ContainerConstants {
 		public static final String SERVICE_PRIVATE_IP_ADDRESS = "servicePrivateIpAddress";
 		public static final String COORDINATES = "coordinates";
 		public static final String REGION = "region";
-		public static final String SERVICE = "service";
 		public static final String IS_REPLICABLE = "isReplicable";
 		public static final String IS_STOPPABLE = "isStoppable";
+
+		public static final class LoadBalancer {
+			public static final String SERVER = "server";
+		}
+
 	}
 
 }

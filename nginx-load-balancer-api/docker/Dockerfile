@@ -16,6 +16,4 @@ mv /go/src/github.com/usmanager/manager/nginx-load-balancer-api/nginx-load-balan
 
 # Build final image
 FROM alpine
-RUN mkdir /app
-WORKDIR /app
-COPY --from=build /app/nginx-load-balancer-api nginx-load-balancer-api
+COPY --from=build /app/nginx-load-balancer-api /nginx-load-balancer-api

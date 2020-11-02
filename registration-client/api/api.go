@@ -81,7 +81,7 @@ func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	if len(errorMessage) > 0 {
 		w.WriteHeader(http.StatusBadGateway)
-		json.NewEncoder(w).Encode(errorMessage)
+		_ = json.NewEncoder(w).Encode(errorMessage)
 		reglog.Logger.Errorf("Error getting instances from eureka: %s", errorMessage)
 	} else if len(instanceEndpoint.InstanceId) == 0 {
 		reglog.Logger.Infof("Found no instances")
@@ -89,7 +89,7 @@ func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 	} else {
 		reglog.Logger.Infof("Found instances: %s", instances)
 		reglog.Logger.Infof("Instance chosen for %s: %s", service, instanceEndpoint.InstanceId)
-		json.NewEncoder(w).Encode(instanceEndpoint)
+		_ = json.NewEncoder(w).Encode(instanceEndpoint)
 	}
 
 }
@@ -118,11 +118,11 @@ func GetServiceEndpoints(w http.ResponseWriter, r *http.Request) {
 
 	if len(errorMessage) > 0 {
 		w.WriteHeader(http.StatusBadGateway)
-		json.NewEncoder(w).Encode(errorMessage)
+		_ = json.NewEncoder(w).Encode(errorMessage)
 		reglog.Logger.Errorf("Error getting instances from eureka: %s", errorMessage)
 	} else {
 		reglog.Logger.Infof("Found instances: %s", instanceEndpoints)
-		json.NewEncoder(w).Encode(instanceEndpoints)
+		_ = json.NewEncoder(w).Encode(instanceEndpoints)
 	}
 }
 
@@ -133,6 +133,10 @@ func RegisterServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func RegisterLocationMonitoring(w http.ResponseWriter, r *http.Request) {
 	var locationMonitoring data.LocationRequest
-	_ = json.NewDecoder(r.Body).Decode(&locationMonitoring)
-	go location.AddRequest(locationMonitoring)
+	err := json.NewDecoder(r.Body).Decode(&locationMonitoring)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		go location.AddRequest(locationMonitoring)
+	}
 }

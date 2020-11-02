@@ -9,7 +9,7 @@ Módulo que contém todos os serviços comuns aos [master](../manager-master) e 
 ##### Maven com java 11  
 ```shell script
 sudo apt install maven  
-maven --version
+mvn --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  
@@ -17,6 +17,11 @@ Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/
  
 ```shell script
 mvn clean install -DskipTests -U
+```
+
+##  Docker
+```shell script
+docker build -f src/main/docker/Dockerfile . -t manager-services
 ```
 
 ## Incluir a dependência  

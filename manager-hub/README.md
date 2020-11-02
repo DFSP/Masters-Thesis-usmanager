@@ -6,13 +6,13 @@ Este módulo é consistido por um cliente web reactjs.
 O qual comunica com o [Manager Master](/usmanager/manager-master) através de REST API para permitir 
 ajustar manualmente e interagir com o sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
  
- ### Instalar
+### Instalar
  
 ```shell script
 npm install
 ```
  
- ### Iniciar
+### Iniciar
  
 ```shell script
 npm start
@@ -29,7 +29,7 @@ docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR
  
 > Ubuntu 20.04.1 LTS
  
-> Chrome browser 85.0.4183.121
+> Chrome browser 86.0.4240.111 
 
 ### Ferramentas
 

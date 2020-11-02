@@ -10,14 +10,19 @@ Módulo que contém todas as entidades e repositórios que constituem a base de 
 #### Maven com java 11  
 ```shell script
 sudo apt install maven`  
-maven --version
+mvn --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  
- ## Executar   
+ ## Instalar   
  
 ```shell script
 mvn clean install -DskipTests -U
+```
+
+##  Docker
+```shell script
+docker build -f src/main/docker/Dockerfile . -t manager-database
 ```
 
 ## Incluir a dependência 

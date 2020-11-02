@@ -32,6 +32,8 @@ docker run --rm -p 8761:8761 registration-server
 ## Guias
 [Spring Eureka Server](https://spring.io/guides/gs/service-registration-and-discovery) - This guide walks you through the process of starting and using the Netflix Eureka service registry.
 
+## Ferramentas
+
 ## License
 
 Registration-server está licenciado com a [MIT license](../LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

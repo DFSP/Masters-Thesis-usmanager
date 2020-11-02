@@ -67,7 +67,7 @@ public class NginxLoadBalancerService {
 
 	private final ContainersService containersService;
 	private final HostsService hostsService;
-	private final ServicesService serviceService;
+	private final ServicesService servicesService;
 
 	private final int stopDelay;
 	private final String dockerApiProxyUsername;
@@ -78,12 +78,12 @@ public class NginxLoadBalancerService {
 	private final Map<Region, Timer> stopLoadBalancerTimers;
 
 	public NginxLoadBalancerService(@Lazy ContainersService containersService, HostsService hostsService,
-									ServicesService serviceService,
+									ServicesService servicesService,
 									NginxLoadBalancerProperties nginxLoadBalancerProperties,
 									DockerProperties dockerProperties) {
 		this.containersService = containersService;
 		this.hostsService = hostsService;
-		this.serviceService = serviceService;
+		this.servicesService = servicesService;
 		this.stopDelay = nginxLoadBalancerProperties.getStopDelay();
 		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
@@ -96,7 +96,7 @@ public class NginxLoadBalancerService {
 	}
 
 	public List<ContainerEntity> launchLoadBalancers(String serviceName, List<Region> regions) {
-		double expectedMemoryConsumption = serviceService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = servicesService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
 
 		Gson gson = new Gson();
 		return regions.stream()
@@ -122,17 +122,18 @@ public class NginxLoadBalancerService {
 		List<String> environment = new ArrayList<>();
 		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername));
 		environment.add(String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword));
+		environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.SERVER_NAME, serviceName));
 		if (nginxServer != null) {
-			environment.add(String.format("%s=%s", ContainerConstants.Environment.SERVER, new Gson().toJson(nginxServer)));
+			environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.SERVER, new Gson().toJson(nginxServer)));
 		}
 		Map<String, String> labels = Map.of(
-			ContainerConstants.Label.SERVICE, serviceName
+			ContainerConstants.Label.LoadBalancer.SERVER, serviceName
 		);
 		return containersService.launchContainer(hostAddress, LOAD_BALANCER, environment, labels);
 	}
 
 	private ContainerEntity launchLoadBalancer(Region region, String serviceName, NginxServer nginxServer) {
-		double availableMemory = serviceService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+		double availableMemory = servicesService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
 		HostAddress hostAddress = hostsService.getCapableNode(availableMemory, region);
 		return launchLoadBalancer(hostAddress, serviceName, nginxServer);
 	}
@@ -167,7 +168,7 @@ public class NginxLoadBalancerService {
 	private List<ContainerEntity> getLoadBalancersForService(String serviceName, Region region) {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
-			Pair.of(ContainerConstants.Label.SERVICE, serviceName),
+			Pair.of(ContainerConstants.Label.LoadBalancer.SERVER, serviceName),
 			Pair.of(ContainerConstants.Label.REGION, region.name())));
 	}
 

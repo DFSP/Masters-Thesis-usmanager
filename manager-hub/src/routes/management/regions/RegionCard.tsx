@@ -64,7 +64,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">Region <b class="white-text">${region.region}</b> successfully removed</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -72,7 +72,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void => {
-        super.toast(`Unable to delete region <a href=/regions/${region.name}><b>${region.name}</b></a>`, 10000, reason, true);
+        super.toast(`Unable to delete region <a href=/regions/${region.region}><b>${region.region}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -82,14 +82,14 @@ class RegionCard extends BaseComponent<Props, State> {
         const {region} = this.props;
         const {loading} = this.state;
         const CardRegion = Card<IRegion>();
-        return <CardRegion id={`region-${region.name}`}
-                           title={region.name}
+        return <CardRegion id={`region-${region.region}`}
+                           title={region.region}
                            link={{to: {pathname: `/regions/${region.region}`, state: region}}}
                            height={'85px'}
                            margin={'10px 0'}
                            hoverable
             /*delete={{
-                url: `regions/${region.name}`,
+                url: `regions/${region.region}`,
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}*/

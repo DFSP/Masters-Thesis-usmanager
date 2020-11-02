@@ -40,70 +40,74 @@ const generatedPath = "generated"
 const filePath = generatedPath + "/nginx.conf"
 const dstPath = "/etc/nginx/nginx.conf"
 
-const tmpl = `load_module "modules/ngx_http_geoip_module.so";
-user nginx;
+const tmpl = `load_module "modules/ngx_http_geoip2_module.so";
+
+user root;
 worker_processes auto;
 
 error_log /dev/stdout info;
 pid /var/run/nginx.pid;
 
 events {
-  worker_connections 1024;
+	worker_connections 1024;
 }
 
 http {
-  geoip_city etc/nginx/geoip/city.dat;
-  
-  access_log /dev/stdout;
+	geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
+		$geoip2_location_latitude default=-1 location latitude;
+		$geoip2_location_longitude default=-1 location longitude;
+    }
 
-  upstream frontend {
-	least_conn;
-    {{- range $index, $server := .}}
-    server {{$server.Hostname}} weight={{$server.Weight}};
-    {{- end}}
-  }
-
-  server {
-    listen 80;
-    server_name load-balancer.com;
-
-    include /etc/nginx/conf.d/*.conf;
-
-    location / {
-      proxy_connect_timeout 100;
-      proxy_read_timeout 100;      
-
-      proxy_pass http://frontend;  
-
-      proxy_set_header X-Latitude $geoip_latitude;
-      proxy_set_header x-Longitude $geoip_longitude;
+	access_log /dev/stdout;
+	{{range $service, $servers := .}}
+	upstream {{$service}} {
+		least_conn;
+		server {{range $servers}}{{.Server}} 
+		#{{.Latitude}} {{.Longitude}} {{.Region}}
+		{{end}}
 	}
+	{{end}}
+  	server {
+		listen 80;
+		server_name load-balancer.com;
+
+		include /etc/nginx/conf.d/*.conf;
+    
+	{{range $service, $servers := .}}
+	location /{{$service}} {
+      	proxy_connect_timeout 100;
+      	proxy_read_timeout 100;      
+
+      	proxy_pass http://{{$service}};  
+
+      	proxy_set_header X-Latitude $geoip_latitude;
+      	proxy_set_header x-Longitude $geoip_longitude;
+    }
+	{{end}}
 
     location /_/nginx-load-balancer-api {
-	  proxy_connect_timeout 100;
-	  proxy_read_timeout 100;
+      	proxy_connect_timeout 100;
+      	proxy_read_timeout 100;
 
-	  auth_basic "Restricted";
-	  auth_basic_user_file /etc/nginx/.htpasswd;           
+      	auth_basic "Restricted";
+      	auth_basic_user_file /etc/nginx/.htpasswd;
 
-	  proxy_pass http://localhost:1906;
-	
-	  proxy_set_header X-Forwarded-Host $host;
-	  proxy_set_header Authorization "";
-	  proxy_redirect off;
-	}
-  }
+      	proxy_pass http://localhost:1906;
+      
+      	proxy_set_header X-Forwarded-Host $host;
+      	proxy_set_header Authorization "";
+      	proxy_redirect off;
+    }
 }
 `
 
 func UpdateNginx() {
-	if len(data.Servers) > 0 {
-		log.Print("Updating nginx config files")
-		generateNginxConfigFile()
-	}
+	log.Print("Updating nginx")
+	generateNginxConfigFile()
 }
 
 func generateNginxConfigFile() {
+	log.Print("Updating nginx config files")
 	folderAbsPath, _ := filepath.Abs(generatedPath)
 	fileAbsPath, _ := filepath.Abs(filePath)
 	copyAbsPath, _ := filepath.Abs(dstPath)
@@ -125,7 +129,7 @@ func generateNginxConfigFile() {
 		return
 	}
 
-	err = t.Execute(f, data.ServersWeight)
+	err = t.Execute(f, data.Servers)
 	if err != nil {
 		log.Fatal("Execute: ", err)
 		return

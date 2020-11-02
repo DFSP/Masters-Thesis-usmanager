@@ -50,7 +50,7 @@ var StopHeartbeatChan chan bool
 
 func init() {
 	flag.StringVar(&Service, "service", "", "Service name")
-	flag.StringVar(&Hostname, "hostname", "127.0.0.1", "Service Hostname")
+	flag.StringVar(&Hostname, "hostname", "127.0.0.1", "Service Server")
 	flag.IntVar(&Port, "port", 1906, "Service Port")
 	flag.Float64Var(&Latitude, "latitude", 0, "Service Latitude")
 	flag.Float64Var(&Longitude, "longitude", 0, "Service Longitude")

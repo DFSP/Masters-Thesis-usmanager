@@ -476,7 +476,7 @@ class Container extends BaseComponent<Props, State> {
     }
 
     private regionOption = (region: IRegion) =>
-        region.name;
+        region.region;
 
     private formFields = (formContainer: INewContainer | Partial<IContainer>, isNew: boolean): JSX.Element =>
         isNew ?

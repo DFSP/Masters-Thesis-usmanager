@@ -36,9 +36,29 @@ Os URIs são relativos a *http://localhost:1906/_/nginx-load-balancer-api/api*
 
 HTTP request | Description
 ------------ | -------------
-**Get** /servers | Lista todos os servidores registados neste load balancer
-**POST** /servers | Adiciona servidores novos. Pedido: `[{hostname, latitude, longitude, region}]`
-**DELETE** /servers/{hostname} | Remove o servidor `{hostname}`
+**Get** /{service}/servers | Lista todos os servidores do serviço `{service}` registados neste load balancer
+**POST** /{service}/servers | Adiciona servidores novos ao serviço `{service}`. Pedido: `[{server, latitude, longitude, region}]`
+**DELETE** /{service}/servers/{server} | Remove o servidor `{server}` do serviço `{service}`
+
+## Exemplos
+
+Obter os servidores do serviço `app`:
+```shell script
+curl -i http://localhost:1907/_/nginx-load-balancer-api/app/servers
+```
+
+Adicionar um servidor ao serviço `app`:
+```shell script
+curl -i \
+     --header "Content-Type: application/json" \
+     --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}' \
+     http://localhost:1907/_/nginx-load-balancer-api/app/servers
+```
+
+Remover o servidor `202.193.200.125:5000` ao serviço `app`:
+```shell script
+curl -i -X DELETE http://localhost:1907/_/nginx-load-balancer-api/app/servers/202.193.200.125:5000
+```
 
 ## Licença
 

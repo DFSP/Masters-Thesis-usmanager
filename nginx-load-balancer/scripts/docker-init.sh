@@ -14,7 +14,11 @@ fi
 
 htpasswd -bBc /etc/nginx/.htpasswd "$BASIC_AUTH_USERNAME" "$BASIC_AUTH_PASSWORD"
 
-cp nginx.conf /etc/nginx/nginx.conf
+if [ -z ${SERVER_NAME+x} ]; then
+  echo "Using default server_name: load-balancer.com";
+else
+  sed -e "s/load-balancer.com/$SERVER_NAME/g" nginx.conf.tmpl > /etc/nginx/nginx.conf
+  echo "Using server_name: $SERVER_NAME";
+fi
 
-./nginx-load-balancer-api &
-exec nginx -g "daemon off;"
+./nginx-load-balancer-api & exec nginx -g "daemon off;"

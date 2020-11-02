@@ -31,15 +31,10 @@ import (
 )
 
 type Server struct {
-	Hostname  string  `json:"hostname"`
+	Server    string  `json:"server"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Region    string  `json:"region"`
-}
-
-type ServerWeight struct {
-	Hostname string `json:"server"`
-	Weight uint16 `json:"weight"`
 }
 
 type Coordinates struct {
@@ -49,30 +44,32 @@ type Coordinates struct {
 }
 
 type Location struct {
-	Coordinates Coordinates `json:"coordinates"`
-	Region      string      `json:"region"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Region    string  `json:"region"`
 }
 
-var Servers []Server
-var ServersWeight []ServerWeight
-
+var Servers map[string][]Server
 var LoadBalancerLocation Location
 
 func init() {
+	Servers = make(map[string][]Server)
+
 	// set loadbalancer location
 	var coordinates Coordinates
 	_ = json.Unmarshal([]byte(os.Getenv("coordinates")), &coordinates)
 	LoadBalancerLocation = Location{
-		Coordinates: coordinates,
-		Region:      os.Getenv("region"),
+		Latitude:  coordinates.Latitude,
+		Longitude: coordinates.Longitude,
+		Region:    os.Getenv("region"),
 	}
 
 	// process initial server, if any
 	var server Server
 	var serverJson = os.Getenv("server")
 	if len(serverJson) > 0 {
-		_ = json.Unmarshal([]byte(serverJson), &coordinates)
-		Servers = append(Servers, server)
+		_ = json.Unmarshal([]byte(serverJson), &server)
+		Servers[server.Server] = []Server{server}
 		log.Printf("Added server %+v", server)
 	}
 }

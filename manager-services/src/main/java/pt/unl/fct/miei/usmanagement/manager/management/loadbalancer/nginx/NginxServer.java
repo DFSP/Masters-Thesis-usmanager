@@ -36,7 +36,7 @@ final class NginxServer implements Serializable {
 
 	private static final long serialVersionUID = -7203502424143183821L;
 
-	private final String hostname;
+	private final String server;
 	private final double latitude;
 	private final double longitude;
 	private final String region;

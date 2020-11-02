@@ -5,7 +5,6 @@
 Gestor que faz a conexão entre as máquinas edge e cloud.
 Está desenhado para ser executado em máquinas localizadas entre a edge e a cloud.  
 Gere um conjunto de nós e containers na edge.  
-Usa [kafka](https://kafka.apache.org/) para comunicar com o manager-master.  
 É um módulo java gerido com maven, usa a framework spring-boot.
 
 ## Dependências
@@ -35,10 +34,8 @@ mvn spring-boot:run
 ```
 
 #### Docker
-
-##### Local
 ```shell script
-docker build -f docker/Dockerfile . -t manager-worker
+docker build -f src/main/docker/Dockerfile . -t manager-worker
 docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 manager-worker
 ```
 

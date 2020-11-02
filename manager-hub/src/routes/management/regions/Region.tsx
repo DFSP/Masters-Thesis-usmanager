@@ -120,42 +120,42 @@ class Region extends BaseComponent<Props, State> {
 
     /*private onPostSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regions/${region.region}><b>${region.region}</b></a>`} saved</span>`);
         this.props.addRegion(region);
         if (this.mounted) {
             this.updateRegion(region);
-            this.props.history.replace(region.name);
+            this.props.history.replace(region.region);
         }
     };*/
 
     /*private onPostFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to save region <b>${region.name}</b>`, 10000, reason, true);*/
+        super.toast(`Unable to save region <b>${region.region}</b>`, 10000, reason, true);*/
 
     /*private onPutSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region have been saved</span>`);
+        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regions/${region.region}><b>${region.name}</b></a>`} region have been saved</span>`);
         const previousRegion = this.getRegion();
         if (previousRegion?.id) {
             this.props.updateRegion(previousRegion as IRegion, region)
         }
         if (this.mounted) {
             this.updateRegion(region);
-            this.props.history.replace(region.name);
+            this.props.history.replace(region.region);
         }
     };*/
 
     /*private onPutFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to update region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
+        super.toast(`Unable to update region ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">Region <b class="white-text">${region.region}</b> successfully removed</span>`);
         if (this.mounted) {
             this.props.history.push(`/regions`);
         }
     };*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to delete region ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
+        super.toast(`Unable to delete region ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
     /*private updateRegion = (region: IRegion) => {
         region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
@@ -209,12 +209,12 @@ class Region extends BaseComponent<Props, State> {
                             failureCallback: this.onPostFailure
                         }}*/
                         /*put={{
-                            url: `regions/${region.name}`,
+                            url: `regions/${region.region}`,
                             successCallback: this.onPutSuccess,
                             failureCallback: this.onPutFailure
                         }}*/
                         /*delete={{
-                            url: `regions/${region.name}`,
+                            url: `regions/${region.region}`,
                             successCallback: this.onDeleteSuccess,
                             failureCallback: this.onDeleteFailure
                         }}*/>

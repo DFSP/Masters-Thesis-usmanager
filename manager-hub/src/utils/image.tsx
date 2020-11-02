@@ -98,7 +98,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
             return <FaMapMarkedAlt/>;
         }
         const region = value as IRegion;
-        const regionName = region.name.toLowerCase();
+        const regionName = region.region.toLowerCase();
         if (regionName.includes('america')) {
             return <FaGlobeAmericas/>;
         }

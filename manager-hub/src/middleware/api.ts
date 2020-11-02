@@ -199,7 +199,7 @@ const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
 });
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
-    idAttribute: (region: IRegion) => region.name
+    idAttribute: (region: IRegion) => region.region
 });
 
 const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefined, {

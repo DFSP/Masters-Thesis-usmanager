@@ -44,22 +44,23 @@ HTTP request | Description
 
 Ver todas as monitorizações:
 ```shell script
-curl http://localhost:1919/api/monitoring
+curl -i http://localhost:1919/api/monitoring
 ```
 
 Ver todas as monitorizações, no últimos 60 segundos, agregadas por serviço:
 ```shell script
-curl http://localhost:1919/api/monitoring?aggregation
+curl -i http://localhost:1919/api/monitoring?aggregation
 ```
 
 Ver todas as monitorizações, no últimos 120 segundos, agregadas por serviço:
 ```shell script
-curl http://localhost:1919/api/monitoring?aggregation&interval=120000
+curl -i http://localhost:1919/api/monitoring?aggregation&interval=120000
 ```
 
 Regista uma nova monitorização de um serviço:
 ```shell script
-curl --header "Content-Type: application/json" \
+curl -i \
+     --header "Content-Type: application/json" \
      --data '{"service":"app","latitude":39.575097,"longitude":-8.909794,"count":1}' \
      http://localhost:1919/api/monitoring
 ```
@@ -69,6 +70,8 @@ curl --header "Content-Type: application/json" \
 [<img src="https://i.imgur.com/DBrGTaL.png" alt="" width="48" height="48"> Postman](https://www.postman.com/) - The Collaboration Platform for API Development
 
 [<img src="https://i.imgur.com/M7dKRag.png" alt="" width="48" height="48"> Json Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) - Chrome extension for printing JSON and JSONP nicely when you visit it 'directly' in a browser tab
+
+[<img src="https://i.imgur.com/LvZ3Anc.png" alt="" width="48" height="48"> Golang playground](https://play.golang.org/) - Go Playground is a web service that runs on golang.org's servers
 
 ## License
 

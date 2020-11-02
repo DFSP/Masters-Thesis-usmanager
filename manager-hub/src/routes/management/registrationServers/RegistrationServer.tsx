@@ -211,7 +211,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
 
     private regionOption = (region: IRegion) =>
-        region.name;
+        region.region;
 
     private formFields = (isNew: boolean, formRegistrationServer?: Partial<IRegistrationServer>) => {
         const {currentForm} = this.state;

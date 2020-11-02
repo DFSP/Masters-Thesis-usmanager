@@ -309,7 +309,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         worker.id.toString();
 
     private regionOption = (region: IRegion) =>
-        region.name;
+        region.region;
 
     private edgeHost = () => {
         const {isLoading, error} = this.props;

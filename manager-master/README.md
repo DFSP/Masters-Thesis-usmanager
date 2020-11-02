@@ -7,12 +7,12 @@ Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de d
 Usa o sistema de gestão de regras de negócios [Drools](https://www.drools.org/) para gerir as regras aplicadas. 
 É um módulo [Spring Boot](https://spring.io/projects/spring-boot), gerido com [maven](https://maven.apache.org/), que disponibiliza um servidor restful.
 
-## Requisitos
+## Dependências
 
 #### Maven com java 11  
 ```shell script
 sudo apt install maven
-maven --version
+mvn --version
 ```
 Confirmar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988)).
  

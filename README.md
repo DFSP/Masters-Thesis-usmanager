@@ -53,7 +53,7 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 ### Ferramentas usadas
 
 [<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://www.jetbrains.com/idea/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
-  
+
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
 > [Manager master](manager-master/README.md#ferramentas)  
@@ -65,6 +65,10 @@ As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos 
 > [Request location monitor](request-location-monitor/README.md#ferramentas)  
 
 > [Registration client](registration-client/README.md#ferramentas)  
+
+> [Registration server](registration-server/README.md#ferramentas)  
+
+> [Nginx-load-balancer-api](registration-client/README.md#ferramentas)  
 
 ### Configuração
 

@@ -42,67 +42,94 @@ func init() {
 	flag.IntVar(&delay, "delay", 15, "Update delay (in seconds) of the nginx configuration after adding a new server")
 }
 
-func GetServers(w http.ResponseWriter, _ *http.Request) {
+func GetServers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if len(data.Servers) == 0 {
-		response := make([]string, 0)
-		json.NewEncoder(w).Encode(response)
-		log.Print("Looking for servers... found none")
+
+	vars := mux.Vars(r)
+	service := vars["service"]
+
+	services, hasServices := data.Servers[service]
+	if hasServices {
+		_ = json.NewEncoder(w).Encode(services)
+		log.Printf("Looking for servers of %s... found %+v", service, services)
 	} else {
-		json.NewEncoder(w).Encode(data.Servers)
-		log.Printf("Looking for servers... found %+v", data.Servers)
+		response := make([]string, 0)
+		_ = json.NewEncoder(w).Encode(response)
+		log.Printf("Looking for servers of %s... found none", service)
 	}
 }
 
 func AddServers(w http.ResponseWriter, r *http.Request) {
-	var reply []data.ServerWeight
-
 	var servers []data.Server
-	_ = json.NewDecoder(r.Body).Decode(&servers)
-
-	for _, server := range servers {
-		data.Servers = append(data.Servers, server)
-		serverWeight := CalculateWeight(server)
-		data.ServersWeight = append(data.ServersWeight, serverWeight)
-		reply = append(reply, serverWeight)
-		log.Printf("Added server %+v with weight %d", server, serverWeight.Weight)
+	err := json.NewDecoder(r.Body).Decode(&servers)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	time.AfterFunc(time.Duration(delay) * time.Second, func() {
+	vars := mux.Vars(r)
+	service := vars["service"]
+
+	for _, server := range servers {
+		currentServers, hasServers := data.Servers[service]
+		if !hasServers {
+			data.Servers[service] = []data.Server{server}
+			log.Printf("Added first server %+v to service %s", server, service)
+		} else if !hasServer(server, currentServers) {
+			currentServers = append(currentServers, server)
+			data.Servers[service] = currentServers
+			log.Printf("Added server %+v to service %s, current servers %v", server, service, currentServers)
+		} else {
+			log.Printf("Server %v is already registered to service %s", server, service)
+		}
+	}
+
+	time.AfterFunc(time.Duration(delay)*time.Second, func() {
 		nginx.UpdateNginx()
 	})
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(reply)
+	_ = json.NewEncoder(w).Encode(servers)
 }
 
 func DeleteServer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	hostname := vars["hostname"]
+	service := vars["service"]
+	server := vars["server"]
 
 	removed := false
-	for index, server := range data.Servers {
-		if server.Hostname == hostname {
-			data.Servers = append(data.Servers[:index], data.Servers[index+1:]...)
-			log.Printf("Removed server %+v", server)
-			removed = true
-			break
+	servers, hasServers := data.Servers[service]
+	if hasServers {
+		for index, s := range servers {
+			if s.Server == server {
+				servers = append(servers[:index], servers[index+1:]...)
+				if len(servers) > 0 {
+					data.Servers[service] = servers
+					log.Printf("Removed server %+v from service %s, current servers %v", server, service, servers)
+				} else {
+					delete(data.Servers, service)
+					log.Printf("Removed server %+v from service %s, no more servers", server, service)
+				}
+
+				removed = true
+				break
+			}
 		}
 	}
 
 	if removed {
 		nginx.UpdateNginx()
 	} else {
-		log.Printf("Server %s not found", hostname)
+		log.Printf("Server %s of %s not found", server, service)
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
-func CalculateWeight(server data.Server) data.ServerWeight {
-	var distance uint16 = 0
-
-	return data.ServerWeight{
-		Hostname: server.Hostname,
-		Weight: distance,
+func hasServer(server data.Server, servers []data.Server) bool {
+	for _, s := range servers {
+		if server.Server == s.Server {
+			return true
+		}
 	}
+	return false
 }

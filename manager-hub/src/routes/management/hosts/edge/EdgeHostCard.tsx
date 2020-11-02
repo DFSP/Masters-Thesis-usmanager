@@ -142,7 +142,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                       value={`${edgeHost.publicDnsName}`}/>
             <CardItem key={'region'}
                       label={'Region'}
-                      value={`${edgeHost.region.name}`}/>
+                      value={`${edgeHost.region.region}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
                       value={`(${edgeHost.coordinates.latitude.toFixed(3)}, ${edgeHost.coordinates.longitude.toFixed(3)})`}/>
