@@ -38,7 +38,7 @@ import (
 
 const generatedPath = "generated"
 const filePath = generatedPath + "/nginx.conf"
-const dstPath = "/etc/nginx/nginx.conf"
+const dstPath = "/usr/local/nginx/conf/nginx.conf"
 
 const tmpl = `load_module "modules/ngx_http_geoip2_module.so";
 
@@ -53,57 +53,54 @@ events {
 }
 
 http {
+	access_log /dev/stdout;
+
 	geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
 		$geoip2_location_latitude default=-1 location latitude;
 		$geoip2_location_longitude default=-1 location longitude;
     }
-
-	access_log /dev/stdout;
 	{{range $service, $servers := .}}
 	upstream {{$service}} {
-		least_conn;
-		server {{range $servers}}{{.Server}} 
-		#{{.Latitude}} {{.Longitude}} {{.Region}}
-		{{end}}
+		least_conn; {{range $servers}}
+        server {{.Server}}; #{{.Latitude}} {{.Longitude}} {{.Region}}{{end}}
 	}
 	{{end}}
   	server {
 		listen 80;
 		server_name load-balancer.com;
-
 		include /etc/nginx/conf.d/*.conf;
-    
-	{{range $service, $servers := .}}
-	location /{{$service}} {
-      	proxy_connect_timeout 100;
-      	proxy_read_timeout 100;      
+		{{range $service, $servers := .}}
+		location /{{$service}} {
+      		proxy_connect_timeout 100;
+      		proxy_read_timeout 100;
+      		proxy_pass http://{{$service}};
+      		#proxy_set_header X-Latitude $geoip2_location_latitude;
+      		#proxy_set_header x-Longitude $geoip2_location_longitude;
+    	}
+		{{end}}
+    	location /_/nginx-load-balancer-api {
+      		proxy_connect_timeout 100;
+      		proxy_read_timeout 100;
 
-      	proxy_pass http://{{$service}};  
+      		auth_basic "Restricted";
+      		auth_basic_user_file /etc/nginx/.htpasswd;
 
-      	proxy_set_header X-Latitude $geoip_latitude;
-      	proxy_set_header x-Longitude $geoip_longitude;
-    }
-	{{end}}
-
-    location /_/nginx-load-balancer-api {
-      	proxy_connect_timeout 100;
-      	proxy_read_timeout 100;
-
-      	auth_basic "Restricted";
-      	auth_basic_user_file /etc/nginx/.htpasswd;
-
-      	proxy_pass http://localhost:1906;
+      		proxy_pass http://localhost:1906;
       
-      	proxy_set_header X-Forwarded-Host $host;
-      	proxy_set_header Authorization "";
-      	proxy_redirect off;
-    }
+      		proxy_set_header X-Forwarded-Host $host;
+      		proxy_set_header Authorization "";
+      		proxy_redirect off;
+
+      		#proxy_set_header X-Latitude $geoip2_location_latitude;
+      		#proxy_set_header x-Longitude $geoip2_location_longitude;
+    	}
+	}
 }
 `
 
 func UpdateNginx() {
 	log.Print("Updating nginx")
-	generateNginxConfigFile()
+	go generateNginxConfigFile()
 }
 
 func generateNginxConfigFile() {

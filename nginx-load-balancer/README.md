@@ -8,12 +8,13 @@ configurado com o [modulo Ngx http geoip2](http://nginx.org/en/docs/http/ngx_htt
 #### Local
 
 Garantir que o nginx é removido (irá ser re-instalado com o módulo ngx_http_geoip2):
-```shell script
+```console
 sudo apt remove nginx
 ```
 
 Instalar e executar o [geoipupdate](https://github.com/maxmind/geoipupdate):
-```shell script
+
+```console
 sudo cp geoip/GeoIP.conf /etc/GeoIP.conf
 sudo apt install geoipupdate -y
 sudo geoipupdate
@@ -50,18 +51,18 @@ docker run -p 1908:80 -p 1907:1907 \
 nginx-load-balancer 
 ```
 
-## Modulo Ngx http geoip2
+## Módulo Ngx http geoip2
 
 O módulo ngx_http_geoip2 permite associar o endereço ip do cliente a uma base de dados MaxMind, possibilitando assim
 extrair valores de geolocalização do cliente.
 
 Incluir o módulo no ficheiro de configuração nginx:
-```shell script
+```nginx
 load_module "modules/ngx_http_geoip2_module.so";
 ```
 
 Através da base de dados GeoLite2-City, ficam disponíveis vários valores associados ao endereço ip. No nosso caso, interessam-nos a latitude e a longitude: 
-```shell script
+```nginx
 geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
   $geoip2_location_latitude default=-1 location latitude;
   $geoip2_location_longitude default=-1 location longitude;
@@ -69,19 +70,26 @@ geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
 ```
 
 Para ver os valores associados ao endereço ip:
-```shell script
+```bash
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip)
 ```
 
 Para ver os valores de localização: 
-```shell script
+```bash
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip) location
 ```
 
 Para ver um valor especifico, e.g. latitude:
-```shell script
+```bash
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip) location latitude
 ```
+
+## Módulos relevantes 
+
+Atualmente não utilizados, mas possivelmente relevantes:
+
+- [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) - Embed the power of Lua into Nginx HTTP Servers
+- [nginx-let-module](https://github.com/arut/nginx-let-module) - Adds support for arithmetic operations to NGINX config
 
 ## Recursos
 

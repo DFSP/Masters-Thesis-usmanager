@@ -30,11 +30,14 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/usmanager/manager/nginx-load-balancer-api/data"
 	"github.com/usmanager/manager/nginx-load-balancer-api/nginx"
 )
+
+var lock sync.Mutex
 
 var delay int
 
@@ -47,6 +50,9 @@ func GetServers(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	service := vars["service"]
+
+	lock.Lock()
+	defer lock.Unlock()
 
 	services, hasServices := data.Servers[service]
 	if hasServices {
@@ -64,38 +70,53 @@ func AddServers(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&servers)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid json")
 		return
 	}
 
 	vars := mux.Vars(r)
 	service := vars["service"]
 
+	var updateNginx = false
+
+	lock.Lock()
+	defer lock.Unlock()
+
 	for _, server := range servers {
 		currentServers, hasServers := data.Servers[service]
-		if !hasServers {
+		if hasServer(server) {
+			log.Printf("Server %v is already registered to service %s", server, service)
+		} else if !hasServers {
 			data.Servers[service] = []data.Server{server}
+			updateNginx = true
 			log.Printf("Added first server %+v to service %s", server, service)
-		} else if !hasServer(server, currentServers) {
+		} else {
 			currentServers = append(currentServers, server)
 			data.Servers[service] = currentServers
+			updateNginx = true
 			log.Printf("Added server %+v to service %s, current servers %v", server, service, currentServers)
-		} else {
-			log.Printf("Server %v is already registered to service %s", server, service)
 		}
 	}
 
-	time.AfterFunc(time.Duration(delay)*time.Second, func() {
-		nginx.UpdateNginx()
-	})
-
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(servers)
+	if updateNginx {
+		time.AfterFunc(time.Duration(delay)*time.Second, func() {
+			nginx.UpdateNginx()
+		})
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(servers)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Servers already registered")
+	}
 }
 
 func DeleteServer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := vars["service"]
 	server := vars["server"]
+
+	lock.Lock()
+	defer lock.Unlock()
 
 	removed := false
 	servers, hasServers := data.Servers[service]
@@ -110,7 +131,6 @@ func DeleteServer(w http.ResponseWriter, r *http.Request) {
 					delete(data.Servers, service)
 					log.Printf("Removed server %+v from service %s, no more servers", server, service)
 				}
-
 				removed = true
 				break
 			}
@@ -120,15 +140,17 @@ func DeleteServer(w http.ResponseWriter, r *http.Request) {
 	if removed {
 		nginx.UpdateNginx()
 	} else {
-		log.Printf("Server %s of %s not found", server, service)
+		log.Printf("Server %s of service %s was not found", server, service)
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
-func hasServer(server data.Server, servers []data.Server) bool {
-	for _, s := range servers {
-		if server.Server == s.Server {
-			return true
+func hasServer(server data.Server) bool {
+	for _, servers := range data.Servers {
+		for _, s := range servers {
+			if server.Server == s.Server {
+				return true
+			}
 		}
 	}
 	return false

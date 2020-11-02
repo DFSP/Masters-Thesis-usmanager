@@ -136,6 +136,7 @@ func RegisterLocationMonitoring(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&locationMonitoring)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid json")
 	} else {
 		go location.AddRequest(locationMonitoring)
 	}

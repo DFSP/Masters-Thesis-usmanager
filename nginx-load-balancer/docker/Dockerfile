@@ -42,8 +42,6 @@ cd .. && \
 rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module && \
 nginx -t
 
-# ENV ALG round-robin
-
 COPY --from=nginx-load-balancer-api /nginx-load-balancer-api /nginx-load-balancer-api
 COPY /scripts/docker-init.sh /
 COPY /nginx.conf.tmpl /
