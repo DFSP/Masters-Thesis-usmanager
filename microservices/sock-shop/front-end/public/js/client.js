@@ -32,7 +32,7 @@ function login() {
         success: function (data, textStatus, jqXHR) {
             $("#login-message").html('<div class="alert alert-success">Login successful.</div>');
             console.log('posted: ' + textStatus);
-            console.log("logged_in cookie: " + $.cookie('logged_in'));
+            console.log("loggedIn cookie: " + $.cookie('loggedIn'));
             setTimeout(function () {
                 location.reload();
             }, 1500);
@@ -72,7 +72,7 @@ function register() {
         success: function (data, textStatus, jqXHR) {
             $("#registration-message").html('<div class="alert alert-success">Registration and login successful.</div>');
             console.log('posted: ' + textStatus);
-            console.log("logged_in cookie: " + $.cookie('logged_in'));
+            console.log("loggedIn cookie: " + $.cookie('loggedIn'));
             setTimeout(function () {
                 location.reload();
             }, 1500);
@@ -88,7 +88,7 @@ function register() {
 }
 
 function logout() {
-    $.removeCookie('logged_in');
+    $.removeCookie('loggedIn');
     location.reload();
 }
 
@@ -109,7 +109,7 @@ function resetTags() {
 }
 
 function order() {
-    if (!$.cookie('logged_in')) {
+    if (!$.cookie('loggedIn')) {
         $("#user-message").html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> You must be logged in to place an order.</div>');
         return false;
     }

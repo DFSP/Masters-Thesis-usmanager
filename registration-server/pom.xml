@@ -39,7 +39,7 @@
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>registration-server</name>
+	<name>Registration-server</name>
 	<description>Registration server integrating a eureka server to register services</description>
 
 	<properties>

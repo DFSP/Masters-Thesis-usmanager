@@ -24,21 +24,22 @@
 
 package works.weave.socks.orders.config;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.api.AppsApi;
-import io.swagger.client.model.App;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import pt.unl.fct.miei.usmanagement.manager.ApiException;
+import pt.unl.fct.miei.usmanagement.manager.api.EndpointsApi;
+import pt.unl.fct.miei.usmanagement.manager.model.Endpoint;
 
 import java.net.URI;
 
 @ConfigurationProperties
 public class OrdersConfigurationProperties {
-	private AppsApi apiInstance = new AppsApi();
 
-	private String getAppEndpoint(String appName) {
+	private final EndpointsApi endpointsApi = new EndpointsApi();
+
+	private String getAppEndpoint(String service) {
 		try {
-			App app = apiInstance.getAppsByName(appName);
-			return app.getEndpoint();
+			Endpoint endpoint = endpointsApi.getServiceEndpoint(service);
+			return endpoint.getEndpoint();
 		}
 		catch (ApiException e) {
 			e.printStackTrace();
@@ -46,16 +47,16 @@ public class OrdersConfigurationProperties {
 		}
 	}
 
-	public URI getPaymentUri_V2() {
+	public URI getPaymentUri() {
 		return new ServiceUri(getAppEndpoint("payment"), "/paymentAuth").toUri();
 	}
 
-	public URI getShippingUri_V2() {
+	public URI getShippingUri() {
 		return new ServiceUri(getAppEndpoint("shipping"), "/shipping").toUri();
 	}
 
-
 	private class ServiceUri {
+
 		private final String hostname;
 		private final String endpoint;
 

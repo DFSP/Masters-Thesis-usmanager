@@ -25,8 +25,8 @@
 (function () {
     'use strict';
 
-    var request = require("request");
-    var helpers = {};
+    const request = require("request");
+    const helpers = {};
 
     /* Public: errorHandler is a middleware that handles your errors
      *
@@ -37,7 +37,7 @@
      * */
 
     helpers.errorHandler = function (err, req, res, next) {
-        var ret = {
+        const ret = {
             message: err.message,
             error: err
         };
@@ -45,7 +45,7 @@
     };
 
     helpers.sessionMiddleware = function (err, req, res, next) {
-        if (!req.cookies.logged_in) {
+        if (!req.cookies.loggedIn) {
             res.session.customerId = null;
         }
     };
@@ -75,7 +75,7 @@
 
     /* Rewrites and redirects any url that doesn't end with a slash. */
     helpers.rewriteSlash = function (req, res, next) {
-        if (req.url.substr(-1) == '/' && req.url.length > 1)
+        if (req.url.substr(-1) === '/' && req.url.length > 1)
             res.redirect(301, req.url.slice(0, -1));
         else
             next();
@@ -104,17 +104,17 @@
         }.bind({res: res}));
     }
 
-    /* TODO: Add documentation */
+    /* Get customer id from cookies or session id */
     helpers.getCustomerId = function (req, env) {
         // Check if logged in. Get customer Id
-        var logged_in = req.cookies.logged_in;
+        const loggedIn = req.cookies.loggedIn;
 
         // TODO REMOVE THIS, SECURITY RISK
-        if (env == "development" && req.query.custId != null) {
-            return req.query.custId;
+        if (env === "development" && req.query.customerId != null) {
+            return req.query.customerId;
         }
 
-        if (!logged_in) {
+        if (!loggedIn) {
             if (!req.session.id) {
                 throw new Error("User not logged in.");
             }
@@ -125,37 +125,30 @@
         return req.session.customerId;
     }
 
-    helpers.processReqLocationHeaders = function (req) {
-        var continent = req.headers.xcontinentcode;
-        var country = req.headers.xcountrycode;
-        var city = req.headers.xcity;
+    helpers.sendLocationInfo = function (req) {
+        let latitude = req.headers.x_latitude;
+        let longitude = req.headers.x_longitude;
 
-        if (continent) {
-            continent = continent.toLowerCase();
-            country = country.toLowerCase();
-            city = city.toLowerCase();
-        } else { // Local execution
-            continent = "eu";
-            country = "pt";
-            city = "lisbon";
+        if (latitude > 0 && longitude > 0) {
+            const options = {
+                uri: 'http://localhost:1906/api/metrics',
+                method: 'POST',
+                json: {
+                    "service": "sock-shop-front-end",
+                    "latitude": latitude,
+                    "longitude": longitude,
+                    "count": 1
+                }
+            };
+            console.log("Send " + options + " to location info service")
+            request(options, function (error, response, body) {
+                if (error) {
+                    console.error("Error sending location info to request-location-monitor...");
+                }
+                console.log("Response body: " + JSON.stringify(body));
+            });
         }
 
-        var options = {
-            uri: 'http://localhost:1906/api/locationdata',
-            method: 'POST',
-            json: {
-                "fromContinent": continent,
-                "fromCountry": country,
-                "fromCity": city,
-                "toService": "front-end",
-                "count": 1
-            }
-        };
-        request(options, function (error, response, body) {
-            if (error) {
-                console.log("=> Error sending location info to register-go...");
-            }
-        });
     }
 
     module.exports = helpers;

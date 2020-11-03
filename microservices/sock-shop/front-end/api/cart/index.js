@@ -25,32 +25,34 @@
 (function () {
     'use strict';
 
-    var async = require("async")
-        , express = require("express")
-        , request = require("request")
-        , helpers = require("../../helpers")
-        , endpoints = require("../endpoints")()
-        , app = express()
+    const
+        async = require("async"),
+        express = require("express"),
+        request = require("request"),
+        helpers = require("../../helpers"),
+        endpoints = require("../endpoints")(),
+        app = express();
 
-    // List items in cart for current logged in user.
+    // List items in cart for current logged in user
     app.get("/cart", function (req, res, next) {
-        console.log("Request received: " + req.url + ", " + req.query.custId);
-        var custId = helpers.getCustomerId(req, app.get("env"));
-        console.log("Customer ID: " + custId);
-        request(endpoints.cartsUrl() + "/" + custId + "/items", function (error, response, body) {
-            if (error) {
-                return next(error);
-            }
-            helpers.respondStatusBody(res, response.statusCode, body)
-        });
+        const customerId = helpers.getCustomerId(req, app.get("env"));
+        console.log("Request received: " + req.url + ", " + req.query.customerId);
+        console.log("Customer ID: " + customerId);
+        request(`${endpoints.cartsUrl()}/${customerId}/items`,
+            function (error, response, body) {
+                if (error) {
+                    return next(error);
+                }
+                helpers.respondStatusBody(res, response.statusCode, body)
+            });
     });
 
     // Delete cart
     app.delete("/cart", function (req, res, next) {
-        var custId = helpers.getCustomerId(req, app.get("env"));
-        console.log('Attempting to delete cart for user: ' + custId);
-        var options = {
-            uri: endpoints.cartsUrl() + "/" + custId,
+        const customerId = helpers.getCustomerId(req, app.get("env"));
+        console.log('Attempting to delete cart for user: ' + customerId);
+        const options = {
+            uri: `${endpoints.cartsUrl()}/${customerId}`,
             method: 'DELETE'
         };
         request(options, function (error, response, body) {
@@ -67,13 +69,10 @@
         if (req.params.id == null) {
             return next(new Error("Must pass id of item to delete"), 400);
         }
-
-        console.log("Delete item from cart: " + req.url);
-
-        var custId = helpers.getCustomerId(req, app.get("env"));
-
-        var options = {
-            uri: endpoints.cartsUrl() + "/" + custId + "/items/" + req.params.id.toString(),
+        const customerId = helpers.getCustomerId(req, app.get("env"));
+        console.log("Delete item from cart " + req.url + " for user " + customerId)
+        const options = {
+            uri: endpoints.cartsUrl() + "/" + customerId + "/items/" + req.params.id.toString(),
             method: 'DELETE'
         };
         request(options, function (error, response, body) {
@@ -88,24 +87,23 @@
     // Add new item to cart
     app.post("/cart", function (req, res, next) {
         console.log("Attempting to add to cart: " + JSON.stringify(req.body));
-
         if (req.body.id == null) {
             next(new Error("Must pass id of item to add"), 400);
             return;
         }
-
-        var custId = helpers.getCustomerId(req, app.get("env"));
+        const customerId = helpers.getCustomerId(req, app.get("env"));
 
         async.waterfall([
             function (callback) {
-                request(endpoints.catalogueUrl() + "/catalogue/" + req.body.id.toString(), function (error, response, body) {
-                    console.log(body);
-                    callback(error, JSON.parse(body));
-                });
+                request(`${endpoints.catalogueUrl()}/catalogue/${req.body.id.toString()}`,
+                    function (error, response, body) {
+                        console.log(body);
+                        callback(error, JSON.parse(body));
+                    });
             },
             function (item, callback) {
-                var options = {
-                    uri: endpoints.cartsUrl() + "/" + custId + "/items",
+                const options = {
+                    uri: `${endpoints.cartsUrl()}/${customerId}/items"`,
                     method: 'POST',
                     json: true,
                     body: {itemId: item.id, unitPrice: item.price}
@@ -123,17 +121,16 @@
             if (err) {
                 return next(err);
             }
-            if (statusCode != 201) {
+            if (statusCode !== 201) {
                 return next(new Error("Unable to add to cart. Status code: " + statusCode))
             }
             helpers.respondStatus(res, statusCode);
         });
     });
 
-// Update cart item
+    // Update cart item
     app.post("/cart/update", function (req, res, next) {
         console.log("Attempting to update cart item: " + JSON.stringify(req.body));
-
         if (req.body.id == null) {
             next(new Error("Must pass id of item to update"), 400);
             return;
@@ -142,7 +139,7 @@
             next(new Error("Must pass quantity to update"), 400);
             return;
         }
-        var custId = helpers.getCustomerId(req, app.get("env"));
+        const customer = helpers.getCustomerId(req, app.get("env"));
 
         async.waterfall([
             function (callback) {
@@ -152,8 +149,8 @@
                 });
             },
             function (item, callback) {
-                var options = {
-                    uri: endpoints.cartsUrl() + "/" + custId + "/items",
+                const options = {
+                    uri: `${endpoints.cartsUrl()}/${customer}/items`,
                     method: 'PATCH',
                     json: true,
                     body: {itemId: item.id, quantity: parseInt(req.body.quantity), unitPrice: item.price}
@@ -171,7 +168,7 @@
             if (err) {
                 return next(err);
             }
-            if (statusCode != 202) {
+            if (statusCode !== 202) {
                 return next(new Error("Unable to add to cart. Status code: " + statusCode))
             }
             helpers.respondStatus(res, statusCode);

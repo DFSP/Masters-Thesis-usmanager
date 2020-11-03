@@ -139,5 +139,7 @@ func RegisterLocationMonitoring(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode("Invalid json")
 	} else {
 		go location.AddRequest(locationMonitoring)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		_ = json.NewEncoder(w).Encode(locationMonitoring)
 	}
 }

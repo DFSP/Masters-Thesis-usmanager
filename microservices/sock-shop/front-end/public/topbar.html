@@ -153,9 +153,9 @@ _________________________________________________________ -->
             contentType: "application/json; charset=utf-8"
         });
 
-        if ($.cookie('logged_in') != null && $.cookie('logged_in') != "") {
+        if ($.cookie('loggedIn') != null && $.cookie('loggedIn') != "") {
 
-            username($.cookie('logged_in'), function (username) {
+            username($.cookie('loggedIn'), function (username) {
                 if (typeof username !== 'undefined') {
                     $("#login").remove();
                     $("#register").remove();

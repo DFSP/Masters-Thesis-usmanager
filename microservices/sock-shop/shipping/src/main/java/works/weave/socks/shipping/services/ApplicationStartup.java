@@ -24,11 +24,11 @@
 
 package works.weave.socks.shipping.services;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.api.AppsApi;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.ApiException;
+import pt.unl.fct.miei.usmanagement.manager.api.EndpointsApi;
 
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
@@ -39,13 +39,13 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 	 */
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
-		registerOnEureka();
+		registerEndpoint();
 	}
 
-	private void registerOnEureka() {
-		AppsApi apiInstance = new AppsApi();
+	private void registerEndpoint() {
+		EndpointsApi endpointsApi = new EndpointsApi();
 		try {
-			apiInstance.register();
+			endpointsApi.register();
 		}
 		catch (ApiException e) {
 			e.printStackTrace();

@@ -80,17 +80,17 @@ HTTP request | Description
 
 Registar manualmente o endpoint:
 ```shell script
-curl -i -X POST http://localhost:2525/api/register
+curl -i -X POST http://localhost:1906/api/register
 ```
 
 Obtém o melhor endpoint para o serviço app
 ```shell script
-curl -i http://localhost:2525/services/app/endpoint
+curl -i http://localhost:1906/services/app/endpoint
 ```
 
 Obtém todos os endpoints do serviço app
 ```shell script
-curl -i http://localhost:2525/services/app/endpoints
+curl -i http://localhost:1906/services/app/endpoints
 ```
 
 Adiciona manualmente uma nova monitorização, que é adicionada aos dados já existentes:
@@ -98,7 +98,7 @@ Adiciona manualmente uma nova monitorização, que é adicionada aos dados já e
 curl -i \
      --header "Content-Type: application/json" \
      --data '{"service":"app","latitude":"39.575097","longitude":"-8.909794","count":"1"}' \
-     http://localhost:2525/api/metrics
+     http://localhost:1906/api/metrics
 ```
 
 ## Ferramentas

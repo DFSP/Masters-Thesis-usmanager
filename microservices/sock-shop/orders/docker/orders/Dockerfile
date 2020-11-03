@@ -1,6 +1,11 @@
+FROM usmanager/registration-client-java as registration-client-java
 FROM usmanager/registration-client AS registration-client
 
 FROM maven:3.6.0-jdk-11-slim AS build
+
+# include dependencies
+COPY --from=registration-client-java /root/.m2 /root/.m2
+
 WORKDIR /usr/src/app
 COPY src ./src
 COPY pom.xml .

@@ -25,39 +25,42 @@
 (function () {
     'use strict';
 
-    var async = require("async"), express = require("express"), request = require("request"),
-        endpoints = require("../endpoints")(), helpers = require("../../helpers"), app = express(),
-        cookie_name = "logged_in"
-
+    const
+        async = require("async"),
+        express = require("express"),
+        request = require("request"),
+        endpoints = require("../endpoints")(),
+        helpers = require("../../helpers"),
+        app = express(),
+        cookie_name = "loggedIn";
 
     app.get("/customers/:id", function (req, res, next) {
-        helpers.simpleHttpRequest(endpoints.customersUrl() + "/" + req.session.customerId, res, next);
+        helpers.simpleHttpRequest(endpoints.userCustomersUrl() + "/" + req.session.customerId, res, next);
     });
     app.get("/cards/:id", function (req, res, next) {
-        helpers.simpleHttpRequest(endpoints.cardsUrl() + "/" + req.params.id, res, next);
+        helpers.simpleHttpRequest(endpoints.userCardsUrl() + "/" + req.params.id, res, next);
     });
 
     app.get("/customers", function (req, res, next) {
-        helpers.simpleHttpRequest(endpoints.customersUrl(), res, next);
+        helpers.simpleHttpRequest(endpoints.userCustomersUrl(), res, next);
     });
     app.get("/addresses", function (req, res, next) {
-        helpers.simpleHttpRequest(endpoints.addressUrl(), res, next);
+        helpers.simpleHttpRequest(endpoints.userAddressesUrl(), res, next);
     });
     app.get("/cards", function (req, res, next) {
-        helpers.simpleHttpRequest(endpoints.cardsUrl(), res, next);
+        helpers.simpleHttpRequest(endpoints.userCardsUrl(), res, next);
     });
 
     // Create Customer - TO BE USED FOR TESTING ONLY (for now)
+
     app.post("/customers", function (req, res, next) {
-        var options = {
-            uri: endpoints.customersUrl(),
+        const options = {
+            uri: endpoints.userCustomersUrl(),
             method: 'POST',
             json: true,
             body: req.body
         };
-
-        console.log("Posting Customer: " + JSON.stringify(req.body));
-
+        console.log("Creating Customer: " + JSON.stringify(req.body));
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
@@ -70,14 +73,13 @@
 
     app.post("/addresses", function (req, res, next) {
         req.body.userID = helpers.getCustomerId(req, app.get("env"));
-
-        var options = {
-            uri: endpoints.addressUrl(),
+        const options = {
+            uri: endpoints.userAddressesUrl(),
             method: 'POST',
             json: true,
             body: req.body
         };
-        console.log("Posting Address: " + JSON.stringify(req.body));
+        console.log("Creating Address: " + JSON.stringify(req.body));
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
@@ -89,18 +91,18 @@
     });
 
     app.get("/card", function (req, res, next) {
-        var custId = helpers.getCustomerId(req, app.get("env"));
-        var options = {
-            uri: endpoints.customersUrl() + '/' + custId + '/cards',
+        const customerId = helpers.getCustomerId(req, app.get("env"));
+        const options = {
+            uri: `${endpoints.userCustomersUrl()}/${customerId}/cards`,
             method: 'GET',
         };
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
             }
-            var data = JSON.parse(body);
+            const data = JSON.parse(body);
             if (data.status_code !== 500 && data._embedded.card.length !== 0) {
-                var resp = {
+                const resp = {
                     "number": data._embedded.card[0].longNum.slice(-4)
                 };
                 return helpers.respondSuccessBody(res, JSON.stringify(resp));
@@ -112,18 +114,18 @@
     });
 
     app.get("/address", function (req, res, next) {
-        var custId = helpers.getCustomerId(req, app.get("env"));
-        var options = {
-            uri: endpoints.customersUrl() + '/' + custId + '/addresses',
+        const customerId = helpers.getCustomerId(req, app.get("env"));
+        const options = {
+            uri: `${endpoints.userCustomersUrl()}/${customerId}/addresses`,
             method: 'GET',
         };
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
             }
-            var data = JSON.parse(body);
+            const data = JSON.parse(body);
             if (data.status_code !== 500 && data._embedded.address.length !== 0) {
-                var resp = data._embedded.address[0];
+                const resp = data._embedded.address[0];
                 return helpers.respondSuccessBody(res, JSON.stringify(resp));
             }
             return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}));
@@ -134,14 +136,13 @@
 
     app.post("/cards", function (req, res, next) {
         req.body.userID = helpers.getCustomerId(req, app.get("env"));
-
-        var options = {
-            uri: endpoints.cardsUrl(),
+        const options = {
+            uri: endpoints.userCardsUrl(),
             method: 'POST',
             json: true,
             body: req.body
         };
-        console.log("Posting Card: " + JSON.stringify(req.body));
+        console.log("Creating Card: " + JSON.stringify(req.body));
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
@@ -154,11 +155,11 @@
 
     // Delete Customer - TO BE USED FOR TESTING ONLY (for now)
     app.delete("/customers/:id", function (req, res, next) {
-        console.log("Deleting Customer " + req.params.id);
-        var options = {
-            uri: endpoints.customersUrl() + "/" + req.params.id,
+        const options = {
+            uri: `${endpoints.userCustomersUrl()}/${ req.params.id}`,
             method: 'DELETE'
         };
+        console.log("Deleting Customer " + req.params.id);
         request(options, function (error, response, body) {
             if (error) {
                 return next(error);
@@ -172,8 +173,8 @@
     // Delete Address - TO BE USED FOR TESTING ONLY (for now)
     app.delete("/addresses/:id", function (req, res, next) {
         console.log("Deleting Address " + req.params.id);
-        var options = {
-            uri: endpoints.addressUrl() + "/" + req.params.id,
+        const options = {
+            uri: `${endpoints.userAddressesUrl()}/${ req.params.id}`,
             method: 'DELETE'
         };
         request(options, function (error, response, body) {
@@ -189,8 +190,8 @@
     // Delete Card - TO BE USED FOR TESTING ONLY (for now)
     app.delete("/cards/:id", function (req, res, next) {
         console.log("Deleting Card " + req.params.id);
-        var options = {
-            uri: endpoints.cardsUrl() + "/" + req.params.id,
+        const options = {
+            uri: `${endpoints.userCardsUrl()}/${req.params.id}`,
             method: 'DELETE'
         };
         request(options, function (error, response, body) {
@@ -204,16 +205,14 @@
     });
 
     app.post("/register", function (req, res, next) {
-        helpers.processReqLocationHeaders(req);
-        var options = {
-            uri: endpoints.registerUrl(),
+        helpers.sendLocationInfo(req);
+        const options = {
+            uri: endpoints.userRegisterUrl(),
             method: 'POST',
             json: true,
             body: req.body
         };
-
-        console.log("Posting Customer: " + JSON.stringify(req.body));
-
+        console.log("Registering Customer: " + JSON.stringify(req.body));
         async.waterfall([
                 function (callback) {
                     request(options, function (error, response, body) {
@@ -221,13 +220,13 @@
                             callback(error);
                             return;
                         }
-                        if (response.statusCode == 200 && body != null && body != "") {
+                        if (response.statusCode === 200 && body != null && body !== "") {
                             if (body.error) {
                                 callback(body.error);
                                 return;
                             }
                             console.log(body);
-                            var customerId = body.id;
+                            const customerId = body.id;
                             console.log(customerId);
                             req.session.customerId = customerId;
                             callback(null, customerId);
@@ -237,12 +236,11 @@
                         callback(true);
                     });
                 },
-                function (custId, callback) {
-                    var sessionId = req.session.id;
-                    console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
-
-                    var options = {
-                        uri: endpoints.cartsUrl() + "/" + custId + "/merge" + "?sessionId=" + sessionId,
+                function (customerId, callback) {
+                    const sessionId = req.session.id;
+                    console.log("Merging carts for customer id: " + customerId + " and session id: " + sessionId);
+                    const options = {
+                        uri: `${endpoints.cartsUrl()}/${customerId}/merge?sessionId=${sessionId}`,
                         method: 'GET'
                     };
                     request(options, function (error, response, body) {
@@ -251,49 +249,47 @@
                             return;
                         }
                         console.log('Carts merged.');
-                        if (callback) callback(null, custId);
+                        if (callback) callback(null, customerId);
                     });
                 }
             ],
-            function (err, custId) {
+            function (err, customerId) {
                 if (err) {
                     console.log("Error with log in: " + err);
                     res.status(500);
                     res.end();
                     return;
                 }
-                console.log("set cookie" + custId);
+                console.log("set cookie" + customerId);
                 res.status(200);
                 res.cookie(cookie_name, req.session.id, {
                     maxAge: 3600000
-                }).send({id: custId});
+                }).send({id: customerId});
                 console.log("Sent cookies.");
                 res.end();
-                return;
             }
         );
     });
 
     app.get("/login", function (req, res, next) {
-        helpers.processReqLocationHeaders(req);
+        helpers.sendLocationInfo(req);
         console.log("Received login request");
-
         async.waterfall([
                 function (callback) {
-                    var options = {
+                    const options = {
                         headers: {
                             'Authorization': req.get('Authorization')
                         },
-                        uri: endpoints.loginUrl()
+                        uri: endpoints.userLoginUrl()
                     };
                     request(options, function (error, response, body) {
                         if (error) {
                             callback(error);
                             return;
                         }
-                        if (response.statusCode == 200 && body != null && body != "") {
+                        if (response.statusCode === 200 && body != null && body !== "") {
                             console.log(body);
-                            var customerId = JSON.parse(body).user.id;
+                            const customerId = JSON.parse(body).user.id;
                             console.log(customerId);
                             req.session.customerId = customerId;
                             callback(null, customerId);
@@ -303,26 +299,25 @@
                         callback(true);
                     });
                 },
-                function (custId, callback) {
-                    var sessionId = req.session.id;
-                    console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
-
-                    var options = {
-                        uri: endpoints.cartsUrl() + "/" + custId + "/merge" + "?sessionId=" + sessionId,
+                function (customerId, callback) {
+                    const sessionId = req.session.id;
+                    console.log("Merging carts for customer id: " + customerId + " and session id: " + sessionId);
+                    const options = {
+                        uri: `${endpoints.cartsUrl()}/${customerId}/merge?sessionId=${sessionId}`,
                         method: 'GET'
                     };
                     request(options, function (error, response, body) {
                         if (error) {
-                            // if cart fails just log it, it prevenst login
+                            // if cart fails just log it, it prevents login
                             console.log(error);
                             //return;
                         }
                         console.log('Carts merged.');
-                        callback(null, custId);
+                        callback(null, customerId);
                     });
                 }
             ],
-            function (err, custId) {
+            function (err, customerId) {
                 if (err) {
                     console.log("Error with log in: " + err);
                     res.status(401);
@@ -335,7 +330,6 @@
                 }).send('Cookie is set');
                 console.log("Sent cookies.");
                 res.end();
-                return;
             });
     });
 

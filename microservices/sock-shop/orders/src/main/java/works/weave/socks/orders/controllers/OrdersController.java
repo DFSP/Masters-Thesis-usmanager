@@ -114,12 +114,12 @@ public class OrdersController {
 				amount);
 			LOG.info("Sending payment request: " + paymentRequest);
 			Future<PaymentResponse> paymentFuture = asyncGetService.postResource(
-				config.getPaymentUri_V2(),
+				config.getPaymentUri(),
 				paymentRequest,
 				new ParameterizedTypeReference<PaymentResponse>() {
 				});
 			PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
-			LOG.info("Payment URI: " + config.getPaymentUri_V2());
+			LOG.info("Payment URI: " + config.getPaymentUri());
 			LOG.info("Received payment response: " + paymentResponse);
 			if (paymentResponse == null) {
 				throw new PaymentDeclinedException("Unable to parse authorisation packet");
@@ -130,10 +130,10 @@ public class OrdersController {
 
 			// Ship
 			String customerId = customerFuture.get(timeout, TimeUnit.SECONDS).getId();
-			Future<Shipment> shipmentFuture = asyncGetService.postResource(config.getShippingUri_V2(), new Shipment
+			Future<Shipment> shipmentFuture = asyncGetService.postResource(config.getShippingUri(), new Shipment
 				(customerId), new ParameterizedTypeReference<Shipment>() {
 			});
-			LOG.info("Shipping URI: " + config.getShippingUri_V2());
+			LOG.info("Shipping URI: " + config.getShippingUri());
 			CustomerOrder order = new CustomerOrder(
 				null,
 				customerId,
