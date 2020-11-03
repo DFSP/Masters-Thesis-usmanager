@@ -48,6 +48,21 @@ func init() {
 func GetServers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	serviceServers := make([]data.ServiceServers, 0)
+	for service, servers := range data.Servers {
+		serviceServer := data.ServiceServers{
+			Service: service,
+			Servers: servers,
+		}
+		serviceServers = append(serviceServers, serviceServer)
+	}
+
+	_ = json.NewEncoder(w).Encode(serviceServers)
+}
+
+func GetServiceServers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	service := vars["service"]
 
@@ -65,7 +80,7 @@ func GetServers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddServers(w http.ResponseWriter, r *http.Request) {
+func AddServiceServers(w http.ResponseWriter, r *http.Request) {
 	var servers []data.Server
 	err := json.NewDecoder(r.Body).Decode(&servers)
 	if err != nil {
@@ -76,6 +91,12 @@ func AddServers(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	service := vars["service"]
+
+	if service == "_" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid service")
+		return
+	}
 
 	if data.AddServiceServers(service, servers) {
 		time.AfterFunc(time.Duration(delay)*time.Second, func() {
@@ -89,7 +110,7 @@ func AddServers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteServer(w http.ResponseWriter, r *http.Request) {
+func DeleteServiceServer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := vars["service"]
 	server := vars["server"]
@@ -97,7 +118,7 @@ func DeleteServer(w http.ResponseWriter, r *http.Request) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	if data.DeleteServer(service, server) {
+	if data.DeleteServiceServer(service, server) {
 		nginx.UpdateNginx()
 	} else {
 		log.Printf("Server %s of service %s was not found", server, service)

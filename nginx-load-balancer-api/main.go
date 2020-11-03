@@ -28,6 +28,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -36,15 +37,16 @@ import (
 )
 
 func main() {
-	var port = flag.String("port", "1906", "Port to bind HTTP listener")
+	var port = flag.Int("port", 1906, "Port to bind HTTP listener")
 	flag.Parse()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers", api.GetServers).Methods("GET")
-	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers", api.AddServers).Methods("POST")
-	router.HandleFunc("/_/nginx-load-balancer-api/{service}/servers/{server}", api.DeleteServer).Methods("DELETE")
-	log.Printf("Nginx API is listening on port %s", *port)
-	log.Fatal(http.ListenAndServe(":"+*port, trimmingMiddleware(router)))
+	router.HandleFunc("/api/servers", api.GetServers).Methods("GET")
+	router.HandleFunc("/api/{service}/servers", api.GetServiceServers).Methods("GET")
+	router.HandleFunc("/api/{service}/servers", api.AddServiceServers).Methods("POST")
+	router.HandleFunc("/api/{service}/servers/{server}", api.DeleteServiceServer).Methods("DELETE")
+	log.Printf("Nginx API is listening on port %d", *port)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), trimmingMiddleware(router)))
 }
 
 func trimmingMiddleware(next http.Handler) http.Handler {

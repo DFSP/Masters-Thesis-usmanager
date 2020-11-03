@@ -63,12 +63,21 @@ nginx -t
 
 #### Docker
  
-```sh
+```shell script
 docker build -f docker/Dockerfile . -t nginx-load-balancer  
-docker run -p 1906:80 \
+docker run -p 1907:80 \
 -e BASIC_AUTH_USERNAME=username \
 -e BASIC_AUTH_PASSWORD=password \
 nginx-load-balancer 
+```
+
+##### Com servidores iniciais
+```shell script
+docker run -p 1907:80 \
+-e BASIC_AUTH_USERNAME=username \
+-e BASIC_AUTH_PASSWORD=password \
+-e SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+nginx-load-balancer
 ```
 
 ## Módulo Ngx http geoip2
@@ -107,12 +116,17 @@ sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://i
 ## Nginx-load-balancer-api
 
 A imagem docker inclui o servidor [nginx-load-balancer-api](../nginx-load-balancer-api), para obter/adicionar/remover servidores.
-O load-balancer redireciona os pedidos que recebe na localização `_/nginx-load-balancer-api`  para o nginx-load-balancer-api que
+O load-balancer redireciona os pedidos que recebe na localização `_/api` para o nginx-load-balancer-api que
 está a executar no localhost.
+
+Obter os servidores de todos os serviços:
+```shell script
+curl -i --user username:password http://localhost:1907/_/api/servers
+```
 
 Obter os servidores do serviço `app`:
 ```shell script
-curl -i --user username:password http://localhost:1907/_/nginx-load-balancer-api/app/servers
+curl -i --user username:password http://localhost:1907/_/api/app/servers
 ```
 
 Adicionar um servidor ao serviço `app`:
@@ -121,7 +135,7 @@ curl -i \
      --user username:password \
      --header "Content-Type: application/json" \
      --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
-     http://localhost:1907/_/nginx-load-balancer-api/app/servers
+     http://localhost:1907/_/api/app/servers
 ```
 
 Remover o servidor `202.193.200.125:5000` ao serviço `app`:
@@ -129,7 +143,7 @@ Remover o servidor `202.193.200.125:5000` ao serviço `app`:
 curl -i \
      --user username:password \
      -X DELETE \
-     http://localhost:1907/_/nginx-load-balancer-api/apps/servers/202.193.200.125:5000
+     http://localhost:1907/_/api/apps/servers/202.193.200.125:5000
 ```
 
 ## Módulos relevantes 

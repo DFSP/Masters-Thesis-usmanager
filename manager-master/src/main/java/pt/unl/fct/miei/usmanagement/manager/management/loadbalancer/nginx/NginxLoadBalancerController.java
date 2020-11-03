@@ -24,10 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -45,6 +42,11 @@ public class NginxLoadBalancerController {
 
 	public NginxLoadBalancerController(NginxLoadBalancerService nginxLoadBalancerService) {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
+	}
+
+	@GetMapping
+	public List<NginxServiceServers> getServers() {
+		return nginxLoadBalancerService.getServers();
 	}
 
 	@PostMapping

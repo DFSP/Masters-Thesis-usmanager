@@ -10,42 +10,97 @@ Usage of ./nginx-load-balancer-api:
 
     Update delay (in seconds) of the nginx configuration after adding a new server (default 15)
         
-- port (string)
+- port (int)
 
-    Port to bind HTTP listener (default "1906")
+    Port to bind HTTP listener (default 1906)
+
+O nginx-load-balancer-api pode ser inicializado com servidores, através duma variável ambiente em formato json, e.g.:
+
+```json
+[
+  {
+    "service": "app",
+    "servers": [
+      {
+        "server": "202.193.200.125:5000",
+        "latitude": 39.575097,
+        "longitude": -8.909794,
+        "region": "EUROPE"
+      },
+      {
+        "server": "202.193.20.125:5000",
+        "latitude": 39.575097,
+        "longitude": -8.909794,
+        "region": "EUROPE"
+      }
+    ]
+  },
+  {
+    "service": "app2",
+    "servers": [
+      {
+        "server": "202.193.203.125:5000",
+        "latitude": 39.575097,
+        "longitude": -8.909794,
+        "region": "EUROPE"
+      }
+    ]
+  }
+]
+```
 
 ## Executar
 
-##### Local
+#### Local
 
 ```shell script
 sudo nginx 
 go build -o nginx-load-balancer-api
 sudo ./nginx-load-balancer-api
 ```
+Com servidores iniciais
+```shell script
+sudo env SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+./nginx-load-balancer-api
+```
 
-##### Docker
+#### Docker
 
 ```shell script
 docker build -f docker/Dockerfile . -t nginx-load-balancer-api
 docker run -p 1906:1906 nginx-load-balancer-api
 ```
 
+Com servidores iniciais
+
+```shell script
+docker build -f docker/Dockerfile . -t nginx-load-balancer-api
+docker run -p 1906:1906 \
+-e SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+nginx-load-balancer-api
+```
+
 ## API Endpoints
 
-Os URIs são relativos a *http://localhost:1906/_/nginx-load-balancer-api/api*
+Os URIs são relativos a *http://localhost:1906/api*
 
 HTTP request | Description
 ------------ | -------------
+**Get** /servers | Obter os servidores de todos os serviços registados neste load balancer
 **Get** /{service}/servers | Lista todos os servidores do serviço `{service}` registados neste load balancer
 **POST** /{service}/servers | Adiciona servidores novos ao serviço `{service}`. Pedido: `[{server, latitude, longitude, region}]`
 **DELETE** /{service}/servers/{server} | Remove o servidor `{server}` do serviço `{service}`
 
 ## Exemplos
 
+Obter os servidores de todos os serviços:
+```shell script
+curl -i --user username:password http://localhost:1906/api/servers
+```
+
 Obter os servidores do serviço `app`:
 ```shell script
-curl -i --user username:password http://localhost:1906/_/nginx-load-balancer-api/app/servers
+curl -i --user username:password http://localhost:1906/api/app/servers
 ```
 
 Adicionar um servidor ao serviço `app`:
@@ -54,7 +109,7 @@ curl -i \
      --user username:password \
      --header "Content-Type: application/json" \
      --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
-     http://localhost:1906/_/nginx-load-balancer-api/app/servers
+     http://localhost:1906/api/app/servers
 ```
 
 Remover o servidor `202.193.200.125:5000` ao serviço `app`:
@@ -62,7 +117,7 @@ Remover o servidor `202.193.200.125:5000` ao serviço `app`:
 curl -i \
      --user username:password \
      -X DELETE \
-     http://localhost:1906/_/nginx-load-balancer-api/apps/servers/202.193.200.125:5000
+     http://localhost:1906/api/apps/servers/202.193.200.125:5000
 ```
 
 ## Licença

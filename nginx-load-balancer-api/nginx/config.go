@@ -79,14 +79,14 @@ http {
       		#proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
 		{{end}}
-    	location /_/nginx-load-balancer-api {
+    	location /_/api/ {
       		#proxy_connect_timeout 100;
       		#proxy_read_timeout 100;
 
       		auth_basic "Restricted";
       		auth_basic_user_file /etc/nginx/.htpasswd;
 
-      		proxy_pass http://localhost:1906;
+            proxy_pass http://localhost:1906/api/;
       
       		proxy_set_header X-Forwarded-Host $host;
       		proxy_set_header Authorization "";

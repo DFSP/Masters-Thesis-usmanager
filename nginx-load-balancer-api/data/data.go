@@ -74,7 +74,10 @@ func init() {
 
 	// process initial servers, if any
 	var servers []ServiceServers
-	var serversJson = os.Getenv("servers")
+	var serversJson = os.Getenv("SERVERS")
+	if len(serversJson) == 0 {
+		serversJson = os.Getenv("servers")
+	}
 	if len(serversJson) > 0 {
 		err := json.Unmarshal([]byte(serversJson), &servers)
 		if err != nil {
@@ -116,7 +119,7 @@ func AddServiceServers(service string, servers []Server) bool {
 	return success
 }
 
-func DeleteServer(service string, server string) bool {
+func DeleteServiceServer(service string, server string) bool {
 	deleted := false
 
 	servers, hasServers := Servers[service]

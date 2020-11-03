@@ -55,11 +55,6 @@ public final class ContainerConstants {
 		public static final String REGION = "region";
 		public static final String IS_REPLICABLE = "isReplicable";
 		public static final String IS_STOPPABLE = "isStoppable";
-
-		public static final class LoadBalancer {
-			public static final String SERVER = "server";
-		}
-
 	}
 
 }
