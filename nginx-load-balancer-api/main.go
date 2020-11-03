@@ -36,7 +36,7 @@ import (
 )
 
 func main() {
-	var port = flag.String("port", "1907", "Port to bind HTTP listener")
+	var port = flag.String("port", "1906", "Port to bind HTTP listener")
 	flag.Parse()
 
 	router := mux.NewRouter()

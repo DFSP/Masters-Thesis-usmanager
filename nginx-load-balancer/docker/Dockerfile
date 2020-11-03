@@ -2,11 +2,10 @@ FROM nginx-load-balancer-api as nginx-load-balancer-api
 FROM alpine
 
 # include dependencies
-RUN apk add --no-cache --update apache2-utils tar g++ make perl git pcre-dev zlib-dev
+RUN apk add --no-cache --update apache2-utils tar g++ make perl git pcre-dev zlib-dev openrc
 
 # include libmaxminddb tool
 ARG LIBMAXMINDDB_VERSION=1.4.3
-COPY /geoip/GeoIP.conf /etc/GeoIP.conf
 RUN wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
 tar -xf libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
 cd libmaxminddb-${LIBMAXMINDDB_VERSION} && \
@@ -34,6 +33,8 @@ tar -xf nginx-$NGINX_VERSION.tar.gz && \
 cd nginx-$NGINX_VERSION && \
 rm -f /etc/nginx/conf.d/* && \
 mkdir /etc/nginx && \
+addgroup -g 101 -S nginx && \
+adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
 ./configure --add-dynamic-module=../ngx_http_geoip2_module && \
 make && \
 make install && \
@@ -44,7 +45,7 @@ nginx -t
 
 COPY --from=nginx-load-balancer-api /nginx-load-balancer-api /nginx-load-balancer-api
 COPY /scripts/docker-init.sh /
-COPY /nginx.conf.tmpl /
+COPY /nginx.conf /
 
 # use SIGQUIT for graceful shutdown
 # c.f. http://nginx.org/en/docs/control.html

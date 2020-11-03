@@ -12,13 +12,14 @@ Usage of ./nginx-load-balancer-api:
         
 - port (string)
 
-    Port to bind HTTP listener (default "1907")
+    Port to bind HTTP listener (default "1906")
 
 ## Executar
 
 ##### Local
 
 ```shell script
+sudo nginx 
 go build -o nginx-load-balancer-api
 sudo ./nginx-load-balancer-api
 ```
@@ -27,7 +28,7 @@ sudo ./nginx-load-balancer-api
 
 ```shell script
 docker build -f docker/Dockerfile . -t nginx-load-balancer-api
-docker run -p 1907:1907 nginx-load-balancer-api
+docker run -p 1906:1906 nginx-load-balancer-api
 ```
 
 ## API Endpoints
@@ -44,20 +45,24 @@ HTTP request | Description
 
 Obter os servidores do serviço `app`:
 ```shell script
-curl -i http://localhost:1907/_/nginx-load-balancer-api/app/servers
+curl -i --user username:password http://localhost:1906/_/nginx-load-balancer-api/app/servers
 ```
 
 Adicionar um servidor ao serviço `app`:
 ```shell script
 curl -i \
+     --user username:password \
      --header "Content-Type: application/json" \
-     --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}' \
-     http://localhost:1907/_/nginx-load-balancer-api/app/servers
+     --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
+     http://localhost:1906/_/nginx-load-balancer-api/app/servers
 ```
 
 Remover o servidor `202.193.200.125:5000` ao serviço `app`:
 ```shell script
-curl -i -X DELETE http://localhost:1907/_/nginx-load-balancer-api/app/servers/202.193.200.125:5000
+curl -i \
+     --user username:password \
+     -X DELETE \
+     http://localhost:1906/_/nginx-load-balancer-api/apps/servers/202.193.200.125:5000
 ```
 
 ## Licença

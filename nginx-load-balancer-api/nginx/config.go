@@ -42,20 +42,21 @@ const dstPath = "/usr/local/nginx/conf/nginx.conf"
 
 const tmpl = `load_module "modules/ngx_http_geoip2_module.so";
 
-user root;
+user nginx;
 worker_processes auto;
 
-error_log /dev/stdout info;
-pid /var/run/nginx.pid;
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
 
 events {
 	worker_connections 1024;
 }
 
 http {
-	access_log /dev/stdout;
-
-	geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
+	geoip2 /usr/local/share/GeoIP/GeoLite2-City.mmdb {
 		$geoip2_location_latitude default=-1 location latitude;
 		$geoip2_location_longitude default=-1 location longitude;
     }
@@ -71,16 +72,17 @@ http {
 		include /etc/nginx/conf.d/*.conf;
 		{{range $service, $servers := .}}
 		location /{{$service}} {
-      		proxy_connect_timeout 100;
-      		proxy_read_timeout 100;
+      		#proxy_connect_timeout 100;
+      		#proxy_read_timeout 100;
+			rewrite /{{$service}}/(.*) /$1  break;
       		proxy_pass http://{{$service}};
       		#proxy_set_header X-Latitude $geoip2_location_latitude;
-      		#proxy_set_header x-Longitude $geoip2_location_longitude;
+      		#proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
 		{{end}}
     	location /_/nginx-load-balancer-api {
-      		proxy_connect_timeout 100;
-      		proxy_read_timeout 100;
+      		#proxy_connect_timeout 100;
+      		#proxy_read_timeout 100;
 
       		auth_basic "Restricted";
       		auth_basic_user_file /etc/nginx/.htpasswd;
@@ -92,7 +94,7 @@ http {
       		proxy_redirect off;
 
       		#proxy_set_header X-Latitude $geoip2_location_latitude;
-      		#proxy_set_header x-Longitude $geoip2_location_longitude;
+      		#proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
 	}
 }

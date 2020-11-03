@@ -13,13 +13,31 @@ Garantir que o nginx é removido (irá ser re-instalado com o módulo ngx_http_g
 sudo apt remove nginx
 ```
 
+Instalar a ferramenta [libmaxminddb](https://github.com/maxmind/libmaxminddb):
+
+```sh
+LIBMAXMINDDB_VERSION=1.4.3
+wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz
+tar -xf libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz
+cd libmaxminddb-${LIBMAXMINDDB_VERSION}
+./configure
+make
+make check
+sudo make install
+sudo ldconfig /
+```
+
 Instalar e executar o [geoipupdate](https://github.com/maxmind/geoipupdate):
 
 ```sh
-sudo cp geoip/GeoIP.conf /etc/GeoIP.conf
-sudo apt install geoipupdate -y
+GEOIPUPDATE_VERSION=4.5.0
+sudo cp geoip/GeoIP.conf /usr/local/etc/
+wget https://github.com/maxmind/geoipupdate/releases/download/v${GEOIPUPDATE_VERSION}/geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz
+tar -xf geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz
+cp geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64/geoipupdate /usr/local/bin
+rm -r geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64
+sudo mkdir /usr/local/share/GeoIP
 sudo geoipupdate
-sudo ls /usr/share/GeoIP/
 ```
 
 Instalar o nginx incluindo o módulo [ngx_http_geoip2](https://github.com/leev/ngx_http_geoip2_module):
@@ -31,11 +49,12 @@ git clone https://github.com/leev/ngx_http_geoip2_module.git
 wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
 tar -xf nginx-$NGINX_VERSION.tar.gz
 cd nginx-$NGINX_VERSION
-sudo rm -f /etc/nginx/conf.d/*
-sudo mkdir /etc/nginx
+rm -f /etc/nginx/conf.d/*
+mkdir /etc/nginx
+sudo useradd -s /bin/false nginx
 ./configure --add-dynamic-module=../ngx_http_geoip2_module
 make
-make install
+sudo make install
 cp /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 cd ..
 rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
@@ -46,10 +65,9 @@ nginx -t
  
 ```sh
 docker build -f docker/Dockerfile . -t nginx-load-balancer  
-docker run -p 1908:80 -p 1907:1907 \
+docker run -p 1906:80 \
 -e BASIC_AUTH_USERNAME=username \
 -e BASIC_AUTH_PASSWORD=password \
--e SERVER=test:3000 \
 nginx-load-balancer 
 ```
 
@@ -65,9 +83,9 @@ load_module "modules/ngx_http_geoip2_module.so";
 
 Através da base de dados GeoLite2-City, ficam disponíveis vários valores associados ao endereço ip. No nosso caso, interessam-nos a latitude e a longitude: 
 ```nginx
-geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
-  $geoip2_location_latitude default=-1 location latitude;
-  $geoip2_location_longitude default=-1 location longitude;
+geoip2 /usr/local/share/GeoIP/GeoLite2-City.mmdb {
+    $geoip2_location_latitude default=-1 location latitude;
+    $geoip2_location_longitude default=-1 location longitude;
 }
 ```
 
