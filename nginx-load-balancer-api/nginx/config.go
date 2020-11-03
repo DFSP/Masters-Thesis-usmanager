@@ -71,11 +71,10 @@ http {
 		server_name load-balancer.com;
 		include /etc/nginx/conf.d/*.conf;
 		{{range $service, $servers := .}}
-		location /{{$service}} {
+		location /{{$service}}/ {
       		#proxy_connect_timeout 100;
       		#proxy_read_timeout 100;
-			rewrite /{{$service}}/(.*) /$1  break;
-      		proxy_pass http://{{$service}};
+      		proxy_pass http://{{$service}}/;
       		#proxy_set_header X-Latitude $geoip2_location_latitude;
       		#proxy_set_header X-Longitude $geoip2_location_longitude;
     	}

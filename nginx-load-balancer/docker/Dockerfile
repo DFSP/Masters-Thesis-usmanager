@@ -1,4 +1,4 @@
-FROM nginx-load-balancer-api as nginx-load-balancer-api
+FROM usmanager/nginx-load-balancer-api as nginx-load-balancer-api
 FROM alpine
 
 # include dependencies

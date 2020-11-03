@@ -104,6 +104,34 @@ Para ver um valor especifico, e.g. latitude:
 sudo mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip $(curl https://ipinfo.io/ip) location latitude
 ```
 
+## Nginx-load-balancer-api
+
+A imagem docker inclui o servidor [nginx-load-balancer-api](../nginx-load-balancer-api), para obter/adicionar/remover servidores.
+O load-balancer redireciona os pedidos que recebe na localização `_/nginx-load-balancer-api`  para o nginx-load-balancer-api que
+está a executar no localhost.
+
+Obter os servidores do serviço `app`:
+```shell script
+curl -i --user username:password http://localhost:1907/_/nginx-load-balancer-api/app/servers
+```
+
+Adicionar um servidor ao serviço `app`:
+```shell script
+curl -i \
+     --user username:password \
+     --header "Content-Type: application/json" \
+     --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
+     http://localhost:1907/_/nginx-load-balancer-api/app/servers
+```
+
+Remover o servidor `202.193.200.125:5000` ao serviço `app`:
+```shell script
+curl -i \
+     --user username:password \
+     -X DELETE \
+     http://localhost:1907/_/nginx-load-balancer-api/apps/servers/202.193.200.125:5000
+```
+
 ## Módulos relevantes 
 
 Atualmente não utilizados, mas possivelmente relevantes:

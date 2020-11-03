@@ -77,28 +77,7 @@ func AddServers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := vars["service"]
 
-	var updateNginx = false
-
-	lock.Lock()
-	defer lock.Unlock()
-
-	for _, server := range servers {
-		currentServers, hasServers := data.Servers[service]
-		if hasServer(server) {
-			log.Printf("Server %v is already registered to service %s", server, service)
-		} else if !hasServers {
-			data.Servers[service] = []data.Server{server}
-			updateNginx = true
-			log.Printf("Added first server %+v to service %s", server, service)
-		} else {
-			currentServers = append(currentServers, server)
-			data.Servers[service] = currentServers
-			updateNginx = true
-			log.Printf("Added server %+v to service %s, current servers %v", server, service, currentServers)
-		}
-	}
-
-	if updateNginx {
+	if data.AddServiceServers(service, servers) {
 		time.AfterFunc(time.Duration(delay)*time.Second, func() {
 			nginx.UpdateNginx()
 		})
@@ -118,40 +97,10 @@ func DeleteServer(w http.ResponseWriter, r *http.Request) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	removed := false
-	servers, hasServers := data.Servers[service]
-	if hasServers {
-		for index, s := range servers {
-			if s.Server == server {
-				servers = append(servers[:index], servers[index+1:]...)
-				if len(servers) > 0 {
-					data.Servers[service] = servers
-					log.Printf("Removed server %+v from service %s, current servers %v", server, service, servers)
-				} else {
-					delete(data.Servers, service)
-					log.Printf("Removed server %+v from service %s, no more servers", server, service)
-				}
-				removed = true
-				break
-			}
-		}
-	}
-
-	if removed {
+	if data.DeleteServer(service, server) {
 		nginx.UpdateNginx()
 	} else {
 		log.Printf("Server %s of service %s was not found", server, service)
 		w.WriteHeader(http.StatusNotFound)
 	}
-}
-
-func hasServer(server data.Server) bool {
-	for _, servers := range data.Servers {
-		for _, s := range servers {
-			if server.Server == s.Server {
-				return true
-			}
-		}
-	}
-	return false
 }
