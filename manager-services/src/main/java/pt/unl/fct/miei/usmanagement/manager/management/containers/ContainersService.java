@@ -104,6 +104,7 @@ public class ContainersService {
 				.names(dockerContainer.getNames())
 				.image(dockerContainer.getImage())
 				.command(dockerContainer.getCommand())
+				.network(dockerContainer.getNetwork())
 				.publicIpAddress(dockerContainer.getPublicIpAddress())
 				.privateIpAddress(dockerContainer.getPrivateIpAddress())
 				.ports(dockerContainer.getPorts())

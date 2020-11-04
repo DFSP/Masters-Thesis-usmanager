@@ -201,7 +201,6 @@ public class HostsService {
 		if (node == null) {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
-		dockerSwarmService.createNetworkOverlay(hostAddress);
 		containersService.addContainer(dockerApiProxyContainerId);
 		containersService.launchContainer(hostAddress, LocationRequestsService.REQUEST_LOCATION_MONITOR, ContainerType.SINGLETON);
 		containersService.launchContainer(hostAddress, PrometheusService.PROMETHEUS, ContainerType.SINGLETON);

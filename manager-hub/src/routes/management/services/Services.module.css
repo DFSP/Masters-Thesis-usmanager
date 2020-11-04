@@ -33,3 +33,21 @@
 .dependencies {
     padding: 0 !important;
 }
+
+.filterDropdown {
+    position: absolute;
+    top: 65px;
+    right: 100px;
+    color: white;
+    display: flex;
+    width: 200px;
+}
+
+.clearButton {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.clearButtonIcon {
+    margin-top: 20px;
+}

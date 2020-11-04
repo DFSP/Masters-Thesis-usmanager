@@ -27,42 +27,100 @@ import MainLayout from '../../../views/mainLayout/MainLayout';
 import ServiceCard from './ServiceCard';
 import AddButton from "../../../components/form/AddButton";
 import {connect} from "react-redux";
-import {loadServices} from "../../../actions";
+import {loadApps, loadAppServices, loadServices} from "../../../actions";
 import {ReduxState} from "../../../reducers";
 import CardList from "../../../components/list/CardList";
 import {IService} from "./Service";
 import styles from './Services.module.css'
 import BaseComponent from "../../../components/BaseComponent";
+import {Dropdown} from "../../../components/form/Dropdown";
+import {IApp} from "../apps/App";
+import { isEqual } from 'lodash';
+import {Link} from "react-router-dom";
 
 interface StateToProps {
     isLoading: boolean
     error?: string | null;
     services: IService[];
+    apps: { [key: string]: IApp };
 }
 
 interface DispatchToProps {
     loadServices: (name?: string) => any;
+    loadApps: () => void;
+    loadAppServices: (app: string) => void;
 }
 
 type Props = StateToProps & DispatchToProps;
 
-class Services extends BaseComponent<Props, {}> {
+interface State {
+    selectedApp?: string,
+}
+
+class Services extends BaseComponent<Props, State> {
+
+    private loadedServices = false;
+
+    state = {
+        selectedApp: undefined
+    }
 
     public componentDidMount(): void {
         this.props.loadServices();
+        this.props.loadApps();
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+        if (this.props.apps && !this.loadedServices) {
+            Object.keys(this.props.apps).forEach(app => this.props.loadAppServices(app));
+            this.loadedServices = true;
+        }
+    }
+
+    private onChangeServicesFilter = (e: React.FormEvent<HTMLSelectElement>) => {
+        const selectedApp = e.currentTarget.value;
+        this.setState(_ => ({selectedApp}))
+    }
+
+    private filteredServices = () => {
+        const {selectedApp} = this.state;
+        const {services, apps} = this.props;
+        return !selectedApp
+            ? services
+            // @ts-ignore
+            : services.filter(service => !selectedApp || Object.keys(apps[selectedApp].services)?.includes(service.serviceName))
+    }
+
+    private clearFilter = () =>
+        this.setState(_ => ({selectedApp: undefined}))
+
     public render() {
+        const {selectedApp} = this.state;
         return (
             <MainLayout>
                 <AddButton tooltip={{text: 'Add service', position: 'left'}}
                            pathname={'/services/new_service?new'}/>
+                <div className={styles.filterDropdown}>
+                    <a className={`btn-fat waves-effect red-text ${styles.clearButton}`} onClick={this.clearFilter}>
+                        <i className={`material-icons ${styles.clearButtonIcon}`}>clear</i>
+                    </a>
+                    <Dropdown<string>
+                        id={'pageSize'}
+                        name={'pageSize'}
+                        value={this.state.selectedApp}
+                        onChange={this.onChangeServicesFilter}
+                        dropdown={{
+                            defaultValue: 'Filter by app',
+                            values: Object.keys(this.props.apps),
+                        }}>
+                    </Dropdown>
+                </div>
                 <div className={`${styles.container}`}>
                     <CardList<IService>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"No services to display"}
-                        list={this.props.services}
+                        emptyMessage={selectedApp? `No services to display for ${selectedApp}` : "No services to display"}
+                        list={this.filteredServices()}
                         card={this.service}
                         predicate={this.predicate}/>
                 </div>
@@ -83,11 +141,14 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
         isLoading: state.entities.services.isLoadingServices,
         error: state.entities.services.loadServicesError,
         services: (state.entities.services.data && Object.values(state.entities.services.data).reverse()) || [],
+        apps: (state.entities.apps.data && state.entities.apps.data) || {},
     }
 );
 
 const mapDispatchToProps: DispatchToProps = {
     loadServices,
+    loadApps,
+    loadAppServices,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Services);

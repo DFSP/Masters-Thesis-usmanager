@@ -121,11 +121,12 @@ public class DockerSwarmService {
 		String nodeId = nodeIdRegexExpression.group(0);
 		setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
 			Collections.singletonMap(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true)));
+		createNetworkOverlay(hostAddress);
 		return nodesService.getNode(nodeId);
 	}
 
-	public void createNetworkOverlay(HostAddress hostAddress) {
-		// docker network create -d overlay --attachable my-attachable-overlay
+	private void createNetworkOverlay(HostAddress hostAddress) {
+		log.info("Creating network {}", NETWORK_OVERLAY);
 		NetworkConfig networkConfig = NetworkConfig.builder()
 			.driver("overlay")
 			.attachable(true)

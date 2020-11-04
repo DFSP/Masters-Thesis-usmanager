@@ -74,6 +74,7 @@ export interface IContainer extends IDatabaseData {
     names: string[];
     image: string;
     command: string;
+    network: string;
     publicIpAddress: string;
     privateIpAddress: string;
     ports: IContainerPort[];

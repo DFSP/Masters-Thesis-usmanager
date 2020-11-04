@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-final class NginxServiceServers implements Serializable {
+public final class NginxServiceServers implements Serializable {
 
 	private static final long serialVersionUID = -1737876658697014089L;
 

@@ -82,7 +82,7 @@ class LogsList extends React.Component<Props, {}> {
                         list={logs}
                         show={this.log}
                         paginate={{
-                            pagesize: {initial: 25, options: [5, 10, 25, 50, 100, 'all']},
+                            pagesize: {initial: 25, options: [5, 10, 25, 50, 100, 'Everything']},
                             page: {last: true},
                             position: 'top-bottom'
                         }}

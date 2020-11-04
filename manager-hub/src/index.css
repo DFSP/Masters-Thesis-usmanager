@@ -982,11 +982,16 @@ select.no-validation-field ~ input.select-dropdown {
     }
 }
 
-
 .btn.disabled, .disabled.btn-large, .disabled.btn-small, .btn-floating.disabled, .btn-large.disabled,
 .btn-small.disabled, .btn-flat.disabled, .btn:disabled, .btn-large:disabled, .btn-small:disabled, .btn-floating:disabled,
 .btn-large:disabled, .btn-small:disabled, .btn-flat:disabled, .btn[disabled], [disabled].btn-large, [disabled].btn-small,
 .btn-floating[disabled], .btn-large[disabled], .btn-small[disabled], .btn-flat[disabled] {
     background-color: unset !important;
     text-decoration: line-through;
+}
+
+@media only screen and (max-width: 760px) {
+    .filter-dropdown {
+        visibility: hidden;
+    }
 }

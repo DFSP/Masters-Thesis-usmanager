@@ -36,7 +36,7 @@ interface FilteredListProps<T> {
     paginate?: {
         pagesize: {
             initial: number,
-            options?: ('all' | number)[],
+            options?: ('Everything' | number)[],
         },
         page?: {
             index?: number,

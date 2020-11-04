@@ -543,6 +543,16 @@ public class DatabaseLoader {
 					.build();
 				mixal = appsService.addApp(mixal);
 			}
+			AppEntity onlineBoutique;
+			try {
+				onlineBoutique = appsService.getApp("Online Boutique");
+			}
+			catch (EntityNotFoundException ignored) {
+				mixal = AppEntity.builder()
+					.name("Online Boutique")
+					.build();
+				onlineBoutique = appsService.addApp(mixal);
+			}
 			AppEntity sockShop;
 			try {
 				sockShop = appsService.getApp("Sock Shop");

@@ -141,25 +141,26 @@ public class EdgeHostsService {
 		String keyFilePath = getPrivateKeyFilePath(edgeHost);
 		log.info("Generating keys for edge host {}", hostAddress);
 
-		String generateKeysCommand = String.format("echo y | ssh-keygen -m PEM -t rsa -b 4096 -f '%s' -q -N \"\" &&"
+		String generateKeysCommand = String.format("echo yes | ssh-keygen -m PEM -t rsa -b 4096 -f '%s' -q -N \"\" &&"
 			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostAddress.getPublicIpAddress());
 		SshCommandResult generateKeysResult = sshService.executeCommandSync(generateKeysCommand, hostAddress, password);
-		if (!generateKeysResult.isSuccessful()) {
+		int exitStatus = generateKeysResult.getExitStatus();
+		if (exitStatus != 0 && exitStatus != 6) {
 			String error = generateKeysResult.getError().get(0);
 			log.error("Unable to generate public/private key pair for {}: {}", hostAddress.toSimpleString(), error);
 			deleteEdgeHostConfig(edgeHost);
 			throw new ManagerException("Unable to generate public/private key pair for %s: %s", hostAddress.toSimpleString(), error);
 		}
 
-		log.info("Protecting private key {} with chmod 400", keyFilePath);
+		/*log.info("Protecting private key {} with chmod 400", keyFilePath);
 		String protectPrivateKeyCommand = String.format("chmod 400 %s", keyFilePath);
 		SshCommandResult protectPrivateKeyResult = sshService.executeCommandSync(protectPrivateKeyCommand, hostAddress);
 		if (!protectPrivateKeyResult.isSuccessful()) {
 			String error = protectPrivateKeyResult.getError().get(0);
 			log.error("Failed to protect private key {} on host {}: {}", keyFilePath, hostAddress.toSimpleString(), error);
 			deleteEdgeHostConfig(edgeHost);
-			throw new ManagerException("Failed to protect private key %s on host %s: %s", hostAddress.toSimpleString(), error);
-		}
+			throw new ManagerException("Failed to protect private key on host %s: %s", hostAddress.toSimpleString(), error);
+		}*/
 	}
 
 	public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {

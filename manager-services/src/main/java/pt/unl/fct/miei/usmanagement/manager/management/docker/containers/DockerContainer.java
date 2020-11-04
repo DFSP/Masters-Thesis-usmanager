@@ -42,6 +42,7 @@ public final class DockerContainer {
 	private final List<String> names;
 	private final String image;
 	private final String command;
+	private final String network;
 	private final String state;
 	private final String status;
 	private final String publicIpAddress;

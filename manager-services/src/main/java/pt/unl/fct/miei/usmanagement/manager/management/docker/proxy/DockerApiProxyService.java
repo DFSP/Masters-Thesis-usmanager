@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
@@ -73,10 +74,10 @@ public class DockerApiProxyService {
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
 				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
 				+ "docker pull %s && "
-				+ "docker run -itd --name=%s -p %s:%s --rm "
+				+ "docker run -itd --name=%s -p %s:%s --hostname %s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
 				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s=%b -l %s=%b %s; fi",
-			serviceName, dockerRepository, serviceName, externalPort, internalPort,
+			serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
 			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,

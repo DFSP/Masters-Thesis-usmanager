@@ -34,7 +34,7 @@ export interface IPagedList<T> {
     paginate: {
         pagesize: {
             initial: number,
-            options?: ('all' | number)[],
+            options?: ('Everything' | number)[],
         },
         page?: {
             index?: number,
@@ -77,11 +77,11 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         return (
             <div className={'list'}>
                 {paginate.pagesize.options && (
-                    <div className={'pageSize'}>
-                        <Dropdown<(number | 'all')>
+                    <div className={'pagination-dropdown'}>
+                        <Dropdown<(number | 'Everything')>
                             id={'pageSize'}
                             name={'pageSize'}
-                            value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
+                            value={this.state.pagesize === Number.MAX_VALUE ? 'Everything' : this.state.pagesize?.toString()}
                             onChange={this.setPageSize}
                             dropdown={{
                                 defaultValue: 'Page size',
@@ -121,7 +121,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
     private setPageSize = (e: React.FormEvent<HTMLSelectElement>) => {
         const selectedPageSize = e.currentTarget.value;
         let pagesize: number;
-        if (selectedPageSize === 'all') {
+        if (selectedPageSize === 'Everything') {
             pagesize = Number.MAX_VALUE;
         } else {
             pagesize = parseInt(selectedPageSize);
@@ -134,6 +134,6 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         })
     };
 
-    private pageSizeOption = (option: (number | 'all')): string =>
+    private pageSizeOption = (option: (number | 'Everything')): string =>
         option.toString();
 }

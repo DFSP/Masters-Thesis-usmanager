@@ -310,7 +310,6 @@ public class DockerContainersService {
 			HostConfig hostConfig = HostConfig.builder()
 				.autoRemove(true)
 				.portBindings(Map.of(internalPort, List.of(PortBinding.of("", externalPort))))
-				.networkMode("overlay")
 				.build();
 			ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
 				.image(dockerRepository)
@@ -503,6 +502,10 @@ public class DockerContainersService {
 		List<String> names = container.names();
 		String image = container.image();
 		String command = container.command();
+		AttachedNetwork attachedNetwork = container.networkSettings().networks().get(DockerSwarmService.NETWORK_OVERLAY);
+		String network = attachedNetwork == null
+			? null
+			: String.format("%s=%s", DockerSwarmService.NETWORK_OVERLAY, attachedNetwork.networkId().substring(0, 5));
 		String state = container.state();
 		String status = container.status();
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
@@ -513,7 +516,7 @@ public class DockerContainersService {
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
-		return new DockerContainer(id, created, names, image, command, state, status, publicIpAddress, privateIpAddress,
+		return new DockerContainer(id, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
 			coordinates, region, ports, labels);
 	}
 

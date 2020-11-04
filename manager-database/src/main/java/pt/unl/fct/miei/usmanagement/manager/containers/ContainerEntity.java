@@ -85,6 +85,8 @@ public class ContainerEntity {
 
 	private String command;
 
+	private String network;
+
 	@NotNull
 	private String publicIpAddress;
 

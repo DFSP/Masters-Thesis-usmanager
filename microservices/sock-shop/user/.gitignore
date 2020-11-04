@@ -1,6 +1,0 @@
-bin
-docker/user/bin
-vendor
-.idea
-user
-*.iml

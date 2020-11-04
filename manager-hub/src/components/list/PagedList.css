@@ -33,6 +33,15 @@
     right: 0;
 }
 
+.pagination-dropdown {
+    position: absolute;
+    top: 65px;
+    right: 100px;
+    color: white;
+    display: flex;
+    width: 125px;
+}
+
 
 .pagination > li > a {
     cursor: pointer;
@@ -51,19 +60,4 @@
 
 .pagination li.disabled {
     opacity: 0.25;
-}
-
-.pageSize {
-    position: absolute;
-    top: 65px;
-    right: 100px;
-    color: white;
-    display: inline;
-    width: 150px;
-}
-
-@media only screen and (max-width: 760px) {
-    .pageSize {
-        visibility: hidden;
-    }
 }
