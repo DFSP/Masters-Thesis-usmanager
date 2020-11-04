@@ -23,7 +23,7 @@
  */
 
 import React from "react";
-import {mapLabelToMaterialIcon} from "../../utils/image";
+import {mapLabelToIcon} from "../../utils/image";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import M from "materialize-css";
 import {FormContext, IErrors, IFormContext, IValues} from "./Form";
@@ -86,7 +86,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     }
 
     private linkedIcon = (label: string, iconName: string | undefined, linkedTo: ((v: T) => string | null) | string, value: any): JSX.Element => {
-        const icon = <>{iconName ? iconName : mapLabelToMaterialIcon(label, value)}</>;
+        const icon = <>{iconName ? iconName : mapLabelToIcon(label, value)}</>;
         const link = typeof linkedTo === 'string' ? linkedTo : linkedTo(value)
         return link ? <Link to={link}>{icon}</Link> : icon;
     }
@@ -119,7 +119,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                             ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id])
                                             : icon?.name
                                                 ? icon.name
-                                                : type?.toLowerCase() !== 'checkbox' && mapLabelToMaterialIcon(label, formContext.values[id])}
+                                                : type?.toLowerCase() !== 'checkbox' && mapLabelToIcon(label, formContext.values[id])}
                                     </i>}
                                     <label className="active" htmlFor={id}>
                                         {camelCaseToSentenceCase(label)}

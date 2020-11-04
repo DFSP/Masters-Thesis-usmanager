@@ -529,7 +529,8 @@ class Container extends BaseComponent<Props, State> {
 
     //TODO get apps' services instead (in case a service is associated to more than 1 app)
     private getSelectableServices = () =>
-        Object.keys(this.props.services).sort();
+        Object.values(this.props.services).filter(service => service.serviceType !== 'SYSTEM')
+            .map(service => service.serviceName).sort();
     /*Object.entries(this.props.services)
         .filter(([_, service]) => service.serviceType.toLowerCase() !== 'system')
         .map(([serviceName, _]) => serviceName);*/

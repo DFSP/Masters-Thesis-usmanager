@@ -28,7 +28,14 @@ import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.*;
+import com.spotify.docker.client.messages.AttachedNetwork;
+import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.ContainerConfig;
+import com.spotify.docker.client.messages.ContainerCreation;
+import com.spotify.docker.client.messages.ContainerInfo;
+import com.spotify.docker.client.messages.ContainerStats;
+import com.spotify.docker.client.messages.HostConfig;
+import com.spotify.docker.client.messages.PortBinding;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -37,11 +44,11 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
@@ -53,6 +60,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.regist
 import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,7 +236,11 @@ public class DockerContainersService {
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
 		launchingContainer = true;
-		try {
+		int retries = 5;
+		String errorMessage = null;
+
+		for (var i = 0; i < retries; i++) {
+
 			if (!hostAddress.isComplete()) {
 				hostAddress = hostsService.getFullHostAddress(hostAddress);
 			}
@@ -296,6 +308,7 @@ public class DockerContainersService {
 
 			Map<String, String> containerLabels = new HashMap<>();
 			containerLabels.put(ContainerConstants.Label.US_MANAGER, String.valueOf(true));
+			containerLabels.put(ContainerConstants.Label.CONTAINER_TYPE, containerType.name());
 			containerLabels.put(ContainerConstants.Label.SERVICE_NAME, serviceName);
 			containerLabels.put(ContainerConstants.Label.SERVICE_TYPE, serviceType);
 			containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
@@ -303,10 +316,6 @@ public class DockerContainersService {
 			containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 			containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 			containerLabels.put(ContainerConstants.Label.REGION, region.name());
-			if (containerType == ContainerType.SINGLETON) {
-				containerLabels.put(ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
-				containerLabels.put(ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false));
-			}
 			containerLabels.putAll(labels);
 
 			log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
@@ -341,13 +350,13 @@ public class DockerContainersService {
 				return getContainer(containerId);
 			}
 			catch (DockerException | InterruptedException e) {
-				log.error("Failed to start container: {}", e.getMessage());
-				throw new ManagerException(e.getMessage());
+				errorMessage = e.getMessage();
+				log.error("Failed to start container: {}", errorMessage);
 			}
+			Timing.sleep(i, TimeUnit.SECONDS);
 		}
-		finally {
-			launchingContainer = false;
-		}
+		launchingContainer = false;
+		throw new ManagerException("Failed to start container: %s", errorMessage);
 	}
 
 	private String getDatabaseHostForService(HostAddress hostAddress, String databaseServiceName) {
@@ -506,7 +515,9 @@ public class DockerContainersService {
 		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
-		List<String> names = container.names();
+		List<String> names = container.names().stream()
+			.map(name -> name.startsWith("/") ? name.substring(1) : name)
+			.collect(Collectors.toList());
 		String image = container.image();
 		String command = container.command();
 		AttachedNetwork attachedNetwork = container.networkSettings().networks().get(DockerSwarmService.NETWORK_OVERLAY);
@@ -539,7 +550,7 @@ public class DockerContainersService {
 			logs = logs.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "");
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Failted to get logs of container {}: {}", containerId, e.getMessage());
 		}
 		return logs;
 	}

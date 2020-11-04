@@ -91,7 +91,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const container = this.getContainer();
         const menus = [];
-        if (container.labels['containerTye'] !== 'SINGLETON') {
+        if (container?.type !== 'SINGLETON') {
             menus.push(
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Replicate'}
@@ -238,7 +238,7 @@ class ContainerCard extends BaseComponent<Props, State> {
                       label={'Type'}
                       value={`${container.type}`}/>
             <CardItem key={'names'}
-                      label={'Names'}
+                      label={container.names.length == 1 ? 'Name' : 'Names'}
                       value={container.names.join(', ')}/>
             <CardItem key={'image'}
                       label={'Image'}

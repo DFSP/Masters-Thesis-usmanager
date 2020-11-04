@@ -45,7 +45,8 @@ import {
     FaListUl,
     FaMapMarkedAlt,
     FaMapPin,
-    FaMinus, FaNetworkWired,
+    FaMinus,
+    FaNetworkWired, FaPaperPlane,
     FaPowerOff,
     FaSdCard,
     FaSortAmountDown,
@@ -55,7 +56,7 @@ import {
     FaThList,
     FaThumbsDown,
     FaThumbsUp,
-    FaToolbox
+    FaToolbox, FaVolumeDown, FaVolumeOff
 } from "react-icons/all";
 import React from "react";
 import {IRegion} from "../routes/management/regions/Region";
@@ -63,8 +64,16 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 
 // https://fontawesome.com/icons?d=gallery&m=free
 // https://materializecss.com/icons.html
-export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
+export const mapLabelToIcon = (label: string, value: any): string | JSX.Element => {
     label = label.toLowerCase().replace(' *', '');
+    if (label === 'type') {
+       if (value === 'BY_REQUEST') {
+           return <FaVolumeOff/>;
+       }
+       if (value === 'SINGLETON') {
+           return 'filter_1';
+       }
+    }
     if (label === 'network') {
         return <FaNetworkWired/>;
     }
