@@ -191,7 +191,6 @@ class Node extends BaseComponent<Props, State> {
             super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> have joined the swarm</span>`);
             this.props.history.push("/nodes");
         }
-
     };
 
     private onPostFailure = (reason: string, place: INewNodeHost | INewNodeLocation): void => {

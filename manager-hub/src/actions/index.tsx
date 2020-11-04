@@ -1962,8 +1962,8 @@ export const LOAD_BALANCERS_SUCCESS = 'LOAD_BALANCERS_SUCCESS';
 export const LOAD_BALANCER_SUCCESS = 'LOAD_BALANCER_SUCCESS';
 export const LOAD_BALANCERS_FAILURE = 'LOAD_BALANCERS_FAILURE';
 export const LOAD_BALANCER_FAILURE = 'LOAD_BALANCER_FAILURE';
-export const loadLoadBalancers = () => (dispatch: any) => {
-    return dispatch(fetchLoadBalancers());
+export const loadLoadBalancers = (id?: string) => (dispatch: any) => {
+    return dispatch(fetchLoadBalancers(id));
 };
 const fetchLoadBalancers = (id?: string) => ({
     [CALL_API]:
@@ -1987,6 +1987,15 @@ export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
     return {
         type: ADD_LOAD_BALANCER,
         data: {loadBalancers: new Array(loadBalancer)}
+    }
+}
+
+export const DELETE_LOAD_BALANCER = 'DELETE_LOAD_BALANCER';
+
+export function deleteLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
+    return {
+        type: DELETE_LOAD_BALANCER,
+        data: {loadBalancers: [loadBalancer]}
     }
 }
 
@@ -2021,6 +2030,14 @@ export function addRegistrationServer(registrationServer: IRegistrationServer): 
     return {
         type: ADD_REGISTRATION_SERVER,
         data: {registrationServers: new Array(registrationServer)}
+    }
+}
+export const DELETE_REGISTRATION_SERVER = 'DELETE_REGISTRATION_SERVER';
+
+export function deleteRegistrationServer(registrationServer: IRegistrationServer): EntitiesAction {
+    return {
+        type: DELETE_REGISTRATION_SERVER,
+        data: {registrationServers: [registrationServer]}
     }
 }
 

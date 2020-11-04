@@ -316,7 +316,11 @@ public class ContainersService {
 	public void deleteContainer(String id) {
 		ContainerEntity container = getContainer(id);
 		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
-			workerManagersService.deleteWorkerManagerByContainer(container);
+			try {
+				workerManagersService.deleteWorkerManagerByContainer(container);
+			} catch (EntityNotFoundException e) {
+				log.error("Failed to delete worker-manager associated with container {}", id);
+			}
 		}
 		containers.delete(container);
 	}

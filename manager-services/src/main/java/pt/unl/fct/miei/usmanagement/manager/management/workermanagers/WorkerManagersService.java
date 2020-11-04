@@ -102,10 +102,12 @@ public class WorkerManagersService {
 	}
 
 	public List<WorkerManagerEntity> launchWorkerManagers(List<Region> regions) {
-		double expectedMemoryConsumption = servicesService
-			.getService(WorkerManagerProperties.WORKER_MANAGER).getExpectedMemoryConsumption();
+		log.info("Launching worker managers at regions {}", regions);
 
-		return regions.stream()
+		double expectedMemoryConsumption = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER)
+			.getExpectedMemoryConsumption();
+
+		return regions.parallelStream()
 			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
 			.distinct()
 			.map(hostAddress -> {

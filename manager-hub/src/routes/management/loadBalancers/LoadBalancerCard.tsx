@@ -29,7 +29,7 @@ import {ILoadBalancer} from "./LoadBalancer";
 import {IContainer} from "../containers/Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteContainer} from "../../../actions";
+import {deleteContainer, deleteLoadBalancer} from "../../../actions";
 import {connect} from "react-redux";
 
 interface State {
@@ -41,7 +41,7 @@ interface LoadBalancerCardProps {
 }
 
 interface DispatchToProps {
-    deleteContainer: (loadBalancer: ILoadBalancer) => void;
+    deleteLoadBalancer: (loadBalancer: ILoadBalancer) => void;
 }
 
 type Props = DispatchToProps & LoadBalancerCardProps;
@@ -70,7 +70,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteContainer(loadBalancer)
+        this.props.deleteLoadBalancer(loadBalancer) //TODO
     }
 
     private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
@@ -156,7 +156,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    deleteContainer
+    deleteLoadBalancer
 };
 
 export default connect(null, mapDispatchToProps)(LoadBalancerCard);

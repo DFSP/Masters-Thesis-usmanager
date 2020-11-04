@@ -45,7 +45,7 @@ import {
     FaListUl,
     FaMapMarkedAlt,
     FaMapPin,
-    FaMinus,
+    FaMinus, FaNetworkWired,
     FaPowerOff,
     FaSdCard,
     FaSortAmountDown,
@@ -65,6 +65,9 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 // https://materializecss.com/icons.html
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
     label = label.toLowerCase();
+    if (label === 'network') {
+        return <FaNetworkWired/>;
+    }
     if (label === 'background') {
         if (value === undefined) {
             return "sync_problem"

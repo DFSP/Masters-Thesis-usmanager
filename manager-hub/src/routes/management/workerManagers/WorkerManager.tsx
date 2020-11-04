@@ -150,14 +150,24 @@ class WorkerManager extends BaseComponent<Props, State> {
     private isNew = () =>
         isNew(this.props.location.search);
 
-    private onPostSuccess = (reply: IReply<IWorkerManager>): void => {
-        const workerManager = reply.data;
-        const hostname = workerManager.container.publicIpAddress;
-        super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${hostname}</span>`);
-        this.props.addWorkerManager(workerManager);
-        this.saveEntities(workerManager);
-        if (this.mounted) {
-            this.updateWorkerManager(workerManager);
+    private onPostSuccess = (reply: IReply<IWorkerManager[]>): void => {
+        let workerManagers = reply.data;
+        if (workerManagers.length === 1) {
+            const workerManager = workerManagers[0];
+            const publicIpAddress = workerManager.container.publicIpAddress;
+            super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
+            this.props.addWorkerManager(workerManager);
+            this.saveEntities(workerManager);
+            if (this.mounted) {
+                this.updateWorkerManager(workerManager);
+                this.props.history.replace(workerManager.id.toString());
+            }
+        } else {
+            workerManagers = workerManagers.reverse();
+            super.toast(`<span class="green-text">Launched ${workerManagers.length} worker-managers:<br/><b class="white-text">${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Container ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
+            if (this.mounted) {
+                this.props.history.push("/worker-managers");
+            }
         }
     };
 

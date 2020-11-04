@@ -98,10 +98,10 @@ class Services extends BaseComponent<Props, State> {
         const {selectedApp} = this.state;
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Add service', position: 'left'}}
+                <AddButton tooltip={{text: 'Add service', position: 'bottom'}}
                            pathname={'/services/new_service?new'}/>
                 <div className={styles.filterDropdown}>
-                    <a className={`btn-fat waves-effect red-text ${styles.clearButton}`} onClick={this.clearFilter}>
+                    <a className={`btn-flat red-text ${styles.clearButton}`} onClick={this.clearFilter}>
                         <i className={`material-icons ${styles.clearButtonIcon}`}>clear</i>
                     </a>
                     <Dropdown<string>

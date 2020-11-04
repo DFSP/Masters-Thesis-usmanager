@@ -29,7 +29,7 @@ import {IRegistrationServer} from "./RegistrationServer";
 import {IContainer} from "../containers/Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteContainer} from "../../../actions";
+import {deleteRegistrationServer} from "../../../actions";
 import {connect} from "react-redux";
 
 interface State {
@@ -41,7 +41,7 @@ interface RegistrationServerCardProps {
 }
 
 interface DispatchToProps {
-    deleteContainer: (registrationServer: IRegistrationServer) => void;
+    deleteRegistrationServer: (registrationServer: IRegistrationServer) => void;
 }
 
 type Props = DispatchToProps & RegistrationServerCardProps;
@@ -70,7 +70,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteContainer(registrationServer)
+        this.props.deleteRegistrationServer(registrationServer)
     }
 
     private onStopFailure = (reason: string, registrationServer: IRegistrationServer): void => {
@@ -126,24 +126,24 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardRegistrationServer = Card<IContainer>();
         return <CardRegistrationServer id={`registrationServer-${registrationServer.containerId}`}
-                                 title={registrationServer.containerId.toString()}
-                                 link={{
-                                     to: {
-                                         pathname: `/registration-servers/${registrationServer.containerId}`,
-                                         state: registrationServer
-                                     }
-                                 }}
-                                 height={'85px'}
-                                 margin={'10px 0'}
-                                 hoverable
-                                 delete={{
-                                     textButton: 'Stop',
-                                     url: `containers/${registrationServer.containerId}`,
-                                     successCallback: this.onStopSuccess,
-                                     failureCallback: this.onStopFailure,
-                                 }}
-                                 loading={loading}
-                                 bottomContextMenuItems={this.contextMenu()}>
+                                       title={registrationServer.containerId.toString()}
+                                       link={{
+                                           to: {
+                                               pathname: `/registration-servers/${registrationServer.containerId}`,
+                                               state: registrationServer
+                                           }
+                                       }}
+                                       height={'85px'}
+                                       margin={'10px 0'}
+                                       hoverable
+                                       delete={{
+                                           textButton: 'Stop',
+                                           url: `containers/${registrationServer.containerId}`,
+                                           successCallback: this.onStopSuccess,
+                                           failureCallback: this.onStopFailure,
+                                       }}
+                                       loading={loading}
+                                       bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'host'}
                       label={'Host'}
                       value={registrationServer.publicIpAddress}/>
@@ -156,7 +156,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    deleteContainer
+    deleteRegistrationServer
 };
 
 export default connect(null, mapDispatchToProps)(RegistrationServerCard);

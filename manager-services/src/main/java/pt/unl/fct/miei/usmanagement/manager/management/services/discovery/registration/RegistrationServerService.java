@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class RegistrationServerService {
 
@@ -87,9 +89,11 @@ public class RegistrationServerService {
 	}
 
 	public List<ContainerEntity> launchRegistrationServers(List<Region> regions) {
+		log.info("Launching registration servers at regions {}", regions);
+
 		double expectedMemoryConsumption = servicesService.getService(REGISTRATION_SERVER).getExpectedMemoryConsumption();
 
-		List<HostAddress> availableHosts = regions.stream()
+		List<HostAddress> availableHosts = regions.parallelStream()
 			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
 			.distinct()
 			.collect(Collectors.toList());

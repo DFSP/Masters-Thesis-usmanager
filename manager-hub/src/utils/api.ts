@@ -31,7 +31,7 @@ export interface IReply<T> extends AxiosResponse<T> {
 }
 
 export const API_URL = 'http://localhost:8080/api';
-export const REQUEST_TIMEOUT = 300000;
+export const REQUEST_TIMEOUT = 600000;
 const CancelToken = axios.CancelToken;
 export const cancelRequests: { [key: string]: CancelTokenSource } = {};
 

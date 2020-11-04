@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addRegistrationServer, loadRegistrationServers, loadNodes, loadRegions,} from "../../../actions";
+import {addRegistrationServer, loadNodes, loadRegions, loadRegistrationServers,} from "../../../actions";
 import {connect} from "react-redux";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
@@ -142,17 +142,19 @@ class RegistrationServer extends BaseComponent<Props, State> {
         isNew(this.props.location.search);
 
     private onPostSuccess = (reply: IReply<IRegistrationServer[]>): void => {
-        const registrationServers = reply.data;
-        registrationServers.forEach(registrationServer => {
+        let registrationServers = reply.data;
+        if (registrationServers.length === 1) {
+            const registrationServer = registrationServers[0];
             super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
             this.props.addRegistrationServer(registrationServer);
-        });
-        if (this.mounted) {
-            if (registrationServers.length === 1) {
-                const registrationServer = registrationServers[0];
+            if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.containerId)
-            } else {
+            }
+        } else {
+            registrationServers = registrationServers.reverse();
+            super.toast(`<span class="green-text">Launched ${registrationServers.length} registration-servers:<br/><b class="white-text">${registrationServers.map(registrationServer => `Container ${registrationServer.containerId} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            if (this.mounted) {
                 this.props.history.push('/registration-servers');
             }
         }
@@ -260,9 +262,9 @@ class RegistrationServer extends BaseComponent<Props, State> {
                                               values: [(formRegistrationServer as IRegistrationServer).region],
                                               optionToString: this.regionOption
                                           }}/>
-                    : <Field key={index}
-                             id={key}
-                             label={key}/>))
+                        : <Field key={index}
+                                 id={key}
+                                 label={key}/>))
         );
     };
 

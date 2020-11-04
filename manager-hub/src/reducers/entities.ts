@@ -133,7 +133,7 @@ import {
     DELETE_CLOUD_HOST,
     DELETE_CONDITION,
     DELETE_CONTAINER,
-    DELETE_EDGE_HOST,
+    DELETE_EDGE_HOST, DELETE_LOAD_BALANCER,
     DELETE_NODE,
     DELETE_RULE_APP,
     DELETE_RULE_CONTAINER,
@@ -362,6 +362,7 @@ import {
     WORKER_MANAGERS_FAILURE,
     WORKER_MANAGERS_REQUEST,
     WORKER_MANAGERS_SUCCESS,
+    DELETE_REGISTRATION_SERVER,
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
@@ -3719,6 +3720,20 @@ const entities = (state: EntitiesState = {
                 });
             }
             break;
+        case DELETE_LOAD_BALANCER:
+            if (data?.loadBalancers?.length) {
+                const loadBalancersToDelete = data.loadBalancers[0];
+                const filteredLoadBalancers = Object.values(state.loadBalancers.data).filter(loadBalancer => loadBalancer.id !== loadBalancersToDelete.id);
+                const loadBalancers = normalize(filteredLoadBalancers, Schemas.LOAD_BALANCER_ARRAY).entities.loadBalancers || {};
+                return {
+                    ...state,
+                    loadBalancers: {
+                        ...state.loadBalancers,
+                        data: loadBalancers,
+                    }
+                }
+            }
+            break;
         case REGISTRATION_SERVERS_REQUEST:
         case REGISTRATION_SERVER_REQUEST:
             return merge({}, state, {
@@ -3764,6 +3779,20 @@ const entities = (state: EntitiesState = {
                         loadRegistrationServersError: null
                     }
                 });
+            }
+            break;
+        case DELETE_REGISTRATION_SERVER:
+            if (data?.registrationServers?.length) {
+                const registrationServersToDelete = data.registrationServers[0];
+                const filteredRegistrationServers = Object.values(state.registrationServers.data).filter(registrationServer => registrationServer.id !== registrationServersToDelete.id);
+                const registrationServers = normalize(filteredRegistrationServers, Schemas.REGISTRATION_SERVER_ARRAY).entities.registrationServers || {};
+                return {
+                    ...state,
+                    registrationServers: {
+                        ...state.registrationServers,
+                        data: registrationServers,
+                    }
+                }
             }
             break;
         case WORKER_MANAGERS_REQUEST:

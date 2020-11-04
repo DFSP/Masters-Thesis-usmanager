@@ -501,6 +501,7 @@ class Form extends BaseComponent<Props, State> {
     private validateForm(): boolean {
         const errors: IErrors = {};
         Object.entries(this.props.fields).forEach(([fieldName, field]) => {
+            console.log(fieldName)
             const validateMessage = this.validate(fieldName);
             if (field.hidden && validateMessage.length) {
                 super.toast(`<div class="red-text">Validation failed:</div> ${validateMessage}`);
@@ -543,6 +544,7 @@ class Form extends BaseComponent<Props, State> {
         const validate = this.validateForm();
         const {isNew, post, put, saveEntities} = this.props;
         const args = this.state.values;
+        console.log(isNew, validate, post?.url, post, args)
         if (isNew) {
             if (post?.url) {
                 if (validate) {

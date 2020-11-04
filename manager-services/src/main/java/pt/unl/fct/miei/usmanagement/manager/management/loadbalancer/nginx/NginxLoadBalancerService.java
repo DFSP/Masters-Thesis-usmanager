@@ -96,10 +96,12 @@ public class NginxLoadBalancerService {
 	}
 
 	public List<ContainerEntity> launchLoadBalancers(String serviceName, List<Region> regions) {
+		log.info("Launching load balancers at regions {}", regions);
+
 		double expectedMemoryConsumption = servicesService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
 
 		Gson gson = new Gson();
-		return regions.stream()
+		return regions.parallelStream()
 			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
 			.distinct()
 			.map(hostAddress -> {

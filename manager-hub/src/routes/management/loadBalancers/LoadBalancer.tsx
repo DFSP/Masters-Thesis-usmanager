@@ -25,16 +25,14 @@
 import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
+import Form, {IFields, required, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addLoadBalancer, loadLoadBalancers, loadNodes, loadRegions, loadServices} from "../../../actions";
-import {connect} from "react-redux";
-import {IService} from "../services/Service";
+import {addLoadBalancer, loadLoadBalancers, loadNodes, loadRegions} from "../../../actions";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
@@ -43,27 +41,24 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
+import {connect} from "react-redux";
 
 export interface ILoadBalancer extends IContainer {
 }
 
 interface INewLoadBalancerRegion {
-    service: IService | undefined,
     regions: string[] | undefined
 }
 
 interface INewLoadBalancerHost {
-    service: IService | undefined,
     host: IHostAddress | undefined
 }
 
 const buildNewLoadBalancerRegion = (): INewLoadBalancerRegion => ({
-    service: undefined,
     regions: undefined
 });
 
 const buildNewLoadBalancerHost = (): INewLoadBalancerHost => ({
-    service: undefined,
     host: undefined
 });
 
@@ -74,7 +69,6 @@ interface StateToProps {
     newLoadBalancerHost?: INewLoadBalancerHost;
     loadBalancer?: ILoadBalancer;
     formLoadBalancer?: Partial<ILoadBalancer>;
-    services: { [key: string]: IService };
     regions: { [key: string]: IRegion };
     nodes: { [key: string]: INode };
 }
@@ -82,7 +76,6 @@ interface StateToProps {
 interface DispatchToProps {
     loadLoadBalancers: (id: string) => void;
     addLoadBalancer: (loadBalancer: ILoadBalancer) => void;
-    loadServices: () => void;
     loadRegions: () => void;
     loadNodes: () => void;
 }
@@ -113,7 +106,6 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
     public componentDidMount(): void {
         this.loadLoadBalancer();
-        this.props.loadServices();
         this.props.loadRegions();
         this.props.loadNodes();
         this.mounted = true;
@@ -150,17 +142,19 @@ class LoadBalancer extends BaseComponent<Props, State> {
         isNew(this.props.location.search);
 
     private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
-        const loadBalancers = reply.data;
-        loadBalancers.forEach(loadBalancer => {
+        let loadBalancers = reply.data;
+        if (loadBalancers.length === 1) {
+            const loadBalancer = loadBalancers[0];
             super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
             this.props.addLoadBalancer(loadBalancer);
-        });
-        if (this.mounted) {
-            if (loadBalancers.length === 1) {
-                const loadBalancer = loadBalancers[0];
+            if (this.mounted) {
                 this.updateLoadBalancer(loadBalancer);
                 this.props.history.replace(loadBalancer.containerId)
-            } else {
+            }
+        } else {
+            loadBalancers = loadBalancers.reverse();
+            super.toast(`<span class="green-text">Launched ${loadBalancers.length} load-balancers:<br/><b class="white-text">${loadBalancers.map(loadBalancer => `Container ${loadBalancer.containerId} => Host ${loadBalancer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            if (this.mounted) {
                 this.props.history.push('/load-balancers');
             }
         }
@@ -186,23 +180,45 @@ class LoadBalancer extends BaseComponent<Props, State> {
         this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});
     };
 
-    private getFields = (loadBalancer: INewLoadBalancerRegion | INewLoadBalancerHost | ILoadBalancer): IFields =>
-        Object.entries(loadBalancer).map(([key, value]) => {
-            return {
-                [key]: {
-                    id: key,
-                    label: key,
-                    validation: getTypeFromValue(value) === 'number'
-                        ? {rule: requiredAndNumberAndMin, args: 0}
-                        : {rule: requiredAndTrimmed}
+    private getFields = (loadBalancer: INewLoadBalancerRegion | INewLoadBalancerHost | ILoadBalancer): IFields => {
+        if (this.isNew()) {
+            if (this.state.currentForm === 'On regions') {
+                return {
+                    regions: {
+                        id: 'regions',
+                        label: 'regions',
+                        validation: {rule: required}
+                    },
                 }
-            };
-        }).reduce((fields, field) => {
-            for (let key in field) {
-                fields[key] = field[key];
+            } else {
+                return {
+                    hostAddress: {
+                        id: 'hostAddress',
+                        label: 'hostAddress',
+                        validation: {rule: required}
+                    },
+                }
             }
-            return fields;
-        }, {});
+        } else {
+            return Object.entries(loadBalancer).map(([key, value]) => {
+                return {
+                    [key]: {
+                        id: key,
+                        label: key,
+                        validation: getTypeFromValue(value) === 'number'
+                            ? {rule: requiredAndNumberAndMin, args: 0}
+                            : {rule: requiredAndTrimmed}
+                    }
+                };
+            }).reduce((fields, field) => {
+                for (let key in field) {
+                    fields[key] = field[key];
+                }
+                return fields;
+            }, {});
+        }
+
+    }
 
     private getSelectableHosts = (): Partial<IHostAddress>[] =>
         Object.entries(this.props.nodes)
@@ -217,6 +233,9 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
         hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
+
+    private regionOption = (region: IRegion) =>
+        region.region;
 
     private formFields = (isNew: boolean, formLoadBalancer?: Partial<ILoadBalancer>) => {
         const {currentForm} = this.state;
@@ -253,16 +272,23 @@ class LoadBalancer extends BaseComponent<Props, State> {
                              id={key}
                              label={key}
                              type={"date"}/>
-                    : <Field key={index}
-                             id={key}
-                             label={key}/>))
+                    : key === 'region'
+                        ? <Field<IRegion> key={index}
+                                          id={key}
+                                          type="dropdown"
+                                          label={key}
+                                          valueToString={this.regionOption}
+                                          dropdown={{
+                                              defaultValue: "Select region",
+                                              emptyMessage: "No regions to select",
+                                              values: [(formLoadBalancer as ILoadBalancer).region],
+                                              optionToString: this.regionOption
+                                          }}/>
+                        : <Field key={index}
+                                 id={key}
+                                 label={key}/>))
         );
     };
-
-    private getSelectableServices = () =>
-        Object.entries(this.props.services)
-            .filter(([_, service]) => service.serviceType.toLowerCase() === 'frontend')
-            .map(([key, _]) => key);
 
     private switchForm = (formId: 'On regions' | 'On host') =>
         this.setState({currentForm: formId});
@@ -287,7 +313,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                           isNew={isNew(this.props.location.search)}
                           post={{
                               textButton: 'launch',
-                              url: 'load-balancer',
+                              url: 'load-balancers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
@@ -340,7 +366,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         formLoadBalancer = {...loadBalancer};
         removeFields(formLoadBalancer);
     }
-    const services = state.entities.services.data;
     const regions = state.entities.regions.data;
     const nodes = state.entities.nodes.data;
     return {
@@ -350,7 +375,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         newLoadBalancerHost,
         loadBalancer,
         formLoadBalancer,
-        services,
         regions,
         nodes
     }
@@ -359,7 +383,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
     loadLoadBalancers,
     addLoadBalancer,
-    loadServices,
     loadRegions,
     loadNodes,
 };

@@ -75,8 +75,8 @@ http {
       		#proxy_connect_timeout 100;
       		#proxy_read_timeout 100;
       		proxy_pass http://{{$service}}/;
-      		#proxy_set_header X-Latitude $geoip2_location_latitude;
-      		#proxy_set_header X-Longitude $geoip2_location_longitude;
+      		proxy_set_header X-Latitude $geoip2_location_latitude;
+      		proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
 		{{end}}
     	location /_/api/ {
@@ -92,8 +92,8 @@ http {
       		proxy_set_header Authorization "";
       		proxy_redirect off;
 
-      		#proxy_set_header X-Latitude $geoip2_location_latitude;
-      		#proxy_set_header X-Longitude $geoip2_location_longitude;
+      		proxy_set_header X-Latitude $geoip2_location_latitude;
+      		proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
 	}
 }

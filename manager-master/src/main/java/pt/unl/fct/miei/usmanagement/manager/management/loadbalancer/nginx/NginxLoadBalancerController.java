@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/load-balancer")
+@RequestMapping("/load-balancers")
 public class NginxLoadBalancerController {
 
 	private final NginxLoadBalancerService nginxLoadBalancerService;
