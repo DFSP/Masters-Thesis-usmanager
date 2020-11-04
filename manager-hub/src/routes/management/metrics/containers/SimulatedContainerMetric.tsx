@@ -64,8 +64,8 @@ const buildNewSimulatedContainerMetric = (): Partial<ISimulatedContainerMetric> 
     field: undefined,
     minimumValue: undefined,
     maximumValue: undefined,
+    override: true,
     active: true,
-    override: undefined,
 });
 
 interface StateToProps {

@@ -65,8 +65,8 @@ const buildNewSimulatedServiceMetric = (): Partial<ISimulatedServiceMetric> => (
     field: undefined,
     minimumValue: undefined,
     maximumValue: undefined,
-    override: undefined,
     generic: undefined,
+    override: true,
     active: true,
 });
 

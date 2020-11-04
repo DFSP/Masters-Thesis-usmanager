@@ -459,7 +459,7 @@ class CloudHost extends BaseComponent<Props, State> {
                           saveEntities={this.saveEntities}
                           loading={this.state.loading}>
                         {isNewCloudHost ?
-                            <Field key='coordinates' id='coordinates' type='map'
+                            <Field key='coordinates' id='coordinates' type='map' label='select position'
                                    map={{
                                        editable: this.isNew(),
                                        singleMarker: true,

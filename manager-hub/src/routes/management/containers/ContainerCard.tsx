@@ -91,7 +91,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const container = this.getContainer();
         const menus = [];
-        if (container.labels['serviceType'] !== 'SYSTEM') {
+        if (container.labels['containerTye'] !== 'SINGLETON') {
             menus.push(
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Replicate'}
@@ -234,6 +234,9 @@ class ContainerCard extends BaseComponent<Props, State> {
                               loading={loading}
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>
+            <CardItem key={'type'}
+                      label={'Type'}
+                      value={`${container.type}`}/>
             <CardItem key={'names'}
                       label={'Names'}
                       value={container.names.join(', ')}/>
@@ -245,15 +248,15 @@ class ContainerCard extends BaseComponent<Props, State> {
                       value={container.publicIpAddress}/>
             <CardItem key={'ports'}
                       label={'Ports'}
-                      value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+                      value={`${container.ports.map(p => `${p.publicPort}:${p.privatePort}`).join('/')}`}/>
             <CardItem key={'region'}
                       label={'Region'}
                       value={`${container.region.region}`}/>
             <CardItem key={'coordinates'}
                       label={'Coordinates'}
                       value={`(${container.coordinates.latitude.toFixed(3)}, ${container.coordinates.longitude.toFixed(3)})`}/>
-            <CardItem key={'type'}
-                      label={'Type'}
+            <CardItem key={'serviceType'}
+                      label={'Service type'}
                       value={`${container.labels['serviceType']}`}/>
         </CardContainer>
     }

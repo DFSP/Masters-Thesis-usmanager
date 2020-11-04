@@ -305,17 +305,17 @@ public class ServicesService {
 			serviceSimulatedMetricsService.removeService(simulatedMetric, serviceName));
 	}
 
-	public int getMinReplicasByServiceName(String serviceName) {
-		Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
-		if (customMinReplicas != null) {
-			log.info("Found event prediction with {} replicas", customMinReplicas);
-			return customMinReplicas;
+	public int getMinimumReplicasByServiceName(String serviceName) {
+		Integer customMinimumReplicas = serviceEventPredictions.getMinimumReplicasByServiceName(serviceName, LocalDate.now());
+		if (customMinimumReplicas != null) {
+			log.info("Found event prediction with {} replicas", customMinimumReplicas);
+			return customMinimumReplicas;
 		}
-		return services.getMinReplicas(serviceName);
+		return services.getMinimumReplicas(serviceName);
 	}
 
-	public int getMaxReplicasByServiceName(String serviceName) {
-		return services.getMaxReplicas(serviceName);
+	public int getMaximumReplicasByServiceName(String serviceName) {
+		return services.getMaximumReplicas(serviceName);
 	}
 
 	private void checkServiceExists(Long serviceId) {

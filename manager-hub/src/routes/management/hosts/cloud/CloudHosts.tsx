@@ -43,11 +43,11 @@ class CloudHosts extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
+                <AddButton tooltip={{text: 'Start cloud instance', position: 'left'}}
                            pathname={'/hosts/cloud/new_instance?new'}
                            offset={1}/>
                 <ActionButton icon={'sync'}
-                              tooltip={{text: 'Sync cloud instances', position: 'left'}}
+                              tooltip={{text: 'Sync cloud instances', position: 'bottom'}}
                               clickCallback={this.syncCloudInstances}
                               offset={0}/>
                 <div className={`${styles.container}`}>

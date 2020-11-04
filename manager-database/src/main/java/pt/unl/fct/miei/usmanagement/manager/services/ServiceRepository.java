@@ -53,15 +53,15 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
 	List<ServiceEntity> findByDockerRepositoryIgnoreCase(@Param("dockerRepository") String dockerRepository);
 
-	@Query("select s.minReplicas "
+	@Query("select s.minimumReplicas "
 		+ "from ServiceEntity s "
 		+ "where lower(s.serviceName) = lower(:serviceName)")
-	int getMinReplicas(@Param("serviceName") String serviceName);
+	int getMinimumReplicas(@Param("serviceName") String serviceName);
 
-	@Query("select s.maxReplicas "
+	@Query("select s.maximumReplicas "
 		+ "from ServiceEntity s "
 		+ "where lower(s.serviceName) = lower(:serviceName)")
-	int getMaxReplicas(@Param("serviceName") String serviceName);
+	int getMaximumReplicas(@Param("serviceName") String serviceName);
 
 	@Query("select a.app "
 		+ "from ServiceEntity s join s.appServices a "

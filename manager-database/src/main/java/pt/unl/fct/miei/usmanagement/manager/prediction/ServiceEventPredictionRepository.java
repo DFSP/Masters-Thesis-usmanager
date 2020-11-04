@@ -38,6 +38,6 @@ public interface ServiceEventPredictionRepository extends JpaRepository<ServiceE
 		+ "from ServiceEventPredictionEntity sp inner join sp.service s "
 		+ "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
 		+ "order by sp.lastUpdate desc")
-	Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") LocalDate date);
+	Integer getMinimumReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") LocalDate date);
 
 }

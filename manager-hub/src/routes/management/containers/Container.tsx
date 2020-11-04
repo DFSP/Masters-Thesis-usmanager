@@ -24,7 +24,14 @@
 
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, IFormLoading, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
+import Form, {
+    IFields,
+    IFormLoading,
+    required,
+    requiredAndNumberAndMin,
+    requiredAndTrimmed,
+    requireGreaterOrEqualSize
+} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -67,9 +74,12 @@ import {ICoordinates} from "../../../components/map/LocationMap";
 import GenericSimulatedServiceMetricList from "../services/GenericSimulatedServiceMetricList";
 import GenericServiceRuleList from "../services/GenericServiceRuleList";
 import {IRegion} from "../regions/Region";
+import {Point} from "react-simple-maps";
+import {IMarker} from "../../../components/map/Marker";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
+    type: ContainerType;
     created: number;
     names: string[];
     image: string;
@@ -86,9 +96,11 @@ export interface IContainer extends IDatabaseData {
     containerSimulatedMetrics?: string[];
 }
 
+export type ContainerType = 'SINGLETON' | 'BY_REQUEST'
+
 export interface IContainerPort {
-    privatePort: number;
     publicPort: number;
+    privatePort: number;
     type: string;
     ip: string;
 }
@@ -97,34 +109,50 @@ export interface IContainerLabel {
     [key: string]: string
 }
 
-interface INewContainer {
+interface INewContainerHost {
     service?: string,
-    internalPort?: number,
     externalPort?: number,
+    internalPort?: number,
     hostAddress?: IHostAddress,
 }
 
-const buildNewContainer = (): INewContainer => ({
+interface INewContainerLocation {
+    service?: string,
+    externalPort?: number,
+    internalPort?: number,
+    coordinates?: Point[];
+}
+
+const buildNewContainerHost = (): INewContainerHost => ({
     service: undefined,
-    internalPort: undefined,
     externalPort: undefined,
+    internalPort: undefined,
     hostAddress: undefined,
+});
+
+const buildNewContainerLocation = (): INewContainerLocation => ({
+    service: undefined,
+    externalPort: undefined,
+    internalPort: undefined,
+    coordinates: undefined,
 });
 
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
-    newContainer?: INewContainer;
+    newContainerHost?: INewContainerHost;
+    newContainerLocation?: INewContainerLocation;
     container?: IContainer;
-    formContainer?: Partial<IContainer> | INewContainer;
+    formContainer?: Partial<IContainer> | INewContainerHost;
     nodes: { [key: string]: INode };
     services: { [key: string]: IService };
     cloudHosts: { [key: string]: ICloudHost };
     edgeHosts: { [key: string]: IEdgeHost };
+    containers: { [key: string]: IContainer };
 }
 
 interface DispatchToProps {
-    loadContainers: (id: string) => void;
+    loadContainers: (containerId?: string) => void;
     loadNodes: () => void;
     loadServices: () => void;
     addContainer: (container: IContainer) => void;
@@ -152,6 +180,7 @@ interface State {
     defaultExternalPort: number,
     unsavedRules: string[],
     unsavedSimulatedMetrics: string[],
+    currentForm: 'On host' | 'On location',
 }
 
 class Container extends BaseComponent<Props, State> {
@@ -162,6 +191,7 @@ class Container extends BaseComponent<Props, State> {
         defaultExternalPort: 0,
         unsavedRules: [],
         unsavedSimulatedMetrics: [],
+        currentForm: 'On host',
     };
     private mounted = false;
     private scrollbar: (ScrollBar | null) = null;
@@ -201,9 +231,11 @@ class Container extends BaseComponent<Props, State> {
         this.scrollbar?.updateScroll();
 
     private loadContainer = () => {
-        if (!isNew(this.props.location.search)) {
+        if (!this.isNew()) {
             const containerId = this.props.match.params.id;
             this.props.loadContainers(containerId);
+        } else {
+            this.props.loadContainers();
         }
     };
 
@@ -216,18 +248,27 @@ class Container extends BaseComponent<Props, State> {
     private isNew = () =>
         isNew(this.props.location.search);
 
-    private onPostSuccess = (reply: IReply<IContainer>): void => {
-        const container = reply.data;
-        super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at ${container.publicIpAddress}</span>`);
-        this.props.addContainer(container);
-        this.saveEntities(container);
-        if (this.mounted) {
-            this.updateContainer(container);
-            this.props.history.replace(container.containerId);
+    private onPostSuccess = (reply: IReply<IContainer[]>): void => {
+        let containers = reply.data;
+        if (containers.length === 1) {
+            const container = containers[0];
+            super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at host ${container.publicIpAddress}</span>`);
+            this.props.addContainer(container);
+            this.saveEntities(container);
+            if (this.mounted) {
+                this.updateContainer(container);
+                this.props.history.replace(container.containerId);
+            }
+        } else {
+            containers = containers.reverse();
+            super.toast(`<span class="green-text">Launched ${containers.length} containers:<br/><b class="white-text">${containers.map(container => `${container.id} => Host ${container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            if (this.mounted) {
+                this.props.history.push("/containers");
+            }
         }
     };
 
-    private onPostFailure = (reason: string, container: INewContainer): void =>
+    private onPostFailure = (reason: string, container: INewContainerHost): void =>
         super.toast(`Unable to start container at <b>${container.hostAddress?.publicIpAddress}/${container.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
 
     private onDeleteSuccess = (container: IContainer): void => {
@@ -417,23 +458,60 @@ class Container extends BaseComponent<Props, State> {
         this.setState({container: container, formContainer: formContainer, loading: undefined});
     };
 
-    private getFields = (container: Partial<IContainer> | INewContainer): IFields =>
-        Object.entries(container).map(([key, value]) => {
-            return {
-                [key]: {
-                    id: key,
-                    label: key,
-                    validation: getTypeFromValue(value) === 'number'
-                        ? {rule: requiredAndNumberAndMin, args: 0}
-                        : {rule: requiredAndTrimmed}
-                }
-            };
-        }).reduce((fields, field) => {
+    private commonFields = (): IFields => {
+        return ['service', 'externalPort', 'internalPort'].map(field => ({
+            [field]: {
+                id: field,
+                label: field,
+                validation: {rule: required}
+            }
+        })).reduce((fields, field) => {
             for (let key in field) {
                 fields[key] = field[key];
             }
             return fields;
         }, {});
+    }
+
+    private getFields = (container: INewContainerHost | INewContainerLocation | IContainer): IFields => {
+        if (this.isNew()) {
+            return this.state.currentForm === 'On host'
+                ? ({
+                    ...this.commonFields(),
+                    hostAddress: {
+                        id: 'hostAddress',
+                        label: 'hostAddress',
+                        validation: {rule: required}
+                    },
+                }) : ({
+                    ...this.commonFields(),
+                    coordinates: {
+                        id: 'coordinates',
+                        label: 'coordinates',
+                        validation: {rule: requireGreaterOrEqualSize, args: 1}
+                    },
+                })
+        } else {
+            return Object.entries(container).map(([key, value]) => {
+                return {
+                    [key]: {
+                        id: key,
+                        label: key,
+                        validation: getTypeFromValue(value) === 'number'
+                            ? {rule: requiredAndNumberAndMin, args: 0}
+                            : key === 'coordinates'
+                                ? {rule: requireGreaterOrEqualSize, args: 1}
+                                : {rule: requiredAndTrimmed}
+                    }
+                };
+            }).reduce((fields, field) => {
+                for (let key in field) {
+                    fields[key] = field[key];
+                }
+                return fields;
+            }, {});
+        }
+    }
 
     private getSelectableHosts = (): Partial<IHostAddress>[] =>
         Object.entries(this.props.nodes)
@@ -479,38 +557,92 @@ class Container extends BaseComponent<Props, State> {
     private regionOption = (region: IRegion) =>
         region.region;
 
-    private formFields = (formContainer: INewContainer | Partial<IContainer>, isNew: boolean): JSX.Element =>
-        isNew ?
-            <>
-                <Field key={'service'}
-                       id={'service'}
-                       label={'service'}
-                       type={'dropdown'}
-                       dropdown={{
-                           defaultValue: "Select service",
-                           values: this.getSelectableServices(),
-                           selectCallback: this.setDefaultPorts,
-                           emptyMessage: 'No services available'
-                       }}/>
-                <Field key={'internalPort'}
-                       id={'internalPort'}
-                       label={'internalPort'}
-                       type={'number'}/>
-                <Field key={'externalPort'}
-                       id={'externalPort'}
-                       label={'externalPort'}
-                       type={'number'}/>
-                <Field<Partial<IHostAddress>> key={'hostAddress'}
-                                              id={'hostAddress'}
-                                              label={'hostAddress'}
-                                              type={'dropdown'}
-                                              dropdown={{
-                                                  defaultValue: "Select host address",
-                                                  values: this.getSelectableHosts(),
-                                                  optionToString: this.hostAddressesDropdown,
-                                                  emptyMessage: 'No hosts available'
-                                              }}/>
-            </>
+    private switchForm = (formId: 'On host' | 'On location') =>
+        this.setState({currentForm: formId});
+
+    private getContainersMarkers = (): IMarker[] => {
+        const containers: IContainer[] = Object.values(this.props.containers);
+        const markers = new Map<String, IMarker>();
+        containers
+            .forEach(container => {
+                const publicIpAddress = container.publicIpAddress;
+                const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
+                if (marker.title === '') {
+                    marker.title += container.coordinates.label + '<br/>';
+                }
+                marker.title += container.containerId.substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+                marker.label = publicIpAddress;
+                marker.latitude = container.coordinates.latitude;
+                marker.longitude = container.coordinates.longitude;
+                marker.color = 'green';
+                markers.set(publicIpAddress, marker);
+            });
+        return Array.from(markers.values());
+    }
+
+    private formFields = (formContainer: INewContainerHost | Partial<IContainer>, isNew: boolean): JSX.Element => {
+        const {currentForm} = this.state;
+        return isNew ?
+            currentForm === 'On host'
+                ?
+                <>
+                    <Field key={'service'}
+                           id={'service'}
+                           label={'service'}
+                           type={'dropdown'}
+                           dropdown={{
+                               defaultValue: "Select service",
+                               values: this.getSelectableServices(),
+                               selectCallback: this.setDefaultPorts,
+                               emptyMessage: 'No services available'
+                           }}/>
+                    <Field key={'externalPort'}
+                           id={'externalPort'}
+                           label={'externalPort'}
+                           type={'number'}/>
+                    <Field key={'internalPort'}
+                           id={'internalPort'}
+                           label={'internalPort'}
+                           type={'number'}/>
+                    <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                                  id={'hostAddress'}
+                                                  label={'hostAddress'}
+                                                  type={'dropdown'}
+                                                  dropdown={{
+                                                      defaultValue: "Select host address",
+                                                      values: this.getSelectableHosts(),
+                                                      optionToString: this.hostAddressesDropdown,
+                                                      emptyMessage: 'No hosts available'
+                                                  }}/>
+                </>
+                :
+                <>
+                    <Field key={'service'}
+                           id={'service'}
+                           label={'service'}
+                           type={'dropdown'}
+                           dropdown={{
+                               defaultValue: "Select service",
+                               values: this.getSelectableServices(),
+                               selectCallback: this.setDefaultPorts,
+                               emptyMessage: 'No services available'
+                           }}/>
+                    <Field key={'internalPort'}
+                           id={'internalPort'}
+                           label={'internalPort'}
+                           type={'number'}/>
+                    <Field key={'externalPort'}
+                           id={'externalPort'}
+                           label={'externalPort'}
+                           type={'number'}/>
+                    <Field key='coordinates' id='coordinates' label='select position(s)' type='map'
+                           map={{
+                               loading: this.props.isLoading,
+                               editable: true,
+                               labeled: false,
+                               markers: this.getContainersMarkers()
+                           }}/>
+                </>
             :
             <>
                 {Object.entries(formContainer).map(([key, value], index) =>
@@ -536,43 +668,52 @@ class Container extends BaseComponent<Props, State> {
                                                   values: [(formContainer as IContainer).region],
                                                   optionToString: this.regionOption
                                               }}/>
-                        : key === 'coordinates'
-                            ? <Field key={index} id='coordinates' label='location' type='map'
-                                     map={{
-                                         loading: this.props.isLoading,
-                                         editable: false,
-                                         zoomable: true,
-                                         labeled: true
-                                     }}/>
-                            : <Field key={index}
-                                     id={key}
-                                     label={key}/>
+                            : key === 'coordinates'
+                                ? <Field key={index} id='coordinates' label='location' type='map'
+                                         map={{
+                                             loading: this.props.isLoading,
+                                             editable: false,
+                                             zoomable: true,
+                                             labeled: true
+                                         }}/>
+                                : <Field key={index}
+                                         id={key}
+                                         label={key}/>
                 )}
             </>;
+    }
 
     private container = () => {
-        const {isLoading, error, newContainer} = this.props;
-        const container = this.getContainer();
-        const formContainer = this.getFormContainer();
+        const {isLoading, error} = this.props;
+        let {newContainerHost, newContainerLocation} = this.props;
+        const {currentForm} = this.state;
         const isNewContainer = this.isNew();
-        const containerValues = isNewContainer
-            ? {
-                ...newContainer,
+        if (isNewContainer) {
+            newContainerHost = {
+                ...newContainerHost,
                 internalPort: this.state.defaultInternalPort,
                 externalPort: this.state.defaultExternalPort
-            }
-            : formContainer;
+            };
+            newContainerLocation = {
+                ...newContainerHost,
+                internalPort: this.state.defaultInternalPort,
+                externalPort: this.state.defaultExternalPort
+            };
+        }
+        const container = isNewContainer ? (currentForm === 'On host' ? newContainerHost : newContainerLocation) : this.getContainer();
+        console.log(currentForm, container)
+        const formContainer = this.getFormContainer();
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
         return (
             <>
                 {!isNewContainer && isLoading && <LoadingSpinner/>}
                 {!isNewContainer && !isLoading && error && <Error message={error}/>}
-                {(isNewContainer || !isLoading) && (isNewContainer || !error) && containerValues && (
+                {(isNewContainer || !isLoading) && (isNewContainer || !error) && container && (
                     /*@ts-ignore*/
                     <Form id={containerKey}
-                          fields={this.getFields(formContainer || {})}
-                          values={containerValues}
+                          fields={this.getFields(container)}
+                          values={container}
                           isNew={isNewContainer}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
@@ -581,19 +722,25 @@ class Container extends BaseComponent<Props, State> {
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
-                          delete={container && container.labels['serviceType'] !== 'SYSTEM'
+                        // delete button is never present on new nodes, so a type cast is safe
+                          delete={container && (container as IContainer).type !== 'SINGLETON'
                               ? {
                                   textButton: 'Stop',
-                                  url: `containers/${container.containerId}`,
+                                  url: `containers/${(container as IContainer).containerId}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }
                               : undefined}
-                          customButtons={container && container.labels['serviceType'] !== 'SYSTEM'
+                        // custom buttons are never present on new nodes, so a type cast is safe
+                          customButtons={container && (container as IContainer).type !== 'SINGLETON'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
                           loading={this.state.loading}
-                          saveEntities={this.saveEntities}>
+                          saveEntities={this.saveEntities}
+                          switchDropdown={isNewContainer ? {
+                              options: currentForm === 'On host' ? ['On location'] : ['On host'],
+                              onSwitch: this.switchForm
+                          } : undefined}>
                         {this.formFields(formContainer || {}, isNewContainer)}
                     </Form>
                 )}
@@ -707,12 +854,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.containers.isLoadingContainers;
     const error = state.entities.containers.loadContainersError;
     const id = props.match.params.id;
-    const newContainer = isNew(props.location.search) ? buildNewContainer() : undefined;
+    const newContainerHost = isNew(props.location.search) ? buildNewContainerHost() : undefined;
+    const newContainerLocation = isNew(props.location.search) ? buildNewContainerLocation() : undefined;
     const container = !isNew(props.location.search) ? state.entities.containers.data[id] : undefined;
     let formContainer;
-    if (newContainer) {
-        formContainer = {...newContainer};
-    }
     if (container) {
         formContainer = {...container};
         removeFields(formContainer);
@@ -721,16 +866,19 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const services = state.entities.services.data;
     const cloudHosts = state.entities.hosts.cloud.data;
     const edgeHosts = state.entities.hosts.edge.data;
+    const containers = state.entities.containers.data;
     return {
         isLoading,
         error,
-        newContainer,
+        newContainerHost,
+        newContainerLocation,
         container,
         formContainer,
         nodes,
         services,
         cloudHosts,
-        edgeHosts
+        edgeHosts,
+        containers
     }
 }
 

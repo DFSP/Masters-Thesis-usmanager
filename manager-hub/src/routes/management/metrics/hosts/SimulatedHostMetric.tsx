@@ -68,9 +68,9 @@ const buildNewSimulatedHostMetric = (): Partial<ISimulatedHostMetric> => ({
     field: undefined,
     minimumValue: undefined,
     maximumValue: undefined,
-    override: undefined,
-    active: true,
     generic: undefined,
+    override: true,
+    active: true,
 });
 
 interface StateToProps {

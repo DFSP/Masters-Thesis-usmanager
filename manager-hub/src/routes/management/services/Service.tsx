@@ -65,10 +65,10 @@ export interface IService extends IDatabaseData {
     defaultInternalPort: number;
     defaultDb: string;
     launchCommand: string;
-    minReplicas: number;
-    maxReplicas: number;
+    minimumReplicas: number;
+    maximumReplicas: number;
     outputLabel: string;
-    serviceType: string;
+    serviceType: ServiceType;
     expectedMemoryConsumption: number;
     apps?: string[];
     dependencies?: string[];
@@ -78,6 +78,8 @@ export interface IService extends IDatabaseData {
     serviceSimulatedMetrics?: string[];
 }
 
+export type ServiceType = 'FRONTEND' | 'BACKEND' | 'DATABASE' | 'SYSTEM';
+
 const buildNewService = (): Partial<IService> => ({
     serviceName: undefined,
     dockerRepository: undefined,
@@ -85,8 +87,8 @@ const buildNewService = (): Partial<IService> => ({
     defaultInternalPort: undefined,
     defaultDb: undefined,
     launchCommand: undefined,
-    minReplicas: undefined,
-    maxReplicas: undefined,
+    minimumReplicas: undefined,
+    maximumReplicas: undefined,
     outputLabel: undefined,
     serviceType: undefined,
     expectedMemoryConsumption: undefined,
@@ -410,7 +412,9 @@ class Service extends BaseComponent<Props, State> {
                     validation:
                         getTypeFromValue(value) === 'number'
                             ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
-                            : {rule: requiredAndTrimmed}
+                            : !['defaultDb', 'launchCommand', 'minimumReplicas', 'maximumReplicas', 'expectedMemoryConsumption'].includes(key)
+                            ? {rule: requiredAndTrimmed}
+                            : undefined
                 }
             };
         }).reduce((fields, field) => {
@@ -467,7 +471,7 @@ class Service extends BaseComponent<Props, State> {
                                 : <Field key={index}
                                          id={key}
                                          label={key}
-                                         type={['defaultExternalPort', 'defaultInternalPort', 'minReplicas', 'maxReplicas',
+                                         type={['defaultExternalPort', 'defaultInternalPort', 'minimumReplicas', 'maximumReplicas',
                                              'expectedMemoryConsumption'].includes(key) ? 'number' : 'text'}/>
                         )}
                     </Form>

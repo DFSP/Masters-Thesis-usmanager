@@ -25,14 +25,18 @@
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
 import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+
+import java.util.List;
 
 @Data
 public class LaunchContainerRequest {
 
-	private final HostAddress hostAddress;
 	private final String service;
-	private final String internalPort;
-	private final String externalPort;
+	private final int internalPort;
+	private final int externalPort;
+	private final HostAddress hostAddress;
+	private List<Coordinates> coordinates;
 
 }

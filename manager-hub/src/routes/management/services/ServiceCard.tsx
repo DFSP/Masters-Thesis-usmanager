@@ -126,13 +126,13 @@ class ServiceCard extends BaseComponent<Props, State> {
         ];
     }
 
-    private getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
-        if (minReplicas === maxReplicas) {
-            return `${minReplicas}`;
-        } else if (maxReplicas === 0) {
-            return `At least ${minReplicas}`
+    private getReplicasMessage = (minimumReplicas: number, maximumReplicas: number): string | null => {
+        if (minimumReplicas === maximumReplicas) {
+            return minimumReplicas > 0 ? `${minimumReplicas}` : null;
+        } else if (maximumReplicas === 0 || maximumReplicas == null) {
+            return `At least ${minimumReplicas}`
         } else {
-            return `At least ${minReplicas} up to ${maxReplicas}`;
+            return `At least ${minimumReplicas} up to ${maximumReplicas}`;
         }
     };
 
@@ -140,6 +140,7 @@ class ServiceCard extends BaseComponent<Props, State> {
         const {service} = this.props;
         const {loading} = this.state;
         const CardService = Card<IService>();
+        const replicasMessage = this.getReplicasMessage(service.minimumReplicas, service.maximumReplicas);
         return <CardService id={`service-${service.id}`}
                             title={service.serviceName}
                             link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
@@ -157,9 +158,10 @@ class ServiceCard extends BaseComponent<Props, State> {
             <CardItem key={'serviceType'}
                       label={'Service type'}
                       value={`${service.serviceType}`}/>
+            {replicasMessage &&
             <CardItem key={'replicas'}
                       label={'Replicas'}
-                      value={this.getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
+                      value={replicasMessage}/>}
             <CardItem key={'ports'}
                       label={'Ports'}
                       value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
@@ -170,7 +172,7 @@ class ServiceCard extends BaseComponent<Props, State> {
             <CardItem key={'outputLabel'}
                       label={'Output label'}
                       value={`${service.outputLabel}`}/>
-            {service.defaultDb !== 'NOT_APPLICABLE' &&
+            {service.defaultDb !== null &&
             <CardItem key={'database'}
                       label={'Database'}
                       value={service.defaultDb}/>}

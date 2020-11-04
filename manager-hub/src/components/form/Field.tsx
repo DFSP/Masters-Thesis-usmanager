@@ -40,6 +40,7 @@ import LocationMap from "../map/LocationMap";
 import {IMarker} from "../map/Marker";
 import LoadingSpinner from "../list/LoadingSpinner";
 import {Checkbox} from "./Checkbox";
+import styles from './Form.module.css';
 
 export interface IValidation {
     rule: (values: IValues, id: keyof IValues, args: any) => string;
@@ -113,13 +114,16 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                             {label && type !== "list" && (
                                 <>
                                     {(icon?.include === undefined || icon?.include) &&
-                                    <i className="material-icons prefix">
+                                    <i className={`material-icons prefix ${styles.labelIcon}`}>
                                         {icon?.linkedTo
                                             ? this.linkedIcon(label, icon.name, icon.linkedTo, formContext.values[id])
-                                            : icon?.name ? icon.name : mapLabelToMaterialIcon(label, formContext.values[id])}
+                                            : icon?.name
+                                                ? icon.name
+                                                : type?.toLowerCase() !== 'checkbox' && mapLabelToMaterialIcon(label, formContext.values[id])}
                                     </i>}
                                     <label className="active" htmlFor={id}>
                                         {camelCaseToSentenceCase(label)}
+                                        {type?.toLowerCase() !== 'checkbox' && formContext.isRequired(id) && <label className={styles.requiredLabel}>*</label>}
                                     </label>
                                 </>
                             )}
@@ -201,6 +205,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                             {(type && type.toLowerCase() === "list") && (
                                 <CheckboxList id={id}
                                               name={id}
+                                              required={formContext.isRequired(id)}
                                               values={this.props.value}
                                               disabled={disabled || !formContext?.isEditing}
                                               onCheckList={this.onCheckList(formContext)}/>

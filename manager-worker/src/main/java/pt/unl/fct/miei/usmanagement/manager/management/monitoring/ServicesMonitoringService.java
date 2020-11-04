@@ -333,8 +333,8 @@ public class ServicesMonitoringService {
 			List<ServiceDecisionResult> relevantContainerDecisions =
 				relevantServicesDecisions.getOrDefault(serviceName, new ArrayList<>());
 			int currentReplicas = containerDecisions.size();
-			int minimumReplicas = servicesService.getMinReplicasByServiceName(serviceName);
-			int maximumReplicas = servicesService.getMaxReplicasByServiceName(serviceName);
+			int minimumReplicas = servicesService.getMinimumReplicasByServiceName(serviceName);
+			int maximumReplicas = servicesService.getMaximumReplicasByServiceName(serviceName);
 			if (currentReplicas < minimumReplicas) {
 				executeStartContainerDecision(containerDecisions, relevantContainerDecisions, servicesHosts);
 			}

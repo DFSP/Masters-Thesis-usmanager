@@ -64,7 +64,7 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 // https://fontawesome.com/icons?d=gallery&m=free
 // https://materializecss.com/icons.html
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
-    label = label.toLowerCase();
+    label = label.toLowerCase().replace(' *', '');
     if (label === 'network') {
         return <FaNetworkWired/>;
     }
@@ -176,9 +176,6 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     if (label === 'image') {
         return <FaDocker/>;
     }
-    if (label === 'minreplicas' || label === 'maxreplicas') {
-        return 'format_list_numbered';
-    }
     if (label === 'instancetype') {
         return <FaHdd/>;
     }
@@ -224,7 +221,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     if (label === 'minimumvalue' || label === 'minimumreplicas') {
         return <FaGreaterThanEqual/>;
     }
-    if (label === 'maximumvalue') {
+    if (label === 'maximumvalue' || label === 'maximumreplicas') {
         return <FaLessThanEqual/>;
     }
     if (label.includes('container')) {

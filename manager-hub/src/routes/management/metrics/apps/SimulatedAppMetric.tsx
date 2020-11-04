@@ -64,8 +64,8 @@ const buildNewSimulatedAppMetric = (): Partial<ISimulatedAppMetric> => ({
     field: undefined,
     minimumValue: undefined,
     maximumValue: undefined,
+    override: true,
     active: true,
-    override: undefined,
 });
 
 interface StateToProps {

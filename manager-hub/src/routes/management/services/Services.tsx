@@ -100,6 +100,7 @@ class Services extends BaseComponent<Props, State> {
             <MainLayout>
                 <AddButton tooltip={{text: 'Add service', position: 'bottom'}}
                            pathname={'/services/new_service?new'}/>
+                {Object.keys(this.props.apps).length > 0 &&
                 <div className={styles.filterDropdown}>
                     <a className={`btn-flat red-text ${styles.clearButton}`} onClick={this.clearFilter}>
                         <i className={`material-icons ${styles.clearButtonIcon}`}>clear</i>
@@ -111,10 +112,11 @@ class Services extends BaseComponent<Props, State> {
                         onChange={this.onChangeServicesFilter}
                         dropdown={{
                             defaultValue: 'Filter by app',
+                            emptyMessage: 'No services to filter',
                             values: Object.keys(this.props.apps),
                         }}>
                     </Dropdown>
-                </div>
+                </div>}
                 <div className={`${styles.container}`}>
                     <CardList<IService>
                         isLoading={this.props.isLoading}

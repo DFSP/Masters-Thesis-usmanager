@@ -41,7 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
@@ -61,7 +61,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
@@ -128,15 +127,21 @@ public class DockerContainersService {
 		List<String> environment = Collections.emptyList();
 		Map<String, String> labels = Collections.emptyMap();
 		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-		int minReplicas = servicesService.getMinReplicasByServiceName(service.getServiceName());
-		List<DockerContainer> containers = new ArrayList<>(minReplicas);
-		for (int i = 0; i < minReplicas; i++) {
+		int minimumReplicas = servicesService.getMinimumReplicasByServiceName(service.getServiceName());
+		List<DockerContainer> containers = new ArrayList<>(minimumReplicas);
+		for (int i = 0; i < minimumReplicas; i++) {
 			HostAddress address = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 			Optional<DockerContainer> container = launchContainer(address, service, ContainerType.BY_REQUEST, environment,
 				labels, dynamicLaunchParams);
 			container.ifPresent(containers::add);
 		}
 		return containers;
+	}
+
+	public Optional<DockerContainer> launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
+		double expectedMemoryUsage = servicesService.getService(serviceName).getExpectedMemoryConsumption();
+		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryUsage, coordinates);
+		return launchContainer(hostAddress, serviceName, externalPort, internalPort);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName) {
@@ -193,26 +198,25 @@ public class DockerContainersService {
 		return launchContainer(address, service, containerType, environment, labels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, String internalPort,
-													 String externalPort) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, internalPort, externalPort);
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, int externalPort, int internalPort) {
+		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, externalPort, internalPort);
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, String internalPort,
-													 String externalPort, List<String> environment) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, internalPort, externalPort, environment);
-	}
-
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
-													 String internalPort, String externalPort) {
-		return launchContainer(address, serviceName, containerType, internalPort, externalPort, Collections.emptyList());
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, int internalPort,
+													 int externalPort, List<String> environment) {
+		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, externalPort, internalPort, environment);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
-													 String internalPort, String externalPort, List<String> environment) {
+													 int externalPort, int internalPort) {
+		return launchContainer(address, serviceName, containerType, externalPort, internalPort, Collections.emptyList());
+	}
+
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
+													 int externalPort, int internalPort, List<String> environment) {
 		ServiceEntity service = servicesService.getService(serviceName).toBuilder()
-			.defaultInternalPort(internalPort)
 			.defaultExternalPort(externalPort)
+			.defaultInternalPort(internalPort)
 			.build();
 		Map<String, String> labels = Collections.emptyMap();
 		Map<String, String> dynamicLaunchParams = Collections.emptyMap();
@@ -250,18 +254,21 @@ public class DockerContainersService {
 			}
 
 			String serviceType = service.getServiceType().name();
-			String internalPort = service.getDefaultInternalPort();
-			String externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
+			int externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
+			int internalPort = service.getDefaultInternalPort();
 			String containerName = containerType == ContainerType.SINGLETON
 				? serviceName
 				: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
 			String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
 			String dockerRepository = service.getDockerRepository();
 			String launchCommand = service.getLaunchCommand();
+			if (launchCommand == null) {
+				launchCommand = "";
+			}
 			launchCommand = launchCommand
 				.replace("${hostname}", hostAddress.getPublicIpAddress())
-				.replace("${externalPort}", externalPort)
-				.replace("${internalPort}", internalPort);
+				.replace("${externalPort}", String.valueOf(externalPort))
+				.replace("${internalPort}", String.valueOf(internalPort));
 			log.info("Launch command: {}", launchCommand);
 
 			Region region = hostAddress.getRegion();
@@ -309,11 +316,11 @@ public class DockerContainersService {
 
 			HostConfig hostConfig = HostConfig.builder()
 				.autoRemove(true)
-				.portBindings(Map.of(internalPort, List.of(PortBinding.of("", externalPort))))
+				.portBindings(Map.of(String.valueOf(internalPort), List.of(PortBinding.of("", String.valueOf(externalPort)))))
 				.build();
 			ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
 				.image(dockerRepository)
-				.exposedPorts(internalPort)
+				.exposedPorts(String.valueOf(internalPort))
 				.hostConfig(hostConfig)
 				.hostname(serviceName)
 				.env(containerEnvironment)
@@ -397,8 +404,8 @@ public class DockerContainersService {
 		ContainerInfo fromContainer = inspectContainer(id, fromHostAddress);
 		String serviceName = fromContainer.name().replace("/", "").split("_")[0];
 		Map.Entry<String, List<PortBinding>> port = fromContainer.hostConfig().portBindings().entrySet().iterator().next();
-		String internalPort = port.getKey();
-		String externalPort = port.getValue().get(0).hostPort();
+		int externalPort = Integer.parseInt(port.getValue().get(0).hostPort());
+		int internalPort = Integer.parseInt(port.getKey());
 		ServiceEntity service = servicesService.getService(serviceName).toBuilder()
 			.defaultInternalPort(internalPort)
 			.defaultExternalPort(externalPort)
@@ -508,6 +515,7 @@ public class DockerContainersService {
 			: String.format("%s=%s", DockerSwarmService.NETWORK_OVERLAY, attachedNetwork.networkId().substring(0, 10));
 		String state = container.state();
 		String status = container.status();
+		ContainerType type = ContainerType.getContainerType(container.labels().get(ContainerConstants.Label.CONTAINER_TYPE));
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
@@ -516,7 +524,7 @@ public class DockerContainersService {
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
-		return new DockerContainer(id, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
+		return new DockerContainer(id, type, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
 			coordinates, region, ports, labels);
 	}
 

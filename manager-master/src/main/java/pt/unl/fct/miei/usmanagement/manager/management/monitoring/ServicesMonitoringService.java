@@ -37,7 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
@@ -426,8 +426,8 @@ public class ServicesMonitoringService {
 			Collections.sort(containerDecisions);
 			ServiceDecisionResult topPriorityDecisionResult = containerDecisions.get(0);
 			int currentReplicas = replicasCount.get(serviceName);
-			int minimumReplicas = servicesService.getMinReplicasByServiceName(serviceName);
-			int maximumReplicas = servicesService.getMaxReplicasByServiceName(serviceName);
+			int minimumReplicas = servicesService.getMinimumReplicasByServiceName(serviceName);
+			int maximumReplicas = servicesService.getMaximumReplicasByServiceName(serviceName);
 			if (currentReplicas < minimumReplicas) {
 				// start a new container to meet the requirements. The location is based on the data collected from the
 				// location-request-monitor component

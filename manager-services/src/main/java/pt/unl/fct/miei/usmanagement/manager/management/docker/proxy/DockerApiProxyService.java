@@ -66,15 +66,15 @@ public class DockerApiProxyService {
 		ServiceEntity dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
 		String serviceName = dockerApiProxy.getServiceName();
 		ServiceType serviceType = dockerApiProxy.getServiceType();
-		String externalPort = dockerApiProxy.getDefaultExternalPort();
-		String internalPort = dockerApiProxy.getDefaultInternalPort();
+		int externalPort = dockerApiProxy.getDefaultExternalPort();
+		int internalPort = dockerApiProxy.getDefaultInternalPort();
 		String dockerRepository = dockerApiProxy.getDockerRepository();
 		Gson gson = new Gson();
 		String command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
 				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
 				+ "docker pull %s && "
-				+ "docker run -itd --name=%s -p %s:%s --hostname %s --rm "
+				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
 				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s=%b -l %s=%b %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,

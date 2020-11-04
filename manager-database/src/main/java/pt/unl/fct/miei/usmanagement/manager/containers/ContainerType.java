@@ -22,11 +22,14 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.containers;
+package pt.unl.fct.miei.usmanagement.manager.containers;
 
 public enum ContainerType {
 
 	SINGLETON, // one instance running on each host
-	BY_REQUEST
+	BY_REQUEST;
 
+	public static ContainerType getContainerType(String type) {
+		return valueOf(type.toUpperCase().replace(" ", "_"));
+	}
 }

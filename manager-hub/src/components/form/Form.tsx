@@ -124,6 +124,7 @@ export interface IFormContext {
     removeValue: (id: keyof IValues, value: any) => void;
     removeValuesExcept: (id: keyof IValues, value: any[]) => void;
     validate: (id: keyof IValues) => void;
+    isRequired: (id: keyof IValues) => boolean;
 }
 
 export const FormContext =
@@ -283,6 +284,7 @@ class Form extends BaseComponent<Props, State> {
             removeValue: this.removeValue,
             removeValuesExcept: this.removeValuesExcept,
             validate: this.validate,
+            isRequired: this.isRequired,
         };
         const {saveRequired, loading} = this.state;
         const {
@@ -489,11 +491,21 @@ class Form extends BaseComponent<Props, State> {
                 || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
     };
 
+    private isRequired = (id: keyof IValues): boolean => {
+        const {fields} = this.props;
+        const field: FieldProps | undefined = fields[id];
+        const validation: IValidation | undefined = field!.validation;
+        return validation?.rule.name.includes('required') || false
+    }
+
     private validate = (id: keyof IValues): string => {
         const {fields} = this.props;
         const field: FieldProps | undefined = fields[id];
         const validation: IValidation | undefined = field!.validation;
         const newError: string = validation ? validation.rule(this.state.values, id, validation.args) : "";
+        if (newError !== "") {
+            console.log("Validation of field " + field.id + ": " + newError);
+        }
         this.setState({errors: {...this.state.errors, [id]: newError}});
         return newError;
     };
@@ -501,7 +513,6 @@ class Form extends BaseComponent<Props, State> {
     private validateForm(): boolean {
         const errors: IErrors = {};
         Object.entries(this.props.fields).forEach(([fieldName, field]) => {
-            console.log(fieldName)
             const validateMessage = this.validate(fieldName);
             if (field.hidden && validateMessage.length) {
                 super.toast(`<div class="red-text">Validation failed:</div> ${validateMessage}`);
@@ -544,7 +555,6 @@ class Form extends BaseComponent<Props, State> {
         const validate = this.validateForm();
         const {isNew, post, put, saveEntities} = this.props;
         const args = this.state.values;
-        console.log(isNew, validate, post?.url, post, args)
         if (isNew) {
             if (post?.url) {
                 if (validate) {

@@ -75,19 +75,19 @@ public class ServiceEntity {
 	@NotNull
 	private String dockerRepository;
 
-	private String defaultExternalPort;
+	private int defaultExternalPort;
 
-	private String defaultInternalPort;
+	private int defaultInternalPort;
 
 	private String defaultDb;
 
 	private String launchCommand;
 
 	@Min(0)
-	private Integer minReplicas;
+	private Integer minimumReplicas;
 
 	@Min(0)
-	private Integer maxReplicas;
+	private Integer maximumReplicas = 0;
 
 	private String outputLabel;
 

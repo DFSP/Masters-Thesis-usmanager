@@ -59,7 +59,7 @@ public class ServiceAffinityEntity {
 	private ServiceEntity service;
 
 	@ManyToOne
-	@JoinColumn(name = "service_id")
+	@JoinColumn(name = "other_service_id")
 	private ServiceEntity otherService;
 
 	private float affinity;

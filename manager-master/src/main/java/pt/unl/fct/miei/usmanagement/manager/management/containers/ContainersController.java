@@ -34,12 +34,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -74,12 +77,27 @@ public class ContainersController {
 	}
 
 	@PostMapping
-	public ContainerEntity launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
-		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+	public List<ContainerEntity> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
 		String serviceName = launchContainerRequest.getService();
-		String internalPort = launchContainerRequest.getInternalPort();
-		String externalPort = launchContainerRequest.getExternalPort();
-		return containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
+		int internalPort = launchContainerRequest.getInternalPort();
+		int externalPort = launchContainerRequest.getExternalPort();
+		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+		List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
+		List<ContainerEntity> containers = new ArrayList<>();
+		if (hostAddress != null) {
+			ContainerEntity container = containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
+			containers.add(container);
+		}
+		else if (coordinates != null) {
+			for (Coordinates coordinate : coordinates) {
+				ContainerEntity container = containersService.launchContainer(coordinate, serviceName, internalPort, externalPort);
+				containers.add(container);
+			}
+		}
+		else {
+			throw new BadRequestException("Expected host address or coordinates to start containers");
+		}
+		return containers;
 	}
 
 	@DeleteMapping("/{id}")

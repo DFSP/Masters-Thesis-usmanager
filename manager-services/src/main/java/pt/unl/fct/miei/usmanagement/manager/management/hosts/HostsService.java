@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
@@ -468,16 +468,16 @@ public class HostsService {
 		}
 	}
 
-	public String findAvailableExternalPort(HostAddress hostAddress, String startExternalPort) {
+	public int findAvailableExternalPort(HostAddress hostAddress, int startExternalPort) {
 		String command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
 		try {
 			List<Integer> usedExternalPorts = executeCommandSync(command, hostAddress).stream()
 				.filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
 				.map(Integer::parseInt)
 				.collect(Collectors.toList());
-			for (int i = Integer.parseInt(startExternalPort); ; i++) {
+			for (int i = startExternalPort; ; i++) {
 				if (!usedExternalPorts.contains(i)) {
-					return String.valueOf(i);
+					return i;
 				}
 			}
 		}

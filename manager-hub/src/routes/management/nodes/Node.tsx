@@ -193,12 +193,12 @@ class Node extends BaseComponent<Props, State> {
         }
     };
 
-    private onPostFailure = (reason: string, place: INewNodeHost | INewNodeLocation): void => {
+    private onPostFailure = (reason: string, node: INewNodeHost | INewNodeLocation): void => {
         let message;
-        if ("host" in place && place.host) {
-            message = `Unable to start node at ${place.host}`;
-        } else if ("coordinates" in place) {
-            message = `Unable to start node at ${place.coordinates}`;
+        if ("host" in node && node.host) {
+            message = `Unable to start node at ${node.host}`;
+        } else if ("coordinates" in node) {
+            message = `Unable to start node at ${node.coordinates}`;
         } else {
             message = `Unable to start node`;
         }

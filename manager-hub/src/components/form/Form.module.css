@@ -92,3 +92,13 @@ ul.dropdown li.disabled a:hover {
 .formButton {
     margin-right: 5px;
 }
+
+.requiredLabel {
+    margin-left: 5px;
+    font-size: 11px;
+    vertical-align: text-top;
+}
+
+.labelIcon {
+    cursor: default;
+}

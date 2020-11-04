@@ -63,11 +63,11 @@ class Containers extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Start container', position: 'bottom'}}
+                <AddButton tooltip={{text: 'Start container', position: 'left'}}
                            pathname={'/containers/start_container?new'}
                            offset={1}/>
                 <ActionButton icon={'sync'}
-                              tooltip={{text: 'Sync containers', position: 'left'}}
+                              tooltip={{text: 'Sync containers', position: 'bottom'}}
                               clickCallback={this.reloadContainers}
                               offset={0}/>
                 <div className={`${styles.container}`}>
@@ -93,6 +93,7 @@ class Containers extends BaseComponent<Props, {}> {
 
     private predicate = (container: IContainer, search: string): boolean =>
         container.containerId.toString().toLowerCase().includes(search)
+        || container.type.toLowerCase().includes(search)
         || container.names.filter(name => name.includes(search)).length > 0
         || container.publicIpAddress.toLowerCase().includes(search)
         || container.labels['serviceType'].toLowerCase().includes(search);

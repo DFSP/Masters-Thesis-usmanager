@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerRepository;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -100,6 +101,7 @@ public class ContainersService {
 		catch (EntityNotFoundException e) {
 			ContainerEntity container = ContainerEntity.builder()
 				.containerId(dockerContainer.getId())
+				.type(dockerContainer.getType())
 				.created(dockerContainer.getCreated())
 				.names(dockerContainer.getNames())
 				.image(dockerContainer.getImage())
@@ -199,6 +201,12 @@ public class ContainersService {
 		return containers;
 	}
 
+	public ContainerEntity launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(coordinates, serviceName, externalPort, internalPort);
+		return container.map(this::addContainerFromDockerContainer)
+			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
+	}
+
 	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName);
 		return container.map(this::addContainerFromDockerContainer)
@@ -268,18 +276,16 @@ public class ContainersService {
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, String internalPort,
-										   String externalPort) {
-		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, internalPort,
-			externalPort);
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, int internalPort, int externalPort) {
+		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, externalPort, internalPort);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, String internalPort,
-										   String externalPort) {
+	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, int internalPort,
+										   int externalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
-			internalPort, externalPort);
+			externalPort, internalPort);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
@@ -308,9 +314,13 @@ public class ContainersService {
 	}
 
 	public void stopContainer(String id) {
-		ContainerEntity container = getContainer(id);
-		dockerContainersService.stopContainer(container);
-		deleteContainer(id);
+		try {
+			ContainerEntity container = getContainer(id);
+			dockerContainersService.stopContainer(container);
+			deleteContainer(id);
+		} catch (ManagerException e) {
+			log.error("Failed to stop container {}: {}", id, e.getMessage());
+		}
 	}
 
 	public void deleteContainer(String id) {

@@ -74,6 +74,9 @@ public class ContainerEntity {
 	private String containerId;
 
 	@NotNull
+	private ContainerType type;
+
+	@NotNull
 	private long created;
 
 	@ElementCollection(fetch = FetchType.EAGER)
