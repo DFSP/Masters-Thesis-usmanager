@@ -45,11 +45,11 @@ class CloudHosts extends BaseComponent<Props, {}> {
             <MainLayout>
                 <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
                            pathname={'/hosts/cloud/new_instance?new'}
-                           offset={0}/>
+                           offset={1}/>
                 <ActionButton icon={'sync'}
                               tooltip={{text: 'Sync cloud instances', position: 'left'}}
                               clickCallback={this.syncCloudInstances}
-                              offset={1}/>
+                              offset={0}/>
                 <div className={`${styles.container}`}>
                     <CloudHostsList/>
                 </div>

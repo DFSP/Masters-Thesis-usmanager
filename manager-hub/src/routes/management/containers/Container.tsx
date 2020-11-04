@@ -98,17 +98,17 @@ export interface IContainerLabel {
 }
 
 interface INewContainer {
-    hostAddress?: IHostAddress,
     service?: string,
     internalPort?: number,
     externalPort?: number,
+    hostAddress?: IHostAddress,
 }
 
 const buildNewContainer = (): INewContainer => ({
-    hostAddress: undefined,
     service: undefined,
     internalPort: undefined,
     externalPort: undefined,
+    hostAddress: undefined,
 });
 
 interface StateToProps {
@@ -451,7 +451,7 @@ class Container extends BaseComponent<Props, State> {
 
     //TODO get apps' services instead (in case a service is associated to more than 1 app)
     private getSelectableServices = () =>
-        Object.keys(this.props.services)
+        Object.keys(this.props.services).sort();
     /*Object.entries(this.props.services)
         .filter(([_, service]) => service.serviceType.toLowerCase() !== 'system')
         .map(([serviceName, _]) => serviceName);*/
@@ -482,16 +482,6 @@ class Container extends BaseComponent<Props, State> {
     private formFields = (formContainer: INewContainer | Partial<IContainer>, isNew: boolean): JSX.Element =>
         isNew ?
             <>
-                <Field<Partial<IHostAddress>> key={'hostAddress'}
-                                              id={'hostAddress'}
-                                              label={'hostAddress'}
-                                              type={'dropdown'}
-                                              dropdown={{
-                                                  defaultValue: "Select host address",
-                                                  values: this.getSelectableHosts(),
-                                                  optionToString: this.hostAddressesDropdown,
-                                                  emptyMessage: 'No hosts available'
-                                              }}/>
                 <Field key={'service'}
                        id={'service'}
                        label={'service'}
@@ -510,6 +500,16 @@ class Container extends BaseComponent<Props, State> {
                        id={'externalPort'}
                        label={'externalPort'}
                        type={'number'}/>
+                <Field<Partial<IHostAddress>> key={'hostAddress'}
+                                              id={'hostAddress'}
+                                              label={'hostAddress'}
+                                              type={'dropdown'}
+                                              dropdown={{
+                                                  defaultValue: "Select host address",
+                                                  values: this.getSelectableHosts(),
+                                                  optionToString: this.hostAddressesDropdown,
+                                                  emptyMessage: 'No hosts available'
+                                              }}/>
             </>
             :
             <>

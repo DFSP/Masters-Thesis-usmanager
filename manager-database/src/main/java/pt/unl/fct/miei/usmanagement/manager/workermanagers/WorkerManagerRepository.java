@@ -56,5 +56,5 @@ public interface WorkerManagerRepository extends JpaRepository<WorkerManagerEnti
 		+ "where w.id = :id")
 	List<EdgeHostEntity> getEdgeHosts(@Param("id") String id);
 
-	Optional<WorkerManagerEntity> getByContainer_Region(Region region);
+	List<WorkerManagerEntity> getByContainer_Region(Region region);
 }

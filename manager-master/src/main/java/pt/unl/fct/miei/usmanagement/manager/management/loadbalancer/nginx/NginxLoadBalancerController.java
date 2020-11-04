@@ -55,15 +55,14 @@ public class NginxLoadBalancerController {
 
 	@PostMapping
 	public List<ContainerEntity> launchLoadBalancer(@RequestBody LaunchNginxLoadBalancer launchNginxLoadBalancer) {
-		String service = launchNginxLoadBalancer.getService();
 		HostAddress hostAddress = launchNginxLoadBalancer.getHostAddress();
 		List<String> regions = launchNginxLoadBalancer.getRegions();
 		if (hostAddress != null) {
-			return List.of(nginxLoadBalancerService.launchLoadBalancer(service, hostAddress));
+			return List.of(nginxLoadBalancerService.launchLoadBalancer(hostAddress));
 		}
 		else if (regions != null) {
 			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
-			return nginxLoadBalancerService.launchLoadBalancers(service, regionsList);
+			return nginxLoadBalancerService.launchLoadBalancers(regionsList);
 		}
 		else {
 			throw new BadRequestException("Expected host address or regions to start load balancer");

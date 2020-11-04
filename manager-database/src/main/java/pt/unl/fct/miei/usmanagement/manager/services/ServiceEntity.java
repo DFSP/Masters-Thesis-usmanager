@@ -95,43 +95,29 @@ public class ServiceEntity {
 	@NotNull
 	private ServiceType serviceType;
 
-	// ##### placement info
+	private double expectedMemoryConsumption;
 
-	@NotNull
-	private Double expectedMemoryConsumption;
+	/*@NotNull
+  	private Double expectedCpuConsumption;
 
-  /*@NotNull
-  private Double expectedCpuConsumption;
+  	@NotNull
+  	private Double expectedStorageConsumption;
 
-  @NotNull
-  private Double expectedStorageConsumption;
+  	@NotNull
+  	private Double expectedBandwidthConsumption;
 
-  @NotNull
-  private Double expectedBandwidthConsumption;
+  	// Stateful services shouldn't migrate until all database replication/migration components are incorporated
+  	@NotNull
+  	private boolean stateful;
 
-  // Stateful services shouldn't migrate until all database replication/migration components are incorporated
-  @NotNull
-  private boolean stateful;
-
-  @Enumerated(EnumType.STRING)
-  private Place place;*/
-
-
-	//QoS requirements of ap-
-	//plication microservices such as service delivery deadline, through-
-	//put
-
-	// #####
-
-
-  /*@Singular
-  @JsonIgnore
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinTable(name = "service_affinity",
-      joinColumns = @JoinColumn(name = "service_id"),
-      inverseJoinColumns = @JoinColumn(name = "affinity_id")
-  )
-  private Set<ServiceAffinityEntity> affinities;*/
+  	/*@Singular
+  	@JsonIgnore
+  	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  	@JoinTable(name = "service_affinity",
+      	joinColumns = @JoinColumn(name = "service_id"),
+      	inverseJoinColumns = @JoinColumn(name = "affinity_id")
+  	)
+  	private Set<ServiceAffinityEntity> affinities;*/
 
 	@Singular
 	@JsonIgnore

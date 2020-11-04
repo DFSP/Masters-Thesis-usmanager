@@ -58,7 +58,7 @@ public class HostsEventsService {
 	public HostEventEntity saveHostEvent(HostAddress hostAddress, String decisionName) {
 		DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
 		HostEventEntity hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
-			.orElse(HostEventEntity.builder().hostAddress(hostAddress).decision(decision).count(0).build());
+			.orElseGet(() -> HostEventEntity.builder().hostAddress(hostAddress).decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
 			hostEvent.setCount(1);

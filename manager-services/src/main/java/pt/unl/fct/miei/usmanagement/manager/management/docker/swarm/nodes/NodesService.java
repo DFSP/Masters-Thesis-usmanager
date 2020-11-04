@@ -108,7 +108,7 @@ public class NodesService {
 	public List<SimpleNode> getReadyNodes(Predicate<Node> filter) {
 		Predicate<Node> readyFilter = n -> n.status().state().equals("ready");
 		Predicate<Node> nodesFilter = filter == null ? readyFilter : filter.and(readyFilter);
-		return getNodes(nodesFilter);
+		return getNodes(nodesFilter).stream().filter(node -> node.getRegion() != null).collect(Collectors.toList());
 	}
 
 	public List<SimpleNode> getReadyManagers() {

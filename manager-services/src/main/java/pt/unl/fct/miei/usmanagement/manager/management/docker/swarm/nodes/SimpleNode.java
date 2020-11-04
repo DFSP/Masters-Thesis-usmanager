@@ -63,7 +63,8 @@ public final class SimpleNode {
 
 	@JsonIgnore
 	public Region getRegion() {
-		return Region.getRegion(labels.get(NodeConstants.Label.REGION));
+		String region = labels.get(NodeConstants.Label.REGION);
+		return region == null ? null : Region.getRegion(region);
 	}
 
 	@JsonIgnore

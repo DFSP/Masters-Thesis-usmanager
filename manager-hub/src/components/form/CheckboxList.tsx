@@ -73,7 +73,7 @@ export class CheckboxList extends React.Component<Props, State> {
     }
 
     public render() {
-        const {id, name} = this.props;
+        const {id, name, disabled} = this.props;
         const {values} = this.state;
         return (
             <div id={id} className='noMargin'>
@@ -82,6 +82,7 @@ export class CheckboxList extends React.Component<Props, State> {
                     ? <p className={`${styles.globalCheckbox}`}>
                         <label>
                             <input type="checkbox"
+                                   disabled={disabled}
                                    onChange={this.handleGlobalCheckbox}
                                    ref={this.globalCheckbox}/>
                             <span/>

@@ -68,23 +68,23 @@ export interface INodeLabel {
 }
 
 interface INewNodeHost {
-    host?: string;
     role?: string;
+    host?: string;
 }
 
 interface INewNodeLocation {
-    coordinates?: Point[];
     role?: string;
+    coordinates?: Point[];
 }
 
 const buildNewNodeLocation = (): INewNodeLocation => ({
-    coordinates: undefined,
     role: undefined,
+    coordinates: undefined,
 });
 
 const buildNewNodeHost = (): INewNodeHost => ({
-    host: undefined,
     role: undefined,
+    host: undefined,
 });
 
 interface StateToProps {
@@ -321,8 +321,7 @@ class Node extends BaseComponent<Props, State> {
     private getNodesMarkers = (): IMarker[] => {
         const nodes: INode[] = Object.values(this.props.nodes);
         const markers = new Map<string, IMarker>();
-        nodes
-            .forEach(node => {
+        nodes.forEach(node => {
                 const id = node.id.toString();
                 const markerId = node.labels['coordinates'];
                 const coordinates = JSON.parse(node.labels['coordinates']) as ICoordinates;
@@ -359,6 +358,14 @@ class Node extends BaseComponent<Props, State> {
                 currentForm === 'On host'
                     ?
                     <>
+                        <Field key={'role'}
+                               id={'role'}
+                               label={'role'}
+                               type="dropdown"
+                               dropdown={{
+                                   defaultValue: "Select role",
+                                   values: ['MANAGER', 'WORKER']
+                               }}/>
                         <Field<string> key={'host'}
                                        id={'host'}
                                        label={'host'}
@@ -368,14 +375,6 @@ class Node extends BaseComponent<Props, State> {
                                            values: this.getSelectableHosts(),
                                            emptyMessage: 'No hosts to select'
                                        }}/>
-                        <Field key={'role'}
-                               id={'role'}
-                               label={'role'}
-                               type="dropdown"
-                               dropdown={{
-                                   defaultValue: "Select role",
-                                   values: ['MANAGER', 'WORKER']
-                               }}/>
                     </>
                     :
                     <>

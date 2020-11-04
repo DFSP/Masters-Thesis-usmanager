@@ -60,8 +60,8 @@ public class ServicesEventsService {
 
 	public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
 		DecisionEntity decision = decisionsService.getServicePossibleDecision(decisionName);
-		ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEventEntity.builder()
-			.containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
+		ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElseGet(() ->
+			ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
 		if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
 			event.setDecision(decision);
 			event.setCount(1);

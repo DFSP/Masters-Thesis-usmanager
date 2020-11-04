@@ -532,6 +532,11 @@ label > span:hover {
     color: grey !important;
 }
 
+label > input:disabled+span:hover {
+    color: white !important;
+    cursor: auto;
+}
+
 .modal-title {
     color: white;
     font-size: 1.6rem;

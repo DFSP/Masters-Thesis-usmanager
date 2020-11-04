@@ -262,14 +262,14 @@ public class DockerContainersService {
 				.replace("${hostname}", hostAddress.getPublicIpAddress())
 				.replace("${externalPort}", externalPort)
 				.replace("${internalPort}", internalPort);
-			log.info("{}", launchCommand);
+			log.info("Launch command: {}", launchCommand);
 
 			Region region = hostAddress.getRegion();
 			if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
 				String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
 				String registrationAddress = registrationServerService
 					.getRegistrationServerAddress(region)
-					.orElse(registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+					.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
 				launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 			}
 

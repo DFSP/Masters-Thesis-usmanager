@@ -218,7 +218,10 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                         resizable/>
                             )}
                             {(type && type.toLowerCase() === "checkbox") && (
-                                <Checkbox id={id} label={checkbox?.label} checked={formContext.values[id]}
+                                <Checkbox id={id}
+                                          label={checkbox?.label}
+                                          checked={formContext.values[id]}
+                                          disabled={disabled || !formContext?.isEditing}
                                           onCheck={this.onCheck(formContext, checkbox?.checkCallback)}/>
                             )}
                             {getError(formContext.errors) && (

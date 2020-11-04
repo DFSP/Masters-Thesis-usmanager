@@ -63,15 +63,6 @@ public class RegistrationServerService {
 		this.port = registrationProperties.getPort();
 	}
 
-	public Optional<String> getRegistrationServerAddress(Region region) {
-		return containersService.getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-			Pair.of(ContainerConstants.Label.REGION, new Gson().toJson(region))))
-			.stream()
-			.map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
-			.findFirst();
-	}
-
 	public ContainerEntity launchRegistrationServer(Region region) {
 		return launchRegistrationServers(List.of(region)).get(0);
 	}
@@ -81,7 +72,7 @@ public class RegistrationServerService {
 
 		Map<String, String> customLabels = Collections.emptyMap();
 
-		List<HostAddress> registrationServerHosts = getRegistrationServerContainers();
+		List<HostAddress> registrationServerHosts = getRegistrationServers();
 		String registrationServers = getRegistrationServerAddresses(registrationServerHosts);
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
 
@@ -102,7 +93,7 @@ public class RegistrationServerService {
 
 		Map<String, String> customLabels = Collections.emptyMap();
 
-		List<HostAddress> registrationServerHosts = getRegistrationServerContainers();
+		List<HostAddress> registrationServerHosts = getRegistrationServers();
 		registrationServerHosts.addAll(availableHosts);
 		String registrationServers = getRegistrationServerAddresses(registrationServerHosts);
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
@@ -121,9 +112,16 @@ public class RegistrationServerService {
 			}).collect(Collectors.toList());
 	}
 
-	private List<HostAddress> getRegistrationServerContainers() {
+	private List<HostAddress> getRegistrationServers() {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER))
+		).stream().map(ContainerEntity::getHostAddress).collect(Collectors.toList());
+	}
+
+	private List<HostAddress> getRegistrationServerHosts(Region region) {
+		return containersService.getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
+			Pair.of(ContainerConstants.Label.REGION, region.name()))
 		).stream().map(ContainerEntity::getHostAddress).collect(Collectors.toList());
 	}
 
@@ -131,6 +129,15 @@ public class RegistrationServerService {
 		return registrationServerHosts.stream()
 			.map(hostAddress -> String.format("http://%s:%s/eureka/", hostAddress.getPublicIpAddress(), port))
 			.collect(Collectors.joining(","));
+	}
+
+	public Optional<String> getRegistrationServerAddress(Region region) {
+		return containersService.getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
+			Pair.of(ContainerConstants.Label.REGION, region.name())))
+			.stream()
+			.map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
+			.findFirst();
 	}
 
 }

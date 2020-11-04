@@ -84,9 +84,8 @@ public class WorkerManagersService {
 			new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
 	}
 
-	public WorkerManagerEntity getWorkerManager(Region region) {
-		return workerManagers.getByContainer_Region(region).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManagerEntity.class, "region", region.getRegion()));
+	public List<WorkerManagerEntity> getWorkerManagers(Region region) {
+		return workerManagers.getByContainer_Region(region);
 	}
 
 	public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
@@ -112,13 +111,10 @@ public class WorkerManagersService {
 			.distinct()
 			.map(hostAddress -> {
 				// avoid launching another worker manager on the same region
-				WorkerManagerEntity workerManager;
-				try {
-					workerManager = getWorkerManager(hostAddress.getRegion());
-				} catch (EntityNotFoundException ignored) {
-					workerManager = launchWorkerManager(hostAddress);
-				}
-				return workerManager;
+				List<WorkerManagerEntity> workerManagers = getWorkerManagers(hostAddress.getRegion());
+				return !workerManagers.isEmpty() ?
+					workerManagers.get(0)
+					: launchWorkerManager(hostAddress);
 			}).collect(Collectors.toList());
 	}
 

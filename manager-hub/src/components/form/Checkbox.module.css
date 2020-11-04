@@ -30,6 +30,10 @@
 
 }
 
+.formCheckbox:disabled {
+    background-color: red !important;
+}
+
 [type="checkbox"]+span:not(.lever).formCheckbox {
     padding-left: 44px;
 }

@@ -32,7 +32,6 @@ import java.util.List;
 @Data
 final class LaunchNginxLoadBalancer {
 
-	private String service;
 	private HostAddress hostAddress;
 	private List<String> regions;
 

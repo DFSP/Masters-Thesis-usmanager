@@ -175,8 +175,8 @@ class ServiceCard extends BaseComponent<Props, State> {
                       label={'Database'}
                       value={service.defaultDb}/>}
             <CardItem key={'memory'}
-                      label={'Memory'}
-                      value={`${service.expectedMemoryConsumption} bytes`}/>
+                      label={'Memory usage'}
+                      value={service.expectedMemoryConsumption > 0 ? `${service.expectedMemoryConsumption} bytes` : 'Unknown'}/>
         </CardService>
     }
 

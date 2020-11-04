@@ -65,11 +65,11 @@ class Containers extends BaseComponent<Props, {}> {
             <MainLayout>
                 <AddButton tooltip={{text: 'Start container', position: 'bottom'}}
                            pathname={'/containers/start_container?new'}
-                           offset={0}/>
+                           offset={1}/>
                 <ActionButton icon={'sync'}
                               tooltip={{text: 'Sync containers', position: 'left'}}
                               clickCallback={this.reloadContainers}
-                              offset={1}/>
+                              offset={0}/>
                 <div className={`${styles.container}`}>
                     <CardList<IContainer>
                         isLoading={this.props.isLoading}
