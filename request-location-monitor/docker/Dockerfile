@@ -9,8 +9,7 @@ go env -w GOPRIVATE=github.com/usmanager/*
 # Build request-location-monitor binary
 COPY . /go/src/github.com/usmanager/manager/request-location-monitor
 WORKDIR /go/src/github.com/usmanager/manager/request-location-monitor
-RUN go mod vendor && \
-go build -o request-location-monitor && \
+RUN go build -o request-location-monitor && \
 mkdir /app && \
 mv /go/src/github.com/usmanager/manager/request-location-monitor/request-location-monitor /app/request-location-monitor
 

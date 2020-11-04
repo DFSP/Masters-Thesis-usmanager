@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.NetworkConfig;
 import com.spotify.docker.client.messages.swarm.Node;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,8 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 public class DockerSwarmService {
+
+	public static final String NETWORK_OVERLAY = "usmanager-network-overlay";
 
 	private final DockerCoreService dockerCoreService;
 	private final NodesService nodesService;
@@ -119,6 +122,23 @@ public class DockerSwarmService {
 		setNodeLabels(nodeId, listenAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(),
 			Collections.singletonMap(NodeConstants.Label.MASTER_MANAGER, String.valueOf(true)));
 		return nodesService.getNode(nodeId);
+	}
+
+	public void createNetworkOverlay(HostAddress hostAddress) {
+		// docker network create -d overlay --attachable my-attachable-overlay
+		NetworkConfig networkConfig = NetworkConfig.builder()
+			.driver("overlay")
+			.attachable(true)
+			.name(NETWORK_OVERLAY)
+			.checkDuplicate(true)
+			.build();
+		try (DockerClient client = dockerCoreService.getDockerClient(hostAddress)) {
+			client.createNetwork(networkConfig);
+		}
+		catch (DockerException | InterruptedException e) {
+			e.printStackTrace();
+			throw new ManagerException(e.getMessage());
+		}
 	}
 
 	public SimpleNode rejoinSwarm(String nodeId) {

@@ -9,8 +9,7 @@ go env -w GOPRIVATE=github.com/usmanager/*
 # Build user binary
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/user
 WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/user
-RUN go mod vendor && \
-go build -o user && \
+RUN go build -o user && \
 mkdir /app && \
 mv /go/src/github.com/usmanager/manager/microservices/sock-shop/user/user /app/user
 

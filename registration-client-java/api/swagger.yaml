@@ -1,0 +1,85 @@
+---
+swagger: "2.0"
+info:
+  description: "Interage com o registration server (eureka) para registar esta instâ\
+    ncia ou obter servidores com o qual pode comunicar"
+  version: "1.0.0"
+  title: "Registration-client-api"
+host: "localhost:1906"
+basePath: "/api"
+schemes:
+- "http"
+paths:
+  /register:
+    post:
+      tags:
+      - "Endpoints"
+      summary: "Regista o endpoint no servidor eureka"
+      operationId: "register"
+      parameters: []
+      responses:
+        "200":
+          description: "Registo com sucesso"
+  /services/{service}/endpoints:
+    get:
+      tags:
+      - "Endpoints"
+      summary: "Obtém todos os endpoints registados em nome do serviço {service}"
+      operationId: "GetServiceEndpoints"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "service"
+        in: "path"
+        description: "Service name"
+        required: true
+        type: "string"
+        x-exportParamName: "Service"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Endpoint"
+        "404":
+          description: "App not found"
+        "502":
+          description: "Não foi possível obter as instâncias ao eureka"
+  /services/{service}/endpoint:
+    get:
+      tags:
+      - "Endpoints"
+      summary: "Obtém o melhor endpoint para o serviço {service}"
+      operationId: "GetServiceEndpoint"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "service"
+        in: "path"
+        description: "Service name"
+        required: true
+        type: "string"
+        x-exportParamName: "Service"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Endpoint"
+        "404":
+          description: "Serviço não encontrado"
+        "502":
+          description: "Não foi possível obter as instâncias ao eureka"
+definitions:
+  Endpoint:
+    type: "object"
+    properties:
+      instanceId:
+        type: "string"
+        example: "sha1(service_hostname_port)"
+      endpoint:
+        type: "string"
+        example: "http://hostname:port"
+    example:
+      endpoint: "http://hostname:port"
+      instanceId: "30b5f1e3d8cb54b548dae75d3a97e6a7f0657257"

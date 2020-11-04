@@ -184,9 +184,10 @@ func main() {
 		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
 	}()
 
+	apiClient := registration.NewAPIClient(registration.NewConfiguration())
+
 	for index := 0; index < 5; index++ {
-		apiClient := swagger.NewAPIClient(swagger.NewConfiguration())
-		_, _, err = apiClient.EndpointsApi.Register(ctx)
+		_, err := apiClient.EndpointsApi.Register(ctx)
 		if err != nil {
 			logger.Log("Error", "Fail to register app", "err", err)
 		} else {

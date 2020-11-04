@@ -59,10 +59,8 @@ func Ticker(eurekaServer eureka.EurekaConnection, instance eureka.Instance) chan
 				} else {
 					retry++
 				}
-			case stop := <-stopChan:
-				if stop {
-					return
-				}
+			case <-stopChan:
+				return
 			}
 		}
 
@@ -70,7 +68,6 @@ func Ticker(eurekaServer eureka.EurekaConnection, instance eureka.Instance) chan
 
 	return stopChan
 }
-
 
 func heartbeat(eurekaServer eureka.EurekaConnection, instance eureka.Instance, t time.Time, retry int) bool {
 	var success bool

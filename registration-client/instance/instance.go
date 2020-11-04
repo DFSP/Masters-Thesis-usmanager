@@ -42,16 +42,15 @@ var Latitude float64
 var Longitude float64
 
 var eurekaAddress string
+var registered bool
 var EurekaServer eureka.EurekaConnection
 var RequestLocationMonitorUrl string
 var Instance eureka.Instance
 
-var StopHeartbeatChan chan bool
-
 func init() {
 	flag.StringVar(&Service, "service", "", "Service name")
 	flag.StringVar(&Hostname, "hostname", "127.0.0.1", "Service Server")
-	flag.IntVar(&Port, "port", 1906, "Service Port")
+	flag.IntVar(&Port, "register-port", 1906, "Service Port")
 	flag.Float64Var(&Latitude, "latitude", 0, "Service Latitude")
 	flag.Float64Var(&Longitude, "longitude", 0, "Service Longitude")
 	flag.StringVar(&eurekaAddress, "server", "127.0.0.1:8761", "Registration server")
@@ -99,14 +98,20 @@ func Register() {
 	Instance.SetMetadataString("longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
 
 	err := EurekaServer.ReregisterInstance(&Instance)
-	if err == nil {
+	if err != nil {
+		reglog.Logger.Error(err)
+	} else {
+		registered = true
 		reglog.Logger.Infof("Instance registered as %s", Instance.InstanceId)
-		StopHeartbeatChan = heartbeat.Ticker(EurekaServer, Instance)
+		heartbeat.Ticker(EurekaServer, Instance)
 	}
-
 }
 
 func Deregister() {
+	if !registered {
+		return
+	}
+ 	reglog.Logger.Infof("Deregistering instance %+v", &Instance)
 	err := EurekaServer.UpdateInstanceStatus(&Instance, eureka.DOWN)
 	if err != nil {
 		reglog.Logger.Errorf("Update instance status error: %s", err.Error())
@@ -116,4 +121,5 @@ func Deregister() {
 	if err != nil {
 		reglog.Logger.Errorf("Deregister instance error: %s", err.Error())
 	}
+
 }

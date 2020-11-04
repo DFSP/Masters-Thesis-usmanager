@@ -31,6 +31,7 @@ import (
 	"github.com/usmanager/manager/registration-client/api"
 	"github.com/usmanager/manager/registration-client/instance"
 	"github.com/usmanager/manager/registration-client/location"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -75,21 +76,24 @@ func main() {
 		reglog.Logger.Fatal(http.Serve(listen, trimmingMiddleware(router)))
 	}()
 
-	sendLocationTimerStopChan := location.SendLocationTimer(time.Duration(interval) * time.Millisecond)
+	location.SendLocationTimer(time.Duration(interval) * time.Millisecond)
 
-	interrupt := make(chan error)
+	signalChan := make(chan os.Signal, 1)
+
+	signal.Notify(
+		signalChan,
+		syscall.SIGHUP,  // kill -SIGHUP XXXX
+		syscall.SIGINT,  // kill -SIGINT XXXX or Ctrl+c
+		syscall.SIGQUIT, // kill -SIGQUIT XXXX
+	)
+	<-signalChan
+	log.Print("os.Interrupt - Shutting down...\n")
+
+	// terminate after second signal before callback is done
 	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		interrupt <- fmt.Errorf("%s", <-c)
+		<-signalChan
+		log.Fatal("os.Kill - Terminating...\n")
 	}()
-	<-interrupt
-
-	instance.StopHeartbeatChan <- true
-	close(instance.StopHeartbeatChan)
-
-	sendLocationTimerStopChan <- true
-	close(sendLocationTimerStopChan)
 
 	instance.Deregister()
 }

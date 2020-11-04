@@ -9,8 +9,7 @@ go env -w GOPRIVATE=github.com/usmanager/*
 # Build payment binary
 COPY . /go/src/github.com/usmanager/manager/microservices/sock-shop/payment
 WORKDIR /go/src/github.com/usmanager/manager/microservices/sock-shop/payment/cmd/paymentsvc
-RUN go mod vendor && \
-go build -o payment && \
+RUN go build -o payment && \
 mkdir /app && \
 mv /go/src/github.com/usmanager/manager/microservices/sock-shop/payment/cmd/paymentsvc/payment /app/payment
 

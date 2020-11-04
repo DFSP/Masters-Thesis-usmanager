@@ -84,10 +84,8 @@ func SendLocationTimer(sendInterval time.Duration) chan bool {
 			select {
 			case <-ticker.C:
 				sendAllData()
-			case stop := <-stopChan:
-				if stop {
-					return
-				}
+			case <-stopChan:
+				return
 			}
 		}
 

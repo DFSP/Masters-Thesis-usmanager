@@ -127,8 +127,8 @@ func GetServiceEndpoints(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterServiceEndpoint(w http.ResponseWriter, r *http.Request) {
+	reglog.Logger.Infof("Registering server by request")
 	go instance.Register()
-	reglog.Logger.Infof("Service was registered by request")
 }
 
 func RegisterLocationMonitoring(w http.ResponseWriter, r *http.Request) {

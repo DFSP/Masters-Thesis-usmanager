@@ -23,7 +23,7 @@ Usage of ./registration-client:
      
     Service Hostname (default "localhost")
    
-  - port (int)
+  - register-port (int)
   
     Service Port (default 1906)
 

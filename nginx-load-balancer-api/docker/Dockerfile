@@ -9,8 +9,7 @@ go env -w GOPRIVATE=github.com/usmanager/*
 # Build nginx-load-balancer-api binary
 COPY . /go/src/github.com/usmanager/manager/nginx-load-balancer-api
 WORKDIR /go/src/github.com/usmanager/manager/nginx-load-balancer-api
-RUN go mod vendor && \
-go build -o nginx-load-balancer-api && \
+RUN go build -o nginx-load-balancer-api && \
 mkdir /app && \
 mv /go/src/github.com/usmanager/manager/nginx-load-balancer-api/nginx-load-balancer-api /app/nginx-load-balancer-api
 

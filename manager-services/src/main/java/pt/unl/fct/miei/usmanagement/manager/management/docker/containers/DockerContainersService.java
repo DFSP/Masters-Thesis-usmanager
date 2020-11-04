@@ -28,13 +28,7 @@ import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.Container;
-import com.spotify.docker.client.messages.ContainerConfig;
-import com.spotify.docker.client.messages.ContainerCreation;
-import com.spotify.docker.client.messages.ContainerInfo;
-import com.spotify.docker.client.messages.ContainerStats;
-import com.spotify.docker.client.messages.HostConfig;
-import com.spotify.docker.client.messages.PortBinding;
+import com.spotify.docker.client.messages.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -50,6 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerPrope
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
@@ -315,11 +310,13 @@ public class DockerContainersService {
 			HostConfig hostConfig = HostConfig.builder()
 				.autoRemove(true)
 				.portBindings(Map.of(internalPort, List.of(PortBinding.of("", externalPort))))
+				.networkMode("overlay")
 				.build();
 			ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
 				.image(dockerRepository)
 				.exposedPorts(internalPort)
 				.hostConfig(hostConfig)
+				.hostname(serviceName)
 				.env(containerEnvironment)
 				.labels(containerLabels);
 			ContainerConfig containerConfig = launchCommand.isEmpty()
@@ -330,8 +327,9 @@ public class DockerContainersService {
 				dockerClient.pull(dockerRepository);
 				ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 				String containerId = containerCreation.id();
+				dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
 				dockerClient.startContainer(containerId);
-				if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
+				if (ServiceType.getServiceType(serviceType) == ServiceType.FRONTEND) {
 					nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
 				}
 				return getContainer(containerId);

@@ -9,8 +9,7 @@ go env -w GOPRIVATE=github.com/usmanager/*
 # Build registration-client binary
 COPY . /go/src/github.com/usmanager/manager/registration-client
 WORKDIR /go/src/github.com/usmanager/manager/registration-client
-RUN go mod vendor && \
-go build -o registration-client && \
+RUN go build -o registration-client && \
 mkdir /app && \
 mv /go/src/github.com/usmanager/manager/registration-client/registration-client /app/registration-client
 
