@@ -577,7 +577,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 active: this.props.location.state?.selected === 'genericSimulatedMetrics'
             },
         ];
-        if (this.getCloudHost().state === awsInstanceStates.RUNNING) {
+        /*if (this.getCloudHost().state === awsInstanceStates.RUNNING) {*/
             tabs.push({
                 title: 'Execute command',
                 id: 'cloudHostSsh',
@@ -590,7 +590,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 content: () => this.sftp(),
                 active: this.props.location.state?.selected === 'sftp'
             });
-        }
+        /*}*/
         return tabs;
     }
 

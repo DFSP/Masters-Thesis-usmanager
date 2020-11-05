@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React, {createRef} from "react";
 import {ISshFile} from "../../ssh/SshFile";
 import {ICloudHost} from "./CloudHost";
 import BaseComponent from "../../../../components/BaseComponent";
@@ -32,7 +32,7 @@ import {IReply} from "../../../../utils/api";
 import {ReduxState} from "../../../../reducers";
 import {addCommand, loadScripts} from "../../../../actions";
 import {connect} from "react-redux";
-import {IFileTransfer} from "../../ssh/Ssh";
+import SshPanel, {IFileTransfer} from "../../ssh/SshPanel";
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
     hostAddress: undefined,
@@ -56,6 +56,8 @@ type Props = SshFileProps & StateToProps & DispatchToProps;
 
 class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
 
+    private sshPanel = createRef<any>();
+
     public componentDidMount(): void {
         this.props.loadScripts();
     };
@@ -63,27 +65,30 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
     public render() {
         const command = buildNewSshCommand();
         return (
-            /*@ts-ignore*/
-            <Form id={'sshCommand'}
-                  fields={this.getFields()}
-                  values={command}
-                  isNew={true}
-                  post={{
-                      textButton: 'Upload',
-                      url: `hosts/cloud/${this.props.cloudHost?.instanceId}/sftp`,
-                      successCallback: this.onPostSuccess,
-                      failureCallback: this.onPostFailure
-                  }}>
-                <Field key='filename'
-                       id='filename'
-                       label='filename'
-                       type='dropdown'
-                       dropdown={{
-                           defaultValue: 'Select filename',
-                           values: this.props.scripts,
-                           emptyMessage: 'No scripts available'
-                       }}/>
-            </Form>
+            <>
+                {/*@ts-ignore*/}
+                <Form id={'sshCommand'}
+                      fields={this.getFields()}
+                      values={command}
+                      isNew={true}
+                      post={{
+                          textButton: 'Upload',
+                          url: `hosts/cloud/${this.props.cloudHost?.instanceId}/sftp`,
+                          successCallback: this.onPostSuccess,
+                          failureCallback: this.onPostFailure
+                      }}>
+                    <Field key='filename'
+                           id='filename'
+                           label='filename'
+                           type='dropdown'
+                           dropdown={{
+                               defaultValue: 'Select filename',
+                               values: this.props.scripts,
+                               emptyMessage: 'No scripts available'
+                           }}/>
+                </Form>
+                <SshPanel ref={this.sshPanel}/>
+            </>
         );
     }
 
@@ -91,6 +96,7 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
         super.toast(`<span class="green-text">File uploaded</span>`);
         const transfer = {...args, timestamp: Date.now()};
         this.props.addCommand(transfer);
+        this.sshPanel.current?.scrollToTop();
     };
 
     private onPostFailure = (reason: string): void =>

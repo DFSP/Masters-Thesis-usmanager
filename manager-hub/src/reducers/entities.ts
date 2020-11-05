@@ -392,7 +392,7 @@ import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager"
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 import {ISshCommand} from "../routes/management/ssh/SshCommand";
-import {ICommand, IFileTransfer} from "../routes/management/ssh/Ssh";
+import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
 
 export type EntitiesState = {
     apps: {

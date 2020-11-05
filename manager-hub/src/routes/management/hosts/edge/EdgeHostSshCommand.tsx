@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React, {createRef} from "react";
 import {connect} from "react-redux";
 import {INewSshCommand, ISshCommand} from "../../ssh/SshCommand";
-import {ICommand} from "../../ssh/Ssh";
+import SshPanel, {ICommand} from "../../ssh/SshPanel";
 import {addCommand} from "../../../../actions";
 import BaseComponent from "../../../../components/BaseComponent";
 import Field from "../../../../components/form/Field";
@@ -51,28 +51,33 @@ type Props = EdgeHostSshCommandProps & DispatchToProps;
 
 class EdgeHostSshCommand extends BaseComponent<Props, {}> {
 
+    private sshPanel = createRef<any>();
+
     public render() {
         const command = buildNewSshCommand();
         return (
-            /*@ts-ignore*/
-            <Form id={'sshCommand'}
-                  fields={this.getFields()}
-                  values={command}
-                  isNew
-                  post={{
-                      textButton: 'Execute',
-                      url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/ssh`,
-                      successCallback: this.onPostSuccess,
-                      failureCallback: this.onPostFailure
-                  }}>
-                <Field key='background'
-                       id='background'
-                       type='checkbox'
-                       checkbox={{label: 'execute in the background'}}/>
-                <Field key='command'
-                       id='command'
-                       label='command'/>
-            </Form>
+            <>
+                {/*@ts-ignore*/}
+                <Form id={'sshCommand'}
+                      fields={this.getFields()}
+                      values={command}
+                      isNew
+                      post={{
+                          textButton: 'Execute',
+                          url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/ssh`,
+                          successCallback: this.onPostSuccess,
+                          failureCallback: this.onPostFailure
+                      }}>
+                    <Field key='background'
+                           id='background'
+                           type='checkbox'
+                           checkbox={{label: 'execute in the background'}}/>
+                    <Field key='command'
+                           id='command'
+                           label='command'/>
+                </Form>
+                <SshPanel ref={this.sshPanel}/>
+            </>
         );
     }
 
@@ -80,6 +85,7 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
         const command = reply.data;
         const timestampedCommand = {...command, timestamp: Date.now()};
         this.props.addCommand(timestampedCommand);
+        this.sshPanel.current?.scrollToTop();
     };
 
     private onPostFailure = (reason: string): void =>

@@ -41,7 +41,7 @@ public class EdgeHostsController {
 
 	@GetMapping("/{hostname}")
 	public EdgeHostEntity getEdgeHost(@PathVariable String hostname) {
-		return edgeHostsService.getEdgeHostByDnsOrIp(hostname);
+		return edgeHostsService.getEdgeHostByHostname(hostname);
 	}
 
 	@PostMapping

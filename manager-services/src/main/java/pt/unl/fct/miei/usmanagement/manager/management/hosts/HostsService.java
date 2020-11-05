@@ -319,19 +319,23 @@ public class HostsService {
 		try {
 			return cloudHostsService.getCloudHostByAddress(hostAddress).getAddress();
 		}
-		catch (EntityNotFoundException ignored) {
+		catch (EntityNotFoundException ignored1) {
 			try {
 				return edgeHostsService.getEdgeHostByAddress(hostAddress).getAddress();
 			}
-			catch (EntityNotFoundException e) {
-				throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
+			catch (EntityNotFoundException ignored2) {
+				try {
+					return edgeHostsService.getEdgeHostByHostname(hostAddress.getHostname()).getAddress();
+				} catch (EntityNotFoundException e) {
+					throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
+				}
 			}
 		}
 	}
 
 	public HostAddress getHostAddress(String hostname) {
 		try {
-			return edgeHostsService.getEdgeHostByDnsOrIp(hostname).getAddress();
+			return edgeHostsService.getEdgeHostByHostname(hostname).getAddress();
 		}
 		catch (EntityNotFoundException ignored) {
 			try {
@@ -354,7 +358,7 @@ public class HostsService {
 		}
 		catch (EntityNotFoundException ignored) {
 			try {
-				EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(host);
+				EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(host);
 				hostAddress = edgeHost.getAddress();
 			}
 			catch (EntityNotFoundException e) {

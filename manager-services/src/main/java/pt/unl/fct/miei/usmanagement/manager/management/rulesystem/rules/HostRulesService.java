@@ -232,7 +232,7 @@ public class HostRulesService {
 		log.info("Adding edge hosts {} to rule {}", hostnames, ruleName);
 		HostRuleEntity rule = getRule(ruleName);
 		hostnames.forEach(hostname -> {
-			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByDnsOrIp(hostname);
+			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
 			edgeHost.addRule(rule);
 		});
 		rules.save(rule);
@@ -246,7 +246,7 @@ public class HostRulesService {
 	public void removeEdgeHosts(String ruleName, List<String> hostnames) {
 		log.info("Removing edge hosts {} from rule {}", hostnames, ruleName);
 		HostRuleEntity rule = getRule(ruleName);
-		hostnames.forEach(hostname -> edgeHostsService.getEdgeHostByDnsOrIp(hostname).removeRule(rule));
+		hostnames.forEach(hostname -> edgeHostsService.getEdgeHostByHostname(hostname).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateHostRules();
 	}

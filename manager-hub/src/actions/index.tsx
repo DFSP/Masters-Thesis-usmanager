@@ -45,8 +45,7 @@ import {IComponent} from "../containers/Root.dev";
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
-import {ISshCommand} from "../routes/management/ssh/SshCommand";
-import {ICommand, IFileTransfer} from "../routes/management/ssh/Ssh";
+import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -2032,6 +2031,7 @@ export function addRegistrationServers(registrationServers: IRegistrationServer[
         data: {registrationServers}
     }
 }
+
 export const DELETE_REGISTRATION_SERVER = 'DELETE_REGISTRATION_SERVER';
 
 export function deleteRegistrationServer(registrationServer: IRegistrationServer): EntitiesAction {
@@ -2149,7 +2149,7 @@ export const ADD_COMMANDS = 'ADD_COMMANDS';
 export const addCommand = (command: ICommand | IFileTransfer) => (
     {
         type: ADD_COMMANDS,
-        data: { commands: [command] }
+        data: {commands: [command]}
     }
 );
 

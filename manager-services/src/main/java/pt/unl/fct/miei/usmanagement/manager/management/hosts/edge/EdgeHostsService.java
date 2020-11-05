@@ -89,7 +89,7 @@ public class EdgeHostsService {
 		return edgeHosts.findAll();
 	}
 
-	public EdgeHostEntity getEdgeHostByDnsOrIp(String host) {
+	public EdgeHostEntity getEdgeHostByHostname(String host) {
 		return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
 			new EntityNotFoundException(EdgeHostEntity.class, "host", host));
 	}
@@ -164,7 +164,7 @@ public class EdgeHostsService {
 	}
 
 	public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
-		EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
+		EdgeHostEntity edgeHost = getEdgeHostByHostname(hostname);
 		log.info("Updating edgeHost {} with {}",
 			ToStringBuilder.reflectionToString(edgeHost),
 			ToStringBuilder.reflectionToString(newEdgeHost));
@@ -173,7 +173,7 @@ public class EdgeHostsService {
 	}
 
 	public void deleteEdgeHost(String hostname) {
-		EdgeHostEntity edgeHost = getEdgeHostByDnsOrIp(hostname);
+		EdgeHostEntity edgeHost = getEdgeHostByHostname(hostname);
 		edgeHosts.delete(edgeHost);
 		deleteEdgeHostConfig(edgeHost);
 	}
@@ -246,14 +246,14 @@ public class EdgeHostsService {
 
 	public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
 		log.info("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
-		EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
+		EdgeHostEntity edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
 			.managedByWorker(workerManagerEntity)
 			.build();
 		edgeHosts.save(edgeHostEntity);
 	}
 
 	public void unassignWorkerManager(String edgeHost) {
-		EdgeHostEntity edgeHostEntity = getEdgeHostByDnsOrIp(edgeHost).toBuilder()
+		EdgeHostEntity edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
 			.managedByWorker(null)
 			.build();
 		edgeHosts.save(edgeHostEntity);
