@@ -31,12 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -50,7 +44,7 @@ public class SshController {
 	}
 
 	@PostMapping("/execute")
-	public SshCommandResult execute(@RequestBody ExecuteSshRequest request) {
+	public SshCommandResult execute(@RequestBody ExecuteHostSshRequest request) {
 		String command = request.getCommand();
 		HostAddress hostAddress = request.getHostAddress();
 		if (request.isBackground()) {
@@ -63,7 +57,7 @@ public class SshController {
 	}
 
 	@PostMapping("/upload")
-	public void upload(@RequestBody ExecuteSftpRequest request) {
+	public void upload(@RequestBody ExecuteHostSftpRequest request) {
 		sshService.uploadFile(request.getHostAddress(), request.getFilename());
 	}
 

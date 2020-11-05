@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ServiceMetricsService {
@@ -46,27 +47,30 @@ public class ServiceMetricsService {
 	}
 
 	public Map<String, Double> getContainerStats(HostAddress hostAddress, String containerId) {
-		ContainerStats containerStats = containersService.getContainerStats(containerId, hostAddress);
-		CpuStats cpuStats = containerStats.cpuStats();
-		CpuStats preCpuStats = containerStats.precpuStats();
-		double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();
-		double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats);
-		MemoryStats memoryStats = containerStats.memoryStats();
-		double ram = memoryStats.usage().doubleValue();
-		double ramPercent = getContainerRamPercent(memoryStats);
-		double rxBytes = 0;
-		double txBytes = 0;
-		for (NetworkStats stats : containerStats.networks().values()) {
-			rxBytes += stats.rxBytes().doubleValue();
-			txBytes += stats.txBytes().doubleValue();
-		}
-		return new HashMap<>(Map.of(
-			"cpu", cpu,
-			"cpu-%", cpuPercent,
-			"ram", ram,
-			"ram-%", ramPercent,
-			"rx-bytes", rxBytes,
-			"tx-bytes", txBytes));
+		Map<String, Double> stats = new HashMap<>();
+		Optional<ContainerStats> containerStats = containersService.getContainerStats(containerId, hostAddress);
+		containerStats.ifPresent(s -> {
+			CpuStats cpuStats = s.cpuStats();
+			CpuStats preCpuStats = s.precpuStats();
+			double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();
+			stats.put("cpu", cpu);
+			double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats);
+			stats.put("cpu-%", cpuPercent);
+			MemoryStats memoryStats = s.memoryStats();
+			double ram = memoryStats.usage().doubleValue();
+			stats.put("ram", ram);
+			double ramPercent = getContainerRamPercent(memoryStats);
+			stats.put("ram-%", ramPercent);
+			double rxBytes = 0;
+			double txBytes = 0;
+			for (NetworkStats networkStats : s.networks().values()) {
+				rxBytes += networkStats.rxBytes().doubleValue();
+				txBytes += networkStats.txBytes().doubleValue();
+			}
+			stats.put("rx-bytes", rxBytes);
+			stats.put("tx-bytes", txBytes);
+		});
+		return stats;
 	}
 
 	private double getContainerCpuPercent(CpuStats preCpuStats, CpuStats cpuStats) {

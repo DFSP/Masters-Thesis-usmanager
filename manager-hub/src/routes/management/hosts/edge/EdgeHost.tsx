@@ -58,6 +58,8 @@ import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import {IRegion} from "../../regions/Region";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
 import {ICoordinates} from "../../../../components/map/LocationMap";
+import EdgeHostSshCommand from "./EdgeHostSshCommand";
+import EdgeHostSshFileTransfer from "./EdgeHostSshFileTransfer";
 
 export interface IEdgeHost extends IDatabaseData {
     username: string;
@@ -108,7 +110,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IEdgeHost,
-    selected: 'edgeHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics'
+    selected: 'edgeHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp',
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -411,38 +413,61 @@ class EdgeHost extends BaseComponent<Props, State> {
     private genericSimulatedMetrics = (): JSX.Element =>
         <GenericSimulatedHostMetricList/>;
 
-    private tabs = (): Tab[] => [
-        {
-            title: 'Edge host',
-            id: 'edgeHost',
-            content: () => this.edgeHost(),
-            active: this.props.location.state?.selected === 'edgeHost'
-        },
-        {
-            title: 'Rules',
-            id: 'rules',
-            content: () => this.rules(),
-            active: this.props.location.state?.selected === 'rules'
-        },
-        {
-            title: 'Generic rules',
-            id: 'genericRules',
-            content: () => this.genericRules(),
-            active: this.props.location.state?.selected === 'genericRules'
-        },
-        {
-            title: 'Simulated metrics',
-            id: 'simulatedMetrics',
-            content: () => this.simulatedMetrics(),
-            active: this.props.location.state?.selected === 'simulatedMetrics'
-        },
-        {
-            title: 'Generic simulated metrics',
-            id: 'genericSimulatedMetrics',
-            content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
-        },
-    ];
+    private ssh = (): JSX.Element =>
+        <EdgeHostSshCommand edgeHost={this.getEdgeHost()}/>;
+
+    private sftp = (): JSX.Element =>
+        <EdgeHostSshFileTransfer edgeHost={this.getEdgeHost()}/>;
+
+    private tabs = (): Tab[] => {
+        const tabs = [
+            {
+                title: 'Edge host',
+                id: 'edgeHost',
+                content: () => this.edgeHost(),
+                active: this.props.location.state?.selected === 'edgeHost'
+            },
+            {
+                title: 'Rules',
+                id: 'rules',
+                content: () => this.rules(),
+                active: this.props.location.state?.selected === 'rules'
+            },
+            {
+                title: 'Generic rules',
+                id: 'genericRules',
+                content: () => this.genericRules(),
+                active: this.props.location.state?.selected === 'genericRules'
+            },
+            {
+                title: 'Simulated metrics',
+                id: 'simulatedMetrics',
+                content: () => this.simulatedMetrics(),
+                active: this.props.location.state?.selected === 'simulatedMetrics'
+            },
+            {
+                title: 'Generic simulated metrics',
+                id: 'genericSimulatedMetrics',
+                content: () => this.genericSimulatedMetrics(),
+                active: this.props.location.state?.selected === 'genericSimulatedMetrics'
+            },
+        ];
+        if (!this.isNew()) {
+            tabs.push({
+                title: 'Execute command',
+                id: 'cloudHostSsh',
+                content: () => this.ssh(),
+                active: this.props.location.state?.selected === 'ssh'
+            });
+            tabs.push({
+                title: 'Upload file',
+                id: 'cloudHostSftp',
+                content: () => this.sftp(),
+                active: this.props.location.state?.selected === 'sftp'
+            });
+        }
+        return tabs;
+    }
 
 }
 

@@ -53,7 +53,6 @@ export class Checkbox extends React.Component<Props, State> {
     public render() {
         const {id, label, disabled} = this.props;
         const {checked} = this.state;
-        console.log(disabled)
         return (
             <div className={styles.checkbox}>
                 <label >

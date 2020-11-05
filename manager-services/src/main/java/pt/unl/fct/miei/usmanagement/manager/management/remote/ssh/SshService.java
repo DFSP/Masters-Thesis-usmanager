@@ -32,12 +32,14 @@ import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.xfer.FileSystemFile;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
@@ -48,12 +50,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,18 +67,21 @@ public class SshService {
 
 	private final EdgeHostsService edgeHostsService;
 	private final CloudHostsService cloudHostsService;
+	private final HostsService hostsService;
 
 	private final int connectionTimeout;
 	private final String awsKeyFilePath;
 	private final Map<String, String> scriptPaths;
 
 	public SshService(EdgeHostsService edgeHostsService, CloudHostsService cloudHostsService,
+					  @Lazy HostsService hostsService,
 					  SshProperties sshProperties, AwsProperties awsProperties, DockerProperties dockerProperties,
 					  PrometheusProperties prometheusProperties) {
 		this.edgeHostsService = edgeHostsService;
 		this.cloudHostsService = cloudHostsService;
 		this.connectionTimeout = sshProperties.getConnectionTimeout();
 		this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
+		this.hostsService = hostsService;
 		PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
 		this.scriptPaths = Map.of(
 			dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
@@ -90,6 +93,9 @@ public class SshService {
 	}
 
 	private SSHClient initClient(HostAddress hostAddress) throws IOException {
+		if (!hostAddress.isComplete()) {
+			hostAddress = hostsService.completeHostAddress(hostAddress);
+		}
 		String publicKeyFile;
 		try {
 			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);

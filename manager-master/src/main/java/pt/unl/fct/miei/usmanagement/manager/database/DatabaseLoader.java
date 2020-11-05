@@ -135,22 +135,6 @@ public class DatabaseLoader {
 
 			// services
 
-			ServiceEntity crashTesting;
-			try {
-				crashTesting = servicesService.getService("crash-testing");
-			}
-			catch (EntityNotFoundException ignored) {
-				crashTesting = ServiceEntity.builder()
-					.serviceName("crash-testing")
-					.dockerRepository(dockerHubUsername + "/crash-testing")
-					.defaultExternalPort(2500)
-					.defaultInternalPort(80)
-					.minimumReplicas(1)
-					.serviceType(ServiceType.SYSTEM)
-					.build();
-				crashTesting = servicesService.addService(crashTesting);
-			}
-
 			ServiceEntity frontend;
 			try {
 				frontend = servicesService.getService("sock-shop-front-end");
@@ -386,6 +370,22 @@ public class DatabaseLoader {
 					.build();
 				rabbitmq = servicesService.addService(rabbitmq);
 			}
+
+			ServiceEntity crashTesting;
+			try {
+				crashTesting = servicesService.getService("crash-testing");
+			}
+			catch (EntityNotFoundException ignored) {
+				crashTesting = ServiceEntity.builder()
+					.serviceName("crash-testing")
+					.dockerRepository(dockerHubUsername + "/crash-testing")
+					.defaultExternalPort(2500)
+					.defaultInternalPort(80)
+					.minimumReplicas(1)
+					.serviceType(ServiceType.SYSTEM)
+					.build();
+				crashTesting = servicesService.addService(crashTesting);
+			}
 			ServiceEntity loadBalancer;
 			try {
 				loadBalancer = servicesService.getService(NginxLoadBalancerService.LOAD_BALANCER);
@@ -510,6 +510,18 @@ public class DatabaseLoader {
 				masterManager = servicesService.addService(masterManager);
 			}
 			//apps
+			AppEntity testing;
+			try {
+				testing = appsService.getApp("Testing");
+			}
+			catch (EntityNotFoundException ignored) {
+				testing = AppEntity.builder()
+					.name("Testing")
+					.build();
+				testing = appsService.addApp(testing);
+				appsServices.saveAll(List.of(
+					AppServiceEntity.builder().app(testing).service(crashTesting).build()));
+			}
 			AppEntity mixal;
 			try {
 				mixal = appsService.getApp("Mixal");

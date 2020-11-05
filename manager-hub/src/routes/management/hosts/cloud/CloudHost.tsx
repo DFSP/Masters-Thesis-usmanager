@@ -55,6 +55,8 @@ import formStyles from "../../../../components/form/Form.module.css";
 import {IWorkerManager} from "../../workerManagers/WorkerManager";
 import {ICoordinates} from "../../../../components/map/LocationMap";
 import {IMarker} from "../../../../components/map/Marker";
+import CloudHostSshCommand from "./CloudHostSshCommand";
+import CloudHostSshFileTransfer from "./CloudHostSshFileTransfer";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -137,7 +139,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ICloudHost,
-    selected: 'cloudHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics'
+    selected: 'cloudHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -536,38 +538,61 @@ class CloudHost extends BaseComponent<Props, State> {
     private genericSimulatedMetrics = (): JSX.Element =>
         <GenericSimulatedHostMetricList/>;
 
-    private tabs = (): Tab[] => [
-        {
-            title: 'Cloud host',
-            id: 'cloudHost',
-            content: () => this.cloudHost(),
-            active: this.props.location.state?.selected === 'cloudHost'
-        },
-        {
-            title: 'Rules',
-            id: 'rules',
-            content: () => this.rules(),
-            active: this.props.location.state?.selected === 'rules'
-        },
-        {
-            title: 'Generic rules',
-            id: 'genericRules',
-            content: () => this.genericRules(),
-            active: this.props.location.state?.selected === 'genericRules'
-        },
-        {
-            title: 'Simulated metrics',
-            id: 'simulatedMetrics',
-            content: () => this.simulatedMetrics(),
-            active: this.props.location.state?.selected === 'simulatedMetrics'
-        },
-        {
-            title: 'Generic simulated metrics',
-            id: 'genericSimulatedMetrics',
-            content: () => this.genericSimulatedMetrics(),
-            active: this.props.location.state?.selected === 'genericSimulatedMetrics'
-        },
-    ];
+    private ssh = (): JSX.Element =>
+        <CloudHostSshCommand cloudHost={this.getCloudHost()}/>;
+
+    private sftp = (): JSX.Element =>
+        <CloudHostSshFileTransfer cloudHost={this.getCloudHost()}/>;
+
+    private tabs = (): Tab[] => {
+        const tabs = [
+            {
+                title: 'Cloud host',
+                id: 'cloudHost',
+                content: () => this.cloudHost(),
+                active: this.props.location.state?.selected === 'cloudHost'
+            },
+            {
+                title: 'Rules',
+                id: 'rules',
+                content: () => this.rules(),
+                active: this.props.location.state?.selected === 'rules'
+            },
+            {
+                title: 'Generic rules',
+                id: 'genericRules',
+                content: () => this.genericRules(),
+                active: this.props.location.state?.selected === 'genericRules'
+            },
+            {
+                title: 'Simulated metrics',
+                id: 'simulatedMetrics',
+                content: () => this.simulatedMetrics(),
+                active: this.props.location.state?.selected === 'simulatedMetrics'
+            },
+            {
+                title: 'Generic simulated metrics',
+                id: 'genericSimulatedMetrics',
+                content: () => this.genericSimulatedMetrics(),
+                active: this.props.location.state?.selected === 'genericSimulatedMetrics'
+            },
+        ];
+        if (this.getCloudHost().state === awsInstanceStates.RUNNING) {
+            tabs.push({
+                title: 'Execute command',
+                id: 'cloudHostSsh',
+                content: () => this.ssh(),
+                active: this.props.location.state?.selected === 'ssh'
+            });
+            tabs.push({
+                title: 'Upload file',
+                id: 'cloudHostSftp',
+                content: () => this.sftp(),
+                active: this.props.location.state?.selected === 'sftp'
+            });
+        }
+        return tabs;
+    }
 
 }
 

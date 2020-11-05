@@ -165,14 +165,15 @@ class ServiceCard extends BaseComponent<Props, State> {
             <CardItem key={'ports'}
                       label={'Ports'}
                       value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
-            {service.launchCommand !== '' &&
+            {service.launchCommand &&
             <CardItem key={'launchCommand'}
                       label={'Launch command'}
                       value={service.launchCommand}/>}
+            {service.outputLabel &&
             <CardItem key={'outputLabel'}
                       label={'Output label'}
-                      value={`${service.outputLabel}`}/>
-            {service.defaultDb !== null &&
+                      value={`${service.outputLabel}`}/>}
+            {service.defaultDb &&
             <CardItem key={'database'}
                       label={'Database'}
                       value={service.defaultDb}/>}

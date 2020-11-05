@@ -81,26 +81,37 @@ class EdgeHostCard extends BaseComponent<Props, State> {
 
     private contextMenu = (): JSX.Element[] => {
         const {edgeHost} = this.props;
+        const publicIpAddress = edgeHost.publicIpAddress;
         return [
             <LinkedContextMenuItem
                 option={'Modify rules'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'rules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'View generic rules'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'genericRules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'simulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'View generic simulated metrics'}
-                pathname={`/hosts/edge/${edgeHost.publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'genericSimulatedMetrics'}
+                state={edgeHost}/>,
+            <LinkedContextMenuItem
+                option={'Execute command'}
+                pathname={`/hosts/edge/${publicIpAddress}`}
+                selected={'ssh'}
+                state={edgeHost}/>,
+            <LinkedContextMenuItem
+                option={'Upload file'}
+                pathname={`/hosts/edge/${publicIpAddress}`}
+                selected={'sftp'}
                 state={edgeHost}/>
         ];
     }

@@ -24,18 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
@@ -67,7 +63,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -75,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -87,9 +81,6 @@ public class ServicesMonitoringService {
 
 	// Container minimum logs to start applying rules
 	private static final int CONTAINER_MINIMUM_LOGS_COUNT = 1;
-
-	private static final int STOP_CONTAINER_RECOVERY_ON_FAILURES = 3;
-	private static final long STOP_CONTAINER_RECOVERY_TIME_FRAME = TimeUnit.MINUTES.toMillis(10);
 
 	private final ServiceMonitoringRepository servicesMonitoring;
 	private final ServiceMonitoringLogsRepository serviceMonitoringLogs;
@@ -105,6 +96,7 @@ public class ServicesMonitoringService {
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
+	private final ContainersRecoveryService containersRecoveryService;
 
 	private final long monitorPeriod;
 	private final int stopContainerOnEventCount;
@@ -123,7 +115,8 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ContainerProperties containerProperties, MasterManagerProperties masterManagerProperties) {
+									 ContainersRecoveryService containersRecoveryService, ContainerProperties containerProperties,
+									 MasterManagerProperties masterManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;
@@ -137,6 +130,7 @@ public class ServicesMonitoringService {
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
+		this.containersRecoveryService = containersRecoveryService;
 		this.monitorPeriod = containerProperties.getMonitorPeriod();
 		this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
 		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
@@ -226,7 +220,7 @@ public class ServicesMonitoringService {
 	}
 
 	public void initServiceMonitorTimer() {
-		serviceMonitoringTimer = new Timer("master-manager-services-monitoring", true);
+		serviceMonitoringTimer = new Timer("services-monitoring", true);
 		serviceMonitoringTimer.schedule(new TimerTask() {
 			private long previousTime = System.currentTimeMillis();
 
@@ -238,8 +232,8 @@ public class ServicesMonitoringService {
 				try {
 					monitorServicesTask(interval);
 				}
-				catch (ManagerException e) {
-					log.error(e.getMessage());
+				catch (ManagerException e) { //FIXME change to Exception
+					log.error("Failed to execute monitor services task: {}", e.getMessage());
 				}
 			}
 		}, monitorPeriod, monitorPeriod);
@@ -247,24 +241,14 @@ public class ServicesMonitoringService {
 
 	private void monitorServicesTask(int interval) {
 		List<ContainerEntity> monitoringContainers = containersService.getAppContainers();
-		if (isTestEnable) {
-			List<ContainerEntity> systemContainers = containersService.getContainersWithLabels(
-				Set.of(
-					Pair.of(ContainerConstants.Label.SERVICE_NAME, MasterManagerProperties.MASTER_MANAGER),
-					Pair.of(ContainerConstants.Label.SERVICE_NAME, WorkerManagerProperties.WORKER_MANAGER)
-				));
-			monitoringContainers.addAll(systemContainers);
-		}
-
 		List<ContainerEntity> systemContainers = containersService.getSystemContainers();
-
 		List<ContainerEntity> synchronizedContainers = containersService.synchronizeDatabaseContainers();
-		restoreCrashedContainers(monitoringContainers, synchronizedContainers);
+
+		containersRecoveryService.restoreCrashedContainers(monitoringContainers, synchronizedContainers);
+
 		systemContainers.parallelStream()
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
-			.forEach(this::restartContainer);
-
-		restoreCrashedContainers(systemContainers, synchronizedContainers);
+			.forEach(containersRecoveryService::restartContainer);
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
@@ -304,11 +288,13 @@ public class ServicesMonitoringService {
 
 				// Calculated metrics
 				Map<String, Double> calculatedMetrics = new HashMap<>(2);
-				if (!serviceSimulatedFields.containsKey("rx-bytes-per-sec")
+				if (stats.containsKey("rx-bytes")
+					&& !serviceSimulatedFields.containsKey("rx-bytes-per-sec")
 					&& !containerSimulatedFields.containsKey("rx-bytes-per-sec")) {
 					calculatedMetrics.put("rx-bytes", stats.get("rx-bytes"));
 				}
-				if (!serviceSimulatedFields.containsKey("tx-bytes-per-sec")
+				if (stats.containsKey("tx-bytes")
+					&& !serviceSimulatedFields.containsKey("tx-bytes-per-sec")
 					&& !containerSimulatedFields.containsKey("tx-bytes-per-sec")) {
 					calculatedMetrics.put("tx-bytes", stats.get("tx-bytes"));
 				}
@@ -343,62 +329,6 @@ public class ServicesMonitoringService {
 		else {
 			log.info("No service decisions to process");
 		}
-	}
-
-	private void restoreCrashedContainers(List<ContainerEntity> monitoringContainers, List<ContainerEntity> synchronizedContainers) {
-		monitoringContainers.parallelStream()
-			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
-			.forEach(this::restartContainerCloseTo);
-	}
-
-	// Restarts the container on a host close to where it used to be running
-	private void restartContainerCloseTo(ContainerEntity container) {
-		String containerId = container.getContainerId();
-		log.info("Recovering crashed container {}={}", container.getServiceName(), containerId);
-		Gson gson = new Gson();
-		List<ContainerRecovery> recoveries = new ArrayList<>();
-		String previousRecoveries = container.getLabels().get(ContainerConstants.Label.RECOVERY);
-		if (previousRecoveries != null) {
-			long currentTimestamp = System.currentTimeMillis();
-			for (ContainerRecovery recovery : gson.fromJson(previousRecoveries, ContainerRecovery[].class)) {
-				if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME > currentTimestamp) {
-					recoveries.add(recovery);
-				}
-			}
-		}
-		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
-		if (shouldStopContainerRecovering(recoveries)) {
-			log.info("Stopping recovery of crashed container {} {}... crashed too many times in a short period of time",
-				container.getServiceName(), containerId);
-			return;
-		}
-		Coordinates coordinates = container.getCoordinates();
-		String serviceName = container.getServiceName();
-		ServiceEntity service = servicesService.getService(serviceName);
-		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-		Map<String, String> labels = Map.of(
-			ContainerConstants.Label.RECOVERY, gson.toJson(recoveries)
-		);
-		containersService.launchContainer(hostAddress, serviceName, Collections.emptyList(), labels);
-	}
-
-	private boolean shouldStopContainerRecovering(List<ContainerRecovery> recoveries) {
-		int count = 0;
-		long currentTimestamp = System.currentTimeMillis();
-		for (ContainerRecovery recovery : recoveries) {
-			if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME < currentTimestamp) {
-				count++;
-			}
-		}
-		return count >= STOP_CONTAINER_RECOVERY_ON_FAILURES;
-	}
-
-	// Restarts the container on the same host
-	private void restartContainer(ContainerEntity container) {
-		HostAddress hostAddress = container.getHostAddress();
-		String serviceName = container.getServiceName();
-		containersService.launchContainer(hostAddress, serviceName);
 	}
 
 	private ServiceDecisionResult runRules(HostAddress hostAddress, String containerId, String serviceName, Map<String, Double> newFields) {

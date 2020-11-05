@@ -88,17 +88,16 @@ public class HostsService {
 	private final SshService sshService;
 	private final BashService bashService;
 	private final HostMetricsService hostMetricsService;
-	private final String localMachineDns;
 	private final int maxWorkers;
 	private final int maxInstances;
 	private final Mode mode;
-	private HostAddress hostAddress;
+	private HostAddress masterHostAddress;
 
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
 						DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
 						CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
 						HostMetricsService hostMetricsService, DockerProperties dockerProperties,
-						AwsProperties awsProperties, ManagerProperties managerProperties, HostProperties hostProperties) {
+						AwsProperties awsProperties, ManagerProperties managerProperties) {
 		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
@@ -109,7 +108,6 @@ public class HostsService {
 		this.hostMetricsService = hostMetricsService;
 		this.maxWorkers = dockerProperties.getSwarm().getInitialMaxWorkers();
 		this.maxInstances = awsProperties.getInitialMaxInstances();
-		this.localMachineDns = hostProperties.getLocalMachineDns();
 		this.mode = managerProperties.getMode();
 	}
 
@@ -117,16 +115,16 @@ public class HostsService {
 		String username = bashService.getUsername();
 		String publicIp = bashService.getPublicIp();
 		String privateIp = bashService.getPrivateIp();
-		this.hostAddress = getFullHostAddress(new HostAddress(username, publicIp, privateIp));
-		log.info("Setting local address: {}", hostAddress.toString());
-		return hostAddress;
+		this.masterHostAddress = completeHostAddress(new HostAddress(username, publicIp, privateIp));
+		log.info("Setting local address: {}", masterHostAddress.toString());
+		return masterHostAddress;
 	}
 
-	public HostAddress getHostAddress() {
-		if (hostAddress == null) {
+	public HostAddress getMasterHostAddress() {
+		if (masterHostAddress == null) {
 			throw new MethodNotAllowedException("manager initialization did not finish");
 		}
-		return hostAddress;
+		return masterHostAddress;
 	}
 
 	public void clusterHosts() {
@@ -161,16 +159,16 @@ public class HostsService {
 	private List<EdgeHostEntity> getLocalWorkerNodes() {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
 		return edgeHostsService.getEdgeHosts().stream()
-			.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.hostAddress.getPublicIpAddress()))
-			.filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.hostAddress.getPrivateIpAddress()))
+			.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.masterHostAddress.getPublicIpAddress()))
+			.filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.masterHostAddress.getPrivateIpAddress()))
 			.filter(this::isEdgeHostRunning)
 			.limit(maxWorkers)
 			.collect(Collectors.toList());
 	}
 
 	public boolean isLocalhost(HostAddress hostAddress) {
-		String machinePublicIp = this.hostAddress.getPublicIpAddress();
-		String machinePrivateIp = this.hostAddress.getPrivateIpAddress();
+		String machinePublicIp = this.masterHostAddress.getPublicIpAddress();
+		String machinePrivateIp = this.masterHostAddress.getPrivateIpAddress();
 		return Objects.equals(machinePublicIp, hostAddress.getPublicIpAddress())
 			&& Objects.equals(machinePrivateIp, hostAddress.getPrivateIpAddress());
 	}
@@ -260,10 +258,10 @@ public class HostsService {
 
 	public HostAddress getClosestCapableHost(double availableMemory, Coordinates coordinates) {
 		List<EdgeHostEntity> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory)
+			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
 		).collect(Collectors.toList());
 		List<CloudHostEntity> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory)
+			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
 		).collect(Collectors.toList());
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}
@@ -314,7 +312,7 @@ public class HostsService {
 		return hostAddress;
 	}
 
-	public HostAddress getFullHostAddress(HostAddress hostAddress) {
+	public HostAddress completeHostAddress(HostAddress hostAddress) {
 		if (hostAddress.isComplete()) {
 			return hostAddress;
 		}
@@ -340,7 +338,7 @@ public class HostsService {
 				return cloudHostsService.getCloudHostByIp(hostname).getAddress();
 			}
 			catch (EntityNotFoundException e) {
-				throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
+				throw new EntityNotFoundException("Host", "hostAddress", hostname);
 			}
 		}
 	}
@@ -396,7 +394,7 @@ public class HostsService {
 				return cloudHostsService.startInstance(cloudHost, addToSwarm);
 			}
 		}
-		Coordinates coordinates = region == null ? hostAddress.getRegion().getCoordinates() : region.getCoordinates();
+		Coordinates coordinates = region == null ? masterHostAddress.getRegion().getCoordinates() : region.getCoordinates();
 		return cloudHostsService.launchInstance(coordinates);
 	}
 
@@ -411,7 +409,7 @@ public class HostsService {
 	private List<String> executeCommand(String command, HostAddress hostAddress, boolean wait) {
 		List<String> result = null;
 		String error = null;
-		if (Objects.equals(this.hostAddress, hostAddress)) {
+		if (Objects.equals(this.masterHostAddress, hostAddress)) {
 			// execute local command
 			if (wait) {
 				BashCommandResult bashCommandResult = bashService.executeCommandSync(command);
@@ -461,7 +459,7 @@ public class HostsService {
 		catch (IOException e) {
 			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
 		}
-		if (Objects.equals(this.hostAddress, hostAddress)) {
+		if (Objects.equals(this.masterHostAddress, hostAddress)) {
 			bashService.executeCommandInBackground(command, outputFilePath);
 		} else {
 			sshService.executeCommandInBackground(command, hostAddress, outputFilePath);
@@ -519,15 +517,6 @@ public class HostsService {
 		// Return if the IP address
 		// matched the ReGex
 		return m.matches();
-	}
-
-	public String getPublicIpAddressFromHost(String host) {
-		try {
-			return cloudHostsService.getCloudHostByIdOrDns(host).getPublicIpAddress();
-		}
-		catch (EntityNotFoundException ignored) {
-			return edgeHostsService.getEdgeHostByDns(host).getPublicIpAddress();
-		}
 	}
 
 }

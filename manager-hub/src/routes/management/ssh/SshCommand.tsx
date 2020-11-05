@@ -41,7 +41,7 @@ export interface ISshCommand {
     error: string[];
 }
 
-interface INewSshCommand {
+export interface INewSshCommand {
     background?: boolean;
     hostAddress?: IHostAddress;
     command?: string;

@@ -369,7 +369,7 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.SYSTEM.name())));
 	}
 
-	public ContainerStats getContainerStats(String containerId, HostAddress hostAddress) {
+	public Optional<ContainerStats> getContainerStats(String containerId, HostAddress hostAddress) {
 		ContainerEntity container = getContainer(containerId);
 		return dockerContainersService.getContainerStats(container, hostAddress);
 	}

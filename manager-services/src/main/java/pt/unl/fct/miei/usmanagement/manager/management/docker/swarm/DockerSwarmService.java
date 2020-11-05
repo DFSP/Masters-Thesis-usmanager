@@ -76,7 +76,7 @@ public class DockerSwarmService {
 	}
 
 	public DockerClient getSwarmLeader() {
-		HostAddress hostAddress = hostsService.getHostAddress();
+		HostAddress hostAddress = hostsService.getMasterHostAddress();
 		return dockerCoreService.getDockerClient(hostAddress);
 	}
 
@@ -106,7 +106,7 @@ public class DockerSwarmService {
 	}
 
 	public SimpleNode initSwarm() {
-		HostAddress hostAddress = hostsService.getHostAddress();
+		HostAddress hostAddress = hostsService.getMasterHostAddress();
 		String username = hostAddress.getUsername();
 		String advertiseAddress = hostAddress.getPublicIpAddress();
 		String listenAddress = hostAddress.getPrivateIpAddress();
@@ -151,7 +151,7 @@ public class DockerSwarmService {
 	}
 
 	public SimpleNode joinSwarm(HostAddress hostAddress, NodeRole role) {
-		String leaderAddress = hostsService.getHostAddress().getPublicIpAddress();
+		String leaderAddress = hostsService.getMasterHostAddress().getPublicIpAddress();
 		try (DockerClient leaderClient = getSwarmLeader();
 			 DockerClient nodeClient = dockerCoreService.getDockerClient(hostAddress)) {
 			/*try {*/

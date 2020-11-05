@@ -219,25 +219,16 @@ class Ssh extends React.Component<Props, State> {
         this.setState({commandsHeight: this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? this.COMMANDS_DEFAULT_HEIGHT : this.COMMANDS_MIN_HEIGHT},
             () => setTimeout(() => this.updateScrollbars(), 500));
 
-    /*private clearCommands = () =>
-        this.setState({commands: []});*/
-
     private addCommand = (sshCommand: ISshCommand) => {
         const command = {...sshCommand, timestamp: Date.now()};
         this.props.addCommand(command);
         this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        /*this.setState({commands: this.state.commands.concat(command)}, () => {
-            this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        });*/
     }
 
     private addFileTransfer = (fileTransfer: ISshFile) => {
         const transfer = {...fileTransfer, timestamp: Date.now()};
         this.props.addCommand(transfer);
         this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        /*this.setState({commands: this.state.commands.concat(transfer)}, () => {
-            this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
-        });*/
     }
 
     private timestampToString = (timestamp: number): string => {

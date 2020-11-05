@@ -242,7 +242,7 @@ public class DockerContainersService {
 			for (var i = 0; i < retries; i++) {
 
 				if (!hostAddress.isComplete()) {
-					hostAddress = hostsService.getFullHostAddress(hostAddress);
+					hostAddress = hostsService.completeHostAddress(hostAddress);
 				}
 				String serviceName = service.getServiceName();
 				log.info("Launching container on mode {} with service {} at {}", containerType, serviceName, hostAddress);
@@ -411,7 +411,7 @@ public class DockerContainersService {
 
 	public Optional<DockerContainer> replicateContainer(String id, HostAddress fromHostAddress, HostAddress toHostAddress) {
 		if (!toHostAddress.isComplete()) {
-			toHostAddress = hostsService.getFullHostAddress(toHostAddress);
+			toHostAddress = hostsService.completeHostAddress(toHostAddress);
 		}
 		ContainerInfo fromContainer = inspectContainer(id, fromHostAddress);
 		String serviceName = fromContainer.name().replace("/", "").split("_")[0];
@@ -443,7 +443,7 @@ public class DockerContainersService {
 
 	public Optional<DockerContainer> migrateContainer(ContainerEntity container, HostAddress toHostAddress) {
 		if (!toHostAddress.isComplete()) {
-			toHostAddress = hostsService.getFullHostAddress(toHostAddress);
+			toHostAddress = hostsService.completeHostAddress(toHostAddress);
 		}
 		Optional<DockerContainer> replicaContainer = replicateContainer(container, toHostAddress);
 		new Timer("StopContainerTimer").schedule(new TimerTask() {
@@ -504,14 +504,14 @@ public class DockerContainersService {
 		}
 	}
 
-	public ContainerStats getContainerStats(ContainerEntity container, HostAddress hostAddress) {
+	public Optional<ContainerStats> getContainerStats(ContainerEntity container, HostAddress hostAddress) {
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
-			return dockerClient.stats(container.getContainerId());
+			return Optional.of(dockerClient.stats(container.getContainerId()));
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
-			throw new ManagerException(e.getMessage());
+			log.error("Unable to get stats of container {}: {}", container.getContainerId(), e.getMessage());
 		}
+		return Optional.empty();
 	}
 
 	private DockerContainer buildDockerContainer(Container container) {

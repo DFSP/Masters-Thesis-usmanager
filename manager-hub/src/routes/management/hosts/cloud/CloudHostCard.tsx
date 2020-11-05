@@ -198,6 +198,16 @@ class CloudHostCard extends BaseComponent<Props, State> {
                 option={'View generic simulated metrics'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'genericSimulatedMetrics'}
+                state={cloudHost}/>,
+            <LinkedContextMenuItem
+                option={'Execute command'}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'ssh'}
+                state={cloudHost}/>,
+            <LinkedContextMenuItem
+                option={'Upload file'}
+                pathname={`/hosts/cloud/${id}`}
+                selected={'sftp'}
                 state={cloudHost}/>
         ];
     }

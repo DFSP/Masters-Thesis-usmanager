@@ -181,14 +181,14 @@ public class HostsMonitoringService {
 	}
 
 	public void initHostMonitorTimer() {
-		hostMonitoringTimer = new Timer("master-manager-hosts-monitoring", true);
+		hostMonitoringTimer = new Timer("hosts-monitoring", true);
 		hostMonitoringTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					monitorHostsTask();
 				}
-				catch (ManagerException e) {
+				catch (Exception e) {
 					log.error(e.getMessage());
 				}
 			}
