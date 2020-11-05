@@ -29,6 +29,7 @@
 .commandsContainer {
     position: absolute !important;
     bottom: 50px;
+    left: 0;
     min-width: 135px;
     min-height: 44px;
     background: #282828;
@@ -129,22 +130,22 @@
 @keyframes shrink {
     0% {
         left: 0;
-        width: 100%
+        width: 100vw
     }
     100% {
         left: 200px;
-        width: calc(100% - 200px)
+        width: calc(100vw - 200px)
     }
 }
 
 @keyframes expand {
     0% {
         left: 200px;
-        width: calc(100% - 200px)
+        width: calc(100vw - 200px)
     }
     100% {
         left: 0;
-        width: 100%
+        width: 100vw
     }
 }
 

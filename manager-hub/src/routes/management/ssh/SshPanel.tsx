@@ -27,8 +27,7 @@ interface SshPanelDispatchToProps {
 }
 
 interface Props {
-    filter?: (command: ICommand | ISshCommand, s: string) => boolean;
-    /*const filteredList = list.filter((s: T) => predicate(s, search));*/
+    filter?: (command: ICommand | IFileTransfer) => boolean;
 }
 
 export type SshPanelProps = Props & SshPanelStateToProps & SshPanelDispatchToProps;
@@ -68,18 +67,24 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
     public scrollToTop = () =>
         this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
 
+    private filteredCommands = () => {
+        const {commands, filter} = this.props;
+        return !filter ? commands : commands.filter((command: ICommand | IFileTransfer) => filter(command));
+    }
+
     public render() {
         const body = document.body, html = document.documentElement;
         const maxHeight = Math.max(body.scrollHeight, body.offsetHeight,
             html.clientHeight, html.scrollHeight, html.offsetHeight) - 50 - 56; // 56 for header and 50 for footer
         return <Resizable
             className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
+            style={{width: this.props.sidenavVisible ? 'calc(100vw - 200px)' : '100vw', left: this.props.sidenavVisible ? '200px' : '0'}}
             maxHeight={maxHeight}
             onResize={this.onResize}
             enable={{top: true}}
             size={{
-                width: this.props.sidenavVisible ? window.innerWidth - 200 : '100%',
-                height: this.state.commandsHeight
+                width: this.props.sidenavVisible ? window.innerWidth - 200 : '100vw',
+                height: this.state.commandsHeight,
             }}
             onResizeStop={(e, direction, ref, d) => {
                 this.setState({
@@ -94,13 +99,12 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                             onClick={this.props.clearCommands}
                             data-position={'top'}
                             data-tooltip={'Clear'}>
-                        <i className="material-icons grey-text">delete_sweep</i>
+                        <i className='material-icons grey-text'>delete_sweep</i>
                     </button>
                 </ScrollBar>
             </div>
-            <ScrollBar ref={(ref) => {
-                this.commandsScrollbar = ref;
-            }} style={{flexGrow: 1}}
+            <ScrollBar ref={(ref) => this.commandsScrollbar = ref}
+                       style={{flexGrow: 1}}
                        containerRef={(container) => {
                            this.commandsContainer = container;
                        }}>
@@ -112,7 +116,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                     </div>
                 </div>
                 <div className={styles.commands}>
-                    {this.props.commands.map((command: ICommand | IFileTransfer, index: number) => (
+                    {this.filteredCommands().map((command: ICommand | IFileTransfer, index: number) => (
                         <div key={index}>
                             {'output' in command ?
                                 <>
@@ -152,7 +156,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                             onClick={this.toggleCommands}
                             data-position={'left'}
                             data-tooltip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Show' : 'Hide'}>
-                        <i className="material-icons">{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
+                        <i className='material-icons'>{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
                     </button>
                 </ScrollBar>
             </div>

@@ -344,13 +344,6 @@ ul.dropdown-content.select-dropdown li.disabled span:hover {
     border-bottom: solid 1px black !important;
 }
 
-.tab-content {
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-    background: #36393F;
-}
-
 button:hover {
     background-color: #1F1F1F !important;
 }

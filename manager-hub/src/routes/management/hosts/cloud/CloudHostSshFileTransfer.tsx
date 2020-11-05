@@ -32,7 +32,7 @@ import {IReply} from "../../../../utils/api";
 import {ReduxState} from "../../../../reducers";
 import {addCommand, loadScripts} from "../../../../actions";
 import {connect} from "react-redux";
-import SshPanel, {IFileTransfer} from "../../ssh/SshPanel";
+import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
     hostAddress: undefined,
@@ -62,6 +62,13 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
         this.props.loadScripts();
     };
 
+    private commandFilter = (command: ICommand | IFileTransfer) =>  {
+        const commandHostAddress = command.hostAddress;
+        const {cloudHost} = this.props;
+        return commandHostAddress.publicIpAddress === cloudHost.publicIpAddress
+            && commandHostAddress.privateIpAddress === cloudHost.privateIpAddress
+    }
+
     public render() {
         const command = buildNewSshCommand();
         return (
@@ -87,7 +94,7 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
                                emptyMessage: 'No scripts available'
                            }}/>
                 </Form>
-                <SshPanel ref={this.sshPanel}/>
+                <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>
             </>
         );
     }

@@ -25,7 +25,7 @@
 import React, {createRef} from "react";
 import {connect} from "react-redux";
 import {INewSshCommand, ISshCommand} from "../../ssh/SshCommand";
-import SshPanel, {ICommand} from "../../ssh/SshPanel";
+import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
 import {addCommand} from "../../../../actions";
 import BaseComponent from "../../../../components/BaseComponent";
 import Field from "../../../../components/form/Field";
@@ -53,6 +53,13 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
 
     private sshPanel = createRef<any>();
 
+    private commandFilter = (command: ICommand | IFileTransfer) =>  {
+        const commandHostAddress = command.hostAddress;
+        const {edgeHost} = this.props;
+        return commandHostAddress.publicIpAddress === edgeHost.publicIpAddress
+            && commandHostAddress.privateIpAddress === edgeHost.privateIpAddress
+    }
+
     public render() {
         const command = buildNewSshCommand();
         return (
@@ -76,7 +83,7 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                            id='command'
                            label='command'/>
                 </Form>
-                <SshPanel ref={this.sshPanel}/>
+                <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>
             </>
         );
     }

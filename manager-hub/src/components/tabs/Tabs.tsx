@@ -127,7 +127,7 @@ class Tabs extends React.Component<Props, State> {
                         </ul>
                         {tabs.map((tab, index) =>
                             ((tab.hidden === undefined || !tab.hidden) && (
-                                <div id={tab.id} key={index} className={`tab-content ${styles.tabContent} col s12`}>
+                                <div id={tab.id} key={index} className={`${styles.tabContent} col s12`}>
                                     {tab.content()}
                                 </div>
                             ))
