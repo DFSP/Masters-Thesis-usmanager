@@ -354,16 +354,22 @@ public class ServicesMonitoringService {
 	// Restarts the container on a host close to where it used to be running
 	private void restartContainerCloseTo(ContainerEntity container) {
 		String containerId = container.getContainerId();
-		log.info("Recovering crashed container {} = {}", container.getServiceName(), containerId);
+		log.info("Recovering crashed container {}={}", container.getServiceName(), containerId);
 		Gson gson = new Gson();
-		String previousRecovery = container.getLabels().get(ContainerConstants.Label.RECOVERY);
 		List<ContainerRecovery> recoveries = new ArrayList<>();
-		if (previousRecovery != null) {
-			recoveries.addAll(Arrays.asList(gson.fromJson(previousRecovery, ContainerRecovery[].class)));
+		String previousRecoveries = container.getLabels().get(ContainerConstants.Label.RECOVERY);
+		if (previousRecoveries != null) {
+			long currentTimestamp = System.currentTimeMillis();
+			for (ContainerRecovery recovery : gson.fromJson(previousRecoveries, ContainerRecovery[].class)) {
+				if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME > currentTimestamp) {
+					recoveries.add(recovery);
+				}
+			}
 		}
 		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		if (shouldStopContainerRecovering(recoveries)) {
-			log.info("Stopping recovery of crashed container {} {}... crashing too many times", container.getServiceName(), containerId);
+			log.info("Stopping recovery of crashed container {} {}... crashed too many times in a short period of time",
+				container.getServiceName(), containerId);
 			return;
 		}
 		Coordinates coordinates = container.getCoordinates();

@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,7 +50,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -100,6 +103,8 @@ public class ContainerEntity {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<ContainerPortMapping> ports;
 
+	@MapKeyColumn(name = "LABEL_KEY", length = 64)
+	@Column(name = "LABEL_VALUE", length = 2048)
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private Map<String, String> labels;

@@ -553,7 +553,7 @@ public class DockerContainersService {
 			logs = logs.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "");
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Failted to get logs of container {}: {}", containerId, e.getMessage());
+			log.error("Failed to get logs of container {}: {}", containerId, e.getMessage());
 		}
 		return logs;
 	}

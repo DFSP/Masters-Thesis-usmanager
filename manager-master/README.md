@@ -46,8 +46,7 @@ docker build -f docker/Dockerfile . -t manager-master
 docker run --rm -p 8080:8080 manager-master
 ```
 
-##### Hub
-##### Hub
+##### Docker hub
 ```shell script
 docker run --rm -p 8080:8080 usmanager/manager-master
 ```

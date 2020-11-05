@@ -132,7 +132,25 @@ public class DatabaseLoader {
 					.build();
 				usersService.addUser(sysAdmin);
 			}
+
 			// services
+
+			ServiceEntity crashTesting;
+			try {
+				crashTesting = servicesService.getService("crash-testing");
+			}
+			catch (EntityNotFoundException ignored) {
+				crashTesting = ServiceEntity.builder()
+					.serviceName("crash-testing")
+					.dockerRepository(dockerHubUsername + "/crash-testing")
+					.defaultExternalPort(2500)
+					.defaultInternalPort(80)
+					.minimumReplicas(1)
+					.serviceType(ServiceType.SYSTEM)
+					.build();
+				crashTesting = servicesService.addService(crashTesting);
+			}
+
 			ServiceEntity frontend;
 			try {
 				frontend = servicesService.getService("sock-shop-front-end");
@@ -708,7 +726,7 @@ public class DatabaseLoader {
 					.publicDnsName("dpimenta.ddns.net")
 					.region(region)
 					.coordinates(coordinates)
-					.build(), "ubuntusoldadox3");
+					.build(), "EDITME");
 			}
 
 			// cloud hosts
