@@ -24,6 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -75,6 +78,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,6 +87,9 @@ public class ServicesMonitoringService {
 
 	// Container minimum logs to start applying rules
 	private static final int CONTAINER_MINIMUM_LOGS_COUNT = 1;
+
+	private static final int STOP_CONTAINER_RECOVERY_ON_FAILURES = 3;
+	private static final long STOP_CONTAINER_RECOVERY_TIME_FRAME = TimeUnit.MINUTES.toMillis(10);
 
 	private final ServiceMonitoringRepository servicesMonitoring;
 	private final ServiceMonitoringLogsRepository serviceMonitoringLogs;
@@ -105,7 +112,6 @@ public class ServicesMonitoringService {
 	private final int migrateContainerOnEventCount;
 	private final boolean isTestEnable;
 	private Timer serviceMonitoringTimer;
-	private final Map<String, Long> crashedContainers;
 
 	public ServicesMonitoringService(ServiceMonitoringRepository servicesMonitoring,
 									 ServiceMonitoringLogsRepository serviceMonitoringLogs,
@@ -136,7 +142,6 @@ public class ServicesMonitoringService {
 		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
 		this.migrateContainerOnEventCount = containerProperties.getMigrateContainerOnEventCount();
 		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
-		this.crashedContainers = new HashMap<>();
 	}
 
 	public List<ServiceMonitoringEntity> getServicesMonitoring() {
@@ -350,17 +355,37 @@ public class ServicesMonitoringService {
 	private void restartContainerCloseTo(ContainerEntity container) {
 		String containerId = container.getContainerId();
 		log.info("Recovering crashed container {} = {}", container.getServiceName(), containerId);
+		Gson gson = new Gson();
 		String previousRecovery = container.getLabels().get(ContainerConstants.Label.RECOVERY);
-		String currentRecovery = previousRecovery == null ? containerId : previousRecovery + " -> " + containerId;
+		List<ContainerRecovery> recoveries = new ArrayList<>();
+		if (previousRecovery != null) {
+			recoveries.addAll(Arrays.asList(gson.fromJson(previousRecovery, ContainerRecovery[].class)));
+		}
+		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
+		if (shouldStopContainerRecovering(recoveries)) {
+			log.info("Stopping recovery of crashed container {} {}... crashing too many times", container.getServiceName(), containerId);
+			return;
+		}
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
 		ServiceEntity service = servicesService.getService(serviceName);
 		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
 		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 		Map<String, String> labels = Map.of(
-			ContainerConstants.Label.RECOVERY, currentRecovery
+			ContainerConstants.Label.RECOVERY, gson.toJson(recoveries)
 		);
 		containersService.launchContainer(hostAddress, serviceName, Collections.emptyList(), labels);
+	}
+
+	private boolean shouldStopContainerRecovering(List<ContainerRecovery> recoveries) {
+		int count = 0;
+		long currentTimestamp = System.currentTimeMillis();
+		for (ContainerRecovery recovery : recoveries) {
+			if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME < currentTimestamp) {
+				count++;
+			}
+		}
+		return count >= STOP_CONTAINER_RECOVERY_ON_FAILURES;
 	}
 
 	// Restarts the container on the same host
