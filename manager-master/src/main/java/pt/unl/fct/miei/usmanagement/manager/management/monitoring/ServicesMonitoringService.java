@@ -105,6 +105,7 @@ public class ServicesMonitoringService {
 	private final int migrateContainerOnEventCount;
 	private final boolean isTestEnable;
 	private Timer serviceMonitoringTimer;
+	private final Map<String, Long> crashedContainers;
 
 	public ServicesMonitoringService(ServiceMonitoringRepository servicesMonitoring,
 									 ServiceMonitoringLogsRepository serviceMonitoringLogs,
@@ -135,6 +136,7 @@ public class ServicesMonitoringService {
 		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
 		this.migrateContainerOnEventCount = containerProperties.getMigrateContainerOnEventCount();
 		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
+		this.crashedContainers = new HashMap<>();
 	}
 
 	public List<ServiceMonitoringEntity> getServicesMonitoring() {
@@ -346,12 +348,19 @@ public class ServicesMonitoringService {
 
 	// Restarts the container on a host close to where it used to be running
 	private void restartContainerCloseTo(ContainerEntity container) {
+		String containerId = container.getContainerId();
+		log.info("Recovering crashed container {} = {}", container.getServiceName(), containerId);
+		String previousRecovery = container.getLabels().get(ContainerConstants.Label.RECOVERY);
+		String currentRecovery = previousRecovery == null ? containerId : previousRecovery + " -> " + containerId;
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
 		ServiceEntity service = servicesService.getService(serviceName);
 		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
 		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-		containersService.launchContainer(hostAddress, serviceName);
+		Map<String, String> labels = Map.of(
+			ContainerConstants.Label.RECOVERY, currentRecovery
+		);
+		containersService.launchContainer(hostAddress, serviceName, Collections.emptyList(), labels);
 	}
 
 	// Restarts the container on the same host

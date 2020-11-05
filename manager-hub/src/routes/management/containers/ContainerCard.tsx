@@ -28,7 +28,7 @@ import React from "react";
 import {IContainer} from "./Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {addContainer, deleteContainer} from "../../../actions";
+import {addContainers, deleteContainer} from "../../../actions";
 import {connect} from "react-redux";
 import ContextSubMenuItem from "../../../components/contextmenu/ContextSubMenuItem";
 import {INode} from "../nodes/Node";
@@ -46,7 +46,7 @@ interface ContainerCardProps {
 
 interface DispatchToProps {
     deleteContainer: (container: IContainer) => void;
-    addContainer: (container: IContainer) => void;
+    addContainers: (containers: IContainer[]) => void;
 }
 
 type Props = DispatchToProps & ContainerCardProps;
@@ -135,7 +135,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.addContainer(container);
+        this.props.addContainers(Array(container));
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
@@ -163,7 +163,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.addContainer(container);
+        this.props.addContainers(Array(container));
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
@@ -264,7 +264,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
 const mapDispatchToProps: DispatchToProps = {
     deleteContainer,
-    addContainer,
+    addContainers,
 };
 
 export default connect(null, mapDispatchToProps)(ContainerCard);

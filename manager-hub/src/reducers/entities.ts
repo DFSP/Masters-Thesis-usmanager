@@ -32,15 +32,15 @@ import {
     ADD_CLOUD_HOST_SIMULATED_METRICS,
     ADD_COMMANDS,
     ADD_CONDITION,
-    ADD_CONTAINER,
+    ADD_CONTAINERS,
     ADD_CONTAINER_RULES,
     ADD_CONTAINER_SIMULATED_METRICS,
     ADD_EDGE_HOST,
     ADD_EDGE_HOST_RULES,
     ADD_EDGE_HOST_SIMULATED_METRICS,
-    ADD_LOAD_BALANCER,
-    ADD_NODE,
-    ADD_REGISTRATION_SERVER,
+    ADD_LOAD_BALANCERS,
+    ADD_NODES,
+    ADD_REGISTRATION_SERVERS,
     ADD_RULE_APP,
     ADD_RULE_APP_APPS,
     ADD_RULE_APP_CONDITIONS,
@@ -69,7 +69,7 @@ import {
     ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS,
     ADD_SIMULATED_SERVICE_METRIC,
     ADD_SIMULATED_SERVICE_METRIC_SERVICES,
-    ADD_WORKER_MANAGER,
+    ADD_WORKER_MANAGERS,
     APP_FAILURE,
     APP_REQUEST,
     APP_RULES_FAILURE,
@@ -1386,7 +1386,7 @@ const entities = (state: EntitiesState = {
                     loadContainersError: null,
                 }
             };
-        case ADD_CONTAINER:
+        case ADD_CONTAINERS:
             if (data?.containers?.length) {
                 const containers = normalize(data?.containers, Schemas.CONTAINER_ARRAY).entities.containers;
                 return merge({}, state, {
@@ -1936,7 +1936,7 @@ const entities = (state: EntitiesState = {
                     loadNodesError: null,
                 }
             };
-        case ADD_NODE:
+        case ADD_NODES:
             if (data?.nodes?.length) {
                 const nodes = normalize(data?.nodes, Schemas.NODE_ARRAY).entities.nodes;
                 return merge({}, state, {nodes: {data: nodes, isLoadingNodes: false, loadNodesError: null}});
@@ -3708,7 +3708,7 @@ const entities = (state: EntitiesState = {
                     loadLoadBalancersError: null,
                 }
             };
-        case ADD_LOAD_BALANCER:
+        case ADD_LOAD_BALANCERS:
             if (data?.loadBalancers?.length) {
                 const loadBalancers = normalize(data?.loadBalancers, Schemas.LOAD_BALANCER_ARRAY).entities.loadBalancers;
                 return merge({}, state, {
@@ -3769,7 +3769,7 @@ const entities = (state: EntitiesState = {
                     loadRegistrationServersError: null,
                 }
             };
-        case ADD_REGISTRATION_SERVER:
+        case ADD_REGISTRATION_SERVERS:
             if (data?.registrationServers?.length) {
                 const registrationServers = normalize(data?.registrationServers, Schemas.REGISTRATION_SERVER_ARRAY).entities.registrationServers;
                 return merge({}, state, {
@@ -3821,7 +3821,7 @@ const entities = (state: EntitiesState = {
                     loadWorkerManagersError: null,
                 }
             };
-        case ADD_WORKER_MANAGER:
+        case ADD_WORKER_MANAGERS:
             if (data?.workerManagers?.length) {
                 const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers;
                 return merge({}, state, {

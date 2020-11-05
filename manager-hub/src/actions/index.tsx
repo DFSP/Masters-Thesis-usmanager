@@ -464,12 +464,12 @@ const fetchContainers = (id?: string) => ({
                 entity: 'containers'
             }
 });
-export const ADD_CONTAINER = 'ADD_CONTAINER';
+export const ADD_CONTAINERS = 'ADD_CONTAINERS';
 
-export function addContainer(container: IContainer): EntitiesAction {
+export function addContainers(containers: IContainer[]): EntitiesAction {
     return {
-        type: ADD_CONTAINER,
-        data: {containers: new Array(container)}
+        type: ADD_CONTAINERS,
+        data: {containers}
     }
 }
 
@@ -860,12 +860,12 @@ const fetchNodes = (id?: string) => ({
                 entity: 'nodes'
             }
 });
-export const ADD_NODE = 'ADD_NODE';
+export const ADD_NODES = 'ADD_NODES';
 
-export function addNode(node: INode): EntitiesAction {
+export function addNodes(nodes: INode[]): EntitiesAction {
     return {
-        type: ADD_NODE,
-        data: {nodes: new Array(node)}
+        type: ADD_NODES,
+        data: {nodes}
     }
 }
 
@@ -1981,12 +1981,12 @@ const fetchLoadBalancers = (id?: string) => ({
                 entity: 'loadBalancers'
             }
 });
-export const ADD_LOAD_BALANCER = 'ADD_LOAD_BALANCER';
+export const ADD_LOAD_BALANCERS = 'ADD_LOAD_BALANCERS';
 
-export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
+export function addLoadBalancers(loadBalancers: ILoadBalancer[]): EntitiesAction {
     return {
-        type: ADD_LOAD_BALANCER,
-        data: {loadBalancers: new Array(loadBalancer)}
+        type: ADD_LOAD_BALANCERS,
+        data: {loadBalancers}
     }
 }
 
@@ -2024,12 +2024,12 @@ const fetchRegistrationServers = (id?: string) => ({
                 entity: 'registrationServers'
             }
 });
-export const ADD_REGISTRATION_SERVER = 'ADD_REGISTRATION_SERVER';
+export const ADD_REGISTRATION_SERVERS = 'ADD_REGISTRATION_SERVERS';
 
-export function addRegistrationServer(registrationServer: IRegistrationServer): EntitiesAction {
+export function addRegistrationServers(registrationServers: IRegistrationServer[]): EntitiesAction {
     return {
-        type: ADD_REGISTRATION_SERVER,
-        data: {registrationServers: new Array(registrationServer)}
+        type: ADD_REGISTRATION_SERVERS,
+        data: {registrationServers}
     }
 }
 export const DELETE_REGISTRATION_SERVER = 'DELETE_REGISTRATION_SERVER';
@@ -2066,12 +2066,12 @@ const fetchWorkerManagers = (id?: string) => ({
                 entity: 'workerManagers'
             }
 });
-export const ADD_WORKER_MANAGER = 'ADD_WORKER_MANAGER';
+export const ADD_WORKER_MANAGERS = 'ADD_WORKER_MANAGERS';
 
-export function addWorkerManager(workerManager: IWorkerManager): EntitiesAction {
+export function addWorkerManagers(workerManagers: IWorkerManager[]): EntitiesAction {
     return {
-        type: ADD_WORKER_MANAGER,
-        data: {workerManagers: new Array(workerManager)}
+        type: ADD_WORKER_MANAGERS,
+        data: {workerManagers}
     }
 }
 

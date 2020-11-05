@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addLoadBalancer, loadLoadBalancers, loadNodes, loadRegions} from "../../../actions";
+import {addLoadBalancers, loadLoadBalancers, loadNodes, loadRegions} from "../../../actions";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
@@ -75,7 +75,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadLoadBalancers: (id: string) => void;
-    addLoadBalancer: (loadBalancer: ILoadBalancer) => void;
+    addLoadBalancers: (loadBalancers: ILoadBalancer[]) => void;
     loadRegions: () => void;
     loadNodes: () => void;
 }
@@ -146,7 +146,6 @@ class LoadBalancer extends BaseComponent<Props, State> {
         if (loadBalancers.length === 1) {
             const loadBalancer = loadBalancers[0];
             super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
-            this.props.addLoadBalancer(loadBalancer);
             if (this.mounted) {
                 this.updateLoadBalancer(loadBalancer);
                 this.props.history.replace(loadBalancer.containerId)
@@ -158,6 +157,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 this.props.history.push('/load-balancers');
             }
         }
+        this.props.addLoadBalancers(loadBalancers);
     };
 
     private onPostFailure = (reason: string): void =>
@@ -382,7 +382,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
     loadLoadBalancers,
-    addLoadBalancer,
+    addLoadBalancers,
     loadRegions,
     loadNodes,
 };

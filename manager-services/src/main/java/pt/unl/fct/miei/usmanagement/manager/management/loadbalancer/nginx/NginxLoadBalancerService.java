@@ -35,6 +35,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
@@ -215,13 +216,11 @@ public class NginxLoadBalancerService {
 		loadBalancers.parallelStream().forEach(loadBalancer -> {
 			String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
 			HttpEntity<NginxServer[]> request = new HttpEntity<>(new NginxServer[]{nginxServer}, headers);
-			ResponseEntity<NginxServer[]> response = restTemplate.postForEntity(url, request, NginxServer[].class);
-			HttpStatus status = response.getStatusCode();
-			if (status != HttpStatus.ACCEPTED) {
-				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, status.getReasonPhrase());
-			}
-			else {
+			try {
+				restTemplate.postForEntity(url, request, NginxServer[].class);
 				log.info("Added server {} to load balancer {}", nginxServer, url);
+			} catch (HttpClientErrorException e) {
+				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, e.getMessage());
 			}
 		});
 	}
@@ -231,7 +230,12 @@ public class NginxLoadBalancerService {
 		List<ContainerEntity> loadBalancers = getLoadBalancers(region);
 		loadBalancers.parallelStream().forEach(loadBalancer -> {
 			String url = String.format("%s/%s/servers/%s", getLoadBalancerApiUrl(loadBalancer), serviceName, server);
-			restTemplate.delete(url);
+			try {
+				restTemplate.delete(url);
+			} catch (HttpClientErrorException e) {
+				throw new ManagerException("Failed to remove server %s of service %s from load balancer %s: %s", server, serviceName,
+					url, e.getMessage());
+			}
 		});
 		if (!containersService.hasContainers(region, serviceName)) {
 			initStopLoadBalancerTimer(region);

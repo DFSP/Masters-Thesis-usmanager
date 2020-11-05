@@ -37,7 +37,7 @@ import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../../actions";
+import {addNodes, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../regions/Region";
@@ -102,7 +102,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadNodes: (nodeId?: string) => void;
-    addNode: (node: INode) => void;
+    addNodes: (nodes: INode[]) => void;
     updateNode: (previousNode: INode, currentNode: INode) => void;
     loadEdgeHosts: () => void;
     loadCloudHosts: () => void;
@@ -182,7 +182,6 @@ class Node extends BaseComponent<Props, State> {
         if (nodes.length === 1) {
             const node = nodes[0];
             super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.publicIpAddress} has joined the swarm</span>`);
-            this.props.addNode(node);
             if (this.mounted) {
                 this.updateNode(node);
                 this.props.history.replace(node.id.toString());
@@ -191,6 +190,7 @@ class Node extends BaseComponent<Props, State> {
             super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> have joined the swarm</span>`);
             this.props.history.push("/nodes");
         }
+        this.props.addNodes(nodes);
     };
 
     private onPostFailure = (reason: string, node: INewNodeHost | INewNodeLocation): void => {
@@ -567,7 +567,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
     loadNodes,
-    addNode,
+    addNodes,
     updateNode,
     loadCloudHosts,
     loadEdgeHosts,

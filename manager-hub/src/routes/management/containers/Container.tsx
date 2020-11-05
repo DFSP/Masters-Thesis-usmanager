@@ -39,7 +39,7 @@ import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
-    addContainer,
+    addContainers,
     addContainerRules,
     addContainerSimulatedMetrics,
     loadContainers,
@@ -155,7 +155,7 @@ interface DispatchToProps {
     loadContainers: (containerId?: string) => void;
     loadNodes: () => void;
     loadServices: () => void;
-    addContainer: (container: IContainer) => void;
+    addContainers: (containers: IContainer[]) => void;
     addContainerRules: (containerId: string, rules: string[]) => void;
     addContainerSimulatedMetrics: (containerId: string, simulatedMetrics: string[]) => void;
 }
@@ -191,7 +191,7 @@ class Container extends BaseComponent<Props, State> {
         defaultExternalPort: 0,
         unsavedRules: [],
         unsavedSimulatedMetrics: [],
-        currentForm: 'On host',
+        currentForm: 'On location',
     };
     private mounted = false;
     private scrollbar: (ScrollBar | null) = null;
@@ -253,7 +253,6 @@ class Container extends BaseComponent<Props, State> {
         if (containers.length === 1) {
             const container = containers[0];
             super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at host ${container.publicIpAddress}</span>`);
-            this.props.addContainer(container);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
@@ -266,6 +265,7 @@ class Container extends BaseComponent<Props, State> {
                 this.props.history.push("/containers");
             }
         }
+        this.props.addContainers(containers);
     };
 
     private onPostFailure = (reason: string, container: INewContainerHost): void =>
@@ -628,13 +628,13 @@ class Container extends BaseComponent<Props, State> {
                                selectCallback: this.setDefaultPorts,
                                emptyMessage: 'No services available'
                            }}/>
-                    <Field key={'internalPort'}
-                           id={'internalPort'}
-                           label={'internalPort'}
-                           type={'number'}/>
                     <Field key={'externalPort'}
                            id={'externalPort'}
                            label={'externalPort'}
+                           type={'number'}/>
+                    <Field key={'internalPort'}
+                           id={'internalPort'}
+                           label={'internalPort'}
                            type={'number'}/>
                     <Field key='coordinates' id='coordinates' label='select position(s)' type='map'
                            map={{
@@ -702,7 +702,6 @@ class Container extends BaseComponent<Props, State> {
             };
         }
         const container = isNewContainer ? (currentForm === 'On host' ? newContainerHost : newContainerLocation) : this.getContainer();
-        console.log(currentForm, container)
         const formContainer = this.getFormContainer();
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
@@ -885,7 +884,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
     loadContainers,
-    addContainer,
+    addContainers,
     loadNodes,
     loadServices,
     addContainerRules,

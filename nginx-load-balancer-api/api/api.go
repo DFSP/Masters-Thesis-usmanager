@@ -102,12 +102,10 @@ func AddServiceServers(w http.ResponseWriter, r *http.Request) {
 		time.AfterFunc(time.Duration(delay)*time.Second, func() {
 			nginx.UpdateNginx()
 		})
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(servers)
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Servers already registered")
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(servers)
 }
 
 func DeleteServiceServer(w http.ResponseWriter, r *http.Request) {

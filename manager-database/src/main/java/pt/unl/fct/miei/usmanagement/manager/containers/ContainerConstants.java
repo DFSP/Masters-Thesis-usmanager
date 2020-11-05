@@ -53,6 +53,7 @@ public final class ContainerConstants {
 		public static final String SERVICE_PRIVATE_IP_ADDRESS = "servicePrivateIpAddress";
 		public static final String COORDINATES = "coordinates";
 		public static final String REGION = "region";
+		public static final String RECOVERY = "recover";
 	}
 
 }

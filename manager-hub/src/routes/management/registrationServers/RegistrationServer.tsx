@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addRegistrationServer, loadNodes, loadRegions, loadRegistrationServers,} from "../../../actions";
+import {addRegistrationServers, loadNodes, loadRegions, loadRegistrationServers,} from "../../../actions";
 import {connect} from "react-redux";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
@@ -75,7 +75,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadRegistrationServers: (id: string) => void;
-    addRegistrationServer: (registrationServer: IContainer) => void;
+    addRegistrationServers: (registrationServers: IRegistrationServer[]) => void;
     loadRegions: () => void;
     loadNodes: () => void;
 }
@@ -146,7 +146,6 @@ class RegistrationServer extends BaseComponent<Props, State> {
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
             super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
-            this.props.addRegistrationServer(registrationServer);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.containerId)
@@ -158,6 +157,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
                 this.props.history.push('/registration-servers');
             }
         }
+        this.props.addRegistrationServers(registrationServers);
     };
 
     private onPostFailure = (reason: string): void =>
@@ -360,7 +360,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
     loadRegistrationServers,
-    addRegistrationServer,
+    addRegistrationServers,
     loadRegions,
     loadNodes,
 };

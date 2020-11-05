@@ -238,124 +238,127 @@ public class DockerContainersService {
 		launchingContainer = true;
 		int retries = 5;
 		String errorMessage = null;
+		try {
+			for (var i = 0; i < retries; i++) {
 
-		for (var i = 0; i < retries; i++) {
-
-			if (!hostAddress.isComplete()) {
-				hostAddress = hostsService.getFullHostAddress(hostAddress);
-			}
-			String serviceName = service.getServiceName();
-			log.info("Launching container on mode {} with service {} at {}", containerType, serviceName, hostAddress);
-
-			if (containerType == ContainerType.SINGLETON) {
-				List<DockerContainer> containers = List.of();
-				try {
-					containers = getContainers(
-						DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
-						DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
-						DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress()));
+				if (!hostAddress.isComplete()) {
+					hostAddress = hostsService.getFullHostAddress(hostAddress);
 				}
-				catch (ManagerException e) {
-					log.error(e.getMessage());
+				String serviceName = service.getServiceName();
+				log.info("Launching container on mode {} with service {} at {}", containerType, serviceName, hostAddress);
+
+				if (containerType == ContainerType.SINGLETON) {
+					List<DockerContainer> containers = List.of();
+					try {
+						containers = getContainers(
+							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
+							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
+							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress()));
+					}
+					catch (ManagerException e) {
+						log.error(e.getMessage());
+					}
+					if (containers.size() > 0) {
+						DockerContainer container = containers.get(0);
+						log.info("Service {} is already running on container {} on host {}", serviceName, container.getId(), hostAddress);
+						return Optional.of(container);
+					}
 				}
-				if (containers.size() > 0) {
-					DockerContainer container = containers.get(0);
-					log.info("Service {} is already running on container {} on host {}", serviceName, container.getId(), hostAddress);
-					return Optional.of(container);
+
+				String serviceType = service.getServiceType().name();
+				int externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
+				int internalPort = service.getDefaultInternalPort();
+				String containerName = containerType == ContainerType.SINGLETON
+					? serviceName
+					: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
+				String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
+				String dockerRepository = service.getDockerRepository();
+				String launchCommand = service.getLaunchCommand();
+				if (launchCommand == null) {
+					launchCommand = "";
 				}
-			}
+				launchCommand = launchCommand
+					.replace("${hostname}", hostAddress.getPublicIpAddress())
+					.replace("${externalPort}", String.valueOf(externalPort))
+					.replace("${internalPort}", String.valueOf(internalPort));
+				log.info("Launch command: {}", launchCommand);
 
-			String serviceType = service.getServiceType().name();
-			int externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
-			int internalPort = service.getDefaultInternalPort();
-			String containerName = containerType == ContainerType.SINGLETON
-				? serviceName
-				: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
-			String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
-			String dockerRepository = service.getDockerRepository();
-			String launchCommand = service.getLaunchCommand();
-			if (launchCommand == null) {
-				launchCommand = "";
-			}
-			launchCommand = launchCommand
-				.replace("${hostname}", hostAddress.getPublicIpAddress())
-				.replace("${externalPort}", String.valueOf(externalPort))
-				.replace("${internalPort}", String.valueOf(internalPort));
-			log.info("Launch command: {}", launchCommand);
-
-			Region region = hostAddress.getRegion();
-			if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
-				String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
-				String registrationAddress = registrationServerService
-					.getRegistrationServerAddress(region)
-					.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
-				launchCommand = launchCommand.replace(outputLabel, registrationAddress);
-			}
-
-			for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
-				String databaseServiceName = databaseService.getServiceName();
-				String databaseHost = getDatabaseHostForService(hostAddress, databaseServiceName);
-				String outputLabel = databaseService.getOutputLabel();
-				launchCommand = launchCommand.replace(outputLabel, databaseHost);
-			}
-			for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
-				launchCommand = launchCommand.replace(param.getKey(), param.getValue());
-			}
-
-			List<String> containerEnvironment = new LinkedList<>();
-			containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
-			containerEnvironment.addAll(environment);
-
-			Map<String, String> containerLabels = new HashMap<>();
-			containerLabels.put(ContainerConstants.Label.US_MANAGER, String.valueOf(true));
-			containerLabels.put(ContainerConstants.Label.CONTAINER_TYPE, containerType.name());
-			containerLabels.put(ContainerConstants.Label.SERVICE_NAME, serviceName);
-			containerLabels.put(ContainerConstants.Label.SERVICE_TYPE, serviceType);
-			containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
-			containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
-			containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
-			containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
-			containerLabels.put(ContainerConstants.Label.REGION, region.name());
-			containerLabels.putAll(labels);
-
-			log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
-					+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
-				hostAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
-				containerLabels);
-
-			HostConfig hostConfig = HostConfig.builder()
-				.autoRemove(true)
-				.portBindings(Map.of(String.valueOf(internalPort), List.of(PortBinding.of("", String.valueOf(externalPort)))))
-				.build();
-			ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
-				.image(dockerRepository)
-				.exposedPorts(String.valueOf(internalPort))
-				.hostConfig(hostConfig)
-				.hostname(serviceName)
-				.env(containerEnvironment)
-				.labels(containerLabels);
-			ContainerConfig containerConfig = launchCommand.isEmpty()
-				? containerBuilder.build()
-				: containerBuilder.cmd(launchCommand.split(" ")).build();
-
-			try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
-				dockerClient.pull(dockerRepository);
-				ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
-				String containerId = containerCreation.id();
-				dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
-				dockerClient.startContainer(containerId);
-				if (ServiceType.getServiceType(serviceType) == ServiceType.FRONTEND) {
-					nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
+				Region region = hostAddress.getRegion();
+				if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
+					String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
+					String registrationAddress = registrationServerService
+						.getRegistrationServerAddress(region)
+						.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+					launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 				}
-				return getContainer(containerId);
+
+				for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
+					String databaseServiceName = databaseService.getServiceName();
+					String databaseHost = getDatabaseHostForService(hostAddress, databaseServiceName);
+					String outputLabel = databaseService.getOutputLabel();
+					launchCommand = launchCommand.replace(outputLabel, databaseHost);
+				}
+				for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
+					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
+				}
+
+				List<String> containerEnvironment = new LinkedList<>();
+				containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
+				containerEnvironment.addAll(environment);
+
+				Map<String, String> containerLabels = new HashMap<>();
+				containerLabels.put(ContainerConstants.Label.US_MANAGER, String.valueOf(true));
+				containerLabels.put(ContainerConstants.Label.CONTAINER_TYPE, containerType.name());
+				containerLabels.put(ContainerConstants.Label.SERVICE_NAME, serviceName);
+				containerLabels.put(ContainerConstants.Label.SERVICE_TYPE, serviceType);
+				containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
+				containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
+				containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
+				containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
+				containerLabels.put(ContainerConstants.Label.REGION, region.name());
+				containerLabels.putAll(labels);
+
+				log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
+						+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
+					hostAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
+					containerLabels);
+
+				HostConfig hostConfig = HostConfig.builder()
+					.autoRemove(true)
+					.portBindings(Map.of(String.valueOf(internalPort), List.of(PortBinding.of("", String.valueOf(externalPort)))))
+					.build();
+				ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
+					.image(dockerRepository)
+					.exposedPorts(String.valueOf(internalPort))
+					.hostConfig(hostConfig)
+					.hostname(serviceName)
+					.env(containerEnvironment)
+					.labels(containerLabels);
+				ContainerConfig containerConfig = launchCommand.isEmpty()
+					? containerBuilder.build()
+					: containerBuilder.cmd(launchCommand.split(" ")).build();
+
+				try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
+					dockerClient.pull(dockerRepository);
+					ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
+					String containerId = containerCreation.id();
+					dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
+					dockerClient.startContainer(containerId);
+					if (ServiceType.getServiceType(serviceType) == ServiceType.FRONTEND) {
+						nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
+					}
+					return getContainer(containerId);
+				}
+				catch (DockerException | InterruptedException e) {
+					errorMessage = e.getMessage();
+					log.error("Failed to start container: {}", errorMessage);
+				}
+				Timing.sleep(i, TimeUnit.SECONDS);
 			}
-			catch (DockerException | InterruptedException e) {
-				errorMessage = e.getMessage();
-				log.error("Failed to start container: {}", errorMessage);
-			}
-			Timing.sleep(i, TimeUnit.SECONDS);
 		}
-		launchingContainer = false;
+		finally {
+			launchingContainer = false;
+		}
 		throw new ManagerException("Failed to start container: %s", errorMessage);
 	}
 

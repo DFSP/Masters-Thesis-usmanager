@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addWorkerManager, assignWorkerManagerHosts, loadNodes, loadRegions, loadWorkerManagers} from "../../../actions";
+import {addWorkerManagers, assignWorkerManagerHosts, loadNodes, loadRegions, loadWorkerManagers} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply, postData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
@@ -80,7 +80,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadWorkerManagers: (id: string) => void;
-    addWorkerManager: (workerManager: IWorkerManager) => void;
+    addWorkerManagers: (workerManagers: IWorkerManager[]) => void;
     loadRegions: () => void;
     loadNodes: () => void;
     assignWorkerManagerHosts: (id: string, Hosts: string[]) => void;
@@ -156,7 +156,6 @@ class WorkerManager extends BaseComponent<Props, State> {
             const workerManager = workerManagers[0];
             const publicIpAddress = workerManager.container.publicIpAddress;
             super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
-            this.props.addWorkerManager(workerManager);
             this.saveEntities(workerManager);
             if (this.mounted) {
                 this.updateWorkerManager(workerManager);
@@ -169,6 +168,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                 this.props.history.push("/worker-managers");
             }
         }
+        this.props.addWorkerManagers(workerManagers);
     };
 
     private onPostFailure = (reason: string): void =>
@@ -417,7 +417,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
     loadWorkerManagers,
-    addWorkerManager,
+    addWorkerManagers,
     loadRegions,
     loadNodes,
     assignWorkerManagerHosts,
