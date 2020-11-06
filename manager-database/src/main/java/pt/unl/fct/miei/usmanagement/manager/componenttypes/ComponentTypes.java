@@ -21,61 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.componenttypes;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
+import java.util.Optional;
 
-@Entity
-@Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor
-@Setter
-@Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Repository
+public interface ComponentTypeRepository extends JpaRepository<ComponentType, Long> {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+	Optional<ComponentType> findByType(@Param("type") ComponentTypeEnum type);
 
-	@NotNull
-	private Region region;
-
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(getId());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof RegionEntity)) {
-			return false;
-		}
-		RegionEntity other = (RegionEntity) o;
-		return id != null && id.equals(other.getId());
-	}
+	@Query("select case when count(t) > 0 then true else false end "
+		+ "from ComponentType t "
+		+ "where lower(t.type) = lower(:type)")
+	boolean hasComponentType(@Param("type") String type);
 
 }
-*/

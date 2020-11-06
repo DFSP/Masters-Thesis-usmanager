@@ -21,24 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.decision;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,19 +56,34 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "decisions")
+public class DecisionEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@NotNull
-	private Region region;
+	@Enumerated(EnumType.STRING)
+	private RuleDecision ruleDecision;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	@ManyToOne
+	@JoinColumn(name = "component_type_id")
+	private ComponentType componentType;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ServiceEvent> serviceEvents;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostEvent> hostEvents;
+
+  /*@Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ServiceDecisionEntity> componentDecisionLogs;*/
 
 	@Override
 	public int hashCode() {
@@ -70,12 +95,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof DecisionEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		DecisionEntity other = (DecisionEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/

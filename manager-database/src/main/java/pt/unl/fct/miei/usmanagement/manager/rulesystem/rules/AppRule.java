@@ -21,24 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,19 +56,41 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "app_rules")
+public class AppRuleEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@NotNull
-	private Region region;
+	@Column(unique = true)
+	private String name;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	private int priority;
+
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<App> apps;
+
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private Decision decision;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "appRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AppRuleCondition> conditions;
+
+	public void removeAssociations() {
+		Iterator<App> appsIterator = apps.iterator();
+		while (appsIterator.hasNext()) {
+			App app = appsIterator.next();
+			appsIterator.remove();
+			app.getAppRules().remove(this);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -70,12 +102,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof AppRuleEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		AppRuleEntity other = (AppRuleEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/

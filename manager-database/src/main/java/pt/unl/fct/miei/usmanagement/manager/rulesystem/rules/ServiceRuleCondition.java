@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,13 +30,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -46,19 +46,20 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "service_rule_conditions")
+public class ServiceRuleConditionEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@NotNull
-	private Region region;
+	@ManyToOne
+	@JoinColumn(name = "service_rule_id")
+	private ServiceRuleEntity serviceRule;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	@ManyToOne
+	@JoinColumn(name = "condition_id")
+	private Condition serviceCondition;
 
 	@Override
 	public int hashCode() {
@@ -70,12 +71,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof ServiceRuleConditionEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		ServiceRuleConditionEntity other = (ServiceRuleConditionEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/

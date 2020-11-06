@@ -21,24 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,19 +56,41 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "container_rules")
+public class ContainerRuleEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@NotNull
-	private Region region;
+	@Column(unique = true)
+	private String name;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	private int priority;
+
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private Decision decision;
+
+	@Singular
+	@JsonIgnore
+	@ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<Container> containers;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ContainerRuleConditionEntity> conditions;
+
+	public void removeAssociations() {
+		Iterator<Container> containersIterator = containers.iterator();
+		while (containersIterator.hasNext()) {
+			Container container = containersIterator.next();
+			containersIterator.remove();
+			container.getContainerRules().remove(this);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -70,12 +102,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof ContainerRuleEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		ContainerRuleEntity other = (ContainerRuleEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/

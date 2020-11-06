@@ -21,61 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
-
-@Entity
-@Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor
-@Setter
-@Getter
-@Table(name = "regions")
-public class RegionEntity {
-
-	@Id
-	@GeneratedValue
-	private Long id;
-
-	@NotNull
-	private Region region;
-
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(getId());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof RegionEntity)) {
-			return false;
-		}
-		RegionEntity other = (RegionEntity) o;
-		return id != null && id.equals(other.getId());
-	}
+@Repository
+public interface ServiceRuleConditionRepository extends JpaRepository<ServiceRuleCondition, Long> {
 
 }
-*/

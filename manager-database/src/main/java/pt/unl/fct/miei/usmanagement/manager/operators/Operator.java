@@ -24,36 +24,71 @@
 
 package pt.unl.fct.miei.usmanagement.manager.operators;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
 
-public enum Operator {
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
+import java.util.Set;
 
-	NOT_EQUAL_TO("!="),
-	EQUAL_TO("=="),
-	GREATER_THAN(">"),
-	LESS_THAN("<"),
-	GREATER_THAN_OR_EQUAL_TO(">="),
-	LESS_THAN_OR_EQUAL_TO("<=");
+@Entity
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
+@Setter
+@Getter
+@Table(name = "operators")
+public class OperatorEntity {
 
-	private final String symbol;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-	Operator(String symbol) {
-		this.symbol = symbol;
+	@NaturalId
+	@Enumerated(EnumType.STRING)
+	private Operator operator;
+
+	@NotNull
+	@Column(unique = true)
+	private String symbol;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ConditionEntity> conditions;
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	public String getSymbol() {
-		return symbol;
-	}
-
-	@JsonCreator
-	public static Operator forValues(@JsonProperty("symbol") String symbol) {
-		for (Operator operator : Operator.values()) {
-			if (operator.symbol.equalsIgnoreCase(symbol)) {
-				return operator;
-			}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
 		}
-		return null;
+		if (!(o instanceof OperatorEntity)) {
+			return false;
+		}
+		OperatorEntity other = (OperatorEntity) o;
+		return id != null && id.equals(other.getId());
 	}
 
 }

@@ -21,61 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.operators;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
+public enum Operator {
 
-@Entity
-@Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor
-@Setter
-@Getter
-@Table(name = "regions")
-public class RegionEntity {
+	NOT_EQUAL_TO("!="),
+	EQUAL_TO("=="),
+	GREATER_THAN(">"),
+	LESS_THAN("<"),
+	GREATER_THAN_OR_EQUAL_TO(">="),
+	LESS_THAN_OR_EQUAL_TO("<=");
 
-	@Id
-	@GeneratedValue
-	private Long id;
+	private final String symbol;
 
-	@NotNull
-	private Region region;
-
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(getId());
+	Operator(String symbol) {
+		this.symbol = symbol;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
+	public String getSymbol() {
+		return symbol;
+	}
+
+	@JsonCreator
+	public static Operator forValues(@JsonProperty("symbol") String symbol) {
+		for (Operator operator : Operator.values()) {
+			if (operator.symbol.equalsIgnoreCase(symbol)) {
+				return operator;
+			}
 		}
-		if (!(o instanceof RegionEntity)) {
-			return false;
-		}
-		RegionEntity other = (RegionEntity) o;
-		return id != null && id.equals(other.getId());
+		return null;
 	}
 
 }
-*/

@@ -21,24 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.workermanagers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,19 +54,32 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "worker_managers")
+public class WorkerManagerEntity {
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	private String id;
 
 	@NotNull
-	private Region region;
+	@OneToOne(cascade = CascadeType.REMOVE)
+	private Container container;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<CloudHost> assignedCloudHosts;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<EdgeHost> assignedEdgeHosts;
+
+	@PrePersist
+	private void prePersist() {
+		if (this.getId() == null) {
+			this.setId(UUID.randomUUID().toString());
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -70,12 +91,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof WorkerManagerEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		WorkerManagerEntity other = (WorkerManagerEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/

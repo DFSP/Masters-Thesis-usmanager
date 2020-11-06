@@ -21,24 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.decision;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
 
-import javax.persistence.Column;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -46,19 +57,38 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "regions")
-public class RegionEntity {
+@Table(name = "host_decisions")
+public class HostDecisionEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@NotNull
-	private Region region;
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private Decision decision;
 
-	@Builder.Default
-	@Column(columnDefinition = "boolean default true")
-	private boolean active = true;
+	@ManyToOne
+	@JoinColumn(name = "rule_id")
+	private HostRuleEntity rule;
+
+	@Lob
+	private HostAddress hostAddress;
+
+	@Basic
+	private Timestamp timestamp;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostDecisionValueEntity> hostDecisions;
+
+	@PrePersist
+	public void prePersist() {
+		if (timestamp == null) {
+			timestamp = Timestamp.from(Instant.now());
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -70,12 +100,11 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof ServiceDecisionEntity)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		ServiceDecisionEntity other = (ServiceDecisionEntity) o;
 		return id != null && id.equals(other.getId());
 	}
 
 }
-*/
