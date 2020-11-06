@@ -29,8 +29,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionRepository;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -39,45 +39,45 @@ import java.util.List;
 @Service
 public class ConditionsService {
 
-	private final ConditionRepository conditions;
+	private final Conditions conditions;
 
-	public ConditionsService(ConditionRepository conditions) {
+	public ConditionsService(Conditions conditions) {
 		this.conditions = conditions;
 	}
 
-	public List<ConditionEntity> getConditions() {
+	public List<Condition> getConditions() {
 		return conditions.findAll();
 	}
 
-	public ConditionEntity getCondition(Long id) {
+	public Condition getCondition(Long id) {
 		return conditions.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "id", id.toString()));
+			new EntityNotFoundException(Condition.class, "id", id.toString()));
 	}
 
-	public ConditionEntity getCondition(String conditionName) {
+	public Condition getCondition(String conditionName) {
 		return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+			new EntityNotFoundException(Condition.class, "conditionName", conditionName));
 	}
 
-	public ConditionEntity addCondition(ConditionEntity condition) {
+	public Condition addCondition(Condition condition) {
 		checkConditionDoesntExist(condition);
 		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
 		return conditions.save(condition);
 	}
 
-	public ConditionEntity updateCondition(String conditionName, ConditionEntity newCondition) {
-		ConditionEntity condition = getCondition(conditionName);
+	public Condition updateCondition(String conditionName, Condition newCondition) {
+		Condition condition = getCondition(conditionName);
 		ObjectUtils.copyValidProperties(newCondition, condition);
 		condition = conditions.save(condition);
 		return condition;
 	}
 
 	public void deleteCondition(String conditionName) {
-		ConditionEntity condition = getCondition(conditionName);
+		Condition condition = getCondition(conditionName);
 		conditions.delete(condition);
 	}
 
-	private void checkConditionDoesntExist(ConditionEntity condition) {
+	private void checkConditionDoesntExist(Condition condition) {
 		String name = condition.getName();
 		if (conditions.hasCondition(name)) {
 			throw new DataIntegrityViolationException("Condition '" + name + "' already exists");

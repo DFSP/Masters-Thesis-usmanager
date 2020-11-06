@@ -28,11 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricsRepository;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
@@ -40,77 +39,77 @@ import java.util.List;
 import java.util.Random;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class ServiceSimulatedMetricsService {
 
 	private final ServicesService servicesService;
 
-	private final ServiceSimulatedMetricsRepository serviceSimulatedMetrics;
+	private final ServiceSimulatedMetrics serviceSimulatedMetrics;
 
 	public ServiceSimulatedMetricsService(@Lazy ServicesService servicesService,
-										  ServiceSimulatedMetricsRepository serviceSimulatedMetrics) {
+										  ServiceSimulatedMetrics serviceSimulatedMetrics) {
 		this.servicesService = servicesService;
 		this.serviceSimulatedMetrics = serviceSimulatedMetrics;
 	}
 
-	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
+	public List<ServiceSimulatedMetric> getServiceSimulatedMetrics() {
 		return serviceSimulatedMetrics.findAll();
 	}
 
-	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetricByService(String serviceName) {
+	public List<ServiceSimulatedMetric> getServiceSimulatedMetricByService(String serviceName) {
 		return serviceSimulatedMetrics.findByService(serviceName);
 	}
 
-	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(Long id) {
+	public ServiceSimulatedMetric getServiceSimulatedMetric(Long id) {
 		return serviceSimulatedMetrics.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ServiceSimulatedMetric.class, "id", id.toString()));
 	}
 
-	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(String simulatedMetricName) {
+	public ServiceSimulatedMetric getServiceSimulatedMetric(String simulatedMetricName) {
 		return serviceSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+			new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
 
-	public ServiceSimulatedMetricEntity addServiceSimulatedMetric(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+	public ServiceSimulatedMetric addServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
 		checkServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
 		log.info("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
 
-	public ServiceSimulatedMetricEntity updateServiceSimulatedMetric(String simulatedMetricName,
-																	 ServiceSimulatedMetricEntity newServiceSimulatedMetric) {
+	public ServiceSimulatedMetric updateServiceSimulatedMetric(String simulatedMetricName,
+															   ServiceSimulatedMetric newServiceSimulatedMetric) {
 		log.info("Updating simulated service metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newServiceSimulatedMetric));
-		ServiceSimulatedMetricEntity serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
+		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newServiceSimulatedMetric, serviceSimulatedMetric);
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
 
 	public void deleteServiceSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated service metric {}", simulatedMetricName);
-		ServiceSimulatedMetricEntity serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
+		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
 		serviceSimulatedMetric.removeAssociations();
 		serviceSimulatedMetrics.delete(serviceSimulatedMetric);
 	}
 
-	public List<ServiceSimulatedMetricEntity> getGenericServiceSimulatedMetrics() {
+	public List<ServiceSimulatedMetric> getGenericServiceSimulatedMetrics() {
 		return serviceSimulatedMetrics.findGenericServiceSimulatedMetrics();
 	}
 
-	public ServiceSimulatedMetricEntity getGenericServiceSimulatedMetric(String simulatedMetricName) {
+	public ServiceSimulatedMetric getGenericServiceSimulatedMetric(String simulatedMetricName) {
 		return serviceSimulatedMetrics.findGenericServiceSimulatedMetric(simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+			new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
 	
-	public List<ServiceEntity> getServices(String simulatedMetricName) {
+	public List<Service> getServices(String simulatedMetricName) {
 		checkServiceSimulatedMetricExists(simulatedMetricName);
 		return serviceSimulatedMetrics.getServices(simulatedMetricName);
 	}
 
-	public ServiceEntity getService(String simulatedMetricName, String serviceName) {
+	public Service getService(String simulatedMetricName, String serviceName) {
 		checkServiceSimulatedMetricExists(simulatedMetricName);
 		return serviceSimulatedMetrics.getService(simulatedMetricName, serviceName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
+			new EntityNotFoundException(Service.class, "serviceName", serviceName));
 	}
 
 	public void addService(String simulatedMetricName, String serviceName) {
@@ -119,9 +118,9 @@ public class ServiceSimulatedMetricsService {
 
 	public void addServices(String simulatedMetricName, List<String> serviceNames) {
 		log.info("Adding services {} to simulated metric {}", serviceNames, simulatedMetricName);
-		ServiceSimulatedMetricEntity serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
+		ServiceSimulatedMetric serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
 		serviceNames.forEach(serviceName -> {
-			ServiceEntity service = servicesService.getService(serviceName);
+			Service service = servicesService.getService(serviceName);
 			service.addServiceSimulatedMetric(serviceMetric);
 		});
 		serviceSimulatedMetrics.save(serviceMetric);
@@ -133,13 +132,13 @@ public class ServiceSimulatedMetricsService {
 
 	public void removeServices(String simulatedMetricName, List<String> serviceNames) {
 		log.info("Removing services {} from simulated metric {}", serviceNames, simulatedMetricName);
-		ServiceSimulatedMetricEntity serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
+		ServiceSimulatedMetric serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
 		serviceNames.forEach(serviceName ->
 			servicesService.getService(serviceName).removeServiceSimulatedMetric(serviceMetric));
 		serviceSimulatedMetrics.save(serviceMetric);
 	}
 
-	public Double randomizeFieldValue(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+	public Double randomizeFieldValue(ServiceSimulatedMetric serviceSimulatedMetric) {
 		Random random = new Random();
 		double minValue = serviceSimulatedMetric.getMinimumValue();
 		double maxValue = serviceSimulatedMetric.getMaximumValue();
@@ -148,11 +147,11 @@ public class ServiceSimulatedMetricsService {
 	
 	private void checkServiceSimulatedMetricExists(String simulatedMetricName) {
 		if (!serviceSimulatedMetrics.hasServiceSimulatedMetric(simulatedMetricName)) {
-			throw new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
+			throw new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName);
 		}
 	}
 
-	private void checkServiceSimulatedMetricDoesntExist(ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+	private void checkServiceSimulatedMetricDoesntExist(ServiceSimulatedMetric serviceSimulatedMetric) {
 		String name = serviceSimulatedMetric.getName();
 		if (serviceSimulatedMetrics.hasServiceSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated service metric '" + name + "' already exists");

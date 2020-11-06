@@ -28,9 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEventRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvents;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,26 +39,26 @@ import java.util.Objects;
 @Service
 public class HostsEventsService {
 
-	private final HostEventRepository hostEvents;
+	private final HostEvents hostEvents;
 	private final DecisionsService decisionsService;
 
-	public HostsEventsService(HostEventRepository hostEvents, DecisionsService decisionsService) {
+	public HostsEventsService(HostEvents hostEvents, DecisionsService decisionsService) {
 		this.hostEvents = hostEvents;
 		this.decisionsService = decisionsService;
 	}
 
-	public List<HostEventEntity> getHostEvents() {
+	public List<HostEvent> getHostEvents() {
 		return hostEvents.findAll();
 	}
 
-	public List<HostEventEntity> getHostEventsByHostAddress(HostAddress hostAddress) {
+	public List<HostEvent> getHostEventsByHostAddress(HostAddress hostAddress) {
 		return hostEvents.findByHostAddress(hostAddress);
 	}
 
-	public HostEventEntity saveHostEvent(HostAddress hostAddress, String decisionName) {
-		DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
-		HostEventEntity hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
-			.orElseGet(() -> HostEventEntity.builder().hostAddress(hostAddress).decision(decision).count(0).build());
+	public HostEvent saveHostEvent(HostAddress hostAddress, String decisionName) {
+		Decision decision = decisionsService.getHostPossibleDecision(decisionName);
+		HostEvent hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
+			.orElseGet(() -> HostEvent.builder().hostAddress(hostAddress).decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
 			hostEvent.setCount(1);

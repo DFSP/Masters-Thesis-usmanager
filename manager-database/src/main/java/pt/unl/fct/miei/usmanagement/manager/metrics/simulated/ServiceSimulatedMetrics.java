@@ -27,58 +27,56 @@ package pt.unl.fct.miei.usmanagement.manager.metrics.simulated;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface ServiceSimulatedMetricsRepository extends JpaRepository<ServiceSimulatedMetricEntity, Long> {
+public interface ServiceSimulatedMetrics extends JpaRepository<ServiceSimulatedMetric, Long> {
 
-	Optional<ServiceSimulatedMetricEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<ServiceSimulatedMetric> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetricEntity m left join m.services s "
+		+ "from ServiceSimulatedMetric m left join m.services s "
 		+ "where m.generic = true or s.serviceName = :serviceName")
-	List<ServiceSimulatedMetricEntity> findByService(@Param("serviceName") String serviceName);
+	List<ServiceSimulatedMetric> findByService(@Param("serviceName") String serviceName);
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetricEntity m join m.services s "
+		+ "from ServiceSimulatedMetric m join m.services s "
 		+ "where lower(s.serviceName) = lower(:serviceName) and lower(m.field.name) = lower(:field)")
-	Optional<ServiceSimulatedMetricEntity> findByServiceAndField(@Param("serviceName") String serviceName,
-																 @Param("field") String field);
+	Optional<ServiceSimulatedMetric> findByServiceAndField(@Param("serviceName") String serviceName,
+														   @Param("field") String field);
 
 	@Query("select case when count(m) > 0 then true else false end "
-		+ "from ServiceSimulatedMetricEntity m "
+		+ "from ServiceSimulatedMetric m "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
 	boolean hasServiceSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
-	
+
 	@Query("select m "
-		+ "from ServiceSimulatedMetricEntity m "
+		+ "from ServiceSimulatedMetric m "
 		+ "where m.generic = true and lower(m.field.name) = lower(:field)")
-	Optional<ServiceSimulatedMetricEntity> findGenericByField(@Param("field") String field);
+	Optional<ServiceSimulatedMetric> findGenericByField(@Param("field") String field);
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetricEntity m "
+		+ "from ServiceSimulatedMetric m "
 		+ "where m.generic = true")
-	List<ServiceSimulatedMetricEntity> findGenericServiceSimulatedMetrics();
+	List<ServiceSimulatedMetric> findGenericServiceSimulatedMetrics();
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetricEntity m "
+		+ "from ServiceSimulatedMetric m "
 		+ "where m.generic = true and lower(m.name) = lower(:simulatedMetricName)")
-	Optional<ServiceSimulatedMetricEntity> findGenericServiceSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
-	
+	Optional<ServiceSimulatedMetric> findGenericServiceSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
+
 
 	@Query("select s "
-		+ "from ServiceSimulatedMetricEntity m join m.services s "
+		+ "from ServiceSimulatedMetric m join m.services s "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
-	List<ServiceEntity> getServices(@Param("simulatedMetricName") String simulatedMetricName);
+	List<Service> getServices(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select s "
-		+ "from ServiceSimulatedMetricEntity m join m.services s "
+		+ "from ServiceSimulatedMetric m join m.services s "
 		+ "where lower(m.name) = lower(:simulatedMetricName) and s.serviceName = :serviceName")
-	Optional<ServiceEntity> getService(@Param("simulatedMetricName") String simulatedMetricName,
-									   @Param("serviceName") String serviceName);
+	Optional<Service> getService(@Param("simulatedMetricName") String simulatedMetricName,
+								 @Param("serviceName") String serviceName);
 
 }

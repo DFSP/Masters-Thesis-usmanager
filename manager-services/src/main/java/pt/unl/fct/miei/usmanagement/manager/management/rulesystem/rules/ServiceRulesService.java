@@ -28,19 +28,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleRepository;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRules;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
@@ -52,20 +50,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class ServiceRulesService {
 
 	private final ConditionsService conditionsService;
 	private final DroolsService droolsService;
 	private final ServicesService servicesService;
 
-	private final ServiceRuleRepository rules;
+	private final ServiceRules rules;
 
 	private final String serviceRuleTemplateFile;
 	private final AtomicLong lastUpdateServiceRules;
 
 	public ServiceRulesService(ConditionsService conditionsService, DroolsService droolsService,
-							   @Lazy ServicesService servicesService, ServiceRuleRepository rules,
+							   @Lazy ServicesService servicesService, ServiceRules rules,
 							   RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.droolsService = droolsService;
@@ -80,30 +78,30 @@ public class ServiceRulesService {
 		lastUpdateServiceRules.getAndSet(currentTime);
 	}
 
-	public List<ServiceRuleEntity> getRules() {
+	public List<ServiceRule> getRules() {
 		return rules.findAll();
 	}
 
-	public ServiceRuleEntity getRule(Long id) {
+	public ServiceRule getRule(Long id) {
 		return rules.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ServiceRuleEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ServiceRule.class, "id", id.toString()));
 	}
 
-	public ServiceRuleEntity getRule(String name) {
+	public ServiceRule getRule(String name) {
 		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-			new EntityNotFoundException(ServiceRuleEntity.class, "name", name));
+			new EntityNotFoundException(ServiceRule.class, "name", name));
 	}
 
-	public ServiceRuleEntity addRule(ServiceRuleEntity rule) {
+	public ServiceRule addRule(ServiceRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		setLastUpdateServiceRules();
 		return rules.save(rule);
 	}
 
-	public ServiceRuleEntity updateRule(String ruleName, ServiceRuleEntity newRule) {
+	public ServiceRule updateRule(String ruleName, ServiceRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
-		ServiceRuleEntity rule = getRule(ruleName);
+		ServiceRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
 		rule = rules.save(rule);
 		setLastUpdateServiceRules();
@@ -112,37 +110,37 @@ public class ServiceRulesService {
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
-		ServiceRuleEntity rule = getRule(ruleName);
+		ServiceRule rule = getRule(ruleName);
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateServiceRules();
 	}
 
-	public List<ServiceRuleEntity> getServiceRules(String serviceName) {
+	public List<ServiceRule> getServiceRules(String serviceName) {
 		return rules.findByServiceName(serviceName);
 	}
 
-	public List<ServiceRuleEntity> getGenericServiceRules() {
+	public List<ServiceRule> getGenericServiceRules() {
 		return rules.findGenericServiceRules();
 	}
 
-	public ConditionEntity getCondition(String ruleName, String conditionName) {
+	public Condition getCondition(String ruleName, String conditionName) {
 		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+			new EntityNotFoundException(Condition.class, "conditionName", conditionName));
 	}
 
-	public List<ConditionEntity> getConditions(String ruleName) {
+	public List<Condition> getConditions(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
 	public void addCondition(String ruleName, String conditionName) {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
-		ConditionEntity condition = conditionsService.getCondition(conditionName);
-		ServiceRuleEntity rule = getRule(ruleName);
-		ServiceRuleConditionEntity serviceRuleCondition =
-			ServiceRuleConditionEntity.builder().serviceCondition(condition).serviceRule(rule).build();
+		Condition condition = conditionsService.getCondition(conditionName);
+		ServiceRule rule = getRule(ruleName);
+		ServiceRuleCondition serviceRuleCondition =
+			ServiceRuleCondition.builder().serviceCondition(condition).serviceRule(rule).build();
 		rule = rule.toBuilder().condition(serviceRuleCondition).build();
 		rules.save(rule);
 		setLastUpdateServiceRules();
@@ -158,20 +156,20 @@ public class ServiceRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		ServiceRuleEntity rule = getRule(ruleName);
+		ServiceRule rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
 		rules.save(rule);
 		setLastUpdateServiceRules();
 	}
 
-	public ServiceEntity getService(String ruleName, String serviceName) {
+	public Service getService(String ruleName, String serviceName) {
 		checkRuleExists(ruleName);
 		return rules.getService(ruleName, serviceName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
+			new EntityNotFoundException(Service.class, "serviceName", serviceName));
 	}
 
-	public List<ServiceEntity> getServices(String ruleName) {
+	public List<Service> getServices(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getServices(ruleName);
 	}
@@ -182,9 +180,9 @@ public class ServiceRulesService {
 
 	public void addServices(String ruleName, List<String> serviceNames) {
 		log.info("Adding services {} to rule {}", serviceNames, ruleName);
-		ServiceRuleEntity rule = getRule(ruleName);
+		ServiceRule rule = getRule(ruleName);
 		serviceNames.forEach(serviceName -> {
-			ServiceEntity service = servicesService.getService(serviceName);
+			Service service = servicesService.getService(serviceName);
 			service.addRule(rule);
 		});
 		rules.save(rule);
@@ -197,7 +195,7 @@ public class ServiceRulesService {
 
 	public void removeServices(String ruleName, List<String> serviceNames) {
 		log.info("Removing services {} from rule {}", serviceNames, ruleName);
-		ServiceRuleEntity rule = getRule(ruleName);
+		ServiceRule rule = getRule(ruleName);
 		serviceNames.forEach(serviceName -> servicesService.getService(serviceName).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateServiceRules();
@@ -205,11 +203,11 @@ public class ServiceRulesService {
 
 	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
-			throw new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName);
+			throw new EntityNotFoundException(ServiceRule.class, "ruleName", ruleName);
 		}
 	}
 
-	private void checkRuleDoesntExist(ServiceRuleEntity serviceRule) {
+	private void checkRuleDoesntExist(ServiceRule serviceRule) {
 		String name = serviceRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Service rule '" + name + "' already exists");
@@ -227,8 +225,8 @@ public class ServiceRulesService {
 	}
 
 	private List<Rule> generateServiceRules(String serviceName) {
-		List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
-		List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
+		List<ServiceRule> genericServiceRules = getGenericServiceRules();
+		List<ServiceRule> serviceRules = getServiceRules(serviceName);
 		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size());
 		log.info("Generating service rules... (count: {})", rules.size());
 		genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
@@ -236,16 +234,16 @@ public class ServiceRulesService {
 		return rules;
 	}
 
-	private Rule generateServiceRule(ServiceRuleEntity serviceRule) {
+	private Rule generateServiceRule(ServiceRule serviceRule) {
 		Long id = serviceRule.getId();
-		List<Condition> conditions = getConditions(serviceRule.getName()).stream().map(condition -> {
+		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(serviceRule.getName()).stream().map(condition -> {
 			String fieldName = String.format("%s-%S", condition.getField().getName(),
 				condition.getValueMode().getName());
 			double value = condition.getValue();
-			Operator operator = condition.getOperator().getOperator();
-			return new Condition(fieldName, value, operator);
+			OperatorEnum operator = condition.getOperator().getOperator();
+			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
 		}).collect(Collectors.toList());
-		RuleDecision decision = serviceRule.getDecision().getRuleDecision();
+		RuleDecisionEnum decision = serviceRule.getDecision().getRuleDecision();
 		int priority = serviceRule.getPriority();
 		return new Rule(id, conditions, decision, priority);
 	}

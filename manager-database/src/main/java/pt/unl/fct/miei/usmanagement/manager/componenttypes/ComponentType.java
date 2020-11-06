@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -53,7 +53,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "component_types")
-public class ComponentTypeEntity {
+public class ComponentType {
 
 	@Id
 	@GeneratedValue
@@ -61,12 +61,12 @@ public class ComponentTypeEntity {
 
 	@NaturalId
 	@Enumerated(EnumType.STRING)
-	private ComponentType type;
+	private ComponentTypeEnum type;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<DecisionEntity> decisions;
+	private Set<Decision> decisions;
 
 	@Override
 	public int hashCode() {
@@ -78,10 +78,10 @@ public class ComponentTypeEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ComponentTypeEntity)) {
+		if (!(o instanceof ComponentType)) {
 			return false;
 		}
-		ComponentTypeEntity other = (ComponentTypeEntity) o;
+		ComponentType other = (ComponentType) o;
 		return id != null && id.equals(other.getId());
 	}
 

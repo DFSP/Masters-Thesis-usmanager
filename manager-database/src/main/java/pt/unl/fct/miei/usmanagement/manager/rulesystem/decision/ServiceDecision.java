@@ -32,7 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -56,7 +56,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "service_decisions")
-public class ServiceDecisionEntity {
+public class ServiceDecision {
 
 	@Id
 	@GeneratedValue
@@ -74,7 +74,7 @@ public class ServiceDecisionEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "rule_id")
-	private ServiceRuleEntity rule;
+	private ServiceRule rule;
 
 	@Basic
 	private Timestamp timestamp;
@@ -82,7 +82,7 @@ public class ServiceDecisionEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceDecisionValueEntity> serviceDecisionValues;
+	private Set<ServiceDecisionValue> serviceDecisionValues;
 
 	@PrePersist
 	public void prePersist() {
@@ -101,10 +101,10 @@ public class ServiceDecisionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceDecisionEntity)) {
+		if (!(o instanceof ServiceDecision)) {
 			return false;
 		}
-		ServiceDecisionEntity other = (ServiceDecisionEntity) o;
+		ServiceDecision other = (ServiceDecision) o;
 		return id != null && id.equals(other.getId());
 	}
 

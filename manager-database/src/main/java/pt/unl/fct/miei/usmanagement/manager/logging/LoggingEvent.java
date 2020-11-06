@@ -46,7 +46,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "logging_event")
-public class LoggingEventEntity {
+public class LoggingEvent {
 
 	@NotNull
 	private Long timestmp;
@@ -85,10 +85,10 @@ public class LoggingEventEntity {
 	private Long eventId;
 
 	@OneToOne
-	private LoggingEventPropertyEntity loggingEventProperty;
+	private LoggingEventProperty loggingEventProperty;
 
 	@OneToOne
-	private LoggingEventExceptionEntity loggingEventException;
+	private LoggingEventException loggingEventException;
 
 	@Override
 	public int hashCode() {
@@ -100,10 +100,10 @@ public class LoggingEventEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof LoggingEventEntity)) {
+		if (!(o instanceof LoggingEvent)) {
 			return false;
 		}
-		LoggingEventEntity other = (LoggingEventEntity) o;
+		LoggingEvent other = (LoggingEvent) o;
 		return eventId != null && eventId.equals(other.getEventId());
 	}
 

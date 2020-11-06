@@ -26,15 +26,13 @@ package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface ServiceEventRepository extends JpaRepository<ServiceEventEntity, Long> {
+public interface ServiceEvents extends JpaRepository<ServiceEvent, Long> {
 
-	List<ServiceEventEntity> findByContainerIdStartingWith(@Param("containerId") String containerId);
+	List<ServiceEvent> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
-	List<ServiceEventEntity> findByServiceName(@Param("serviceName") String serviceName);
+	List<ServiceEvent> findByServiceName(@Param("serviceName") String serviceName);
 
 }

@@ -37,9 +37,9 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -61,7 +61,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "cloud_hosts")
-public class CloudHostEntity {
+public class CloudHost {
 
 	@Id
 	@GeneratedValue
@@ -92,7 +92,7 @@ public class CloudHostEntity {
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne
-	private WorkerManagerEntity managedByWorker;
+	private WorkerManager managedByWorker;
 
 	@Singular
 	@JsonIgnore
@@ -101,7 +101,7 @@ public class CloudHostEntity {
 		joinColumns = @JoinColumn(name = "cloud_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
-	private Set<HostRuleEntity> hostRules;
+	private Set<HostRule> hostRules;
 
 	@Singular
 	@JsonIgnore
@@ -110,24 +110,24 @@ public class CloudHostEntity {
 		joinColumns = @JoinColumn(name = "cloud_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
-	private Set<HostSimulatedMetricEntity> simulatedHostMetrics;
+	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
-	public void addRule(HostRuleEntity rule) {
+	public void addRule(HostRule rule) {
 		hostRules.add(rule);
 		rule.getCloudHosts().add(this);
 	}
 
-	public void removeRule(HostRuleEntity rule) {
+	public void removeRule(HostRule rule) {
 		hostRules.remove(rule);
 		rule.getCloudHosts().remove(this);
 	}
 
-	public void addHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
+	public void addHostSimulatedMetric(HostSimulatedMetric hostMetric) {
 		simulatedHostMetrics.add(hostMetric);
 		hostMetric.getCloudHosts().add(this);
 	}
 
-	public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
+	public void removeHostSimulatedMetric(HostSimulatedMetric hostMetric) {
 		simulatedHostMetrics.remove(hostMetric);
 		hostMetric.getCloudHosts().remove(this);
 	}
@@ -148,10 +148,10 @@ public class CloudHostEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof CloudHostEntity)) {
+		if (!(o instanceof CloudHost)) {
 			return false;
 		}
-		CloudHostEntity other = (CloudHostEntity) o;
+		CloudHost other = (CloudHost) o;
 		return id != null && id.equals(other.getId());
 	}
 

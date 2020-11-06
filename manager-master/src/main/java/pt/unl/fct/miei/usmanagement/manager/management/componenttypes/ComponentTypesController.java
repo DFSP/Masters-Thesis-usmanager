@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEntity;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,28 +48,28 @@ public class ComponentTypesController {
 	}
 
 	@GetMapping
-	public List<ComponentTypeEntity> getComponentTypes() {
+	public List<ComponentType> getComponentTypes() {
 		return componentTypesService.getComponentTypes();
 	}
 
 	@GetMapping("/{componentTypeId}")
-	public ComponentTypeEntity getComponentType(@PathVariable Long componentTypeId) {
+	public ComponentType getComponentType(@PathVariable Long componentTypeId) {
 		return componentTypesService.getComponentType(componentTypeId);
 	}
 
 	@GetMapping("/{componentTypeName}")
-	public ComponentTypeEntity getComponentType(@PathVariable String componentTypeName) {
+	public ComponentType getComponentType(@PathVariable String componentTypeName) {
 		return componentTypesService.getComponentType(componentTypeName);
 	}
 
 	@PostMapping
-	public ComponentTypeEntity addComponentType(@RequestBody ComponentTypeEntity componentType) {
+	public ComponentType addComponentType(@RequestBody ComponentType componentType) {
 		Validation.validatePostRequest(componentType.getId());
 		return componentTypesService.addComponentType(componentType);
 	}
 
 	@PutMapping("/{componentTypeName}")
-	public ComponentTypeEntity updateComponentType(@PathVariable String componentTypeName, @RequestBody ComponentTypeEntity componentType) {
+	public ComponentType updateComponentType(@PathVariable String componentTypeName, @RequestBody ComponentType componentType) {
 		Validation.validatePutRequest(componentType.getId());
 		return componentTypesService.updateComponentType(componentTypeName, componentType);
 	}

@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.Arrays;
@@ -54,23 +54,23 @@ public class ServicesController {
 	}
 
 	@GetMapping
-	public List<ServiceEntity> getServices() {
+	public List<Service> getServices() {
 		return servicesService.getServices();
 	}
 
 	@GetMapping("/{serviceName}")
-	public ServiceEntity getService(@PathVariable String serviceName) {
+	public Service getService(@PathVariable String serviceName) {
 		return servicesService.getService(serviceName);
 	}
 
 	@PostMapping
-	public ServiceEntity addService(@RequestBody ServiceEntity service) {
+	public Service addService(@RequestBody Service service) {
 		Validation.validatePostRequest(service.getId());
 		return servicesService.addService(service);
 	}
 
 	@PutMapping("/{serviceName}")
-	public ServiceEntity updateService(@PathVariable String serviceName, @RequestBody ServiceEntity service) {
+	public Service updateService(@PathVariable String serviceName, @RequestBody Service service) {
 		Validation.validatePutRequest(service.getId());
 		return servicesService.updateService(serviceName, service);
 	}
@@ -81,7 +81,7 @@ public class ServicesController {
 	}
 
 	@GetMapping("/{serviceName}/apps")
-	public List<AppEntity> getServiceApps(@PathVariable String serviceName) {
+	public List<App> getServiceApps(@PathVariable String serviceName) {
 		return servicesService.getApps(serviceName);
 	}
 
@@ -101,7 +101,7 @@ public class ServicesController {
 	}
 
 	@GetMapping("/{serviceName}/dependencies")
-	public List<ServiceEntity> getServiceDependencies(@PathVariable String serviceName) {
+	public List<Service> getServiceDependencies(@PathVariable String serviceName) {
 		return servicesService.getDependencies(serviceName);
 	}
 
@@ -121,18 +121,18 @@ public class ServicesController {
 	}
 
 	@GetMapping("/{serviceName}/dependents")
-	public List<ServiceEntity> getServiceDependents(@PathVariable String serviceName) {
+	public List<Service> getServiceDependents(@PathVariable String serviceName) {
 		return servicesService.getDependents(serviceName);
 	}
 
 	@GetMapping("/{serviceName}/predictions")
-	public List<ServiceEventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
+	public List<ServiceEventPrediction> getServicePredictions(@PathVariable String serviceName) {
 		return servicesService.getPredictions(serviceName);
 	}
 
 	@PostMapping("/{serviceName}/predictions")
-	public List<ServiceEventPredictionEntity> addServicePredictions(@PathVariable String serviceName,
-																	@RequestBody ServiceEventPredictionEntity[] predictions) {
+	public List<ServiceEventPrediction> addServicePredictions(@PathVariable String serviceName,
+															  @RequestBody ServiceEventPrediction[] predictions) {
 		return servicesService.addPredictions(serviceName, Arrays.asList(predictions));
 	}
 
@@ -147,7 +147,7 @@ public class ServicesController {
 	}
 
 	@GetMapping("/{serviceName}/rules")
-	public List<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
+	public List<ServiceRule> getServiceRules(@PathVariable String serviceName) {
 		return servicesService.getRules(serviceName);
 	}
 
@@ -167,7 +167,7 @@ public class ServicesController {
 	}
 
 	@GetMapping("/{serviceName}/simulated-metrics")
-	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics(@PathVariable String serviceName) {
+	public List<ServiceSimulatedMetric> getServiceSimulatedMetrics(@PathVariable String serviceName) {
 		return servicesService.getSimulatedMetrics(serviceName);
 	}
 

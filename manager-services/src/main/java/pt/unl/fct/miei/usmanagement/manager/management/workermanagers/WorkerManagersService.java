@@ -28,19 +28,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerRepository;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,14 +52,14 @@ import java.util.stream.Stream;
 @Service
 public class WorkerManagersService {
 
-	private final WorkerManagerRepository workerManagers;
+	private final WorkerManagers workerManagers;
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
 	private final ContainersService containersService;
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 
-	public WorkerManagersService(WorkerManagerRepository workerManagers, CloudHostsService cloudHostsService,
+	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService) {
 		this.workerManagers = workerManagers;
@@ -70,37 +70,37 @@ public class WorkerManagersService {
 		this.servicesService = servicesService;
 	}
 
-	public List<WorkerManagerEntity> getWorkerManagers() {
+	public List<WorkerManager> getWorkerManagers() {
 		return workerManagers.findAll();
 	}
 
-	public WorkerManagerEntity getWorkerManager(String id) {
+	public WorkerManager getWorkerManager(String id) {
 		return workerManagers.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManagerEntity.class, "id", id));
+			new EntityNotFoundException(WorkerManager.class, "id", id));
 	}
 
-	public WorkerManagerEntity getWorkerManager(ContainerEntity containerEntity) {
-		return workerManagers.getByContainer(containerEntity).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManagerEntity.class, "containerEntity", containerEntity.getContainerId()));
+	public WorkerManager getWorkerManager(Container container) {
+		return workerManagers.getByContainer(container).orElseThrow(() ->
+			new EntityNotFoundException(WorkerManager.class, "containerEntity", container.getContainerId()));
 	}
 
-	public List<WorkerManagerEntity> getWorkerManagers(Region region) {
+	public List<WorkerManager> getWorkerManagers(RegionEnum region) {
 		return workerManagers.getByContainer_Region(region);
 	}
 
-	public WorkerManagerEntity saveWorkerManager(ContainerEntity container) {
-		return workerManagers.save(WorkerManagerEntity.builder().container(container).build());
+	public WorkerManager saveWorkerManager(Container container) {
+		return workerManagers.save(WorkerManager.builder().container(container).build());
 	}
 
-	public WorkerManagerEntity launchWorkerManager(HostAddress hostAddress) {
+	public WorkerManager launchWorkerManager(HostAddress hostAddress) {
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
-		ContainerEntity container = launchWorkerManager(hostAddress, id);
-		WorkerManagerEntity workerManagerEntity = WorkerManagerEntity.builder().id(id).container(container).build();
-		return workerManagers.save(workerManagerEntity);
+		Container container = launchWorkerManager(hostAddress, id);
+		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).build();
+		return workerManagers.save(workerManager);
 	}
 
-	public List<WorkerManagerEntity> launchWorkerManagers(List<Region> regions) {
+	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {
 		log.info("Launching worker managers at regions {}", regions);
 
 		double expectedMemoryConsumption = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER)
@@ -111,14 +111,14 @@ public class WorkerManagersService {
 			.distinct()
 			.map(hostAddress -> {
 				// avoid launching another worker manager on the same region
-				List<WorkerManagerEntity> workerManagers = getWorkerManagers(hostAddress.getRegion());
+				List<WorkerManager> workerManagers = getWorkerManagers(hostAddress.getRegion());
 				return !workerManagers.isEmpty() ?
 					workerManagers.get(0)
 					: launchWorkerManager(hostAddress);
 			}).collect(Collectors.toList());
 	}
 
-	private ContainerEntity launchWorkerManager(HostAddress hostAddress, String id) {
+	private Container launchWorkerManager(HostAddress hostAddress, String id) {
 		List<String> environment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.ID + "=" + id,
 			ContainerConstants.Environment.MASTER + "=" + hostsService.getMasterHostAddress().getPublicIpAddress()));
@@ -126,32 +126,32 @@ public class WorkerManagersService {
 	}
 
 	public void deleteWorkerManager(String workerManagerId) {
-		WorkerManagerEntity workerManager = getWorkerManager(workerManagerId);
+		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		containersService.stopContainer(workerManager.getContainer().getContainerId());
 	}
 
-	public void deleteWorkerManagerByContainer(ContainerEntity container) {
-		WorkerManagerEntity workerManager = getWorkerManager(container);
+	public void deleteWorkerManagerByContainer(Container container) {
+		WorkerManager workerManager = getWorkerManager(container);
 		workerManagers.delete(workerManager);
 	}
 
 	public List<String> getAssignedHosts(String workerManagerId) {
 		checkWorkerManagerExists(workerManagerId);
 		List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
-			.map(CloudHostEntity::getPublicIpAddress).collect(Collectors.toList());
+			.map(CloudHost::getPublicIpAddress).collect(Collectors.toList());
 		List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
-			.map(EdgeHostEntity::getPublicIpAddress).collect(Collectors.toList());
+			.map(EdgeHost::getPublicIpAddress).collect(Collectors.toList());
 		return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
 	}
 
 	// host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
 	public void assignHost(String workerManagerId, String hostname) {
-		WorkerManagerEntity workerManagerEntity = getWorkerManager(workerManagerId);
+		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		try {
-			cloudHostsService.assignWorkerManager(workerManagerEntity, hostname);
+			cloudHostsService.assignWorkerManager(workerManager, hostname);
 		}
 		catch (EntityNotFoundException ignored) {
-			edgeHostsService.assignWorkerManager(workerManagerEntity, hostname);
+			edgeHostsService.assignWorkerManager(workerManager, hostname);
 		}
 	}
 
@@ -164,7 +164,7 @@ public class WorkerManagersService {
 	}
 
 	public void unassignHosts(String workerManagerId, List<String> hosts) {
-		WorkerManagerEntity workerManager = getWorkerManager(workerManagerId);
+		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		log.info("Removing hosts {}", hosts);
 		hosts.forEach(host -> {
 			try {
@@ -179,7 +179,7 @@ public class WorkerManagersService {
 
 	private void checkWorkerManagerExists(String id) {
 		if (!workerManagers.hasWorkerManager(id)) {
-			throw new EntityNotFoundException(WorkerManagerEntity.class, "id", id);
+			throw new EntityNotFoundException(WorkerManager.class, "id", id);
 		}
 	}
 

@@ -32,10 +32,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -51,24 +50,24 @@ public class HostSimulatedMetricsController {
 	}
 
 	@GetMapping
-	public List<HostSimulatedMetricEntity> getHostSimulatedMetrics() {
+	public List<HostSimulatedMetric> getHostSimulatedMetrics() {
 		return hostSimulatedMetricsService.getHostSimulatedMetrics();
 	}
 
 	@GetMapping("/{simulatedMetricName}")
-	public HostSimulatedMetricEntity getHostSimulatedMetric(@PathVariable String simulatedMetricName) {
+	public HostSimulatedMetric getHostSimulatedMetric(@PathVariable String simulatedMetricName) {
 		return hostSimulatedMetricsService.getHostSimulatedMetric(simulatedMetricName);
 	}
 
 	@PostMapping
-	public HostSimulatedMetricEntity addHostSimulatedMetric(@RequestBody HostSimulatedMetricEntity simulatedMetric) {
+	public HostSimulatedMetric addHostSimulatedMetric(@RequestBody HostSimulatedMetric simulatedMetric) {
 		Validation.validatePostRequest(simulatedMetric.getId());
 		return hostSimulatedMetricsService.addHostSimulatedMetric(simulatedMetric);
 	}
 
 	@PutMapping("/{simulatedMetricName}")
-	public HostSimulatedMetricEntity updateHostSimulatedMetric(@PathVariable String simulatedMetricName,
-															   @RequestBody HostSimulatedMetricEntity simulatedMetric) {
+	public HostSimulatedMetric updateHostSimulatedMetric(@PathVariable String simulatedMetricName,
+														 @RequestBody HostSimulatedMetric simulatedMetric) {
 		Validation.validatePutRequest(simulatedMetric.getId());
 		return hostSimulatedMetricsService.updateHostSimulatedMetric(simulatedMetricName, simulatedMetric);
 	}
@@ -79,7 +78,7 @@ public class HostSimulatedMetricsController {
 	}
 
 	@GetMapping("/{simulatedMetricName}/cloud-hosts")
-	public List<CloudHostEntity> getHostSimulatedMetricCloudHosts(@PathVariable String simulatedMetricName) {
+	public List<CloudHost> getHostSimulatedMetricCloudHosts(@PathVariable String simulatedMetricName) {
 		return hostSimulatedMetricsService.getCloudHosts(simulatedMetricName);
 	}
 
@@ -102,7 +101,7 @@ public class HostSimulatedMetricsController {
 	}
 
 	@GetMapping("/{simulatedMetricName}/edge-hosts")
-	public List<EdgeHostEntity> getHostSimulatedMetricEdgeHosts(@PathVariable String simulatedMetricName) {
+	public List<EdgeHost> getHostSimulatedMetricEdgeHosts(@PathVariable String simulatedMetricName) {
 		return hostSimulatedMetricsService.getEdgeHosts(simulatedMetricName);
 	}
 

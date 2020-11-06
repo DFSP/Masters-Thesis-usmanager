@@ -31,7 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -48,7 +48,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_events")
-public class ServiceEventEntity {
+public class ServiceEvent {
 
 	@Id
 	@GeneratedValue
@@ -61,7 +61,7 @@ public class ServiceEventEntity {
 	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
-	private DecisionEntity decision;
+	private Decision decision;
 
 	private int count;
 
@@ -75,10 +75,10 @@ public class ServiceEventEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceEventEntity)) {
+		if (!(o instanceof ServiceEvent)) {
 			return false;
 		}
-		ServiceEventEntity other = (ServiceEventEntity) o;
+		ServiceEvent other = (ServiceEvent) o;
 		return id != null && id.equals(other.getId());
 	}
 

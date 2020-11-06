@@ -31,14 +31,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface RegionRepository extends JpaRepository<RegionEntity, Long> {
+public interface RegionRepository extends JpaRepository<Region, Long> {
 
 	@Query("select case when count(r) > 0 then true else false end "
-		+ "from RegionEntity r "
+		+ "from Region r "
 		+ "where lower(r.region) = :region")
 	boolean hasRegion(@Param("region") Region region);
 
-	Optional<RegionEntity> findByRegion(@Param("region") Region region);
+	Optional<Region> findByRegion(@Param("region") Region region);
 
 }*/

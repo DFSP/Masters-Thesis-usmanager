@@ -25,16 +25,16 @@
 package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 @Data
 public final class Decision {
 
-	private final RuleDecision decision;
+	private final RuleDecisionEnum decision;
 	private final int priority;
 
 	public Decision() {
-		this.decision = RuleDecision.NONE;
+		this.decision = RuleDecisionEnum.NONE;
 		this.priority = 0;
 	}
 

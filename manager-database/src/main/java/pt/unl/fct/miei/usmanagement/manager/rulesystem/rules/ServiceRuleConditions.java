@@ -25,9 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ServiceRuleConditionRepository extends JpaRepository<ServiceRuleCondition, Long> {
+public interface ServiceRuleConditions extends JpaRepository<ServiceRuleCondition, Long> {
 
 }

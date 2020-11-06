@@ -62,7 +62,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "services")
-public class ServiceEntity {
+public class Service {
 
 	@Id
 	@GeneratedValue
@@ -93,7 +93,7 @@ public class ServiceEntity {
 
 	@Enumerated(EnumType.STRING)
 	@NotNull
-	private ServiceType serviceType;
+	private ServiceTypeEnum serviceType;
 
 	private double expectedMemoryConsumption;
 
@@ -192,10 +192,10 @@ public class ServiceEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceEntity)) {
+		if (!(o instanceof Service)) {
 			return false;
 		}
-		ServiceEntity other = (ServiceEntity) o;
+		Service other = (Service) o;
 		return id != null && id.equals(other.getId());
 	}
 

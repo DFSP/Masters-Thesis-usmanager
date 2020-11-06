@@ -48,7 +48,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @Getter
 @Table(name = "users")
-public class UserEntity {
+public class User {
 
 	@Id
 	@GeneratedValue
@@ -71,6 +71,6 @@ public class UserEntity {
 	private String email;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	private UserRoleEnum role;
 
 }

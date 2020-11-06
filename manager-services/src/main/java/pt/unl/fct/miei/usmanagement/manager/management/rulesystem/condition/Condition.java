@@ -25,13 +25,13 @@
 package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 
 @Data
 public final class Condition {
 
 	private final String fieldName;
 	private final Double value;
-	private final Operator operator;
+	private final OperatorEnum operator;
 
 }

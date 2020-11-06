@@ -48,7 +48,7 @@ import java.util.Objects;
 @Getter
 @IdClass(LoggingEventPropertyId.class)
 @Table(name = "logging_event_property")
-public class LoggingEventPropertyEntity {
+public class LoggingEventProperty {
 
 	@Id
 	private Long eventId;
@@ -73,10 +73,10 @@ public class LoggingEventPropertyEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof LoggingEventPropertyEntity)) {
+		if (!(o instanceof LoggingEventProperty)) {
 			return false;
 		}
-		LoggingEventPropertyEntity other = (LoggingEventPropertyEntity) o;
+		LoggingEventProperty other = (LoggingEventProperty) o;
 		return eventId != null && eventId.equals(other.getEventId());
 	}
 

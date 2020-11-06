@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Map;
 
@@ -62,9 +62,9 @@ public final class SimpleNode {
 	}
 
 	@JsonIgnore
-	public Region getRegion() {
+	public RegionEnum getRegion() {
 		String region = labels.get(NodeConstants.Label.REGION);
-		return region == null ? null : Region.getRegion(region);
+		return region == null ? null : RegionEnum.getRegion(region);
 	}
 
 	@JsonIgnore
@@ -72,7 +72,7 @@ public final class SimpleNode {
 		final String username = getUsername();
 		final String privateIpAddress = getPrivateIpAddress();
 		final Coordinates coordinates = getCoordinates();
-		final Region region = getRegion();
+		final RegionEnum region = getRegion();
 		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region);
 	}
 

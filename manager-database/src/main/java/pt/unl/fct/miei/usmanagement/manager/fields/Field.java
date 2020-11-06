@@ -32,11 +32,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValueEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -56,7 +56,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "fields")
-public class FieldEntity {
+public class Field {
 
 	@Id
 	@GeneratedValue
@@ -66,27 +66,27 @@ public class FieldEntity {
 	@Column(unique = true)
 	private String name;
 
-	private PrometheusQuery query;
+	private PrometheusQueryEnum query;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ConditionEntity> conditions;
+	private Set<Condition> conditions;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostSimulatedMetricEntity> simulatedHostMetrics;
+	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceSimulatedMetricEntity> simulatedServiceMetrics;
+	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceDecisionValueEntity> componentDecisionValueLogs;
+	private Set<ServiceDecisionValue> componentDecisionValueLogs;
 
 	@Override
 	public int hashCode() {
@@ -98,10 +98,10 @@ public class FieldEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof FieldEntity)) {
+		if (!(o instanceof Field)) {
 			return false;
 		}
-		FieldEntity other = (FieldEntity) o;
+		Field other = (Field) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -25,17 +25,20 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoring;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
@@ -50,14 +53,10 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceR
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerFieldAverage;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventEntity;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogsRepository;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogs;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitorings;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -72,18 +71,17 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Service
+@org.springframework.stereotype.Service
 @Slf4j
 public class ServicesMonitoringService {
 
 	// Container minimum logs to start applying rules
 	private static final int CONTAINER_MINIMUM_LOGS_COUNT = 1;
 
-	private final ServiceMonitoringRepository servicesMonitoring;
-	private final ServiceMonitoringLogsRepository serviceMonitoringLogs;
+	private final ServiceMonitorings servicesMonitoring;
+	private final ServiceMonitoringLogs serviceMonitoringLogs;
 
 	private final ContainersService containersService;
 	private final ServicesService servicesService;
@@ -105,8 +103,8 @@ public class ServicesMonitoringService {
 	private final boolean isTestEnable;
 	private Timer serviceMonitoringTimer;
 
-	public ServicesMonitoringService(ServiceMonitoringRepository servicesMonitoring,
-									 ServiceMonitoringLogsRepository serviceMonitoringLogs,
+	public ServicesMonitoringService(ServiceMonitorings servicesMonitoring,
+									 ServiceMonitoringLogs serviceMonitoringLogs,
 									 ContainersService containersService,
 									 ServicesService servicesService, ServiceRulesService serviceRulesService,
 									 ServicesEventsService servicesEventsService, HostsService hostsService,
@@ -138,27 +136,27 @@ public class ServicesMonitoringService {
 		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
 	}
 
-	public List<ServiceMonitoringEntity> getServicesMonitoring() {
+	public List<ServiceMonitoring> getServicesMonitoring() {
 		return servicesMonitoring.findAll();
 	}
 
-	public List<ServiceMonitoringEntity> getServiceMonitoring(String serviceName) {
+	public List<ServiceMonitoring> getServiceMonitoring(String serviceName) {
 		return servicesMonitoring.getByServiceNameIgnoreCase(serviceName);
 	}
 
-	public List<ServiceMonitoringEntity> getContainerMonitoring(String containerId) {
+	public List<ServiceMonitoring> getContainerMonitoring(String containerId) {
 		return servicesMonitoring.getByContainerId(containerId);
 	}
 
-	public ServiceMonitoringEntity getContainerMonitoring(String containerId, String field) {
+	public ServiceMonitoring getContainerMonitoring(String containerId, String field) {
 		return servicesMonitoring.getByContainerIdAndFieldIgnoreCase(containerId, field);
 	}
 
 	public void saveServiceMonitoring(String containerId, String serviceName, String field, double value) {
-		ServiceMonitoringEntity serviceMonitoring = getContainerMonitoring(containerId, field);
+		ServiceMonitoring serviceMonitoring = getContainerMonitoring(containerId, field);
 		Timestamp updateTime = Timestamp.from(Instant.now());
 		if (serviceMonitoring == null) {
-			serviceMonitoring = ServiceMonitoringEntity.builder()
+			serviceMonitoring = ServiceMonitoring.builder()
 				.containerId(containerId)
 				.serviceName(serviceName)
 				.field(field)
@@ -192,30 +190,30 @@ public class ServicesMonitoringService {
 		return servicesMonitoring.getContainerFieldAverage(containerId, field);
 	}
 
-	public List<ServiceMonitoringEntity> getTopContainersByField(List<String> containerIds, String field) {
+	public List<ServiceMonitoring> getTopContainersByField(List<String> containerIds, String field) {
 		return servicesMonitoring.getTopContainersByField(containerIds, field);
 	}
 
 	public void saveServiceMonitoringLog(String containerId, String serviceName, String field, double effectiveValue) {
-		ServiceMonitoringLogEntity serviceMonitoringLogEntity = ServiceMonitoringLogEntity.builder()
+		ServiceMonitoringLog serviceMonitoringLog = ServiceMonitoringLog.builder()
 			.containerId(containerId)
 			.serviceName(serviceName)
 			.field(field)
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
 			.build();
-		serviceMonitoringLogs.save(serviceMonitoringLogEntity);
+		serviceMonitoringLogs.save(serviceMonitoringLog);
 	}
 
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogs() {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogs() {
 		return serviceMonitoringLogs.findAll();
 	}
 
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByServiceName(String serviceName) {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogsByServiceName(String serviceName) {
 		return serviceMonitoringLogs.findByServiceName(serviceName);
 	}
 
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByContainerId(String containerId) {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogsByContainerId(String containerId) {
 		return serviceMonitoringLogs.findByContainerIdStartingWith(containerId);
 	}
 
@@ -240,9 +238,9 @@ public class ServicesMonitoringService {
 	}
 
 	private void monitorServicesTask(int interval) {
-		List<ContainerEntity> monitoringContainers = containersService.getAppContainers();
-		List<ContainerEntity> systemContainers = containersService.getSystemContainers();
-		List<ContainerEntity> synchronizedContainers = containersService.synchronizeDatabaseContainers();
+		List<Container> monitoringContainers = containersService.getAppContainers();
+		List<Container> systemContainers = containersService.getSystemContainers();
+		List<Container> synchronizedContainers = containersService.synchronizeDatabaseContainers();
 
 		containersRecoveryService.restoreCrashedContainers(monitoringContainers, synchronizedContainers);
 
@@ -255,7 +253,7 @@ public class ServicesMonitoringService {
 		monitoringContainers.parallelStream().forEach(container -> {
 			if (synchronizedContainers.stream().noneMatch(c ->
 				Objects.equals(c.getContainerId(), container.getContainerId()) && Objects.equals(c.getHostAddress(), container.getHostAddress()))) {
-				containersService.launchContainer(container.getHostAddress(), container.getServiceName(), ContainerType.SINGLETON);
+				containersService.launchContainer(container.getHostAddress(), container.getServiceName(), ContainerTypeEnum.SINGLETON);
 			}
 			else {
 				HostAddress hostAddress = container.getHostAddress();
@@ -266,7 +264,7 @@ public class ServicesMonitoringService {
 				Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
 
 				// Simulated app metrics
-				for (AppEntity app : servicesService.getApps(serviceName)) {
+				for (App app : servicesService.getApps(serviceName)) {
 					String appName = app.getName();
 					Map<String, Double> appSimulatedFields = appSimulatedMetricsService.getAppSimulatedMetricByApp(appName)
 						.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
@@ -299,7 +297,7 @@ public class ServicesMonitoringService {
 					calculatedMetrics.put("tx-bytes", stats.get("tx-bytes"));
 				}
 				calculatedMetrics.forEach((field, value) -> {
-					ServiceMonitoringEntity monitoring = getContainerMonitoring(containerId, field);
+					ServiceMonitoring monitoring = getContainerMonitoring(containerId, field);
 					double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
 					double bytesPerSec = Math.max(0, (value - lastValue) / interval);
 					stats.put(field + "-per-sec", bytesPerSec);
@@ -362,14 +360,14 @@ public class ServicesMonitoringService {
 			for (ServiceDecisionResult containerDecision : serviceDecisions) {
 				String serviceName = containerDecision.getServiceName();
 				String containerId = containerDecision.getContainerId();
-				RuleDecision decision = containerDecision.getDecision();
+				RuleDecisionEnum decision = containerDecision.getDecision();
 				log.info("Service {} on container {} had decision {}", serviceName, containerId, decision);
-				ServiceEventEntity serviceEvent =
+				ServiceEvent serviceEvent =
 					servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
 				int serviceEventCount = serviceEvent.getCount();
-				if (decision == RuleDecision.STOP && serviceEventCount >= stopContainerOnEventCount
-					|| decision == RuleDecision.REPLICATE && serviceEventCount >= replicateContainerOnEventCount
-					|| decision == RuleDecision.MIGRATE && serviceEventCount >= migrateContainerOnEventCount) {
+				if (decision == RuleDecisionEnum.STOP && serviceEventCount >= stopContainerOnEventCount
+					|| decision == RuleDecisionEnum.REPLICATE && serviceEventCount >= replicateContainerOnEventCount
+					|| decision == RuleDecisionEnum.MIGRATE && serviceEventCount >= migrateContainerOnEventCount) {
 					List<ServiceDecisionResult> decisionsList = decisions.get(serviceName);
 					if (decisionsList != null) {
 						decisionsList.add(containerDecision);
@@ -405,7 +403,7 @@ public class ServicesMonitoringService {
 				if (coordinates == null) {
 					coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
 				}
-				ServiceEntity service = servicesService.getService(serviceName);
+				Service service = servicesService.getService(serviceName);
 				double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
 				HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 				log.info("Service {} has too few replicas ({}/{}). Starting another container close to {}",
@@ -413,8 +411,8 @@ public class ServicesMonitoringService {
 				containersService.launchContainer(hostAddress, serviceName);
 			}
 			else {
-				RuleDecision topPriorityDecision = topPriorityDecisionResult.getDecision();
-				if (topPriorityDecision == RuleDecision.REPLICATE) {
+				RuleDecisionEnum topPriorityDecision = topPriorityDecisionResult.getDecision();
+				if (topPriorityDecision == RuleDecisionEnum.REPLICATE) {
 					if (maximumReplicas == 0 || currentReplicas < maximumReplicas) {
 						String containerId = topPriorityDecisionResult.getContainerId();
 						String decision = topPriorityDecisionResult.getDecision().name();
@@ -432,7 +430,7 @@ public class ServicesMonitoringService {
 						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
 					}
 				}
-				else if (topPriorityDecision == RuleDecision.STOP) {
+				else if (topPriorityDecision == RuleDecisionEnum.STOP) {
 					if (currentReplicas > minimumReplicas) {
 						ServiceDecisionResult leastPriorityContainer = containerDecisions.get(containerDecisions.size() - 1);
 						String containerId = leastPriorityContainer.getContainerId();
@@ -452,7 +450,7 @@ public class ServicesMonitoringService {
 	private void saveServiceDecision(String containerId, String serviceName, String decision, long ruleId, Map<String, Double> fields, String result) {
 		log.info("Executed decision: {}", result);
 		servicesEventsService.resetServiceEvent(serviceName);
-		ServiceDecisionEntity serviceDecision = decisionsService.addServiceDecision(containerId, serviceName, decision, ruleId, result);
+		ServiceDecision serviceDecision = decisionsService.addServiceDecision(containerId, serviceName, decision, ruleId, result);
 		decisionsService.addServiceDecisionValueFromFields(serviceDecision, fields);
 	}
 

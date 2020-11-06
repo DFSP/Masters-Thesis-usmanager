@@ -52,7 +52,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_monitoring_logs")
-public class HostMonitoringLogEntity {
+public class HostMonitoringLog {
 
 	@Id
 	@GeneratedValue
@@ -91,10 +91,10 @@ public class HostMonitoringLogEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostMonitoringLogEntity)) {
+		if (!(o instanceof HostMonitoringLog)) {
 			return false;
 		}
-		HostMonitoringLogEntity other = (HostMonitoringLogEntity) o;
+		HostMonitoringLog other = (HostMonitoringLog) o;
 		return id != null && id.equals(other.getId());
 	}
 

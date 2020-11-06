@@ -32,14 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.Arrays;
@@ -58,23 +56,23 @@ public class AppsController {
 	}
 
 	@GetMapping
-	public List<AppEntity> getApps() {
+	public List<App> getApps() {
 		return appsService.getApps();
 	}
 
 	@GetMapping("/{appName}")
-	public AppEntity getApp(@PathVariable String appName) {
+	public App getApp(@PathVariable String appName) {
 		return appsService.getApp(appName);
 	}
 
 	@PostMapping
-	public AppEntity addApp(@RequestBody AppEntity app) {
+	public App addApp(@RequestBody App app) {
 		Validation.validatePostRequest(app.getId());
 		return appsService.addApp(app);
 	}
 
 	@PutMapping("/{appName}")
-	public AppEntity updateApp(@PathVariable String appName, @RequestBody AppEntity app) {
+	public App updateApp(@PathVariable String appName, @RequestBody App app) {
 		Validation.validatePutRequest(app.getId());
 		return appsService.updateApp(appName, app);
 	}
@@ -85,7 +83,7 @@ public class AppsController {
 	}
 
 	@GetMapping("/{appName}/services")
-	public List<AppServiceEntity> getAppServices(@PathVariable String appName) {
+	public List<AppService> getAppServices(@PathVariable String appName) {
 		return appsService.getServices(appName);
 	}
 
@@ -107,12 +105,12 @@ public class AppsController {
 	}
 
 	@PostMapping("/{appName}/launch")
-	public Map<String, List<ContainerEntity>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
+	public Map<String, List<Container>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
 		return appsService.launch(appName, coordinates);
 	}
 
 	@GetMapping("/{appId}/rules")
-	public List<AppRuleEntity> addAppRule(@PathVariable String appId) {
+	public List<AppRule> addAppRule(@PathVariable String appId) {
 		return appsService.getRules(appId);
 	}
 
@@ -132,7 +130,7 @@ public class AppsController {
 	}
 
 	@GetMapping("/{appId}/simulated-metrics")
-	public List<AppSimulatedMetricEntity> getAppSimulatedMetrics(@PathVariable String appId) {
+	public List<AppSimulatedMetric> getAppSimulatedMetrics(@PathVariable String appId) {
 		return appsService.getSimulatedMetrics(appId);
 	}
 

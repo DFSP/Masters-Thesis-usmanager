@@ -58,7 +58,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "host_rules")
-public class HostRuleEntity {
+public class HostRule {
 
 	@Id
 	@GeneratedValue
@@ -89,7 +89,7 @@ public class HostRuleEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostRuleConditionEntity> conditions;
+	private Set<HostRuleCondition> conditions;
 
 	public void removeAssociations() {
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
@@ -116,10 +116,10 @@ public class HostRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostRuleEntity)) {
+		if (!(o instanceof HostRule)) {
 			return false;
 		}
-		HostRuleEntity other = (HostRuleEntity) o;
+		HostRule other = (HostRule) o;
 		return id != null && id.equals(other.getId());
 	}
 

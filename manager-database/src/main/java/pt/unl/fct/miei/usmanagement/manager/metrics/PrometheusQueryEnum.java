@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -35,7 +35,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum PrometheusQuery {
+public enum PrometheusQueryEnum {
 
 	AVAILABLE_MEMORY("node_memory_MemAvailable_bytes"),
 	TOTAL_MEMORY("node_memory_MemTotal_bytes"),
@@ -49,8 +49,8 @@ public enum PrometheusQuery {
 	private final String query;
 
 	@JsonCreator
-	public static PrometheusQuery forValues(@JsonProperty("query") String query) {
-		for (PrometheusQuery prometheusQuery : PrometheusQuery.values()) {
+	public static PrometheusQueryEnum forValues(@JsonProperty("query") String query) {
+		for (PrometheusQueryEnum prometheusQuery : PrometheusQueryEnum.values()) {
 			if (prometheusQuery.query.equalsIgnoreCase(query)) {
 				return prometheusQuery;
 			}

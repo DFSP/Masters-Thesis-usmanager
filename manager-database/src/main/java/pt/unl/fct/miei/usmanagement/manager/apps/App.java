@@ -32,10 +32,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,7 +56,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "apps")
-public class AppEntity {
+public class App {
 
 	@Id
 	@GeneratedValue
@@ -73,7 +71,7 @@ public class AppEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<AppServiceEntity> appServices;
+	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
@@ -82,7 +80,7 @@ public class AppEntity {
 		joinColumns = @JoinColumn(name = "app_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
-	private Set<AppRuleEntity> appRules;
+	private Set<AppRule> appRules;
 
 	@Singular
 	@JsonIgnore
@@ -91,28 +89,28 @@ public class AppEntity {
 		joinColumns = @JoinColumn(name = "app_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
-	private Set<AppSimulatedMetricEntity> simulatedAppMetrics;
+	private Set<AppSimulatedMetric> simulatedAppMetrics;
 
-	public void addRule(AppRuleEntity rule) {
+	public void addRule(AppRule rule) {
 		appRules.add(rule);
 		rule.getApps().add(this);
 	}
 
-	public void removeRule(AppRuleEntity rule) {
+	public void removeRule(AppRule rule) {
 		appRules.remove(rule);
 		rule.getApps().remove(this);
 	}
 
-	public void addAppSimulatedMetric(AppSimulatedMetricEntity appMetric) {
+	public void addAppSimulatedMetric(AppSimulatedMetric appMetric) {
 		simulatedAppMetrics.add(appMetric);
 		appMetric.getApps().add(this);
 	}
 
-	public void removeAppSimulatedMetric(AppSimulatedMetricEntity appMetric) {
+	public void removeAppSimulatedMetric(AppSimulatedMetric appMetric) {
 		simulatedAppMetrics.remove(appMetric);
 		appMetric.getApps().remove(this);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());
@@ -123,10 +121,10 @@ public class AppEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppEntity)) {
+		if (!(o instanceof App)) {
 			return false;
 		}
-		AppEntity other = (AppEntity) o;
+		App other = (App) o;
 		return id != null && id.equals(other.getId());
 	}
 

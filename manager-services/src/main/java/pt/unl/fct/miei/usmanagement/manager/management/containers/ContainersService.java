@@ -29,11 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerRepository;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.Containers;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -45,11 +44,11 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,7 +64,7 @@ import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Service
+@org.springframework.stereotype.Service
 @Slf4j
 public class ContainersService {
 
@@ -77,7 +76,7 @@ public class ContainersService {
 	private final DockerApiProxyService dockerApiProxyService;
 	private final WorkerManagersService workerManagersService;
 
-	private final ContainerRepository containers;
+	private final Containers containers;
 
 	private Timer syncDatabaseContainersTimer;
 
@@ -85,7 +84,7 @@ public class ContainersService {
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
-							 ContainerRepository containers) {
+							 Containers containers) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
@@ -94,12 +93,12 @@ public class ContainersService {
 		this.workerManagersService = workerManagersService;
 	}
 
-	public ContainerEntity addContainerFromDockerContainer(DockerContainer dockerContainer) {
+	public Container addContainerFromDockerContainer(DockerContainer dockerContainer) {
 		try {
 			return getContainer(dockerContainer.getId());
 		}
 		catch (EntityNotFoundException e) {
-			ContainerEntity container = ContainerEntity.builder()
+			Container container = Container.builder()
 				.containerId(dockerContainer.getId())
 				.type(dockerContainer.getType())
 				.created(dockerContainer.getCreated())
@@ -118,42 +117,42 @@ public class ContainersService {
 		}
 	}
 
-	public Optional<ContainerEntity> addContainer(String containerId) {
+	public Optional<Container> addContainer(String containerId) {
 		return dockerContainersService.getContainer(containerId).map(this::addContainerFromDockerContainer);
 	}
 
-	public ContainerEntity addContainer(ContainerEntity container) {
+	public Container addContainer(Container container) {
 		checkContainerDoesntExist(container);
 		log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
 		return containers.save(container);
 	}
 
-	public List<ContainerEntity> getContainers() {
+	public List<Container> getContainers() {
 		return containers.findAll();
 	}
 
-	public ContainerEntity getContainer(String containerId) {
+	public Container getContainer(String containerId) {
 		return containers.findByContainerIdStartingWith(containerId).orElseThrow(() ->
-			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
+			new EntityNotFoundException(Container.class, "containerId", containerId));
 	}
 
-	public List<ContainerEntity> getHostContainers(HostAddress hostAddress) {
+	public List<Container> getHostContainers(HostAddress hostAddress) {
 		return containers.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
 			hostAddress.getPrivateIpAddress());
 	}
 
-	public List<ContainerEntity> getHostContainersWithLabels(HostAddress hostAddress, Set<Pair<String, String>> labels) {
-		List<ContainerEntity> containers = getHostContainers(hostAddress);
+	public List<Container> getHostContainersWithLabels(HostAddress hostAddress, Set<Pair<String, String>> labels) {
+		List<Container> containers = getHostContainers(hostAddress);
 		return filterContainersWithLabels(containers, labels);
 	}
 
-	public List<ContainerEntity> getContainersWithLabels(Set<Pair<String, String>> labels) {
-		List<ContainerEntity> containers = getContainers();
+	public List<Container> getContainersWithLabels(Set<Pair<String, String>> labels) {
+		List<Container> containers = getContainers();
 		return filterContainersWithLabels(containers, labels);
 	}
 
-	private List<ContainerEntity> filterContainersWithLabels(List<ContainerEntity> containers,
-															 Set<Pair<String, String>> labels) {
+	private List<Container> filterContainersWithLabels(List<Container> containers,
+													   Set<Pair<String, String>> labels) {
 		// TODO try to build a database query instead
 		List<String> labelKeys = labels.stream().map(Pair::getFirst).collect(Collectors.toList());
 		return containers.stream()
@@ -170,18 +169,18 @@ public class ContainersService {
 			.collect(Collectors.toList());
 	}
 
-	public List<ContainerEntity> synchronizeDatabaseContainers() {
-		List<ContainerEntity> containers = getContainers();
+	public List<Container> synchronizeDatabaseContainers() {
+		List<Container> containers = getContainers();
 		if (dockerContainersService.isLaunchingContainer()) {
 			return containers;
 		}
 		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
 		List<String> dockerContainerIds = dockerContainers
 			.stream().map(DockerContainer::getId).collect(Collectors.toList());
-		Iterator<ContainerEntity> containerIterator = containers.iterator();
+		Iterator<Container> containerIterator = containers.iterator();
 		// Remove invalid container entities
 		while (containerIterator.hasNext()) {
-			ContainerEntity container = containerIterator.next();
+			Container container = containerIterator.next();
 			String containerId = container.getContainerId();
 			if (!dockerContainerIds.contains(containerId)) {
 				deleteContainer(containerId);
@@ -193,118 +192,118 @@ public class ContainersService {
 		dockerContainers.forEach(dockerContainer -> {
 			String containerId = dockerContainer.getId();
 			if (!hasContainer(containerId)) {
-				ContainerEntity containerEntity = addContainerFromDockerContainer(dockerContainer);
-				containers.add(containerEntity);
+				Container container = addContainerFromDockerContainer(dockerContainer);
+				containers.add(container);
 				log.info("Added missing container {}", containerId);
 			}
 		});
 		return containers;
 	}
 
-	public ContainerEntity launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
+	public Container launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(coordinates, serviceName, externalPort, internalPort);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, List<String> environment) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, List<String> environment) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type, List<String> environment) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, environment);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, Map<String, String> labels) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, labels);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, Map<String, String> labels) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type, Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type, labels);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
-										   Map<String, String> labels) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
+									 Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
-										   Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, List<String> environment,
+									 Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, environment,
 			labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
-										   List<String> environment, Map<String, String> labels) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type,
+									 List<String> environment, Map<String, String> labels) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type,
-										   List<String> environment, Map<String, String> labels,
-										   Map<String, String> dynamicLaunchParams) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type,
+									 List<String> environment, Map<String, String> labels,
+									 Map<String, String> dynamicLaunchParams) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			environment, labels, dynamicLaunchParams);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, int internalPort, int externalPort) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, int internalPort, int externalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, externalPort, internalPort);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity launchContainer(HostAddress hostAddress, String serviceName, ContainerType type, int internalPort,
-										   int externalPort) {
+	public Container launchContainer(HostAddress hostAddress, String serviceName, ContainerTypeEnum type, int internalPort,
+									 int externalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(hostAddress, serviceName, type,
 			externalPort, internalPort);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to find launched container of service %s", serviceName));
 	}
 
-	public ContainerEntity replicateContainer(String id, HostAddress toHostAddress) {
-		ContainerEntity containerEntity = getContainer(id);
+	public Container replicateContainer(String id, HostAddress toHostAddress) {
+		Container containerEntity = getContainer(id);
 		Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
 		return container.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to replicate container %s", id));
 	}
 
-	public ContainerEntity migrateContainer(String id, HostAddress hostAddress) {
-		ContainerEntity container = getContainer(id);
+	public Container migrateContainer(String id, HostAddress hostAddress) {
+		Container container = getContainer(id);
 		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
 		return dockerContainer.map(this::addContainerFromDockerContainer)
 			.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
 	}
 
-	public Map<String, List<ContainerEntity>> launchApp(List<ServiceEntity> services, Coordinates coordinates) {
+	public Map<String, List<Container>> launchApp(List<Service> services, Coordinates coordinates) {
 		return dockerContainersService.launchApp(services, coordinates).entrySet()
 			.stream()
 			.collect(Collectors.toMap(
@@ -315,7 +314,7 @@ public class ContainersService {
 
 	public void stopContainer(String id) {
 		try {
-			ContainerEntity container = getContainer(id);
+			Container container = getContainer(id);
 			dockerContainersService.stopContainer(container);
 			deleteContainer(id);
 		} catch (ManagerException e) {
@@ -324,7 +323,7 @@ public class ContainersService {
 	}
 
 	public void deleteContainer(String id) {
-		ContainerEntity container = getContainer(id);
+		Container container = getContainer(id);
 		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
 			try {
 				workerManagersService.deleteWorkerManagerByContainer(container);
@@ -335,47 +334,47 @@ public class ContainersService {
 		containers.delete(container);
 	}
 
-	public List<ContainerEntity> getAppContainers() {
+	public List<Container> getAppContainers() {
 		return getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.FRONTEND.name()),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.BACKEND.name()))
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
 		);
 	}
 
-	public List<ContainerEntity> getAppContainers(HostAddress hostAddress) {
+	public List<Container> getAppContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.FRONTEND.name()),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.BACKEND.name())));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())));
 	}
 
-	public List<ContainerEntity> getDatabaseContainers() {
+	public List<Container> getDatabaseContainers() {
 		return getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.DATABASE.name())));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name())));
 	}
 
-	public List<ContainerEntity> getDatabaseContainers(HostAddress hostAddress) {
+	public List<Container> getDatabaseContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.DATABASE.name())));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name())));
 	}
 
-	public List<ContainerEntity> getSystemContainers() {
+	public List<Container> getSystemContainers() {
 		return getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.SYSTEM.name()))
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()))
 		);
 	}
 
-	public List<ContainerEntity> getSystemContainers(HostAddress hostAddress) {
+	public List<Container> getSystemContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceType.SYSTEM.name())));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name())));
 	}
 
 	public Optional<ContainerStats> getContainerStats(String containerId, HostAddress hostAddress) {
-		ContainerEntity container = getContainer(containerId);
+		Container container = getContainer(containerId);
 		return dockerContainersService.getContainerStats(container, hostAddress);
 	}
 
 	public String getLogs(String containerId) {
-		ContainerEntity container = getContainer(containerId);
+		Container container = getContainer(containerId);
 		String logs = dockerContainersService.getContainerLogs(container);
 		if (logs != null) {
 			String path = String.format("./logs/services/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
@@ -391,7 +390,7 @@ public class ContainersService {
 		return logs;
 	}
 
-	public List<ContainerRuleEntity> getRules(String containerId) {
+	public List<ContainerRule> getRules(String containerId) {
 		checkContainerExists(containerId);
 		return containers.getRules(containerId);
 	}
@@ -416,15 +415,15 @@ public class ContainersService {
 		ruleNames.forEach(rule -> containerRulesService.removeContainer(rule, containerId));
 	}
 
-	public List<ContainerSimulatedMetricEntity> getSimulatedMetrics(String containerId) {
+	public List<ContainerSimulatedMetric> getSimulatedMetrics(String containerId) {
 		checkContainerExists(containerId);
 		return containers.getSimulatedMetrics(containerId);
 	}
 
-	public ContainerSimulatedMetricEntity getSimulatedMetric(String containerId, String simulatedMetricName) {
+	public ContainerSimulatedMetric getSimulatedMetric(String containerId, String simulatedMetricName) {
 		checkContainerExists(containerId);
 		return containers.getSimulatedMetric(containerId, simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+			new EntityNotFoundException(ContainerSimulatedMetric.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
@@ -464,7 +463,7 @@ public class ContainersService {
 	}
 
 	public void stopDockerApiProxies() {
-		List<ContainerEntity> dockerApiProxies = getContainersWithLabels(Set.of(
+		List<Container> dockerApiProxies = getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY)));
 		dockerApiProxies.parallelStream().forEach(dockerApiProxy -> {
 			dockerApiProxyService.stopDockerApiProxy(dockerApiProxy.getHostAddress());
@@ -476,11 +475,11 @@ public class ContainersService {
 		return containers.hasContainer(containerId);
 	}
 
-	public boolean hasContainers(Region region) {
+	public boolean hasContainers(RegionEnum region) {
 		return getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.REGION, region.name()))).size() > 0;
 	}
 
-	public boolean hasContainers(Region region, String serviceName) {
+	public boolean hasContainers(RegionEnum region, String serviceName) {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.REGION, region.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)
@@ -489,11 +488,11 @@ public class ContainersService {
 
 	private void checkContainerExists(String containerId) {
 		if (!hasContainer(containerId)) {
-			throw new EntityNotFoundException(ContainerEntity.class, "containerId", containerId);
+			throw new EntityNotFoundException(Container.class, "containerId", containerId);
 		}
 	}
 
-	private void checkContainerDoesntExist(ContainerEntity container) {
+	private void checkContainerDoesntExist(Container container) {
 		String containerId = container.getContainerId();
 		if (containers.hasContainer(containerId)) {
 			throw new DataIntegrityViolationException("Container '" + containerId + "' already exists");

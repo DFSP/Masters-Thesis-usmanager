@@ -31,7 +31,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -54,7 +54,7 @@ public class PrometheusService {
 		this.restTemplate = new RestTemplate();
 	}
 
-	public Optional<Double> getStat(HostAddress hostAddress, PrometheusQuery prometheusQuery) {
+	public Optional<Double> getStat(HostAddress hostAddress, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
 		URI uri = UriComponentsBuilder
 			.fromHttpUrl(String.format(URL, hostAddress.getPublicIpAddress(), DEFAULT_PORT))

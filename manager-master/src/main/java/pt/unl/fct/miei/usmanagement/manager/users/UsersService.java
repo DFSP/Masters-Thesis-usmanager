@@ -27,7 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.users;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,22 +39,22 @@ import java.util.List;
 @Service
 public class UsersService implements UserDetailsService {
 
-	private final UsersRepository users;
+	private final Users users;
 	private final PasswordEncoder encoder;
 
-	public UsersService(UsersRepository users, @Lazy PasswordEncoder encoder) {
+	public UsersService(Users users, @Lazy PasswordEncoder encoder) {
 		this.users = users;
 		this.encoder = encoder;
 	}
 
-	public UserEntity addUser(UserEntity userEntity) {
-		userEntity.setPassword(encoder.encode(userEntity.getPassword()));
-		return users.save(userEntity);
+	public User addUser(User user) {
+		user.setPassword(encoder.encode(user.getPassword()));
+		return users.save(user);
 	}
 
-	public UserEntity addUser(String firstName, String lastName, String username, String password, String email,
-							  UserRole role) {
-		UserEntity user = UserEntity.builder()
+	public User addUser(String firstName, String lastName, String username, String password, String email,
+						UserRoleEnum role) {
+		User user = User.builder()
 			.firstName(firstName)
 			.lastName(lastName)
 			.username(username)
@@ -68,11 +67,11 @@ public class UsersService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) {
-		UserEntity user = users.findByUsername(username);
+		User user = users.findByUsername(username);
 		if (user == null) {
-			throw new EntityNotFoundException(UserEntity.class, "username", username);
+			throw new EntityNotFoundException(User.class, "username", username);
 		}
-		return new User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
+		return new org.springframework.security.core.userdetails.User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
 	}
 
 	public boolean hasUser(String username) {

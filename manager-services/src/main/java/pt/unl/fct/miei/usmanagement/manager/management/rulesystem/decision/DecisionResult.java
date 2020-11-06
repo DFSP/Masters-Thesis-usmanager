@@ -26,7 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision;
 
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
 public class DecisionResult implements Comparable<DecisionResult> {
 
 	private final HostAddress hostAddress;
-	private final RuleDecision decision;
+	private final RuleDecisionEnum decision;
 	private final long ruleId;
 	private final Map<String, Double> fields;
 	private final int priority;
@@ -51,8 +51,8 @@ public class DecisionResult implements Comparable<DecisionResult> {
 			}
 		}
 		else {
-			return this.getDecision() == RuleDecision.OVERWORK
-				|| (this.getDecision() == RuleDecision.UNDERWORK && o.getDecision() == RuleDecision.NONE) ? -1 : 1;
+			return this.getDecision() == RuleDecisionEnum.OVERWORK
+				|| (this.getDecision() == RuleDecisionEnum.UNDERWORK && o.getDecision() == RuleDecisionEnum.NONE) ? -1 : 1;
 		}
 	}
 

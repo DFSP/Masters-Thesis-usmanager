@@ -27,12 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.componenttypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface ComponentTypeRepository extends JpaRepository<ComponentType, Long> {
+public interface ComponentTypes extends JpaRepository<ComponentType, Long> {
 
 	Optional<ComponentType> findByType(@Param("type") ComponentTypeEnum type);
 

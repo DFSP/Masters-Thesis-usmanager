@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_rule_conditions")
-public class HostRuleConditionEntity {
+public class HostRuleCondition {
 
 	@Id
 	@GeneratedValue
@@ -55,7 +55,7 @@ public class HostRuleConditionEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "host_rule_id")
-	private HostRuleEntity hostRule;
+	private HostRule hostRule;
 
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
@@ -71,10 +71,10 @@ public class HostRuleConditionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostRuleConditionEntity)) {
+		if (!(o instanceof HostRuleCondition)) {
 			return false;
 		}
-		HostRuleConditionEntity other = (HostRuleConditionEntity) o;
+		HostRuleCondition other = (HostRuleCondition) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -40,7 +40,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum Region {
+public enum RegionEnum {
 
 	NORTH_AMERICA("North America", new Coordinates("North America", 39.787092, -99.754244)),
 	SOUTH_AMERICA("South America", new Coordinates("South America", -14.864205, -55.902655)),
@@ -53,8 +53,8 @@ public enum Region {
 	private final String region;
 	private final Coordinates coordinates;
 
-	public static Region getClosestRegion(Coordinates coordinates) {
-		List<Region> regions = Arrays.asList(values());
+	public static RegionEnum getClosestRegion(Coordinates coordinates) {
+		List<RegionEnum> regions = Arrays.asList(values());
 		regions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherRegion.getCoordinates().distanceTo(coordinates);
@@ -63,13 +63,13 @@ public enum Region {
 		return regions.get(0);
 	}
 
-	public static Region getRegion(String name) {
+	public static RegionEnum getRegion(String name) {
 		return valueOf(name.toUpperCase().replace(" ", "_"));
 	}
 
 	@JsonCreator
-	public static Region forValues(@JsonProperty("region") String regionName, @JsonProperty("coordinates") Coordinates coordinates) {
-		for (Region region : Region.values()) {
+	public static RegionEnum forValues(@JsonProperty("region") String regionName, @JsonProperty("coordinates") Coordinates coordinates) {
+		for (RegionEnum region : RegionEnum.values()) {
 			if (region.region.equalsIgnoreCase(regionName) && Objects.equals(region.coordinates, coordinates)) {
 				return region;
 			}

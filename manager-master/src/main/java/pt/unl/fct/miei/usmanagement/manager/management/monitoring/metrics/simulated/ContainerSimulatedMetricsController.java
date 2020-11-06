@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,24 +48,24 @@ public class ContainerSimulatedMetricsController {
 	}
 
 	@GetMapping
-	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
+	public List<ContainerSimulatedMetric> getContainerSimulatedMetrics() {
 		return containerSimulatedMetricsService.getContainerSimulatedMetrics();
 	}
 
 	@GetMapping("/{simulatedMetricName}")
-	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
+	public ContainerSimulatedMetric getContainerSimulatedMetric(@PathVariable String simulatedMetricName) {
 		return containerSimulatedMetricsService.getContainerSimulatedMetric(simulatedMetricName);
 	}
 
 	@PostMapping
-	public ContainerSimulatedMetricEntity addContainerSimulatedMetric(@RequestBody ContainerSimulatedMetricEntity containerSimulatedMetric) {
+	public ContainerSimulatedMetric addContainerSimulatedMetric(@RequestBody ContainerSimulatedMetric containerSimulatedMetric) {
 		Validation.validatePostRequest(containerSimulatedMetric.getId());
 		return containerSimulatedMetricsService.addContainerSimulatedMetric(containerSimulatedMetric);
 	}
 
 	@PutMapping("/{simulatedMetricName}")
-	public ContainerSimulatedMetricEntity updateContainerSimulatedMetric(@PathVariable String simulatedMetricName,
-																		 @RequestBody ContainerSimulatedMetricEntity simulatedMetric) {
+	public ContainerSimulatedMetric updateContainerSimulatedMetric(@PathVariable String simulatedMetricName,
+																   @RequestBody ContainerSimulatedMetric simulatedMetric) {
 		Validation.validatePutRequest(simulatedMetric.getId());
 		return containerSimulatedMetricsService.updateContainerSimulatedMetric(simulatedMetricName, simulatedMetric);
 	}
@@ -76,7 +76,7 @@ public class ContainerSimulatedMetricsController {
 	}
 
 	@GetMapping("/{simulatedMetricName}/containers")
-	public List<ContainerEntity> getContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName) {
+	public List<Container> getContainerSimulatedMetricContainers(@PathVariable String simulatedMetricName) {
 		return containerSimulatedMetricsService.getContainers(simulatedMetricName);
 	}
 

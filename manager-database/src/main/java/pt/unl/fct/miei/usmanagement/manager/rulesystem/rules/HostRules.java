@@ -27,7 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
@@ -35,17 +34,16 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> {
+public interface HostRules extends JpaRepository<HostRule, Long> {
 
-	Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<HostRule> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
-		+ "from HostRuleEntity r join r.cloudHosts c join r.edgeHosts e "
+		+ "from HostRule r join r.cloudHosts c join r.edgeHosts e "
 		+ "where (c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
 		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)")
-	List<HostRuleEntity> findByHostAddress(@Param("publicIpAddress") String publicIpAddress,
-										   @Param("privateIpAddress") String privateIpAddress);
+	List<HostRule> findByHostAddress(@Param("publicIpAddress") String publicIpAddress,
+									 @Param("privateIpAddress") String privateIpAddress);
 
 /*	@Query("select r "
 		+ "from HostRuleEntity r join r.cloudHosts c join r.edgeHosts e "
@@ -63,48 +61,48 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 	List<HostRuleEntity> findByEdgeHostname(@Param("hostname") String hostname);*/
 
 	@Query("select r "
-		+ "from HostRuleEntity r "
+		+ "from HostRule r "
 		+ "where r.generic = true")
-	List<HostRuleEntity> findGenericHostRules();
+	List<HostRule> findGenericHostRules();
 
 	@Query("select r "
-		+ "from HostRuleEntity r "
+		+ "from HostRule r "
 		+ "where r.generic = true and r.name = :ruleName")
-	Optional<HostRuleEntity> findGenericHostRule(@Param("ruleName") String ruleName);
+	Optional<HostRule> findGenericHostRule(@Param("ruleName") String ruleName);
 
 	@Query("select case when count(r) > 0 then true else false end "
-		+ "from HostRuleEntity r "
+		+ "from HostRule r "
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
 	@Query("select rc.hostCondition "
-		+ "from HostRuleEntity r join r.conditions rc "
+		+ "from HostRule r join r.conditions rc "
 		+ "where r.name = :ruleName")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
 	@Query("select rc.hostCondition "
-		+ "from HostRuleEntity r join r.conditions rc "
+		+ "from HostRule r join r.conditions rc "
 		+ "where r.name = :ruleName and rc.hostCondition.name = :conditionName")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 
 	@Query("select h "
-		+ "from HostRuleEntity r join r.cloudHosts h "
+		+ "from HostRule r join r.cloudHosts h "
 		+ "where r.name = :ruleName")
 	List<CloudHost> getCloudHosts(@Param("ruleName") String ruleName);
 
 	@Query("select h "
-		+ "from HostRuleEntity r join r.cloudHosts h "
+		+ "from HostRule r join r.cloudHosts h "
 		+ "where r.name = :ruleName and h.instanceId = :instanceId")
 	Optional<CloudHost> getCloudHost(@Param("ruleName") String ruleName, @Param("instanceId") String instanceId);
 
 	@Query("select h "
-		+ "from HostRuleEntity r join r.edgeHosts h "
+		+ "from HostRule r join r.edgeHosts h "
 		+ "where r.name = :ruleName")
 	List<EdgeHost> getEdgeHosts(@Param("ruleName") String ruleName);
 
 	@Query("select h "
-		+ "from HostRuleEntity r join r.edgeHosts h "
+		+ "from HostRule r join r.edgeHosts h "
 		+ "where r.name = :ruleName and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
 	Optional<EdgeHost> getEdgeHost(@Param("ruleName") String ruleName, @Param("hostname") String hostname);
 

@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
 
 import java.util.List;
 
@@ -46,32 +46,32 @@ public class DecisionsController {
 	}
 
 	@GetMapping
-	public List<DecisionEntity> getDecisions() {
+	public List<Decision> getDecisions() {
 		return decisionsService.getDecisions();
 	}
 
 	@GetMapping("/services")
-	public List<DecisionEntity> getServicesPossibleDecisions() {
+	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getServicesPossibleDecisions() {
 		return decisionsService.getServicesPossibleDecisions();
 	}
 
 	@GetMapping("/services/{serviceName}")
-	public List<ServiceDecisionEntity> getServiceDecisions(@PathVariable String serviceName) {
+	public List<ServiceDecision> getServiceDecisions(@PathVariable String serviceName) {
 		return decisionsService.getServiceDecisions(serviceName);
 	}
 
 	@GetMapping("/containers/{containerId}")
-	public List<ServiceDecisionEntity> getContainerDecisions(@PathVariable String containerId) {
+	public List<ServiceDecision> getContainerDecisions(@PathVariable String containerId) {
 		return decisionsService.getContainerDecisions(containerId);
 	}
 
 	@GetMapping("/hosts")
-	public List<DecisionEntity> getHostsPossibleDecisions() {
+	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getHostsPossibleDecisions() {
 		return decisionsService.getHostsPossibleDecisions();
 	}
 
 	@GetMapping("/hosts/{hostname}")
-	public List<HostDecisionEntity> getHostDecisions(@PathVariable String hostname) {
+	public List<HostDecision> getHostDecisions(@PathVariable String hostname) {
 		return decisionsService.getHostDecisions(new HostAddress(hostname));
 	}
 

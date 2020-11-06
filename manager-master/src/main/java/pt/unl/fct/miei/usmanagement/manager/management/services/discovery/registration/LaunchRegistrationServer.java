@@ -25,10 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
 
 import java.util.List;
 

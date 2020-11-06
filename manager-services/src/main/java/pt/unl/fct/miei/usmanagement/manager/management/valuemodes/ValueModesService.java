@@ -30,8 +30,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeRepository;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModes;
 
 import java.util.List;
 
@@ -39,34 +39,34 @@ import java.util.List;
 @Service
 public class ValueModesService {
 
-	private final ValueModeRepository valueModes;
+	private final ValueModes valueModes;
 
-	public ValueModesService(ValueModeRepository valueModes) {
+	public ValueModesService(ValueModes valueModes) {
 		this.valueModes = valueModes;
 	}
 
-	public List<ValueModeEntity> getValueModes() {
+	public List<ValueMode> getValueModes() {
 		return valueModes.findAll();
 	}
 
-	public ValueModeEntity getValueMode(Long id) {
+	public ValueMode getValueMode(Long id) {
 		return valueModes.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ValueModeEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ValueMode.class, "id", id.toString()));
 	}
 
-	public ValueModeEntity getValueMode(String valueModeName) {
+	public ValueMode getValueMode(String valueModeName) {
 		return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
-			new EntityNotFoundException(ValueModeEntity.class, "name", valueModeName));
+			new EntityNotFoundException(ValueMode.class, "name", valueModeName));
 	}
 
-	public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
+	public ValueMode addValueMode(ValueMode valueMode) {
 		checkValueModeDoesntExist(valueMode);
 		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
 		return valueModes.save(valueMode);
 	}
 
-	public ValueModeEntity updateValueMode(String valueModeName, ValueModeEntity newValueMode) {
-		ValueModeEntity valueMode = getValueMode(valueModeName);
+	public ValueMode updateValueMode(String valueModeName, ValueMode newValueMode) {
+		ValueMode valueMode = getValueMode(valueModeName);
 		log.info("Updating valueMode {} with {}",
 			ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
 		log.info("valueMode before copying properties: {}",
@@ -79,11 +79,11 @@ public class ValueModesService {
 	}
 
 	public void deleteValueMode(String valueModeName) {
-		ValueModeEntity valueMode = getValueMode(valueModeName);
+		ValueMode valueMode = getValueMode(valueModeName);
 		valueModes.delete(valueMode);
 	}
 
-	private void checkValueModeDoesntExist(ValueModeEntity valueMode) {
+	private void checkValueModeDoesntExist(ValueMode valueMode) {
 		String valueModeName = valueMode.getName();
 		if (valueModes.hasValueMode(valueModeName)) {
 			throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");

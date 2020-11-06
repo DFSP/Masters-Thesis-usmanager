@@ -26,7 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules;
 
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.EventType;
 
 import java.util.List;
@@ -37,11 +37,11 @@ public final class Rule {
 
 	private final long id;
 	private final List<Condition> conditions;
-	private final RuleDecision decision;
+	private final RuleDecisionEnum decision;
 	private final int priority;
 	private final EventType eventType;
 
-	public Rule(long id, List<Condition> conditions, RuleDecision decision, int priority) {
+	public Rule(long id, List<Condition> conditions, RuleDecisionEnum decision, int priority) {
 		this.id = id;
 		this.conditions = conditions;
 		this.decision = decision;

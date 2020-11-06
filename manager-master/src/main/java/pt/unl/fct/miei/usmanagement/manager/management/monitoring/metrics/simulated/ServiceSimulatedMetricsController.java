@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -49,25 +49,25 @@ public class ServiceSimulatedMetricsController {
 	}
 
 	@GetMapping
-	public List<ServiceSimulatedMetricEntity> getServiceSimulatedMetrics() {
+	public List<ServiceSimulatedMetric> getServiceSimulatedMetrics() {
 		return serviceSimulatedMetricsService.getServiceSimulatedMetrics();
 	}
 
 	@GetMapping("/{simulatedMetricName}")
-	public ServiceSimulatedMetricEntity getServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
+	public ServiceSimulatedMetric getServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
 		return serviceSimulatedMetricsService.getServiceSimulatedMetric(simulatedMetricName);
 	}
 
 	@PostMapping
-	public ServiceSimulatedMetricEntity addServiceSimulatedMetric(
-		@RequestBody ServiceSimulatedMetricEntity serviceSimulatedMetric) {
+	public ServiceSimulatedMetric addServiceSimulatedMetric(
+		@RequestBody ServiceSimulatedMetric serviceSimulatedMetric) {
 		Validation.validatePostRequest(serviceSimulatedMetric.getId());
 		return serviceSimulatedMetricsService.addServiceSimulatedMetric(serviceSimulatedMetric);
 	}
 
 	@PutMapping("/{simulatedMetricName}")
-	public ServiceSimulatedMetricEntity updateServiceSimulatedMetric(@PathVariable String simulatedMetricName,
-																	 @RequestBody ServiceSimulatedMetricEntity simulatedMetric) {
+	public ServiceSimulatedMetric updateServiceSimulatedMetric(@PathVariable String simulatedMetricName,
+															   @RequestBody ServiceSimulatedMetric simulatedMetric) {
 		Validation.validatePutRequest(simulatedMetric.getId());
 		return serviceSimulatedMetricsService.updateServiceSimulatedMetric(simulatedMetricName, simulatedMetric);
 	}
@@ -79,7 +79,7 @@ public class ServiceSimulatedMetricsController {
 
 
 	@GetMapping("/{simulatedMetricName}/services")
-	public List<ServiceEntity> getServiceSimulatedMetricServices(@PathVariable String simulatedMetricName) {
+	public List<Service> getServiceSimulatedMetricServices(@PathVariable String simulatedMetricName) {
 		return serviceSimulatedMetricsService.getServices(simulatedMetricName);
 	}
 

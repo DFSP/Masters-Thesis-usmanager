@@ -27,13 +27,11 @@ package pt.unl.fct.miei.usmanagement.manager.management.docker.proxy;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
@@ -41,7 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import java.util.List;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class DockerApiProxyService {
 
 	public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
@@ -64,9 +62,9 @@ public class DockerApiProxyService {
 	}
 
 	public String launchDockerApiProxy(HostAddress hostAddress) {
-		ServiceEntity dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
+		Service dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
 		String serviceName = dockerApiProxy.getServiceName();
-		ServiceType serviceType = dockerApiProxy.getServiceType();
+		ServiceTypeEnum serviceType = dockerApiProxy.getServiceType();
 		int externalPort = dockerApiProxy.getDefaultExternalPort();
 		int internalPort = dockerApiProxy.getDefaultInternalPort();
 		String dockerRepository = dockerApiProxy.getDockerRepository();
@@ -83,7 +81,7 @@ public class DockerApiProxyService {
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
 			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
 			ContainerConstants.Label.US_MANAGER, true,
-			ContainerConstants.Label.CONTAINER_TYPE, ContainerType.SINGLETON,
+			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
 			ContainerConstants.Label.SERVICE_TYPE, serviceType,
 			ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,

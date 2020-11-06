@@ -26,22 +26,22 @@ package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValueEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValueRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValueEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValueRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decisions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValue;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValues;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValues;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
@@ -58,18 +58,18 @@ public class DecisionsService {
 
 	private final ServiceRulesService serviceRulesService;
 	private final HostRulesService hostRulesService;
-	private final DecisionRepository decisions;
-	private final ServiceDecisionRepository serviceDecisions;
-	private final HostDecisionRepository hostDecisions;
-	private final ServiceDecisionValueRepository serviceDecisionValues;
-	private final HostDecisionValueRepository hostDecisionValues;
+	private final Decisions decisions;
+	private final ServiceDecisions serviceDecisions;
+	private final HostDecisions hostDecisions;
+	private final ServiceDecisionValues serviceDecisionValues;
+	private final HostDecisionValues hostDecisionValues;
 	private final FieldsService fieldsService;
 
 	public DecisionsService(ServiceRulesService serviceRulesService, HostRulesService hostRulesService,
-							DecisionRepository decisions, ServiceDecisionRepository serviceDecisions,
-							HostDecisionRepository hostDecisions,
-							ServiceDecisionValueRepository serviceDecisionValues,
-							HostDecisionValueRepository hostDecisionValues,
+							Decisions decisions, ServiceDecisions serviceDecisions,
+							HostDecisions hostDecisions,
+							ServiceDecisionValues serviceDecisionValues,
+							HostDecisionValues hostDecisionValues,
 							FieldsService fieldsService) {
 		this.serviceRulesService = serviceRulesService;
 		this.hostRulesService = hostRulesService;
@@ -81,57 +81,57 @@ public class DecisionsService {
 		this.fieldsService = fieldsService;
 	}
 
-	public List<DecisionEntity> getDecisions() {
+	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getDecisions() {
 		return decisions.findAll();
 	}
 
-	public DecisionEntity getDecision(String decisionName) {
-		RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getDecision(String decisionName) {
+		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
 		return decisions.findByRuleDecision(decision).orElseThrow(() ->
-			new EntityNotFoundException(DecisionEntity.class, "decision", decisionName));
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decision", decisionName));
 	}
 
-	public DecisionEntity getDecision(Long id) {
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getDecision(Long id) {
 		return decisions.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "id", id.toString()));
 	}
 
-	public DecisionEntity addDecision(DecisionEntity decisionEntity) {
-		return decisions.save(decisionEntity);
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addDecision(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision) {
+		return decisions.save(decision);
 	}
 
-	public List<DecisionEntity> getServicesPossibleDecisions() {
-		return decisions.findByComponentTypeType(ComponentType.SERVICE);
+	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getServicesPossibleDecisions() {
+		return decisions.findByComponentTypeType(ComponentTypeEnum.SERVICE);
 	}
 
-	public List<DecisionEntity> getHostsPossibleDecisions() {
-		return decisions.findByComponentTypeType(ComponentType.HOST);
+	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getHostsPossibleDecisions() {
+		return decisions.findByComponentTypeType(ComponentTypeEnum.HOST);
 	}
 
-	public DecisionEntity getServicePossibleDecision(String decisionName) {
-		RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
-			new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getServicePossibleDecision(String decisionName) {
+		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentTypeEnum.SERVICE).orElseThrow(() ->
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decisionName));
 	}
 
-	public DecisionEntity getContainerPossibleDecision(String decisionName) {
-		RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.CONTAINER).orElseThrow(() ->
-			new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getContainerPossibleDecision(String decisionName) {
+		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentTypeEnum.CONTAINER).orElseThrow(() ->
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decisionName));
 	}
 
-	public DecisionEntity getHostPossibleDecision(String decisionName) {
-		RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
-		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
-			new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getHostPossibleDecision(String decisionName) {
+		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentTypeEnum.HOST).orElseThrow(() ->
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decisionName));
 	}
 
-	public ServiceDecisionEntity addServiceDecision(String containerId, String serviceName, String decisionName,
-													long ruleId, String result) {
-		ServiceRuleEntity rule = serviceRulesService.getRule(ruleId);
-		DecisionEntity decision = getServicePossibleDecision(decisionName);
+	public ServiceDecision addServiceDecision(String containerId, String serviceName, String decisionName,
+											  long ruleId, String result) {
+		ServiceRule rule = serviceRulesService.getRule(ruleId);
+		Decision decision = getServicePossibleDecision(decisionName);
 		Timestamp timestamp = Timestamp.from(Instant.now());
-		ServiceDecisionEntity serviceDecision = ServiceDecisionEntity.builder()
+		ServiceDecision serviceDecision = ServiceDecision.builder()
 			.containerId(containerId)
 			.serviceName(serviceName)
 			.result(result)
@@ -141,20 +141,20 @@ public class DecisionsService {
 		return serviceDecisions.save(serviceDecision);
 	}
 
-	public HostDecisionEntity addHostDecision(HostAddress hostAddress, String decisionName, long ruleId) {
-		HostRuleEntity rule = hostRulesService.getRule(ruleId);
-		DecisionEntity decision = getHostPossibleDecision(decisionName);
-		HostDecisionEntity hostDecision = HostDecisionEntity.builder().hostAddress(hostAddress).rule(rule).decision(decision).build();
+	public HostDecision addHostDecision(HostAddress hostAddress, String decisionName, long ruleId) {
+		HostRule rule = hostRulesService.getRule(ruleId);
+		pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision = getHostPossibleDecision(decisionName);
+		HostDecision hostDecision = HostDecision.builder().hostAddress(hostAddress).rule(rule).decision(decision).build();
 		return hostDecisions.save(hostDecision);
 	}
 
-	public void addServiceDecisionValueFromFields(ServiceDecisionEntity serviceDecision,
+	public void addServiceDecisionValueFromFields(ServiceDecision serviceDecision,
 												  Map<String, Double> fields) {
 		serviceDecisionValues.saveAll(
 			fields.entrySet().stream()
 				.filter(field -> field.getKey().contains("effective-val"))
 				.map(field ->
-					ServiceDecisionValueEntity.builder()
+					ServiceDecisionValue.builder()
 						.serviceDecision(serviceDecision)
 						.field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
 						.value(field.getValue())
@@ -163,12 +163,12 @@ public class DecisionsService {
 		);
 	}
 
-	public void addHostDecisionValueFromFields(HostDecisionEntity hostDecision, Map<String, Double> fields) {
+	public void addHostDecisionValueFromFields(HostDecision hostDecision, Map<String, Double> fields) {
 		hostDecisionValues.saveAll(
 			fields.entrySet().stream()
 				.filter(field -> field.getKey().contains("effective-val"))
 				.map(field ->
-					HostDecisionValueEntity.builder()
+					HostDecisionValue.builder()
 						.hostDecision(hostDecision)
 						.field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
 						.value(field.getValue())
@@ -177,15 +177,15 @@ public class DecisionsService {
 		);
 	}
 
-	public List<ServiceDecisionEntity> getServiceDecisions(String serviceName) {
+	public List<ServiceDecision> getServiceDecisions(String serviceName) {
 		return serviceDecisions.findByServiceName(serviceName);
 	}
 
-	public List<ServiceDecisionEntity> getContainerDecisions(String containerId) {
+	public List<ServiceDecision> getContainerDecisions(String containerId) {
 		return serviceDecisions.findByContainerIdStartingWith(containerId);
 	}
 
-	public List<HostDecisionEntity> getHostDecisions(HostAddress hostAddress) {
+	public List<HostDecision> getHostDecisions(HostAddress hostAddress) {
 		return hostDecisions.findByHostAddress(hostAddress);
 	}
 

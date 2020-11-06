@@ -27,51 +27,49 @@ package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface AppRuleRepository extends JpaRepository<AppRuleEntity, Long> {
+public interface AppRules extends JpaRepository<AppRule, Long> {
 
 	@Query("select r "
-		+ "from AppRuleEntity r "
+		+ "from AppRule r "
 		+ "where r.name = :ruleName")
-	Optional<AppRuleEntity> findAppRule(@Param("ruleName") String ruleName);
+	Optional<AppRule> findAppRule(@Param("ruleName") String ruleName);
 
-	Optional<AppRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<AppRule> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
-		+ "from AppRuleEntity r join r.apps s "
+		+ "from AppRule r join r.apps s "
 		+ "where s.name = :name")
-	List<AppRuleEntity> findByAppName(@Param("name") String name);
+	List<AppRule> findByAppName(@Param("name") String name);
 
 	@Query("select case when count(r) > 0 then true else false end "
-		+ "from AppRuleEntity r "
+		+ "from AppRule r "
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
 	@Query("select rc.appCondition "
-		+ "from AppRuleEntity r join r.conditions rc "
+		+ "from AppRule r join r.conditions rc "
 		+ "where r.name = :ruleName")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
 	@Query("select rc.appCondition "
-		+ "from AppRuleEntity r join r.conditions rc "
+		+ "from AppRule r join r.conditions rc "
 		+ "where r.name = :ruleName and rc.appCondition.name = :conditionName")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 
 	@Query("select s "
-		+ "from AppRuleEntity r join r.apps s "
+		+ "from AppRule r join r.apps s "
 		+ "where r.name = :ruleName")
 	List<App> getApps(@Param("ruleName") String ruleName);
 
 	@Query("select s "
-		+ "from AppRuleEntity r join r.apps s "
+		+ "from AppRule r join r.apps s "
 		+ "where r.name = :ruleName and s.name = :name")
 	Optional<App> getApp(@Param("ruleName") String ruleName, @Param("name") String name);
 

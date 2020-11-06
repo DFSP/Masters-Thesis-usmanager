@@ -29,7 +29,6 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.AttachedNetwork;
-import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerInfo;
@@ -40,11 +39,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -57,9 +55,9 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;
@@ -78,7 +76,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Service
+@org.springframework.stereotype.Service
 @Slf4j
 public class DockerContainersService {
 
@@ -113,7 +111,7 @@ public class DockerContainersService {
 		this.launchingContainer = false;
 	}
 
-	public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, Coordinates coordinates) {
+	public Map<String, List<DockerContainer>> launchApp(List<Service> services, Coordinates coordinates) {
 		Map<String, List<DockerContainer>> serviceContainers = new HashMap<>();
 		Map<String, String> dynamicLaunchParams = new HashMap<>();
 		services.forEach(service -> {
@@ -130,7 +128,7 @@ public class DockerContainersService {
 		return serviceContainers;
 	}
 
-	private List<DockerContainer> launchMicroservice(ServiceEntity service, Coordinates coordinates,
+	private List<DockerContainer> launchMicroservice(Service service, Coordinates coordinates,
 													 Map<String, String> dynamicLaunchParams) {
 		List<String> environment = Collections.emptyList();
 		Map<String, String> labels = Collections.emptyMap();
@@ -139,7 +137,7 @@ public class DockerContainersService {
 		List<DockerContainer> containers = new ArrayList<>(minimumReplicas);
 		for (int i = 0; i < minimumReplicas; i++) {
 			HostAddress address = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-			Optional<DockerContainer> container = launchContainer(address, service, ContainerType.BY_REQUEST, environment,
+			Optional<DockerContainer> container = launchContainer(address, service, ContainerTypeEnum.BY_REQUEST, environment,
 				labels, dynamicLaunchParams);
 			container.ifPresent(containers::add);
 		}
@@ -153,76 +151,76 @@ public class DockerContainersService {
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST);
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType) {
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerTypeEnum containerType) {
 		List<String> environment = Collections.emptyList();
 		return launchContainer(address, serviceName, containerType, environment);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, List<String> environment) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, environment);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, environment);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName,
-													 ContainerType containerType, List<String> environment) {
+													 ContainerTypeEnum containerType, List<String> environment) {
 		Map<String, String> labels = Collections.emptyMap();
 		return launchContainer(address, serviceName, containerType, environment, labels);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, Map<String, String> labels) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, labels);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, labels);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName,
-													 ContainerType containerType, Map<String, String> labels) {
+													 ContainerTypeEnum containerType, Map<String, String> labels) {
 		List<String> environment = Collections.emptyList();
 		return launchContainer(address, serviceName, containerType, environment, labels);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, List<String> environment,
 													 Map<String, String> labels) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, environment, labels);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, environment, labels);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, List<String> environment,
 													 Map<String, String> labels,
 													 Map<String, String> dynamicLaunchParams) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, environment, labels, dynamicLaunchParams);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, environment, labels, dynamicLaunchParams);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName,
-													 ContainerType containerType, List<String> environment,
+													 ContainerTypeEnum containerType, List<String> environment,
 													 Map<String, String> labels) {
 		Map<String, String> dynamicLaunchParams = Collections.emptyMap();
 		return launchContainer(address, serviceName, containerType, environment, labels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerTypeEnum containerType,
 													 List<String> environment, Map<String, String> labels,
 													 Map<String, String> dynamicLaunchParams) {
-		ServiceEntity service = servicesService.getService(serviceName);
+		Service service = servicesService.getService(serviceName);
 		return launchContainer(address, service, containerType, environment, labels, dynamicLaunchParams);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, int externalPort, int internalPort) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, externalPort, internalPort);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, externalPort, internalPort);
 	}
 
 	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, int internalPort,
 													 int externalPort, List<String> environment) {
-		return launchContainer(address, serviceName, ContainerType.BY_REQUEST, externalPort, internalPort, environment);
+		return launchContainer(address, serviceName, ContainerTypeEnum.BY_REQUEST, externalPort, internalPort, environment);
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerTypeEnum containerType,
 													 int externalPort, int internalPort) {
 		return launchContainer(address, serviceName, containerType, externalPort, internalPort, Collections.emptyList());
 	}
 
-	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerType containerType,
+	public Optional<DockerContainer> launchContainer(HostAddress address, String serviceName, ContainerTypeEnum containerType,
 													 int externalPort, int internalPort, List<String> environment) {
-		ServiceEntity service = servicesService.getService(serviceName).toBuilder()
+		Service service = servicesService.getService(serviceName).toBuilder()
 			.defaultExternalPort(externalPort)
 			.defaultInternalPort(internalPort)
 			.build();
@@ -231,8 +229,8 @@ public class DockerContainersService {
 		return launchContainer(address, service, containerType, environment, labels, dynamicLaunchParams);
 	}
 
-	private Optional<DockerContainer> launchContainer(HostAddress hostAddress, ServiceEntity service,
-													  ContainerType containerType, List<String> environment,
+	private Optional<DockerContainer> launchContainer(HostAddress hostAddress, Service service,
+													  ContainerTypeEnum containerType, List<String> environment,
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
 		launchingContainer = true;
@@ -247,7 +245,7 @@ public class DockerContainersService {
 				String serviceName = service.getServiceName();
 				log.info("Launching container on mode {} with service {} at {}", containerType, serviceName, hostAddress);
 
-				if (containerType == ContainerType.SINGLETON) {
+				if (containerType == ContainerTypeEnum.SINGLETON) {
 					List<DockerContainer> containers = List.of();
 					try {
 						containers = getContainers(
@@ -268,7 +266,7 @@ public class DockerContainersService {
 				String serviceType = service.getServiceType().name();
 				int externalPort = hostsService.findAvailableExternalPort(hostAddress, service.getDefaultExternalPort());
 				int internalPort = service.getDefaultInternalPort();
-				String containerName = containerType == ContainerType.SINGLETON
+				String containerName = containerType == ContainerTypeEnum.SINGLETON
 					? serviceName
 					: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
 				String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
@@ -283,7 +281,7 @@ public class DockerContainersService {
 					.replace("${internalPort}", String.valueOf(internalPort));
 				log.info("Launch command: {}", launchCommand);
 
-				Region region = hostAddress.getRegion();
+				RegionEnum region = hostAddress.getRegion();
 				if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
 					String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
@@ -292,7 +290,7 @@ public class DockerContainersService {
 					launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 				}
 
-				for (ServiceEntity databaseService : servicesService.getDependenciesByType(serviceName, ServiceType.DATABASE)) {
+				for (Service databaseService : servicesService.getDependenciesByType(serviceName, ServiceTypeEnum.DATABASE)) {
 					String databaseServiceName = databaseService.getServiceName();
 					String databaseHost = getDatabaseHostForService(hostAddress, databaseServiceName);
 					String outputLabel = databaseService.getOutputLabel();
@@ -344,7 +342,7 @@ public class DockerContainersService {
 					String containerId = containerCreation.id();
 					dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
 					dockerClient.startContainer(containerId);
-					if (ServiceType.getServiceType(serviceType) == ServiceType.FRONTEND) {
+					if (ServiceTypeEnum.getServiceType(serviceType) == ServiceTypeEnum.FRONTEND) {
 						nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
 					}
 					return getContainer(containerId);
@@ -363,7 +361,7 @@ public class DockerContainersService {
 	}
 
 	private String getDatabaseHostForService(HostAddress hostAddress, String databaseServiceName) {
-		ContainerEntity databaseContainer = containersService.getHostContainersWithLabels(hostAddress,
+		Container databaseContainer = containersService.getHostContainersWithLabels(hostAddress,
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
 			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, databaseServiceName));
 		if (databaseContainer == null) {
@@ -374,7 +372,7 @@ public class DockerContainersService {
 		return address;
 	}
 
-	public void stopContainer(ContainerEntity container) {
+	public void stopContainer(Container container) {
 		String containerId = container.getContainerId();
 		HostAddress hostAddress = container.getHostAddress();
 		stopContainer(containerId, hostAddress);
@@ -387,10 +385,10 @@ public class DockerContainersService {
 	public void stopContainer(String id, HostAddress hostAddress, Integer delay) {
 		ContainerInfo containerInfo = inspectContainer(id, hostAddress);
 		String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
-		ServiceType serviceType = ServiceType.getServiceType(containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE));
-		if (serviceType == ServiceType.FRONTEND) {
+		ServiceTypeEnum serviceType = ServiceTypeEnum.getServiceType(containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE));
+		if (serviceType == ServiceTypeEnum.FRONTEND) {
 			String serviceAddress = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_ADDRESS);
-			Region region = Region.getRegion(containerInfo.config().labels().get(ContainerConstants.Label.REGION));
+			RegionEnum region = RegionEnum.getRegion(containerInfo.config().labels().get(ContainerConstants.Label.REGION));
 			nginxLoadBalancerService.removeServer(serviceName, serviceAddress, region);
 		}
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
@@ -405,7 +403,7 @@ public class DockerContainersService {
 		}
 	}
 
-	public Optional<DockerContainer> replicateContainer(ContainerEntity container, HostAddress toHostAddress) {
+	public Optional<DockerContainer> replicateContainer(Container container, HostAddress toHostAddress) {
 		return replicateContainer(container.getContainerId(), container.getHostAddress(), toHostAddress);
 	}
 
@@ -418,7 +416,7 @@ public class DockerContainersService {
 		Map.Entry<String, List<PortBinding>> port = fromContainer.hostConfig().portBindings().entrySet().iterator().next();
 		int externalPort = Integer.parseInt(port.getValue().get(0).hostPort());
 		int internalPort = Integer.parseInt(port.getKey());
-		ServiceEntity service = servicesService.getService(serviceName).toBuilder()
+		Service service = servicesService.getService(serviceName).toBuilder()
 			.defaultInternalPort(internalPort)
 			.defaultExternalPort(externalPort)
 			.build();
@@ -438,10 +436,10 @@ public class DockerContainersService {
 				.boxed()
 				.collect(Collectors.toMap(params::get, args::get));
 		}
-		return launchContainer(toHostAddress, service, ContainerType.BY_REQUEST, customEnvs, customLabels, dynamicLaunchParams);
+		return launchContainer(toHostAddress, service, ContainerTypeEnum.BY_REQUEST, customEnvs, customLabels, dynamicLaunchParams);
 	}
 
-	public Optional<DockerContainer> migrateContainer(ContainerEntity container, HostAddress toHostAddress) {
+	public Optional<DockerContainer> migrateContainer(Container container, HostAddress toHostAddress) {
 		if (!toHostAddress.isComplete()) {
 			toHostAddress = hostsService.completeHostAddress(toHostAddress);
 		}
@@ -504,7 +502,7 @@ public class DockerContainersService {
 		}
 	}
 
-	public Optional<ContainerStats> getContainerStats(ContainerEntity container, HostAddress hostAddress) {
+	public Optional<ContainerStats> getContainerStats(Container container, HostAddress hostAddress) {
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
 			return Optional.of(dockerClient.stats(container.getContainerId()));
 		}
@@ -514,7 +512,7 @@ public class DockerContainersService {
 		return Optional.empty();
 	}
 
-	private DockerContainer buildDockerContainer(Container container) {
+	private DockerContainer buildDockerContainer(com.spotify.docker.client.messages.Container container) {
 		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
@@ -529,11 +527,11 @@ public class DockerContainersService {
 			: String.format("%s=%s", DockerSwarmService.NETWORK_OVERLAY, attachedNetwork.networkId().substring(0, 10));
 		String state = container.state();
 		String status = container.status();
-		ContainerType type = ContainerType.getContainerType(container.labels().get(ContainerConstants.Label.CONTAINER_TYPE));
+		ContainerTypeEnum type = ContainerTypeEnum.getContainerType(container.labels().get(ContainerConstants.Label.CONTAINER_TYPE));
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
-		Region region = Region.getRegion(container.labels().get(ContainerConstants.Label.REGION));
+		RegionEnum region = RegionEnum.getRegion(container.labels().get(ContainerConstants.Label.REGION));
 		List<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toList());
@@ -542,7 +540,7 @@ public class DockerContainersService {
 			coordinates, region, ports, labels);
 	}
 
-	public String getContainerLogs(ContainerEntity container) {
+	public String getContainerLogs(Container container) {
 		HostAddress hostAddress = container.getHostAddress();
 		String containerId = container.getContainerId();
 		String logs = null;

@@ -28,20 +28,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 @RestController
 @RequestMapping("/regions")
 public class RegionsController {
 
 	@GetMapping
-	public Region[] getRegions() {
-		return Region.values();
+	public RegionEnum[] getRegions() {
+		return RegionEnum.values();
 	}
 
 	@GetMapping("/{name}")
-	public Region getRegion(@PathVariable String name) {
-		return Region.getRegion(name);
+	public RegionEnum getRegion(@PathVariable String name) {
+		return RegionEnum.getRegion(name);
 	}
 
 	/*private final RegionsService regionsService;
@@ -56,18 +56,18 @@ public class RegionsController {
 	}
 
 	@GetMapping("/{regionName}")
-	public RegionEntity getRegion(@PathVariable String regionName) {
+	public Region getRegion(@PathVariable String regionName) {
 		return regionsService.getRegion(regionName);
 	}
 
 	@PostMapping
-	public RegionEntity addRegion(@RequestBody RegionEntity region) {
+	public Region addRegion(@RequestBody Region region) {
 		Validation.validatePostRequest(region.getId());
 		return regionsService.addRegion(region);
 	}
 
 	@PutMapping(value = "/{name}")
-	public RegionEntity updateRegion(@PathVariable String name, @RequestBody RegionEntity region) {
+	public Region updateRegion(@PathVariable String name, @RequestBody Region region) {
 		Validation.validatePutRequest(region.getId());
 		return regionsService.updateRegion(name, region);
 	}

@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_app_metrics")
-public class AppSimulatedMetricEntity {
+public class AppSimulatedMetric {
 
 	@Id
 	@GeneratedValue
@@ -108,10 +108,10 @@ public class AppSimulatedMetricEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppSimulatedMetricEntity)) {
+		if (!(o instanceof AppSimulatedMetric)) {
 			return false;
 		}
-		AppSimulatedMetricEntity other = (AppSimulatedMetricEntity) o;
+		AppSimulatedMetric other = (AppSimulatedMetric) o;
 		return id != null && id.equals(other.getId());
 	}
 

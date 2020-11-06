@@ -28,20 +28,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPredictionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceRepository;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
+import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPredictions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.Services;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
@@ -52,16 +51,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class ServicesService {
 
-	private final ServiceRepository services;
-	private final ServiceEventPredictionRepository serviceEventPredictions;
+	private final Services services;
+	private final ServiceEventPredictions serviceEventPredictions;
 	private final ServiceRulesService serviceRulesService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final AppsService appsService;
 
-	public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
+	public ServicesService(Services services, ServiceEventPredictions serviceEventPredictions,
 						   ServiceRulesService serviceRulesService,
 						   ServiceSimulatedMetricsService serviceSimulatedMetricsService, @Lazy AppsService appsService) {
 		this.services = services;
@@ -71,32 +70,32 @@ public class ServicesService {
 		this.appsService = appsService;
 	}
 
-	public List<ServiceEntity> getServices() {
+	public List<Service> getServices() {
 		return services.findAll();
 	}
 
-	public ServiceEntity getService(Long id) {
+	public Service getService(Long id) {
 		return services.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ServiceEntity.class, "id", id.toString()));
+			new EntityNotFoundException(Service.class, "id", id.toString()));
 	}
 
-	public ServiceEntity getService(String serviceName) {
+	public Service getService(String serviceName) {
 		return services.findByServiceNameIgnoreCase(serviceName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
+			new EntityNotFoundException(Service.class, "serviceName", serviceName));
 	}
 
-	public List<ServiceEntity> getServicesByDockerRepository(String dockerRepository) {
+	public List<Service> getServicesByDockerRepository(String dockerRepository) {
 		return services.findByDockerRepositoryIgnoreCase(dockerRepository);
 	}
 
-	public ServiceEntity addService(ServiceEntity service) {
+	public Service addService(Service service) {
 		checkServiceDoesntExist(service);
 		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 		return services.save(service);
 	}
 
-	public ServiceEntity updateService(String serviceName, ServiceEntity newService) {
-		ServiceEntity service = getService(serviceName);
+	public Service updateService(String serviceName, Service newService) {
+		Service service = getService(serviceName);
 		log.info("Updating service {} with {}",
 			ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
 		log.info("Service before copying properties: {}",
@@ -108,27 +107,27 @@ public class ServicesService {
 	}
 
 	public void deleteService(String serviceName) {
-		ServiceEntity service = getService(serviceName);
+		Service service = getService(serviceName);
 		services.delete(service);
 	}
 
-	public AppEntity getApp(String serviceName, String appName) {
+	public App getApp(String serviceName, String appName) {
 		checkServiceExists(serviceName);
 		return services.getApp(serviceName, appName).orElseThrow(() ->
-			new EntityNotFoundException(AppEntity.class, "appName", appName));
+			new EntityNotFoundException(App.class, "appName", appName));
 	}
 
-	public List<AppEntity> getApps(String serviceName) {
+	public List<App> getApps(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getApps(serviceName);
 	}
 
 	public void addApp(String serviceName, AddServiceApp addServiceApp) {
-		ServiceEntity service = getService(serviceName);
+		Service service = getService(serviceName);
 		String appName = addServiceApp.getName();
 		int launchOrder = addServiceApp.getLaunchOrder();
-		AppEntity app = appsService.getApp(appName);
-		AppServiceEntity appService = AppServiceEntity.builder()
+		App app = appsService.getApp(appName);
+		AppService appService = AppService.builder()
 			.app(app)
 			.service(service)
 			.launchOrder(launchOrder)
@@ -146,19 +145,19 @@ public class ServicesService {
 	}
 
 	public void removeApps(String serviceName, List<String> apps) {
-		ServiceEntity service = getService(serviceName);
+		Service service = getService(serviceName);
 		log.info("Removing apps {}", apps);
 		service.getAppServices()
 			.removeIf(app -> apps.contains(app.getApp().getName()));
 		services.save(service);
 	}
 
-	public List<ServiceEntity> getDependencies(String serviceName) {
+	public List<Service> getDependencies(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getDependencies(serviceName);
 	}
 
-	public List<ServiceEntity> getDependenciesByType(String serviceName, ServiceType type) {
+	public List<Service> getDependenciesByType(String serviceName, ServiceTypeEnum type) {
 		checkServiceExists(serviceName);
 		return services.getDependenciesByType(serviceName, type);
 	}
@@ -170,9 +169,9 @@ public class ServicesService {
 	}
 
 	public void addDependency(String serviceName, String dependencyName) {
-		ServiceEntity service = getService(serviceName);
-		ServiceEntity dependency = getService(dependencyName);
-		ServiceDependencyEntity serviceDependency = ServiceDependencyEntity.builder().service(service).dependency(dependency).build();
+		Service service = getService(serviceName);
+		Service dependency = getService(dependencyName);
+		ServiceDependency serviceDependency = ServiceDependency.builder().service(service).dependency(dependency).build();
 		service = service.toBuilder().dependency(serviceDependency).build();
 		services.save(service);
 	}
@@ -186,35 +185,35 @@ public class ServicesService {
 	}
 
 	public void removeDependencies(String serviceName, List<String> dependencies) {
-		ServiceEntity service = getService(serviceName);
+		Service service = getService(serviceName);
 		log.info("Removing dependencies {}", dependencies);
 		service.getDependencies().removeIf(dependency ->
 			dependencies.contains(dependency.getDependency().getServiceName()));
 		services.save(service);
 	}
 
-	public List<ServiceEntity> getDependents(String serviceName) {
+	public List<Service> getDependents(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getDependents(serviceName);
 	}
 
-	public List<ServiceEventPredictionEntity> getPredictions(String serviceName) {
+	public List<ServiceEventPrediction> getPredictions(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getPredictions(serviceName);
 	}
 
-	public ServiceEventPredictionEntity addPrediction(String serviceName, ServiceEventPredictionEntity prediction) {
-		ServiceEntity service = getService(serviceName);
-		ServiceEventPredictionEntity servicePrediction = prediction.toBuilder()
+	public ServiceEventPrediction addPrediction(String serviceName, ServiceEventPrediction prediction) {
+		Service service = getService(serviceName);
+		ServiceEventPrediction servicePrediction = prediction.toBuilder()
 			.service(service).lastUpdate(Timestamp.from(Instant.now())).build();
 		service = service.toBuilder().eventPrediction(servicePrediction).build();
 		services.save(service);
 		return getEventPrediction(serviceName, prediction.getName());
 	}
 
-	public List<ServiceEventPredictionEntity> addPredictions(String serviceName,
-															 List<ServiceEventPredictionEntity> predictions) {
-		List<ServiceEventPredictionEntity> predictionsEntities = new ArrayList<>(predictions.size());
+	public List<ServiceEventPrediction> addPredictions(String serviceName,
+													   List<ServiceEventPrediction> predictions) {
+		List<ServiceEventPrediction> predictionsEntities = new ArrayList<>(predictions.size());
 		predictions.forEach(prediction -> predictionsEntities.add(addPrediction(serviceName, prediction)));
 		return predictionsEntities;
 	}
@@ -224,30 +223,30 @@ public class ServicesService {
 	}
 
 	public void removePredictions(String serviceName, List<String> predictionsName) {
-		ServiceEntity service = getService(serviceName);
+		Service service = getService(serviceName);
 		service.getEventPredictions()
 			.removeIf(prediction -> predictionsName.contains(prediction.getName()));
 		services.save(service);
 	}
 
-	public ServiceEventPredictionEntity getEventPrediction(String serviceName,
-														   String predictionsName) {
+	public ServiceEventPrediction getEventPrediction(String serviceName,
+													 String predictionsName) {
 		checkServiceExists(serviceName);
 		return services.getPrediction(serviceName, predictionsName).orElseThrow(() ->
 			new EntityNotFoundException(
-				ServiceEventPredictionEntity.class, "predictionsName", predictionsName)
+				ServiceEventPrediction.class, "predictionsName", predictionsName)
 		);
 	}
 
-	public List<ServiceRuleEntity> getRules(String serviceName) {
+	public List<ServiceRule> getRules(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getRules(serviceName);
 	}
 
-	public ServiceRuleEntity getRule(String serviceName, String ruleName) {
+	public ServiceRule getRule(String serviceName, String ruleName) {
 		checkServiceExists(serviceName);
 		return services.getRule(serviceName, ruleName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName)
+			new EntityNotFoundException(ServiceRule.class, "ruleName", ruleName)
 		);
 	}
 
@@ -271,15 +270,15 @@ public class ServicesService {
 		ruleNames.forEach(rule -> serviceRulesService.removeService(rule, serviceName));
 	}
 
-	public List<ServiceSimulatedMetricEntity> getSimulatedMetrics(String serviceName) {
+	public List<ServiceSimulatedMetric> getSimulatedMetrics(String serviceName) {
 		checkServiceExists(serviceName);
 		return services.getSimulatedMetrics(serviceName);
 	}
 
-	public ServiceSimulatedMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
+	public ServiceSimulatedMetric getSimulatedMetric(String serviceName, String simulatedMetricName) {
 		checkServiceExists(serviceName);
 		return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(ServiceSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+			new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
@@ -320,17 +319,17 @@ public class ServicesService {
 
 	private void checkServiceExists(Long serviceId) {
 		if (!services.hasService(serviceId)) {
-			throw new EntityNotFoundException(ServiceEntity.class, "id", serviceId.toString());
+			throw new EntityNotFoundException(Service.class, "id", serviceId.toString());
 		}
 	}
 
 	private void checkServiceExists(String serviceName) {
 		if (!services.hasService(serviceName)) {
-			throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
+			throw new EntityNotFoundException(Service.class, "serviceName", serviceName);
 		}
 	}
 
-	private void checkServiceDoesntExist(ServiceEntity service) {
+	private void checkServiceDoesntExist(Service service) {
 		String name = service.getServiceName();
 		if (services.hasService(name)) {
 			throw new DataIntegrityViolationException("Service '" + name + "' already exists");

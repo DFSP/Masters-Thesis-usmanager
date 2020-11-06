@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "service_rules")
-public class ServiceRuleEntity {
+public class ServiceRule {
 
 	@Id
 	@GeneratedValue
@@ -74,7 +74,7 @@ public class ServiceRuleEntity {
 	@Singular
 	@JsonIgnore
 	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ServiceEntity> services;
+	private Set<Service> services;
 
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
@@ -86,9 +86,9 @@ public class ServiceRuleEntity {
 	private Set<ServiceRuleCondition> conditions;
 
 	public void removeAssociations() {
-		Iterator<ServiceEntity> servicesIterator = services.iterator();
+		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {
-			ServiceEntity service = servicesIterator.next();
+			Service service = servicesIterator.next();
 			servicesIterator.remove();
 			service.getServiceRules().remove(this);
 		}
@@ -104,10 +104,10 @@ public class ServiceRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceRuleEntity)) {
+		if (!(o instanceof ServiceRule)) {
 			return false;
 		}
-		ServiceRuleEntity other = (ServiceRuleEntity) o;
+		ServiceRule other = (ServiceRule) o;
 		return id != null && id.equals(other.getId());
 	}
 

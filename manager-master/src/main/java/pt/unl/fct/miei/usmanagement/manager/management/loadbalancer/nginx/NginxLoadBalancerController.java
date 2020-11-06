@@ -29,10 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,14 +54,14 @@ public class NginxLoadBalancerController {
 	}
 
 	@PostMapping
-	public List<ContainerEntity> launchLoadBalancer(@RequestBody LaunchNginxLoadBalancer launchNginxLoadBalancer) {
+	public List<Container> launchLoadBalancer(@RequestBody LaunchNginxLoadBalancer launchNginxLoadBalancer) {
 		HostAddress hostAddress = launchNginxLoadBalancer.getHostAddress();
 		List<String> regions = launchNginxLoadBalancer.getRegions();
 		if (hostAddress != null) {
 			return List.of(nginxLoadBalancerService.launchLoadBalancer(hostAddress));
 		}
 		else if (regions != null) {
-			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
+			List<RegionEnum> regionsList = Arrays.stream(regions.toArray(new String[0])).map(RegionEnum::getRegion).collect(Collectors.toList());
 			return nginxLoadBalancerService.launchLoadBalancers(regionsList);
 		}
 		else {

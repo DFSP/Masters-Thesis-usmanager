@@ -25,9 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.decision;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ServiceDecisionValueRepository extends JpaRepository<ServiceDecisionValueEntity, Long> {
+public interface ServiceDecisionValues extends JpaRepository<ServiceDecisionValue, Long> {
 
 }

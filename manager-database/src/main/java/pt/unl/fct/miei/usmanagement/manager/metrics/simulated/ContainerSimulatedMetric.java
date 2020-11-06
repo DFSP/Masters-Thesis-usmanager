@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_container_metrics")
-public class ContainerSimulatedMetricEntity {
+public class ContainerSimulatedMetric {
 
 	@Id
 	@GeneratedValue
@@ -108,10 +108,10 @@ public class ContainerSimulatedMetricEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ContainerSimulatedMetricEntity)) {
+		if (!(o instanceof ContainerSimulatedMetric)) {
 			return false;
 		}
-		ContainerSimulatedMetricEntity other = (ContainerSimulatedMetricEntity) o;
+		ContainerSimulatedMetric other = (ContainerSimulatedMetric) o;
 		return id != null && id.equals(other.getId());
 	}
 

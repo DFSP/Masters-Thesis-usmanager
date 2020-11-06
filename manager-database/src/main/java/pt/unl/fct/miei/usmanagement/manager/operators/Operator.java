@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -55,7 +55,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "operators")
-public class OperatorEntity {
+public class Operator {
 
 	@Id
 	@GeneratedValue
@@ -63,7 +63,7 @@ public class OperatorEntity {
 
 	@NaturalId
 	@Enumerated(EnumType.STRING)
-	private Operator operator;
+	private OperatorEnum operator;
 
 	@NotNull
 	@Column(unique = true)
@@ -72,7 +72,7 @@ public class OperatorEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ConditionEntity> conditions;
+	private Set<Condition> conditions;
 
 	@Override
 	public int hashCode() {
@@ -84,10 +84,10 @@ public class OperatorEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof OperatorEntity)) {
+		if (!(o instanceof Operator)) {
 			return false;
 		}
-		OperatorEntity other = (OperatorEntity) o;
+		Operator other = (Operator) o;
 		return id != null && id.equals(other.getId());
 	}
 

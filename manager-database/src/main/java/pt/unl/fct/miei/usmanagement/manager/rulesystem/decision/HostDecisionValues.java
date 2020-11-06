@@ -25,9 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.decision;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface HostDecisionValueRepository extends JpaRepository<HostDecisionValueEntity, Long> {
+public interface HostDecisionValues extends JpaRepository<HostDecisionValue, Long> {
 
 }

@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "app_rule_conditions")
-public class AppRuleConditionEntity {
+public class AppRuleCondition {
 
 	@Id
 	@GeneratedValue
@@ -55,7 +55,7 @@ public class AppRuleConditionEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "app_rule_id")
-	private AppRuleEntity appRule;
+	private AppRule appRule;
 
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
@@ -71,10 +71,10 @@ public class AppRuleConditionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppRuleConditionEntity)) {
+		if (!(o instanceof AppRuleCondition)) {
 			return false;
 		}
-		AppRuleConditionEntity other = (AppRuleConditionEntity) o;
+		AppRuleCondition other = (AppRuleCondition) o;
 		return id != null && id.equals(other.getId());
 	}
 

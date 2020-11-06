@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAverage;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 
 import java.util.List;
 
@@ -46,12 +46,12 @@ public class HostMonitoringController {
 	}
 
 	@GetMapping
-	public List<HostMonitoringEntity> getHostsMonitoring() {
+	public List<HostMonitoring> getHostsMonitoring() {
 		return hostsMonitoringService.getHostsMonitoring();
 	}
 
 	@GetMapping("/{hostname}")
-	public List<HostMonitoringEntity> getHostMonitoring(@PathVariable String hostname) {
+	public List<HostMonitoring> getHostMonitoring(@PathVariable String hostname) {
 		return hostsMonitoringService.getHostMonitoring(new HostAddress(hostname));
 	}
 
@@ -66,12 +66,12 @@ public class HostMonitoringController {
 	}
 
 	@GetMapping("/logs")
-	public List<HostMonitoringLogEntity> getHostMonitoringLogs() {
+	public List<HostMonitoringLog> getHostMonitoringLogs() {
 		return hostsMonitoringService.getHostMonitoringLogs();
 	}
 
 	@GetMapping("/{hostname}/logs")
-	public List<HostMonitoringLogEntity> getHostMonitoringLogs(@PathVariable String hostname) {
+	public List<HostMonitoringLog> getHostMonitoringLogs(@PathVariable String hostname) {
 		return hostsMonitoringService.getHostMonitoringLogs(new HostAddress(hostname));
 	}
 

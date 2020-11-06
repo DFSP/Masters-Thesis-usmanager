@@ -30,8 +30,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorRepository;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -40,35 +40,35 @@ import java.util.List;
 @Service
 public class OperatorsService {
 
-	private final OperatorRepository operators;
+	private final Operators operators;
 
-	public OperatorsService(OperatorRepository operators) {
+	public OperatorsService(Operators operators) {
 		this.operators = operators;
 	}
 
-	public List<OperatorEntity> getOperators() {
+	public List<Operator> getOperators() {
 		return operators.findAll();
 	}
 
-	public OperatorEntity getOperator(Long id) {
+	public Operator getOperator(Long id) {
 		return operators.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(OperatorEntity.class, "id", id.toString()));
+			new EntityNotFoundException(Operator.class, "id", id.toString()));
 	}
 
-	public OperatorEntity getOperator(String operatorName) {
-		Operator operator = Operator.valueOf(operatorName.toUpperCase());
+	public Operator getOperator(String operatorName) {
+		OperatorEnum operator = OperatorEnum.valueOf(operatorName.toUpperCase());
 		return operators.findByOperator(operator).orElseThrow(() ->
-			new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
+			new EntityNotFoundException(Operator.class, "name", operatorName));
 	}
 
-	public OperatorEntity addOperator(OperatorEntity operator) {
+	public Operator addOperator(Operator operator) {
 		checkOperatorDoesntExist(operator);
 		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
 		return operators.save(operator);
 	}
 
-	public OperatorEntity updateOperator(String operatorName, OperatorEntity newOperator) {
-		OperatorEntity operator = getOperator(operatorName);
+	public Operator updateOperator(String operatorName, Operator newOperator) {
+		Operator operator = getOperator(operatorName);
 		log.info("Updating operator {} with {}",
 			ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
 		log.info("operator before copying properties: {}",
@@ -81,12 +81,12 @@ public class OperatorsService {
 	}
 
 	public void deleteOperator(String operatorName) {
-		OperatorEntity operator = getOperator(operatorName);
+		Operator operator = getOperator(operatorName);
 		operators.delete(operator);
 	}
 
-	private void checkOperatorDoesntExist(OperatorEntity operator) {
-		Operator op = operator.getOperator();
+	private void checkOperatorDoesntExist(Operator operator) {
+		OperatorEnum op = operator.getOperator();
 		if (operators.hasOperator(op)) {
 			throw new DataIntegrityViolationException("Operator '" + op.getSymbol() + "' already exists");
 		}

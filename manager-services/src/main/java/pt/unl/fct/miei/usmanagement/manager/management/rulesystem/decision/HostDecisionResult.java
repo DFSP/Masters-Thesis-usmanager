@@ -29,9 +29,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Getter
@@ -41,10 +40,10 @@ import java.util.Map;
 public class HostDecisionResult extends DecisionResult {
 
 	public HostDecisionResult(HostAddress hostAddress, Map<String, Double> fields) {
-		this(hostAddress, RuleDecision.NONE, 0, fields, 0);
+		this(hostAddress, RuleDecisionEnum.NONE, 0, fields, 0);
 	}
 
-	public HostDecisionResult(HostAddress hostAddress, RuleDecision decision, long ruleId,
+	public HostDecisionResult(HostAddress hostAddress, RuleDecisionEnum decision, long ruleId,
 							  Map<String, Double> fields, int priority) {
 		super(hostAddress, decision, ruleId, fields, priority,
 			fields.values().stream().mapToDouble(Double::doubleValue).sum());

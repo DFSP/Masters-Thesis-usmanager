@@ -24,10 +24,6 @@
 
 .tabContent {
     padding: 0 !important;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-    background: #36393F;
 }
 
 .scrollButton {

@@ -33,8 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,24 +51,24 @@ public class WorkerManagersController {
 	}
 
 	@GetMapping
-	public List<WorkerManagerEntity> getWorkerManagers() {
+	public List<WorkerManager> getWorkerManagers() {
 		return workerManagersService.getWorkerManagers();
 	}
 
 	@GetMapping("/{workerManagerId}")
-	public WorkerManagerEntity getWorkerManager(@PathVariable String workerManagerId) {
+	public WorkerManager getWorkerManager(@PathVariable String workerManagerId) {
 		return workerManagersService.getWorkerManager(workerManagerId);
 	}
 
 	@PostMapping
-	public List<WorkerManagerEntity> launchWorkerManagers(@RequestBody LaunchWorkerManager launchWorkerManager) {
+	public List<WorkerManager> launchWorkerManagers(@RequestBody LaunchWorkerManager launchWorkerManager) {
 		HostAddress hostAddress = launchWorkerManager.getHostAddress();
 		List<String> regions = launchWorkerManager.getRegions();
 		if (hostAddress != null) {
 			return List.of(workerManagersService.launchWorkerManager(hostAddress));
 		}
 		else if (regions != null) {
-			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
+			List<RegionEnum> regionsList = Arrays.stream(regions.toArray(new String[0])).map(RegionEnum::getRegion).collect(Collectors.toList());
 			return workerManagersService.launchWorkerManagers(regionsList);
 		}
 		else {

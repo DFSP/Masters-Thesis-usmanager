@@ -5,6 +5,7 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
+    #url: postgres://dpfolicxxwcyad:8677c4b215c2e15638fce483715d954d6072bef4e304b00b1081f87fd7d1c39f@ec2-54-196-89-124.compute-1.amazonaws.com:5432/d4cdsdrnastu20
     url: jdbc:h2:file:./db/manager-master-db;DB_CLOSE_ON_EXIT=FALSE
     #url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
     username: sa

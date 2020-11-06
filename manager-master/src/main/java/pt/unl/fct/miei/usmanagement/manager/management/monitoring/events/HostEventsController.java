@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 
 import java.util.List;
 
@@ -44,12 +44,12 @@ public class HostEventsController {
 	}
 
 	@GetMapping
-	public List<HostEventEntity> getHostEvents() {
+	public List<HostEvent> getHostEvents() {
 		return hostsEventsService.getHostEvents();
 	}
 
 	@GetMapping("/{hostname}")
-	public List<HostEventEntity> getHostEvents(@PathVariable String hostname) {
+	public List<HostEvent> getHostEvents(@PathVariable String hostname) {
 		return hostsEventsService.getHostEventsByHostAddress(new HostAddress(hostname));
 	}
 

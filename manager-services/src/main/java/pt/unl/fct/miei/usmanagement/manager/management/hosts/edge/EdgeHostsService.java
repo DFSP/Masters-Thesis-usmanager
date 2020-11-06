@@ -33,19 +33,19 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostRepository;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHosts;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +60,7 @@ public class EdgeHostsService {
 	private final BashService bashService;
 	private final NodesService nodesService;
 
-	private final EdgeHostRepository edgeHosts;
+	private final EdgeHosts edgeHosts;
 
 	private final String edgeKeyFilePath;
 
@@ -68,7 +68,7 @@ public class EdgeHostsService {
 							@Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							@Lazy SshService sshService, BashService bashService,
 							@Lazy NodesService nodesService,
-							EdgeHostRepository edgeHosts, EdgeHostsProperties edgeHostsProperties) {
+							EdgeHosts edgeHosts, EdgeHostsProperties edgeHostsProperties) {
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.sshService = sshService;
@@ -78,53 +78,53 @@ public class EdgeHostsService {
 		this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
 	}
 
-	public String getPrivateKeyFilePath(EdgeHostEntity edgeHostEntity) {
-		String username = edgeHostEntity.getUsername();
-		String hostname = edgeHostEntity.getHostname();
+	public String getPrivateKeyFilePath(EdgeHost edgeHost) {
+		String username = edgeHost.getUsername();
+		String hostname = edgeHost.getHostname();
 		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
 			hostname.replace(".", "_"));
 	}
 
-	public List<EdgeHostEntity> getEdgeHosts() {
+	public List<EdgeHost> getEdgeHosts() {
 		return edgeHosts.findAll();
 	}
 
-	public EdgeHostEntity getEdgeHostByHostname(String host) {
+	public EdgeHost getEdgeHostByHostname(String host) {
 		return edgeHosts.findByPublicDnsNameOrPublicIpAddress(host, host).orElseThrow(() ->
-			new EntityNotFoundException(EdgeHostEntity.class, "host", host));
+			new EntityNotFoundException(EdgeHost.class, "host", host));
 	}
 
-	public EdgeHostEntity getEdgeHostByAddress(HostAddress address) {
+	public EdgeHost getEdgeHostByAddress(HostAddress address) {
 		return edgeHosts.findByAddress(address.getPublicIpAddress(), address.getPrivateIpAddress()).orElseThrow(() ->
-			new EntityNotFoundException(EdgeHostEntity.class, "address", address.toString()));
+			new EntityNotFoundException(EdgeHost.class, "address", address.toString()));
 	}
 
-	public EdgeHostEntity getEdgeHostByDns(String dns) {
+	public EdgeHost getEdgeHostByDns(String dns) {
 		return edgeHosts.findByPublicDnsName(dns).orElseThrow(() ->
-			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
+			new EntityNotFoundException(EdgeHost.class, "dns", dns));
 	}
 
-	public EdgeHostEntity addEdgeHost(String username, char[] password, String publicIpAddress, String privateIpAddress,
-									  String publicDnsName, Coordinates coordinates) {
-		EdgeHostEntity edgeHost = EdgeHostEntity.builder()
+	public EdgeHost addEdgeHost(String username, char[] password, String publicIpAddress, String privateIpAddress,
+								String publicDnsName, Coordinates coordinates) {
+		EdgeHost edgeHost = EdgeHost.builder()
 			.username(username)
 			.publicIpAddress(publicIpAddress)
 			.privateIpAddress(privateIpAddress)
 			.publicDnsName(publicDnsName)
 			.coordinates(coordinates)
-			.region(Region.getClosestRegion(coordinates))
+			.region(RegionEnum.getClosestRegion(coordinates))
 			.build();
 		return addEdgeHost(edgeHost, password);
 	}
 
-	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHostEntity) {
-		return addEdgeHost(edgeHostEntity, null);
+	public EdgeHost addEdgeHost(EdgeHost edgeHost) {
+		return addEdgeHost(edgeHost, null);
 	}
 
-	public EdgeHostEntity addManualEdgeHost(EdgeHostEntity edgeHost) {
+	public EdgeHost addManualEdgeHost(EdgeHost edgeHost) {
 		checkHostDoesntExist(edgeHost);
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-		EdgeHostEntity edgeHostEntity = edgeHosts.save(edgeHost);
+		EdgeHost edgeHostEntity = edgeHosts.save(edgeHost);
 
 		boolean setup = false;
 		for (int i = 0; i < 5; i++) {
@@ -147,10 +147,10 @@ public class EdgeHostsService {
 		return edgeHostEntity;
 	}
 
-	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, char[] password) {
+	public EdgeHost addEdgeHost(EdgeHost edgeHost, char[] password) {
 		checkHostDoesntExist(edgeHost);
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-		EdgeHostEntity edgeHostEntity = edgeHosts.save(edgeHost);
+		EdgeHost edgeHostEntity = edgeHosts.save(edgeHost);
 		if (password != null) {
 			try {
 				setupEdgeHost(edgeHost, password);
@@ -166,7 +166,7 @@ public class EdgeHostsService {
 		return edgeHostEntity;
 	}
 
-	private void setupEdgeHost(EdgeHostEntity edgeHost, char[] password) {
+	private void setupEdgeHost(EdgeHost edgeHost, char[] password) {
 		HostAddress hostAddress = edgeHost.getAddress();
 		String keyFilePath = getPrivateKeyFilePath(edgeHost);
 		log.info("Generating keys for edge host {}", hostAddress);
@@ -193,8 +193,8 @@ public class EdgeHostsService {
 		}*/
 	}
 
-	public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
-		EdgeHostEntity edgeHost = getEdgeHostByHostname(hostname);
+	public EdgeHost updateEdgeHost(String hostname, EdgeHost newEdgeHost) {
+		EdgeHost edgeHost = getEdgeHostByHostname(hostname);
 		log.info("Updating edgeHost {} with {}",
 			ToStringBuilder.reflectionToString(edgeHost),
 			ToStringBuilder.reflectionToString(newEdgeHost));
@@ -203,20 +203,20 @@ public class EdgeHostsService {
 	}
 
 	public void deleteEdgeHost(String hostname) {
-		EdgeHostEntity edgeHost = getEdgeHostByHostname(hostname);
+		EdgeHost edgeHost = getEdgeHostByHostname(hostname);
 		edgeHosts.delete(edgeHost);
 		deleteEdgeHostConfig(edgeHost);
 	}
 
-	public List<HostRuleEntity> getRules(String hostname) {
+	public List<HostRule> getRules(String hostname) {
 		checkHostExists(hostname);
 		return edgeHosts.getRules(hostname);
 	}
 
-	public HostRuleEntity getRule(String hostname, String ruleName) {
+	public HostRule getRule(String hostname, String ruleName) {
 		checkHostExists(hostname);
 		return edgeHosts.getRule(hostname, ruleName).orElseThrow(() ->
-			new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
+			new EntityNotFoundException(HostRule.class, "ruleName", ruleName)
 		);
 	}
 
@@ -240,15 +240,15 @@ public class EdgeHostsService {
 		ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
 	}
 
-	public List<HostSimulatedMetricEntity> getSimulatedMetrics(String hostname) {
+	public List<HostSimulatedMetric> getSimulatedMetrics(String hostname) {
 		checkHostExists(hostname);
 		return edgeHosts.getSimulatedMetrics(hostname);
 	}
 
-	public HostSimulatedMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
+	public HostSimulatedMetric getSimulatedMetric(String hostname, String simulatedMetricName) {
 		checkHostExists(hostname);
 		return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(HostSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+			new EntityNotFoundException(HostSimulatedMetric.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
@@ -274,16 +274,16 @@ public class EdgeHostsService {
 			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
 	}
 
-	public void assignWorkerManager(WorkerManagerEntity workerManagerEntity, String edgeHost) {
-		log.info("Assigning worker manager {} to edge host {}", workerManagerEntity.getId(), edgeHost);
-		EdgeHostEntity edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
-			.managedByWorker(workerManagerEntity)
+	public void assignWorkerManager(WorkerManager workerManager, String edgeHost) {
+		log.info("Assigning worker manager {} to edge host {}", workerManager.getId(), edgeHost);
+		EdgeHost edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
+			.managedByWorker(workerManager)
 			.build();
 		edgeHosts.save(edgeHostEntity);
 	}
 
 	public void unassignWorkerManager(String edgeHost) {
-		EdgeHostEntity edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
+		EdgeHost edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
 			.managedByWorker(null)
 			.build();
 		edgeHosts.save(edgeHostEntity);
@@ -295,24 +295,24 @@ public class EdgeHostsService {
 
 	private void checkHostExists(String hostname) {
 		if (!hasEdgeHost(hostname)) {
-			throw new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname);
+			throw new EntityNotFoundException(EdgeHost.class, "hostname", hostname);
 		}
 	}
 
-	private void checkHostDoesntExist(EdgeHostEntity edgeHost) {
+	private void checkHostDoesntExist(EdgeHost edgeHost) {
 		String hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
 		if (edgeHosts.hasEdgeHost(hostname)) {
 			throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
 		}
 	}
 
-	private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
+	private void deleteEdgeHostConfig(EdgeHost edgeHost) {
 		String privateKeyFilePath = getPrivateKeyFilePath(edgeHost);
 		String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
 		bashService.cleanup(privateKeyFilePath, publicKeyFilePath);
 	}
 
-	public List<EdgeHostEntity> getInactiveEdgeHosts() {
+	public List<EdgeHost> getInactiveEdgeHosts() {
 		return getEdgeHosts().stream()
 			.filter(host -> !nodesService.isPartOfSwarm(host.getAddress()))
 			.collect(Collectors.toList());

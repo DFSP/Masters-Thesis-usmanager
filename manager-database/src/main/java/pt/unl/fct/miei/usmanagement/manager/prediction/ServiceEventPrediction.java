@@ -33,7 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,7 +55,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_event_predictions")
-public class ServiceEventPredictionEntity {
+public class ServiceEventPrediction {
 
 	@Id
 	@GeneratedValue
@@ -88,7 +88,7 @@ public class ServiceEventPredictionEntity {
 	@JsonIgnore
 	@JoinColumn(name = "service_id")
 	@ManyToOne
-	private ServiceEntity service;
+	private Service service;
 
 	@JsonIgnore
 	private Timestamp lastUpdate;
@@ -103,10 +103,10 @@ public class ServiceEventPredictionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceEventPredictionEntity)) {
+		if (!(o instanceof ServiceEventPrediction)) {
 			return false;
 		}
-		ServiceEventPredictionEntity other = (ServiceEventPredictionEntity) o;
+		ServiceEventPrediction other = (ServiceEventPrediction) o;
 		return id != null && id.equals(other.getId());
 	}
 

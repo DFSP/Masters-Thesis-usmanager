@@ -32,8 +32,8 @@ import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
 import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
@@ -45,9 +45,9 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 
 	private final HostsService hostsService;
 	private final CloudHostsService cloudHostsService;
-	private CloudHostEntity oldCloudHost;
+	private CloudHost oldCloudHost;
 	private final EdgeHostsService edgeHostsService;
-	private EdgeHostEntity oldEdgeHost;
+	private EdgeHost oldEdgeHost;
 
 	@Value("${external-id}")
 	private String id;

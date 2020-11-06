@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,24 +48,24 @@ public class AppSimulatedMetricsController {
 	}
 
 	@GetMapping
-	public List<AppSimulatedMetricEntity> getAppSimulatedMetrics() {
+	public List<AppSimulatedMetric> getAppSimulatedMetrics() {
 		return appSimulatedMetricsService.getAppSimulatedMetrics();
 	}
 
 	@GetMapping("/{simulatedMetricName}")
-	public AppSimulatedMetricEntity getAppSimulatedMetric(@PathVariable String simulatedMetricName) {
+	public AppSimulatedMetric getAppSimulatedMetric(@PathVariable String simulatedMetricName) {
 		return appSimulatedMetricsService.getAppSimulatedMetric(simulatedMetricName);
 	}
 
 	@PostMapping
-	public AppSimulatedMetricEntity addAppSimulatedMetric(@RequestBody AppSimulatedMetricEntity appSimulatedMetric) {
+	public AppSimulatedMetric addAppSimulatedMetric(@RequestBody AppSimulatedMetric appSimulatedMetric) {
 		Validation.validatePostRequest(appSimulatedMetric.getId());
 		return appSimulatedMetricsService.addAppSimulatedMetric(appSimulatedMetric);
 	}
 
 	@PutMapping("/{simulatedMetricName}")
-	public AppSimulatedMetricEntity updateAppSimulatedMetric(@PathVariable String simulatedMetricName,
-																		 @RequestBody AppSimulatedMetricEntity simulatedMetric) {
+	public AppSimulatedMetric updateAppSimulatedMetric(@PathVariable String simulatedMetricName,
+													   @RequestBody AppSimulatedMetric simulatedMetric) {
 		Validation.validatePutRequest(simulatedMetric.getId());
 		return appSimulatedMetricsService.updateAppSimulatedMetric(simulatedMetricName, simulatedMetric);
 	}
@@ -76,7 +76,7 @@ public class AppSimulatedMetricsController {
 	}
 
 	@GetMapping("/{simulatedMetricName}/apps")
-	public List<AppEntity> getAppSimulatedMetricApps(@PathVariable String simulatedMetricName) {
+	public List<App> getAppSimulatedMetricApps(@PathVariable String simulatedMetricName) {
 		return appSimulatedMetricsService.getApps(simulatedMetricName);
 	}
 

@@ -29,11 +29,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricsRepository;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -45,63 +45,63 @@ public class ContainerSimulatedMetricsService {
 
 	private final ContainersService containersService;
 
-	private final ContainerSimulatedMetricsRepository containerSimulatedMetrics;
+	private final ContainerSimulatedMetrics containerSimulatedMetrics;
 
 	public ContainerSimulatedMetricsService(@Lazy ContainersService containersService,
-											ContainerSimulatedMetricsRepository containerSimulatedMetrics) {
+											ContainerSimulatedMetrics containerSimulatedMetrics) {
 		this.containersService = containersService;
 		this.containerSimulatedMetrics = containerSimulatedMetrics;
 	}
 
-	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics() {
+	public List<ContainerSimulatedMetric> getContainerSimulatedMetrics() {
 		return containerSimulatedMetrics.findAll();
 	}
 
-	public List<ContainerSimulatedMetricEntity> getServiceSimulatedMetricByContainer(String containerId) {
+	public List<ContainerSimulatedMetric> getServiceSimulatedMetricByContainer(String containerId) {
 		return containerSimulatedMetrics.findByContainer(containerId);
 	}
 
-	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(Long id) {
+	public ContainerSimulatedMetric getContainerSimulatedMetric(Long id) {
 		return containerSimulatedMetrics.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ContainerSimulatedMetric.class, "id", id.toString()));
 	}
 
-	public ContainerSimulatedMetricEntity getContainerSimulatedMetric(String simulatedMetricName) {
+	public ContainerSimulatedMetric getContainerSimulatedMetric(String simulatedMetricName) {
 		return containerSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+			new EntityNotFoundException(ContainerSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
 
-	public ContainerSimulatedMetricEntity addContainerSimulatedMetric(ContainerSimulatedMetricEntity containerSimulatedMetric) {
+	public ContainerSimulatedMetric addContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
 		checkContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
 		log.info("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
 
-	public ContainerSimulatedMetricEntity updateContainerSimulatedMetric(String simulatedMetricName,
-																		 ContainerSimulatedMetricEntity newContainerSimulatedMetric) {
+	public ContainerSimulatedMetric updateContainerSimulatedMetric(String simulatedMetricName,
+																   ContainerSimulatedMetric newContainerSimulatedMetric) {
 		log.info("Updating simulated container metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newContainerSimulatedMetric));
-		ContainerSimulatedMetricEntity containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
+		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newContainerSimulatedMetric, containerSimulatedMetric);
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
 
 	public void deleteContainerSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated container metric {}", simulatedMetricName);
-		ContainerSimulatedMetricEntity containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
+		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
 		containerSimulatedMetric.removeAssociations();
 		containerSimulatedMetrics.delete(containerSimulatedMetric);
 	}
 
-	public List<ContainerEntity> getContainers(String simulatedMetricName) {
+	public List<Container> getContainers(String simulatedMetricName) {
 		checkContainerSimulatedMetricExists(simulatedMetricName);
 		return containerSimulatedMetrics.getContainers(simulatedMetricName);
 	}
 
-	public ContainerEntity getContainer(String simulatedMetricName, String containerId) {
+	public Container getContainer(String simulatedMetricName, String containerId) {
 		checkContainerSimulatedMetricExists(simulatedMetricName);
 		return containerSimulatedMetrics.getContainer(simulatedMetricName, containerId).orElseThrow(() ->
-			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
+			new EntityNotFoundException(Container.class, "containerId", containerId));
 	}
 
 	public void addContainer(String simulatedMetricName, String containerId) {
@@ -110,9 +110,9 @@ public class ContainerSimulatedMetricsService {
 
 	public void addContainers(String simulatedMetricName, List<String> containerIds) {
 		log.info("Adding containers {} to simulated metric {}", containerIds, simulatedMetricName);
-		ContainerSimulatedMetricEntity containerMetric = getContainerSimulatedMetric(simulatedMetricName);
+		ContainerSimulatedMetric containerMetric = getContainerSimulatedMetric(simulatedMetricName);
 		containerIds.forEach(containerId -> {
-			ContainerEntity container = containersService.getContainer(containerId);
+			Container container = containersService.getContainer(containerId);
 			container.addContainerSimulatedMetric(containerMetric);
 		});
 		containerSimulatedMetrics.save(containerMetric);
@@ -124,7 +124,7 @@ public class ContainerSimulatedMetricsService {
 
 	public void removeContainers(String simulatedMetricName, List<String> containerIds) {
 		log.info("Removing containers {} from simulated metric {}", containerIds, simulatedMetricName);
-		ContainerSimulatedMetricEntity containerMetric = getContainerSimulatedMetric(simulatedMetricName);
+		ContainerSimulatedMetric containerMetric = getContainerSimulatedMetric(simulatedMetricName);
 		containerIds.forEach(containerId ->
 			containersService.getContainer(containerId).removeContainerSimulatedMetric(containerMetric));
 		containerSimulatedMetrics.save(containerMetric);
@@ -132,18 +132,18 @@ public class ContainerSimulatedMetricsService {
 
 	private void checkContainerSimulatedMetricExists(String name) {
 		if (!containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
-			throw new EntityNotFoundException(ContainerSimulatedMetricEntity.class, "name", name);
+			throw new EntityNotFoundException(ContainerSimulatedMetric.class, "name", name);
 		}
 	}
 
-	private void checkContainerSimulatedMetricDoesntExist(ContainerSimulatedMetricEntity containerSimulatedMetric) {
+	private void checkContainerSimulatedMetricDoesntExist(ContainerSimulatedMetric containerSimulatedMetric) {
 		String name = containerSimulatedMetric.getName();
 		if (containerSimulatedMetrics.hasContainerSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated container metric '" + name + "' already exists");
 		}
 	}
 
-	public Double randomizeFieldValue(ContainerSimulatedMetricEntity metric) {
+	public Double randomizeFieldValue(ContainerSimulatedMetric metric) {
 		Random random = new Random();
 		double minValue = metric.getMinimumValue();
 		double maxValue = metric.getMaximumValue();

@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "app_rules")
-public class AppRuleEntity {
+public class AppRule {
 
 	@Id
 	@GeneratedValue
@@ -102,10 +102,10 @@ public class AppRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppRuleEntity)) {
+		if (!(o instanceof AppRule)) {
 			return false;
 		}
-		AppRuleEntity other = (AppRuleEntity) o;
+		AppRule other = (AppRule) o;
 		return id != null && id.equals(other.getId());
 	}
 

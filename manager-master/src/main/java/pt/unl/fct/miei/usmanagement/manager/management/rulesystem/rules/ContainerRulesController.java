@@ -32,13 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 
 import java.util.List;
 
@@ -53,28 +52,28 @@ public class ContainerRulesController {
 	}
 
 	@GetMapping
-	public List<ContainerRuleEntity> getContainerRules() {
+	public List<ContainerRule> getContainerRules() {
 		return containerRulesService.getRules();
 	}
 
 	@GetMapping("/{ruleName}")
-	public ContainerRuleEntity getContainerRule(@PathVariable String ruleName) {
+	public ContainerRule getContainerRule(@PathVariable String ruleName) {
 		return containerRulesService.getRule(ruleName);
 	}
 
 	@PostMapping
-	public ContainerRuleEntity addRule(@RequestBody ContainerRuleEntity rule) {
-		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
-		if (decisionComponentType != ComponentType.SERVICE) {
+	public ContainerRule addRule(@RequestBody ContainerRule rule) {
+		ComponentTypeEnum decisionComponentTypeEnum = rule.getDecision().getComponentType().getType();
+		if (decisionComponentTypeEnum != ComponentTypeEnum.SERVICE) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
-				ComponentType.SERVICE.name(), decisionComponentType.name());
+				ComponentTypeEnum.SERVICE.name(), decisionComponentTypeEnum.name());
 		}
 		Validation.validatePostRequest(rule.getId());
 		return containerRulesService.addRule(rule);
 	}
 
 	@PutMapping("/{ruleName}")
-	public ContainerRuleEntity updateRule(@PathVariable String ruleName, @RequestBody ContainerRuleEntity rule) {
+	public ContainerRule updateRule(@PathVariable String ruleName, @RequestBody ContainerRule rule) {
 		Validation.validatePutRequest(rule.getId());
 		return containerRulesService.updateRule(ruleName, rule);
 	}
@@ -85,7 +84,7 @@ public class ContainerRulesController {
 	}
 
 	@GetMapping("/{ruleName}/conditions")
-	public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
+	public List<Condition> getRuleConditions(@PathVariable String ruleName) {
 		return containerRulesService.getConditions(ruleName);
 	}
 
@@ -105,7 +104,7 @@ public class ContainerRulesController {
 	}
 
 	@GetMapping("/{ruleName}/containers")
-	public List<ContainerEntity> getRuleContainers(@PathVariable String ruleName) {
+	public List<Container> getRuleContainers(@PathVariable String ruleName) {
 		return containerRulesService.getContainers(ruleName);
 	}
 

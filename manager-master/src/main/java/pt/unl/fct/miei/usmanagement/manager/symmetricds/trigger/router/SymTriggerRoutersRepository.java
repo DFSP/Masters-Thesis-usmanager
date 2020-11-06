@@ -26,8 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-@Repository
 public interface SymTriggerRoutersRepository extends JpaRepository<SymTriggerRouterEntity, SymTriggerRouterId> {
 
 }

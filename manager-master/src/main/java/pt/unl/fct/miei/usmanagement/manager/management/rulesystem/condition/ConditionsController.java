@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,23 +48,23 @@ public class ConditionsController {
 	}
 
 	@GetMapping
-	public List<ConditionEntity> getConditions() {
+	public List<Condition> getConditions() {
 		return conditionsService.getConditions();
 	}
 
 	@GetMapping("/{conditionName}")
-	public ConditionEntity getCondition(@PathVariable String conditionName) {
+	public Condition getCondition(@PathVariable String conditionName) {
 		return conditionsService.getCondition(conditionName);
 	}
 
 	@PostMapping
-	public ConditionEntity addCondition(@RequestBody ConditionEntity condition) {
+	public Condition addCondition(@RequestBody Condition condition) {
 		Validation.validatePostRequest(condition.getId());
 		return conditionsService.addCondition(condition);
 	}
 
 	@PutMapping("/{conditionName}")
-	public ConditionEntity updateCondition(@PathVariable String conditionName, @RequestBody ConditionEntity condition) {
+	public Condition updateCondition(@PathVariable String conditionName, @RequestBody Condition condition) {
 		Validation.validatePutRequest(condition.getId());
 		return conditionsService.updateCondition(conditionName, condition);
 	}

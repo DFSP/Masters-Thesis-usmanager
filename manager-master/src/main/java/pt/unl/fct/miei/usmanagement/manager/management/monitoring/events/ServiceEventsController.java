@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 
 import java.util.List;
 
@@ -43,17 +43,17 @@ public class ServiceEventsController {
 	}
 
 	@GetMapping
-	public List<ServiceEventEntity> getServiceEvents() {
+	public List<ServiceEvent> getServiceEvents() {
 		return servicesEventsService.getServiceEvents();
 	}
 
 	@GetMapping("/{serviceName}")
-	public List<ServiceEventEntity> getServiceEventsByServiceName(@PathVariable String serviceName) {
+	public List<ServiceEvent> getServiceEventsByServiceName(@PathVariable String serviceName) {
 		return servicesEventsService.getServiceEventsByServiceName(serviceName);
 	}
 
 	@GetMapping("/containers/{containerId}")
-	public List<ServiceEventEntity> getServiceEventsByContainerId(@PathVariable String containerId) {
+	public List<ServiceEvent> getServiceEventsByContainerId(@PathVariable String containerId) {
 		return servicesEventsService.getServiceEventsByContainerId(containerId);
 	}
 

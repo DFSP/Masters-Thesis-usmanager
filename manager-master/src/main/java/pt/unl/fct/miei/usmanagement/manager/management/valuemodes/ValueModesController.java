@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,23 +48,23 @@ public class ValueModesController {
 	}
 
 	@GetMapping
-	public List<ValueModeEntity> getValueModes() {
+	public List<ValueMode> getValueModes() {
 		return valueModesService.getValueModes();
 	}
 
 	@GetMapping("/{valueModeName}")
-	public ValueModeEntity getValueMode(@PathVariable String valueModeName) {
+	public ValueMode getValueMode(@PathVariable String valueModeName) {
 		return valueModesService.getValueMode(valueModeName);
 	}
 
 	@PostMapping
-	public ValueModeEntity addValueMode(@RequestBody ValueModeEntity valueMode) {
+	public ValueMode addValueMode(@RequestBody ValueMode valueMode) {
 		Validation.validatePostRequest(valueMode.getId());
 		return valueModesService.addValueMode(valueMode);
 	}
 
 	@PutMapping("/{valueModeName}")
-	public ValueModeEntity updateValueMode(@PathVariable String valueModeName, @RequestBody ValueModeEntity valueMode) {
+	public ValueMode updateValueMode(@PathVariable String valueModeName, @RequestBody ValueMode valueMode) {
 		Validation.validatePutRequest(valueMode.getId());
 		return valueModesService.updateValueMode(valueModeName, valueMode);
 	}

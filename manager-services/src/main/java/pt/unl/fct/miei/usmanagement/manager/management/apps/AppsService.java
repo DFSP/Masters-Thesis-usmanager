@@ -27,22 +27,21 @@ package pt.unl.fct.miei.usmanagement.manager.management.apps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppRepository;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -50,7 +49,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class AppsService {
 
 	private final ServicesService servicesService;
@@ -58,11 +57,11 @@ public class AppsService {
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ContainersService containersService;
 
-	private final AppRepository apps;
+	private final Apps apps;
 
 	public AppsService(ServicesService servicesService, AppRulesService appRulesService,
 					   AppSimulatedMetricsService appSimulatedMetricsService, ContainersService containersService,
-					   AppRepository apps) {
+					   Apps apps) {
 		this.servicesService = servicesService;
 		this.appRulesService = appRulesService;
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
@@ -70,28 +69,28 @@ public class AppsService {
 		this.apps = apps;
 	}
 
-	public List<AppEntity> getApps() {
+	public List<App> getApps() {
 		return apps.findAll();
 	}
 
-	public AppEntity getApp(Long id) {
+	public App getApp(Long id) {
 		return apps.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(AppEntity.class, "id", id.toString()));
+			new EntityNotFoundException(App.class, "id", id.toString()));
 	}
 
-	public AppEntity getApp(String appName) {
+	public App getApp(String appName) {
 		return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
-			new EntityNotFoundException(AppEntity.class, "name", appName));
+			new EntityNotFoundException(App.class, "name", appName));
 	}
 
-	public AppEntity addApp(AppEntity app) {
+	public App addApp(App app) {
 		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
 		return apps.save(app);
 	}
 
-	public AppEntity updateApp(String appName, AppEntity newApp) {
-		AppEntity app = getApp(appName);
+	public App updateApp(String appName, App newApp) {
+		App app = getApp(appName);
 		log.info("Updating app {} with {}",
 			ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
 		log.info("Service before copying properties: {}",
@@ -103,19 +102,19 @@ public class AppsService {
 	}
 
 	public void deleteApp(String name) {
-		AppEntity app = getApp(name);
+		App app = getApp(name);
 		apps.delete(app);
 	}
 
-	public List<AppServiceEntity> getServices(String appName) {
+	public List<AppService> getServices(String appName) {
 		checkAppExists(appName);
 		return apps.getServices(appName);
 	}
 
 	public void addService(String appName, String serviceName, int order) {
-		AppEntity app = getApp(appName);
-		ServiceEntity service = servicesService.getService(serviceName);
-		AppServiceEntity appService = AppServiceEntity.builder()
+		App app = getApp(appName);
+		Service service = servicesService.getService(serviceName);
+		AppService appService = AppService.builder()
 			.app(app)
 			.service(service)
 			.launchOrder(order)
@@ -133,22 +132,22 @@ public class AppsService {
 	}
 
 	public void removeServices(String appName, List<String> services) {
-		AppEntity app = getApp(appName);
+		App app = getApp(appName);
 		log.info("Removing services {}", services);
 		app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
 		apps.save(app);
 	}
 
-	public Map<String, List<ContainerEntity>> launch(String appName, Coordinates coordinates) {
+	public Map<String, List<Container>> launch(String appName, Coordinates coordinates) {
 		log.info("Launching app {} at latitude {} and longitude {}", appName, coordinates.getLatitude(), coordinates.getLongitude());
-		List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
-			.filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
+		List<Service> services = apps.getServicesOrder(appName).stream()
+			.filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceTypeEnum.DATABASE)
 			.map(ServiceOrder::getService)
 			.collect(Collectors.toList());
 		return containersService.launchApp(services, coordinates);
 	}
 
-	public List<AppRuleEntity> getRules(String appId) {
+	public List<AppRule> getRules(String appId) {
 		checkAppExists(appId);
 		return apps.getRules(appId);
 	}
@@ -173,15 +172,15 @@ public class AppsService {
 		ruleNames.forEach(rule -> appRulesService.removeApp(rule, appId));
 	}
 
-	public List<AppSimulatedMetricEntity> getSimulatedMetrics(String appId) {
+	public List<AppSimulatedMetric> getSimulatedMetrics(String appId) {
 		checkAppExists(appId);
 		return apps.getSimulatedMetrics(appId);
 	}
 
-	public AppSimulatedMetricEntity getSimulatedMetric(String appId, String simulatedMetricName) {
+	public AppSimulatedMetric getSimulatedMetric(String appId, String simulatedMetricName) {
 		checkAppExists(appId);
 		return apps.getSimulatedMetric(appId, simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(AppSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+			new EntityNotFoundException(AppSimulatedMetric.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
@@ -209,11 +208,11 @@ public class AppsService {
 
 	private void checkAppExists(String appName) {
 		if (!apps.hasApp(appName)) {
-			throw new EntityNotFoundException(AppEntity.class, "name", appName);
+			throw new EntityNotFoundException(App.class, "name", appName);
 		}
 	}
 
-	private void checkAppDoesntExist(AppEntity app) {
+	private void checkAppDoesntExist(App app) {
 		String name = app.getName();
 		if (apps.hasApp(name)) {
 			throw new DataIntegrityViolationException("App '" + name + "' already exists");

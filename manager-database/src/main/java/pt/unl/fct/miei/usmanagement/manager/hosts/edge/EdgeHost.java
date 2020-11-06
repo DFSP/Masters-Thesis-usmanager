@@ -35,10 +35,10 @@ import lombok.Setter;
 import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagerEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -60,7 +60,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "edge_hosts")
-public class EdgeHostEntity {
+public class EdgeHost {
 
 	@Id
 	@GeneratedValue
@@ -78,7 +78,7 @@ public class EdgeHostEntity {
 	private String publicDnsName;
 
 	@NotNull
-	private Region region;
+	private RegionEnum region;
 
 	@NotNull
 	private Coordinates coordinates;
@@ -86,7 +86,7 @@ public class EdgeHostEntity {
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne
 	@JoinColumn(name = "managedByWorker_id")
-	private WorkerManagerEntity managedByWorker;
+	private WorkerManager managedByWorker;
 
 	@Singular
 	@JsonIgnore
@@ -95,7 +95,7 @@ public class EdgeHostEntity {
 		joinColumns = @JoinColumn(name = "edge_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
-	private Set<HostRuleEntity> hostRules;
+	private Set<HostRule> hostRules;
 
 	@Singular
 	@JsonIgnore
@@ -104,29 +104,29 @@ public class EdgeHostEntity {
 		joinColumns = @JoinColumn(name = "edge_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
-	private Set<HostSimulatedMetricEntity> simulatedHostMetrics;
+	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@JsonIgnore
 	public String getHostname() {
 		return this.publicDnsName == null ? this.publicIpAddress : this.publicDnsName;
 	}
 
-	public void addRule(HostRuleEntity rule) {
+	public void addRule(HostRule rule) {
 		hostRules.add(rule);
 		rule.getEdgeHosts().add(this);
 	}
 
-	public void removeRule(HostRuleEntity rule) {
+	public void removeRule(HostRule rule) {
 		hostRules.remove(rule);
 		rule.getEdgeHosts().remove(this);
 	}
 
-	public void addHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
+	public void addHostSimulatedMetric(HostSimulatedMetric hostMetric) {
 		simulatedHostMetrics.add(hostMetric);
 		hostMetric.getEdgeHosts().add(this);
 	}
 
-	public void removeHostSimulatedMetric(HostSimulatedMetricEntity hostMetric) {
+	public void removeHostSimulatedMetric(HostSimulatedMetric hostMetric) {
 		simulatedHostMetrics.remove(hostMetric);
 		hostMetric.getEdgeHosts().remove(this);
 	}
@@ -146,10 +146,10 @@ public class EdgeHostEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof EdgeHostEntity)) {
+		if (!(o instanceof EdgeHost)) {
 			return false;
 		}
-		EdgeHostEntity other = (EdgeHostEntity) o;
+		EdgeHost other = (EdgeHost) o;
 		return id != null && id.equals(other.getId());
 	}
 

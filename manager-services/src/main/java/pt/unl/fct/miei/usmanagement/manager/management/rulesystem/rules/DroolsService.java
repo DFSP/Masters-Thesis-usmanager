@@ -42,7 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.Event;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
@@ -147,7 +147,7 @@ public class DroolsService {
 			"ruleId", rule.getId(),
 			"rule", rule,
 			"eventType", event.getClass().getName(),
-			"decision", RuleDecision.class.getSimpleName() + "." + rule.getDecision().toString(),
+			"decision", RuleDecisionEnum.class.getSimpleName() + "." + rule.getDecision().toString(),
 			"priority", rule.getPriority());
 		ByteArrayInputStream ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
 		return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);

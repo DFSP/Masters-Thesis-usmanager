@@ -43,7 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRo
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -242,11 +242,11 @@ public class DockerSwarmService {
 		}
 	}
 
-	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, Region region) {
+	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, RegionEnum region) {
 		setNodeLabels(nodeId, privateIpAddress, username, coordinates, region, Collections.emptyMap());
 	}
 
-	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, Region region,
+	private void setNodeLabels(String nodeId, String privateIpAddress, String username, Coordinates coordinates, RegionEnum region,
 							   Map<String, String> customLabels) {
 		Map<String, String> labels = new HashMap<>(customLabels);
 		labels.put(NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);

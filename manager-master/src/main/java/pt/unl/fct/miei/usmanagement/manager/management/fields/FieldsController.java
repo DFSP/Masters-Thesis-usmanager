@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,23 +48,23 @@ public class FieldsController {
 	}
 
 	@GetMapping
-	public List<FieldEntity> getFields() {
+	public List<Field> getFields() {
 		return fieldsService.getFields();
 	}
 
 	@GetMapping("/{fieldName}")
-	public FieldEntity getField(@PathVariable String fieldName) {
+	public Field getField(@PathVariable String fieldName) {
 		return fieldsService.getField(fieldName);
 	}
 
 	@PostMapping
-	public FieldEntity addField(@RequestBody FieldEntity field) {
+	public Field addField(@RequestBody Field field) {
 		Validation.validatePostRequest(field.getId());
 		return fieldsService.addField(field);
 	}
 
 	@PutMapping("/{fieldName}")
-	public FieldEntity updateField(@PathVariable String fieldName, @RequestBody FieldEntity field) {
+	public Field updateField(@PathVariable String fieldName, @RequestBody Field field) {
 		Validation.validatePutRequest(field.getId());
 		return fieldsService.updateField(fieldName, field);
 	}

@@ -29,13 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,11 +63,11 @@ public class RegistrationServerService {
 		this.port = registrationProperties.getPort();
 	}
 
-	public ContainerEntity launchRegistrationServer(Region region) {
+	public Container launchRegistrationServer(RegionEnum region) {
 		return launchRegistrationServers(List.of(region)).get(0);
 	}
 
-	public ContainerEntity launchRegistrationServer(HostAddress hostAddress) {
+	public Container launchRegistrationServer(HostAddress hostAddress) {
 		List<String> customEnvs = Collections.emptyList();
 
 		Map<String, String> customLabels = Collections.emptyMap();
@@ -79,7 +79,7 @@ public class RegistrationServerService {
 		return containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
 	}
 
-	public List<ContainerEntity> launchRegistrationServers(List<Region> regions) {
+	public List<Container> launchRegistrationServers(List<RegionEnum> regions) {
 		log.info("Launching registration servers at regions {}", regions);
 
 		double expectedMemoryConsumption = servicesService.getService(REGISTRATION_SERVER).getExpectedMemoryConsumption();
@@ -102,7 +102,7 @@ public class RegistrationServerService {
 		return availableHosts.stream()
 			.map(hostAddress -> {
 				// avoid launching another registration server on the same region
-				List<ContainerEntity> containers = containersService.getContainersWithLabels(Set.of(
+				List<Container> containers = containersService.getContainersWithLabels(Set.of(
 					Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
 					Pair.of(ContainerConstants.Label.REGION, gson.toJson(hostAddress.getRegion()))
 				));
@@ -115,14 +115,14 @@ public class RegistrationServerService {
 	private List<HostAddress> getRegistrationServers() {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER))
-		).stream().map(ContainerEntity::getHostAddress).collect(Collectors.toList());
+		).stream().map(Container::getHostAddress).collect(Collectors.toList());
 	}
 
-	private List<HostAddress> getRegistrationServerHosts(Region region) {
+	private List<HostAddress> getRegistrationServerHosts(RegionEnum region) {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
 			Pair.of(ContainerConstants.Label.REGION, region.name()))
-		).stream().map(ContainerEntity::getHostAddress).collect(Collectors.toList());
+		).stream().map(Container::getHostAddress).collect(Collectors.toList());
 	}
 
 	private String getRegistrationServerAddresses(List<HostAddress> registrationServerHosts) {
@@ -131,7 +131,7 @@ public class RegistrationServerService {
 			.collect(Collectors.joining(","));
 	}
 
-	public Optional<String> getRegistrationServerAddress(Region region) {
+	public Optional<String> getRegistrationServerAddress(RegionEnum region) {
 		return containersService.getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
 			Pair.of(ContainerConstants.Label.REGION, region.name())))

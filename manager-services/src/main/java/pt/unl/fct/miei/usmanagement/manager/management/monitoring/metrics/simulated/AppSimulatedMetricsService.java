@@ -29,11 +29,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetricsRepository;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -45,62 +45,62 @@ public class AppSimulatedMetricsService {
 
 	private final AppsService appsService;
 
-	private final AppSimulatedMetricsRepository appSimulatedMetrics;
+	private final AppSimulatedMetrics appSimulatedMetrics;
 
-	public AppSimulatedMetricsService(@Lazy AppsService appsService, AppSimulatedMetricsRepository appSimulatedMetrics) {
+	public AppSimulatedMetricsService(@Lazy AppsService appsService, AppSimulatedMetrics appSimulatedMetrics) {
 		this.appsService = appsService;
 		this.appSimulatedMetrics = appSimulatedMetrics;
 	}
 
-	public List<AppSimulatedMetricEntity> getAppSimulatedMetrics() {
+	public List<AppSimulatedMetric> getAppSimulatedMetrics() {
 		return appSimulatedMetrics.findAll();
 	}
 
-	public List<AppSimulatedMetricEntity> getAppSimulatedMetricByApp(String appName) {
+	public List<AppSimulatedMetric> getAppSimulatedMetricByApp(String appName) {
 		return appSimulatedMetrics.findByApp(appName);
 	}
 
-	public AppSimulatedMetricEntity getAppSimulatedMetric(Long id) {
+	public AppSimulatedMetric getAppSimulatedMetric(Long id) {
 		return appSimulatedMetrics.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(AppSimulatedMetricEntity.class, "id", id.toString()));
+			new EntityNotFoundException(AppSimulatedMetric.class, "id", id.toString()));
 	}
 
-	public AppSimulatedMetricEntity getAppSimulatedMetric(String simulatedMetricName) {
+	public AppSimulatedMetric getAppSimulatedMetric(String simulatedMetricName) {
 		return appSimulatedMetrics.findByNameIgnoreCase(simulatedMetricName).orElseThrow(() ->
-			new EntityNotFoundException(AppSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName));
+			new EntityNotFoundException(AppSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
 
-	public AppSimulatedMetricEntity addAppSimulatedMetric(AppSimulatedMetricEntity appSimulatedMetric) {
+	public AppSimulatedMetric addAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
 		checkAppSimulatedMetricDoesntExist(appSimulatedMetric);
 		log.info("Saving simulated app metric {}", ToStringBuilder.reflectionToString(appSimulatedMetric));
 		return appSimulatedMetrics.save(appSimulatedMetric);
 	}
 
-	public AppSimulatedMetricEntity updateAppSimulatedMetric(String simulatedMetricName,
-																	 AppSimulatedMetricEntity newAppSimulatedMetric) {
+	public AppSimulatedMetric updateAppSimulatedMetric(String simulatedMetricName,
+													   AppSimulatedMetric newAppSimulatedMetric) {
 		log.info("Updating simulated app metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newAppSimulatedMetric));
-		AppSimulatedMetricEntity appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
+		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newAppSimulatedMetric, appSimulatedMetric);
 		return appSimulatedMetrics.save(appSimulatedMetric);
 	}
 
 	public void deleteAppSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated app metric {}", simulatedMetricName);
-		AppSimulatedMetricEntity appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
+		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
 		appSimulatedMetric.removeAssociations();
 		appSimulatedMetrics.delete(appSimulatedMetric);
 	}
 	
-	public List<AppEntity> getApps(String simulatedMetricName) {
+	public List<App> getApps(String simulatedMetricName) {
 		checkAppSimulatedMetricExists(simulatedMetricName);
 		return appSimulatedMetrics.getApps(simulatedMetricName);
 	}
 
-	public AppEntity getApp(String simulatedMetricName, String appName) {
+	public App getApp(String simulatedMetricName, String appName) {
 		checkAppSimulatedMetricExists(simulatedMetricName);
 		return appSimulatedMetrics.getApp(simulatedMetricName, appName).orElseThrow(() ->
-			new EntityNotFoundException(AppEntity.class, "appName", appName));
+			new EntityNotFoundException(App.class, "appName", appName));
 	}
 
 	public void addApp(String simulatedMetricName, String appName) {
@@ -109,9 +109,9 @@ public class AppSimulatedMetricsService {
 
 	public void addApps(String simulatedMetricName, List<String> appNames) {
 		log.info("Adding apps {} to simulated metric {}", appNames, simulatedMetricName);
-		AppSimulatedMetricEntity appMetric = getAppSimulatedMetric(simulatedMetricName);
+		AppSimulatedMetric appMetric = getAppSimulatedMetric(simulatedMetricName);
 		appNames.forEach(appName -> {
-			AppEntity app = appsService.getApp(appName);
+			App app = appsService.getApp(appName);
 			app.addAppSimulatedMetric(appMetric);
 		});
 		appSimulatedMetrics.save(appMetric);
@@ -123,13 +123,13 @@ public class AppSimulatedMetricsService {
 
 	public void removeApps(String simulatedMetricName, List<String> appNames) {
 		log.info("Removing apps {} from simulated metric {}", appNames, simulatedMetricName);
-		AppSimulatedMetricEntity appMetric = getAppSimulatedMetric(simulatedMetricName);
+		AppSimulatedMetric appMetric = getAppSimulatedMetric(simulatedMetricName);
 		appNames.forEach(appName ->
 			appsService.getApp(appName).removeAppSimulatedMetric(appMetric));
 		appSimulatedMetrics.save(appMetric);
 	}
 
-	public Double randomizeFieldValue(AppSimulatedMetricEntity appSimulatedMetric) {
+	public Double randomizeFieldValue(AppSimulatedMetric appSimulatedMetric) {
 		Random random = new Random();
 		double minValue = appSimulatedMetric.getMinimumValue();
 		double maxValue = appSimulatedMetric.getMaximumValue();
@@ -138,11 +138,11 @@ public class AppSimulatedMetricsService {
 	
 	private void checkAppSimulatedMetricExists(String simulatedMetricName) {
 		if (!appSimulatedMetrics.hasAppSimulatedMetric(simulatedMetricName)) {
-			throw new EntityNotFoundException(AppSimulatedMetricEntity.class, "simulatedMetricName", simulatedMetricName);
+			throw new EntityNotFoundException(AppSimulatedMetric.class, "simulatedMetricName", simulatedMetricName);
 		}
 	}
 
-	private void checkAppSimulatedMetricDoesntExist(AppSimulatedMetricEntity appSimulatedMetric) {
+	private void checkAppSimulatedMetricDoesntExist(AppSimulatedMetric appSimulatedMetric) {
 		String name = appSimulatedMetric.getName();
 		if (appSimulatedMetrics.hasAppSimulatedMetric(name)) {
 			throw new DataIntegrityViolationException("Simulated app metric '" + name + "' already exists");

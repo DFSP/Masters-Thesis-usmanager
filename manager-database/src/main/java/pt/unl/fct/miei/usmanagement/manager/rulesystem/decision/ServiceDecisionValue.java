@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_decision_values")
-public class ServiceDecisionValueEntity {
+public class ServiceDecisionValue {
 
 	@Id
 	@GeneratedValue
@@ -55,7 +55,7 @@ public class ServiceDecisionValueEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "service_decision_id")
-	private ServiceDecisionEntity serviceDecision;
+	private ServiceDecision serviceDecision;
 
 	@ManyToOne
 	@JoinColumn(name = "field_id")
@@ -73,10 +73,10 @@ public class ServiceDecisionValueEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceDecisionValueEntity)) {
+		if (!(o instanceof ServiceDecisionValue)) {
 			return false;
 		}
-		ServiceDecisionValueEntity other = (ServiceDecisionValueEntity) o;
+		ServiceDecisionValue other = (ServiceDecisionValue) o;
 		return id != null && id.equals(other.getId());
 	}
 

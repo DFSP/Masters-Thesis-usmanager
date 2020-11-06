@@ -37,9 +37,9 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -50,7 +50,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -67,7 +66,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "containers")
-public class ContainerEntity {
+public class Container {
 
 	@Id
 	@GeneratedValue
@@ -77,7 +76,7 @@ public class ContainerEntity {
 	private String containerId;
 
 	@NotNull
-	private ContainerType type;
+	private ContainerTypeEnum type;
 
 	@NotNull
 	private long created;
@@ -110,7 +109,7 @@ public class ContainerEntity {
 	private Map<String, String> labels;
 
 	@NotNull
-	private Region region;
+	private RegionEnum region;
 
 	@NotNull
 	private Coordinates coordinates;
@@ -122,7 +121,7 @@ public class ContainerEntity {
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
-	private Set<ContainerRuleEntity> containerRules;
+	private Set<ContainerRule> containerRules;
 
 	@Singular
 	@JsonIgnore
@@ -131,29 +130,29 @@ public class ContainerEntity {
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
-	private Set<ContainerSimulatedMetricEntity> simulatedContainerMetrics;
+	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
 
 	@JsonIgnore
 	public String getServiceName() {
 		return getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 	}
 
-	public void addRule(ContainerRuleEntity rule) {
+	public void addRule(ContainerRule rule) {
 		containerRules.add(rule);
 		rule.getContainers().add(this);
 	}
 
-	public void removeRule(ContainerRuleEntity rule) {
+	public void removeRule(ContainerRule rule) {
 		containerRules.remove(rule);
 		rule.getContainers().remove(this);
 	}
 
-	public void addContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
+	public void addContainerSimulatedMetric(ContainerSimulatedMetric containerMetric) {
 		simulatedContainerMetrics.add(containerMetric);
 		containerMetric.getContainers().add(this);
 	}
 
-	public void removeContainerSimulatedMetric(ContainerSimulatedMetricEntity containerMetric) {
+	public void removeContainerSimulatedMetric(ContainerSimulatedMetric containerMetric) {
 		simulatedContainerMetrics.remove(containerMetric);
 		containerMetric.getContainers().remove(this);
 	}
@@ -173,10 +172,10 @@ public class ContainerEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ContainerEntity)) {
+		if (!(o instanceof Container)) {
 			return false;
 		}
-		ContainerEntity other = (ContainerEntity) o;
+		Container other = (Container) o;
 		return id != null && id.equals(other.getId());
 	}
 

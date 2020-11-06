@@ -29,16 +29,16 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.ManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerType;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
@@ -56,7 +56,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.Pro
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.io.IOException;
@@ -131,14 +131,14 @@ public class HostsService {
 		List<HostAddress> workerHosts = new LinkedList<>();
 		if (mode == null || mode == Mode.LOCAL) {
 			log.info("Clustering edge worker hosts into the swarm");
-			workerHosts.addAll(getLocalWorkerNodes().stream().map(EdgeHostEntity::getAddress).collect(Collectors.toList()));
+			workerHosts.addAll(getLocalWorkerNodes().stream().map(EdgeHost::getAddress).collect(Collectors.toList()));
 			if (getLocalWorkerNodes().size() < 1) {
 				log.info("No edge worker hosts found");
 			}
 		}
 		if (mode == null || mode == Mode.GLOBAL) {
 			log.info("Clustering cloud hosts into the swarm");
-			workerHosts.addAll(getCloudWorkerNodes().stream().map(CloudHostEntity::getAddress).collect(Collectors.toList()));
+			workerHosts.addAll(getCloudWorkerNodes().stream().map(CloudHost::getAddress).collect(Collectors.toList()));
 			if (getCloudWorkerNodes().size() < 1) {
 				log.info("No cloud worker hosts found");
 			}
@@ -146,17 +146,17 @@ public class HostsService {
 		workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER));
 	}
 
-	private List<CloudHostEntity> getCloudWorkerNodes() {
+	private List<CloudHost> getCloudWorkerNodes() {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
 		int maxInstances = Math.min(this.maxInstances, maxWorkers);
-		List<CloudHostEntity> cloudHosts = new ArrayList<>(maxInstances);
+		List<CloudHost> cloudHosts = new ArrayList<>(maxInstances);
 		for (int i = 0; i < maxInstances; i++) {
 			cloudHosts.add(chooseCloudHost(null, false));
 		}
 		return cloudHosts;
 	}
 
-	private List<EdgeHostEntity> getLocalWorkerNodes() {
+	private List<EdgeHost> getLocalWorkerNodes() {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
 		return edgeHostsService.getEdgeHosts().stream()
 			.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.masterHostAddress.getPublicIpAddress()))
@@ -201,7 +201,7 @@ public class HostsService {
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
 		List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
-			.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerType.SINGLETON));
+			.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON));
 		executeCommandInBackground(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
@@ -232,11 +232,11 @@ public class HostsService {
 		}
 	}
 
-	public HostAddress getClosestCapableHost(double availableMemory, Region region) {
+	public HostAddress getClosestCapableHost(double availableMemory, RegionEnum region) {
 		return getClosestCapableHost(availableMemory, region.getCoordinates());
 	}
 
-	public HostAddress getCapableNode(double availableMemory, Region region) {
+	public HostAddress getCapableNode(double availableMemory, RegionEnum region) {
 		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory))
@@ -257,28 +257,28 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestCapableHost(double availableMemory, Coordinates coordinates) {
-		List<EdgeHostEntity> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host ->
+		List<EdgeHost> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host ->
 			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
 		).collect(Collectors.toList());
-		List<CloudHostEntity> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
+		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
 			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
 		).collect(Collectors.toList());
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates) {
-		List<EdgeHostEntity> edgeHosts = edgeHostsService.getEdgeHosts();
-		List<CloudHostEntity> cloudHosts = cloudHostsService.getCloudHosts();
+		List<EdgeHost> edgeHosts = edgeHostsService.getEdgeHosts();
+		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts();
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}
 
 	public HostAddress getClosestInactiveHost(Coordinates coordinates) {
-		List<EdgeHostEntity> inactiveEdgeHosts = edgeHostsService.getInactiveEdgeHosts();
-		List<CloudHostEntity> inactiveCloudHosts = cloudHostsService.getInactiveCloudHosts();
+		List<EdgeHost> inactiveEdgeHosts = edgeHostsService.getInactiveEdgeHosts();
+		List<CloudHost> inactiveCloudHosts = cloudHostsService.getInactiveCloudHosts();
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
 	}
 
-	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHostEntity> edgeHosts, List<CloudHostEntity> cloudHosts) {
+	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHost> edgeHosts, List<CloudHost> cloudHosts) {
 		edgeHosts.sort((oneEdgeHost, anotherEdgeHost) -> {
 			double oneDistance = oneEdgeHost.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherEdgeHost.getCoordinates().distanceTo(coordinates);
@@ -293,9 +293,9 @@ public class HostsService {
 
 		final HostAddress hostAddress;
 		if (!edgeHosts.isEmpty() && !cloudHosts.isEmpty()) {
-			EdgeHostEntity edgeHost = edgeHosts.get(0);
+			EdgeHost edgeHost = edgeHosts.get(0);
 			double distanceToEdgeHost = edgeHost.getCoordinates().distanceTo(coordinates);
-			CloudHostEntity cloudHost = cloudHosts.get(0);
+			CloudHost cloudHost = cloudHosts.get(0);
 			double distanceToCloudHost = cloudHost.getAwsRegion().getCoordinates().distanceTo(coordinates);
 			hostAddress = distanceToEdgeHost <= distanceToCloudHost ? edgeHost.getAddress() : cloudHost.getAddress();
 		}
@@ -350,7 +350,7 @@ public class HostsService {
 	public SimpleNode addHost(String host, NodeRole role) {
 		HostAddress hostAddress;
 		try {
-			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
+			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
 			if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
 				cloudHost = cloudHostsService.startInstance(host, false);
 			}
@@ -358,7 +358,7 @@ public class HostsService {
 		}
 		catch (EntityNotFoundException ignored) {
 			try {
-				EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(host);
+				EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(host);
 				hostAddress = edgeHost.getAddress();
 			}
 			catch (EntityNotFoundException e) {
@@ -381,12 +381,12 @@ public class HostsService {
 		nodeId.ifPresent(nodesService::removeNode);
 	}
 
-	private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {
+	private boolean isEdgeHostRunning(EdgeHost edgeHost) {
 		return sshService.hasConnection(edgeHost.getAddress());
 	}
 
-	private CloudHostEntity chooseCloudHost(Region region, boolean addToSwarm) {
-		for (CloudHostEntity cloudHost : cloudHostsService.getCloudHosts()) {
+	private CloudHost chooseCloudHost(RegionEnum region, boolean addToSwarm) {
+		for (CloudHost cloudHost : cloudHostsService.getCloudHosts()) {
 			int stateCode = cloudHost.getState().getCode();
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
 				HostAddress hostAddress = cloudHost.getAddress();

@@ -34,13 +34,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,8 +59,8 @@ public class ContainersController {
 	}
 
 	@GetMapping
-	public List<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
-		List<ContainerEntity> containers;
+	public List<Container> getContainers(@RequestParam(required = false) String serviceName) {
+		List<Container> containers;
 		if (serviceName != null) {
 			containers = containersService.getContainersWithLabels(
 				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
@@ -72,25 +72,25 @@ public class ContainersController {
 	}
 
 	@GetMapping("/{id}")
-	public ContainerEntity getContainer(@PathVariable String id) {
+	public Container getContainer(@PathVariable String id) {
 		return containersService.getContainer(id);
 	}
 
 	@PostMapping
-	public List<ContainerEntity> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
+	public List<Container> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
 		String serviceName = launchContainerRequest.getService();
 		int internalPort = launchContainerRequest.getInternalPort();
 		int externalPort = launchContainerRequest.getExternalPort();
 		HostAddress hostAddress = launchContainerRequest.getHostAddress();
 		List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
-		List<ContainerEntity> containers = new ArrayList<>();
+		List<Container> containers = new ArrayList<>();
 		if (hostAddress != null) {
-			ContainerEntity container = containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
+			Container container = containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
 			containers.add(container);
 		}
 		else if (coordinates != null) {
 			for (Coordinates coordinate : coordinates) {
-				ContainerEntity container = containersService.launchContainer(coordinate, serviceName, internalPort, externalPort);
+				Container container = containersService.launchContainer(coordinate, serviceName, internalPort, externalPort);
 				containers.add(container);
 			}
 		}
@@ -106,18 +106,18 @@ public class ContainersController {
 	}
 
 	@PostMapping("/{id}/replicate")
-	public ContainerEntity replicateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
+	public Container replicateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
 		return containersService.replicateContainer(id, hostAddress);
 	}
 
 	@PostMapping("/{id}/migrate")
-	public ContainerEntity migrateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
+	public Container migrateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
 		log.info("{}", hostAddress);
 		return containersService.migrateContainer(id, hostAddress);
 	}
 
 	@PostMapping("/reload")
-	public List<ContainerEntity> syncDatabaseContainers() {
+	public List<Container> syncDatabaseContainers() {
 		return containersService.synchronizeDatabaseContainers();
 	}
 
@@ -127,7 +127,7 @@ public class ContainersController {
 	}
 
 	@GetMapping("/{containerId}/rules")
-	public List<ContainerRuleEntity> addContainerRule(@PathVariable String containerId) {
+	public List<ContainerRule> addContainerRule(@PathVariable String containerId) {
 		return containersService.getRules(containerId);
 	}
 
@@ -147,7 +147,7 @@ public class ContainersController {
 	}
 
 	@GetMapping("/{containerId}/simulated-metrics")
-	public List<ContainerSimulatedMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
+	public List<ContainerSimulatedMetric> getContainerSimulatedMetrics(@PathVariable String containerId) {
 		return containersService.getSimulatedMetrics(containerId);
 	}
 

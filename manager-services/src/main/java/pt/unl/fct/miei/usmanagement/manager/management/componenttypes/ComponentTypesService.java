@@ -29,8 +29,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeRepository;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypes;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
@@ -40,35 +40,35 @@ import java.util.List;
 @Service
 public class ComponentTypesService {
 
-	private final ComponentTypeRepository componentTypes;
+	private final ComponentTypes componentTypes;
 
-	public ComponentTypesService(ComponentTypeRepository componentTypes) {
+	public ComponentTypesService(ComponentTypes componentTypes) {
 		this.componentTypes = componentTypes;
 	}
 
-	public List<ComponentTypeEntity> getComponentTypes() {
+	public List<ComponentType> getComponentTypes() {
 		return componentTypes.findAll();
 	}
 
-	public ComponentTypeEntity getComponentType(Long id) {
+	public ComponentType getComponentType(Long id) {
 		return componentTypes.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ComponentTypeEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ComponentType.class, "id", id.toString()));
 	}
 
-	public ComponentTypeEntity getComponentType(String type) {
-		ComponentType componentType = ComponentType.valueOf(type.toUpperCase());
+	public ComponentType getComponentType(String type) {
+		ComponentTypeEnum componentType = ComponentTypeEnum.valueOf(type.toUpperCase());
 		return componentTypes.findByType(componentType).orElseThrow(() ->
-			new EntityNotFoundException(ComponentTypeEntity.class, "type", type));
+			new EntityNotFoundException(ComponentType.class, "type", type));
 	}
 
-	public ComponentTypeEntity addComponentType(ComponentTypeEntity componentType) {
+	public ComponentType addComponentType(ComponentType componentType) {
 		checkComponentTypeDoesntExist(componentType);
 		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
 		return componentTypes.save(componentType);
 	}
 
-	public ComponentTypeEntity updateComponentType(String componentTypeName, ComponentTypeEntity newComponentType) {
-		ComponentTypeEntity componentType = getComponentType(componentTypeName);
+	public ComponentType updateComponentType(String componentTypeName, ComponentType newComponentType) {
+		ComponentType componentType = getComponentType(componentTypeName);
 		log.info("Updating componentType {} with {}",
 			ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
 		log.info("ComponentType before copying properties: {}",
@@ -81,11 +81,11 @@ public class ComponentTypesService {
 	}
 
 	public void deleteComponentType(String componentTypeName) {
-		ComponentTypeEntity componentType = getComponentType(componentTypeName);
+		ComponentType componentType = getComponentType(componentTypeName);
 		componentTypes.delete(componentType);
 	}
 
-	private void checkComponentTypeDoesntExist(ComponentTypeEntity componentType) {
+	private void checkComponentTypeDoesntExist(ComponentType componentType) {
 		String componentTypeName = componentType.getType().name();
 		if (componentTypes.hasComponentType(componentTypeName)) {
 			throw new DataIntegrityViolationException("Component type '" + componentTypeName + "' already exists");

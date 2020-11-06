@@ -10,16 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteHostSftpRequest;
-import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteHostSshRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSftpRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSshRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,32 +35,32 @@ public class CloudHostsController {
 	}
 
 	@PostMapping
-	public CloudHostEntity startCloudHost(@RequestBody AddCloudInstance addCloudInstance) {
+	public CloudHost startCloudHost(@RequestBody AddCloudInstance addCloudInstance) {
 		return cloudHostsService.launchInstance(addCloudInstance.getCoordinates());
 	}
 
 	@GetMapping
-	public List<CloudHostEntity> getCloudHosts() {
+	public List<CloudHost> getCloudHosts() {
 		return cloudHostsService.getCloudHosts();
 	}
 
 	@PostMapping("/sync")
-	public List<CloudHostEntity> synchronizeDatabaseCloudHosts() {
+	public List<CloudHost> synchronizeDatabaseCloudHosts() {
 		return cloudHostsService.synchronizeDatabaseCloudHosts();
 	}
 
 	@GetMapping("/{instanceId}")
-	public CloudHostEntity getCloudHost(@PathVariable String instanceId) {
+	public CloudHost getCloudHost(@PathVariable String instanceId) {
 		return cloudHostsService.getCloudHostById(instanceId);
 	}
 
 	@PutMapping("/{instanceId}/start")
-	public CloudHostEntity startCloudInstance(@PathVariable String instanceId) {
+	public CloudHost startCloudInstance(@PathVariable String instanceId) {
 		return cloudHostsService.startInstance(instanceId, true);
 	}
 
 	@PutMapping("/{instanceId}/stop")
-	public CloudHostEntity stopCloudInstance(@PathVariable String instanceId) {
+	public CloudHost stopCloudInstance(@PathVariable String instanceId) {
 		return cloudHostsService.stopInstance(instanceId);
 	}
 
@@ -72,12 +70,12 @@ public class CloudHostsController {
 	}
 
 	@GetMapping("/{instanceId}/rules/{ruleName}")
-	public HostRuleEntity getCloudHostRule(@PathVariable String instanceId, String ruleName) {
+	public HostRule getCloudHostRule(@PathVariable String instanceId, String ruleName) {
 		return cloudHostsService.getRule(instanceId, ruleName);
 	}
 
 	@GetMapping("/{instanceId}/rules")
-	public List<HostRuleEntity> getCloudHostRules(@PathVariable String instanceId) {
+	public List<HostRule> getCloudHostRules(@PathVariable String instanceId) {
 		return cloudHostsService.getRules(instanceId);
 	}
 
@@ -97,13 +95,13 @@ public class CloudHostsController {
 	}
 
 	@GetMapping("/{instanceId}/simulated-metrics")
-	public List<HostSimulatedMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
+	public List<HostSimulatedMetric> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
 		return cloudHostsService.getSimulatedMetrics(instanceId);
 	}
 
 	@GetMapping("/{instanceId}/simulated-metrics/{simulatedMetricName}")
-	public HostSimulatedMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
-																 @PathVariable String simulatedMetricName) {
+	public HostSimulatedMetric getCloudHostSimulatedMetric(@PathVariable String instanceId,
+														   @PathVariable String simulatedMetricName) {
 		return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
 	}
 

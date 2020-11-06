@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "regions")
-public class RegionEntity {
+public class Region {
 
 	@Id
 	@GeneratedValue
@@ -70,10 +70,10 @@ public class RegionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof RegionEntity)) {
+		if (!(o instanceof Region)) {
 			return false;
 		}
-		RegionEntity other = (RegionEntity) o;
+		Region other = (Region) o;
 		return id != null && id.equals(other.getId());
 	}
 

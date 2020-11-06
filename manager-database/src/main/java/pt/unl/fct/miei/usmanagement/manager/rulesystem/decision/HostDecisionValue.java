@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_decision_values")
-public class HostDecisionValueEntity {
+public class HostDecisionValue {
 
 	@Id
 	@GeneratedValue
@@ -55,7 +55,7 @@ public class HostDecisionValueEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "host_decision_id")
-	private HostDecisionEntity hostDecision;
+	private HostDecision hostDecision;
 
 	@ManyToOne
 	@JoinColumn(name = "field_id")
@@ -73,10 +73,10 @@ public class HostDecisionValueEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostDecisionValueEntity)) {
+		if (!(o instanceof HostDecisionValue)) {
 			return false;
 		}
-		HostDecisionValueEntity other = (HostDecisionValueEntity) o;
+		HostDecisionValue other = (HostDecisionValue) o;
 		return id != null && id.equals(other.getId());
 	}
 

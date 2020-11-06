@@ -51,6 +51,24 @@ docker run --rm -p 8080:8080 manager-master
 docker run --rm -p 8080:8080 usmanager/manager-master
 ```
 
+## Hal explorer
+
+O [hal explorer](https://mvnrepository.com/artifact/org.springframework.data/spring-data-rest-hal-explorer) do spring boot está ativado através do url:
+
+http://localhost:8080/api
+
+
+## Heroku
+
+O ficheiro [Procfile](./Procfile) permite lançar a api para a cloud [Heroku](https://www.heroku.com/).
+Guia disponível [aqui](https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku).
+
+```shell script
+sudo snap install heroku --classic
+heroku create
+heroku open -a sheltered-refuge-34060
+```
+
 ## Ambiente
 
 > Ubuntu 20.04.1 LTS

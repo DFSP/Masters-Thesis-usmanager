@@ -29,45 +29,44 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldRepository;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
+import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
 public class FieldsService {
 
-	private final FieldRepository fields;
+	private final Fields fields;
 
-	public FieldsService(FieldRepository fields) {
+	public FieldsService(Fields fields) {
 		this.fields = fields;
 	}
 
-	public List<FieldEntity> getFields() {
+	public List<Field> getFields() {
 		return fields.findAll();
 	}
 
-	public FieldEntity getField(Long id) {
+	public Field getField(Long id) {
 		return fields.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(FieldEntity.class, "id", id.toString()));
+			new EntityNotFoundException(Field.class, "id", id.toString()));
 	}
 
-	public FieldEntity getField(String name) {
+	public Field getField(String name) {
 		return fields.findByNameIgnoreCase(name).orElseThrow(() ->
-			new EntityNotFoundException(FieldEntity.class, "name", name));
+			new EntityNotFoundException(Field.class, "name", name));
 	}
 
-	public FieldEntity addField(FieldEntity field) {
+	public Field addField(Field field) {
 		checkFieldDoesntExist(field);
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		return fields.save(field);
 	}
 
-	public FieldEntity updateField(String fieldName, FieldEntity newField) {
-		FieldEntity field = getField(fieldName);
+	public Field updateField(String fieldName, Field newField) {
+		Field field = getField(fieldName);
 		log.info("Updating field {} with {}",
 			ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
 		log.info("Field before copying properties: {}",
@@ -80,7 +79,7 @@ public class FieldsService {
 	}
 
 	public void deleteField(String fieldName) {
-		FieldEntity field = getField(fieldName);
+		Field field = getField(fieldName);
 		fields.delete(field);
 	}
 
@@ -88,7 +87,7 @@ public class FieldsService {
 		return fields.hasField(fieldName);
 	}
 
-	private void checkFieldDoesntExist(FieldEntity field) {
+	private void checkFieldDoesntExist(Field field) {
 		String fieldName = field.getName();
 		if (fields.hasField(fieldName)) {
 			throw new DataIntegrityViolationException("Field " + fieldName + " already exists");

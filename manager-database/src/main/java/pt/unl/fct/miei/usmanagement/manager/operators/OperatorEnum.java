@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.operators;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum Operator {
+public enum OperatorEnum {
 
 	NOT_EQUAL_TO("!="),
 	EQUAL_TO("=="),
@@ -38,7 +38,7 @@ public enum Operator {
 
 	private final String symbol;
 
-	Operator(String symbol) {
+	OperatorEnum(String symbol) {
 		this.symbol = symbol;
 	}
 
@@ -47,8 +47,8 @@ public enum Operator {
 	}
 
 	@JsonCreator
-	public static Operator forValues(@JsonProperty("symbol") String symbol) {
-		for (Operator operator : Operator.values()) {
+	public static OperatorEnum forValues(@JsonProperty("symbol") String symbol) {
+		for (OperatorEnum operator : OperatorEnum.values()) {
 			if (operator.symbol.equalsIgnoreCase(symbol)) {
 				return operator;
 			}

@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,14 +48,14 @@ public class RegistrationServerController {
 	}
 
 	@PostMapping
-	public List<ContainerEntity> launchRegistration(@RequestBody LaunchRegistrationServer launchRegistrationServer) {
+	public List<Container> launchRegistration(@RequestBody LaunchRegistrationServer launchRegistrationServer) {
 		HostAddress hostAddress = launchRegistrationServer.getHostAddress();
 		List<String> regions = launchRegistrationServer.getRegions();
 		if (hostAddress != null) {
 			return List.of(registrationServerService.launchRegistrationServer(hostAddress));
 		}
 		else if (regions != null) {
-			List<Region> regionsList = Arrays.stream(regions.toArray(new String[0])).map(Region::getRegion).collect(Collectors.toList());
+			List<RegionEnum> regionsList = Arrays.stream(regions.toArray(new String[0])).map(RegionEnum::getRegion).collect(Collectors.toList());
 			return registrationServerService.launchRegistrationServers(regionsList);
 		}
 		else {

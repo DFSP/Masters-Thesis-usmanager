@@ -27,12 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.monitoring;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface ServiceMonitoringRepository extends JpaRepository<ServiceMonitoring, Long> {
+public interface ServiceMonitorings extends JpaRepository<ServiceMonitoring, Long> {
 
 	List<ServiceMonitoring> getByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
 

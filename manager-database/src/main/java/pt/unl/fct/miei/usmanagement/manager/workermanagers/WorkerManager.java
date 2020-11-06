@@ -55,7 +55,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Table(name = "worker_managers")
-public class WorkerManagerEntity {
+public class WorkerManager {
 
 	@Id
 	private String id;
@@ -91,10 +91,10 @@ public class WorkerManagerEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof WorkerManagerEntity)) {
+		if (!(o instanceof WorkerManager)) {
 			return false;
 		}
-		WorkerManagerEntity other = (WorkerManagerEntity) o;
+		WorkerManager other = (WorkerManager) o;
 		return id != null && id.equals(other.getId());
 	}
 

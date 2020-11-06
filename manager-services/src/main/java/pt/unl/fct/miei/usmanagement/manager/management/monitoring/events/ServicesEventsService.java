@@ -27,9 +27,9 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEventRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvents;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,30 +38,30 @@ import java.util.Objects;
 @Service
 public class ServicesEventsService {
 
-	private final ServiceEventRepository serviceEvents;
+	private final ServiceEvents serviceEvents;
 	private final DecisionsService decisionsService;
 
-	public ServicesEventsService(ServiceEventRepository serviceEvents, DecisionsService decisionsService) {
+	public ServicesEventsService(ServiceEvents serviceEvents, DecisionsService decisionsService) {
 		this.serviceEvents = serviceEvents;
 		this.decisionsService = decisionsService;
 	}
 
-	public List<ServiceEventEntity> getServiceEvents() {
+	public List<ServiceEvent> getServiceEvents() {
 		return serviceEvents.findAll();
 	}
 
-	public List<ServiceEventEntity> getServiceEventsByServiceName(String serviceName) {
+	public List<ServiceEvent> getServiceEventsByServiceName(String serviceName) {
 		return serviceEvents.findByServiceName(serviceName);
 	}
 
-	public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
+	public List<ServiceEvent> getServiceEventsByContainerId(String containerId) {
 		return serviceEvents.findByContainerIdStartingWith(containerId);
 	}
 
-	public ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
-		DecisionEntity decision = decisionsService.getServicePossibleDecision(decisionName);
-		ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElseGet(() ->
-			ServiceEventEntity.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
+	public ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
+		Decision decision = decisionsService.getServicePossibleDecision(decisionName);
+		ServiceEvent event = getServiceEventsByContainerId(containerId).stream().findFirst().orElseGet(() ->
+			ServiceEvent.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
 		if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
 			event.setDecision(decision);
 			event.setCount(1);
@@ -74,7 +74,7 @@ public class ServicesEventsService {
 	}
 
 	public void resetServiceEvent(String serviceName) {
-		DecisionEntity decision = decisionsService.getServicePossibleDecision("NONE");
+		Decision decision = decisionsService.getServicePossibleDecision("NONE");
 		serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
 			serviceEvent.setDecision(decision);
 			serviceEvent.setCount(1);

@@ -26,8 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.symmetricds.node.group;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-@Repository
 public interface SymNodeGroupsRepository extends JpaRepository<SymNodeGroupEntity, String> {
 
 }

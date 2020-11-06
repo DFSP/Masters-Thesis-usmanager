@@ -32,13 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 
 import java.util.List;
 
@@ -53,28 +52,28 @@ public class ServiceRulesController {
 	}
 
 	@GetMapping
-	public List<ServiceRuleEntity> getRules() {
+	public List<ServiceRule> getRules() {
 		return serviceRulesService.getRules();
 	}
 
 	@GetMapping("/{ruleName}")
-	public ServiceRuleEntity getRule(@PathVariable String ruleName) {
+	public ServiceRule getRule(@PathVariable String ruleName) {
 		return serviceRulesService.getRule(ruleName);
 	}
 
 	@PostMapping
-	public ServiceRuleEntity addRule(@RequestBody ServiceRuleEntity rule) {
-		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
-		if (decisionComponentType != ComponentType.SERVICE) {
+	public ServiceRule addRule(@RequestBody ServiceRule rule) {
+		ComponentTypeEnum decisionComponentTypeEnum = rule.getDecision().getComponentType().getType();
+		if (decisionComponentTypeEnum != ComponentTypeEnum.SERVICE) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
-				ComponentType.SERVICE.name(), decisionComponentType.name());
+				ComponentTypeEnum.SERVICE.name(), decisionComponentTypeEnum.name());
 		}
 		Validation.validatePostRequest(rule.getId());
 		return serviceRulesService.addRule(rule);
 	}
 
 	@PutMapping("/{ruleName}")
-	public ServiceRuleEntity updateRule(@PathVariable String ruleName, @RequestBody ServiceRuleEntity rule) {
+	public ServiceRule updateRule(@PathVariable String ruleName, @RequestBody ServiceRule rule) {
 		Validation.validatePutRequest(rule.getId());
 		return serviceRulesService.updateRule(ruleName, rule);
 	}
@@ -85,7 +84,7 @@ public class ServiceRulesController {
 	}
 
 	@GetMapping("/{ruleName}/conditions")
-	public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
+	public List<Condition> getRuleConditions(@PathVariable String ruleName) {
 		return serviceRulesService.getConditions(ruleName);
 	}
 
@@ -105,7 +104,7 @@ public class ServiceRulesController {
 	}
 
 	@GetMapping("/{ruleName}/services")
-	public List<ServiceEntity> getRuleServices(@PathVariable String ruleName) {
+	public List<Service> getRuleServices(@PathVariable String ruleName) {
 		return serviceRulesService.getServices(ruleName);
 	}
 

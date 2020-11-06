@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,7 +50,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_monitoring")
-public class HostMonitoringEntity {
+public class HostMonitoring {
 
 	@Id
 	@GeneratedValue
@@ -103,10 +102,10 @@ public class HostMonitoringEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostMonitoringEntity)) {
+		if (!(o instanceof HostMonitoring)) {
 			return false;
 		}
-		HostMonitoringEntity other = (HostMonitoringEntity) o;
+		HostMonitoring other = (HostMonitoring) o;
 		return id != null && id.equals(other.getId());
 	}
 

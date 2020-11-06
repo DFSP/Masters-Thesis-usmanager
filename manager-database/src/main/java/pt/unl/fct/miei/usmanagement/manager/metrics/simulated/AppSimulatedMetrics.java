@@ -27,40 +27,38 @@ package pt.unl.fct.miei.usmanagement.manager.metrics.simulated;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface AppSimulatedMetricsRepository extends JpaRepository<AppSimulatedMetricEntity, Long> {
+public interface AppSimulatedMetrics extends JpaRepository<AppSimulatedMetric, Long> {
 
-	Optional<AppSimulatedMetricEntity> findByNameIgnoreCase(@Param("name") String name);
+	Optional<AppSimulatedMetric> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select m "
-		+ "from AppSimulatedMetricEntity m left join m.apps s "
+		+ "from AppSimulatedMetric m left join m.apps s "
 		+ "where s.name = :name")
-	List<AppSimulatedMetricEntity> findByApp(@Param("name") String name);
+	List<AppSimulatedMetric> findByApp(@Param("name") String name);
 
 	@Query("select m "
-		+ "from AppSimulatedMetricEntity m join m.apps s "
+		+ "from AppSimulatedMetric m join m.apps s "
 		+ "where lower(s.name) = lower(:name) and lower(m.field.name) = lower(:field)")
-	Optional<AppSimulatedMetricEntity> findByAppAndField(@Param("name") String name,
-														 @Param("field") String field);
+	Optional<AppSimulatedMetric> findByAppAndField(@Param("name") String name,
+												   @Param("field") String field);
 
 	@Query("select case when count(m) > 0 then true else false end "
-		+ "from AppSimulatedMetricEntity m "
+		+ "from AppSimulatedMetric m "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
 	boolean hasAppSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select s "
-		+ "from AppSimulatedMetricEntity m join m.apps s "
+		+ "from AppSimulatedMetric m join m.apps s "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
 	List<App> getApps(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select s "
-		+ "from AppSimulatedMetricEntity m join m.apps s "
+		+ "from AppSimulatedMetric m join m.apps s "
 		+ "where lower(m.name) = lower(:simulatedMetricName) and s.name = :name")
 	Optional<App> getApp(@Param("simulatedMetricName") String simulatedMetricName, @Param("name") String name);
 

@@ -32,12 +32,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -59,7 +59,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "conditions")
-public class ConditionEntity {
+public class Condition {
 
 	@Id
 	@GeneratedValue
@@ -71,7 +71,7 @@ public class ConditionEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "value_mode_id")
-	private ValueModeEntity valueMode;
+	private ValueMode valueMode;
 
 	@ManyToOne
 	@JoinColumn(name = "field_id")
@@ -86,17 +86,17 @@ public class ConditionEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostRuleConditionEntity> hostRuleConditions;
+	private Set<HostRuleCondition> hostRuleConditions;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceRuleConditionEntity> serviceConditions;
+	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleConditionEntity> containerConditions;
+	private Set<ContainerRuleCondition> containerConditions;
 
 	@Override
 	public int hashCode() {
@@ -108,10 +108,10 @@ public class ConditionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ConditionEntity)) {
+		if (!(o instanceof Condition)) {
 			return false;
 		}
-		ConditionEntity other = (ConditionEntity) o;
+		Condition other = (Condition) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -49,7 +49,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_monitoring_logs")
-public class ServiceMonitoringLogEntity {
+public class ServiceMonitoringLog {
 
 	@Id
 	@GeneratedValue
@@ -89,10 +89,10 @@ public class ServiceMonitoringLogEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceMonitoringLogEntity)) {
+		if (!(o instanceof ServiceMonitoringLog)) {
 			return false;
 		}
-		ServiceMonitoringLogEntity other = (ServiceMonitoringLogEntity) o;
+		ServiceMonitoringLog other = (ServiceMonitoringLog) o;
 		return id != null && id.equals(other.getId());
 	}
 

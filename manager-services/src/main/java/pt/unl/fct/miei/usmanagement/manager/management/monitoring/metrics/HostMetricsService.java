@@ -30,7 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,9 +56,9 @@ public class HostMetricsService {
 
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		List<Optional<Double>> metrics = List.of(
-			PrometheusQuery.TOTAL_MEMORY,
-			PrometheusQuery.AVAILABLE_MEMORY,
-			PrometheusQuery.CPU_USAGE_PERCENTAGE)
+			PrometheusQueryEnum.TOTAL_MEMORY,
+			PrometheusQueryEnum.AVAILABLE_MEMORY,
+			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
 			.parallelStream().map(stat -> prometheusService.getStat(hostAddress, stat))
 			.collect(Collectors.toList());
 		Optional<Double> totalRam = metrics.get(0);

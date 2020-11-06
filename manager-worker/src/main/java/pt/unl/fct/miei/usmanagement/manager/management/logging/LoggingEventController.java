@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.logging;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.logging.LoggingEventEntity;
+import pt.unl.fct.miei.usmanagement.manager.logging.LoggingEvent;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class LoggingEventController {
 	}
 
 	@GetMapping
-	public List<LoggingEventEntity> getLogs() {
+	public List<LoggingEvent> getLogs() {
 		return loggingEvents.getLogs();
 	}
 

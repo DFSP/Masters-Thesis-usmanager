@@ -32,11 +32,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -52,28 +52,28 @@ public class AppRulesController {
 	}
 
 	@GetMapping
-	public List<AppRuleEntity> getAppRules() {
+	public List<AppRule> getAppRules() {
 		return appRulesService.getRules();
 	}
 
 	@GetMapping("/{ruleName}")
-	public AppRuleEntity getAppRule(@PathVariable String ruleName) {
+	public AppRule getAppRule(@PathVariable String ruleName) {
 		return appRulesService.getRule(ruleName);
 	}
 
 	@PostMapping
-	public AppRuleEntity addRule(@RequestBody AppRuleEntity rule) {
-		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
-		if (decisionComponentType != ComponentType.SERVICE) {
+	public AppRule addRule(@RequestBody AppRule rule) {
+		ComponentTypeEnum decisionComponentTypeEnum = rule.getDecision().getComponentType().getType();
+		if (decisionComponentTypeEnum != ComponentTypeEnum.SERVICE) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
-				ComponentType.SERVICE.name(), decisionComponentType.name());
+				ComponentTypeEnum.SERVICE.name(), decisionComponentTypeEnum.name());
 		}
 		Validation.validatePostRequest(rule.getId());
 		return appRulesService.addRule(rule);
 	}
 
 	@PutMapping("/{ruleName}")
-	public AppRuleEntity updateRule(@PathVariable String ruleName, @RequestBody AppRuleEntity rule) {
+	public AppRule updateRule(@PathVariable String ruleName, @RequestBody AppRule rule) {
 		Validation.validatePutRequest(rule.getId());
 		return appRulesService.updateRule(ruleName, rule);
 	}
@@ -84,7 +84,7 @@ public class AppRulesController {
 	}
 
 	@GetMapping("/{ruleName}/conditions")
-	public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
+	public List<Condition> getRuleConditions(@PathVariable String ruleName) {
 		return appRulesService.getConditions(ruleName);
 	}
 
@@ -104,7 +104,7 @@ public class AppRulesController {
 	}
 
 	@GetMapping("/{ruleName}/apps")
-	public List<AppEntity> getRuleApps(@PathVariable String ruleName) {
+	public List<App> getRuleApps(@PathVariable String ruleName) {
 		return appRulesService.getApps(ruleName);
 	}
 

@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSftpRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSshRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetricEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.Arrays;
@@ -37,24 +37,24 @@ public class EdgeHostsController {
 	}
 
 	@GetMapping
-	public List<EdgeHostEntity> getEdgeHosts() {
+	public List<EdgeHost> getEdgeHosts() {
 		return edgeHostsService.getEdgeHosts();
 	}
 
 	@GetMapping("/{hostname}")
-	public EdgeHostEntity getEdgeHost(@PathVariable String hostname) {
+	public EdgeHost getEdgeHost(@PathVariable String hostname) {
 		return edgeHostsService.getEdgeHostByHostname(hostname);
 	}
 
 	@PostMapping
-	public EdgeHostEntity addEdgeHost(@RequestBody AddEdgeHost addEdgeHost) {
+	public EdgeHost addEdgeHost(@RequestBody AddEdgeHost addEdgeHost) {
 		log.info("{}", addEdgeHost);
 		return edgeHostsService.addEdgeHost(addEdgeHost.getUsername(), addEdgeHost.getPassword(), addEdgeHost.getPublicIpAddress(),
 			addEdgeHost.getPrivateIpAddress(), addEdgeHost.getPublicDnsName(), addEdgeHost.getCoordinates());
 	}
 
 	@PutMapping("/{hostname}")
-	public EdgeHostEntity updateEdgeHost(@PathVariable String hostname, @RequestBody EdgeHostEntity edgeHost) {
+	public EdgeHost updateEdgeHost(@PathVariable String hostname, @RequestBody EdgeHost edgeHost) {
 		Validation.validatePutRequest(edgeHost.getId());
 		return edgeHostsService.updateEdgeHost(hostname, edgeHost);
 	}
@@ -65,12 +65,12 @@ public class EdgeHostsController {
 	}
 
 	@GetMapping("/{hostname}/rules")
-	public List<HostRuleEntity> getEdgeHostRules(@PathVariable String hostname) {
+	public List<HostRule> getEdgeHostRules(@PathVariable String hostname) {
 		return edgeHostsService.getRules(hostname);
 	}
 
 	@GetMapping("/{hostname}/rules/{ruleName}")
-	public HostRuleEntity getEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
+	public HostRule getEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
 		return edgeHostsService.getRule(hostname, ruleName);
 	}
 
@@ -90,13 +90,13 @@ public class EdgeHostsController {
 	}
 
 	@GetMapping("/{hostname}/simulated-metrics")
-	public List<HostSimulatedMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
+	public List<HostSimulatedMetric> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
 		return edgeHostsService.getSimulatedMetrics(hostname);
 	}
 
 	@GetMapping("/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public HostSimulatedMetricEntity getEdgeHostSimulatedMetric(@PathVariable String hostname,
-																@PathVariable String simulatedMetricName) {
+	public HostSimulatedMetric getEdgeHostSimulatedMetric(@PathVariable String hostname,
+														  @PathVariable String simulatedMetricName) {
 		return edgeHostsService.getSimulatedMetric(hostname, simulatedMetricName);
 	}
 

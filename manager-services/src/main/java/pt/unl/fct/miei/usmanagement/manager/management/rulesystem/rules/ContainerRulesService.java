@@ -29,13 +29,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleRepository;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
@@ -49,13 +49,13 @@ public class ContainerRulesService {
 	private final ContainersService containersService;
 	private final DroolsService droolsService;
 
-	private final ContainerRuleRepository rules;
+	private final ContainerRules rules;
 
 	//private final String containerRuleTemplateFile;
 	//private final AtomicLong lastUpdateContainerRules;
 
 	public ContainerRulesService(ConditionsService conditionsService, @Lazy ContainersService containersService,
-								 DroolsService droolsService, ContainerRuleRepository rules,
+								 DroolsService droolsService, ContainerRules rules,
 								 RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.containersService = containersService;
@@ -70,30 +70,30 @@ public class ContainerRulesService {
     lastUpdateContainerRules.getAndSet(currentTime);
   }*/
 
-	public List<ContainerRuleEntity> getRules() {
+	public List<ContainerRule> getRules() {
 		return rules.findAll();
 	}
 
-	public ContainerRuleEntity getRule(Long id) {
+	public ContainerRule getRule(Long id) {
 		return rules.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(ContainerRuleEntity.class, "id", id.toString()));
+			new EntityNotFoundException(ContainerRule.class, "id", id.toString()));
 	}
 
-	public ContainerRuleEntity getRule(String name) {
+	public ContainerRule getRule(String name) {
 		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-			new EntityNotFoundException(ContainerRuleEntity.class, "name", name));
+			new EntityNotFoundException(ContainerRule.class, "name", name));
 	}
 
-	public ContainerRuleEntity addRule(ContainerRuleEntity rule) {
+	public ContainerRule addRule(ContainerRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		//setLastUpdateContainerRules();
 		return rules.save(rule);
 	}
 
-	public ContainerRuleEntity updateRule(String ruleName, ContainerRuleEntity newRule) {
+	public ContainerRule updateRule(String ruleName, ContainerRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
-		ContainerRuleEntity rule = getRule(ruleName);
+		ContainerRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
 		rule = rules.save(rule);
 		//setLastUpdateContainerRules();
@@ -102,29 +102,29 @@ public class ContainerRulesService {
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
-		ContainerRuleEntity rule = getRule(ruleName);
+		ContainerRule rule = getRule(ruleName);
 		rule.removeAssociations();
 		rules.delete(rule);
 		//setLastUpdateContainerRules();
 	}
 
-	public ConditionEntity getCondition(String ruleName, String conditionName) {
+	public Condition getCondition(String ruleName, String conditionName) {
 		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+			new EntityNotFoundException(Condition.class, "conditionName", conditionName));
 	}
 
-	public List<ConditionEntity> getConditions(String ruleName) {
+	public List<Condition> getConditions(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
 	public void addCondition(String ruleName, String conditionName) {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
-		ConditionEntity condition = conditionsService.getCondition(conditionName);
-		ContainerRuleEntity rule = getRule(ruleName);
-		ContainerRuleConditionEntity containerRuleCondition =
-			ContainerRuleConditionEntity.builder().containerCondition(condition).containerRule(rule).build();
+		Condition condition = conditionsService.getCondition(conditionName);
+		ContainerRule rule = getRule(ruleName);
+		ContainerRuleCondition containerRuleCondition =
+			ContainerRuleCondition.builder().containerCondition(condition).containerRule(rule).build();
 		rule = rule.toBuilder().condition(containerRuleCondition).build();
 		rules.save(rule);
 		//setLastUpdateContainerRules();
@@ -140,20 +140,20 @@ public class ContainerRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		ContainerRuleEntity rule = getRule(ruleName);
+		ContainerRule rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
 		rules.save(rule);
 		//setLastUpdateContainerRules();
 	}
 
-	public ContainerEntity getContainer(String ruleName, String containerId) {
+	public Container getContainer(String ruleName, String containerId) {
 		checkRuleExists(ruleName);
 		return rules.getContainer(ruleName, containerId).orElseThrow(() ->
-			new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
+			new EntityNotFoundException(Container.class, "containerId", containerId));
 	}
 
-	public List<ContainerEntity> getContainers(String ruleName) {
+	public List<Container> getContainers(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getContainers(ruleName);
 	}
@@ -164,9 +164,9 @@ public class ContainerRulesService {
 
 	public void addContainers(String ruleName, List<String> containerIds) {
 		log.info("Adding containers {} to rule {}", containerIds, ruleName);
-		ContainerRuleEntity rule = getRule(ruleName);
+		ContainerRule rule = getRule(ruleName);
 		containerIds.forEach(containerId -> {
-			ContainerEntity container = containersService.getContainer(containerId);
+			Container container = containersService.getContainer(containerId);
 			container.addRule(rule);
 		});
 		rules.save(rule);
@@ -179,7 +179,7 @@ public class ContainerRulesService {
 
 	public void removeContainers(String ruleName, List<String> containerIds) {
 		log.info("Removing containers {} from rule {}", containerIds, ruleName);
-		ContainerRuleEntity rule = getRule(ruleName);
+		ContainerRule rule = getRule(ruleName);
 		containerIds.forEach(containerId -> containersService.getContainer(containerId).removeRule(rule));
 		rules.save(rule);
 		//setLastUpdateContainerRules();
@@ -187,11 +187,11 @@ public class ContainerRulesService {
 
 	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
-			throw new EntityNotFoundException(ContainerRuleEntity.class, "ruleName", ruleName);
+			throw new EntityNotFoundException(ContainerRule.class, "ruleName", ruleName);
 		}
 	}
 
-	private void checkRuleDoesntExist(ContainerRuleEntity containerRule) {
+	private void checkRuleDoesntExist(ContainerRule containerRule) {
 		String name = containerRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");

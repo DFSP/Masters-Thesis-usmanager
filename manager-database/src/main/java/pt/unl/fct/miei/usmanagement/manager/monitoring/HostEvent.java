@@ -32,7 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -50,7 +50,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_events")
-public class HostEventEntity {
+public class HostEvent {
 
 	@Id
 	@GeneratedValue
@@ -63,7 +63,7 @@ public class HostEventEntity {
 	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
-	private DecisionEntity decision;
+	private Decision decision;
 
 	private int count;
 
@@ -77,10 +77,10 @@ public class HostEventEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostEventEntity)) {
+		if (!(o instanceof HostEvent)) {
 			return false;
 		}
-		HostEventEntity other = (HostEventEntity) o;
+		HostEvent other = (HostEvent) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -41,7 +41,7 @@ public class LoggingEventController {
 	}
 
 	@GetMapping
-	public List<LoggingEventEntity> getLogs() {
+	public List<LoggingEvent> getLogs() {
 		return loggingEvents.getLogs();
 	}
 

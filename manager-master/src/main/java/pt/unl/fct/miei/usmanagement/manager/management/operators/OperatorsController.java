@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 
 import java.util.List;
@@ -48,23 +48,23 @@ public class OperatorsController {
 	}
 
 	@GetMapping
-	public List<OperatorEntity> getOperators() {
+	public List<Operator> getOperators() {
 		return operatorsService.getOperators();
 	}
 
 	@GetMapping("/{operatorName}")
-	public OperatorEntity getOperator(@PathVariable String operatorName) {
+	public Operator getOperator(@PathVariable String operatorName) {
 		return operatorsService.getOperator(operatorName);
 	}
 
 	@PostMapping
-	public OperatorEntity addOperator(@RequestBody OperatorEntity operator) {
+	public Operator addOperator(@RequestBody Operator operator) {
 		Validation.validatePostRequest(operator.getId());
 		return operatorsService.addOperator(operator);
 	}
 
 	@PutMapping("/{operatorName}")
-	public OperatorEntity updateOperator(@PathVariable String operatorName, @RequestBody OperatorEntity operator) {
+	public Operator updateOperator(@PathVariable String operatorName, @RequestBody Operator operator) {
 		Validation.validatePutRequest(operator.getId());
 		return operatorsService.updateOperator(operatorName, operator);
 	}

@@ -37,8 +37,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -98,13 +98,13 @@ public class SshService {
 		}
 		String publicKeyFile;
 		try {
-			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
+			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			hostAddress = edgeHost.getAddress();
 			publicKeyFile = edgeHostsService.getPrivateKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
 			try {
-				CloudHostEntity cloudHost = cloudHostsService.getCloudHostByAddress(hostAddress);
+				CloudHost cloudHost = cloudHostsService.getCloudHostByAddress(hostAddress);
 				hostAddress = cloudHost.getAddress();
 			}
 			catch (EntityNotFoundException ignored) {

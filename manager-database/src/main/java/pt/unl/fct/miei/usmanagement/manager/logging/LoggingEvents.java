@@ -25,9 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.logging;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface LoggingEventRepository extends JpaRepository<LoggingEvent, Long> {
+public interface LoggingEvents extends JpaRepository<LoggingEvent, Long> {
 
 }

@@ -27,18 +27,16 @@ package pt.unl.fct.miei.usmanagement.manager.rulesystem.condition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface ConditionRepository extends JpaRepository<ConditionEntity, Long> {
+public interface Conditions extends JpaRepository<Condition, Long> {
 
 	@Query("select case when count(c) > 0 then true else false end "
-		+ "from ConditionEntity c "
+		+ "from Condition c "
 		+ "where lower(c.name) = lower(:conditionName)")
 	boolean hasCondition(@Param("conditionName") String conditionName);
 
-	Optional<ConditionEntity> findByNameIgnoreCase(String name);
+	Optional<Condition> findByNameIgnoreCase(String name);
 
 }

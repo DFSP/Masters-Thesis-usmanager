@@ -35,7 +35,7 @@ import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -57,14 +57,14 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "decisions")
-public class DecisionEntity {
+public class Decision {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
-	private RuleDecision ruleDecision;
+	private RuleDecisionEnum ruleDecision;
 
 	@ManyToOne
 	@JoinColumn(name = "component_type_id")
@@ -95,10 +95,10 @@ public class DecisionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof DecisionEntity)) {
+		if (!(o instanceof Decision)) {
 			return false;
 		}
-		DecisionEntity other = (DecisionEntity) o;
+		Decision other = (Decision) o;
 		return id != null && id.equals(other.getId());
 	}
 

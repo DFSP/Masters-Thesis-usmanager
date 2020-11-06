@@ -49,7 +49,7 @@ import java.util.Objects;
 @Getter
 @IdClass(LoggingEventExceptionId.class)
 @Table(name = "logging_event_exception")
-public class LoggingEventExceptionEntity {
+public class LoggingEventException {
 
 	@Id
 	private Long eventId;
@@ -63,7 +63,7 @@ public class LoggingEventExceptionEntity {
 	@OneToOne
 	@MapsId
 	@JoinColumn(name = "eventId")
-	private LoggingEventEntity loggingEvent;
+	private LoggingEvent loggingEvent;
 
 	@Override
 	public int hashCode() {
@@ -75,10 +75,10 @@ public class LoggingEventExceptionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof LoggingEventExceptionEntity)) {
+		if (!(o instanceof LoggingEventException)) {
 			return false;
 		}
-		LoggingEventExceptionEntity other = (LoggingEventExceptionEntity) o;
+		LoggingEventException other = (LoggingEventException) o;
 		return eventId != null && eventId.equals(other.getEventId());
 	}
 

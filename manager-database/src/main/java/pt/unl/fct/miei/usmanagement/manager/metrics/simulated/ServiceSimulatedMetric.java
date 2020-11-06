@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_service_metrics")
-public class ServiceSimulatedMetricEntity {
+public class ServiceSimulatedMetric {
 
 	@Id
 	@GeneratedValue
@@ -90,12 +90,12 @@ public class ServiceSimulatedMetricEntity {
 	@Singular
 	@JsonIgnore
 	@ManyToMany(mappedBy = "simulatedServiceMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ServiceEntity> services;
+	private Set<Service> services;
 
 	public void removeAssociations() {
-		Iterator<ServiceEntity> servicesIterator = services.iterator();
+		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {
-			ServiceEntity service = servicesIterator.next();
+			Service service = servicesIterator.next();
 			servicesIterator.remove();
 			service.getSimulatedServiceMetrics().remove(this);
 		}
@@ -111,10 +111,10 @@ public class ServiceSimulatedMetricEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceSimulatedMetricEntity)) {
+		if (!(o instanceof ServiceSimulatedMetric)) {
 			return false;
 		}
-		ServiceSimulatedMetricEntity other = (ServiceSimulatedMetricEntity) o;
+		ServiceSimulatedMetric other = (ServiceSimulatedMetric) o;
 		return id != null && id.equals(other.getId());
 	}
 

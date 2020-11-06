@@ -52,7 +52,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "value_modes")
-public class ValueModeEntity {
+public class ValueMode {
 
 	@Id
 	@GeneratedValue
@@ -77,10 +77,10 @@ public class ValueModeEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ValueModeEntity)) {
+		if (!(o instanceof ValueMode)) {
 			return false;
 		}
-		ValueModeEntity other = (ValueModeEntity) o;
+		ValueMode other = (ValueMode) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -31,7 +31,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionEntity;
+import pt.unl.fct.miei.usmanagement.manager.database.regions.Region;
 import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionRepository;
 import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
@@ -48,25 +48,25 @@ public class RegionsService {
 		this.regions = regions;
 	}
 
-	public List<RegionEntity> getRegions() {
+	public List<Region> getRegions() {
 		return regions.findAll();
 	}
 
-	public RegionEntity getRegion(Long id) {
+	public Region getRegion(Long id) {
 		return regions.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
+			new EntityNotFoundException(Region.class, "id", id.toString()));
 	}
 
-	public RegionEntity getRegion(String name) {
+	public Region getRegion(String name) {
 		Region region = Region.valueOf(name.toUpperCase().replace(" ", "_"));
 		return regions.findByRegion(name).orElseThrow(() ->
-			new EntityNotFoundException(RegionEntity.class, "name", name));
+			new EntityNotFoundException(Region.class, "name", name));
 	}
 
-	public RegionEntity getClosestRegion(Coordinates coordinates) {
-		List<RegionEntity> regions = getRegions();
+	public Region getClosestRegion(Coordinates coordinates) {
+		List<Region> regions = getRegions();
 		if (regions.size() < 1) {
-			throw new EntityNotFoundException(RegionEntity.class);
+			throw new EntityNotFoundException(Region.class);
 		}
 		regions.sort((oneRegion, anotherRegion) -> {
 			double oneDistance = oneRegion.getRegion().getCoordinates().distanceTo(coordinates);
@@ -76,14 +76,14 @@ public class RegionsService {
 		return regions.get(0);
 	}
 
-	public RegionEntity addRegion(RegionEntity region) {
+	public Region addRegion(Region region) {
 		checkRegionDoesntExist(region);
 		log.info("Saving region {}", ToStringBuilder.reflectionToString(region));
 		return regions.save(region);
 	}
 
-	public RegionEntity updateRegion(String name, RegionEntity newRegion) {
-		RegionEntity region = getRegion(name);
+	public Region updateRegion(String name, Region newRegion) {
+		Region region = getRegion(name);
 		log.info("Updating region {} with {}",
 			ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
 		log.info("Region before copying properties: {}",
@@ -95,7 +95,7 @@ public class RegionsService {
 	}
 
 	public void deleteRegion(String name) {
-		RegionEntity region = getRegion(name);
+		Region region = getRegion(name);
 		regions.delete(region);
 	}
 
@@ -103,7 +103,7 @@ public class RegionsService {
 		return regions.hasRegion(region);
 	}
 
-	private void checkRegionDoesntExist(RegionEntity region) {
+	private void checkRegionDoesntExist(Region region) {
 		if (regions.hasRegion(region.getRegion())) {
 			throw new DataIntegrityViolationException("Region " + region.getRegion().getName() + " already exists");
 		}

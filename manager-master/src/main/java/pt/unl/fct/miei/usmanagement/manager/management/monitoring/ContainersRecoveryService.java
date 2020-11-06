@@ -2,15 +2,14 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Service
+@org.springframework.stereotype.Service
 public class ContainersRecoveryService {
 
 	private static final int STOP_CONTAINER_RECOVERY_ON_FAILURES = 3;
@@ -36,13 +35,13 @@ public class ContainersRecoveryService {
 		this.containersService = containersService;
 	}
 
-	void restoreCrashedContainers(List<ContainerEntity> monitoringContainers, List<ContainerEntity> synchronizedContainers) {
+	void restoreCrashedContainers(List<Container> monitoringContainers, List<Container> synchronizedContainers) {
 		monitoringContainers.parallelStream()
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
 			.forEach(this::restartContainerCloseTo);
 	}
 
-	List<ContainerRecovery> getContainerRecoveries(ContainerEntity container) {
+	List<ContainerRecovery> getContainerRecoveries(Container container) {
 		String containerId = container.getContainerId();
 		log.info("Recovering crashed container {}={}", container.getServiceName(), containerId);
 		List<ContainerRecovery> recoveries = new ArrayList<>();
@@ -75,7 +74,7 @@ public class ContainersRecoveryService {
 	}
 
 	// Restarts the container on a host close to where it used to be running
-	void restartContainerCloseTo(ContainerEntity container) {
+	void restartContainerCloseTo(Container container) {
 		String containerId = container.getContainerId();
 		List<ContainerRecovery> recoveries = getContainerRecoveries(container);
 		if (shouldStopContainerRecovering(recoveries)) {
@@ -86,7 +85,7 @@ public class ContainersRecoveryService {
 		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
-		ServiceEntity service = servicesService.getService(serviceName);
+		Service service = servicesService.getService(serviceName);
 		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
 		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 		Map<String, String> labels = Map.of(
@@ -96,7 +95,7 @@ public class ContainersRecoveryService {
 	}
 
 	// Restarts the container on the same host
-	void restartContainer(ContainerEntity container) {
+	void restartContainer(Container container) {
 		String containerId = container.getContainerId();
 		List<ContainerRecovery> recoveries = getContainerRecoveries(container);
 		if (shouldStopContainerRecovering(recoveries)) {

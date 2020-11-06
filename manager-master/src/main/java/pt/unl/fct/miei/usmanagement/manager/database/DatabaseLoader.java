@@ -29,19 +29,29 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceType;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceRepository;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyEntity;
-import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyRepository;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencies;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.fields.FieldEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -65,23 +75,13 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQuery;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEntity;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditionRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.users.UserEntity;
-import pt.unl.fct.miei.usmanagement.manager.users.UserRole;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.users.User;
+import pt.unl.fct.miei.usmanagement.manager.users.UserRoleEnum;
 import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModeEntity;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.List;
 
@@ -92,16 +92,16 @@ public class DatabaseLoader {
 	@Bean
 	CommandLineRunner initDatabase(UsersService usersService,
 								   ServicesService servicesService,
-								   AppsService appsService, AppServiceRepository appsServices,
-								   ServiceDependencyRepository servicesDependencies, /*RegionsService regionsService,*/
+								   AppsService appsService, AppServices appsServices,
+								   ServiceDependencies servicesDependencies, /*RegionsService regionsService,*/
 								   EdgeHostsService edgeHostsService, CloudHostsService cloudHostsService,
 								   ComponentTypesService componentTypesService,
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
-								   HostRuleConditionRepository hostRuleConditions,
+								   HostRuleConditions hostRuleConditions,
 								   ServiceRulesService serviceRulesService,
-								   ServiceRuleConditionRepository serviceRuleConditions,
+								   ServiceRuleConditions serviceRuleConditions,
 								   DockerProperties dockerProperties, HostsEventsService hostsEventsService,
 								   ServicesEventsService servicesEventsService, HostsMonitoringService hostsMonitoringService,
 								   ServicesMonitoringService servicesMonitoringService) {
@@ -111,36 +111,36 @@ public class DatabaseLoader {
 
 			// users
 			if (!usersService.hasUser("admin")) {
-				UserEntity sysAdmin = UserEntity.builder()
+				User sysAdmin = User.builder()
 					.firstName("admin")
 					.lastName("admin")
 					.username("admin")
 					.password("admin")
 					.email("admin@admin.pt")
-					.role(UserRole.ROLE_SYS_ADMIN)
+					.role(UserRoleEnum.ROLE_SYS_ADMIN)
 					.build();
 				usersService.addUser(sysAdmin);
 			}
 			if (!usersService.hasUser("danielfct")) {
-				UserEntity sysAdmin = UserEntity.builder()
+				User sysAdmin = User.builder()
 					.firstName("daniel")
 					.lastName("pimenta")
 					.username("danielfct")
 					.password("danielfct")
 					.email("d.pimenta@campus.fct.unl.pt")
-					.role(UserRole.ROLE_SYS_ADMIN)
+					.role(UserRoleEnum.ROLE_SYS_ADMIN)
 					.build();
 				usersService.addUser(sysAdmin);
 			}
 
 			// services
 
-			ServiceEntity frontend;
+			Service frontend;
 			try {
 				frontend = servicesService.getService("sock-shop-front-end");
 			}
 			catch (EntityNotFoundException ignored) {
-				frontend = ServiceEntity.builder()
+				frontend = Service.builder()
 					.serviceName("sock-shop-front-end")
 					.dockerRepository(dockerHubUsername + "/sock-shop-front-end")
 					.defaultExternalPort(8081)
@@ -148,17 +148,17 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minimumReplicas(1)
 					.outputLabel("${front-endHost}")
-					.serviceType(ServiceType.FRONTEND)
+					.serviceType(ServiceTypeEnum.FRONTEND)
 					.expectedMemoryConsumption(209715200d)
 					.build();
 				frontend = servicesService.addService(frontend);
 			}
-			ServiceEntity user;
+			Service user;
 			try {
 				user = servicesService.getService("sock-shop-user");
 			}
 			catch (EntityNotFoundException ignored) {
-				user = ServiceEntity.builder()
+				user = Service.builder()
 					.serviceName("sock-shop-user")
 					.dockerRepository(dockerHubUsername + "/sock-shop-user")
 					.defaultExternalPort(8082)
@@ -167,34 +167,34 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
 					.minimumReplicas(1)
 					.outputLabel("${userHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(62914560d)
 					.build();
 				user = servicesService.addService(user);
 			}
-			ServiceEntity userDb;
+			Service userDb;
 			try {
 				userDb = servicesService.getService("sock-shop-user-db");
 			}
 			catch (EntityNotFoundException ignored) {
-				userDb = ServiceEntity.builder()
+				userDb = Service.builder()
 					.serviceName("sock-shop-user-db")
 					.dockerRepository(dockerHubUsername + "/sock-shop-user-db")
 					.defaultExternalPort(27017)
 					.defaultInternalPort(27017)
 					.minimumReplicas(1)
 					.outputLabel("${userDatabaseHost}")
-					.serviceType(ServiceType.DATABASE)
+					.serviceType(ServiceTypeEnum.DATABASE)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				userDb = servicesService.addService(userDb);
 			}
-			ServiceEntity catalogue;
+			Service catalogue;
 			try {
 				catalogue = servicesService.getService("sock-shop-catalogue");
 			}
 			catch (EntityNotFoundException ignored) {
-				catalogue = ServiceEntity.builder()
+				catalogue = Service.builder()
 					.serviceName("sock-shop-catalogue")
 					.dockerRepository(dockerHubUsername + "/sock-shop-catalogue")
 					.defaultExternalPort(8083)
@@ -203,34 +203,34 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
 					.minimumReplicas(1)
 					.outputLabel("${catalogueHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(62914560d)
 					.build();
 				catalogue = servicesService.addService(catalogue);
 			}
-			ServiceEntity catalogueDb;
+			Service catalogueDb;
 			try {
 				catalogueDb = servicesService.getService("sock-shop-catalogue-db");
 			}
 			catch (EntityNotFoundException ignored) {
-				catalogueDb = ServiceEntity.builder()
+				catalogueDb = Service.builder()
 					.serviceName("sock-shop-catalogue-db")
 					.dockerRepository(dockerHubUsername + "/sock-shop-catalogue-db")
 					.defaultExternalPort(3306)
 					.defaultInternalPort(3306)
 					.minimumReplicas(1)
 					.outputLabel("${catalogueDatabaseHost}")
-					.serviceType(ServiceType.DATABASE)
+					.serviceType(ServiceTypeEnum.DATABASE)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				catalogueDb = servicesService.addService(catalogueDb);
 			}
-			ServiceEntity payment;
+			Service payment;
 			try {
 				payment = servicesService.getService("sock-shop-payment");
 			}
 			catch (EntityNotFoundException ignored) {
-				payment = ServiceEntity.builder()
+				payment = Service.builder()
 					.serviceName("sock-shop-payment")
 					.dockerRepository(dockerHubUsername + "/sock-shop-payment")
 					.defaultExternalPort(8084)
@@ -238,17 +238,17 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.minimumReplicas(1)
 					.outputLabel("${paymentHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(62914560d)
 					.build();
 				payment = servicesService.addService(payment);
 			}
-			ServiceEntity carts;
+			Service carts;
 			try {
 				carts = servicesService.getService("sock-shop-carts");
 			}
 			catch (EntityNotFoundException ignored) {
-				carts = ServiceEntity.builder()
+				carts = Service.builder()
 					.serviceName("sock-shop-carts")
 					.dockerRepository(dockerHubUsername + "/sock-shop-carts")
 					.defaultExternalPort(8085)
@@ -257,34 +257,34 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
 					.minimumReplicas(1)
 					.outputLabel("${cartsHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				carts = servicesService.addService(carts);
 			}
-			ServiceEntity cartsDb;
+			Service cartsDb;
 			try {
 				cartsDb = servicesService.getService("sock-shop-carts-db");
 			}
 			catch (EntityNotFoundException ignored) {
-				cartsDb = ServiceEntity.builder()
+				cartsDb = Service.builder()
 					.serviceName("sock-shop-carts-db")
 					.dockerRepository(dockerHubUsername + "/sock-shop-carts-db")
 					.defaultExternalPort(27016)
 					.defaultInternalPort(27017)
 					.minimumReplicas(1)
 					.outputLabel("${cartsDatabaseHost}")
-					.serviceType(ServiceType.DATABASE)
+					.serviceType(ServiceTypeEnum.DATABASE)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				cartsDb = servicesService.addService(cartsDb);
 			}
-			ServiceEntity orders;
+			Service orders;
 			try {
 				orders = servicesService.getService("sock-shop-orders");
 			}
 			catch (EntityNotFoundException ignored) {
-				orders = ServiceEntity.builder()
+				orders = Service.builder()
 					.serviceName("sock-shop-orders")
 					.dockerRepository(dockerHubUsername + "/sock-shop-orders")
 					.defaultExternalPort(8086)
@@ -293,34 +293,34 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
 					.minimumReplicas(1)
 					.outputLabel("${ordersHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				orders = servicesService.addService(orders);
 			}
-			ServiceEntity ordersDb;
+			Service ordersDb;
 			try {
 				ordersDb = servicesService.getService("sock-shop-orders-db");
 			}
 			catch (EntityNotFoundException ignored) {
-				ordersDb = ServiceEntity.builder()
+				ordersDb = Service.builder()
 					.serviceName("sock-shop-orders-db")
 					.dockerRepository(dockerHubUsername + "/sock-shop-orders-db")
 					.defaultExternalPort(27015)
 					.defaultInternalPort(27017)
 					.minimumReplicas(1)
 					.outputLabel("${ordersDatabaseHost}")
-					.serviceType(ServiceType.DATABASE)
+					.serviceType(ServiceTypeEnum.DATABASE)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				ordersDb = servicesService.addService(ordersDb);
 			}
-			ServiceEntity shipping;
+			Service shipping;
 			try {
 				shipping = servicesService.getService("sock-shop-shipping");
 			}
 			catch (EntityNotFoundException ignored) {
-				shipping = ServiceEntity.builder()
+				shipping = Service.builder()
 					.serviceName("sock-shop-shipping")
 					.dockerRepository(dockerHubUsername + "/sock-shop-shipping")
 					.defaultExternalPort(8087)
@@ -328,17 +328,17 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
 					.minimumReplicas(1)
 					.outputLabel("${shippingHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				shipping = servicesService.addService(shipping);
 			}
-			ServiceEntity queueMaster;
+			Service queueMaster;
 			try {
 				queueMaster = servicesService.getService("sock-shop-queue-master");
 			}
 			catch (EntityNotFoundException ignored) {
-				queueMaster = ServiceEntity.builder()
+				queueMaster = Service.builder()
 					.serviceName("sock-shop-queue-master")
 					.dockerRepository(dockerHubUsername + "/sock-shop-queue-master")
 					.defaultExternalPort(8088)
@@ -346,17 +346,17 @@ public class DatabaseLoader {
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
 					.minimumReplicas(1)
 					.outputLabel("${queue-masterHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				queueMaster = servicesService.addService(queueMaster);
 			}
-			ServiceEntity rabbitmq;
+			Service rabbitmq;
 			try {
 				rabbitmq = servicesService.getService("sock-shop-rabbitmq");
 			}
 			catch (EntityNotFoundException ignored) {
-				rabbitmq = ServiceEntity.builder()
+				rabbitmq = Service.builder()
 					.serviceName("sock-shop-rabbitmq")
 					.dockerRepository(dockerHubUsername + "/sock-shop-rabbitmq")
 					.defaultExternalPort(5672)
@@ -365,67 +365,67 @@ public class DatabaseLoader {
 					.minimumReplicas(1)
 					.maximumReplicas(1)
 					.outputLabel("${rabbitmqHost}")
-					.serviceType(ServiceType.BACKEND)
+					.serviceType(ServiceTypeEnum.BACKEND)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				rabbitmq = servicesService.addService(rabbitmq);
 			}
 
-			ServiceEntity crashTesting;
+			Service crashTesting;
 			try {
 				crashTesting = servicesService.getService("crash-testing");
 			}
 			catch (EntityNotFoundException ignored) {
-				crashTesting = ServiceEntity.builder()
+				crashTesting = Service.builder()
 					.serviceName("crash-testing")
 					.dockerRepository(dockerHubUsername + "/crash-testing")
 					.defaultExternalPort(2500)
 					.defaultInternalPort(80)
 					.minimumReplicas(1)
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.build();
 				crashTesting = servicesService.addService(crashTesting);
 			}
-			ServiceEntity loadBalancer;
+			Service loadBalancer;
 			try {
 				loadBalancer = servicesService.getService(NginxLoadBalancerService.LOAD_BALANCER);
 			}
 			catch (EntityNotFoundException ignored) {
-				loadBalancer = ServiceEntity.builder()
+				loadBalancer = Service.builder()
 					.serviceName(NginxLoadBalancerService.LOAD_BALANCER)
 					.dockerRepository(dockerHubUsername + "/nginx-load-balancer")
 					.defaultExternalPort(1906)
 					.defaultInternalPort(80)
 					.minimumReplicas(1)
 					.outputLabel("${loadBalancerHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(10485760d)
 					.build();
 				loadBalancer = servicesService.addService(loadBalancer);
 			}
-			ServiceEntity requestLocationMonitor;
+			Service requestLocationMonitor;
 			try {
 				requestLocationMonitor = servicesService.getService(LocationRequestsService.REQUEST_LOCATION_MONITOR);
 			}
 			catch (EntityNotFoundException ignored) {
-				requestLocationMonitor = ServiceEntity.builder()
+				requestLocationMonitor = Service.builder()
 					.serviceName(LocationRequestsService.REQUEST_LOCATION_MONITOR)
 					.dockerRepository(dockerHubUsername + "/request-location-monitor")
 					.defaultExternalPort(1919)
 					.defaultInternalPort(1919)
 					.minimumReplicas(1)
 					.outputLabel("${requestLocationMonitorHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(52428800d)
 					.build();
 				requestLocationMonitor = servicesService.addService(requestLocationMonitor);
 			}
-			ServiceEntity registrationServer;
+			Service registrationServer;
 			try {
 				registrationServer = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER);
 			}
 			catch (EntityNotFoundException ignored) {
-				registrationServer = ServiceEntity.builder()
+				registrationServer = Service.builder()
 					.serviceName(RegistrationServerService.REGISTRATION_SERVER)
 					.dockerRepository(dockerHubUsername + "/registration-server")
 					.defaultExternalPort(8761)
@@ -433,68 +433,68 @@ public class DatabaseLoader {
 					.launchCommand("${externalPort} ${internalPort} ${hostname} ${zone}")
 					.minimumReplicas(1)
 					.outputLabel("${registrationHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(262144000d)
 					.build();
 				registrationServer = servicesService.addService(registrationServer);
 			}
-			ServiceEntity prometheus;
+			Service prometheus;
 			try {
 				prometheus = servicesService.getService(PrometheusService.PROMETHEUS);
 			}
 			catch (EntityNotFoundException ignored) {
-				prometheus = ServiceEntity.builder()
+				prometheus = Service.builder()
 					.serviceName(PrometheusService.PROMETHEUS)
 					.dockerRepository(dockerHubUsername + "/prometheus")
 					.defaultExternalPort(9090)
 					.defaultInternalPort(9090)
 					.minimumReplicas(1)
 					.outputLabel("${prometheusHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(52428800d)
 					.build();
 				prometheus = servicesService.addService(prometheus);
 			}
-			ServiceEntity dockerApiProxy;
+			Service dockerApiProxy;
 			try {
 				dockerApiProxy = servicesService.getService(DockerApiProxyService.DOCKER_API_PROXY);
 			}
 			catch (EntityNotFoundException ignored) {
-				dockerApiProxy = ServiceEntity.builder()
+				dockerApiProxy = Service.builder()
 					.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
 					.dockerRepository(dockerHubUsername + "/nginx-basic-auth-proxy")
 					.defaultExternalPort(dockerProperties.getApiProxy().getPort())
 					.defaultInternalPort(80)
 					.minimumReplicas(1)
 					.outputLabel("${dockerApiProxyHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(10485760d)
 					.build();
 				dockerApiProxy = servicesService.addService(dockerApiProxy);
 			}
-			ServiceEntity workerManager;
+			Service workerManager;
 			try {
 				workerManager = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER);
 			}
 			catch (EntityNotFoundException ignored) {
-				workerManager = ServiceEntity.builder()
+				workerManager = Service.builder()
 					.serviceName(WorkerManagerProperties.WORKER_MANAGER)
 					.dockerRepository(dockerHubUsername + "/manager-worker")
 					.defaultExternalPort(8081)
 					.defaultInternalPort(8081)
 					.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 					.outputLabel("${workerManagerHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					.expectedMemoryConsumption(256901152d)
 					.build();
 				workerManager = servicesService.addService(workerManager);
 			}
-			ServiceEntity masterManager;
+			Service masterManager;
 			try {
 				masterManager = servicesService.getService(MasterManagerProperties.MASTER_MANAGER);
 			}
 			catch (EntityNotFoundException ignored) {
-				masterManager = ServiceEntity.builder()
+				masterManager = Service.builder()
 					.serviceName(MasterManagerProperties.MASTER_MANAGER)
 					.dockerRepository(dockerHubUsername + "/manager-master")
 					.defaultExternalPort(8080)
@@ -503,7 +503,7 @@ public class DatabaseLoader {
 					.minimumReplicas(1)
 					.maximumReplicas(1)
 					.outputLabel("${masterManagerHost}")
-					.serviceType(ServiceType.SYSTEM)
+					.serviceType(ServiceTypeEnum.SYSTEM)
 					// TODO
 					.expectedMemoryConsumption(256901152d)
 					.build();
@@ -511,35 +511,35 @@ public class DatabaseLoader {
 			}
 
 			// apps
-			AppEntity testing;
+			App testing;
 			try {
 				testing = appsService.getApp("Testing");
 			}
 			catch (EntityNotFoundException ignored) {
-				testing = AppEntity.builder()
+				testing = App.builder()
 					.name("Testing")
 					.description("Microservices designed to test some components of the system.")
 					.build();
 				testing = appsService.addApp(testing);
 				appsServices.saveAll(List.of(
-					AppServiceEntity.builder().app(testing).service(crashTesting).build()));
+					AppService.builder().app(testing).service(crashTesting).build()));
 			}
-			AppEntity mixal;
+			App mixal;
 			try {
 				mixal = appsService.getApp("Mixal");
 			}
 			catch (EntityNotFoundException ignored) {
-				mixal = AppEntity.builder()
+				mixal = App.builder()
 					.name("Mixal")
 					.build();
 				mixal = appsService.addApp(mixal);
 			}
-			AppEntity onlineBoutique;
+			App onlineBoutique;
 			try {
 				onlineBoutique = appsService.getApp("Online Boutique");
 			}
 			catch (EntityNotFoundException ignored) {
-				mixal = AppEntity.builder()
+				mixal = App.builder()
 					.name("Online Boutique")
 					.description("Online Boutique is a cloud-native microservices demo application. " +
 						"Online Boutique consists of a 10-tier microservices application. The application is a web-based " +
@@ -547,176 +547,176 @@ public class DatabaseLoader {
 					.build();
 				onlineBoutique = appsService.addApp(mixal);
 			}
-			AppEntity sockShop;
+			App sockShop;
 			try {
 				sockShop = appsService.getApp("Sock Shop");
 			}
 			catch (EntityNotFoundException ignored) {
-				sockShop = AppEntity.builder()
+				sockShop = App.builder()
 					.name("Sock Shop")
 					.description("Sock Shop simulates the user-facing part of an e-commerce website that sells socks. " +
 						"It is intended to aid the demonstration and testing of microservice and cloud native technologies.")
 					.build();
 				sockShop = appsService.addApp(sockShop);
 				appsServices.saveAll(List.of(
-					AppServiceEntity.builder().app(sockShop).service(frontend).launchOrder(25).build(),
-					AppServiceEntity.builder().app(sockShop).service(user).launchOrder(10).build(),
-					AppServiceEntity.builder().app(sockShop).service(userDb).launchOrder(0).build(),
-					AppServiceEntity.builder().app(sockShop).service(catalogue).launchOrder(5).build(),
-					AppServiceEntity.builder().app(sockShop).service(catalogueDb).launchOrder(0).build(),
-					AppServiceEntity.builder().app(sockShop).service(payment).launchOrder(5).build(),
-					AppServiceEntity.builder().app(sockShop).service(carts).launchOrder(10).build(),
-					AppServiceEntity.builder().app(sockShop).service(cartsDb).launchOrder(0).build(),
-					AppServiceEntity.builder().app(sockShop).service(orders).launchOrder(20).build(),
-					AppServiceEntity.builder().app(sockShop).service(ordersDb).launchOrder(0).build(),
-					AppServiceEntity.builder().app(sockShop).service(shipping).launchOrder(15).build(),
-					AppServiceEntity.builder().app(sockShop).service(queueMaster).launchOrder(15).build(),
-					AppServiceEntity.builder().app(sockShop).service(rabbitmq).launchOrder(5).build()));
+					AppService.builder().app(sockShop).service(frontend).launchOrder(25).build(),
+					AppService.builder().app(sockShop).service(user).launchOrder(10).build(),
+					AppService.builder().app(sockShop).service(userDb).launchOrder(0).build(),
+					AppService.builder().app(sockShop).service(catalogue).launchOrder(5).build(),
+					AppService.builder().app(sockShop).service(catalogueDb).launchOrder(0).build(),
+					AppService.builder().app(sockShop).service(payment).launchOrder(5).build(),
+					AppService.builder().app(sockShop).service(carts).launchOrder(10).build(),
+					AppService.builder().app(sockShop).service(cartsDb).launchOrder(0).build(),
+					AppService.builder().app(sockShop).service(orders).launchOrder(20).build(),
+					AppService.builder().app(sockShop).service(ordersDb).launchOrder(0).build(),
+					AppService.builder().app(sockShop).service(shipping).launchOrder(15).build(),
+					AppService.builder().app(sockShop).service(queueMaster).launchOrder(15).build(),
+					AppService.builder().app(sockShop).service(rabbitmq).launchOrder(5).build()));
 			}
 
 			// service dependencies
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity frontendRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency frontendRegistrationServerDependency = ServiceDependency.builder()
 					.service(frontend)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(frontendRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), user.getServiceName())) {
-				ServiceDependencyEntity frontendUserDependency = ServiceDependencyEntity.builder()
+				ServiceDependency frontendUserDependency = ServiceDependency.builder()
 					.service(frontend)
 					.dependency(user)
 					.build();
 				servicesDependencies.save(frontendUserDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), catalogue.getServiceName())) {
-				ServiceDependencyEntity frontendCatalogueDependency = ServiceDependencyEntity.builder()
+				ServiceDependency frontendCatalogueDependency = ServiceDependency.builder()
 					.service(frontend)
 					.dependency(catalogue)
 					.build();
 				servicesDependencies.save(frontendCatalogueDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), payment.getServiceName())) {
-				ServiceDependencyEntity frontendPaymentDependency = ServiceDependencyEntity.builder()
+				ServiceDependency frontendPaymentDependency = ServiceDependency.builder()
 					.service(frontend)
 					.dependency(payment)
 					.build();
 				servicesDependencies.save(frontendPaymentDependency);
 			}
 			if (!servicesDependencies.hasDependency(frontend.getServiceName(), carts.getServiceName())) {
-				ServiceDependencyEntity frontendCartsDependency = ServiceDependencyEntity.builder()
+				ServiceDependency frontendCartsDependency = ServiceDependency.builder()
 					.service(frontend)
 					.dependency(carts)
 					.build();
 				servicesDependencies.save(frontendCartsDependency);
 			}
 			if (!servicesDependencies.hasDependency(user.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity userRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency userRegistrationServerDependency = ServiceDependency.builder()
 					.service(user)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(userRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(user.getServiceName(), userDb.getServiceName())) {
-				ServiceDependencyEntity userUserDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependency userUserDbDependency = ServiceDependency.builder()
 					.service(user)
 					.dependency(userDb)
 					.build();
 				servicesDependencies.save(userUserDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity catalogueRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency catalogueRegistrationServerDependency = ServiceDependency.builder()
 					.service(catalogue)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(catalogueRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(catalogue.getServiceName(), catalogueDb.getServiceName())) {
-				ServiceDependencyEntity catalogueCatalogueDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependency catalogueCatalogueDbDependency = ServiceDependency.builder()
 					.service(catalogue)
 					.dependency(catalogueDb)
 					.build();
 				servicesDependencies.save(catalogueCatalogueDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(payment.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity paymentRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency paymentRegistrationServerDependency = ServiceDependency.builder()
 					.service(payment)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(paymentRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(carts.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity cartsRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency cartsRegistrationServerDependency = ServiceDependency.builder()
 					.service(carts)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(cartsRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(carts.getServiceName(), cartsDb.getServiceName())) {
-				ServiceDependencyEntity cartsCartsDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependency cartsCartsDbDependency = ServiceDependency.builder()
 					.service(carts)
 					.dependency(cartsDb)
 					.build();
 				servicesDependencies.save(cartsCartsDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity ordersRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency ordersRegistrationServerDependency = ServiceDependency.builder()
 					.service(orders)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(ordersRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), payment.getServiceName())) {
-				ServiceDependencyEntity ordersPaymentDependency = ServiceDependencyEntity.builder()
+				ServiceDependency ordersPaymentDependency = ServiceDependency.builder()
 					.service(orders)
 					.dependency(payment)
 					.build();
 				servicesDependencies.save(ordersPaymentDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), shipping.getServiceName())) {
-				ServiceDependencyEntity ordersShippingDependency = ServiceDependencyEntity.builder()
+				ServiceDependency ordersShippingDependency = ServiceDependency.builder()
 					.service(orders)
 					.dependency(shipping)
 					.build();
 				servicesDependencies.save(ordersShippingDependency);
 			}
 			if (!servicesDependencies.hasDependency(orders.getServiceName(), ordersDb.getServiceName())) {
-				ServiceDependencyEntity ordersOrdersDbDependency = ServiceDependencyEntity.builder()
+				ServiceDependency ordersOrdersDbDependency = ServiceDependency.builder()
 					.service(orders)
 					.dependency(ordersDb)
 					.build();
 				servicesDependencies.save(ordersOrdersDbDependency);
 			}
 			if (!servicesDependencies.hasDependency(shipping.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity shippingRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency shippingRegistrationServerDependency = ServiceDependency.builder()
 					.service(shipping)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(shippingRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(shipping.getServiceName(), rabbitmq.getServiceName())) {
-				ServiceDependencyEntity shippingRabbitmqDependency = ServiceDependencyEntity.builder()
+				ServiceDependency shippingRabbitmqDependency = ServiceDependency.builder()
 					.service(shipping)
 					.dependency(rabbitmq)
 					.build();
 				servicesDependencies.save(shippingRabbitmqDependency);
 			}
 			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity queueMasterRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency queueMasterRegistrationServerDependency = ServiceDependency.builder()
 					.service(queueMaster)
 					.dependency(registrationServer)
 					.build();
 				servicesDependencies.save(queueMasterRegistrationServerDependency);
 			}
 			if (!servicesDependencies.hasDependency(queueMaster.getServiceName(), rabbitmq.getServiceName())) {
-				ServiceDependencyEntity queueMasterRabbitmqDependency = ServiceDependencyEntity.builder()
+				ServiceDependency queueMasterRabbitmqDependency = ServiceDependency.builder()
 					.service(queueMaster)
 					.dependency(rabbitmq)
 					.build();
 				servicesDependencies.save(queueMasterRabbitmqDependency);
 			}
 			if (!servicesDependencies.hasDependency(rabbitmq.getServiceName(), registrationServer.getServiceName())) {
-				ServiceDependencyEntity rabbitmqRegistrationServerDependency = ServiceDependencyEntity.builder()
+				ServiceDependency rabbitmqRegistrationServerDependency = ServiceDependency.builder()
 					.service(rabbitmq)
 					.dependency(registrationServer)
 					.build();
@@ -726,19 +726,19 @@ public class DatabaseLoader {
 			/*// regions
 			for (Region region : Region.values()) {
 				if (!regionsService.hasRegion(region)) {
-					RegionEntity regionEntity = RegionEntity.builder()
+					Region region = Region.builder()
 						.region(region)
 						.active(true)
 						.build();
-					regionsService.addRegion(regionEntity);
+					regionsService.addRegion(region);
 				}
 			}*/
 
 			// edge hosts
 			if (!edgeHostsService.hasEdgeHost("dpimenta.ddns.net")) {
 				Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
-				Region region = Region.getClosestRegion(coordinates);
-				edgeHostsService.addManualEdgeHost(EdgeHostEntity.builder()
+				RegionEnum region = RegionEnum.getClosestRegion(coordinates);
+				edgeHostsService.addManualEdgeHost(EdgeHost.builder()
 					.username("daniel")
 					.publicIpAddress("2.82.208.89")
 					.privateIpAddress("192.168.1.83")
@@ -752,352 +752,352 @@ public class DatabaseLoader {
 			cloudHostsService.synchronizeDatabaseCloudHosts();
 
 			// component types
-			ComponentTypeEntity host;
+			ComponentType host;
 			try {
-				host = componentTypesService.getComponentType(ComponentType.HOST.name());
+				host = componentTypesService.getComponentType(ComponentTypeEnum.HOST.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				host = ComponentTypeEntity.builder()
-					.type(ComponentType.HOST)
+				host = ComponentType.builder()
+					.type(ComponentTypeEnum.HOST)
 					.build();
 				host = componentTypesService.addComponentType(host);
 			}
-			ComponentTypeEntity service;
+			ComponentType service;
 			try {
-				service = componentTypesService.getComponentType(ComponentType.SERVICE.name());
+				service = componentTypesService.getComponentType(ComponentTypeEnum.SERVICE.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				service = ComponentTypeEntity.builder()
-					.type(ComponentType.SERVICE)
+				service = ComponentType.builder()
+					.type(ComponentTypeEnum.SERVICE)
 					.build();
 				service = componentTypesService.addComponentType(service);
 			}
-			ComponentTypeEntity container;
+			ComponentType container;
 			try {
-				container = componentTypesService.getComponentType(ComponentType.CONTAINER.name());
+				container = componentTypesService.getComponentType(ComponentTypeEnum.CONTAINER.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				container = ComponentTypeEntity.builder()
-					.type(ComponentType.CONTAINER)
+				container = ComponentType.builder()
+					.type(ComponentTypeEnum.CONTAINER)
 					.build();
 				container = componentTypesService.addComponentType(container);
 			}
 
 			// operator
-			OperatorEntity notEqualTo;
+			Operator notEqualTo;
 			try {
-				notEqualTo = operatorsService.getOperator(Operator.NOT_EQUAL_TO.name());
+				notEqualTo = operatorsService.getOperator(OperatorEnum.NOT_EQUAL_TO.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				notEqualTo = OperatorEntity.builder()
-					.operator(Operator.NOT_EQUAL_TO)
-					.symbol(Operator.NOT_EQUAL_TO.getSymbol())
+				notEqualTo = Operator.builder()
+					.operator(OperatorEnum.NOT_EQUAL_TO)
+					.symbol(OperatorEnum.NOT_EQUAL_TO.getSymbol())
 					.build();
 				notEqualTo = operatorsService.addOperator(notEqualTo);
 			}
-			OperatorEntity equalTo;
+			Operator equalTo;
 			try {
-				equalTo = operatorsService.getOperator(Operator.EQUAL_TO.name());
+				equalTo = operatorsService.getOperator(OperatorEnum.EQUAL_TO.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				equalTo = OperatorEntity.builder()
-					.operator(Operator.EQUAL_TO)
-					.symbol(Operator.EQUAL_TO.getSymbol())
+				equalTo = Operator.builder()
+					.operator(OperatorEnum.EQUAL_TO)
+					.symbol(OperatorEnum.EQUAL_TO.getSymbol())
 					.build();
 				equalTo = operatorsService.addOperator(equalTo);
 			}
-			OperatorEntity greaterThan;
+			Operator greaterThan;
 			try {
-				greaterThan = operatorsService.getOperator(Operator.GREATER_THAN.name());
+				greaterThan = operatorsService.getOperator(OperatorEnum.GREATER_THAN.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				greaterThan = OperatorEntity.builder()
-					.operator(Operator.GREATER_THAN)
-					.symbol(Operator.GREATER_THAN.getSymbol())
+				greaterThan = Operator.builder()
+					.operator(OperatorEnum.GREATER_THAN)
+					.symbol(OperatorEnum.GREATER_THAN.getSymbol())
 					.build();
 				greaterThan = operatorsService.addOperator(greaterThan);
 			}
-			OperatorEntity lessThan;
+			Operator lessThan;
 			try {
-				lessThan = operatorsService.getOperator(Operator.LESS_THAN.name());
+				lessThan = operatorsService.getOperator(OperatorEnum.LESS_THAN.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				lessThan = OperatorEntity.builder()
-					.operator(Operator.LESS_THAN)
-					.symbol(Operator.LESS_THAN.getSymbol())
+				lessThan = Operator.builder()
+					.operator(OperatorEnum.LESS_THAN)
+					.symbol(OperatorEnum.LESS_THAN.getSymbol())
 					.build();
 				lessThan = operatorsService.addOperator(lessThan);
 			}
-			OperatorEntity greaterThanOrEqualTo;
+			Operator greaterThanOrEqualTo;
 			try {
-				greaterThanOrEqualTo = operatorsService.getOperator(Operator.GREATER_THAN_OR_EQUAL_TO.name());
+				greaterThanOrEqualTo = operatorsService.getOperator(OperatorEnum.GREATER_THAN_OR_EQUAL_TO.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				greaterThanOrEqualTo = OperatorEntity.builder()
-					.operator(Operator.GREATER_THAN_OR_EQUAL_TO)
-					.symbol(Operator.GREATER_THAN_OR_EQUAL_TO.getSymbol())
+				greaterThanOrEqualTo = Operator.builder()
+					.operator(OperatorEnum.GREATER_THAN_OR_EQUAL_TO)
+					.symbol(OperatorEnum.GREATER_THAN_OR_EQUAL_TO.getSymbol())
 					.build();
 				greaterThanOrEqualTo = operatorsService.addOperator(greaterThanOrEqualTo);
 			}
-			OperatorEntity lessThanOrEqualTo;
+			Operator lessThanOrEqualTo;
 			try {
-				lessThanOrEqualTo = operatorsService.getOperator(Operator.LESS_THAN_OR_EQUAL_TO.name());
+				lessThanOrEqualTo = operatorsService.getOperator(OperatorEnum.LESS_THAN_OR_EQUAL_TO.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				lessThanOrEqualTo = OperatorEntity.builder()
-					.operator(Operator.LESS_THAN_OR_EQUAL_TO)
-					.symbol(Operator.LESS_THAN_OR_EQUAL_TO.getSymbol())
+				lessThanOrEqualTo = Operator.builder()
+					.operator(OperatorEnum.LESS_THAN_OR_EQUAL_TO)
+					.symbol(OperatorEnum.LESS_THAN_OR_EQUAL_TO.getSymbol())
 					.build();
 				lessThanOrEqualTo = operatorsService.addOperator(lessThanOrEqualTo);
 			}
 
 			// service decisions
-			DecisionEntity serviceDecisionNone;
+			Decision serviceDecisionNone;
 			try {
-				serviceDecisionNone = decisionsService.getServicePossibleDecision(RuleDecision.NONE.name());
+				serviceDecisionNone = decisionsService.getServicePossibleDecision(RuleDecisionEnum.NONE.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				serviceDecisionNone = DecisionEntity.builder()
+				serviceDecisionNone = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(service)
-					.ruleDecision(RuleDecision.NONE)
+					.ruleDecision(RuleDecisionEnum.NONE)
 					.build();
 				serviceDecisionNone = decisionsService.addDecision(serviceDecisionNone);
 			}
-			DecisionEntity serviceDecisionReplicate;
+			Decision serviceDecisionReplicate;
 			try {
-				serviceDecisionReplicate = decisionsService.getServicePossibleDecision(RuleDecision.REPLICATE.name());
+				serviceDecisionReplicate = decisionsService.getServicePossibleDecision(RuleDecisionEnum.REPLICATE.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				serviceDecisionReplicate = DecisionEntity.builder()
+				serviceDecisionReplicate = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(service)
-					.ruleDecision(RuleDecision.REPLICATE)
+					.ruleDecision(RuleDecisionEnum.REPLICATE)
 					.build();
 				serviceDecisionReplicate = decisionsService.addDecision(serviceDecisionReplicate);
 			}
-			DecisionEntity serviceDecisionMigrate;
+			Decision serviceDecisionMigrate;
 			try {
-				serviceDecisionMigrate = decisionsService.getServicePossibleDecision(RuleDecision.MIGRATE.name());
+				serviceDecisionMigrate = decisionsService.getServicePossibleDecision(RuleDecisionEnum.MIGRATE.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				serviceDecisionMigrate = DecisionEntity.builder()
+				serviceDecisionMigrate = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(service)
-					.ruleDecision(RuleDecision.MIGRATE)
+					.ruleDecision(RuleDecisionEnum.MIGRATE)
 					.build();
 				serviceDecisionMigrate = decisionsService.addDecision(serviceDecisionMigrate);
 			}
-			DecisionEntity serviceDecisionStop;
+			Decision serviceDecisionStop;
 			try {
-				serviceDecisionStop = decisionsService.getServicePossibleDecision(RuleDecision.STOP.name());
+				serviceDecisionStop = decisionsService.getServicePossibleDecision(RuleDecisionEnum.STOP.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				serviceDecisionStop = DecisionEntity.builder()
+				serviceDecisionStop = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(service)
-					.ruleDecision(RuleDecision.STOP)
+					.ruleDecision(RuleDecisionEnum.STOP)
 					.build();
 				serviceDecisionStop = decisionsService.addDecision(serviceDecisionStop);
 			}
 			// host decisions
-			DecisionEntity hostDecisionNone;
+			Decision hostDecisionNone;
 			try {
-				hostDecisionNone = decisionsService.getHostPossibleDecision(RuleDecision.NONE.name());
+				hostDecisionNone = decisionsService.getHostPossibleDecision(RuleDecisionEnum.NONE.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				hostDecisionNone = DecisionEntity.builder()
+				hostDecisionNone = Decision.builder()
 					.componentType(host)
-					.ruleDecision(RuleDecision.NONE)
+					.ruleDecision(RuleDecisionEnum.NONE)
 					.build();
 				hostDecisionNone = decisionsService.addDecision(hostDecisionNone);
 			}
-			DecisionEntity hostDecisionStart;
+			Decision hostDecisionStart;
 			try {
-				hostDecisionStart = decisionsService.getHostPossibleDecision(RuleDecision.OVERWORK.name());
+				hostDecisionStart = decisionsService.getHostPossibleDecision(RuleDecisionEnum.OVERWORK.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				hostDecisionStart = DecisionEntity.builder()
+				hostDecisionStart = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(host)
-					.ruleDecision(RuleDecision.OVERWORK)
+					.ruleDecision(RuleDecisionEnum.OVERWORK)
 					.build();
 				hostDecisionStart = decisionsService.addDecision(hostDecisionStart);
 			}
-			DecisionEntity hostDecisionUnderwork;
+			Decision hostDecisionUnderwork;
 			try {
-				hostDecisionUnderwork = decisionsService.getHostPossibleDecision(RuleDecision.UNDERWORK.name());
+				hostDecisionUnderwork = decisionsService.getHostPossibleDecision(RuleDecisionEnum.UNDERWORK.name());
 			}
 			catch (EntityNotFoundException ignored) {
-				hostDecisionUnderwork = DecisionEntity.builder()
+				hostDecisionUnderwork = pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.builder()
 					.componentType(host)
-					.ruleDecision(RuleDecision.UNDERWORK)
+					.ruleDecision(RuleDecisionEnum.UNDERWORK)
 					.build();
 				hostDecisionUnderwork = decisionsService.addDecision(hostDecisionUnderwork);
 			}
 
 			// fields
 			// TODO is missing more fields...
-			FieldEntity cpu;
+			Field cpu;
 			try {
 				cpu = fieldsService.getField("cpu");
 			}
 			catch (EntityNotFoundException ignored) {
-				cpu = FieldEntity.builder()
+				cpu = Field.builder()
 					.name("cpu")
 					.build();
 				cpu = fieldsService.addField(cpu);
 			}
-			FieldEntity ram;
+			Field ram;
 			try {
 				ram = fieldsService.getField("ram");
 			}
 			catch (EntityNotFoundException ignored) {
-				ram = FieldEntity.builder()
+				ram = Field.builder()
 					.name("ram")
-					.query(PrometheusQuery.MEMORY_USAGE)
+					.query(PrometheusQueryEnum.MEMORY_USAGE)
 					.build();
 				ram = fieldsService.addField(ram);
 			}
-			FieldEntity cpuPercentage;
+			Field cpuPercentage;
 			try {
 				cpuPercentage = fieldsService.getField("cpu-%");
 			}
 			catch (EntityNotFoundException ignored) {
-				cpuPercentage = FieldEntity.builder()
+				cpuPercentage = Field.builder()
 					.name("cpu-%")
-					.query(PrometheusQuery.CPU_USAGE_PERCENTAGE)
+					.query(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
 					.build();
 				cpuPercentage = fieldsService.addField(cpuPercentage);
 			}
-			FieldEntity ramPercentage;
+			Field ramPercentage;
 			try {
 				ramPercentage = fieldsService.getField("ram-%");
 			}
 			catch (EntityNotFoundException ignored) {
-				ramPercentage = FieldEntity.builder()
+				ramPercentage = Field.builder()
 					.name("ram-%")
-					.query(PrometheusQuery.MEMORY_USAGE_PERCENTAGE)
+					.query(PrometheusQueryEnum.MEMORY_USAGE_PERCENTAGE)
 					.build();
 				ramPercentage = fieldsService.addField(ramPercentage);
 			}
-			FieldEntity rxBytes;
+			Field rxBytes;
 			try {
 				rxBytes = fieldsService.getField("rx-bytes");
 			}
 			catch (EntityNotFoundException ignored) {
-				rxBytes = FieldEntity.builder()
+				rxBytes = Field.builder()
 					.name("rx-bytes")
 					.build();
 				rxBytes = fieldsService.addField(rxBytes);
 			}
-			FieldEntity txBytes;
+			Field txBytes;
 			try {
 				txBytes = fieldsService.getField("tx-bytes");
 			}
 			catch (EntityNotFoundException ignored) {
-				txBytes = FieldEntity.builder()
+				txBytes = Field.builder()
 					.name("tx-bytes")
 					.build();
 				txBytes = fieldsService.addField(txBytes);
 			}
-			FieldEntity rxBytesPerSec;
+			Field rxBytesPerSec;
 			try {
 				rxBytesPerSec = fieldsService.getField("rx-bytes-per-sec");
 			}
 			catch (EntityNotFoundException ignored) {
-				rxBytesPerSec = FieldEntity.builder()
+				rxBytesPerSec = Field.builder()
 					.name("rx-bytes-per-sec")
 					.build();
 				rxBytesPerSec = fieldsService.addField(rxBytesPerSec);
 			}
-			FieldEntity txBytesPerSec;
+			Field txBytesPerSec;
 			try {
 				txBytesPerSec = fieldsService.getField("tx-bytes-per-sec");
 			}
 			catch (EntityNotFoundException ignored) {
-				txBytesPerSec = FieldEntity.builder()
+				txBytesPerSec = Field.builder()
 					.name("tx-bytes-per-sec")
 					.build();
 				txBytesPerSec = fieldsService.addField(txBytesPerSec);
 			}
-			FieldEntity latency;
+			Field latency;
 			try {
 				latency = fieldsService.getField("latency");
 			}
 			catch (EntityNotFoundException ignored) {
-				latency = FieldEntity.builder()
+				latency = Field.builder()
 					.name("latency")
 					.build();
 				latency = fieldsService.addField(latency);
 			}
-			FieldEntity bandwidthPercentage;
+			Field bandwidthPercentage;
 			try {
 				bandwidthPercentage = fieldsService.getField("bandwidth-%");
 			}
 			catch (EntityNotFoundException ignored) {
-				bandwidthPercentage = FieldEntity.builder()
+				bandwidthPercentage = Field.builder()
 					.name("bandwidth-%")
 					.build();
 				bandwidthPercentage = fieldsService.addField(bandwidthPercentage);
 			}
-			FieldEntity filesystemAvailableSpace;
+			Field filesystemAvailableSpace;
 			try {
 				filesystemAvailableSpace = fieldsService.getField("filesystem-available-space");
 			}
 			catch (EntityNotFoundException ignored) {
-				latency = FieldEntity.builder()
+				latency = Field.builder()
 					.name("filesystem-available-space")
-					.query(PrometheusQuery.FILESYSTEM_AVAILABLE_SPACE)
+					.query(PrometheusQueryEnum.FILESYSTEM_AVAILABLE_SPACE)
 					.build();
 				filesystemAvailableSpace = fieldsService.addField(latency);
 			}
 
 
 			// value modes
-			ValueModeEntity effectiveValue;
+			ValueMode effectiveValue;
 			try {
 				effectiveValue = valueModesService.getValueMode("effective-val");
 			}
 			catch (EntityNotFoundException ignored) {
-				effectiveValue = ValueModeEntity.builder()
+				effectiveValue = ValueMode.builder()
 					.name("effective-val")
 					.build();
 				effectiveValue = valueModesService.addValueMode(effectiveValue);
 			}
-			ValueModeEntity averageValue;
+			ValueMode averageValue;
 			try {
 				averageValue = valueModesService.getValueMode("avg-val");
 			}
 			catch (EntityNotFoundException ignored) {
-				averageValue = ValueModeEntity.builder()
+				averageValue = ValueMode.builder()
 					.name("avg-val")
 					.build();
 				averageValue = valueModesService.addValueMode(averageValue);
 			}
-			ValueModeEntity deviationPercentageOnAverageValue;
+			ValueMode deviationPercentageOnAverageValue;
 			try {
 				deviationPercentageOnAverageValue = valueModesService.getValueMode("deviation-%-on-avg-val");
 			}
 			catch (EntityNotFoundException ignored) {
-				deviationPercentageOnAverageValue = ValueModeEntity.builder()
+				deviationPercentageOnAverageValue = ValueMode.builder()
 					.name("deviation-%-on-avg-val")
 					.build();
 				deviationPercentageOnAverageValue = valueModesService.addValueMode(deviationPercentageOnAverageValue);
 			}
-			ValueModeEntity deviationPercentageOnLastValue;
+			ValueMode deviationPercentageOnLastValue;
 			try {
 				deviationPercentageOnLastValue = valueModesService.getValueMode("deviation-%-on-last-val");
 			}
 			catch (EntityNotFoundException ignored) {
-				deviationPercentageOnLastValue = ValueModeEntity.builder()
+				deviationPercentageOnLastValue = ValueMode.builder()
 					.name("deviation-%-on-last-val")
 					.build();
 				deviationPercentageOnLastValue = valueModesService.addValueMode(deviationPercentageOnLastValue);
 			}
 
 			// conditions
-			ConditionEntity cpuPercentageOver90;
+			Condition cpuPercentageOver90;
 			try {
 				cpuPercentageOver90 = conditionsService.getCondition("CpuPercentageOver90");
 			}
 			catch (EntityNotFoundException ignored) {
-				cpuPercentageOver90 = ConditionEntity.builder()
+				cpuPercentageOver90 = Condition.builder()
 					.name("CpuPercentageOver90")
 					.valueMode(effectiveValue)
 					.field(cpuPercentage)
@@ -1106,12 +1106,12 @@ public class DatabaseLoader {
 					.build();
 				cpuPercentageOver90 = conditionsService.addCondition(cpuPercentageOver90);
 			}
-			ConditionEntity ramPercentageOver90;
+			Condition ramPercentageOver90;
 			try {
 				ramPercentageOver90 = conditionsService.getCondition("RamPercentageOver90");
 			}
 			catch (EntityNotFoundException ignored) {
-				ramPercentageOver90 = ConditionEntity.builder()
+				ramPercentageOver90 = Condition.builder()
 					.name("RamPercentageOver90")
 					.valueMode(effectiveValue)
 					.field(ramPercentage)
@@ -1120,12 +1120,12 @@ public class DatabaseLoader {
 					.build();
 				ramPercentageOver90 = conditionsService.addCondition(ramPercentageOver90);
 			}
-			ConditionEntity rxBytesPerSecOver500000;
+			Condition rxBytesPerSecOver500000;
 			try {
 				rxBytesPerSecOver500000 = conditionsService.getCondition("RxBytesPerSecOver500000");
 			}
 			catch (EntityNotFoundException ignored) {
-				rxBytesPerSecOver500000 = ConditionEntity.builder()
+				rxBytesPerSecOver500000 = Condition.builder()
 					.name("RxBytesPerSecOver500000")
 					.valueMode(effectiveValue)
 					.field(rxBytesPerSec)
@@ -1134,12 +1134,12 @@ public class DatabaseLoader {
 					.build();
 				rxBytesPerSecOver500000 = conditionsService.addCondition(rxBytesPerSecOver500000);
 			}
-			ConditionEntity txBytesPerSecOver100000;
+			Condition txBytesPerSecOver100000;
 			try {
 				txBytesPerSecOver100000 = conditionsService.getCondition("TxBytesPerSecOver100000");
 			}
 			catch (EntityNotFoundException ignored) {
-				txBytesPerSecOver100000 = ConditionEntity.builder()
+				txBytesPerSecOver100000 = Condition.builder()
 					.name("TxBytesPerSecOver100000")
 					.valueMode(effectiveValue)
 					.field(txBytesPerSec)
@@ -1150,12 +1150,12 @@ public class DatabaseLoader {
 			}
 
 			// generic host rules
-			HostRuleEntity cpuAndRamOver90GenericHostRule;
+			HostRule cpuAndRamOver90GenericHostRule;
 			try {
 				cpuAndRamOver90GenericHostRule = hostRulesService.getRule("CpuAndRamOver90");
 			}
 			catch (EntityNotFoundException ignored) {
-				cpuAndRamOver90GenericHostRule = HostRuleEntity.builder()
+				cpuAndRamOver90GenericHostRule = HostRule.builder()
 					.name("CpuAndRamOver90")
 					.priority(1)
 					.decision(hostDecisionStart)
@@ -1163,31 +1163,31 @@ public class DatabaseLoader {
 					.build();
 				cpuAndRamOver90GenericHostRule = hostRulesService.addRule(cpuAndRamOver90GenericHostRule);
 
-				HostRuleConditionEntity cpuOver90Condition = HostRuleConditionEntity.builder()
+				HostRuleCondition cpuOver90Condition = HostRuleCondition.builder()
 					.hostRule(cpuAndRamOver90GenericHostRule)
 					.hostCondition(cpuPercentageOver90)
 					.build();
 				hostRuleConditions.save(cpuOver90Condition);
-				HostRuleConditionEntity ramOver90Condition = HostRuleConditionEntity.builder()
+				HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
 					.hostRule(cpuAndRamOver90GenericHostRule)
 					.hostCondition(ramPercentageOver90)
 					.build();
 				hostRuleConditions.save(ramOver90Condition);
 			}
 			// generic service rules
-			ServiceRuleEntity rxOver500000GenericServiceRule;
+			ServiceRule rxOver500000GenericServiceRule;
 			try {
 				rxOver500000GenericServiceRule = serviceRulesService.getRule("RxOver500000");
 			}
 			catch (EntityNotFoundException ignored) {
-				rxOver500000GenericServiceRule = ServiceRuleEntity.builder()
+				rxOver500000GenericServiceRule = ServiceRule.builder()
 					.name("RxOver500000")
 					.priority(1)
 					.decision(serviceDecisionReplicate)
 					.generic(true)
 					.build();
 				rxOver500000GenericServiceRule = serviceRulesService.addRule(rxOver500000GenericServiceRule);
-				ServiceRuleConditionEntity rxOver500000Condition = ServiceRuleConditionEntity.builder()
+				ServiceRuleCondition rxOver500000Condition = ServiceRuleCondition.builder()
 					.serviceRule(rxOver500000GenericServiceRule)
 					.serviceCondition(rxBytesPerSecOver500000)
 					.build();

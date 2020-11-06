@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.hosts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import pt.unl.fct.miei.usmanagement.manager.regions.Region;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public class HostAddress implements Serializable {
 	private final String publicIpAddress;
 	private final String privateIpAddress;
 	private final Coordinates coordinates;
-	private final Region region;
+	private final RegionEnum region;
 
 	public HostAddress() {
 		this(null);
@@ -69,7 +69,7 @@ public class HostAddress implements Serializable {
 		this(username, publicIpAddress, privateIpAddress, coordinates, null);
 	}
 
-	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates, Region region) {
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates, RegionEnum region) {
 		this.username = username;
 		this.publicDnsName = null;
 		this.privateIpAddress = privateIpAddress;

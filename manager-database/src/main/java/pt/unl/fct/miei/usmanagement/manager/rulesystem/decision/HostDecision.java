@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -58,7 +58,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "host_decisions")
-public class HostDecisionEntity {
+public class HostDecision {
 
 	@Id
 	@GeneratedValue
@@ -70,7 +70,7 @@ public class HostDecisionEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "rule_id")
-	private HostRuleEntity rule;
+	private HostRule rule;
 
 	@Lob
 	private HostAddress hostAddress;
@@ -81,7 +81,7 @@ public class HostDecisionEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostDecisionValueEntity> hostDecisions;
+	private Set<HostDecisionValue> hostDecisions;
 
 	@PrePersist
 	public void prePersist() {
@@ -100,10 +100,10 @@ public class HostDecisionEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceDecisionEntity)) {
+		if (!(o instanceof ServiceDecision)) {
 			return false;
 		}
-		ServiceDecisionEntity other = (ServiceDecisionEntity) o;
+		ServiceDecision other = (ServiceDecision) o;
 		return id != null && id.equals(other.getId());
 	}
 

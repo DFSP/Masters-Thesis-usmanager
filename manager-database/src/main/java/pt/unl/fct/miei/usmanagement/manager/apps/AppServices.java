@@ -25,9 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.apps;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface AppServiceRepository extends JpaRepository<AppServiceEntity, Long> {
+public interface AppServices extends JpaRepository<AppService, Long> {
 
 }

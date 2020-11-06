@@ -47,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_affinity")
-public class ServiceAffinityEntity {
+public class ServiceAffinity {
 
 	@Id
 	@GeneratedValue
@@ -56,11 +56,11 @@ public class ServiceAffinityEntity {
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "service_id")
-	private ServiceEntity service;
+	private Service service;
 
 	@ManyToOne
 	@JoinColumn(name = "other_service_id")
-	private ServiceEntity otherService;
+	private Service otherService;
 
 	private float affinity;
 
@@ -69,10 +69,10 @@ public class ServiceAffinityEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceAffinityEntity)) {
+		if (!(o instanceof ServiceAffinity)) {
 			return false;
 		}
-		ServiceAffinityEntity other = (ServiceAffinityEntity) o;
+		ServiceAffinity other = (ServiceAffinity) o;
 		return id != null && id.equals(other.getId());
 	}
 

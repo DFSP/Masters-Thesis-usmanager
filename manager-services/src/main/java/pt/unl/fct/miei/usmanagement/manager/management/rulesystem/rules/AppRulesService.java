@@ -29,25 +29,22 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleRepository;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppEntity;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRules;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -59,13 +56,13 @@ public class AppRulesService {
 	private final DroolsService droolsService;
 	private final AppsService appsService;
 
-	private final AppRuleRepository rules;
+	private final AppRules rules;
 
 	private final String appRuleTemplateFile;
 	private final AtomicLong lastUpdateAppRules;
 
 	public AppRulesService(ConditionsService conditionsService, DroolsService droolsService,
-						   @Lazy AppsService appsService, AppRuleRepository rules,
+						   @Lazy AppsService appsService, AppRules rules,
 						   RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.droolsService = droolsService;
@@ -80,30 +77,30 @@ public class AppRulesService {
 		lastUpdateAppRules.getAndSet(currentTime);
 	}
 
-	public List<AppRuleEntity> getRules() {
+	public List<AppRule> getRules() {
 		return rules.findAll();
 	}
 
-	public AppRuleEntity getRule(Long id) {
+	public AppRule getRule(Long id) {
 		return rules.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(AppRuleEntity.class, "id", id.toString()));
+			new EntityNotFoundException(AppRule.class, "id", id.toString()));
 	}
 
-	public AppRuleEntity getRule(String name) {
+	public AppRule getRule(String name) {
 		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-			new EntityNotFoundException(AppRuleEntity.class, "name", name));
+			new EntityNotFoundException(AppRule.class, "name", name));
 	}
 
-	public AppRuleEntity addRule(AppRuleEntity rule) {
+	public AppRule addRule(AppRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		setLastUpdateAppRules();
 		return rules.save(rule);
 	}
 
-	public AppRuleEntity updateRule(String ruleName, AppRuleEntity newRule) {
+	public AppRule updateRule(String ruleName, AppRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
-		AppRuleEntity rule = getRule(ruleName);
+		AppRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
 		rule = rules.save(rule);
 		setLastUpdateAppRules();
@@ -112,33 +109,33 @@ public class AppRulesService {
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
-		AppRuleEntity rule = getRule(ruleName);
+		AppRule rule = getRule(ruleName);
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateAppRules();
 	}
 
-	public List<AppRuleEntity> getAppRules(String appName) {
+	public List<AppRule> getAppRules(String appName) {
 		return rules.findByAppName(appName);
 	}
 
-	public ConditionEntity getCondition(String ruleName, String conditionName) {
+	public Condition getCondition(String ruleName, String conditionName) {
 		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+			new EntityNotFoundException(Condition.class, "conditionName", conditionName));
 	}
 
-	public List<ConditionEntity> getConditions(String ruleName) {
+	public List<Condition> getConditions(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
 	public void addCondition(String ruleName, String conditionName) {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
-		ConditionEntity condition = conditionsService.getCondition(conditionName);
-		AppRuleEntity rule = getRule(ruleName);
-		AppRuleConditionEntity appRuleCondition =
-			AppRuleConditionEntity.builder().appCondition(condition).appRule(rule).build();
+		Condition condition = conditionsService.getCondition(conditionName);
+		AppRule rule = getRule(ruleName);
+		AppRuleCondition appRuleCondition =
+			AppRuleCondition.builder().appCondition(condition).appRule(rule).build();
 		rule = rule.toBuilder().condition(appRuleCondition).build();
 		rules.save(rule);
 		setLastUpdateAppRules();
@@ -154,20 +151,20 @@ public class AppRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		AppRuleEntity rule = getRule(ruleName);
+		AppRule rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getAppCondition().getName()));
 		rules.save(rule);
 		setLastUpdateAppRules();
 	}
 
-	public AppEntity getApp(String ruleName, String appName) {
+	public App getApp(String ruleName, String appName) {
 		checkRuleExists(ruleName);
 		return rules.getApp(ruleName, appName).orElseThrow(() ->
-			new EntityNotFoundException(AppEntity.class, "appName", appName));
+			new EntityNotFoundException(App.class, "appName", appName));
 	}
 
-	public List<AppEntity> getApps(String ruleName) {
+	public List<App> getApps(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getApps(ruleName);
 	}
@@ -178,9 +175,9 @@ public class AppRulesService {
 
 	public void addApps(String ruleName, List<String> appNames) {
 		log.info("Adding apps {} to rule {}", appNames, ruleName);
-		AppRuleEntity rule = getRule(ruleName);
+		AppRule rule = getRule(ruleName);
 		appNames.forEach(appName -> {
-			AppEntity app = appsService.getApp(appName);
+			App app = appsService.getApp(appName);
 			app.addRule(rule);
 		});
 		rules.save(rule);
@@ -193,7 +190,7 @@ public class AppRulesService {
 
 	public void removeApps(String ruleName, List<String> appNames) {
 		log.info("Removing apps {} from rule {}", appNames, ruleName);
-		AppRuleEntity rule = getRule(ruleName);
+		AppRule rule = getRule(ruleName);
 		appNames.forEach(appName -> appsService.getApp(appName).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateAppRules();
@@ -201,11 +198,11 @@ public class AppRulesService {
 
 	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
-			throw new EntityNotFoundException(AppRuleEntity.class, "ruleName", ruleName);
+			throw new EntityNotFoundException(AppRule.class, "ruleName", ruleName);
 		}
 	}
 
-	private void checkRuleDoesntExist(AppRuleEntity appRule) {
+	private void checkRuleDoesntExist(AppRule appRule) {
 		String name = appRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("App rule '" + name + "' already exists");
@@ -224,21 +221,21 @@ public class AppRulesService {
 	}
 
 	private List<Rule> generateAppRules(String appName) {
-		List<AppRuleEntity> appRules = getAppRules(appName);
+		List<AppRule> appRules = getAppRules(appName);
 		log.info("Generating app rules... (count: {})", appRules.size());
 		return appRules.stream().map(this::generateAppRule).collect(Collectors.toList());
 	}
 
-	private Rule generateAppRule(AppRuleEntity appRule) {
+	private Rule generateAppRule(AppRule appRule) {
 		Long id = appRule.getId();
-		List<Condition> conditions = getConditions(appRule.getName()).stream().map(condition -> {
+		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(appRule.getName()).stream().map(condition -> {
 			String fieldName = String.format("%s-%S", condition.getField().getName(),
 				condition.getValueMode().getName());
 			double value = condition.getValue();
-			Operator operator = condition.getOperator().getOperator();
-			return new Condition(fieldName, value, operator);
+			OperatorEnum operator = condition.getOperator().getOperator();
+			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
 		}).collect(Collectors.toList());
-		RuleDecision decision = appRule.getDecision().getRuleDecision();
+		RuleDecisionEnum decision = appRule.getDecision().getRuleDecision();
 		int priority = appRule.getPriority();
 		return new Rule(id, conditions, decision, priority);
 	}

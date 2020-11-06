@@ -24,7 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
-public enum RuleDecision {
+public enum RuleDecisionEnum {
 
 	NONE,
 	STOP,

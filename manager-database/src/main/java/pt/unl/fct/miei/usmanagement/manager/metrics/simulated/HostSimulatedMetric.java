@@ -33,9 +33,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -59,7 +59,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_host_metrics")
-public class HostSimulatedMetricEntity {
+public class HostSimulatedMetric {
 
 	@Id
 	@GeneratedValue
@@ -124,10 +124,10 @@ public class HostSimulatedMetricEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostSimulatedMetricEntity)) {
+		if (!(o instanceof HostSimulatedMetric)) {
 			return false;
 		}
-		HostSimulatedMetricEntity other = (HostSimulatedMetricEntity) o;
+		HostSimulatedMetric other = (HostSimulatedMetric) o;
 		return id != null && id.equals(other.getId());
 	}
 

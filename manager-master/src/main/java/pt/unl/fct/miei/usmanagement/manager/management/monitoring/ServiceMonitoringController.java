@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringEntity;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogEntity;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoring;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 
 import java.util.List;
 
@@ -45,12 +45,12 @@ public class ServiceMonitoringController {
 	}
 
 	@GetMapping
-	public List<ServiceMonitoringEntity> getServicesMonitoring() {
+	public List<ServiceMonitoring> getServicesMonitoring() {
 		return servicesMonitoringService.getServicesMonitoring();
 	}
 
 	@GetMapping("/{serviceName}")
-	public List<ServiceMonitoringEntity> getServiceMonitoring(@PathVariable String serviceName) {
+	public List<ServiceMonitoring> getServiceMonitoring(@PathVariable String serviceName) {
 		return servicesMonitoringService.getServiceMonitoring(serviceName);
 	}
 
@@ -65,17 +65,17 @@ public class ServiceMonitoringController {
 	}
 
 	@GetMapping("/logs")
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogs() {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogs() {
 		return servicesMonitoringService.getServiceMonitoringLogs();
 	}
 
 	@GetMapping("/logs/{serviceName}")
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByServiceName(@PathVariable String serviceName) {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogsByServiceName(@PathVariable String serviceName) {
 		return servicesMonitoringService.getServiceMonitoringLogsByServiceName(serviceName);
 	}
 
 	@GetMapping("/logs/containers/{containerId}")
-	public List<ServiceMonitoringLogEntity> getServiceMonitoringLogsByContainerId(@PathVariable String containerId) {
+	public List<ServiceMonitoringLog> getServiceMonitoringLogsByContainerId(@PathVariable String containerId) {
 		return servicesMonitoringService.getServiceMonitoringLogsByContainerId(containerId);
 	}
 

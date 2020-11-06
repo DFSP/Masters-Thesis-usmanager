@@ -57,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "container_rules")
-public class ContainerRuleEntity {
+public class ContainerRule {
 
 	@Id
 	@GeneratedValue
@@ -81,7 +81,7 @@ public class ContainerRuleEntity {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleConditionEntity> conditions;
+	private Set<ContainerRuleCondition> conditions;
 
 	public void removeAssociations() {
 		Iterator<Container> containersIterator = containers.iterator();
@@ -102,10 +102,10 @@ public class ContainerRuleEntity {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ContainerRuleEntity)) {
+		if (!(o instanceof ContainerRule)) {
 			return false;
 		}
-		ContainerRuleEntity other = (ContainerRuleEntity) o;
+		ContainerRule other = (ContainerRule) o;
 		return id != null && id.equals(other.getId());
 	}
 

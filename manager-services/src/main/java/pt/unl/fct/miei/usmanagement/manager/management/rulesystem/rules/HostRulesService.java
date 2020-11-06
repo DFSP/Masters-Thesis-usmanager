@@ -30,17 +30,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleRepository;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRules;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
@@ -61,13 +60,13 @@ public class HostRulesService {
 	private final EdgeHostsService edgeHostsService;
 	private final DroolsService droolsService;
 
-	private final HostRuleRepository rules;
+	private final HostRules rules;
 
 	private final String hostRuleTemplateFile;
 	private final AtomicLong lastUpdateHostRules;
 
 	public HostRulesService(ConditionsService conditionsService, CloudHostsService cloudHostsService,
-							EdgeHostsService edgeHostsService, DroolsService droolsService, HostRuleRepository rules,
+							EdgeHostsService edgeHostsService, DroolsService droolsService, HostRules rules,
 							RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.cloudHostsService = cloudHostsService;
@@ -83,36 +82,36 @@ public class HostRulesService {
 		lastUpdateHostRules.getAndSet(currentTime);
 	}
 
-	public List<HostRuleEntity> getRules() {
+	public List<HostRule> getRules() {
 		return rules.findAll();
 	}
 
-	public List<HostRuleEntity> getRules(HostAddress hostAddress) {
+	public List<HostRule> getRules(HostAddress hostAddress) {
 		String publicIpAddress = hostAddress.getPublicIpAddress();
 		String privateIpAddress = hostAddress.getPrivateIpAddress();
 		return rules.findByHostAddress(publicIpAddress, privateIpAddress);
 	}
 
-	public HostRuleEntity getRule(Long id) {
+	public HostRule getRule(Long id) {
 		return rules.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(HostRuleEntity.class, "id", id.toString()));
+			new EntityNotFoundException(HostRule.class, "id", id.toString()));
 	}
 
-	public HostRuleEntity getRule(String name) {
+	public HostRule getRule(String name) {
 		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-			new EntityNotFoundException(HostRuleEntity.class, "name", name));
+			new EntityNotFoundException(HostRule.class, "name", name));
 	}
 
-	public HostRuleEntity addRule(HostRuleEntity rule) {
+	public HostRule addRule(HostRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		setLastUpdateHostRules();
 		return rules.save(rule);
 	}
 
-	public HostRuleEntity updateRule(String ruleName, HostRuleEntity newRule) {
+	public HostRule updateRule(String ruleName, HostRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
 		rule = rules.save(rule);
 		setLastUpdateHostRules();
@@ -121,38 +120,38 @@ public class HostRulesService {
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateHostRules();
 	}
 
-	public List<HostRuleEntity> getGenericHostRules() {
+	public List<HostRule> getGenericHostRules() {
 		return rules.findGenericHostRules();
 	}
 
-	public HostRuleEntity getGenericHostRule(String ruleName) {
+	public HostRule getGenericHostRule(String ruleName) {
 		return rules.findGenericHostRule(ruleName).orElseThrow(() ->
-			new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName));
+			new EntityNotFoundException(HostRule.class, "ruleName", ruleName));
 	}
 
-	public ConditionEntity getCondition(String ruleName, String conditionName) {
+	public Condition getCondition(String ruleName, String conditionName) {
 		checkRuleExists(ruleName);
 		return rules.getCondition(ruleName, conditionName).orElseThrow(() ->
-			new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
+			new EntityNotFoundException(Condition.class, "conditionName", conditionName));
 	}
 
-	public List<ConditionEntity> getConditions(String ruleName) {
+	public List<Condition> getConditions(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getConditions(ruleName);
 	}
 
 	public void addCondition(String ruleName, String conditionName) {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
-		ConditionEntity condition = conditionsService.getCondition(conditionName);
-		HostRuleEntity rule = getRule(ruleName);
-		HostRuleConditionEntity hostRuleCondition =
-			HostRuleConditionEntity.builder().hostCondition(condition).hostRule(rule).build();
+		Condition condition = conditionsService.getCondition(conditionName);
+		HostRule rule = getRule(ruleName);
+		HostRuleCondition hostRuleCondition =
+			HostRuleCondition.builder().hostCondition(condition).hostRule(rule).build();
 		rule = rule.toBuilder().condition(hostRuleCondition).build();
 		rules.save(rule);
 		setLastUpdateHostRules();
@@ -168,20 +167,20 @@ public class HostRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
 		rules.save(rule);
 		setLastUpdateHostRules();
 	}
 
-	public CloudHostEntity getCloudHost(String ruleName, String instanceId) {
+	public CloudHost getCloudHost(String ruleName, String instanceId) {
 		checkRuleExists(ruleName);
 		return rules.getCloudHost(ruleName, instanceId).orElseThrow(() ->
-			new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
+			new EntityNotFoundException(CloudHost.class, "instanceId", instanceId));
 	}
 
-	public List<CloudHostEntity> getCloudHosts(String ruleName) {
+	public List<CloudHost> getCloudHosts(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getCloudHosts(ruleName);
 	}
@@ -192,9 +191,9 @@ public class HostRulesService {
 
 	public void addCloudHosts(String ruleName, List<String> instanceIds) {
 		log.info("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		instanceIds.forEach(instanceId -> {
-			CloudHostEntity cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
+			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
 			cloudHost.addRule(rule);
 		});
 		rules.save(rule);
@@ -207,19 +206,19 @@ public class HostRulesService {
 
 	public void removeCloudHosts(String ruleName, List<String> instanceIds) {
 		log.info("Removing cloud hosts {} from rule {}", instanceIds, ruleName);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateHostRules();
 	}
 
-	public EdgeHostEntity getEdgeHost(String ruleName, String hostname) {
+	public EdgeHost getEdgeHost(String ruleName, String hostname) {
 		checkRuleExists(ruleName);
 		return rules.getEdgeHost(ruleName, hostname).orElseThrow(() ->
-			new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
+			new EntityNotFoundException(EdgeHost.class, "hostname", hostname));
 	}
 
-	public List<EdgeHostEntity> getEdgeHosts(String ruleName) {
+	public List<EdgeHost> getEdgeHosts(String ruleName) {
 		checkRuleExists(ruleName);
 		return rules.getEdgeHosts(ruleName);
 	}
@@ -230,9 +229,9 @@ public class HostRulesService {
 
 	public void addEdgeHosts(String ruleName, List<String> hostnames) {
 		log.info("Adding edge hosts {} to rule {}", hostnames, ruleName);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		hostnames.forEach(hostname -> {
-			EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+			EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
 			edgeHost.addRule(rule);
 		});
 		rules.save(rule);
@@ -245,7 +244,7 @@ public class HostRulesService {
 
 	public void removeEdgeHosts(String ruleName, List<String> hostnames) {
 		log.info("Removing edge hosts {} from rule {}", hostnames, ruleName);
-		HostRuleEntity rule = getRule(ruleName);
+		HostRule rule = getRule(ruleName);
 		hostnames.forEach(hostname -> edgeHostsService.getEdgeHostByHostname(hostname).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateHostRules();
@@ -253,11 +252,11 @@ public class HostRulesService {
 
 	private void checkRuleExists(String ruleName) {
 		if (!rules.hasRule(ruleName)) {
-			throw new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName);
+			throw new EntityNotFoundException(HostRule.class, "ruleName", ruleName);
 		}
 	}
 
-	private void checkRuleDoesntExist(HostRuleEntity hostRule) {
+	private void checkRuleDoesntExist(HostRule hostRule) {
 		String name = hostRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("Host rule '" + name + "' already exists");
@@ -275,22 +274,22 @@ public class HostRulesService {
 
 	private List<Rule> generateHostRules(HostAddress hostAddress) {
 		//FIXME what about cloud hosts?
-		List<HostRuleEntity> hostRules = getRules(hostAddress);
+		List<HostRule> hostRules = getRules(hostAddress);
 		List<Rule> rules = new ArrayList<>(hostRules.size());
 		log.info("Generating host rules... (count: {})", rules.size());
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
 		return rules;
 	}
 
-	private Rule generateRule(HostRuleEntity hostRule) {
+	private Rule generateRule(HostRule hostRule) {
 		Long id = hostRule.getId();
-		List<Condition> conditions = getConditions(hostRule.getName()).stream().map(condition -> {
+		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(hostRule.getName()).stream().map(condition -> {
 			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName());
 			double value = condition.getValue();
-			Operator operator = condition.getOperator().getOperator();
-			return new Condition(fieldName, value, operator);
+			OperatorEnum operator = condition.getOperator().getOperator();
+			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
 		}).collect(Collectors.toList());
-		RuleDecision decision = hostRule.getDecision().getRuleDecision();
+		RuleDecisionEnum decision = hostRule.getDecision().getRuleDecision();
 		int priority = hostRule.getPriority();
 		return new Rule(id, conditions, decision, priority);
 	}

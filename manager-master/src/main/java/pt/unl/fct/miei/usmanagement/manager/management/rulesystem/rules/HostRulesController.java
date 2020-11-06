@@ -32,14 +32,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleEntity;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.util.Validation;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 
 import java.util.List;
 
@@ -54,28 +53,28 @@ public class HostRulesController {
 	}
 
 	@GetMapping
-	public List<HostRuleEntity> getHostRules() {
+	public List<HostRule> getHostRules() {
 		return hostRulesService.getRules();
 	}
 
 	@GetMapping("/{ruleName}")
-	public HostRuleEntity getHostRule(@PathVariable String ruleName) {
+	public HostRule getHostRule(@PathVariable String ruleName) {
 		return hostRulesService.getRule(ruleName);
 	}
 
 	@PostMapping
-	public HostRuleEntity addRule(@RequestBody HostRuleEntity rule) {
-		ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
-		if (decisionComponentType != ComponentType.HOST) {
+	public HostRule addRule(@RequestBody HostRule rule) {
+		ComponentTypeEnum decisionComponentTypeEnum = rule.getDecision().getComponentType().getType();
+		if (decisionComponentTypeEnum != ComponentTypeEnum.HOST) {
 			throw new BadRequestException("Expected decision type %s, instead got %s",
-				ComponentType.HOST.name(), decisionComponentType.name());
+				ComponentTypeEnum.HOST.name(), decisionComponentTypeEnum.name());
 		}
 		Validation.validatePostRequest(rule.getId());
 		return hostRulesService.addRule(rule);
 	}
 
 	@PutMapping("/{ruleName}")
-	public HostRuleEntity updateRule(@PathVariable String ruleName, @RequestBody HostRuleEntity rule) {
+	public HostRule updateRule(@PathVariable String ruleName, @RequestBody HostRule rule) {
 		Validation.validatePutRequest(rule.getId());
 		return hostRulesService.updateRule(ruleName, rule);
 	}
@@ -86,7 +85,7 @@ public class HostRulesController {
 	}
 
 	@GetMapping("/{ruleName}/conditions")
-	public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
+	public List<Condition> getRuleConditions(@PathVariable String ruleName) {
 		return hostRulesService.getConditions(ruleName);
 	}
 
@@ -106,7 +105,7 @@ public class HostRulesController {
 	}
 
 	@GetMapping("/{ruleName}/cloud-hosts")
-	public List<CloudHostEntity> getRuleCloudHosts(@PathVariable String ruleName) {
+	public List<CloudHost> getRuleCloudHosts(@PathVariable String ruleName) {
 		return hostRulesService.getCloudHosts(ruleName);
 	}
 
@@ -126,7 +125,7 @@ public class HostRulesController {
 	}
 
 	@GetMapping("/{ruleName}/edge-hosts")
-	public List<EdgeHostEntity> getRuleEdgeHosts(@PathVariable String ruleName) {
+	public List<EdgeHost> getRuleEdgeHosts(@PathVariable String ruleName) {
 		return hostRulesService.getEdgeHosts(ruleName);
 	}
 

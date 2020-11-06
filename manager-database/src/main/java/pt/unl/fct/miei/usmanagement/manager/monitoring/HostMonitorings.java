@@ -27,27 +27,25 @@ package pt.unl.fct.miei.usmanagement.manager.monitoring;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.List;
 
-@Repository
-public interface HostMonitoringRepository extends JpaRepository<HostMonitoringEntity, Long> {
+public interface HostMonitorings extends JpaRepository<HostMonitoring, Long> {
 
-	List<HostMonitoringEntity> getByHost(@Param("host") HostAddress hostAddress);
+	List<HostMonitoring> getByHost(@Param("host") HostAddress hostAddress);
 
-	HostMonitoringEntity getByHostAndFieldIgnoreCase(@Param("host") HostAddress hostAddress, @Param("field") String field);
+	HostMonitoring getByHostAndFieldIgnoreCase(@Param("host") HostAddress hostAddress, @Param("field") String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
 		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
-		+ "from HostMonitoringEntity m "
+		+ "from HostMonitoring m "
 		+ "where m.host = :host")
 	List<HostFieldAverage> getHostMonitoringFieldsAverage(@Param("host") HostAddress hostAddress);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
 		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
-		+ "from HostMonitoringEntity m "
+		+ "from HostMonitoring m "
 		+ "where m.host = :host and m.field = :field")
 	HostFieldAverage getHostMonitoringFieldAverage(@Param("host") HostAddress hostAddress, @Param("field") String field);
 
