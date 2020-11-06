@@ -57,6 +57,7 @@ import {ICoordinates} from "../../../../components/map/LocationMap";
 import {IMarker} from "../../../../components/map/Marker";
 import CloudHostSshCommand from "./CloudHostSshCommand";
 import CloudHostSshFileTransfer from "./CloudHostSshFileTransfer";
+import { isEqual } from "lodash";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -286,8 +287,8 @@ class CloudHost extends BaseComponent<Props, State> {
     private startStopTerminateButtons = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
         const cloudHost = this.getCloudHost();
-        const state = this.getCloudHost()?.state?.name;
-        if (state?.includes(awsInstanceStates.STOPPED.name)) {
+        const state = this.getCloudHost()?.state;
+        if (isEqual(state, awsInstanceStates.STOPPED)) {
             buttons.push({
                 button:
                     <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
@@ -296,7 +297,7 @@ class CloudHost extends BaseComponent<Props, State> {
                     </button>
             });
         }
-        if (state?.includes(awsInstanceStates.RUNNING.name)) {
+        if (isEqual(state, awsInstanceStates.RUNNING)) {
             buttons.push({
                 button:
                     <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
@@ -305,8 +306,8 @@ class CloudHost extends BaseComponent<Props, State> {
                     </button>
             });
         }
-        if (!state?.includes(awsInstanceStates.TERMINATED.name)
-            && !state?.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
+        if (!isEqual(state, awsInstanceStates.TERMINATED)
+            && !isEqual(state, awsInstanceStates.SHUTTING_DOWN)) {
             buttons.push({
                 button:
                     <button
@@ -577,20 +578,20 @@ class CloudHost extends BaseComponent<Props, State> {
                 active: this.props.location.state?.selected === 'genericSimulatedMetrics'
             },
         ];
-        /*if (this.getCloudHost().state === awsInstanceStates.RUNNING)  TODO{*/
+        if (isEqual(this.getCloudHost().state, awsInstanceStates.RUNNING)) {
             tabs.push({
                 title: 'Execute command',
-                id: 'cloudHostSsh',
+                id: 'ssh',
                 content: () => this.ssh(),
                 active: this.props.location.state?.selected === 'ssh'
             });
             tabs.push({
                 title: 'Upload file',
-                id: 'cloudHostSftp',
+                id: 'sftp',
                 content: () => this.sftp(),
                 active: this.props.location.state?.selected === 'sftp'
             });
-        /*}*/
+        }
         return tabs;
     }
 

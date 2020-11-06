@@ -68,6 +68,8 @@ public class AppEntity {
 	@Column(unique = true)
 	private String name;
 
+	private String description;
+
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)

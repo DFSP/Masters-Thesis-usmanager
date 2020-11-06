@@ -62,12 +62,8 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
         this.props.loadScripts();
     };
 
-    private commandFilter = (command: ICommand | IFileTransfer) =>  {
-        const commandHostAddress = command.hostAddress;
-        const {cloudHost} = this.props;
-        return commandHostAddress.publicIpAddress === cloudHost.publicIpAddress
-            && commandHostAddress.privateIpAddress === cloudHost.privateIpAddress
-    }
+    private commandFilter = (command: ICommand | IFileTransfer) =>
+        command.hostAddress.publicIpAddress === this.props.cloudHost.publicIpAddress
 
     public render() {
         const command = buildNewSshCommand();

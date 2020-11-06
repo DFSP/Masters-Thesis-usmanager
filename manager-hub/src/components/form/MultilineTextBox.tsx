@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React, {createRef} from "react";
 
 interface Props {
     className: string;
@@ -36,14 +36,26 @@ interface Props {
 
 export class MultilineTextBox extends React.Component<Props, {}> {
 
+    private textArea = createRef<HTMLTextAreaElement>();
+
+    public componentDidMount() {
+        this.updateTextArea();
+    }
+
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+        this.updateTextArea();
+    }
+
+    private updateTextArea = () => {
         M.updateTextFields();
+        M.textareaAutoResize(this.textArea.current as Element);
     }
 
     render(): any {
         const {className, id, name, value, disabled, onChange, onBlur} = this.props;
         return (
             <textarea
+                ref={this.textArea}
                 className={`materialize-textarea ${className}`}
                 id={id}
                 name={name}

@@ -45,21 +45,23 @@ import (
 
 var register bool
 var interval int
+var registerPort int
 
 func init()  {
 	flag.BoolVar(&register, "register", true, "True: registration-client will register service on Eureka; False: service will manually trigger the register")
 	flag.IntVar(&interval, "interval", 5000, "Interval time (in ms) to send location data")
+	flag.IntVar(&registerPort, "register-port", 1906, "Port to start the http server")
 }
 
 func main() {
 	flag.Parse()
 
-	address := fmt.Sprintf(":%d", instance.Port)
+	address := fmt.Sprintf(":%d", registerPort)
 	listen, err := net.Listen("tcp", address)
 	if err != nil {
 		reglog.Logger.Fatal(err)
 	}
-	reglog.Logger.Infof("Registration-client is listening on port %d", instance.Port)
+	reglog.Logger.Infof("Registration-client is listening on port %d", registerPort)
 
 	if register {
 		go func() {

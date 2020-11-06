@@ -144,7 +144,7 @@ class ServiceCard extends BaseComponent<Props, State> {
         return <CardService id={`service-${service.id}`}
                             title={service.serviceName}
                             link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
-                            height={'250px'}
+                            height={'200px'}
                             margin={'10px 0'}
                             hoverable
                             delete={{

@@ -32,6 +32,7 @@ import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IHostAddress} from "../hosts/Hosts";
+import { isEqual } from "lodash";
 
 export interface ISshCommand {
     hostAddress: IHostAddress;
@@ -130,7 +131,7 @@ class SshCommand extends BaseComponent<Props, {}> {
 
     private getSelectableHosts = (): (Partial<IHostAddress>)[] => {
         const cloudHosts = Object.values(this.props.cloudHosts)
-            .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+            .filter(cloudHost => isEqual(cloudHost.state, awsInstanceStates.RUNNING))
             .map(instance => ({
                 publicIpAddress: instance.publicIpAddress,
                 privateIpAddress: instance.privateIpAddress

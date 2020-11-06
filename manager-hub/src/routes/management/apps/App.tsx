@@ -25,7 +25,13 @@
 import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {ICustomButton, IFields, IFormLoading, requiredAndTrimmed} from "../../../components/form/Form";
+import Form, {
+    ICustomButton,
+    IFields,
+    IFormLoading,
+    maxSizeAndTrimmed,
+    requiredAndTrimmed,
+} from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -61,6 +67,7 @@ import AppSimulatedMetricList from "./AppSimulatedMetricList";
 
 export interface IApp extends IDatabaseData {
     name: string;
+    description?: string;
     services?: { [key: string]: IAppService }
     appRules?: string[];
     appSimulatedMetrics?: string[];
@@ -68,6 +75,7 @@ export interface IApp extends IDatabaseData {
 
 const buildNewApp = (): Partial<IApp> => ({
     name: undefined,
+    description: undefined,
 });
 
 interface ILaunchApp {
@@ -136,7 +144,7 @@ class App extends BaseComponent<Props, State> {
         return (
             <MainLayout>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="container">
+                <div className='container'>
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -161,7 +169,7 @@ class App extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class="green-text">App ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} saved</span>`);
+        super.toast(`<span class='green-text'>App ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} saved</span>`);
         this.props.addApp(app);
         this.saveEntities(app);
         if (this.mounted) {
@@ -175,7 +183,7 @@ class App extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app have been saved</span>`);
+        super.toast(`<span class='green-text'>Changes to ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} app have been saved</span>`);
         this.saveEntities(app);
         const previousApp = this.getApp();
         if (previousApp.id) {
@@ -188,17 +196,17 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to update app ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to update app ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class="green-text">App <b class="white-text">${app.name}</b> successfully removed</span>`);
+        super.toast(`<span class='green-text'>App <b class='white-text'>${app.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.props.history.push(`/apps`);
         }
     };
 
     private onDeleteFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to delete app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to delete app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedServices.length
@@ -240,7 +248,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save services of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save services of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private addAppRule = (rule: string): void => {
         this.setState({
@@ -271,7 +279,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save rules of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save rules of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private addAppSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -302,7 +310,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of app ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private launchButton = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -331,10 +339,10 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onLaunchSuccess = (launchApp: ILaunchApp) => {
-        super.toast(`<span><span class="green-text">Successfully launched services<br/>
+        super.toast(`<span><span class='green-text'>Successfully launched services<br/>
         </span>${Object.entries(launchApp)
                 .map(([service, containers]) => `<b>${service}</b> ${containers.map(c =>
-                    `<a href=/containers/${c.containerId}>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
+                    `<a href='/containers/${c.containerId}'>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
             20000);
         if (this.mounted) {
             this.setState({loading: undefined});
@@ -343,7 +351,7 @@ class App extends BaseComponent<Props, State> {
 
     private onLaunchFailure = (reason: string, app: Partial<IApp>) => {
         super.toast(`Failed to launch services of 
-        ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`,
+        ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} app`,
             10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
@@ -363,7 +371,9 @@ class App extends BaseComponent<Props, State> {
                 [key]: {
                     id: key,
                     label: key,
-                    validation: {rule: requiredAndTrimmed}
+                    validation: key === 'description'
+                        ? {rule: maxSizeAndTrimmed, args: 1024}
+                        : {rule: requiredAndTrimmed}
                 }
             };
         }).reduce((fields, field) => {
@@ -412,9 +422,14 @@ class App extends BaseComponent<Props, State> {
                               saveEntities={this.saveEntities}
                               loading={this.state.loading}>
                             {Object.keys(formApp).map((key, index) =>
-                                <Field key={index}
-                                       id={key}
-                                       label={key}/>
+                                key === 'description'
+                                    ? <Field key={index}
+                                             id={key}
+                                             type={'multilinetext'}
+                                             label={key}/>
+                                    : <Field key={index}
+                                             id={key}
+                                             label={key}/>
                             )}
                         </Form>
                         <LaunchAppDialog launchAppCallback={this.launchApp}/>

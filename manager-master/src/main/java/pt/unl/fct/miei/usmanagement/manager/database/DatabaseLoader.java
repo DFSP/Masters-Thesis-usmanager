@@ -509,7 +509,8 @@ public class DatabaseLoader {
 					.build();
 				masterManager = servicesService.addService(masterManager);
 			}
-			//apps
+
+			// apps
 			AppEntity testing;
 			try {
 				testing = appsService.getApp("Testing");
@@ -517,6 +518,7 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				testing = AppEntity.builder()
 					.name("Testing")
+					.description("Microservices designed to test some components of the system.")
 					.build();
 				testing = appsService.addApp(testing);
 				appsServices.saveAll(List.of(
@@ -539,6 +541,9 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				mixal = AppEntity.builder()
 					.name("Online Boutique")
+					.description("Online Boutique is a cloud-native microservices demo application. " +
+						"Online Boutique consists of a 10-tier microservices application. The application is a web-based " +
+						"e-commerce app where users can browse items, add them to the cart, and purchase them.")
 					.build();
 				onlineBoutique = appsService.addApp(mixal);
 			}
@@ -549,6 +554,8 @@ public class DatabaseLoader {
 			catch (EntityNotFoundException ignored) {
 				sockShop = AppEntity.builder()
 					.name("Sock Shop")
+					.description("Sock Shop simulates the user-facing part of an e-commerce website that sells socks. " +
+						"It is intended to aid the demonstration and testing of microservice and cloud native technologies.")
 					.build();
 				sockShop = appsService.addApp(sockShop);
 				appsServices.saveAll(List.of(
@@ -731,14 +738,14 @@ public class DatabaseLoader {
 			if (!edgeHostsService.hasEdgeHost("dpimenta.ddns.net")) {
 				Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
 				Region region = Region.getClosestRegion(coordinates);
-				edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
+				edgeHostsService.addManualEdgeHost(EdgeHostEntity.builder()
 					.username("daniel")
 					.publicIpAddress("2.82.208.89")
 					.privateIpAddress("192.168.1.83")
 					.publicDnsName("dpimenta.ddns.net")
 					.region(region)
 					.coordinates(coordinates)
-					.build(), "EDITME");
+					.build());
 			}
 
 			// cloud hosts

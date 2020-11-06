@@ -31,7 +31,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 final class AddEdgeHost {
 
 	private final String username;
-	private final String password;
+	private final char[] password;
 	private final String privateIpAddress;
 	private final String publicIpAddress;
 	private final String publicDnsName;

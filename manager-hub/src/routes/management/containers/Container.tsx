@@ -313,9 +313,7 @@ class Container extends BaseComponent<Props, State> {
                     {!nodes.length ? 'No nodes to select' : 'Choose host address'}
                 </a>
             </li>
-            <PerfectScrollbar ref={(ref) => {
-                this.scrollbar = ref;
-            }}>
+            <PerfectScrollbar ref={(ref) => this.scrollbar = ref}>
                 {nodes.map((node, index) =>
                     <li key={index} onClick={onClick}>
                         <a>

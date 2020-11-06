@@ -63,11 +63,11 @@ export interface IService extends IDatabaseData {
     dockerRepository: string;
     defaultExternalPort: number;
     defaultInternalPort: number;
-    defaultDb: string;
-    launchCommand: string;
+    defaultDb?: string;
+    launchCommand?: string;
     minimumReplicas: number;
     maximumReplicas: number;
-    outputLabel: string;
+    outputLabel?: string;
     serviceType: ServiceType;
     expectedMemoryConsumption: number;
     apps?: string[];

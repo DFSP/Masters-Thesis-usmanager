@@ -127,7 +127,7 @@ public class SshService {
 		return sshClient;
 	}
 
-	private SSHClient initClient(HostAddress hostAddress, String password) throws IOException {
+	private SSHClient initClient(HostAddress hostAddress, char[] password) throws IOException {
 		String hostname = hostAddress.getPublicIpAddress();
 		String username = hostAddress.getUsername();
 		SSHClient sshClient = new SSHClient();
@@ -177,21 +177,21 @@ public class SshService {
 		}
 	}
 
-	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress, String password) {
+	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress, char[] password) {
 		return executeCommand(command, hostAddress, password, true);
 	}
 
-	public SshCommandResult executeCommandAsync(String command, HostAddress hostAddress, String password) {
+	public SshCommandResult executeCommandAsync(String command, HostAddress hostAddress, char[] password) {
 		return executeCommand(command, hostAddress, password, false);
 	}
 
-	private SshCommandResult executeCommand(String command, HostAddress hostAddress, String password, boolean wait) {
+	private SshCommandResult executeCommand(String command, HostAddress hostAddress, char[] password, boolean wait) {
 		try (SSHClient sshClient = initClient(hostAddress, password);
 			 Session session = sshClient.startSession()) {
 			return executeCommand(session, command, hostAddress, wait);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Unable to execute command: {}", e.getMessage());
 			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
 		}
 	}

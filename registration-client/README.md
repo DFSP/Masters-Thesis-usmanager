@@ -23,9 +23,9 @@ Usage of ./registration-client:
      
     Service Hostname (default "localhost")
    
-  - register-port (int)
+  - port (int) *
   
-    Service Port (default 1906)
+    Service Port
 
   - process (string)
   
@@ -35,9 +35,9 @@ Usage of ./registration-client:
   
     Time (in ms) to cache instances endpoints before contacting Eureka (default 10000)
   
-  - eureka (string)
+  - server (string)
   
-    Eureka server (default "127.0.0.1:8761")
+    Registration server (default "127.0.0.1:8761")
         
   - interval (int)
   
@@ -46,6 +46,10 @@ Usage of ./registration-client:
   - register (bool)
   
     True: registration-client will register service on Eureka; False: service must manually trigger the register (default true)
+
+  - register-port (int)
+  
+    Port to start the http server
 
 ## Executar
 

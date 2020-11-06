@@ -35,6 +35,7 @@ import {connect} from "react-redux";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {RouteComponentProps, withRouter} from "react-router";
+import {isEqual} from "lodash";
 
 interface State {
     loading: boolean;
@@ -159,16 +160,16 @@ class CloudHostCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const cloudHost = this.getCloudHost();
         const menus = [];
-        if (cloudHost.state.name === awsInstanceStates.STOPPED.name) {
+        if (isEqual(cloudHost.state, awsInstanceStates.STOPPED)) {
             menus.push(<ActionContextMenuItem className='green-text' option='Start' state={cloudHost}
                                               onClick={this.startCloudHost}/>);
         }
-        if (cloudHost.state.name === awsInstanceStates.RUNNING.name) {
+        if (isEqual(cloudHost.state, awsInstanceStates.RUNNING)) {
             menus.push(<ActionContextMenuItem className='blue-text' option='Stop' state={cloudHost}
                                               onClick={this.stopCloudHost}/>);
         }
-        if (!cloudHost.state.name.includes(awsInstanceStates.TERMINATED.name)
-            && !cloudHost.state.name.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
+        if (!isEqual(cloudHost.state, awsInstanceStates.TERMINATED)
+            && !isEqual(cloudHost.state, awsInstanceStates.SHUTTING_DOWN)) {
             menus.push(<ActionContextMenuItem className='red-text' option='Terminate' state={cloudHost}
                                               onClick={this.terminateCloudHost}/>);
         }
@@ -177,7 +178,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
 
     private bottomContextMenu = (): JSX.Element[] => {
         const cloudHost = this.getCloudHost();
-        const id = cloudHost.publicIpAddress || cloudHost.instanceId;
+        const id = cloudHost.instanceId;
         return [
             <LinkedContextMenuItem
                 option={'Modify rules'}

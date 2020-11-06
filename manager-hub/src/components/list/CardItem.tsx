@@ -26,13 +26,15 @@ import React from 'react';
 import styles from './CardItem.module.css';
 
 interface CardItemProps {
-    label: string;
+    label?: string;
     value: string;
 }
 
 const CardItem: React.FC<CardItemProps> = ({label, value}) =>
-    <div className={`${styles.cardItem}`}>
-        {label}: <p className={`${styles.cardValue}`}>{value}</p>
-    </div>;
+    label
+        ? <div className={`${styles.cardItem}`}>
+            {label} <p className={`${styles.cardValue}`}>{value}</p>
+        </div>
+        : <p className={`${styles.cardValue}`}>{value}</p>
 
 export default CardItem;

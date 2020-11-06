@@ -104,7 +104,7 @@ public class EdgeHostsService {
 			new EntityNotFoundException(EdgeHostEntity.class, "dns", dns));
 	}
 
-	public EdgeHostEntity addEdgeHost(String username, String password, String publicIpAddress, String privateIpAddress,
+	public EdgeHostEntity addEdgeHost(String username, char[] password, String publicIpAddress, String privateIpAddress,
 									  String publicDnsName, Coordinates coordinates) {
 		EdgeHostEntity edgeHost = EdgeHostEntity.builder()
 			.username(username)
@@ -121,28 +121,58 @@ public class EdgeHostsService {
 		return addEdgeHost(edgeHostEntity, null);
 	}
 
-	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, String password) {
+	public EdgeHostEntity addManualEdgeHost(EdgeHostEntity edgeHost) {
+		checkHostDoesntExist(edgeHost);
+		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
+		EdgeHostEntity edgeHostEntity = edgeHosts.save(edgeHost);
+
+		boolean setup = false;
+		for (int i = 0; i < 5; i++) {
+			char[] password = System.console().readPassword("%s", "> Enter edge host password: ");
+			try {
+				setupEdgeHost(edgeHost, password);
+				setup = true;
+				break;
+			}
+			catch (Exception e) {
+				log.error("Unable to setup new edge host: {}", e.getMessage());
+			}
+			java.util.Arrays.fill(password, ' ');
+		}
+		if (!setup) {
+			edgeHosts.delete(edgeHostEntity);
+			throw new ManagerException("Unable to setup new edge host");
+		}
+
+		return edgeHostEntity;
+	}
+
+	public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, char[] password) {
 		checkHostDoesntExist(edgeHost);
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
 		EdgeHostEntity edgeHostEntity = edgeHosts.save(edgeHost);
 		if (password != null) {
 			try {
 				setupEdgeHost(edgeHost, password);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				edgeHosts.delete(edgeHostEntity);
-				throw e;
+				throw new ManagerException("Unable to setup new edge host: {}", e.getMessage());
+			}
+			finally {
+				java.util.Arrays.fill(password, ' ');
 			}
 		}
 		return edgeHostEntity;
 	}
 
-	private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
+	private void setupEdgeHost(EdgeHostEntity edgeHost, char[] password) {
 		HostAddress hostAddress = edgeHost.getAddress();
 		String keyFilePath = getPrivateKeyFilePath(edgeHost);
 		log.info("Generating keys for edge host {}", hostAddress);
 
 		String generateKeysCommand = String.format("echo yes | ssh-keygen -m PEM -t rsa -b 4096 -f '%s' -q -N \"\" &&"
-			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostAddress.getPublicIpAddress());
+			+ " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, String.valueOf(password), keyFilePath, hostAddress.getPublicIpAddress());
 		SshCommandResult generateKeysResult = sshService.executeCommandSync(generateKeysCommand, hostAddress, password);
 		int exitStatus = generateKeysResult.getExitStatus();
 		if (exitStatus != 0 && exitStatus != 6) {

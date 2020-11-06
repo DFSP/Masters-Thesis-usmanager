@@ -78,7 +78,10 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
             html.clientHeight, html.scrollHeight, html.offsetHeight) - 50 - 56; // 56 for header and 50 for footer
         return <Resizable
             className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
-            style={{width: this.props.sidenavVisible ? 'calc(100vw - 200px)' : '100vw', left: this.props.sidenavVisible ? '200px' : '0'}}
+            style={{
+                width: this.props.sidenavVisible ? 'calc(100vw - 200px)' : '100vw',
+                left: this.props.sidenavVisible ? '200px' : '0'
+            }}
             maxHeight={maxHeight}
             onResize={this.onResize}
             enable={{top: true}}
@@ -122,8 +125,8 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                                 <>
                                     <div>
                                         <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                        <span
-                                            className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>
+                                        {!this.props.filter &&
+                                        <span className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>}
                                         <span className={styles.command}>{command.command}</span>
                                         {command.exitStatus !== 0 && command.error !== null && command.output !== null &&
                                         <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}

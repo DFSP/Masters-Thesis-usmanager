@@ -455,13 +455,13 @@ class EdgeHost extends BaseComponent<Props, State> {
         if (!this.isNew()) {
             tabs.push({
                 title: 'Execute command',
-                id: 'cloudHostSsh',
+                id: 'ssh',
                 content: () => this.ssh(),
                 active: this.props.location.state?.selected === 'ssh'
             });
             tabs.push({
                 title: 'Upload file',
-                id: 'cloudHostSftp',
+                id: 'sftp',
                 content: () => this.sftp(),
                 active: this.props.location.state?.selected === 'sftp'
             });

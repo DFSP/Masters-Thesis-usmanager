@@ -107,7 +107,7 @@ class Sidenav extends React.Component<Props, {}> {
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
         this.scrollbar?.updateScroll();
         if (prevProps.sidenav.user != this.props.sidenav.user && !this.props.sidenav.user) {
-           M.Sidenav.getInstance(this.sidenav.current as Element).close();
+            M.Sidenav.getInstance(this.sidenav.current as Element).close();
         }
     }
 
@@ -127,37 +127,35 @@ class Sidenav extends React.Component<Props, {}> {
             }
         })(this.props.component);
         return (
-            <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
+            <ul id='slide-out' className='sidenav sidenav-fixed no-shadows'
                 style={this.props.sidenav.user ? {width: 200, transition: 'width .25s'} : {
                     width: 0,
                     transition: 'width .25s'
                 }} ref={this.sidenav}>
-                <div className="sidenav-menu">
+                <div className='sidenav-menu'>
                     <a
-                        className="sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
-                        data-target="slide-out"
+                        className='sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light'
+                        data-target='slide-out'
                         onClick={this.handleSidenav}>
-                        <i className="material-icons">menu</i>
+                        <i className='material-icons'>menu</i>
                     </a>
                 </div>
-                <ScrollBar ref={(ref) => {
-                    this.scrollbar = ref;
-                }}
-                           component="div">
+                <ScrollBar ref={(ref) => this.scrollbar = ref}
+                           component='div'>
                     {links.map((link, index) =>
                         <div key={index}>
                             <li>
-                                <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
+                                <Link className='white-text' to={link.link} onClick={this.closeSlideSidenav}>
                                     <span style={{whiteSpace: 'nowrap'}}>{link.name}</span>
                                 </Link>
                             </li>
                             {link.sub && link.sub.map((sublink, index) =>
                                 <div key={index}>
                                     {<li>
-                                        <div className="divider grey darken-4"/>
+                                        <div className='divider grey darken-4'/>
                                     </li>}
                                     <li>
-                                        <Link className="white-text sub-link" to={`${link.link}${sublink.link}`}
+                                        <Link className='white-text sub-link' to={`${link.link}${sublink.link}`}
                                               onClick={this.closeSlideSidenav}>
                                             <span style={{whiteSpace: 'nowrap'}}>{sublink.name}</span>
                                         </Link>
@@ -165,7 +163,7 @@ class Sidenav extends React.Component<Props, {}> {
                                 </div>
                             )}
                             {index < sidenavManagementLinks.length - 1 && <li>
-                                <div className="divider grey darken-3"/>
+                                <div className='divider grey darken-3'/>
                             </li>}
                         </div>
                     )}

@@ -1,16 +1,15 @@
 FROM usmanager/manager-database as manager-database
-
-FROM maven:3.6.0-jdk-11-slim
-
-# include dependencies
-COPY --from=manager-database /root/.m2 /root/.m2
+FROM maven:3.6.0-jdk-11-slim as build
 
 WORKDIR /usr/src/app
 
 # install
 COPY src ./src
 COPY pom.xml .
-RUN mvn clean install -DskipTests
+RUN mvn clean install -DskipTests -Dmaven.javadoc.skip=true
 
-# cleanup
-RUN rm -rf src pom.xml target
+FROM alpine
+COPY --from=manager-database /root/.m2 /root/.m2
+COPY --from=build /root/.m2 /root/.m2
+
+

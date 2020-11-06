@@ -26,8 +26,6 @@ import React, {createRef} from "react";
 import ScrollBar from "react-perfect-scrollbar";
 import {Link} from "react-router-dom";
 import CardTitle from "../list/CardTitle";
-import {ReduxState} from "../../reducers";
-import {connect} from "react-redux";
 import {ContextMenu, ContextMenuTrigger, MenuItem} from "react-contextmenu";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {deleteData} from "../../utils/api";
@@ -35,6 +33,8 @@ import {RestOperation} from "../form/Form";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import LinkedContextMenuItem from "../contextmenu/LinkedContextMenuItem";
 import DividerContextMenuItem from "../contextmenu/DividerContextMenuItem";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
 
 interface CardProps<T> {
     id: string;
@@ -43,7 +43,7 @@ interface CardProps<T> {
     height?: number | string;
     margin?: number | string;
     hoverable?: boolean;
-    children?: any[];
+    children?: any;
     delete?: RestOperation;
     loading?: boolean;
     topContextMenuItems?: JSX.Element[];
@@ -112,7 +112,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                 <ContextMenu id={`contextMenu-${id}`}>
                     {topContextMenuItems?.map((menuItem, index) =>
                         <div key={index}>
-                            {index > 0 && <MenuItem className="react-contextmenu-item--divider"/>}
+                            {index > 0 && <MenuItem className='react-contextmenu-item--divider'/>}
                             {menuItem}
                         </div>
                     )}
@@ -173,36 +173,29 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
     private getChildrenCount = (): number =>
         React.Children.count(this.props.children);
 
-    private getHeight = (): number => {
-        let height = this.props.height || this.getChildrenCount() * this.CARD_ITEM_HEIGHT;
-        if (typeof height === 'string') {
-            height = Number(height.replace(/[^0-9]/g, ''));
-        }
-        return height;
-    };
+    private getHeight = (): number | string =>
+        this.props.height || this.getChildrenCount() * this.CARD_ITEM_HEIGHT;
 
     private blockBodyScroll = () => {
         const cardContent = this.cardContent.current;
-        if (cardContent && cardContent.scrollHeight > this.getHeight()) {
+        const height = this.getHeight();
+        if (cardContent && typeof height === "number" && cardContent.scrollHeight > height) {
             this.card.current?.addEventListener('wheel', event => event.preventDefault())
         }
     };
 
     private cardElement = (): JSX.Element => {
-        const {title, hoverable, children} = this.props;
+        const {title, hoverable, link, children} = this.props;
         const childrenCount = this.getChildrenCount();
         return (
-            <div className={hoverable ? 'hoverable' : undefined}
+            <div className={hoverable ? 'hoverable' : ''}
                  style={childrenCount === 0 ? {borderBottom: '1px black solid'} : undefined}>
                 {title && <CardTitle title={title}/>}
                 {childrenCount > 0 && (
                     <div className={`card gridCard`}
                          style={{height: this.getHeight()}}
                          ref={this.card}>
-                        <ScrollBar ref={(ref) => {
-                            this.scrollbar = ref;
-                        }}
-                                   component="div">
+                        <ScrollBar ref={(ref) => this.scrollbar = ref} component='div'>
                             <div className='card-content' ref={this.cardContent}>
                                 {children}
                             </div>

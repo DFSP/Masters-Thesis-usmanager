@@ -93,7 +93,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     public render() {
         const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map, checkbox} = this.props;
-        const getError = (errors: IErrors): string => (errors ? errors[id] : "");
+        const getError = (errors: IErrors): string => (errors ? errors[id] : '');
         const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
             const hasErrors = getError(errors);
             if (hasErrors) {
@@ -261,7 +261,8 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     private onChange = (id: string, formContext: IFormContext, validate: boolean, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         let value = target.value;
-        if (!isNaN(+value)) {
+        // regex to test if value has only \n chars
+        if (!new RegExp("^[\n\s]+$").test(value) && !isNaN(+value)) {
             value = `"${value}"`;
         }
         try {

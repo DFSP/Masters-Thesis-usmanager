@@ -50,17 +50,16 @@ public class ContainersRecoveryService {
 		if (previousRecoveries != null) {
 			long currentTimestamp = System.currentTimeMillis();
 			for (ContainerRecovery recovery : new Gson().fromJson(previousRecoveries, ContainerRecovery[].class)) {
-				/*if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME > currentTimestamp) {*/
+				if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME > currentTimestamp) {
 					log.info("Adding previous recovery: {}", recovery);
 					recoveries.add(recovery);
-				/*} else {
+				} else {
 					log.info("Ignoring previous recovery {} because it has expired", recovery);
-				}*/
+				}
 			}
 		} else {
 			log.info("This is the first known recovery on container {}", containerId);
 		}
-		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		return recoveries;
 	}
 
@@ -84,6 +83,7 @@ public class ContainersRecoveryService {
 				container.getServiceName(), containerId);
 			return;
 		}
+		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
 		ServiceEntity service = servicesService.getService(serviceName);
@@ -104,6 +104,7 @@ public class ContainersRecoveryService {
 				container.getServiceName(), containerId);
 			return;
 		}
+		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		HostAddress hostAddress = container.getHostAddress();
 		String serviceName = container.getServiceName();
 		containersService.launchContainer(hostAddress, serviceName);

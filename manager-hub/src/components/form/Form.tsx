@@ -180,12 +180,12 @@ export const trimmed = (values: IValues, id: keyof IValues): string =>
         ? `${camelCaseToSentenceCase(id as string)} can't start or end with spaces`
         : "";
 
-export const min = (values: IValues, id: keyof IValues, args: any): string =>
+export const min = (values: IValues, id: keyof IValues, args: number): string =>
     values[id] < args
         ? `Required minimum value of ${args}`
         : "";
 
-export const max = (values: IValues, id: keyof IValues, args: any): string =>
+export const max = (values: IValues, id: keyof IValues, args: number): string =>
     values[id] > args
         ? `Required maximum value of ${args}`
         : "";
@@ -194,6 +194,14 @@ export const number = (values: IValues, id: keyof IValues): string =>
     getTypeFromValue(values[id]) !== 'number'
         ? `${camelCaseToSentenceCase(id as string)} is a number`
         : "";
+
+export const maxSize = (values: IValues, id: keyof IValues, args: any) =>
+    values[id] && values[id].length >= args
+        ? `Limit of ${args} characters`
+        : "";
+
+export const maxSizeAndTrimmed = (values: IValues, id: keyof IValues, args: any) =>
+    trimmed(values, id) || maxSize(values, id, args);
 
 export const requiredAndTrimmed = (values: IValues, id: keyof IValues) =>
     required(values, id) || trimmed(values, id);
@@ -555,18 +563,26 @@ class Form extends BaseComponent<Props, State> {
         const validate = this.validateForm();
         const {isNew, post, put, saveEntities} = this.props;
         const args = this.state.values;
+        let requestBody = {};
+        // replace trailing \n
+        for (const key in args) {
+            requestBody = {
+                ...requestBody,
+                [key]: !args || typeof args[key] !== 'string' ? args[key] : args[key].replace(/\n+$/, "")
+            }
+        }
         if (isNew) {
             if (post?.url) {
                 if (validate) {
-                    postData(post.url, args,
+                    postData(post.url, requestBody,
                         (reply) => {
-                            post.successCallback(reply, args);
+                            post.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({savedValues: args, loading: undefined});
+                                this.setState({savedValues: requestBody, loading: undefined});
                             }
                         },
                         (reply) => {
-                            post.failureCallback(reply, args);
+                            post.failureCallback(reply, requestBody);
                             if (this.mounted) {
                                 this.setState({loading: undefined});
                             }
@@ -578,15 +594,15 @@ class Form extends BaseComponent<Props, State> {
             const saveRequired = this.saveRequired();
             if (saveRequired) {
                 if (put?.url && validate) {
-                    putData(put.url, args,
+                    putData(put.url, requestBody,
                         (reply) => {
-                            put.successCallback(reply, args);
+                            put.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({savedValues: args, loading: undefined});
+                                this.setState({savedValues: requestBody, loading: undefined});
                             }
                         },
                         (reason) => {
-                            put.failureCallback(reason, args);
+                            put.failureCallback(reason, requestBody);
                             if (this.mounted) {
                                 this.setState({loading: undefined});
                             }
@@ -594,7 +610,7 @@ class Form extends BaseComponent<Props, State> {
                     this.setState({loading: {method: 'put', url: put.url}});
                 }
             } else {
-                saveEntities?.(args);
+                saveEntities?.(requestBody);
             }
         }
     };

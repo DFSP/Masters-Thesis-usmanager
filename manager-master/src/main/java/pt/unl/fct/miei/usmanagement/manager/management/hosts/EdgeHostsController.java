@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.Validation;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/hosts/edge")
 public class EdgeHostsController {
@@ -46,6 +48,7 @@ public class EdgeHostsController {
 
 	@PostMapping
 	public EdgeHostEntity addEdgeHost(@RequestBody AddEdgeHost addEdgeHost) {
+		log.info("{}", addEdgeHost);
 		return edgeHostsService.addEdgeHost(addEdgeHost.getUsername(), addEdgeHost.getPassword(), addEdgeHost.getPublicIpAddress(),
 			addEdgeHost.getPrivateIpAddress(), addEdgeHost.getPublicDnsName(), addEdgeHost.getCoordinates());
 	}

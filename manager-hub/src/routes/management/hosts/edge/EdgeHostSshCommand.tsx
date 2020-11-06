@@ -53,12 +53,8 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
 
     private sshPanel = createRef<any>();
 
-    private commandFilter = (command: ICommand | IFileTransfer) =>  {
-        const commandHostAddress = command.hostAddress;
-        const {edgeHost} = this.props;
-        return commandHostAddress.publicIpAddress === edgeHost.publicIpAddress
-            && commandHostAddress.privateIpAddress === edgeHost.privateIpAddress
-    }
+    private commandFilter = (command: ICommand | IFileTransfer) =>
+        command.hostAddress.publicIpAddress === this.props.edgeHost.publicIpAddress
 
     public render() {
         const command = buildNewSshCommand();

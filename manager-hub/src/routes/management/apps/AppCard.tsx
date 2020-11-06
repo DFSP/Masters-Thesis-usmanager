@@ -30,6 +30,7 @@ import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContext
 import {EntitiesAction} from "../../../reducers/entities";
 import {deleteApp} from "../../../actions";
 import {connect} from "react-redux";
+import CardItem from "../../../components/list/CardItem";
 
 interface State {
     loading: boolean;
@@ -65,7 +66,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class="green-text">App <b class="white-text">${app.name}</b> successfully removed</span>`);
+        super.toast(`<span class='green-text'>App <b class='white-text'>${app.name}</b> successfully removed</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +74,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, app: IApp): void => {
-        super.toast(`Unable to delete <a href=/apps/${app.name}><b>${app.name}</b></a> app`, 10000, reason, true);
+        super.toast(`Unable to delete <a href='/apps/${app.name}'><b>${app.name}</b></a> app`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -114,10 +115,14 @@ class AppCard extends BaseComponent<Props, State> {
         const {app} = this.props;
         const {loading} = this.state;
         const CardApp = Card<IApp>();
+        let description = app.description || 'No description available';
+        if (!description.endsWith('.')) {
+            description += '.';
+        }
         return <CardApp id={`app-${app.name}`}
                         title={app.name}
                         link={{to: {pathname: `/apps/${app.name}`, state: app}}}
-                        height={'30px'}
+                        height={'175px'}
                         margin={'10px 0'}
                         hoverable
                         delete={{
@@ -126,7 +131,10 @@ class AppCard extends BaseComponent<Props, State> {
                             failureCallback: this.onDeleteFailure
                         }}
                         loading={loading}
-                        bottomContextMenuItems={this.contextMenu()}/>
+                        bottomContextMenuItems={this.contextMenu()}>
+            <CardItem key={'app'}
+                      value={description}/>
+        </CardApp>
     }
 
 }
