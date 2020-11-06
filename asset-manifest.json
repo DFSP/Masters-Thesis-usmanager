@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/manager-hub/static/css/main.0b727d8a.chunk.css",
+    "main.js": "/manager-hub/static/js/main.dc3b46fc.chunk.js",
+    "main.js.map": "/manager-hub/static/js/main.dc3b46fc.chunk.js.map",
+    "runtime-main.js": "/manager-hub/static/js/runtime-main.6f39385b.js",
+    "runtime-main.js.map": "/manager-hub/static/js/runtime-main.6f39385b.js.map",
+    "static/css/2.18fb2ca0.chunk.css": "/manager-hub/static/css/2.18fb2ca0.chunk.css",
+    "static/js/2.473381d5.chunk.js": "/manager-hub/static/js/2.473381d5.chunk.js",
+    "static/js/2.473381d5.chunk.js.map": "/manager-hub/static/js/2.473381d5.chunk.js.map",
+    "index.html": "/manager-hub/index.html",
+    "precache-manifest.65ec7394afc3d7ecdccada7f6c7d304d.js": "/manager-hub/precache-manifest.65ec7394afc3d7ecdccada7f6c7d304d.js",
+    "service-worker.js": "/manager-hub/service-worker.js",
+    "static/css/2.18fb2ca0.chunk.css.map": "/manager-hub/static/css/2.18fb2ca0.chunk.css.map",
+    "static/css/main.0b727d8a.chunk.css.map": "/manager-hub/static/css/main.0b727d8a.chunk.css.map",
+    "static/js/2.473381d5.chunk.js.LICENSE": "/manager-hub/static/js/2.473381d5.chunk.js.LICENSE",
+    "static/media/logo.png": "/manager-hub/static/media/logo.747bba5b.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6f39385b.js",
+    "static/css/2.18fb2ca0.chunk.css",
+    "static/js/2.473381d5.chunk.js",
+    "static/css/main.0b727d8a.chunk.css",
+    "static/js/main.dc3b46fc.chunk.js"
+  ]
+}
