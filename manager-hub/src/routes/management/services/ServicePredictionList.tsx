@@ -210,7 +210,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
 
     private predictionModal = () =>
         <div>
-            <Field key='name' id={'name'} label='name' disabled={false}/>
+            <Field key='name' id={'name'} label='name'/>
             <Field key='description' id={'description'} label='description' type='multilinetext'/>
             <div className={'col s6 inline-field'}>
                 <Field key='startDate' id={'startDate'} label='startDate' type='datepicker'/>

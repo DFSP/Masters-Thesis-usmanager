@@ -115,6 +115,7 @@ export default class InputDialog extends BaseComponent<Props, State> {
                           fields={fields}
                           values={values}
                           controlsMode={fullscreen ? 'modal-fullscreen' : 'modal'}
+                          isNew
                           modal={{
                               onConfirm: this.confirmCallback,
                               scrollbar: this.scrollbar,

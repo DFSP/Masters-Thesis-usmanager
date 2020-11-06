@@ -16,49 +16,51 @@ sudo apt remove nginx
 Instalar a ferramenta [libmaxminddb](https://github.com/maxmind/libmaxminddb):
 
 ```sh
-LIBMAXMINDDB_VERSION=1.4.3
-wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz
-tar -xf libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz
-cd libmaxminddb-${LIBMAXMINDDB_VERSION}
-./configure
-make
-make check
-sudo make install
-sudo ldconfig /
+LIBMAXMINDDB_VERSION=1.4.3 && \
+wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
+tar -xf libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
+cd libmaxminddb-${LIBMAXMINDDB_VERSION} && \
+sudo ./configure && \
+sudo make && \
+sudo make check && \
+sudo sudo make install && \
+sudo ldconfig && \
+cd .. && \
+sudo rm -rf libmaxminddb-${LIBMAXMINDDB_VERSION} && \
 ```
 
 Instalar e executar o [geoipupdate](https://github.com/maxmind/geoipupdate):
 
 ```sh
-GEOIPUPDATE_VERSION=4.5.0
-sudo cp geoip/GeoIP.conf /usr/local/etc/
-wget https://github.com/maxmind/geoipupdate/releases/download/v${GEOIPUPDATE_VERSION}/geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz
-tar -xf geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz
-cp geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64/geoipupdate /usr/local/bin
-rm -r geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64
-sudo mkdir /usr/local/share/GeoIP
+GEOIPUPDATE_VERSION=4.5.0 && \
+sudo cp geoip/GeoIP.conf /usr/local/etc/ && \
+wget https://github.com/maxmind/geoipupdate/releases/download/v${GEOIPUPDATE_VERSION}/geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz && \
+tar -xf geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64.tar.gz && \
+cp geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64/geoipupdate /usr/local/bin && \
+rm -r geoipupdate_${GEOIPUPDATE_VERSION}_linux_amd64 && \
+sudo mkdir /usr/local/share/GeoIP && \
 sudo geoipupdate
 ```
 
 Instalar o nginx incluindo o módulo [ngx_http_geoip2](https://github.com/leev/ngx_http_geoip2_module):
 
 ```sh
-NGINX_VERSION=1.19.4
-sudo apt install libmaxminddb0 libmaxminddb-dev mmdb-bin -y
-git clone https://github.com/leev/ngx_http_geoip2_module.git
-wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
-tar -xf nginx-$NGINX_VERSION.tar.gz
-cd nginx-$NGINX_VERSION
-rm -f /etc/nginx/conf.d/*
-mkdir /etc/nginx
-sudo useradd -s /bin/false nginx
-./configure --add-dynamic-module=../ngx_http_geoip2_module
-make
-sudo make install
-cp /usr/local/nginx/sbin/nginx /usr/sbin/nginx
-cd ..
-rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
-nginx -t
+NGINX_VERSION=1.19.4 && \
+sudo apt install libmaxminddb0 libmaxminddb-dev mmdb-bin -y && \
+git clone https://github.com/leev/ngx_http_geoip2_module.git && \
+wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
+tar -xf nginx-$NGINX_VERSION.tar.gz && \
+cd nginx-$NGINX_VERSION && \
+rm -f /etc/nginx/conf.d/* && \
+mkdir /etc/nginx && \
+sudo useradd -s /bin/false nginx && \
+./configure --add-dynamic-module=../ngx_http_geoip2_module && \
+make && \
+sudo make install && \
+sudo cp /usr/local/nginx/sbin/nginx /usr/sbin/nginx && \
+cd .. && \
+sudo rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module && \
+sudo nginx -t
 ```
 
 #### Docker

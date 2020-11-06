@@ -1,0 +1,9 @@
+*
+!manager-database/pom.xml
+!manager-database/src
+!manager-services/pom.xml
+!manager-services/src
+!manager-worker/pom.xml
+!manager-worker/src
+!manager-master/pom.xml
+!manager-master/src

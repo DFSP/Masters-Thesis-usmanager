@@ -1,23 +1,21 @@
-FROM usmanager/manager-database as manager-database
-FROM usmanager/manager-services as manager-services
+FROM maven:3.6.0-jdk-11-slim AS build
+WORKDIR /usr/src/app/manager-database
+COPY manager-database/src ./src
+COPY manager-database/pom.xml ./pom.xml
+RUN mvn install -DskipTests -U
 
-FROM maven:3.6.0-jdk-11-slim
-
-# include dependencies
-COPY --from=manager-database /root/.m2 /root/.m2
-COPY --from=manager-services /root/.m2 /root/.m2
+WORKDIR /usr/src/app/manager-services
+COPY manager-services/src ./src
+COPY manager-services/pom.xml ./pom.xml
+RUN mvn install -DskipTests -U
 
 WORKDIR /usr/src/app
-
-# install
-COPY src ./src
-COPY pom.xml .
+COPY manager-master/src src
+COPY manager-master/pom.xml .
 RUN mvn -DskipTests clean package
-RUN mv target/*.jar ./manager-master.jar
 
-# cleanup
-RUN rm -rf /root/.m2 src pom.xml target
-
-# execute
+FROM adoptopenjdk/openjdk11:alpine-jre
+WORKDIR /app
+COPY --from=build /usr/src/app/target/*.jar manager-master.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","./manager-master.jar"]
+ENTRYPOINT ["java","-jar","manager-master.jar"]

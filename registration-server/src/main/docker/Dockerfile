@@ -1,17 +1,16 @@
-FROM maven:3.6.0-jdk-11-slim AS build
+FROM maven:3.6.1-jdk-8-alpine AS build
 
 WORKDIR /usr/src/app
-
-# install
 COPY src ./src
 COPY pom.xml .
 RUN mvn -DskipTests clean package
-RUN mv target/*.jar ./registration-server.jar
 
-# cleanup
-RUN rm -rf /root/.m2 src pom.xml target
+FROM openjdk:8-jre-alpine
 
-# execution
+RUN apk add bash
+
+WORKDIR /app
+COPY --from=build /usr/src/app/target/*.jar registration-server.jar
 COPY scripts/docker-init.sh .
 RUN ["chmod", "+x", "docker-init.sh"]
 ENTRYPOINT ["/bin/bash", "-c", "./docker-init.sh"]

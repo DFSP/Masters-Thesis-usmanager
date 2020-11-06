@@ -54,13 +54,6 @@
 		</license>
 	</licenses>
 
-	<repositories>
-		<repository>
-			<id>usmanager</id>
-			<url>file://${project.basedir}/repo</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
@@ -139,5 +132,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+
 
 </project>

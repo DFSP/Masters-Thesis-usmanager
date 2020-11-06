@@ -1,8 +1,7 @@
 FROM nginx:alpine
 
 # for htpasswd command
-RUN apk add --no-cache --update \
-      apache2-utils
+RUN apk add --no-cache --update apache2-utils
 RUN rm -f /etc/nginx/conf.d/*
 
 ENV SERVER_NAME docker-api-proxy

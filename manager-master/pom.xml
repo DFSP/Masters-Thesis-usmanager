@@ -61,10 +61,6 @@
 
 	<repositories>
 		<repository>
-			<id>usmanager</id>
-			<url>file://${project.basedir}/repo</url>
-		</repository>
-		<repository>
 			<id>symmetricds</id>
 			<url>http://maven.jumpmind.com/repo</url>
 		</repository>
@@ -123,6 +119,10 @@
 			<version>3.2.6.RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.4.200</version>
@@ -150,15 +150,12 @@
 			<version>1.18.12</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>42.2.18</version>
 		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>

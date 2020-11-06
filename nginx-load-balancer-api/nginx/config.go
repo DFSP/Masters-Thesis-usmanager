@@ -95,6 +95,9 @@ http {
       		proxy_set_header X-Latitude $geoip2_location_latitude;
       		proxy_set_header X-Longitude $geoip2_location_longitude;
     	}
+		location = /404.html {
+			internal;
+        }
 	}
 }
 `

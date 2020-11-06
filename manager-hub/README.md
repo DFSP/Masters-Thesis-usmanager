@@ -2,9 +2,13 @@
 
 [![js-eslint-style](https://img.shields.io/badge/code%20style-TSLint-blue.svg?style=flat-square)](https://palantir.github.io/tslint/)
 
-Este módulo é consistido por um cliente web reactjs.  
-O qual comunica com o [Manager Master](/usmanager/manager-master) através de REST API para permitir 
-ajustar manualmente e interagir com o sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
+Este módulo é consistido por um cliente web desenvolvido com [reactjs](https://docs.npmjs.com/) 
+e [typescript](https://www.typescriptlang.org/docs/home.html). Usa [react-redux](https://redux.js.org/) para gerir os dados.
+
+Comunica com o [Manager Master](../manager-master) através de [REST API](https://restfulapi.net/) para permitir 
+ajustar manualmente e interagir com o sistema, bem como permitir a visualização do progresso e comportamento do sistema como um todo.  
+ 
+<sup>Nota: Ver o início do [DatabaseLoader](../manager-master/src/main/java/pt/unl/fct/miei/usmanagement/manager/database/DatabaseLoader.java) do manager master para obter as credenciais.</sup>
  
 ### Instalar
  
@@ -20,15 +24,29 @@ npm start
  
 ### Docker
  
+##### Ambiente de desenvolvimento
+ 
 ```shell script
-docker build -f docker/Dockerfile . -t manager-hub
-docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true manager-hub
+docker build -f docker/Dockerfile.dev . -t dev-manager-hub
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true dev-manager-hub
 ```
 
-### Ambiente
+##### Ambiente de produção
+```shell script
+docker build -f docker/Dockerfile . -t manager-hub
+docker run -it --rm -p 80:80 manager-hub
+```
+
+##### Docker hub
+```shell script
+docker run -it --rm -p 80:80 usmanager/manager-hub
+```
+
+### Testes
+ 
+ Testado no ambiente:
  
 > Ubuntu 20.04.1 LTS
- 
 > Chrome browser 86.0.4240.111 
 
 ### Ferramentas
@@ -43,6 +61,8 @@ docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR
 
 [<img src="https://i.imgur.com/lwAbTpS.png" alt="" width="48" height="48"> Typescript](https://www.typescriptlang.org/docs/home.html) - TypeScript is a typed superset of JavaScript that compiles to plain JavaScript
 
+[<img src="https://i.imgur.com/7C87tJD.png" alt="" width="48" height="48"> React-redux](https://redux.js.org/) - A Predictable State Container for JS Apps
+
 ### Resolução de erros
 
 Se após a execução de `npm start`, por acaso aparecer o erro:
@@ -55,17 +75,6 @@ Executar os comandos seguintes deve resolvê-lo:
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf`
 sudo sysctl -p
 ```
-
-### Lista TO-DO
-
-- O código pode ser fatorizado um pouco mais. 
-Por exemplo, existir um componente genérico Entity que representa as entidades principais,
-como app, service, container, host, etc. E um EntityList para representar as listas das entidades, 
-por exemplo dos serviços da apps, ou das regras de um container.
-Iria permitir a remoção de algum código que parece repetido.
-
-- Outro melhoramento seria o uso de listas animadas, trabalho o qual já foi iniciado no componente AnimatedList (ver [react-spring](https://www.react-spring.io/)).
-Por exemplo, ao remover/adicionar novos elementos a uma lista, ou ao mudar de página numa lista paginada.
 
 ### Licença
 

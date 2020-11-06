@@ -1,19 +1,19 @@
-FROM usmanager/nginx-load-balancer-api as nginx-load-balancer-api
-FROM alpine
+FROM usmanager/nginx-load-balancer-api AS nginx-load-balancer-api
+FROM alpine AS BUILD
 
-# include dependencies
-RUN apk add --no-cache --update apache2-utils tar g++ make perl git pcre-dev zlib-dev openrc
-
-# include libmaxminddb tool
+# install libmaxminddb tool
 ARG LIBMAXMINDDB_VERSION=1.4.3
-RUN wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
+RUN apk add --no-cache --update tar make g++ perl && \
+wget https://github.com/maxmind/libmaxminddb/releases/download/${LIBMAXMINDDB_VERSION}/libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
 tar -xf libmaxminddb-${LIBMAXMINDDB_VERSION}.tar.gz && \
 cd libmaxminddb-${LIBMAXMINDDB_VERSION} && \
+mkdir /usr/bin/file && \
 ./configure && \
 make && \
 make check && \
 make install && \
-ldconfig /
+ldconfig / && \
+apk del tar make g++ perl
 
 # install and run geoipupdate
 ARG GEOIPUPDATE_VERSION=4.5.0
@@ -27,7 +27,9 @@ geoipupdate
 
 # install nginx with geoip2 dynamic module to retrieve information from ip addresses
 ARG NGINX_VERSION=1.19.4
-RUN git clone https://github.com/leev/ngx_http_geoip2_module.git && \
+RUN apk add --no-cache --update tar make g++ perl pcre-dev zlib-dev && \
+wget https://github.com/leev/ngx_http_geoip2_module/archive/3.3.tar.gz -O ngx_http_geoip2_module.tar.gz && \
+tar -xf ngx_http_geoip2_module.tar.gz && \
 wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz && \
 tar -xf nginx-$NGINX_VERSION.tar.gz && \
 cd nginx-$NGINX_VERSION && \
@@ -35,13 +37,17 @@ rm -f /etc/nginx/conf.d/* && \
 mkdir /etc/nginx && \
 addgroup -g 101 -S nginx && \
 adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
-./configure --add-dynamic-module=../ngx_http_geoip2_module && \
+./configure --add-dynamic-module=../ngx_http_geoip2_module-3.3 && \
 make && \
 make install && \
 cp /usr/local/nginx/sbin/nginx /usr/sbin/nginx && \
 cd .. && \
-rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module && \
-nginx -t
+rm -r nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module-3.3 && \
+nginx -t && \
+apk del tar make g++ perl zlib-dev
+
+# packages needed: htpasswd from apache2-utils and pcre from pcre-dev
+RUN apk add --no-cache --update apache2-utils
 
 COPY --from=nginx-load-balancer-api /nginx-load-balancer-api /nginx-load-balancer-api
 COPY /scripts/docker-init.sh /
