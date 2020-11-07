@@ -74,7 +74,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
                                 data-for='dark-tooltip' data-tip="Reload" data-place='bottom'
                                 type="button"
                                 onClick={this.reloadLogs}>
-                            <i className="large material-icons">cached</i>
+                            <i className="large material-icons">sync</i>
                         </button>
                     </div>)}
                 <div className={styles.logsListContainer}>

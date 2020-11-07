@@ -30,7 +30,7 @@ import WorkerManagersList from "./WorkerManagersList";
 
 const WorkerManagers: React.FC = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Launch worker-manager', position: 'left'}}
+        <AddButton button={{text: 'Launch worker-manager'}}
                    pathname={'/worker-managers/launch?new'}/>
         <div className={`${styles.container}`}>
             <WorkerManagersList/>

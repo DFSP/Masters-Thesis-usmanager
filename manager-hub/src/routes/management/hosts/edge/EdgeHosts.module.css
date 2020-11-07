@@ -25,3 +25,7 @@
 .container {
     margin: 0 10px;
 }
+
+.buttons {
+    flex-direction: column
+}

@@ -55,7 +55,7 @@ class Apps extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Add app', position: 'left'}}
+                <AddButton button={{text: 'New app'}}
                            pathname={'/apps/new_app?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<IApp>

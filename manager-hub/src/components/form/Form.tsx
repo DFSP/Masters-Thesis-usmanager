@@ -111,6 +111,7 @@ interface State {
     savedValues: IValues;
     errors: IErrors;
     isEditing: boolean;
+    isValid: boolean;
     saveRequired: boolean;
     loading?: { method: Method, url: string };
 }
@@ -245,6 +246,7 @@ class Form extends BaseComponent<Props, State> {
             isEditing: props.isNew || false,
             saveRequired: false,
             loading: props.loading,
+            isValid: true,
         }
     }
 
@@ -382,7 +384,7 @@ class Form extends BaseComponent<Props, State> {
                                                 data-for='dark-tooltip' data-tip="Edit" data-place='bottom'
                                                 type="button"
                                                 onClick={this.onClickEdit}>
-                                                <i className={`large material-icons ${this.state.isEditing ? (this.validateForm(false) ? 'green-text' : 'red-text') : ''}`}>edit</i>
+                                                <i className={`large material-icons ${this.state.isEditing ? (this.state.isValid ? 'green-text' : 'red-text') : ''}`}>edit</i>
                                             </button>
                                         )}
                                     </>
@@ -513,7 +515,7 @@ class Form extends BaseComponent<Props, State> {
         if (newError !== "") {
             console.log("Validation of field " + field.id + ": " + newError);
         }
-        this.setState({errors: {...this.state.errors, [id]: newError}});
+        this.setState(_=> ({errors: {...this.state.errors, [id]: newError}, isValid: newError === ""}));
         return newError;
     };
 
@@ -532,8 +534,12 @@ class Form extends BaseComponent<Props, State> {
         return this.isValid(errors);
     }
 
-    private isValid = (errors: IErrors) =>
-        Object.values(errors).every(error => !error);
+    private isValid = (errors: IErrors) => {
+        const isValid = Object.values(errors).every(error => !error);
+        this.setState(_=> ({isValid}));
+        return isValid;
+    }
+
 
     private onClickEdit = (): void => {
         this.setState(prevState => ({isEditing: !prevState.isEditing}));
@@ -668,7 +674,7 @@ class Form extends BaseComponent<Props, State> {
 
     private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        if (!this.validateForm()) {
+        if (!this.validateForm(true)) {
             return;
         }
         this.props.modal?.onConfirm?.(this.state.values);

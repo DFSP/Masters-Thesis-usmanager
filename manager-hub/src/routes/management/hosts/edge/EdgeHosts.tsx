@@ -30,8 +30,8 @@ import EdgeHostsList from "./EdgeHostsList";
 
 const EdgeHosts: React.FC = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add edge host', position: 'left'}}
-                   pathname={'/hosts/edge/add_machine?new'}/>
+        <AddButton button={{text: 'New edge host'}}
+                   pathname={'/hosts/edge/add_host?new'}/>
         <div className={`${styles.container}`}>
             <EdgeHostsList/>
         </div>

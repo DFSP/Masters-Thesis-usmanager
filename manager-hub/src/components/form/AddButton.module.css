@@ -59,3 +59,12 @@ ul.dropdown li.disabled a:hover {
 .nolabelCheckbox label span {
     margin-bottom: -7.5px;
 }
+
+.button {
+    margin-left: 24px;
+    margin-bottom: 20px;
+}
+
+.button:hover {
+    background-color: #282828;
+}

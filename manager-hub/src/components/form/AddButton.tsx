@@ -29,7 +29,7 @@ import M from "materialize-css";
 import ScrollBar from "react-perfect-scrollbar";
 
 interface Props {
-    tooltip: { text: string, position: 'left' | 'right' | 'bottom' | 'top' };
+    button: { text: string, tooltip?: string };
     pathname?: string;
     dropdown?: {
         id: string | number,
@@ -37,7 +37,6 @@ interface Props {
         empty?: string,
         data: { text: string, pathname: string }[]
     }
-    offset?: number;
 }
 
 export default class AddButton extends React.Component<Props, {}> {
@@ -54,25 +53,20 @@ export default class AddButton extends React.Component<Props, {}> {
     }
 
     public render() {
-        const {offset, tooltip, pathname, dropdown} = this.props;
+        const {button, pathname, dropdown} = this.props;
         return (
             <>
                 {!dropdown
-                    ? <div className="fixed-action-btn"
-                           data-for='tooltip' data-tip={tooltip.text} data-place={tooltip.position}
-                           style={offset ? {right: `${offset * 100 + 23}px`} : undefined}>
-                        <Link className="btn-floating grey darken-3"
-                              to={pathname || ""}>
-                            <i className="large material-icons">add</i>
-                        </Link>
-                    </div>
+                    ? <Link className={`btn-flat btn-small green-text ${styles.button}`}
+                            to={pathname || ""}>
+                        {button.text}
+                    </Link>
                     : <>
                         <div
-                            className="dropdown-trigger fixed-action-btn btn-floating grey darken-3"
-                            data-for='tooltip' data-tip={tooltip.text} data-place={tooltip.position}
+                            className={`btn-flat btn-small green-text ${styles.button} dropdown-trigger`}
                             data-target={`dropdown-${dropdown.id}`}
                             ref={this.dropdown}>
-                            <i className="large material-icons">add</i>
+                            {button.text}
                         </div>
                         <ul id={`dropdown-${dropdown.id}`}
                             className={`dropdown-content ${styles.dropdown}`}>

@@ -23,6 +23,7 @@
  */
 
 import React from "react";
+import styles from "./ActionButton.module.css";
 
 interface Props {
     icon: string;
@@ -35,7 +36,6 @@ interface Props {
     clickCallback: () => void;
     active?: boolean;
     automatic?: boolean;
-    offset?: number;
 }
 
 interface State {
@@ -56,12 +56,11 @@ export default class ActionButton extends React.Component<Props, State> {
     };
 
     public render() {
-        const {icon, offset, tooltip, automatic} = this.props;
+        const {icon, tooltip, automatic} = this.props;
         const {isActive} = this.state;
         return (
-            <div className={`fixed-action-btn btn-floating grey darken-${isActive ? '4' : '3'}`}
+            <div className={`btn-flat large ${styles.button} ${isActive ? 'grey darken-1' : 'white-text'}`}
                  data-for='tooltip' data-tip={`${automatic ? (isActive ? tooltip.activatedText : tooltip.deactivatedText) : tooltip.text}`} data-place={tooltip.position}
-                 style={offset ? {right: `${offset * 55 + 23}px`} : undefined}
                  onClick={this.handleOnClick}>
                 <i className="large material-icons">{icon}</i>
             </div>

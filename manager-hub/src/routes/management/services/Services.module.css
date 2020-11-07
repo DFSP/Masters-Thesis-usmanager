@@ -36,8 +36,8 @@
 
 .filterDropdown {
     position: absolute;
-    top: 65px;
-    right: 100px;
+    top: 60px;
+    right: 30px;
     color: white;
     display: flex;
     width: 200px;

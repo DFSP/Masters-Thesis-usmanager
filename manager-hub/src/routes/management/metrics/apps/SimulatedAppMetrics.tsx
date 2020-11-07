@@ -30,7 +30,7 @@ import SimulatedAppMetricsList from "./SimulatedAppMetricsList";
 
 const SimulatedAppMetrics: React.FC = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add simulated app metric', position: 'left'}}
+        <AddButton button={{text: 'Add simulated app metric'}}
                    pathname={'/simulated-metrics/apps/add_simulated_metric?new'}/>
         <div className={`${styles.app}`}>
             <SimulatedAppMetricsList/>

@@ -69,14 +69,14 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
 		HostAddress hostAddress = hostsService.setHostAddress();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
-		/*cloudHostsService.synchronizeDatabaseCloudHosts();
+		cloudHostsService.synchronizeDatabaseCloudHosts();
 		containersService.synchronizeDatabaseContainers();
 		hostsService.clusterHosts();
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
-		*//*cloudHostsService.initSyncDatabaseCloudHostsTimer();*//*
-		*//*containersService.initSyncDatabaseContainersTimer();*//*
-		symService.startSymmetricDSServer(hostAddress);*/
+		cloudHostsService.initSyncDatabaseCloudHostsTimer();
+		containersService.initSyncDatabaseContainersTimer();
+		symService.startSymmetricDSServer(hostAddress);
 	}
 
 }

@@ -30,7 +30,7 @@ import SimulatedContainerMetricsList from "./SimulatedContainerMetricsList";
 
 const SimulatedContainerMetrics: React.FC = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add simulated container metric', position: 'left'}}
+        <AddButton button={{text: 'Add simulated container metric'}}
                    pathname={'/simulated-metrics/containers/add_simulated_metric?new'}/>
         <div className={`${styles.container}`}>
             <SimulatedContainerMetricsList/>

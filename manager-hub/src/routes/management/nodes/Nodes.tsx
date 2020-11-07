@@ -55,7 +55,7 @@ class Nodes extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Add node', position: 'left'}}
+                <AddButton button={{text: 'Add node'}}
                            pathname={'/nodes/new_node?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<INode>

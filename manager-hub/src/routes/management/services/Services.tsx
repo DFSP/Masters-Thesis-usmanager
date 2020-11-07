@@ -98,7 +98,7 @@ class Services extends BaseComponent<Props, State> {
         const {selectedApp} = this.state;
         return (
             <MainLayout>
-                <AddButton tooltip={{text: 'Add service', position: 'bottom'}}
+                <AddButton button={{text: 'New service'}}
                            pathname={'/services/new_service?new'}/>
                 {Object.keys(this.props.apps).length > 0 &&
                 <div className={styles.filterDropdown}>

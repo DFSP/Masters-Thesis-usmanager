@@ -34,15 +34,15 @@ import SimulatedAppMetricsList from "./apps/SimulatedAppMetricsList";
 
 const SimulatedMetrics = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add simulated metric', position: 'left'}}
+        <AddButton button={{text: 'Add simulated metric'}}
                    dropdown={{
                        id: 'simulatedMetrics',
-                       title: 'Simulated metric',
+                       title: 'Select',
                        data: [
-                           {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new'},
-                           {text: 'App', pathname: '/simulated-metrics/apps/new_metric?new'},
-                           {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new'},
-                           {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new'},
+                           {text: 'Host metric', pathname: '/simulated-metrics/hosts/new_metric?new'},
+                           {text: 'App metric', pathname: '/simulated-metrics/apps/new_metric?new'},
+                           {text: 'Service metric', pathname: '/simulated-metrics/services/new_metric?new'},
+                           {text: 'Container metric', pathname: '/simulated-metrics/containers/new_metric?new'},
                        ],
                    }}/>
         <div className={`${styles.container}`}>

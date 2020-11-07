@@ -30,7 +30,7 @@ import RulesAppList from "./RulesAppList";
 
 const RulesApp: React.FC = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add app rule', position: 'left'}}
+        <AddButton button={{text: 'New app rule'}}
                    pathname={'/rules/apps/new_app_rule?new'}/>
         <div className={`${styles.app}`}>
             <RulesAppList/>

@@ -35,12 +35,12 @@ import RulesAppList from "./apps/RulesAppList";
 
 const Rules = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add condition or rule', position: 'left'}}
+        <AddButton button={{text: 'New condition/rule'}}
                    dropdown={{
                        id: 'addRuleOrCondition',
                        title: 'Select menu',
                        data: [
-                           {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new'},
+                           {text: 'Condition', pathname: '/rules/conditions/new_condition?new'},
                            {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new'},
                            {text: 'App rule', pathname: '/rules/apps/new_app_rule?new'},
                            {text: 'Service rule', pathname: '/rules/services/new_service_rule?new'},

@@ -41,13 +41,13 @@ export interface IHostAddress {
 
 const Hosts = () =>
     <MainLayout>
-        <AddButton tooltip={{text: 'Add host', position: 'left'}}
+        <AddButton button={{text: 'New host'}}
                    dropdown={{
                        id: 'hosts',
-                       title: 'Host type',
+                       title: 'Select location',
                        data: [
                            {text: 'Cloud', pathname: '/hosts/cloud/new_instance?new'},
-                           {text: 'Edge', pathname: '/hosts/edge/add_machine?new'}
+                           {text: 'Edge', pathname: '/hosts/edge/add_host?new'}
                        ],
                    }}/>
         <div className={`${styles.container}`}>

@@ -98,9 +98,8 @@ class Landing extends React.Component<Props, State> {
         const {center} = this.state;
         const centerButton =
             <>
-                <ReactTooltip id='center-tooltip' effect='solid' type='light'/>
                 <button className={`btn-floating btn-flat right ${styles.centerButton}`}
-                        data-for='center-tooltip' data-tip='Center' data-place='bottom'
+                        data-for='tooltip' data-tip='Center' data-place='bottom'
                         onClick={this.handleCenter}
                         type='button'>
                     <i className='material-icons'>center_focus_weak</i>;
@@ -112,9 +111,8 @@ class Landing extends React.Component<Props, State> {
         </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
-                <ReactTooltip id='fullscreen-tooltip' effect='solid' type='light'/>
                 <button className={`modal-trigger btn-floating btn-flat right`}
-                        data-for='fullscreen-tooltip' data-tip='Fullscreen' data-place='bottom'
+                        data-for='tooltip' data-tip='Fullscreen' data-place='bottom'
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className='material-icons'>fullscreen</i>
