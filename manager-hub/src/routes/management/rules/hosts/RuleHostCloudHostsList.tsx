@@ -135,7 +135,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/hosts/cloud/${cloudHost}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

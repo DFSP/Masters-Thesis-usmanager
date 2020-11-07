@@ -28,7 +28,7 @@ import ReactTooltip from "react-tooltip";
 import {Point} from "react-simple-maps";
 import Marker, {IMarker} from "./Marker";
 import Dialog from "../dialogs/Dialog";
-import styles from "../../routes/management/landing/Landing.module.css";
+import Sidenav from "../../views/sidenav/Sidenav";
 
 export interface ICoordinates {
     label?: string,
@@ -69,21 +69,17 @@ export default class LocationMap extends React.Component<Props, State> {
         }
     }
 
-    public componentDidMount() {
-        M.AutoInit();
-    }
-
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         if (prevProps.zoomable !== this.props.zoomable) {
-            this.resizeMarkers({coordinates: [0, 0], zoom: 1});
+            this.resizeMarkers(1);
         }
     }
 
     private setTooltip = (tooltip: string) =>
         this.setState({tooltip});
 
-    private resizeMarkers = (position: { coordinates: Point, zoom: number }) =>
-        this.setState({markerSize: (this.props.marker?.size || this.DEFAULT_MARKER_SIZE) / position.zoom})
+    private resizeMarkers = (zoom: number) =>
+        this.setState({markerSize: (this.props.marker?.size || this.DEFAULT_MARKER_SIZE) / zoom})
 
     private handleCenter = () =>
         this.setState({center: !this.center()})
@@ -93,17 +89,15 @@ export default class LocationMap extends React.Component<Props, State> {
 
     private buttons = (tooltipPosition: string) => (
         <>
-            <button className={`btn-floating btn-flat right tooltipped`}
-                    data-position={tooltipPosition}
-                    data-tooltip={'Center'}
+            <button className={`btn-floating btn-flat right`}
+                    data-for='dark-tooltip' data-tip="Center" data-place={tooltipPosition}
                     onClick={this.handleCenter}
                     type='button'>
                 <i className="material-icons">center_focus_weak</i>;
             </button>
             {this.props.onClear &&
-            <button className={`btn-floating btn-flat right tooltipped`}
-                    data-position={tooltipPosition}
-                    data-tooltip={'Clear'}
+            <button className={`btn-floating btn-flat right`}
+                    data-for='dark-tooltip' data-tip="Clear" data-place={tooltipPosition}
                     onClick={this.props.onClear}
                     type='button'>
                 <i className="material-icons">clear_all</i>;
@@ -142,9 +136,8 @@ export default class LocationMap extends React.Component<Props, State> {
         return <>
             {resizable &&
             <>
-                <button className={`modal-trigger btn-floating btn-flat right tooltipped`}
-                        data-position={'top'}
-                        data-tooltip={'Fullscreen'}
+                <button className={`modal-trigger btn-floating btn-flat right`}
+                        data-for='button-tooltip' data-tip="Fullscreen" data-place={'top'}
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className="material-icons">fullscreen</i>

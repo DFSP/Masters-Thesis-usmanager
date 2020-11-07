@@ -127,7 +127,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                     {!error && data.length > 0 && (
                         <p className={`${styles.noLabelCheckbox}`}>
                             <label>
-                                <input type="checkbox"
+                                <input type='checkbox'
                                        onChange={this.handleGlobalCheckbox}
                                        ref={this.globalCheckbox}/>
                                 <span/>
@@ -137,11 +137,11 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                     {!error && dropdown && (
                         <>
                             <button
-                                className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
-                                data-position="bottom" data-tooltip={dropdown.title}
+                                className={`dropdown-trigger btn-floating btn-flat btn-small right ${styles.formButton}`}
+                                data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
                                 data-target={`dropdown-${dropdown.id}`}
                                 ref={this.dropdown}>
-                                <i className="material-icons">add</i>
+                                <i className='material-icons'>add</i>
                             </button>
                             <ul id={`dropdown-${dropdown.id}`}
                                 className={`dropdown-content ${styles.dropdown}`}>
@@ -169,15 +169,15 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                     {(!error && formModal &&
                         <>
                             <button
-                                className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.button}`}
-                                data-position="bottom" data-tooltip={formModal.title}
+                                className={`modal-trigger btn-floating btn-flat btn-small right ${styles.button}`}
+                                data-for='dark-tooltip' data-tip={formModal.title} data-place='bottom'
                                 data-target={formModal.id}>
-                                <i className="material-icons">add</i>
+                                <i className='material-icons'>add</i>
                             </button>
                             {this.inputDialog(formModal)}
                         </>
                     )}
-                    <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
+                    <button className={`btn-flat btn-small red-text right ${styles.button}`}
                         /*style={!error && Object.values(this.state)
                             .map(item => item?.isChecked || false)
                             .some(checked => checked)

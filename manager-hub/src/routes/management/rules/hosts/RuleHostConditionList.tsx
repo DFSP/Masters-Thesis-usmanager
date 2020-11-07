@@ -135,7 +135,7 @@ class RuleHostConditionList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/rules/conditions/${condition}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

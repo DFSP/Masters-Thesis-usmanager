@@ -68,7 +68,7 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
                 <span>{rule}</span>
             </div>
             <Link to={`/rules/hosts/${rule}`}
-                  className={`${styles.link} waves-effect`}>
+                  className={`${styles.link}`}>
                 <i className={`${styles.linkIcon} material-icons right`}>link</i>
             </Link>
         </ListItem>;

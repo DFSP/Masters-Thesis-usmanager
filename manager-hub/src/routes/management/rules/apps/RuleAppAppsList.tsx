@@ -136,7 +136,7 @@ class RuleAppAppsList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/apps/${app}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

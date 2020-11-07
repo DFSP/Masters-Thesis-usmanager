@@ -98,10 +98,9 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                 <ScrollBar ref={(ref) => {
                     this.leftControlsScrollbar = ref;
                 }}>
-                    <button className='btn-floating btn-flat btn-small tooltipped'
-                            onClick={this.props.clearCommands}
-                            data-position={'top'}
-                            data-tooltip={'Clear'}>
+                    <button className='btn-floating btn-flat btn-small'
+                            data-for='tooltip' data-tip="Clear" data-place='top'
+                            onClick={this.props.clearCommands}>
                         <i className='material-icons grey-text'>delete_sweep</i>
                     </button>
                 </ScrollBar>
@@ -155,10 +154,10 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                 <ScrollBar ref={(ref) => {
                     this.rightControlsScrollbar = ref;
                 }}>
-                    <button className={`btn-floating btn-flat btn-small tooltipped`}
-                            onClick={this.toggleCommands}
-                            data-position={'left'}
-                            data-tooltip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Show' : 'Hide'}>
+                    <button className={`btn-floating btn-flat btn-small`}
+                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Show' : 'Hide'}
+                            data-place='left'
+                            onClick={this.toggleCommands}>
                         <i className='material-icons'>{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
                     </button>
                 </ScrollBar>

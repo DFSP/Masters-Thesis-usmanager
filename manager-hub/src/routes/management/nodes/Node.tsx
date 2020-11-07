@@ -248,7 +248,7 @@ class Node extends BaseComponent<Props, State> {
         const buttons: ICustomButton[] = [];
         buttons.push({
             button:
-                <button className={`btn-flat btn-small waves-effect waves-light green-text ${formStyles.formButton}`}
+                <button className={`btn-flat btn-small green-text ${formStyles.formButton}`}
                         onClick={this.rejoinSwarm}>
                     Rejoin swarm
                 </button>

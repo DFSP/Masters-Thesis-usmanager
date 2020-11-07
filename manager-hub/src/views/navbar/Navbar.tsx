@@ -106,7 +106,7 @@ class Navbar extends React.Component<Props, State> {
                     <nav className="no-shadows">
                         <div className="nav-wrapper row">
                             {!loggingIn &&
-                            <a className="sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
+                            <a className="sidenav-trigger transparent btn-floating btn-flat btn-small"
                                data-target="slide-out"
                                onClick={this.handleSidenav}>
                                 <i className="material-icons">menu</i>
@@ -138,13 +138,13 @@ class Navbar extends React.Component<Props, State> {
                                     {loggedInUser}
                                 </li>
                                 <li>
-                                    <a className="tooltipped" data-tooltip="GitHub" data-position="bottom"
+                                    <a data-for='tooltip' data-tip="GitHub" data-place='bottom'
                                        href="https://github.com/usmanager/" target="_blank" rel="noopener noreferrer">
                                         <i className="material-icons"><GoMarkGithub/></i>
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="tooltipped" data-tooltip="DockerHub" data-position="bottom"
+                                    <a data-for='tooltip' data-tip="Docker Hub" data-place='bottom'
                                        href="https://hub.docker.com/orgs/usmanager" target="_blank"
                                        rel="noopener noreferrer">
                                         <i className="material-icons"><FaDocker/></i>

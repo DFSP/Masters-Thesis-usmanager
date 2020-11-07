@@ -139,7 +139,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/simulated-metrics/services/${simulatedMetric}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

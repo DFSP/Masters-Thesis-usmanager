@@ -134,7 +134,7 @@ class Sidenav extends React.Component<Props, {}> {
                 }} ref={this.sidenav}>
                 <div className='sidenav-menu'>
                     <a
-                        className='sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light'
+                        className='sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small'
                         data-target='slide-out'
                         onClick={this.handleSidenav}>
                         <i className='material-icons'>menu</i>

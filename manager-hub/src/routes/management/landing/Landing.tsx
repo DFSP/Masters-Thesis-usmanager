@@ -33,6 +33,7 @@ import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
 import {IMarker} from "../../../components/map/Marker";
 import {Error} from "../../../components/errors/Error";
+import ReactTooltip from "react-tooltip";
 
 interface StateToProps {
     isLoading: boolean;
@@ -77,19 +78,18 @@ class Landing extends React.Component<Props, State> {
     private getContainersMarkers = (): IMarker[] => {
         const containers: IContainer[] = Object.values(this.props.containers);
         const markers = new Map<String, IMarker>();
-        containers
-            .forEach(container => {
-                const publicIpAddress = container.publicIpAddress;
-                const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
-                if (marker.title === '') {
-                    marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
-                }
-                marker.title += container.containerId.substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
-                marker.label = publicIpAddress;
-                marker.latitude = container.coordinates.latitude;
-                marker.longitude = container.coordinates.longitude;
-                markers.set(publicIpAddress, marker);
-            });
+        containers.forEach(container => {
+            const publicIpAddress = container.publicIpAddress;
+            const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
+            if (marker.title === '') {
+                marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
+            }
+            marker.title += container.containerId.substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+            marker.label = publicIpAddress;
+            marker.latitude = container.coordinates.latitude;
+            marker.longitude = container.coordinates.longitude;
+            markers.set(publicIpAddress, marker);
+        });
         return Array.from(markers.values());
     }
 
@@ -97,25 +97,27 @@ class Landing extends React.Component<Props, State> {
         const {error} = this.props;
         const {center} = this.state;
         const centerButton =
-            <button className={`btn-floating btn-flat right tooltipped ${styles.centerButton}`}
-                    data-position={'bottom'}
-                    data-tooltip={'Center'}
-                    onClick={this.handleCenter}
-                    type='button'>
-                <i className="material-icons">center_focus_weak</i>;
-            </button>;
+            <>
+                <ReactTooltip id='center-tooltip' effect='solid' type='light'/>
+                <button className={`btn-floating btn-flat right ${styles.centerButton}`}
+                        data-for='center-tooltip' data-tip='Center' data-place='bottom'
+                        onClick={this.handleCenter}
+                        type='button'>
+                    <i className='material-icons'>center_focus_weak</i>;
+                </button>
+            </>;
         const map = <>
             {error && <Error message={error}/>}
             {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover/>}
         </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
-                <button className={`modal-trigger btn-floating btn-flat right tooltipped`}
-                        data-position={'bottom'}
-                        data-tooltip={'Fullscreen'}
+                <ReactTooltip id='fullscreen-tooltip' effect='solid' type='light'/>
+                <button className={`modal-trigger btn-floating btn-flat right`}
+                        data-for='fullscreen-tooltip' data-tip='Fullscreen' data-place='bottom'
                         data-target={'fullscreen-modal'}
                         type='button'>
-                    <i className="material-icons">fullscreen</i>
+                    <i className='material-icons'>fullscreen</i>
                 </button>
                 {centerButton}
             </div>

@@ -135,7 +135,7 @@ class ServiceRuleList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/rules/services/${rule}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

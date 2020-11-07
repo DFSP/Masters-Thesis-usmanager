@@ -128,12 +128,12 @@ export default class Dialog extends BaseComponent<Props, State> {
                         className={`modal-footer dialog-footer`}>
                         <div>
                             <button
-                                className={`modal-close waves-effect waves-light btn-flat red-text inline-button`}
+                                className={`modal-close btn-flat red-text inline-button`}
                                 type="button">
                                 Cancel
                             </button>
                             {confirmCallback &&
-                            <button className={`waves-effect waves-light btn-flat green-text inline-button`}
+                            <button className={`btn-flat green-text inline-button`}
                                     type="button"
                                     onClick={this.confirmCallback}>
                                 Confirm

@@ -312,8 +312,8 @@ class Form extends BaseComponent<Props, State> {
                                 {switchDropdown && (
                                     <>
                                         <button
-                                            className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                                            data-position="bottom" data-tooltip={switchDropdown.title || 'Switch form'}
+                                            className={`dropdown-trigger btn-floating btn-flat btn-small right`}
+                                            data-for='dark-tooltip' data-tip={switchDropdown.title || 'Switch form'} data-place='bottom'
                                             data-target={`switch-dropdown`}
                                             type={'button'}
                                             ref={this.dropdown}>
@@ -343,7 +343,7 @@ class Form extends BaseComponent<Props, State> {
                                 {isNew && !loading
                                     ?
                                     <button
-                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}>
+                                        className={`${styles.controlButton} btn-flat btn-small green-text left slide`}>
                                         {this.props.post?.textButton || 'Save'}
                                     </button>
                                     :
@@ -361,7 +361,7 @@ class Form extends BaseComponent<Props, State> {
                                             ))}
                                             {deletable !== undefined && !loading && (
                                                 <button
-                                                    className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small waves-effect waves-light red-text inline-button`}
+                                                    className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small red-text inline-button`}
                                                     type="button"
                                                     data-target='confirm-delete'
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
@@ -369,7 +369,7 @@ class Form extends BaseComponent<Props, State> {
                                                 </button>)}
                                             {!loading && (
                                                 <button
-                                                    className={`btn-flat btn-small waves-effect waves-light green-text slide inline-button`}
+                                                    className={`btn-flat btn-small green-text slide inline-button`}
                                                     /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
                                                     /*style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}*/
                                                     disabled={!saveRequired}>
@@ -378,19 +378,18 @@ class Form extends BaseComponent<Props, State> {
                                         </div>
                                         {editable !== undefined && !loading && (
                                             <button
-                                                className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped inline-button`}
-                                                data-position="bottom"
-                                                data-tooltip="Edit"
+                                                className={`btn-floating btn-flat btn-small right inline-button`}
+                                                data-for='dark-tooltip' data-tip="Edit" data-place='bottom'
                                                 type="button"
                                                 onClick={this.onClickEdit}>
-                                                <i className="large material-icons">edit</i>
+                                                <i className={`large material-icons ${this.state.isEditing ? (this.validateForm(false) ? 'green-text' : 'red-text') : ''}`}>edit</i>
                                             </button>
                                         )}
                                     </>
                                 }
                                 {loading && (
                                     <button
-                                        className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide inline-button`}
+                                        className={`${styles.controlButton} btn-flat btn-small red-text right slide inline-button`}
                                         type="button"
                                         onClick={this.cancelRequest}>
                                         Cancel
@@ -399,8 +398,8 @@ class Form extends BaseComponent<Props, State> {
                                 {dropdown && (
                                     <>
                                         <button
-                                            className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped inline-button`}
-                                            data-position="bottom" data-tooltip={dropdown.title}
+                                            className={`dropdown-trigger btn-floating btn-flat btn-small right inline-button`}
+                                            data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
                                             data-target={`dropdown-${dropdown.id}`}
                                             type="button"
                                             ref={this.dropdown}>
@@ -459,17 +458,17 @@ class Form extends BaseComponent<Props, State> {
                         <div
                             className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
                             <div>
-                                <button className={`waves-effect waves-light btn-flat red-text inline-button`}
+                                <button className={`btn-flat red-text inline-button`}
                                         type="button"
                                         onClick={this.clearValues}>
                                     Clear
                                 </button>
                                 <button
-                                    className={`modal-close waves-effect waves-light btn-flat red-text inline-button`}
+                                    className={`modal-close btn-flat red-text inline-button`}
                                     type="button">
                                     Cancel
                                 </button>
-                                <button className={`waves-effect waves-light btn-flat green-text inline-button`}
+                                <button className={`btn-flat green-text inline-button`}
                                         type="button"
                                         onClick={this.onModalConfirm}>
                                     Confirm
@@ -518,7 +517,7 @@ class Form extends BaseComponent<Props, State> {
         return newError;
     };
 
-    private validateForm(): boolean {
+    private validateForm(setErrors: boolean): boolean {
         const errors: IErrors = {};
         Object.entries(this.props.fields).forEach(([fieldName, field]) => {
             const validateMessage = this.validate(fieldName);
@@ -527,7 +526,9 @@ class Form extends BaseComponent<Props, State> {
             }
             errors[fieldName] = validateMessage;
         });
-        this.setState({errors});
+        if (setErrors) {
+            this.setState({errors});
+        }
         return this.isValid(errors);
     }
 
@@ -560,7 +561,7 @@ class Form extends BaseComponent<Props, State> {
 
     private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        const validate = this.validateForm();
+        const validate = this.validateForm(true);
         const {isNew, post, put, saveEntities} = this.props;
         const args = this.state.values;
         let requestBody = {};

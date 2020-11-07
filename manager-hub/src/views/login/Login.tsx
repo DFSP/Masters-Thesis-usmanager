@@ -89,7 +89,7 @@ class Login extends BaseComponent<Props, State> {
                                 {showPassword ? "visibility_off" : "visibility"}
                             </i>
                         </div>
-                        <button className="btn btn-flat waves-effect waves-light white-text right slide"
+                        <button className="btn btn-flat white-text right slide"
                                 type="submit" tabIndex={0} onClick={this.handleLogin}>
                             Login
                         </button>

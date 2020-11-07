@@ -30,3 +30,7 @@
 .hideMessage {
     color: grey;
 }
+
+.actionButton {
+    margin: 0 5px !important;
+}

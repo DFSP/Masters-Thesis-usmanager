@@ -58,20 +58,18 @@ export default class AddButton extends React.Component<Props, {}> {
         return (
             <>
                 {!dropdown
-                    ? <div className="fixed-action-btn tooltipped"
-                           data-position={tooltip.position}
-                           data-tooltip={tooltip.text}
-                           style={offset ? {right: `${offset * 55 + 23}px`} : undefined}>
-                        <Link className="waves-effect btn-floating grey darken-3"
+                    ? <div className="fixed-action-btn"
+                           data-for='tooltip' data-tip={tooltip.text} data-place={tooltip.position}
+                           style={offset ? {right: `${offset * 100 + 23}px`} : undefined}>
+                        <Link className="btn-floating grey darken-3"
                               to={pathname || ""}>
                             <i className="large material-icons">add</i>
                         </Link>
                     </div>
                     : <>
                         <div
-                            className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
-                            data-position={tooltip.position}
-                            data-tooltip={tooltip.text}
+                            className="dropdown-trigger fixed-action-btn btn-floating grey darken-3"
+                            data-for='tooltip' data-tip={tooltip.text} data-place={tooltip.position}
                             data-target={`dropdown-${dropdown.id}`}
                             ref={this.dropdown}>
                             <i className="large material-icons">add</i>

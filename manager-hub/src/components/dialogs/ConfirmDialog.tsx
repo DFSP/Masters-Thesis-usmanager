@@ -96,11 +96,11 @@ class ConfirmDialog extends React.Component<Props, {}> {
                             <span className={`${styles.hideMessage}`}>Don't show me this again</span>
                         </label>
                     </div>
-                    <button className="modal-close waves-effect waves-red btn-flat white-text"
+                    <button className={`modal-close btn-flat white-text ${styles.actionButton}`}
                             onClick={this.handleCancel}>
                         No
                     </button>
-                    <button className="modal-close waves-effect waves-green btn-flat white-text"
+                    <button className={`modal-close btn-flat white-text ${styles.actionButton}`}
                             onClick={this.handleConfirm}>
                         Absolutely
                     </button>

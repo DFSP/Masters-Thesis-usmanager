@@ -291,7 +291,7 @@ class CloudHost extends BaseComponent<Props, State> {
         if (isEqual(state, awsInstanceStates.STOPPED)) {
             buttons.push({
                 button:
-                    <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
+                    <button className={`btn-flat btn-small blue-text ${formStyles.formButton}`}
                             onClick={this.startCloudHost}>
                         Start
                     </button>
@@ -300,7 +300,7 @@ class CloudHost extends BaseComponent<Props, State> {
         if (isEqual(state, awsInstanceStates.RUNNING)) {
             buttons.push({
                 button:
-                    <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
+                    <button className={`btn-flat btn-small blue-text ${formStyles.formButton}`}
                             onClick={this.stopCloudHost}>
                         Stop
                     </button>
@@ -311,7 +311,7 @@ class CloudHost extends BaseComponent<Props, State> {
             buttons.push({
                 button:
                     <button
-                        className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${formStyles.formButton}`}
+                        className={`modal-trigger btn-flat btn-small red-text ${formStyles.formButton}`}
                         data-target='terminate-cloudHost'>
                         Terminate
                     </button>,

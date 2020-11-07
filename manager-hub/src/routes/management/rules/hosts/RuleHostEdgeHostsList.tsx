@@ -135,7 +135,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/hosts/edge/${edgeHost}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

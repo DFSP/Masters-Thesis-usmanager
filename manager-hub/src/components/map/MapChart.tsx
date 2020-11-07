@@ -23,11 +23,12 @@
  */
 
 import {ComposableMap, Geographies, Geography, Marker, Point, ZoomableGroup} from "react-simple-maps";
-import React, {createRef, memo} from "react";
+import React, {createRef} from "react";
 import * as d3Geo from "d3-geo";
 import {IMarker} from "./Marker";
 
 const {geoPath} = d3Geo
+
 
 type Props = {
     setTooltipContent: (tooltip: string) => void;
@@ -38,23 +39,28 @@ type Props = {
     zoomable?: boolean;
     position?: { coordinates: Point, zoom: number },
     center?: boolean;
-    onZoom?: (position: { coordinates: Point, zoom: number }) => void;
+    onZoom?: (zoom: number) => void;
 }
 
 type State = {
     scale: number;
     position: { coordinates: Point, zoom: number };
+    maxWidth: number;
+    maxHeight: number;
 }
 
 class MapChart extends React.Component<Props, State> {
 
-    private MAP_MAX_WIDTH = window.innerWidth;
-    private MAP_MAX_HEIGHT = window.innerHeight - 125;
     private map = createRef<HTMLDivElement>();
 
     constructor(props: Props) {
         super(props);
-        this.state = {scale: 1.0, position: {coordinates: [0, 0], zoom: 1}};
+        this.state = {
+            scale: 1.0,
+            position: {coordinates: [15, 0], zoom: 1},
+            maxWidth: window.innerWidth - 250,
+            maxHeight: window.innerHeight - 125,
+        };
     }
 
     public componentDidMount() {
@@ -68,10 +74,15 @@ class MapChart extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         this.calculateScale();
         if (this.props.center !== undefined && prevProps.center !== this.props.center) {
-            this.setState({position: {coordinates: [0, 0], zoom: 1}});
+            this.setState({position: {coordinates: [15, 0], zoom: 1}}, () => this.props.onZoom?.(1));
         }
         if (prevProps.zoomable !== this.props.zoomable) {
-            this.setState({position: {coordinates: this.props.position?.coordinates || [0, 0], zoom: 1}});
+            this.setState({
+                position: {
+                    coordinates: this.props.position?.coordinates || [15, 0],
+                    zoom: 1
+                }
+            }, () => this.props.onZoom?.(1));
         }
     }
 
@@ -81,14 +92,16 @@ class MapChart extends React.Component<Props, State> {
         }
     }
 
-    private handleResize = () =>
+    private handleResize = () => {
         this.calculateScale();
+        this.setState(_ => ({maxWidth: window.innerWidth - 250, maxHeight: window.innerHeight - 125}));
+    }
 
     private calculateScale = () => {
         const map = this.map.current;
         if (map) {
             const {width} = map.getBoundingClientRect();
-            const newScale = width / this.MAP_MAX_WIDTH;
+            const newScale = width / this.state.maxWidth;
             if (newScale !== this.state.scale) {
                 this.setState({scale: newScale});
             }
@@ -113,7 +126,7 @@ class MapChart extends React.Component<Props, State> {
 
     private handleMoveEnd = (position: { coordinates: Point, zoom: number }) => {
         this.setState({position: position});
-        this.props.onZoom?.(position);
+        this.props.onZoom?.(position.zoom);
     }
 
     public render() {
@@ -121,9 +134,9 @@ class MapChart extends React.Component<Props, State> {
         const {position} = this.state;
         const geoUrl = "/resources/world-110m.json";
         return (
-            <div style={{width: '100%', maxWidth: this.MAP_MAX_WIDTH, margin: '0 auto'}} ref={this.map}>
-                <ComposableMap data-tip="" projectionConfig={{scale: 315, rotate: [-11, 0, 0]}}
-                               width={this.MAP_MAX_WIDTH} height={this.MAP_MAX_HEIGHT}
+            <div style={{width: '100%', maxWidth: this.state.maxWidth, margin: '0 auto'}} ref={this.map}>
+                <ComposableMap data-tip='' projectionConfig={{scale: 315, rotate: [-11, 0, 0]}}
+                               width={this.state.maxWidth + 250} height={this.state.maxHeight}
                                style={{width: '100%', height: 'auto'}}>
                     <ZoomableGroup zoom={position.zoom} maxZoom={!zoomable ? 1 : 5} center={position.coordinates}
                                    onMoveEnd={this.handleMoveEnd}>
@@ -171,4 +184,5 @@ class MapChart extends React.Component<Props, State> {
 
 }
 
-export default memo(MapChart);
+
+export default MapChart;

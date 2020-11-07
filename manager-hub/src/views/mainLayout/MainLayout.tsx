@@ -31,6 +31,7 @@ import M from "materialize-css";
 import {RouteComponentProps, withRouter} from "react-router";
 import {bindActionCreators} from "redux";
 import {updateSearch} from "../../actions";
+import ReactTooltip from "react-tooltip";
 
 interface StateToProps {
     sidenavVisible: boolean;
@@ -51,14 +52,16 @@ class MainLayout extends React.Component<Props, {}> {
     public componentDidMount(): void {
         M.AutoInit();
         this.props.updateSearch('');
+        window.scrollTo(0, 0)
     }
 
     public render() {
         const paddingLeft = this.props.sidenavVisible ? 200 : 0;
-
         return (
             <div>
                 <Sidenav/>
+                <ReactTooltip id='tooltip' effect='solid' type='light'/>
+                <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
                     <div className="row col s12">
                         {/* @ts-ignore*/}

@@ -319,7 +319,7 @@ class App extends BaseComponent<Props, State> {
                 button:
                     <>
                         <button
-                            className={`modal-trigger btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
+                            className={`modal-trigger btn-flat btn-small blue-text ${formStyles.formButton}`}
                             data-target={'launch-app-modal'}>
                             Launch
                         </button>

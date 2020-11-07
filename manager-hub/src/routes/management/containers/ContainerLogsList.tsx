@@ -70,9 +70,8 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
             <>
                 {!!logs.length && (
                     <div className='smallControlsContainer'>
-                        <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
-                                data-position="left"
-                                data-tooltip="Reload"
+                        <button className='btn-floating btn-flat btn-small right'
+                                data-for='dark-tooltip' data-tip="Reload" data-place='bottom'
                                 type="button"
                                 onClick={this.reloadLogs}>
                             <i className="large material-icons">cached</i>

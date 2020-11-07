@@ -143,7 +143,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/services/${dependency}`}
-                          className={`${styles.link} waves-effect`}>
+                          className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}

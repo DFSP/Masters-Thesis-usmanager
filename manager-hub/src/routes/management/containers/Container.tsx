@@ -76,6 +76,8 @@ import GenericServiceRuleList from "../services/GenericServiceRuleList";
 import {IRegion} from "../regions/Region";
 import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
+import Sidenav from "../../../views/sidenav/Sidenav";
+import ReactTooltip from "react-tooltip";
 
 export interface IContainer extends IDatabaseData {
     containerId: string;
@@ -210,6 +212,7 @@ class Container extends BaseComponent<Props, State> {
     public render() {
         return (
             <MainLayout>
+                <ReactTooltip id='tooltip' effect='solid' type='light'/>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
                 <div className="container">
                     <Tabs {...this.props} tabs={this.tabs()}/>
@@ -284,7 +287,7 @@ class Container extends BaseComponent<Props, State> {
     private replicateButton = () =>
         <>
             <button
-                className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+                className={`btn-flat btn-small blue-text dropdown-trigger ${formStyles.formButton}`}
                 data-target={`replicate-dropdown-host-address`}
                 ref={(ref) => this.initDropdown(ref)}>
                 Replicate
@@ -295,7 +298,7 @@ class Container extends BaseComponent<Props, State> {
     private migrateButton = () =>
         <>
             <button
-                className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
+                className={`btn-flat btn-small blue-text dropdown-trigger ${formStyles.formButton}`}
                 data-target={`migrate-dropdown-host-address`}
                 ref={(ref) => this.initDropdown(ref)}>
                 Migrate
