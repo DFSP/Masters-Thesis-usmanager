@@ -24,7 +24,7 @@
 
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form from "../../../components/form/Form";
+import Form, {IFields, required, requireGreaterOrEqualSize} from "../../../components/form/Form";
 import Field from "../../../components/form/Field";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import {Error} from "../../../components/errors/Error";
@@ -164,7 +164,7 @@ class Region extends BaseComponent<Props, State> {
         this.setState({region: region, formRegion: formRegion});
     };*/
 
-    /*private getFields = (region: Partial<IRegion>): IFields =>
+    private getFields = (region: Partial<IRegion>): IFields =>
         Object.keys(region).map(key => {
             return {
                 [key]: {
@@ -180,7 +180,7 @@ class Region extends BaseComponent<Props, State> {
                 fields[key] = field[key];
             }
             return fields;
-        }, {});*/
+        }, {});
 
     private region = () => {
         const {isLoading, error} = this.props;
@@ -200,7 +200,7 @@ class Region extends BaseComponent<Props, State> {
                     /*@ts-ignore*/
                     <Form id={regionKey}
                         /*fields={this.getFields(formRegion)}*/
-                        /*fields={this.getFields(region)}*/
+                          fields={this.getFields(region)}
                           values={region}
                         /*isNew={isNew(this.props.location.search)}*/
                         /*post={{

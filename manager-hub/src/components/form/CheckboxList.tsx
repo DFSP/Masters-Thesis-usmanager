@@ -80,7 +80,7 @@ export class CheckboxList extends React.Component<Props, State> {
             <div id={id} className='noMargin'>
                 <h6 className={`white-text ${styles.title} ${values.length ? 'left' : ''}`}>
                     {camelCaseToSentenceCase(name)}
-                    {required && <span className={styles.requiredLabel}>*</span>}
+                    {required && <span className={`red-text ${styles.requiredLabel}`}>*</span>}
                 </h6>
                 {values.length
                     ? <p className={`${styles.globalCheckbox}`}>

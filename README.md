@@ -10,13 +10,14 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 ### Organização do projeto (módulos)
 
-- [manager-database](manager-database)
-
-- [manager-services](manager-services)
 
 - [manager-master](manager-master)
 
 - [manager-worker](manager-worker)
+
+- [manager-database](manager-database)
+
+- [manager-services](manager-services)
 
 - [manager-hub](manager-hub)
 
@@ -28,6 +29,8 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [prometheus](prometheus)
 
+- [request-location-monitor](request-location-monitor)
+
 - [registration-server](registration-server)
 
 - [registration-client](registration-client)
@@ -36,23 +39,35 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [registration-client-go](registration-client-go)
 
-- [request-location-monitor](request-location-monitor)
+- [registration-client-cpp](registration-client-cpp)
 
-- microserviços
-  - sock-shop
-    - [carts](microservices/sock-shop/carts)
-    - [docker-rabbitmq](microservices/sock-shop/docker-rabbitmq)
-    - [front-end](microservices/sock-shop/front-end)
-    - [orders](microservices/sock-shop/orders)
-    - [queue-master](microservices/sock-shop/queue-master)
-    - [shipping](microservices/sock-shop/shipping)
-  - mixal
+- [registration-client-csharp](registration-client-csharp)
+
+- Microserviços
+  - Sock shop
+    - [carts](../microservices/sock-shop/carts)
+    - [rabbitmq](../microservices/sock-shop/rabbitmq)
+    - [front-end](../microservices/sock-shop/front-end)
+    - [orders](../microservices/sock-shop/orders)
+    - [queue-master](../microservices/sock-shop/queue-master)
+    - [shipping](../microservices/sock-shop/shipping)
+  - Online boutique
+    - TODO 
+  - Death-star-bench
     - TODO
+  - Mixal
+    - TODO
+  - Test suite
+    - Crash-testing
+    
+  
 
 
 ### Ferramentas usadas
 
 [<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://www.jetbrains.com/idea/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
+
+[<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> CLion](https://www.jetbrains.com/clion/) - A cross-platform IDE for C and C++
 
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
@@ -95,11 +110,6 @@ Substituir o id da ami no application.yaml, propriedade aws.instance.ami.
 com tipo de acesso Programmatic access, e política AdministratorAccess. Substituir os valores da access key e secret access key no application.yaml, propriedades aws.access.key e aws.access.secret-key, respetivamente.
 
 - [Configurar chaves](https://aws.amazon.com/pt/premiumsupport/knowledge-center/ec2-ssh-key-pair-regions/) em todas as regiões disponíveis.
-
-##### Go
-
-Para usar repositórios privados com o go modules:  
-`go env -w GOPRIVATE=github.com/usmanager/*`
 
 ### Licença
 

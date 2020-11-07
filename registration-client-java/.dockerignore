@@ -1,7 +1,0 @@
-.gradle
-gradle*
-build*
-target
-.gitignore
-.dockerignore
-README.md

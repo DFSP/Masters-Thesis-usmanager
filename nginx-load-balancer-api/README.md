@@ -60,7 +60,7 @@ sudo ./nginx-load-balancer-api
 ```
 Com servidores iniciais
 ```shell script
-sudo env SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+sudo env SERVERS="[{\"service\":\"app1\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
 ./nginx-load-balancer-api
 ```
 
@@ -76,7 +76,7 @@ Com servidores iniciais
 ```shell script
 docker build -f docker/Dockerfile . -t nginx-load-balancer-api
 docker run -p 1906:1906 \
--e SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+-e SERVERS="[{\"service\":\"app1\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
 nginx-load-balancer-api
 ```
 
@@ -98,26 +98,26 @@ Obter os servidores de todos os serviços:
 curl -i --user username:password http://localhost:1906/api/servers
 ```
 
-Obter os servidores do serviço `app`:
+Obter os servidores do serviço `app1`:
 ```shell script
-curl -i --user username:password http://localhost:1906/api/app/servers
+curl -i --user username:password http://localhost:1906/api/app1/servers
 ```
 
-Adicionar um servidor ao serviço `app`:
+Adicionar um servidor ao serviço `app1`:
 ```shell script
 curl -i \
      --user username:password \
      --header "Content-Type: application/json" \
      --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
-     http://localhost:1906/api/app/servers
+     http://localhost:1906/api/app1/servers
 ```
 
-Remover o servidor `202.193.200.125:5000` ao serviço `app`:
+Remover o servidor `202.193.200.125:5000` ao serviço `app1`:
 ```shell script
 curl -i \
      --user username:password \
      -X DELETE \
-     http://localhost:1906/api/apps/servers/202.193.200.125:5000
+     http://localhost:1906/api/app1/servers/202.193.200.125:5000
 ```
 
 ## Licença

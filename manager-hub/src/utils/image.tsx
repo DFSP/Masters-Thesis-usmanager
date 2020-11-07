@@ -109,15 +109,14 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
         if (value === undefined) {
             return <FaMapMarkedAlt/>;
         }
-        const region = value as IRegion;
-        const regionName = region.region.toLowerCase();
+        const regionName = (typeof value === 'string' ? value : (value as IRegion).region).toLowerCase();
         if (regionName.includes('america')) {
             return <FaGlobeAmericas/>;
         }
         if (regionName.includes('europe')) {
             return <FaGlobeEurope/>;
         }
-        if (regionName.includes('asia')) {
+        if (regionName.includes('asia') || regionName.includes('oceania')) {
             return <FaGlobeAsia/>;
         }
         if (regionName.includes('africa') || regionName.includes('middle east')) {

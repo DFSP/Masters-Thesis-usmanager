@@ -67,7 +67,7 @@ sudo nginx -t
  
 ```shell script
 docker build -f docker/Dockerfile . -t nginx-load-balancer  
-docker run -p 1907:80 \
+docker run -p 1906:80 \
 -e BASIC_AUTH_USERNAME=username \
 -e BASIC_AUTH_PASSWORD=password \
 nginx-load-balancer 
@@ -75,10 +75,11 @@ nginx-load-balancer
 
 ##### Com servidores iniciais
 ```shell script
-docker run -p 1907:80 \
+docker build -f docker/Dockerfile . -t nginx-load-balancer
+docker run -p 1906:80 \
 -e BASIC_AUTH_USERNAME=username \
 -e BASIC_AUTH_PASSWORD=password \
--e SERVERS="[{\"service\":\"app\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
+-e SERVERS="[{\"service\":\"app1\",\"servers\":[{\"server\":\"202.193.200.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"},{\"server\":\"202.193.20.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]},{\"service\":\"app2\",\"servers\":[{\"server\":\"202.193.203.125:5000\",\"latitude\":39.575097,\"longitude\":-8.909794,\"region\":\"EUROPE\"}]}]" \
 nginx-load-balancer
 ```
 
@@ -123,29 +124,29 @@ está a executar no localhost.
 
 Obter os servidores de todos os serviços:
 ```shell script
-curl -i --user username:password http://localhost:1907/_/api/servers
+curl -i --user username:password http://localhost:1906/_/api/servers
 ```
 
-Obter os servidores do serviço `app`:
+Obter os servidores do serviço `app1`:
 ```shell script
-curl -i --user username:password http://localhost:1907/_/api/app/servers
+curl -i --user username:password http://localhost:1906/_/api/app1/servers
 ```
 
-Adicionar um servidor ao serviço `app`:
+Adicionar um servidor ao serviço `app1`:
 ```shell script
 curl -i \
      --user username:password \
      --header "Content-Type: application/json" \
      --data '[{"server":"202.193.200.125:5000","latitude":39.575097,"longitude":-8.909794,"region":"EUROPE"}]' \
-     http://localhost:1907/_/api/app/servers
+     http://localhost:1906/_/api/app1/servers
 ```
 
-Remover o servidor `202.193.200.125:5000` ao serviço `app`:
+Remover o servidor `202.193.200.125:5000` ao serviço `app1`:
 ```shell script
 curl -i \
      --user username:password \
      -X DELETE \
-     http://localhost:1907/_/api/apps/servers/202.193.200.125:5000
+     http://localhost:1906/_/api/app1/servers/202.193.200.125:5000
 ```
 
 ## Módulos relevantes 

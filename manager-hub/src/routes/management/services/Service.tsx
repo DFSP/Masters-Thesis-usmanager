@@ -431,6 +431,7 @@ class Service extends BaseComponent<Props, State> {
         // @ts-ignore
         const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
         const isNewService = this.isNew();
+        console.log(getTypeFromValue(formService?.defaultDb))
         return (
             <>
                 {!isNewService && isLoading && <LoadingSpinner/>}

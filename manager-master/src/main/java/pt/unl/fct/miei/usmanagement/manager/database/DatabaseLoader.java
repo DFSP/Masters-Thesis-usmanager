@@ -513,12 +513,12 @@ public class DatabaseLoader {
 			// apps
 			App testing;
 			try {
-				testing = appsService.getApp("Testing");
+				testing = appsService.getApp("Test suite");
 			}
 			catch (EntityNotFoundException ignored) {
 				testing = App.builder()
-					.name("Testing")
-					.description("Microservices designed to test some components of the system.")
+					.name("Test suite")
+					.description("Microservices designed to test components of the system.")
 					.build();
 				testing = appsService.addApp(testing);
 				appsServices.saveAll(List.of(

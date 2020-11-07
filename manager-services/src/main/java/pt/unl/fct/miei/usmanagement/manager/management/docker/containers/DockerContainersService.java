@@ -119,8 +119,8 @@ public class DockerContainersService {
 			serviceContainers.put(service.getServiceName(), containers);
 			containers.forEach(container -> {
 				String hostname = container.getPublicIpAddress();
-				int privatePort = container.getPorts().get(0).getPrivatePort(); //TODO privado ou publico?
-				String address = String.format("%s:%d", hostname, privatePort);
+				int publicPort = container.getPorts().get(0).getPublicPort();
+				String address = String.format("%s:%d", hostname, publicPort);
 				dynamicLaunchParams.put(service.getOutputLabel(), address);
 			});
 			//TODO rever tempo de espera, é preciso? Timing.sleep(DELAY_BETWEEN_CONTAINER_LAUNCH, TimeUnit.MILLISECONDS);
