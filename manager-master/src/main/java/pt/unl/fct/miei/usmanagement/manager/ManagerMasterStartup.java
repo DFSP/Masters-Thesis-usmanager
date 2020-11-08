@@ -77,6 +77,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		cloudHostsService.initSyncDatabaseCloudHostsTimer();
 		containersService.initSyncDatabaseContainersTimer();
 		symService.startSymmetricDSServer(hostAddress);
+		//TODO start 1 eureka on each region at the start
 	}
 
 }
