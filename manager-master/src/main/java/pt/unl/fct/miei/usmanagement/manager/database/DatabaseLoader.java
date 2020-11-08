@@ -84,7 +84,6 @@ import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +116,6 @@ public class DatabaseLoader {
 
 			String dockerHubUsername = dockerProperties.getHub().getUsername();
 			Map<String, Service> services = new HashMap<>(loadSystemComponents(dockerHubUsername, servicesService, dockerProperties));
-			Service registrationServer = services.get(RegistrationServerService.REGISTRATION_SERVER);
 			services.putAll(loadSockShop(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadMixal(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadOnlineBoutique(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
@@ -833,7 +831,7 @@ public class DatabaseLoader {
 	}
 
 	private Map<String, Service> loadMediaMicroservices(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-														ServiceDependenciesService serviceDependenciesService, AppServices appService) {
+														ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(32);
 
 		String appName = "Media";
@@ -868,9 +866,12 @@ public class DatabaseLoader {
 		Map.Entry<String, Service> userMemcached = associateServiceToApp(appName, "user-memcached", 21213, 11211, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(userMemcached.getKey(), userMemcached.getValue());
-		Map.Entry<String, Service> reviewMemcached = associateServiceToApp(appName, "review", 10006, 9090, ServiceTypeEnum.BACKEND,
+		Map.Entry<String, Service> composeReview = associateServiceToApp(appName, "compose-review", 10006, 9090, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(reviewMemcached.getKey(), reviewMemcached.getValue());
+		servicesMap.put(composeReview.getKey(), composeReview.getValue());
+		Map.Entry<String, Service> composeReviewMemcached = associateServiceToApp(appName, "compose-review-memcached", 10006, 9090, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(composeReviewMemcached.getKey(), composeReviewMemcached.getValue());
 		Map.Entry<String, Service> reviewStorage = associateServiceToApp(appName, "review-storage", 10007, 9090, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(reviewStorage.getKey(), reviewStorage.getValue());
@@ -925,19 +926,165 @@ public class DatabaseLoader {
 		Map.Entry<String, Service> plotMemcached = associateServiceToApp(appName, "plot-memcached", 11220, 11211, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(plotMemcached.getKey(), plotMemcached.getValue());
-		Map.Entry<String, Service> plotMovieInfo = associateServiceToApp(appName, "plot-movie-info", 10012, 9090, ServiceTypeEnum.BACKEND,
+		Map.Entry<String, Service> movieInfo = associateServiceToApp(appName, "movie-info", 10012, 9090, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(plotMovieInfo.getKey(), plotMovieInfo.getValue());
-		Map.Entry<String, Service> plotMovieInfoDb = associateServiceToApp(appName, "plot-movie-info-db", 47017, 27017, ServiceTypeEnum.DATABASE,
+		servicesMap.put(movieInfo.getKey(), movieInfo.getValue());
+		Map.Entry<String, Service> movieInfoDb = associateServiceToApp(appName, "movie-info-db", 47017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(plotMovieInfoDb.getKey(), plotMovieInfoDb.getValue());
-		Map.Entry<String, Service> plotMovieInfoMemcached = associateServiceToApp(appName, "plot-movie-info-memcached", 11221, 11211, ServiceTypeEnum.BACKEND,
+		servicesMap.put(movieInfoDb.getKey(), movieInfoDb.getValue());
+		Map.Entry<String, Service> movieInfoMemcached = associateServiceToApp(appName, "movie-info-memcached", 11221, 11211, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(plotMovieInfoMemcached.getKey(), plotMovieInfoMemcached.getValue());
+		servicesMap.put(movieInfoMemcached.getKey(), movieInfoMemcached.getValue());
+		Map.Entry<String, Service> page = associateServiceToApp(appName, "page", 9090, 9090, ServiceTypeEnum.FRONTEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(movieInfoMemcached.getKey(), movieInfoMemcached.getValue());
+
 		/*- 5775:5775/udp, 6831:6831/udp, 6832:6832/udp, 5778:5778, 16686:16686, 14268:14268, 9411:9411*/
 		Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 16686, 16686, ServiceTypeEnum.BACKEND,
 			Set.of("COLLECTOR_ZIPKIN_HTTP_PORT=9411"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(jaeger.getKey(), jaeger.getValue());
+
+		if (!appsService.hasApp(appName)) {
+			App hotelReservation = App.builder().name(appName)
+				.description("This application contains microservices about movies including info, plots, reviews, etc.")
+				.build();
+			hotelReservation = appsService.addApp(hotelReservation);
+			appServices.saveAll(List.of(
+				AppService.builder().app(hotelReservation).service(uniqueId.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieId.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieIdDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieIdMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(text.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(rating.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(ratingRedis.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(user.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(userDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(userMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(composeReview.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(composeReviewMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(reviewStorage.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(reviewStorageDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(reviewStorageMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(userReview.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(userReviewDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(userReviewRedis.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieReview.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieReviewDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieReviewRedis.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(nginxWebServer.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(castInfo.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(castInfoDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(castInfoMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(plot.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(plotDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(plotMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieInfo.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieInfoDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(movieInfoMemcached.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(page.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(jaeger.getValue()).build())
+			);
+		}
+
+		if (!serviceDependenciesService.hasDependency(castInfo.getKey(), castInfoDb.getKey())) {
+			serviceDependenciesService.addDependency(castInfo.getValue(), castInfoDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(castInfo.getKey(), castInfoMemcached.getKey())) {
+			serviceDependenciesService.addDependency(castInfo.getValue(), castInfoMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(composeReview.getKey(), reviewStorage.getKey())) {
+			serviceDependenciesService.addDependency(composeReview.getValue(), reviewStorage.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(composeReview.getKey(), userReview.getKey())) {
+			serviceDependenciesService.addDependency(composeReview.getValue(), userReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(composeReview.getKey(), movieReview.getKey())) {
+			serviceDependenciesService.addDependency(composeReview.getValue(), movieReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(composeReview.getKey(), composeReviewMemcached.getKey())) {
+			serviceDependenciesService.addDependency(composeReview.getValue(), composeReviewMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieId.getKey(), composeReview.getKey())) {
+			serviceDependenciesService.addDependency(movieId.getValue(), composeReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieId.getKey(), rating.getKey())) {
+			serviceDependenciesService.addDependency(movieId.getValue(), rating.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieId.getKey(), movieIdDb.getKey())) {
+			serviceDependenciesService.addDependency(movieId.getValue(), movieIdDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieId.getKey(), movieIdMemcached.getKey())) {
+			serviceDependenciesService.addDependency(movieId.getValue(), movieIdMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieInfo.getKey(), movieInfoDb.getKey())) {
+			serviceDependenciesService.addDependency(movieInfo.getValue(), movieInfoDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieInfo.getKey(), movieInfoMemcached.getKey())) {
+			serviceDependenciesService.addDependency(movieInfo.getValue(), movieInfoMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieReview.getKey(), reviewStorage.getKey())) {
+			serviceDependenciesService.addDependency(movieReview.getValue(), reviewStorage.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieReview.getKey(), movieReviewDb.getKey())) {
+			serviceDependenciesService.addDependency(movieReview.getValue(), movieReviewDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(movieReview.getKey(), movieReviewRedis.getKey())) {
+			serviceDependenciesService.addDependency(movieReview.getValue(), movieReviewRedis.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(page.getKey(), castInfo.getKey())) {
+			serviceDependenciesService.addDependency(page.getValue(), castInfo.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(page.getKey(), movieReview.getKey())) {
+			serviceDependenciesService.addDependency(page.getValue(), movieReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(page.getKey(), movieInfo.getKey())) {
+			serviceDependenciesService.addDependency(page.getValue(), movieInfo.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(page.getKey(), plot.getKey())) {
+			serviceDependenciesService.addDependency(page.getValue(), plot.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(plot.getKey(), plotDb.getKey())) {
+			serviceDependenciesService.addDependency(page.getValue(), plotDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(plot.getKey(), plotMemcached.getKey())) {
+			serviceDependenciesService.addDependency(plot.getValue(), plotMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(rating.getKey(), composeReview.getKey())) {
+			serviceDependenciesService.addDependency(rating.getValue(), composeReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(rating.getKey(), ratingRedis.getKey())) {
+			serviceDependenciesService.addDependency(rating.getValue(), ratingRedis.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(reviewStorage.getKey(), reviewStorageDb.getKey())) {
+			serviceDependenciesService.addDependency(reviewStorage.getValue(), reviewStorageDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(reviewStorage.getKey(), reviewStorageMemcached.getKey())) {
+			serviceDependenciesService.addDependency(reviewStorage.getValue(), reviewStorageMemcached.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(text.getKey(), composeReview.getKey())) {
+			serviceDependenciesService.addDependency(text.getValue(), composeReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(uniqueId.getKey(), composeReview.getKey())) {
+			serviceDependenciesService.addDependency(uniqueId.getValue(), composeReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(userReview.getKey(), reviewStorage.getKey())) {
+			serviceDependenciesService.addDependency(userReview.getValue(), reviewStorage.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(userReview.getKey(), userReviewDb.getKey())) {
+			serviceDependenciesService.addDependency(userReview.getValue(), userReviewDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(userReview.getKey(), userReviewRedis.getKey())) {
+			serviceDependenciesService.addDependency(userReview.getValue(), userReviewRedis.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(user.getKey(), composeReview.getKey())) {
+			serviceDependenciesService.addDependency(user.getValue(), composeReview.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(user.getKey(), userDb.getKey())) {
+			serviceDependenciesService.addDependency(user.getValue(), userDb.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(user.getKey(), userMemcached.getKey())) {
+			serviceDependenciesService.addDependency(user.getValue(), userMemcached.getValue());
+		}
 
 		return servicesMap;
 	}
@@ -977,13 +1124,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(reservation.getKey(), reservation.getValue());
 		Map.Entry<String, Service> memcachedRate = associateServiceToApp(appName, "memcached-rate", 11212, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "EMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedRate.getKey(), memcachedRate.getValue());
 		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "memcached-profile", 11213, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "EMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedProfile.getKey(), memcachedProfile.getValue());
 		Map.Entry<String, Service> memcachedReserve = associateServiceToApp(appName, "memcached-reserve", 11214, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "EMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedReserve.getKey(), memcachedReserve.getValue());
 		// volume - geo:/data/db
 		Map.Entry<String, Service> geoDb = associateServiceToApp(appName, "geo-db", 28017, 27017, ServiceTypeEnum.DATABASE,
@@ -1094,7 +1241,7 @@ public class DatabaseLoader {
 			Set.of("DISABLE_PROFILER=1"), servicesService, dockerHubUsername, null, 64000000d);
 		servicesMap.put(email.getKey(), email.getValue());
 		Map.Entry<String, Service> frontend = associateServiceToApp(appName, "frontend", 8090, 8080, ServiceTypeEnum.FRONTEND,
-			Set.of("ENV_PLATFORM=gcp"), servicesService, dockerHubUsername, null,  64000000d);
+			Set.of("ENV_PLATFORM=gcp"), servicesService, dockerHubUsername, null, 64000000d);
 		servicesMap.put(frontend.getKey(), frontend.getValue());
 		Map.Entry<String, Service> loadGenerator = associateServiceToApp(appName, "loadGenerator", null, null, ServiceTypeEnum.BACKEND,
 			Set.of("USERS=10"), servicesService, dockerHubUsername, null, 256000000d);
@@ -1124,60 +1271,66 @@ public class DatabaseLoader {
 				.build();
 			onlineBoutique = appsService.addApp(onlineBoutique);
 			appServices.saveAll(List.of(
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueLoadGenerator).launchOrder(11).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueFrontend).launchOrder(10).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueAds).launchOrder(9).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueCheckout).launchOrder(8).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueShipping).launchOrder(7).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueCurrency).launchOrder(6).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueCatalogue).launchOrder(5).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueRecommendation).launchOrder(4).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueCarts).launchOrder(3).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiqueEmail).launchOrder(2).build(),
-				AppService.builder().app(onlineBoutique).service(onlineBoutiquePayment).launchOrder(1).build()));
+				AppService.builder().app(onlineBoutique).service(loadGenerator.getValue()).launchOrder(11).build(),
+				AppService.builder().app(onlineBoutique).service(frontend.getValue()).launchOrder(10).build(),
+				AppService.builder().app(onlineBoutique).service(ads.getValue()).launchOrder(9).build(),
+				AppService.builder().app(onlineBoutique).service(checkout.getValue()).launchOrder(8).build(),
+				AppService.builder().app(onlineBoutique).service(shipping.getValue()).launchOrder(7).build(),
+				AppService.builder().app(onlineBoutique).service(currency.getValue()).launchOrder(6).build(),
+				AppService.builder().app(onlineBoutique).service(catalogue.getValue()).launchOrder(5).build(),
+				AppService.builder().app(onlineBoutique).service(recommendation.getValue()).launchOrder(4).build(),
+				AppService.builder().app(onlineBoutique).service(carts.getValue()).launchOrder(3).build(),
+				AppService.builder().app(onlineBoutique).service(email.getValue()).launchOrder(2).build(),
+				AppService.builder().app(onlineBoutique).service(payment.getValue()).launchOrder(1).build()));
 		}
 
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueLoadGenerator.getServiceName(), onlineBoutiqueFrontend.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueLoadGenerator, onlineBoutiqueFrontend);
+		if (!serviceDependenciesService.hasDependency(carts.getKey(), redis.getKey())) {
+			serviceDependenciesService.addDependency(carts.getValue(), redis.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueAds.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueAds);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), catalogue.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), catalogue.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueCheckout.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueCheckout);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), shipping.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), shipping.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueShipping.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueShipping);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), payment.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), payment.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueCurrency.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueCurrency);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), email.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), email.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueCatalogue.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueCatalogue);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), currency.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), currency.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueRecommendation.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueRecommendation);
+		if (!serviceDependenciesService.hasDependency(checkout.getKey(), carts.getKey())) {
+			serviceDependenciesService.addDependency(checkout.getValue(), carts.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueFrontend.getServiceName(), onlineBoutiqueCarts.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueFrontend, onlineBoutiqueCarts);
+		if (!serviceDependenciesService.hasDependency(recommendation.getKey(), catalogue.getKey())) {
+			serviceDependenciesService.addDependency(recommendation.getValue(), catalogue.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueCheckout.getServiceName(), onlineBoutiqueEmail.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueCheckout, onlineBoutiqueCarts);
+		if (!serviceDependenciesService.hasDependency(loadGenerator.getKey(), frontend.getKey())) {
+			serviceDependenciesService.addDependency(loadGenerator.getValue(), frontend.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueCheckout.getServiceName(), onlineBoutiquePayment.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueCheckout, onlineBoutiquePayment);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), catalogue.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), catalogue.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueCheckout.getServiceName(), onlineBoutiqueShipping.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueCheckout, onlineBoutiqueShipping);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), currency.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), currency.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueCheckout.getServiceName(), onlineBoutiqueCurrency.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueCheckout, onlineBoutiqueCurrency);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), carts.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), carts.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueCheckout.getServiceName(), onlineBoutiqueCarts.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueCheckout, onlineBoutiqueCurrency);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), recommendation.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), recommendation.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(onlineBoutiqueRecommendation.getServiceName(), onlineBoutiqueCatalogue.getServiceName())) {
-			serviceDependenciesService.addDependency(onlineBoutiqueRecommendation, onlineBoutiqueCatalogue);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), shipping.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), shipping.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), checkout.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), checkout.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), ads.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), ads.getValue());
 		}
 
 		return servicesMap;
@@ -1187,123 +1340,45 @@ public class DatabaseLoader {
 										   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(5);
 
-		Service mixalPrime;
-		try {
-			mixalPrime = servicesService.getService("mixal-prime");
-		}
-		catch (EntityNotFoundException ignored) {
-			mixalPrime = Service.builder()
-				.serviceName("mixal-prime")
-				.dockerRepository(dockerHubUsername + "/mixal-prime")
-				.defaultExternalPort(9001)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${primeHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.build();
-			mixalPrime = servicesService.addService(mixalPrime);
-		}
-		servicesMap.put("mixal-prime", mixalPrime);
+		String appName = "Mixal";
 
-		Service mixalMovie;
-		try {
-			mixalMovie = servicesService.getService("mixal-movie");
-		}
-		catch (EntityNotFoundException ignored) {
-			mixalMovie = Service.builder()
-				.serviceName("mixal-movie")
-				.dockerRepository(dockerHubUsername + "/mixal-movie")
-				.defaultExternalPort(9002)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${movieDatabaseHost}")
-				.minimumReplicas(1)
-				.outputLabel("${movieHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.build();
-			mixalMovie = servicesService.addService(mixalMovie);
-		}
-		servicesMap.put("mixal-movie", mixalMovie);
+		Map.Entry<String, Service> prime = associateServiceToApp(appName, "prime", 9001, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(prime.getKey(), prime.getValue());
+		Map.Entry<String, Service> movie = associateServiceToApp(appName, "movie", 9002, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(movie.getKey(), movie.getValue());
+		Map.Entry<String, Service> movieDb = associateServiceToApp(appName, "movie-db", 22027, 28027, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(movieDb.getKey(), movieDb.getValue());
+		Map.Entry<String, Service> serve = associateServiceToApp(appName, "serve", 9003, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(serve.getKey(), serve.getValue());
+		Map.Entry<String, Service> webac = associateServiceToApp(appName, "webac", 9004, 80, ServiceTypeEnum.FRONTEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(webac.getKey(), webac.getValue());
 
-
-		Service mixalMovieDb;
-		try {
-			mixalMovieDb = servicesService.getService("mixal-movie-db");
-		}
-		catch (EntityNotFoundException ignored) {
-			mixalMovieDb = Service.builder()
-				.serviceName("mixal-movie-db")
-				.dockerRepository(dockerHubUsername + "/mixal-movie-db")
-				.defaultExternalPort(28027)
-				.defaultInternalPort(28027)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${movieDbHost}")
-				.serviceType(ServiceTypeEnum.DATABASE)
-				.build();
-			mixalMovieDb = servicesService.addService(mixalMovieDb);
-		}
-		servicesMap.put("mixal-movie", mixalMovie);
-
-		Service mixalServe;
-		try {
-			mixalServe = servicesService.getService("mixal-serve");
-		}
-		catch (EntityNotFoundException ignored) {
-			mixalServe = Service.builder()
-				.serviceName("mixal-serve")
-				.dockerRepository(dockerHubUsername + "/mixal-serve")
-				.defaultExternalPort(9003)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${serveHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.build();
-			mixalServe = servicesService.addService(mixalServe);
-		}
-		servicesMap.put("mixal-serve", mixalServe);
-
-		Service mixalWebac;
-		try {
-			mixalWebac = servicesService.getService("mixal-webac");
-		}
-		catch (EntityNotFoundException ignored) {
-			mixalWebac = Service.builder()
-				.serviceName("mixal-webac")
-				.dockerRepository(dockerHubUsername + "/mixal-webac")
-				.defaultExternalPort(9004)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${webacHost}")
-				.serviceType(ServiceTypeEnum.FRONTEND)
-				.build();
-			mixalWebac = servicesService.addService(mixalWebac);
-		}
-		servicesMap.put("mixal-webac", mixalWebac);
-
-		if (!appsService.hasApp("Mixal")) {
+		if (!appsService.hasApp(appName)) {
 			App mixal = App.builder()
-				.name("Mixal")
+				.name(appName)
 				.description("Set of four simple microservices.")
 				.build();
 			mixal = appsService.addApp(mixal);
 			appServices.saveAll(List.of(
-				AppService.builder().app(mixal).service(mixalWebac).launchOrder(5).build(),
-				AppService.builder().app(mixal).service(mixalServe).launchOrder(4).build(),
-				AppService.builder().app(mixal).service(mixalPrime).launchOrder(3).build(),
-				AppService.builder().app(mixal).service(mixalMovie).launchOrder(2).build(),
-				AppService.builder().app(mixal).service(mixalMovieDb).launchOrder(1).build()));
+				AppService.builder().app(mixal).service(webac.getValue()).launchOrder(5).build(),
+				AppService.builder().app(mixal).service(serve.getValue()).launchOrder(4).build(),
+				AppService.builder().app(mixal).service(prime.getValue()).launchOrder(3).build(),
+				AppService.builder().app(mixal).service(movie.getValue()).launchOrder(2).build(),
+				AppService.builder().app(mixal).service(movieDb.getValue()).launchOrder(1).build()));
 		}
-		if (!serviceDependenciesService.hasDependency(mixalServe.getServiceName(), mixalMovie.getServiceName())) {
-			serviceDependenciesService.addDependency(mixalServe, mixalMovie);
+		if (!serviceDependenciesService.hasDependency(serve.getKey(), movie.getKey())) {
+			serviceDependenciesService.addDependency(serve.getValue(), movie.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(mixalServe.getServiceName(), mixalPrime.getServiceName())) {
-			serviceDependenciesService.addDependency(mixalServe, mixalPrime);
+		if (!serviceDependenciesService.hasDependency(serve.getKey(), prime.getKey())) {
+			serviceDependenciesService.addDependency(serve.getValue(), prime.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(mixalServe.getServiceName(), mixalWebac.getServiceName())) {
-			serviceDependenciesService.addDependency(mixalServe, mixalWebac);
+		if (!serviceDependenciesService.hasDependency(serve.getKey(), webac.getKey())) {
+			serviceDependenciesService.addDependency(serve.getValue(), webac.getValue());
 		}
 
 		return servicesMap;
