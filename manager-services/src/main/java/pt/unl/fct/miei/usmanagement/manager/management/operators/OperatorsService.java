@@ -57,8 +57,12 @@ public class OperatorsService {
 
 	public Operator getOperator(String operatorName) {
 		OperatorEnum operator = OperatorEnum.valueOf(operatorName.toUpperCase());
+		return getOperator(operator);
+	}
+
+	public Operator getOperator(OperatorEnum operator) {
 		return operators.findByOperator(operator).orElseThrow(() ->
-			new EntityNotFoundException(Operator.class, "name", operatorName));
+			new EntityNotFoundException(Operator.class, "name", operator.name()));
 	}
 
 	public Operator addOperator(Operator operator) {

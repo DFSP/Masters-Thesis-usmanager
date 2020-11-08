@@ -166,7 +166,7 @@ public class DroolsService {
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed to create rule template {}: {}", templateFile, e.getMessage());
 		}
 		return result.toString(StandardCharsets.UTF_8);
 	}

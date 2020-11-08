@@ -127,10 +127,10 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                {service}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {service}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (

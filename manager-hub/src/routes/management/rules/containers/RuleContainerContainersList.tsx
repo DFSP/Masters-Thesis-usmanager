@@ -130,10 +130,10 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                {container}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {container}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (

@@ -52,7 +52,7 @@ interface ControlledListProps<T> {
     dropdown?: IDropdown;
     formModal?: IFormModal;
     show: (index: number, element: T, separate: boolean, checked: boolean,
-           handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
+           handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void, list: T[]) => JSX.Element;
     onAdd?: (data: string) => void;
     onAddInput?: (input: IValues) => void;
     onRemove?: (data: string[]) => void;
@@ -111,6 +111,20 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
             }, {}));
         }
         this.initDropdown();
+    }
+
+    public update = (data: T) => {
+        const key = this.getDataStateKey(data);
+        this.setState(state => ({
+            [key]: {
+                value: data,
+                // @ts-ignore
+                isChecked: state[key].isChecked,
+                // @ts-ignore
+                isNew: state[key].isNew
+            }
+        }));
+
     }
 
     public render() {
@@ -177,7 +191,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                             {this.inputDialog(formModal)}
                         </>
                     )}
-                    <button className={`btn-flat btn-small red-text right ${styles.button}`}
+                    {!error && <button className={`btn-flat btn-small red-text right ${styles.button}`}
                         /*style={!error && Object.values(this.state)
                             .map(item => item?.isChecked || false)
                             .some(checked => checked)
@@ -188,7 +202,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                 .every(checked => !checked)}
                             onClick={this.onRemove}>
                         {removeButtonText || 'Remove'}
-                    </button>
+                    </button>}
                 </div>
                 <DataList
                     isLoading={isLoading}
@@ -258,10 +272,10 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
         return this.state[dataKey];
     };
 
-    private show = (data: T, index: number): JSX.Element => {
+    private show = (data: T, index: number, last: boolean, list: T[]): JSX.Element => {
         const separate = index !== Object.entries(this.state).filter(([_, data]) => data).length - 1;
         const checked = this.getDataState(data)?.isChecked || false;
-        return this.props.show(index, data, separate, checked, this.handleCheckbox)
+        return this.props.show(index, data, separate, checked, this.handleCheckbox, list)
     };
 
     private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
@@ -342,7 +356,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                             position={formModal.position}
                             confirmCallback={preSelected ? this.onAddDropdownModalInput : this.onAddFormModalInput}
                             fullscreen={formModal.fullScreen}
-                            scrollbar={formModal.scrollbar}>
+                            scrollbar={formModal.scrollbar}
+                            onResize={formModal.onResize}>
             {formModal?.content()}
         </InputDialog>;
     };

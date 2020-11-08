@@ -53,6 +53,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmS
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -86,6 +87,7 @@ public class DockerContainersService {
 	private final DockerCoreService dockerCoreService;
 	private final NodesService nodesService;
 	private final ServicesService servicesService;
+	private final ServiceDependenciesService serviceDependenciesService;
 	private final NginxLoadBalancerService nginxLoadBalancerService;
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
@@ -97,13 +99,14 @@ public class DockerContainersService {
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService, ServicesService servicesService,
-								   NginxLoadBalancerService nginxLoadBalancerService,
+								   ServiceDependenciesService serviceDependenciesService, NginxLoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
 								   ContainerProperties containerProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
 		this.servicesService = servicesService;
+		this.serviceDependenciesService = serviceDependenciesService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
@@ -282,7 +285,7 @@ public class DockerContainersService {
 				log.info("Launch command: {}", launchCommand);
 
 				RegionEnum region = hostAddress.getRegion();
-				if (servicesService.serviceDependsOn(serviceName, RegistrationServerService.REGISTRATION_SERVER)) {
+				if (serviceDependenciesService.hasDependents(serviceName)) {
 					String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
@@ -398,8 +401,7 @@ public class DockerContainersService {
 			log.info("Stopped container {} ({}) on host {}", serviceName, id, hostAddress.toString());
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
-			throw new ManagerException(e.getMessage());
+			log.error("Failed to stop container {}: {}", id, e.getMessage());
 		}
 	}
 
@@ -467,7 +469,7 @@ public class DockerContainersService {
 			return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Failed to get containers running at {}: {}", hostAddress.toSimpleString(), e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}
@@ -497,7 +499,7 @@ public class DockerContainersService {
 			return dockerClient.inspectContainer(containerId);
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable to get inspect container {}: {}", containerId, e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}

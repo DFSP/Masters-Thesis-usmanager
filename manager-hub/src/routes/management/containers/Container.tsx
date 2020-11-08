@@ -308,7 +308,7 @@ class Container extends BaseComponent<Props, State> {
 
     private chooseHostAddressDropdown = (id: string, onClick: (event: any) => void) => {
         const nodes = Object.values(this.props.nodes)
-            .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress != this.getContainer()?.publicIpAddress));
+            .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress !== this.getContainer()?.publicIpAddress));
         return <ul id={id}
                    className={`dropdown-content ${styles.dropdown}`}>
             <li className={`${styles.disabled}`}>

@@ -206,6 +206,10 @@ public class AppsService {
 			appSimulatedMetricsService.removeApp(simulatedMetric, appId));
 	}
 
+	public boolean hasApp(String appname) {
+		return apps.hasApp(appname);
+	}
+
 	private void checkAppExists(String appName) {
 		if (!apps.hasApp(appName)) {
 			throw new EntityNotFoundException(App.class, "name", appName);

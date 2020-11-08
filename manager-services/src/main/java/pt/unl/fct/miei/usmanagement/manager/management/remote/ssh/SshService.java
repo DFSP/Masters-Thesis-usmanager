@@ -153,7 +153,6 @@ public class SshService {
 		}
 		catch (IOException e) {
 			log.error("Failed to transfer file {} to {}: {}", filename, hostAddress.toSimpleString(), e.getMessage());
-			e.printStackTrace();
 			throw new ManagerException(e.getMessage());
 		}
 	}

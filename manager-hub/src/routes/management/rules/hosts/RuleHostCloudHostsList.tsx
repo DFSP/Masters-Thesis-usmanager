@@ -127,10 +127,10 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                 {cloudHost}
-               </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {cloudHost}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (

@@ -320,7 +320,6 @@ class EdgeHost extends BaseComponent<Props, State> {
         // @ts-ignore
         const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
         const isNewEdgeHost = this.isNew();
-        console.log(formEdgeHost)
         return (
             <>
                 {!isNewEdgeHost && isLoading && <LoadingSpinner/>}

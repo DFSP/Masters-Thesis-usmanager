@@ -23,9 +23,10 @@
  */
 
 import BaseComponent from "../../../components/BaseComponent";
-import React from "react";
+import React, {createRef} from "react";
 import ListItem from "../../../components/list/ListItem";
 import listItemStyles from "../../../components/list/ListItem.module.css";
+import styles from "../../../components/list/ListItem.module.css";
 import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
@@ -37,6 +38,8 @@ import {IService} from "../services/Service";
 import Field from "../../../components/form/Field";
 import {IFields, IValues, requiredAndNumberAndMinAndMax} from "../../../components/form/Form";
 import IDatabaseData from "../../../components/IDatabaseData";
+import { isEqual } from "lodash";
+import ScrollBar from "react-perfect-scrollbar";
 
 export interface IAppService extends IDatabaseData {
     service: IService;
@@ -61,47 +64,81 @@ interface DispatchToProps {
     removeAppServices: (appName: string, services: string[]) => void;
 }
 
-interface ServiceAppListProps {
+interface AppServiceListProps {
     isLoadingApp: boolean;
     loadAppError?: string | null;
     app: IApp | Partial<IApp> | null;
     unsavedServices: IAddAppService[];
     onAddAppService: (service: IAddAppService) => void;
     onRemoveAppServices: (services: string[]) => void;
+    updateAppService: (service: IAppService | IAddAppService) => void;
 }
 
-type Props = StateToProps & DispatchToProps & ServiceAppListProps;
+type Props = StateToProps & DispatchToProps & AppServiceListProps;
 
 interface State {
     selectedService?: string;
     entitySaved: boolean;
+    appServices: (IAppService | IAddAppService)[];
 }
 
 class AppServiceList extends BaseComponent<Props, State> {
 
+    private controlledList = createRef<any>();
+    private scrollbar = createRef<ScrollBar>();
+
     constructor(props: Props) {
         super(props);
-        this.state = {entitySaved: !this.isNew()};
+        this.state = {
+            entitySaved: !this.isNew(),
+            appServices: [],
+        };
     }
 
     public componentDidMount(): void {
         this.props.loadServices();
         this.loadEntities();
+        this.setState({appServices: this.props.appServices});
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
         if (!prevProps.app?.id && this.props.app?.id) {
             this.setState({entitySaved: true});
         }
+        if (!isEqual(prevProps.appServices, this.props.appServices)) {
+            this.setState({appServices: this.props.appServices});
+        }
+    }
+
+    private updateModalScrollbar = () =>
+        this.scrollbar.current?.updateScroll();
+
+    private moveService = (position: number, service: IAddAppService | IAppService, index: number, list: (IAddAppService | IAppService)[],
+                           update: (data: IAppService | IAddAppService) => void) => (_: any) => {
+        const up = list[index + position];
+        if (!up) {
+            return;
+        }
+        const newLaunchOrder = Math.max(0, up.launchOrder + position);
+        if (newLaunchOrder == service.launchOrder) {
+            return;
+        }
+        let updateService = {...service, launchOrder: Math.max(0, up.launchOrder + position)};
+        const updatedServices = this.state.appServices.filter(s => service.service.serviceName !== s.service.serviceName);
+        updatedServices.push(updateService);
+        this.setState(({appServices: updatedServices}));
+        this.props.updateAppService(updateService);
+        update(updateService);
     }
 
     public render() {
         const isNew = this.isNew();
-        return <ControlledList<IAppService>
+        return <ControlledList<IAppService | IAddAppService>
+            ref={this.controlledList}
             isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadAppError || this.props.error : undefined}
             emptyMessage={`Services list is empty`}
-            data={this.props.appServices}
+            data={this.state.appServices}
             dataKey={['service', 'serviceName']}
             dropdown={{
                 id: 'appServices',
@@ -115,9 +152,10 @@ class AppServiceList extends BaseComponent<Props, State> {
                     values: this.getModalValues(),
                     content: this.addModal,
                     position: '20%',
+                    scrollbar: this.scrollbar,
                 }
             }}
-            show={this.service}
+            show={this.service(this.controlledList?.current?.update)}
             onAddInput={this.onAdd}
             onRemove={this.onRemove}
             onDelete={{
@@ -126,7 +164,7 @@ class AppServiceList extends BaseComponent<Props, State> {
                 failureCallback: this.onDeleteFailure
             }}
             entitySaved={this.state.entitySaved}
-            sort={(a: IAppService, b: IAppService) => a.launchOrder - b.launchOrder}/>;
+            sort={(a: IAppService | IAddAppService, b: IAppService | IAddAppService) => a.launchOrder - b.launchOrder}/>;
     }
 
     private loadEntities = () => {
@@ -139,8 +177,11 @@ class AppServiceList extends BaseComponent<Props, State> {
     private isNew = () =>
         this.props.app?.name === undefined;
 
-    private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    private service = (update: (service: IAppService | IAddAppService) => void) => (index: number,
+                                                                                    service: IAppService | IAddAppService,
+                                                                                    separate: boolean, checked: boolean,
+                                                                                    handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void,
+                                                                                    list: (IAppService | IAddAppService)[]): JSX.Element => {
         const serviceName = service.service.serviceName;
         const isNew = this.isNew();
         const unsaved = this.props.unsavedServices.map(service => service.service.serviceName).includes(serviceName);
@@ -149,14 +190,14 @@ class AppServiceList extends BaseComponent<Props, State> {
                 <div className={`${listItemStyles.linkedItemContent}`}>
                     <label>
                         <input id={serviceName}
-                               type="checkbox"
+                               type='checkbox'
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {service.launchOrder}. {serviceName}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
+                                {service.launchOrder}. {serviceName}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (
@@ -165,12 +206,21 @@ class AppServiceList extends BaseComponent<Props, State> {
                         <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}
+                <div className={`${styles.actions}`}>
+                    <div className={`btn-flat large white-text ${styles.actionButton}`}
+                         onClick={this.moveService(-1, service, index, list, update)}>
+                        <i className='small material-icons'>arrow_upward</i>
+                    </div>
+                    <div className={`btn-flat large white-text ${styles.actionButton}`}
+                         onClick={this.moveService(1, service, index, list, update)}>
+                        <i className='small material-icons'>arrow_downward</i>
+                    </div>
+                </div>
             </ListItem>
         );
     };
 
     private onAdd = (service: IValues): void => {
-        console.log(service)
         this.props.onAddAppService(service as IAddAppService);
         this.setState({selectedService: undefined});
     };
@@ -227,7 +277,7 @@ class AppServiceList extends BaseComponent<Props, State> {
 
 }
 
-function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): StateToProps {
+function mapStateToProps(state: ReduxState, ownProps: AppServiceListProps): StateToProps {
     const appName = ownProps.app?.name;
     const app = appName && state.entities.apps.data[appName];
     const appServices = app && app.services;

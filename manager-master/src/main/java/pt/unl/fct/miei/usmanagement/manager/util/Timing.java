@@ -25,11 +25,13 @@
 package pt.unl.fct.miei.usmanagement.manager.util;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
 
+@Slf4j
 @UtilityClass
 public class Timing {
 
@@ -38,7 +40,7 @@ public class Timing {
 			timeUnit.sleep(time);
 		}
 		catch (InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable to sleep {} {}: {}", time, timeUnit.name(), e.getMessage());
 		}
 	}
 
@@ -52,12 +54,7 @@ public class Timing {
 			if (System.currentTimeMillis() - start > timeout) {
 				throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
 			}
-			try {
-				Thread.sleep(sleep);
-			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Timing.sleep(sleep, TimeUnit.MILLISECONDS);
 		}
 	}
 

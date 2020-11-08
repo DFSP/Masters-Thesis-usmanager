@@ -116,7 +116,7 @@ public class BashService {
 			return new BashCommandResult(command, exitStatus, output, error);
 		}
 		catch (InterruptedException | IOException e) {
-			e.printStackTrace();
+			log.error("Failed to execute bash command: {}", command);
 			return new BashCommandResult(command, -1, null, List.of(e.getMessage()));
 		}
 	}

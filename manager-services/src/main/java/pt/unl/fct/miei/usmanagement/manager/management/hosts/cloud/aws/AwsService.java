@@ -155,7 +155,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			e.printStackTrace();
+			log.error("Unable wait for instance {} to boot: {}", instanceId, e.getMessage());
 		}
 		return instance;
 	}
@@ -186,7 +186,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			e.printStackTrace();
+			log.error("Unable wait for instance {} to boot: {}", instanceId, e.getMessage());
 		}
 		return instance;
 	}

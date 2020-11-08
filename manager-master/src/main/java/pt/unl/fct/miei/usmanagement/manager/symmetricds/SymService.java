@@ -109,7 +109,7 @@ public class SymService {
 		this.symmetricDSProperties = symmetricDSProperties;
 	}
 
-	public void startSymmetricDSServer(HostAddress hostAddress) throws SQLException {
+	public void startSymmetricDSServer(HostAddress hostAddress) throws SQLException, IOException {
 		SymmetricEngineHolder holder = new SymmetricEngineHolder();
 
 		Properties properties = new Properties();
@@ -118,7 +118,8 @@ public class SymService {
 			properties.load(is);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed load sym-node properties: {}", e.getMessage());
+			throw e;
 		}
 
 		properties.setProperty(ParameterConstants.SYNC_URL,

@@ -131,14 +131,14 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                 <div className={`${styles.linkedItemContent}`}>
                     <label>
                         <input id={dependency}
-                               type="checkbox"
+                               type='checkbox'
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                 {dependency}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {dependency}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (
@@ -169,8 +169,12 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
 
     private getSelectableServicesNames = () => {
         const {services, service, dependencies, unsavedDependencies} = this.props;
-        return Object.keys(services)
-            .filter(name => (!service || name !== service.serviceName) && !dependencies.includes(name) && !unsavedDependencies.includes(name));
+        return Object.values(services).filter(s =>
+            s?.serviceType !== 'SYSTEM'
+            && (!service || s.serviceName !== service.serviceName)
+            && !dependencies.includes(s.serviceName)
+            && !unsavedDependencies.includes(s.serviceName))
+            .map(service => service.serviceName);
     };
 
 }

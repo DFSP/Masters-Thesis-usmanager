@@ -37,6 +37,7 @@ interface InputDialogProps {
     confirmCallback: (input: any) => void;
     fullscreen?: boolean;
     scrollbar?: React.RefObject<ScrollBar>;
+    onResize?: () => void;
 }
 
 type Props = InputDialogProps;
@@ -155,11 +156,14 @@ export default class InputDialog extends BaseComponent<Props, State> {
             scrollMaxHeight: this.calcDialogScrollMaxHeight(this.state.fullscreen)
         })
         this.scrollbar?.current?.updateScroll();
+        console.log(this.props.onResize)
+        this.props.onResize?.();
     }
 
     private onOpenModal = (): void => {
         M.updateTextFields();
         this.scrollbar.current?.updateScroll();
+        console.log("??")
     };
 
     private onCloseModal = (): void => {

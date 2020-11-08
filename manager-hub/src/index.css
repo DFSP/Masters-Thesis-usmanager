@@ -980,6 +980,12 @@ select.no-validation-field ~ input.select-dropdown {
     z-index: 10000;
 }
 
+@media only screen and (max-width: 992px) and (min-width: 601px) {
+    #toast-container {
+        left: 0;
+    }
+}
+
 .toast {
     margin-top: 0;
     min-height: 56px;

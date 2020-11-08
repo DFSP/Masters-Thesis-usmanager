@@ -96,7 +96,7 @@ class AppCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'View generic rules'}
                 pathname={`/apps/${app.name}`}
-                selected={'genericServiceRules'}
+                selected={'genericRules'}
                 state={app}/>,
             <LinkedContextMenuItem
                 option={'Modify simulated metrics'}

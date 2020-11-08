@@ -28,7 +28,7 @@ import React, {useEffect, useState} from 'react';
 
 interface AnimatedListProps<T> {
     list: T[];
-    show: (element: T, index: number, last: boolean) => JSX.Element;
+    show: (element: T, index: number, last: boolean, list: T[]) => JSX.Element;
     header?: () => JSX.Element;
 }
 

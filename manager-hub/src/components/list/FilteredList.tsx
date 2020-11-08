@@ -31,7 +31,7 @@ import Empty from "./Empty";
 
 interface FilteredListProps<T> {
     list: T[];
-    show: (element: T, index: number, last: boolean) => JSX.Element;
+    show: (element: T, index: number, last: boolean, list: T[]) => JSX.Element;
     predicate: (x: T, s: string) => boolean;
     paginate?: {
         pagesize: {

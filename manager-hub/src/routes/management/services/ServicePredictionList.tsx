@@ -148,14 +148,14 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                 <div className={`${styles.listItemContent}`}>
                     <label>
                         <input id={prediction.name}
-                               type="checkbox"
+                               type='checkbox'
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                {prediction.name} ({prediction.minimumReplicas} replicas)
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {prediction.name} ({prediction.minimumReplicas} replicas)
+                            </div>
+                        </span>
                     </label>
                     <div className={`${styles.smallText}`}>
                         {prediction.startDate === prediction.endDate ?

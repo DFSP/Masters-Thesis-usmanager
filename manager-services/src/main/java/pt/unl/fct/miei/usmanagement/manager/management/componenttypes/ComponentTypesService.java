@@ -57,8 +57,12 @@ public class ComponentTypesService {
 
 	public ComponentType getComponentType(String type) {
 		ComponentTypeEnum componentType = ComponentTypeEnum.valueOf(type.toUpperCase());
-		return componentTypes.findByType(componentType).orElseThrow(() ->
-			new EntityNotFoundException(ComponentType.class, "type", type));
+		return getComponentType(componentType);
+	}
+
+	public ComponentType getComponentType(ComponentTypeEnum type) {
+		return componentTypes.findByType(type).orElseThrow(() ->
+			new EntityNotFoundException(ComponentTypeEnum.class, "type", type.name()));
 	}
 
 	public ComponentType addComponentType(ComponentType componentType) {

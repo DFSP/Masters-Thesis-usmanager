@@ -133,7 +133,7 @@ public class NodesService {
 			log.info("Deleted node {}", nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable remove node {} from the swarm: {}", nodeId, e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}
@@ -148,7 +148,7 @@ public class NodesService {
 			return nodeInfo.managerStatus() != null;
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable to check if node {} is a manager: {}", nodeId, e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}
@@ -159,7 +159,7 @@ public class NodesService {
 			return nodeInfo.managerStatus() == null;
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable to check if node {} is a worker: {}", nodeId, e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}
@@ -225,13 +225,13 @@ public class NodesService {
 	}
 
 	private SimpleNode updateNode(SimpleNode node, NodeSpec nodeSpec) {
+		String nodeId = node.getId();
 		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			String nodeId = node.getId();
 			swarmManager.updateNode(nodeId, node.getVersion(), nodeSpec);
 			return getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
-			e.printStackTrace();
+			log.error("Unable to update node {}: {}", nodeId, e.getMessage());
 			throw new ManagerException(e.getMessage());
 		}
 	}

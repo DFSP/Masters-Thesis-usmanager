@@ -140,7 +140,7 @@ public class LocationRequestsService {
 			locationMonitoringData = restTemplate.getForObject(url, Map.class);
 		}
 		catch (RestClientException e) {
-			e.printStackTrace();
+			log.error("Failed to get node {} location requests: {}", hostname, e.getMessage());
 		}
 
 		return locationMonitoringData;

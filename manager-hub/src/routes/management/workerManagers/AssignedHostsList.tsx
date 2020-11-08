@@ -132,10 +132,10 @@ class AssignedHostsList extends BaseComponent<Props, State> {
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {assignedHost}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
+                                {assignedHost}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (

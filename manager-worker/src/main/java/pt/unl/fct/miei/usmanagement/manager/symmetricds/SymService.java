@@ -87,7 +87,7 @@ public class SymService {
 		this.masterHostname = workerManagerProperties.getMasterHostname();
 	}
 
-	public void startSymmetricDSServer() {
+	public void startSymmetricDSServer() throws IOException {
 		final SymmetricEngineHolder engineHolder = new SymmetricEngineHolder();
 
 		final Properties properties = new Properties();
@@ -96,7 +96,8 @@ public class SymService {
 			properties.load(is);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed load sym-node properties: {}", e.getMessage());
+			throw e;
 		}
 
 		properties.setProperty(ParameterConstants.REGISTRATION_URL,

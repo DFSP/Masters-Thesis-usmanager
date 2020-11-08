@@ -68,6 +68,7 @@ export interface FieldProps<T = string> {
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
     value === undefined
+    || value === null
     || value === ''
     || typeof value === 'boolean'
     || (typeof value === 'string' && !value.trim().length)
@@ -260,7 +261,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     private onChange = (id: string, formContext: IFormContext, validate: boolean, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        let value = target.value;
+        let value: string | number = target.value;
         // regex to test if value has only \n chars
         if (!new RegExp("^[\n\s]+$").test(value) && !isNaN(+value)) {
             value = `"${value}"`;
@@ -268,6 +269,9 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
         try {
             value = JSON.parse(value);
         } catch (_) {
+        }
+        if (getTypeFromValue(value) === 'number') {
+            value = Number(value)
         }
         if (selected) {
             this.props.dropdown?.selectCallback?.(value);

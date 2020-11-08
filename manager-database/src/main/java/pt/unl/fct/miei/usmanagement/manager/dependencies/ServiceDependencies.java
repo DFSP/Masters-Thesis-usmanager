@@ -35,4 +35,13 @@ public interface ServiceDependencies extends JpaRepository<ServiceDependency, Lo
 		+ "where d.service.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
 	boolean hasDependency(@Param("serviceName") String serviceName, @Param("dependencyName") String dependencyName);
 
+	@Query("select case when count(d) > 0 then true else false end "
+		+ "from ServiceDependency d "
+		+ "where d.service.serviceName = :serviceName")
+	boolean hasDependencies(@Param("serviceName") String serviceName);
+
+	@Query("select case when count(d) > 0 then true else false end "
+		+ "from ServiceDependency d "
+		+ "where d.dependency.serviceName = :serviceName")
+	boolean hasDependents(@Param("serviceName") String serviceName);
 }

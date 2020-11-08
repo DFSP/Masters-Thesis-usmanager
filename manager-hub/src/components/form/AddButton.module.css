@@ -63,6 +63,7 @@ ul.dropdown li.disabled a:hover {
 .button {
     margin-left: 24px;
     margin-bottom: 10px;
+    user-select: none;
 }
 
 .button:hover {

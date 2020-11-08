@@ -86,7 +86,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {entitySaved: !this.isNew()};
+        this.state = {
+            entitySaved: !this.isNew(),
+        };
     }
 
     public componentDidMount(): void {
@@ -101,13 +103,17 @@ class ServiceAppList extends BaseComponent<Props, State> {
         }
     }
 
+    private sort = (a: string | IAddServiceApp, b: string | IAddServiceApp): number =>
+        typeof a === 'string' || typeof b === 'string' ? 0 : a.launchOrder - b.launchOrder
+
     public render() {
         const isNew = this.isNew();
-        return <ControlledList<string>
+        return <ControlledList<string | IAddServiceApp>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
             emptyMessage='Apps list is empty'
             data={this.props.serviceApps}
+            sort={this.sort}
             dataKey={['name']}
             dropdown={{
                 id: 'apps',
@@ -133,8 +139,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}
-            entitySaved={this.state.entitySaved}/>;
-
+            entitySaved={this.state.entitySaved}/>
     }
 
     private loadEntities = () => {
@@ -147,6 +152,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     private isNew = () =>
         this.props.service?.serviceName === undefined;
 
+
     private app = (index: number, app: string | IAddServiceApp, separate: boolean, checked: boolean,
                    handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
         const appName = typeof app === 'string' ? app : app.name;
@@ -157,19 +163,18 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 <div className={`${listItemStyles.linkedItemContent}`}>
                     <label>
                         <input id={appName}
-                               type="checkbox"
+                               type='checkbox'
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {typeof app === 'object' ? app.launchOrder + '.' : ''} {appName}
-              </div>
-            </span>
+                            <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
+                                {typeof app === 'object' ? app.launchOrder + '.' : ''} {appName}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/apps/${appName}`}
-                          className={`${listItemStyles.link}`}>
+                    <Link to={`/apps/${appName}`} className={`${listItemStyles.link}`}>
                         <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}
@@ -233,6 +238,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 {list && !!list.length &&
                 <Collapsible id={'otherServicesList'}
                              title={'Other services\' launch order'}
+                             active
                              onChange={this.updateModalScrollbar}>
                     <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>
                 </Collapsible>}
@@ -265,6 +271,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
         this.scrollbar.current?.updateScroll();
 
 }
+
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): StateToProps {
     const serviceName = ownProps.service?.serviceName;

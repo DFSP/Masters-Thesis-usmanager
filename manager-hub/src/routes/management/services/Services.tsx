@@ -87,8 +87,10 @@ class Services extends BaseComponent<Props, State> {
         const {services, apps} = this.props;
         return !selectedApp
             ? services
-            // @ts-ignore
-            : services.filter(service => !selectedApp || Object.keys(apps[selectedApp].services)?.includes(service.serviceName))
+            : services.filter(service => !selectedApp
+                || (selectedApp === 'System' && service.serviceType === 'SYSTEM')
+                // @ts-ignore
+                || Object.keys(apps[selectedApp]?.services || {})?.includes(service.serviceName))
     }
 
     private clearFilter = () =>
@@ -113,7 +115,7 @@ class Services extends BaseComponent<Props, State> {
                         dropdown={{
                             defaultValue: 'Filter by app',
                             emptyMessage: 'No services to filter',
-                            values: Object.keys(this.props.apps),
+                            values: ['System', ...Object.keys(this.props.apps)],
                         }}>
                     </Dropdown>
                 </div>}

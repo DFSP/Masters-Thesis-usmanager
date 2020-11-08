@@ -47,7 +47,8 @@ export interface IFormModal {
     position?: string,
     content: () => JSX.Element,
     fullScreen?: boolean,
-    scrollbar?: React.RefObject<ScrollBar>
+    scrollbar?: React.RefObject<ScrollBar>,
+    onResize?: () => void,
 }
 
 export type RestOperation = {

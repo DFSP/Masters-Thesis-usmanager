@@ -384,7 +384,7 @@ public class ContainersService {
 				Files.write(logsPath, logs.getBytes());
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				log.error("Failed to get container {} logs: {}", containerId, e.getMessage());
 			}
 		}
 		return logs;

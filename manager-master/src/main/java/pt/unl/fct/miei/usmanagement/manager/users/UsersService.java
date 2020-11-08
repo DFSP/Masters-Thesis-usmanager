@@ -52,32 +52,19 @@ public class UsersService implements UserDetailsService {
 		return users.save(user);
 	}
 
-	public User addUser(String firstName, String lastName, String username, String password, String email,
-						UserRoleEnum role) {
-		User user = User.builder()
-			.firstName(firstName)
-			.lastName(lastName)
-			.username(username)
-			.password(encoder.encode(password))
-			.email(email)
-			.role(role)
-			.build();
-		return users.save(user);
-	}
-
 	@Override
 	public UserDetails loadUserByUsername(String username) {
+		User user = getUser(username);
+		return new org.springframework.security.core.userdetails.User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
+	}
+
+	public User getUser(String username) {
 		User user = users.findByUsername(username);
 		if (user == null) {
 			throw new EntityNotFoundException(User.class, "username", username);
 		}
-		return new org.springframework.security.core.userdetails.User(username, user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
+		return user;
 	}
-
-	public boolean hasUser(String username) {
-		return users.hasUser(username);
-	}
-
 
 	@Bean
 	public PasswordEncoder encoder() {

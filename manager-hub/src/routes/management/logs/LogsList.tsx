@@ -69,7 +69,7 @@ class LogsList extends React.Component<Props, {}> {
                 <ActionButton icon={'cached'}
                               tooltip={{
                                   activatedText: 'Deactivate automatic reload',
-                                  deactivatedText: 'Activate automatic reload',
+                                  deactivatedText: 'Activate automatic reload every 15s',
                                   position: 'bottom'
                               }}
                               clickCallback={this.onReloadClick}

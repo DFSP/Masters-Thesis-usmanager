@@ -131,10 +131,10 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
                                onChange={handleCheckbox}
                                checked={checked}/>
                         <span id={'checkbox'}>
-              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                 {simulatedMetric}
-               </div>
-            </span>
+                            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                                {simulatedMetric}
+                            </div>
+                        </span>
                     </label>
                 </div>
                 {!isNew && (

@@ -36,6 +36,7 @@ public class ContainersRecoveryService {
 	}
 
 	void restoreCrashedContainers(List<Container> monitoringContainers, List<Container> synchronizedContainers) {
+		// TODO filter minimumReplicas > 0
 		monitoringContainers.parallelStream()
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
 			.forEach(this::restartContainerCloseTo);

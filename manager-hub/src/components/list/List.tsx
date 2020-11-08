@@ -36,7 +36,7 @@ interface ListProps<T> {
     error?: string | null;
     emptyMessage?: string;
     list: T[];
-    show: (element: T, index: number, last: boolean) => JSX.Element;
+    show: (element: T, index: number, last: boolean, list: T[]) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
     paginate?: {
         pagesize: {

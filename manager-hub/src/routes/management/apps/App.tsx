@@ -106,7 +106,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IApp,
-    selected: 'app' | 'services' | 'rules' | 'genericServiceRules' | 'simulatedMetrics' | 'genericSimulatedMetrics';
+    selected: 'app' | 'services' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics';
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -115,6 +115,7 @@ interface State {
     app?: IApp,
     formApp?: IApp,
     loading: IFormLoading,
+    services: IAddAppService[],
     unsavedServices: IAddAppService[],
     unsavedRules: string[],
     unsavedSimulatedMetrics: string[],
@@ -124,6 +125,7 @@ class App extends BaseComponent<Props, State> {
 
     state: State = {
         loading: undefined,
+        services: [],
         unsavedServices: [],
         unsavedRules: [],
         unsavedSimulatedMetrics: [],
@@ -224,6 +226,12 @@ class App extends BaseComponent<Props, State> {
             unsavedServices: this.state.unsavedServices.concat(service)
         });
     };
+
+    private updateAppService = (service: IAppService | IAddAppService): void => {
+        const updatedUnsavedServices = this.state.unsavedServices.filter(s => service.service.serviceName !== s.service.serviceName);
+        updatedUnsavedServices.push(service);
+        this.setState(({unsavedServices: updatedUnsavedServices}));
+    }
 
     private removeAppServices = (services: string[]): void => {
         this.setState({
@@ -445,7 +453,8 @@ class App extends BaseComponent<Props, State> {
                          app={this.getApp()}
                          unsavedServices={this.state.unsavedServices}
                          onAddAppService={this.addAppService}
-                         onRemoveAppServices={this.removeAppServices}/>;
+                         onRemoveAppServices={this.removeAppServices}
+                         updateAppService={this.updateAppService}/>
 
     private rules = (): JSX.Element =>
         <AppRuleList isLoadingApp={this.props.isLoading}
@@ -483,10 +492,17 @@ class App extends BaseComponent<Props, State> {
             active: this.props.location.state?.selected === 'services',
         },
         {
+            title: 'Rules',
+            id: 'appRules',
+            content: () => this.rules(),
+            active: this.props.location.state?.selected === 'rules'
+        },
+
+        {
             title: 'Generic rules',
             id: 'genericAppRules',
             content: () => this.genericRules(),
-            active: this.props.location.state?.selected === 'genericServiceRules'
+            active: this.props.location.state?.selected === 'genericRules'
         },
         {
             title: 'Simulated metrics',

@@ -27,7 +27,7 @@ import styles from './SimpleList.module.css';
 
 interface GenericSimpleListProps<T> {
     list: T[];
-    show: (element: T, index: number, last: boolean) => JSX.Element;
+    show: (element: T, index: number, last: boolean, list: T[]) => JSX.Element;
     header?: () => JSX.Element;
 }
 
@@ -43,7 +43,7 @@ export default class SimpleList<T> extends React.Component<Props<T>, {}> {
                     {header && header()}
                     {list.map((c, i) => (
                         <div key={i}>
-                            {show(c, i, i === list.length - 1)}
+                            {show(c, i, i === list.length - 1, list)}
                         </div>
                     ))}
                 </div>

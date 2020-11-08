@@ -87,8 +87,12 @@ public class DecisionsService {
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getDecision(String decisionName) {
 		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return getDecision(decision);
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getDecision(RuleDecisionEnum decision) {
 		return decisions.findByRuleDecision(decision).orElseThrow(() ->
-			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decision", decisionName));
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decision", decision.name()));
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getDecision(Long id) {
@@ -110,8 +114,12 @@ public class DecisionsService {
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getServicePossibleDecision(String decisionName) {
 		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return getServicePossibleDecision(decision);
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getServicePossibleDecision(RuleDecisionEnum decision) {
 		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentTypeEnum.SERVICE).orElseThrow(() ->
-			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decisionName));
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decision.name()));
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getContainerPossibleDecision(String decisionName) {
@@ -122,8 +130,12 @@ public class DecisionsService {
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getHostPossibleDecision(String decisionName) {
 		RuleDecisionEnum decision = RuleDecisionEnum.valueOf(decisionName.toUpperCase());
+		return getHostPossibleDecision(decision);
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision getHostPossibleDecision(RuleDecisionEnum decision) {
 		return decisions.findByRuleDecisionAndComponentTypeType(decision, ComponentTypeEnum.HOST).orElseThrow(() ->
-			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decisionName));
+			new EntityNotFoundException(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision.class, "decisionName", decision.name()));
 	}
 
 	public ServiceDecision addServiceDecision(String containerId, String serviceName, String decisionName,

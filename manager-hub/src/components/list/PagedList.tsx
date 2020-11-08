@@ -30,7 +30,7 @@ import Pagination from "./Pagination";
 
 export interface IPagedList<T> {
     list: T[];
-    show: (element: T, index: number, last: boolean) => JSX.Element;
+    show: (element: T, index: number, last: boolean, list: T[]) => JSX.Element;
     paginate: {
         pagesize: {
             initial: number,

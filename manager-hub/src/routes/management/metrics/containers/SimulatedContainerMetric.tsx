@@ -150,7 +150,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
-        console.log(simulatedMetric)
         super.toast(`<span class="green-text">Simulated container metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
         this.props.addSimulatedContainerMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);

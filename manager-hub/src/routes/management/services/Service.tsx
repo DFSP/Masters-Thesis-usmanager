@@ -162,7 +162,7 @@ class Service extends BaseComponent<Props, State> {
         return (
             <MainLayout>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="container">
+                <div className='container'>
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -187,7 +187,7 @@ class Service extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IService>): void => {
         const service = reply.data;
-        super.toast(`<span class="green-text">Service ${this.mounted ? `<b class="white-text">${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} saved</span>`);
+        super.toast(`<span class='green-text'>Service ${this.mounted ? `<b class='white-text'>${service.serviceName}</b>` : `<a href='/services/${service.serviceName}'><b>${service.serviceName}</b></a>`} saved</span>`);
         this.props.addService(service);
         this.saveEntities(service);
         if (this.mounted) {
@@ -201,7 +201,7 @@ class Service extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IService>): void => {
         const service = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service have been saved</span>`);
+        super.toast(`<span class='green-text'>Changes to ${this.mounted ? `<b class='white-text'>${service.serviceName}</b>` : `<a href='/services/${service.serviceName}'><b>${service.serviceName}</b></a>`} service have been saved</span>`);
         this.saveEntities(service);
         const previousService = this.getService();
         if (previousService.id) {
@@ -214,17 +214,17 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, service: IService): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to update ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/${service.serviceName}'><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
     private onDeleteSuccess = (service: IService): void => {
-        super.toast(`<span class="green-text">Service <b class="white-text">${service.serviceName}</b> successfully removed</span>`);
+        super.toast(`<span class='green-text'>Service <b class='white-text'>${service.serviceName}</b> successfully removed</span>`);
         if (this.mounted) {
             this.props.history.push(`/services`);
         }
     };
 
     private onDeleteFailure = (reason: string, service: IService): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+        super.toast(`Unable to delete ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/${service.serviceName}'><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedApps.length
@@ -270,7 +270,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save apps of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save apps of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceDependency = (dependency: string): void => {
         this.setState({
@@ -301,7 +301,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveDependenciesFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save dependencies of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save dependencies of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServicePrediction = (prediction: IPrediction): void => {
         this.setState({
@@ -332,7 +332,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSavePredictionsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save predictions of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save predictions of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceRule = (rule: string): void => {
         this.setState({
@@ -363,7 +363,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save rules of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save rules of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -394,7 +394,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (service: IService, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Unable to save simulated metrics of service ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/services/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private updateService = (service: IService) => {
         service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
@@ -431,7 +431,6 @@ class Service extends BaseComponent<Props, State> {
         // @ts-ignore
         const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
         const isNewService = this.isNew();
-        console.log(getTypeFromValue(formService?.defaultDb))
         return (
             <>
                 {!isNewService && isLoading && <LoadingSpinner/>}
@@ -463,7 +462,7 @@ class Service extends BaseComponent<Props, State> {
                             key === 'serviceType'
                                 ? <Field key={index}
                                          id={key}
-                                         type="dropdown"
+                                         type='dropdown'
                                          label={key}
                                          dropdown={{
                                              defaultValue: "Choose service type",
