@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.util;
+package pt.unl.fct.miei.usmanagement.manager.util.json;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -32,6 +32,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import pt.unl.fct.miei.usmanagement.manager.util.strings.Text;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

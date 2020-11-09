@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.util;
+package pt.unl.fct.miei.usmanagement.manager.util.validate;
 
 import lombok.experimental.UtilityClass;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;

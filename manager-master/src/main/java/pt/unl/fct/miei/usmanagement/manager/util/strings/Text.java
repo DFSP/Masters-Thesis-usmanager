@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,14 +22,28 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.util;
+package pt.unl.fct.miei.usmanagement.manager.util.strings;
 
-import lombok.Data;
+import lombok.experimental.UtilityClass;
 
-@Data
-public class GenericResponse {
+import java.util.Objects;
 
-	private final String key;
-	private final String value;
+@UtilityClass
+public class Text {
+
+	public boolean notEmptyEquals(String string1, String string2) {
+		return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
+	}
+
+	public boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
+
+	public String capitalize(String str) {
+		if (str == null || str.length() < 1) {
+			return str;
+		}
+		return str.substring(0, 1).toUpperCase() + str.substring(1);
+	}
 
 }

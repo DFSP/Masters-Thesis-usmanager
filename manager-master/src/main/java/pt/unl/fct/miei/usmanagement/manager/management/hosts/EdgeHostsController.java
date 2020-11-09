@@ -18,7 +18,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResu
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.Arrays;
 import java.util.List;

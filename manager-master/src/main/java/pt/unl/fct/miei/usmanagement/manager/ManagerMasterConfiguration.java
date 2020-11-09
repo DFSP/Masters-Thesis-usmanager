@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import pt.unl.fct.miei.usmanagement.manager.util.JsonPathArgumentResolver;
+import pt.unl.fct.miei.usmanagement.manager.util.json.JsonPathArgumentResolver;
 
 import java.util.List;
 

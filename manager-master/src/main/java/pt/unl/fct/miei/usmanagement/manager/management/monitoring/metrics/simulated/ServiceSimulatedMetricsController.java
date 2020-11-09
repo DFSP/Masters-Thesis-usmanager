@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
 

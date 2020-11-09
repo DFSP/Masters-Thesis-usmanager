@@ -81,6 +81,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.users.User;
 import pt.unl.fct.miei.usmanagement.manager.users.UserRoleEnum;
 import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.util.strings.Text;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.ArrayList;
@@ -89,6 +90,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -774,7 +776,7 @@ public class DatabaseLoader {
 	private Map.Entry<String, Service> associateServiceToApp(String appName, String serviceName, Integer defaultExternalPort,
 															 Integer defaultInternalPort, ServiceTypeEnum type,
 															 Set<String> environment, ServicesService servicesService,
-															 String dockerHubUsername, String launch,
+															 String dockerHubUsername, List<String> launch,
 															 Double expectedMemoryConsumption) {
 		appName = appName.toLowerCase().replace(" ", "_") + "-" + serviceName;
 		Service service;
@@ -782,12 +784,13 @@ public class DatabaseLoader {
 			service = servicesService.getService(appName);
 		}
 		catch (EntityNotFoundException ignored) {
+			String launchCommand = launch == null ? null : launch.stream().map(param -> "${" + Text.capitalize(param) + "}").collect(Collectors.joining(" "));
 			service = Service.builder()
 				.serviceName(appName)
 				.dockerRepository(dockerHubUsername + "/" + appName)
 				.defaultExternalPort(defaultExternalPort)
 				.defaultInternalPort(defaultInternalPort)
-				.launchCommand(String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launch != null ? " " + launch : ""))
+				.launchCommand(String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand: ""))
 				.minimumReplicas(1)
 				.outputLabel(String.format("${%sHost}", serviceName))
 				.environment(environment)
@@ -840,7 +843,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(uniqueId.getKey(), uniqueId.getValue());
 		Map.Entry<String, Service> movieId = associateServiceToApp(appName, "movie-id", 10002, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(movieId.getKey(), movieId.getValue());
 		Map.Entry<String, Service> movieIdDb = associateServiceToApp(appName, "movie-id-db", 40018, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -852,13 +855,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(text.getKey(), text.getValue());
 		Map.Entry<String, Service> rating = associateServiceToApp(appName, "rating", 10004, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis"), null);
 		servicesMap.put(rating.getKey(), rating.getValue());
 		Map.Entry<String, Service> ratingRedis = associateServiceToApp(appName, "rating-redis", 6382, 6379, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(ratingRedis.getKey(), ratingRedis.getValue());
 		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 10005, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(user.getKey(), user.getValue());
 		Map.Entry<String, Service> userDb = associateServiceToApp(appName, "user-db", 41018, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -867,13 +870,13 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(userMemcached.getKey(), userMemcached.getValue());
 		Map.Entry<String, Service> composeReview = associateServiceToApp(appName, "compose-review", 10006, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached"), null);
 		servicesMap.put(composeReview.getKey(), composeReview.getValue());
 		Map.Entry<String, Service> composeReviewMemcached = associateServiceToApp(appName, "compose-review-memcached", 10006, 9090, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(composeReviewMemcached.getKey(), composeReviewMemcached.getValue());
 		Map.Entry<String, Service> reviewStorage = associateServiceToApp(appName, "review-storage", 10007, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(reviewStorage.getKey(), reviewStorage.getValue());
 		Map.Entry<String, Service> reviewStorageDb = associateServiceToApp(appName, "review-storage-db", 42018, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -882,7 +885,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(reviewStorageMemcached.getKey(), reviewStorageMemcached.getValue());
 		Map.Entry<String, Service> userReview = associateServiceToApp(appName, "user-review", 10008, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "redis"), null);
 		servicesMap.put(userReview.getKey(), userReview.getValue());
 		Map.Entry<String, Service> userReviewDb = associateServiceToApp(appName, "user-review-db", 43017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -891,9 +894,8 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(userReviewRedis.getKey(), userReviewRedis.getValue());
 		Map.Entry<String, Service> movieReview = associateServiceToApp(appName, "movie-review", 10009, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "redis"), null);
 		servicesMap.put(movieReview.getKey(), movieReview.getValue());
-		servicesMap.put(userReviewRedis.getKey(), userReviewRedis.getValue());
 		Map.Entry<String, Service> movieReviewDb = associateServiceToApp(appName, "movie-review-db", 44017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(movieReviewDb.getKey(), movieReviewDb.getValue());
@@ -909,7 +911,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(nginxWebServer.getKey(), nginxWebServer.getValue());
 		Map.Entry<String, Service> castInfo = associateServiceToApp(appName, "cast-info", 10010, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(castInfo.getKey(), castInfo.getValue());
 		Map.Entry<String, Service> castInfoDb = associateServiceToApp(appName, "cast-info-db", 45017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -918,7 +920,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(castInfoMemcached.getKey(), castInfoMemcached.getValue());
 		Map.Entry<String, Service> plot = associateServiceToApp(appName, "plot", 10011, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(plot.getKey(), plot.getValue());
 		Map.Entry<String, Service> plotDb = associateServiceToApp(appName, "plot-db", 46017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -927,7 +929,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(plotMemcached.getKey(), plotMemcached.getValue());
 		Map.Entry<String, Service> movieInfo = associateServiceToApp(appName, "movie-info", 10012, 9090, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(movieInfo.getKey(), movieInfo.getValue());
 		Map.Entry<String, Service> movieInfoDb = associateServiceToApp(appName, "movie-info-db", 47017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -945,44 +947,44 @@ public class DatabaseLoader {
 		servicesMap.put(jaeger.getKey(), jaeger.getValue());
 
 		if (!appsService.hasApp(appName)) {
-			App hotelReservation = App.builder().name(appName)
+			App media = App.builder().name(appName)
 				.description("This application contains microservices about movies including info, plots, reviews, etc.")
 				.build();
-			hotelReservation = appsService.addApp(hotelReservation);
+			media = appsService.addApp(media);
 			appServices.saveAll(List.of(
-				AppService.builder().app(hotelReservation).service(uniqueId.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieId.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieIdDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieIdMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(text.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(rating.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(ratingRedis.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(user.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(userDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(userMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(composeReview.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(composeReviewMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(reviewStorage.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(reviewStorageDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(reviewStorageMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(userReview.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(userReviewDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(userReviewRedis.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieReview.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieReviewDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieReviewRedis.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(nginxWebServer.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(castInfo.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(castInfoDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(castInfoMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(plot.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(plotDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(plotMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieInfo.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieInfoDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(movieInfoMemcached.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(page.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(jaeger.getValue()).build())
+				AppService.builder().app(media).service(uniqueId.getValue()).build(),
+				AppService.builder().app(media).service(movieId.getValue()).build(),
+				AppService.builder().app(media).service(movieIdDb.getValue()).build(),
+				AppService.builder().app(media).service(movieIdMemcached.getValue()).build(),
+				AppService.builder().app(media).service(text.getValue()).build(),
+				AppService.builder().app(media).service(rating.getValue()).build(),
+				AppService.builder().app(media).service(ratingRedis.getValue()).build(),
+				AppService.builder().app(media).service(user.getValue()).build(),
+				AppService.builder().app(media).service(userDb.getValue()).build(),
+				AppService.builder().app(media).service(userMemcached.getValue()).build(),
+				AppService.builder().app(media).service(composeReview.getValue()).build(),
+				AppService.builder().app(media).service(composeReviewMemcached.getValue()).build(),
+				AppService.builder().app(media).service(reviewStorage.getValue()).build(),
+				AppService.builder().app(media).service(reviewStorageDb.getValue()).build(),
+				AppService.builder().app(media).service(reviewStorageMemcached.getValue()).build(),
+				AppService.builder().app(media).service(userReview.getValue()).build(),
+				AppService.builder().app(media).service(userReviewDb.getValue()).build(),
+				AppService.builder().app(media).service(userReviewRedis.getValue()).build(),
+				AppService.builder().app(media).service(movieReview.getValue()).build(),
+				AppService.builder().app(media).service(movieReviewDb.getValue()).build(),
+				AppService.builder().app(media).service(movieReviewRedis.getValue()).build(),
+				AppService.builder().app(media).service(nginxWebServer.getValue()).build(),
+				AppService.builder().app(media).service(castInfo.getValue()).build(),
+				AppService.builder().app(media).service(castInfoDb.getValue()).build(),
+				AppService.builder().app(media).service(castInfoMemcached.getValue()).build(),
+				AppService.builder().app(media).service(plot.getValue()).build(),
+				AppService.builder().app(media).service(plotDb.getValue()).build(),
+				AppService.builder().app(media).service(plotMemcached.getValue()).build(),
+				AppService.builder().app(media).service(movieInfo.getValue()).build(),
+				AppService.builder().app(media).service(movieInfoDb.getValue()).build(),
+				AppService.builder().app(media).service(movieInfoMemcached.getValue()).build(),
+				AppService.builder().app(media).service(page.getValue()).build(),
+				AppService.builder().app(media).service(jaeger.getValue()).build())
 			);
 		}
 
@@ -1099,63 +1101,63 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(frontend.getKey(), frontend.getValue());
 		Map.Entry<String, Service> profile = associateServiceToApp(appName, "profile", 6555, 8081, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
 		servicesMap.put(profile.getKey(), profile.getValue());
-		Map.Entry<String, Service> search = associateServiceToApp(appName, "search", 6666, 8082, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(search.getKey(), search.getValue());
-		Map.Entry<String, Service> geo = associateServiceToApp(appName, "geo", 6777, 8083, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(geo.getKey(), geo.getValue());
-		Map.Entry<String, Service> rate = associateServiceToApp(appName, "rate", 6888, 8084, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(rate.getKey(), rate.getValue());
-		Map.Entry<String, Service> recommendation = associateServiceToApp(appName, "recommendation", 6999, 8085, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(recommendation.getKey(), recommendation.getValue());
-		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 7111, 8086, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(user.getKey(), user.getValue());
-		Map.Entry<String, Service> reservation = associateServiceToApp(appName, "reservation", 7222, 8087, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(reservation.getKey(), reservation.getValue());
-		// available: "14269", "5778:5778", "14268:14268", "14267", "16686:16686", "5775:5775/udp", "6831:6831/udp", "6832:6832/udp"
-		Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 5778, 5778, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(reservation.getKey(), reservation.getValue());
-		Map.Entry<String, Service> memcachedRate = associateServiceToApp(appName, "memcached-rate", 11212, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(memcachedRate.getKey(), memcachedRate.getValue());
-		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "memcached-profile", 11213, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(memcachedProfile.getKey(), memcachedProfile.getValue());
-		Map.Entry<String, Service> memcachedReserve = associateServiceToApp(appName, "memcached-reserve", 11214, 11211, ServiceTypeEnum.DATABASE,
-			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(memcachedReserve.getKey(), memcachedReserve.getValue());
-		// volume - geo:/data/db
-		Map.Entry<String, Service> geoDb = associateServiceToApp(appName, "geo-db", 28017, 27017, ServiceTypeEnum.DATABASE,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(geoDb.getKey(), geoDb.getValue());
 		// volume - profile:/data/db
 		Map.Entry<String, Service> profileDb = associateServiceToApp(appName, "profile-db", 29017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(profileDb.getKey(), profileDb.getValue());
+		Map.Entry<String, Service> memcachedProfile = associateServiceToApp(appName, "memcached-profile", 11213, 11211, ServiceTypeEnum.DATABASE,
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(memcachedProfile.getKey(), memcachedProfile.getValue());
+		Map.Entry<String, Service> search = associateServiceToApp(appName, "search", 6666, 8082, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(search.getKey(), search.getValue());
+		Map.Entry<String, Service> geo = associateServiceToApp(appName, "geo", 6777, 8083, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), null);
+		servicesMap.put(geo.getKey(), geo.getValue());
+		// volume - geo:/data/db
+		Map.Entry<String, Service> geoDb = associateServiceToApp(appName, "geo-db", 28017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(geoDb.getKey(), geoDb.getValue());
+		Map.Entry<String, Service> rate = associateServiceToApp(appName, "rate", 6888, 8084, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
+		servicesMap.put(rate.getKey(), rate.getValue());
 		// volume - rate:/data/db
 		Map.Entry<String, Service> rateDb = associateServiceToApp(appName, "rate-db", 30017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(rateDb.getKey(), rateDb.getValue());
+		Map.Entry<String, Service> memcachedRate = associateServiceToApp(appName, "memcached-rate", 11212, 11211, ServiceTypeEnum.DATABASE,
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(memcachedRate.getKey(), memcachedRate.getValue());
+		Map.Entry<String, Service> recommendation = associateServiceToApp(appName, "recommendation", 6999, 8085, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), null);
+		servicesMap.put(recommendation.getKey(), recommendation.getValue());
 		// volume - recommendation:/data/db
 		Map.Entry<String, Service> recommendationDb = associateServiceToApp(appName, "recommendation-db", 31017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(recommendationDb.getKey(), recommendationDb.getValue());
-		// volume - reservation:/data/db
-		Map.Entry<String, Service> reservationDb = associateServiceToApp(appName, "reservation-db", 32017, 27017, ServiceTypeEnum.DATABASE,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(reservationDb.getKey(), reservationDb.getValue());
+		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 7111, 8086, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), null);
+		servicesMap.put(user.getKey(), user.getValue());
 		// volume - user:/data/db
 		Map.Entry<String, Service> userDb = associateServiceToApp(appName, "user-db", 33017, 27017, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(userDb.getKey(), userDb.getValue());
+		Map.Entry<String, Service> reservation = associateServiceToApp(appName, "reservation", 7222, 8087, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database", "memcached"), null);
+		servicesMap.put(reservation.getKey(), reservation.getValue());
+		// volume - reservation:/data/db
+		Map.Entry<String, Service> reservationDb = associateServiceToApp(appName, "reservation-db", 32017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(reservationDb.getKey(), reservationDb.getValue());
+		Map.Entry<String, Service> memcachedReserve = associateServiceToApp(appName, "memcached-reserve", 11214, 11211, ServiceTypeEnum.DATABASE,
+			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(memcachedReserve.getKey(), memcachedReserve.getValue());
+		// available: "14269", "5778:5778", "14268:14268", "14267", "16686:16686", "5775:5775/udp", "6831:6831/udp", "6832:6832/udp"
+		Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 5778, 5778, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(reservation.getKey(), reservation.getValue());
 
 		if (!appsService.hasApp(appName)) {
 			App hotelReservation = App.builder().name(appName)
@@ -1169,22 +1171,22 @@ public class DatabaseLoader {
 			appServices.saveAll(List.of(
 				AppService.builder().app(hotelReservation).service(frontend.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(profile.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(memcachedProfile.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(profileDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(memcachedProfile.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(search.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(geo.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(geoDb.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(rate.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(rateDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(memcachedRate.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(recommendation.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(recommendationDb.getValue()).build(),
+				AppService.builder().app(hotelReservation).service(memcachedReserve.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(user.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(userDb.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(reservation.getValue()).build(),
 				AppService.builder().app(hotelReservation).service(reservationDb.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(jaeger.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(memcachedRate.getValue()).build(),
-				AppService.builder().app(hotelReservation).service(memcachedReserve.getValue()).build())
+				AppService.builder().app(hotelReservation).service(jaeger.getValue()).build())
 			);
 		}
 
@@ -1198,7 +1200,7 @@ public class DatabaseLoader {
 			serviceDependenciesService.addDependency(geo.getValue(), geoDb.getValue());
 		}
 		if (!serviceDependenciesService.hasDependency(rate.getKey(), rateDb.getKey())) {
-			serviceDependenciesService.addDependency(rate.getValue(), geoDb.getValue());
+			serviceDependenciesService.addDependency(rate.getValue(), rateDb.getValue());
 		}
 		if (!serviceDependenciesService.hasDependency(rate.getKey(), memcachedRate.getKey())) {
 			serviceDependenciesService.addDependency(rate.getValue(), memcachedRate.getValue());
@@ -1229,7 +1231,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, 180000000d);
 		servicesMap.put(ads.getKey(), ads.getValue());
 		Map.Entry<String, Service> carts = associateServiceToApp(appName, "carts", 7070, 7070, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, 64000000d);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis"), 64000000d);
 		servicesMap.put(carts.getKey(), carts.getValue());
 		Map.Entry<String, Service> checkout = associateServiceToApp(appName, "checkout", 5050, 5050, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, 64000000d);
@@ -1346,7 +1348,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(prime.getKey(), prime.getValue());
 		Map.Entry<String, Service> movie = associateServiceToApp(appName, "movie", 9002, 80, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), null);
 		servicesMap.put(movie.getKey(), movie.getValue());
 		Map.Entry<String, Service> movieDb = associateServiceToApp(appName, "movie-db", 22027, 28027, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
@@ -1380,6 +1382,9 @@ public class DatabaseLoader {
 		if (!serviceDependenciesService.hasDependency(serve.getKey(), webac.getKey())) {
 			serviceDependenciesService.addDependency(serve.getValue(), webac.getValue());
 		}
+		if (!serviceDependenciesService.hasDependency(serve.getKey(), movieDb.getKey())) {
+			serviceDependenciesService.addDependency(serve.getValue(), movieDb.getValue());
+		}
 
 		return servicesMap;
 	}
@@ -1388,328 +1393,109 @@ public class DatabaseLoader {
 											  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(14);
 
-		Service sockShopFrontend;
-		try {
-			sockShopFrontend = servicesService.getService("sock-shop-front-end");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopFrontend = Service.builder()
-				.serviceName("sock-shop-front-end")
-				.dockerRepository(dockerHubUsername + "/sock-shop-front-end")
-				.defaultExternalPort(8081)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${frontendHost}")
-				.serviceType(ServiceTypeEnum.FRONTEND)
-				.expectedMemoryConsumption(209715200d)
-				.build();
-			sockShopFrontend = servicesService.addService(sockShopFrontend);
-		}
-		servicesMap.put("sock-shop-front-end", sockShopFrontend);
+		String appName = "Sock Shop";
 
-		Service sockShopUser;
-		try {
-			sockShopUser = servicesService.getService("sock-shop-user");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopUser = Service.builder()
-				.serviceName("sock-shop-user")
-				.dockerRepository(dockerHubUsername + "/sock-shop-user")
-				.defaultExternalPort(8082)
-				.defaultInternalPort(80)
-				.defaultDb("user-db:27017")
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
-				.minimumReplicas(1)
-				.outputLabel("${userHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(62914560d)
-				.build();
-			sockShopUser = servicesService.addService(sockShopUser);
-		}
-		servicesMap.put("sock-shop-user", sockShopUser);
+		Map.Entry<String, Service> frontend = associateServiceToApp(appName, "frontend", 8085, 80, ServiceTypeEnum.FRONTEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 209715200d);
+		servicesMap.put(frontend.getKey(), frontend.getValue());
+		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 8086, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), 62914560d);
+		servicesMap.put(user.getKey(), user.getValue());
+		Map.Entry<String, Service> userDb = associateServiceToApp(appName, "user-db", 15017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 262144000d);
+		servicesMap.put(userDb.getKey(), userDb.getValue());
+		Map.Entry<String, Service> catalogue = associateServiceToApp(appName, "catalogue", 8083, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), 62914560d);
+		servicesMap.put(catalogue.getKey(), catalogue.getValue());
+		Map.Entry<String, Service> catalogueDb = associateServiceToApp(appName, "catalogue-db", 3306, 3306, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 262144000d);
+		servicesMap.put(catalogueDb.getKey(), catalogueDb.getValue());
+		Map.Entry<String, Service> payment = associateServiceToApp(appName, "payment", 8084, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 62914560d);
+		servicesMap.put(payment.getKey(), payment.getValue());
+		Map.Entry<String, Service> carts = associateServiceToApp(appName, "carts", 8085, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), 262144000d);
+		servicesMap.put(carts.getKey(), carts.getValue());
+		Map.Entry<String, Service> cartsDb = associateServiceToApp(appName, "carts-db", 27071, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 262144000d);
+		servicesMap.put(cartsDb.getKey(), cartsDb.getValue());
+		Map.Entry<String, Service> orders = associateServiceToApp(appName, "orders", 8086, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("database"), 262144000d);
+		servicesMap.put(orders.getKey(), orders.getValue());
+		Map.Entry<String, Service> ordersDb = associateServiceToApp(appName, "orders-db", 34017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 262144000d);
+		servicesMap.put(ordersDb.getKey(), ordersDb.getValue());
+		Map.Entry<String, Service> shipping = associateServiceToApp(appName, "shipping", 8087, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
+		servicesMap.put(shipping.getKey(), shipping.getValue());
+		Map.Entry<String, Service> queueMaster = associateServiceToApp(appName, "queue-master", 8088, 80, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
+		servicesMap.put(queueMaster.getKey(), queueMaster.getValue());
+		Map.Entry<String, Service> rabbitmq = associateServiceToApp(appName, "rabbitmq", 5672, 5672, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
+		servicesMap.put(rabbitmq.getKey(), rabbitmq.getValue());
 
-		Service sockShopUserDb;
-		try {
-			sockShopUserDb = servicesService.getService("sock-shop-user-db");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopUserDb = Service.builder()
-				.serviceName("sock-shop-user-db")
-				.dockerRepository(dockerHubUsername + "/sock-shop-user-db")
-				.defaultExternalPort(27017)
-				.defaultInternalPort(27017)
-				.minimumReplicas(1)
-				.outputLabel("${userDatabaseHost}")
-				.serviceType(ServiceTypeEnum.DATABASE)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopUserDb = servicesService.addService(sockShopUserDb);
-		}
-		servicesMap.put("sock-shop-user-db", sockShopUserDb);
-
-		Service sockShopCatalogue;
-		try {
-			sockShopCatalogue = servicesService.getService("sock-shop-catalogue");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopCatalogue = Service.builder()
-				.serviceName("sock-shop-catalogue")
-				.dockerRepository(dockerHubUsername + "/sock-shop-catalogue")
-				.defaultExternalPort(8083)
-				.defaultInternalPort(80)
-				.defaultDb("catalogue-db:3306")
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
-				.minimumReplicas(1)
-				.outputLabel("${catalogueHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(62914560d)
-				.build();
-			sockShopCatalogue = servicesService.addService(sockShopCatalogue);
-		}
-		servicesMap.put("sock-shop-catalogue", sockShopCatalogue);
-
-		Service sockShopCatalogueDb;
-		try {
-			sockShopCatalogueDb = servicesService.getService("sock-shop-catalogue-db");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopCatalogueDb = Service.builder()
-				.serviceName("sock-shop-catalogue-db")
-				.dockerRepository(dockerHubUsername + "/sock-shop-catalogue-db")
-				.defaultExternalPort(3306)
-				.defaultInternalPort(3306)
-				.minimumReplicas(1)
-				.outputLabel("${catalogueDatabaseHost}")
-				.serviceType(ServiceTypeEnum.DATABASE)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopCatalogueDb = servicesService.addService(sockShopCatalogueDb);
-		}
-		servicesMap.put("sock-shop-catalogue-db", sockShopCatalogueDb);
-
-		Service sockShopPayment;
-		try {
-			sockShopPayment = servicesService.getService("sock-shop-payment");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopPayment = Service.builder()
-				.serviceName("sock-shop-payment")
-				.dockerRepository(dockerHubUsername + "/sock-shop-payment")
-				.defaultExternalPort(8084)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.outputLabel("${paymentHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(62914560d)
-				.build();
-			sockShopPayment = servicesService.addService(sockShopPayment);
-		}
-		servicesMap.put("sock-shop-payment", sockShopPayment);
-
-		Service sockShopCarts;
-		try {
-			sockShopCarts = servicesService.getService("sock-shop-carts");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopCarts = Service.builder()
-				.serviceName("sock-shop-carts")
-				.dockerRepository(dockerHubUsername + "/sock-shop-carts")
-				.defaultExternalPort(8085)
-				.defaultInternalPort(80)
-				.defaultDb("carts-db:27017")
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
-				.minimumReplicas(1)
-				.outputLabel("${cartsHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopCarts = servicesService.addService(sockShopCarts);
-		}
-		servicesMap.put("sock-shop-carts", sockShopCarts);
-
-		Service sockShopCartsDb;
-		try {
-			sockShopCartsDb = servicesService.getService("sock-shop-carts-db");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopCartsDb = Service.builder()
-				.serviceName("sock-shop-carts-db")
-				.dockerRepository(dockerHubUsername + "/sock-shop-carts-db")
-				.defaultExternalPort(27016)
-				.defaultInternalPort(27017)
-				.minimumReplicas(1)
-				.outputLabel("${cartsDatabaseHost}")
-				.serviceType(ServiceTypeEnum.DATABASE)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopCartsDb = servicesService.addService(sockShopCartsDb);
-		}
-		servicesMap.put("sock-shop-carts-db", sockShopCartsDb);
-
-		Service sockShopOrders;
-		try {
-			sockShopOrders = servicesService.getService("sock-shop-orders");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopOrders = Service.builder()
-				.serviceName("sock-shop-orders")
-				.dockerRepository(dockerHubUsername + "/sock-shop-orders")
-				.defaultExternalPort(8086)
-				.defaultInternalPort(80)
-				.defaultDb("orders-db:27017")
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
-				.minimumReplicas(1)
-				.outputLabel("${ordersHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopOrders = servicesService.addService(sockShopOrders);
-		}
-		servicesMap.put("sock-shop-orders", sockShopOrders);
-
-		Service sockShopOrdersDb;
-		try {
-			sockShopOrdersDb = servicesService.getService("sock-shop-orders-db");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopOrdersDb = Service.builder()
-				.serviceName("sock-shop-orders-db")
-				.dockerRepository(dockerHubUsername + "/sock-shop-orders-db")
-				.defaultExternalPort(27015)
-				.defaultInternalPort(27017)
-				.minimumReplicas(1)
-				.outputLabel("${ordersDatabaseHost}")
-				.serviceType(ServiceTypeEnum.DATABASE)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopOrdersDb = servicesService.addService(sockShopOrdersDb);
-		}
-		servicesMap.put("sock-shop-orders-db", sockShopOrdersDb);
-
-		Service sockShopShipping;
-		try {
-			sockShopShipping = servicesService.getService("sock-shop-shipping");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopShipping = Service.builder()
-				.serviceName("sock-shop-shipping")
-				.dockerRepository(dockerHubUsername + "/sock-shop-shipping")
-				.defaultExternalPort(8087)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
-				.minimumReplicas(1)
-				.outputLabel("${shippingHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopShipping = servicesService.addService(sockShopShipping);
-		}
-		servicesMap.put("sock-shop-shipping", sockShopShipping);
-
-		Service sockShopQueueMaster;
-		try {
-			sockShopQueueMaster = servicesService.getService("sock-shop-queue-master");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopQueueMaster = Service.builder()
-				.serviceName("sock-shop-queue-master")
-				.dockerRepository(dockerHubUsername + "/sock-shop-queue-master")
-				.defaultExternalPort(8088)
-				.defaultInternalPort(80)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
-				.minimumReplicas(1)
-				.outputLabel("${queue-masterHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopQueueMaster = servicesService.addService(sockShopQueueMaster);
-		}
-		servicesMap.put("sock-shop-queue-master", sockShopQueueMaster);
-
-		Service sockShopRabbitmq;
-		try {
-			sockShopRabbitmq = servicesService.getService("sock-shop-rabbitmq");
-		}
-		catch (EntityNotFoundException ignored) {
-			sockShopRabbitmq = Service.builder()
-				.serviceName("sock-shop-rabbitmq")
-				.dockerRepository(dockerHubUsername + "/sock-shop-rabbitmq")
-				.defaultExternalPort(5672)
-				.defaultInternalPort(5672)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
-				.minimumReplicas(1)
-				.maximumReplicas(1)
-				.outputLabel("${rabbitmqHost}")
-				.serviceType(ServiceTypeEnum.BACKEND)
-				.expectedMemoryConsumption(262144000d)
-				.build();
-			sockShopRabbitmq = servicesService.addService(sockShopRabbitmq);
-		}
-		servicesMap.put("sock-shop-rabbitmq", sockShopRabbitmq);
-
-		if (!appsService.hasApp("Sock Shop")) {
+		if (!appsService.hasApp(appName)) {
 			App sockShop = App.builder()
-				.name("Sock Shop")
+				.name(appName)
 				.description("Sock Shop simulates the user-facing part of an e-commerce website that sells socks. " +
 					"It is intended to aid the demonstration and testing of microservice and cloud native technologies.")
 				.build();
 			sockShop = appsService.addApp(sockShop);
 			appServices.saveAll(List.of(
-				AppService.builder().app(sockShop).service(sockShopFrontend).launchOrder(25).build(),
-				AppService.builder().app(sockShop).service(sockShopUser).launchOrder(10).build(),
-				AppService.builder().app(sockShop).service(sockShopUserDb).launchOrder(0).build(),
-				AppService.builder().app(sockShop).service(sockShopCatalogue).launchOrder(5).build(),
-				AppService.builder().app(sockShop).service(sockShopCatalogueDb).launchOrder(0).build(),
-				AppService.builder().app(sockShop).service(sockShopPayment).launchOrder(5).build(),
-				AppService.builder().app(sockShop).service(sockShopCarts).launchOrder(10).build(),
-				AppService.builder().app(sockShop).service(sockShopCartsDb).launchOrder(0).build(),
-				AppService.builder().app(sockShop).service(sockShopOrders).launchOrder(20).build(),
-				AppService.builder().app(sockShop).service(sockShopOrdersDb).launchOrder(0).build(),
-				AppService.builder().app(sockShop).service(sockShopShipping).launchOrder(15).build(),
-				AppService.builder().app(sockShop).service(sockShopQueueMaster).launchOrder(15).build(),
-				AppService.builder().app(sockShop).service(sockShopRabbitmq).launchOrder(5).build()));
+				AppService.builder().app(sockShop).service(frontend.getValue()).launchOrder(13).build(),
+				AppService.builder().app(sockShop).service(user.getValue()).launchOrder(12).build(),
+				AppService.builder().app(sockShop).service(userDb.getValue()).launchOrder(11).build(),
+				AppService.builder().app(sockShop).service(catalogue.getValue()).launchOrder(10).build(),
+				AppService.builder().app(sockShop).service(catalogueDb.getValue()).launchOrder(9).build(),
+				AppService.builder().app(sockShop).service(payment.getValue()).launchOrder(8).build(),
+				AppService.builder().app(sockShop).service(carts.getValue()).launchOrder(7).build(),
+				AppService.builder().app(sockShop).service(cartsDb.getValue()).launchOrder(6).build(),
+				AppService.builder().app(sockShop).service(orders.getValue()).launchOrder(5).build(),
+				AppService.builder().app(sockShop).service(ordersDb.getValue()).launchOrder(4).build(),
+				AppService.builder().app(sockShop).service(shipping.getValue()).launchOrder(3).build(),
+				AppService.builder().app(sockShop).service(queueMaster.getValue()).launchOrder(2).build(),
+				AppService.builder().app(sockShop).service(rabbitmq.getValue()).launchOrder(1).build()));
 		}
 
-		if (!serviceDependenciesService.hasDependency(sockShopFrontend.getServiceName(), sockShopUser.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopFrontend, sockShopUser);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), user.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), user.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopFrontend.getServiceName(), sockShopCatalogue.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopFrontend, sockShopCatalogue);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), catalogue.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), catalogue.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopFrontend.getServiceName(), sockShopPayment.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopFrontend, sockShopPayment);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), payment.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), payment.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopFrontend.getServiceName(), sockShopCarts.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopFrontend, sockShopCarts);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), carts.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), carts.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopFrontend.getServiceName(), sockShopOrders.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopFrontend, sockShopOrders);
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), orders.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), orders.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopUser.getServiceName(), sockShopUserDb.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopUser, sockShopUserDb);
+		if (!serviceDependenciesService.hasDependency(user.getKey(), userDb.getKey())) {
+			serviceDependenciesService.addDependency(user.getValue(), userDb.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopCatalogue.getServiceName(), sockShopCatalogueDb.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopCatalogue, sockShopCatalogueDb);
+		if (!serviceDependenciesService.hasDependency(catalogue.getKey(), catalogueDb.getKey())) {
+			serviceDependenciesService.addDependency(catalogue.getValue(), catalogueDb.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopCarts.getServiceName(), sockShopCartsDb.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopCarts, sockShopCartsDb);
+		if (!serviceDependenciesService.hasDependency(carts.getKey(), cartsDb.getKey())) {
+			serviceDependenciesService.addDependency(carts.getValue(), cartsDb.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopOrders.getServiceName(), sockShopPayment.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopOrders, sockShopPayment);
+		if (!serviceDependenciesService.hasDependency(orders.getKey(), payment.getKey())) {
+			serviceDependenciesService.addDependency(orders.getValue(), payment.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopOrders.getServiceName(), sockShopShipping.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopOrders, sockShopShipping);
+		if (!serviceDependenciesService.hasDependency(orders.getKey(), shipping.getKey())) {
+			serviceDependenciesService.addDependency(orders.getValue(), shipping.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopOrders.getServiceName(), sockShopOrdersDb.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopOrders, sockShopOrdersDb);
+		if (!serviceDependenciesService.hasDependency(orders.getKey(), ordersDb.getKey())) {
+			serviceDependenciesService.addDependency(orders.getValue(), ordersDb.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopShipping.getServiceName(), sockShopRabbitmq.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopShipping, sockShopRabbitmq);
+		if (!serviceDependenciesService.hasDependency(shipping.getKey(), rabbitmq.getKey())) {
+			serviceDependenciesService.addDependency(shipping.getValue(), rabbitmq.getValue());
 		}
-		if (!serviceDependenciesService.hasDependency(sockShopQueueMaster.getServiceName(), sockShopRabbitmq.getServiceName())) {
-			serviceDependenciesService.addDependency(sockShopQueueMaster, sockShopRabbitmq);
+		if (!serviceDependenciesService.hasDependency(queueMaster.getKey(), rabbitmq.getKey())) {
+			serviceDependenciesService.addDependency(queueMaster.getValue(), rabbitmq.getValue());
 		}
 
 		return servicesMap;

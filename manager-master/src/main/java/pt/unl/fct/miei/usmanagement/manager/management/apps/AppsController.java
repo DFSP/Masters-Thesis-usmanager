@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
-import pt.unl.fct.miei.usmanagement.manager.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.Arrays;
 import java.util.List;

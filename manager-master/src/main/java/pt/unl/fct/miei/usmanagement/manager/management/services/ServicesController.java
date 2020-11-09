@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMe
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.util.Validation;
+import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.Arrays;
 import java.util.List;
