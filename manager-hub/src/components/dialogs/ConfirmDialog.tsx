@@ -81,10 +81,8 @@ class ConfirmDialog extends React.Component<Props, {}> {
         return (
             <div id={this.props.id} className='modal dialog' ref={this.modal}>
                 <div className="modal-content">
-                    <div className="modal-message">{`Are you sure you want ${message.startsWith('to ') ? 'to ' : ''}`}
-                        <div
-                            className="dialog-message">{message.startsWith('to ') ? message.substr(3, message.length) : message}</div>
-                        ?
+                    <div className="modal-message">{`Esta ação afeta definitivamente os dados: `}
+                        <div className="dialog-message">{message}.</div>
                     </div>
                 </div>
                 <div className={`modal-footer dialog-footer`}>
@@ -93,16 +91,16 @@ class ConfirmDialog extends React.Component<Props, {}> {
                             <input ref={this.checkbox}
                                    id={'disable-confirmation-dialog'}
                                    type="checkbox"/>
-                            <span className={`${styles.hideMessage}`}>Don't show me this again</span>
+                            <span className={`${styles.hideMessage}`}>Não mostrar novamente</span>
                         </label>
                     </div>
-                    <button className={`modal-close btn-flat white-text ${styles.actionButton}`}
+                    <button className={`modal-close btn-flat red-text ${styles.actionButton}`}
                             onClick={this.handleCancel}>
-                        No
+                        Cancelar
                     </button>
-                    <button className={`modal-close btn-flat white-text ${styles.actionButton}`}
+                    <button className={`modal-close btn-flat green-text ${styles.actionButton}`}
                             onClick={this.handleConfirm}>
-                        Absolutely
+                        Continuar
                     </button>
                 </div>
             </div>

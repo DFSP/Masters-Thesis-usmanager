@@ -30,8 +30,8 @@ import RegistrationServersList from "./RegistrationServersList";
 
 const RegistrationServers: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Executar novo servidor'}}
-                   pathname={'/servidores de registo/executar?new'}/>
+        <AddButton button={{text: 'Lançar servidor'}}
+                   pathname={'/servidores de registo/lançar?new'}/>
         <div className={`${styles.container}`}>
             <RegistrationServersList/>
         </div>

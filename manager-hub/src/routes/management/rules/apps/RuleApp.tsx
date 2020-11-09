@@ -143,7 +143,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleApp(ruleApp);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -157,7 +157,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleApp);
         const previousRuleApp = this.getRuleApp();
         if (previousRuleApp?.id) {
@@ -170,7 +170,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleApp: IRuleApp): void =>
-        super.toast(`Não foi possível guardar a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleApp: IRuleApp): void => {
         super.toast(`<span class="green-text">A regra <b class="white-text">${ruleApp.name}</b> foi apagada com sucesso</span>`);
@@ -180,7 +180,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleApp: IRuleApp): void =>
-        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -220,7 +220,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleApp: IRuleApp, reason: string): void =>
-        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleApp = (app: string): void =>
         this.setState({
@@ -250,7 +250,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (ruleApp: IRuleApp, reason: string): void =>
-        super.toast(`Não foi possível guardar as aplicações associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as aplicações associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleApp = (ruleApp: IRuleApp) => {
         ruleApp = Object.values(normalize(ruleApp, Schemas.RULE_APP).entities.appRules || {})[0];

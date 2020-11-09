@@ -90,7 +90,7 @@ class AppSimulatedMetricList extends BaseComponent<Props, State> {
                                dropdown={{
                                    id: 'simulatedMetrics',
                                    title: 'Selecionar a métrica simulada',
-                                   empty: 'Não há regras simuladas disponíveis',
+                                   empty: 'Não há métricas simuladas disponíveis',
                                    data: this.getSelectableSimulatedMetrics()
                                }}
                                show={this.simulatedMetric}

@@ -150,7 +150,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/contentores/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedContainerMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -164,7 +164,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">As mudanças à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foram guardadas</span>`);
+        super.toast(`<span class="green-text">As mudanças à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/contentores/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foram guardadas</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedContainerMetric = this.getSimulatedContainerMetric();
         if (previousSimulatedContainerMetric.id) {
@@ -177,7 +177,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Não foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/contentores/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
         super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
@@ -187,7 +187,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/contentores/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedContainersIds.length;
@@ -229,7 +229,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveContainersFailure = (simulatedMetric: ISimulatedContainerMetric, reason: string): void =>
-        super.toast(`Não foi possível guardar os contentores associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os contentores associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/contentores/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
         simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
@@ -311,12 +311,12 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                        id={key}
                                        label={key}
                                        type='checkbox'
-                                       checkbox={{label: 'override true metrics'}}/>
+                                       checkbox={{label: 'Sobrepor às métricas obtidas'}}/>
                                 : key === 'active'
                                     ? <Field key={index}
                                              id={key}
                                              type='checkbox'
-                                             checkbox={{label: 'active'}}/>
+                                             checkbox={{label: 'ativo'}}/>
                                     : key === 'minimumValue' || key === 'maximumValue'
                                         ? <Field key={index}
                                                  id={key}

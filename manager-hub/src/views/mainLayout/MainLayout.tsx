@@ -56,7 +56,7 @@ class MainLayout extends React.Component<Props, {}> {
     }
 
     public render() {
-        const paddingLeft = this.props.sidenavVisible ? 200 : 0;
+        const paddingLeft = this.props.sidenavVisible ? 225 : 0;
         return (
             <div>
                 <Sidenav/>

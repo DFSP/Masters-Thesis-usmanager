@@ -29,6 +29,10 @@ public enum ComponentTypeEnum {
 	HOST,
 	APP,
 	SERVICE,
-	CONTAINER
+	CONTAINER;
+
+	public static ComponentTypeEnum getComponentType(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

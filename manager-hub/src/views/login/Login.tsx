@@ -67,7 +67,7 @@ class Login extends BaseComponent<Props, State> {
         return (
             <div className={`container ${styles.container} row`}>
                 <ul className={`tabs ${styles.tabs} col s9 m6 l6 offset-s1 offset-m3 offset-l3`} ref={this.tabs}>
-                    <li className={`tab col s12`}><a className={styles.title}>Introduz as credenciais</a></li>
+                    <li className={`tab col s12`}><a className={styles.title}>Introduza as credenciais</a></li>
                 </ul>
                 <div className={`tab-content ${styles.tabContent} col s9 m6 l6 offset-s1 offset-m3 offset-l3`}>
                     <form onSubmit={this.handleLogin}>

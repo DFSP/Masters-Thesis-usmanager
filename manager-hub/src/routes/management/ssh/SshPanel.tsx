@@ -7,6 +7,7 @@ import {addCommand, clearCommands} from "../../../actions";
 import {connect} from "react-redux";
 import {ISshCommand} from "./SshCommand";
 import {ISshFile} from "./SshFile";
+import {IHostAddress} from "../hosts/Hosts";
 
 export interface ICommand extends ISshCommand {
     timestamp: number;
@@ -23,11 +24,12 @@ interface SshPanelStateToProps {
 
 interface SshPanelDispatchToProps {
     addCommand: (command: ICommand | IFileTransfer) => void;
-    clearCommands: () => void;
+    clearCommands: (hostAddress?: IHostAddress) => void;
 }
 
 interface Props {
     filter?: (command: ICommand | IFileTransfer) => boolean;
+    hostAddress?: IHostAddress;
 }
 
 export type SshPanelProps = Props & SshPanelStateToProps & SshPanelDispatchToProps;
@@ -35,6 +37,7 @@ export type SshPanelProps = Props & SshPanelStateToProps & SshPanelDispatchToPro
 interface State {
     commandsHeight: number;
     animate: boolean;
+    panelWidth: string;
 }
 
 class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel {
@@ -51,17 +54,29 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
         this.state = {
             commandsHeight: this.COMMANDS_DEFAULT_HEIGHT,
             animate: false,
+            panelWidth: this.props.sidenavVisible ? 'calc(100vw - 225px)' : '100vw'
         }
     }
 
     public componentDidMount() {
         this.updateScrollbars();
+        window.addEventListener('resize', this.handleResize);
     }
 
     public componentDidUpdate(prevProps: Readonly<SshPanelProps>, prevState: Readonly<State>, snapshot?: any) {
         if (!this.state.animate && prevProps.sidenavVisible !== this.props.sidenavVisible) {
             this.setState({animate: true});
         }
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    private handleResize = () => {
+        this.setState({
+            panelWidth: this.props.sidenavVisible ? 'calc(100vw - 225px)' : '100vw'
+        })
     }
 
     public scrollToTop = () =>
@@ -72,6 +87,10 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
         return !filter ? commands : commands.filter((command: ICommand | IFileTransfer) => filter(command));
     }
 
+    private clearCommands = () => {
+        this.props.clearCommands(this.props.hostAddress);
+    }
+
     public render() {
         const body = document.body, html = document.documentElement;
         const maxHeight = Math.max(body.scrollHeight, body.offsetHeight,
@@ -79,14 +98,14 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
         return <Resizable
             className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
             style={{
-                width: this.props.sidenavVisible ? 'calc(100vw - 200px)' : '100vw',
-                left: this.props.sidenavVisible ? '200px' : '0'
+                width: this.state.panelWidth,
+                left: this.props.sidenavVisible ? '225px' : '0'
             }}
             maxHeight={maxHeight}
             onResize={this.onResize}
             enable={{top: true}}
             size={{
-                width: this.props.sidenavVisible ? window.innerWidth - 200 : '100vw',
+                width: this.props.sidenavVisible ? window.innerWidth - 225 : '100vw',
                 height: this.state.commandsHeight,
             }}
             onResizeStop={(e, direction, ref, d) => {
@@ -100,7 +119,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                 }}>
                     <button className='btn-floating btn-flat btn-small'
                             data-for='tooltip' data-tip="Limpar" data-place='top'
-                            onClick={this.props.clearCommands}>
+                            onClick={this.clearCommands}>
                         <i className='material-icons grey-text'>delete_sweep</i>
                     </button>
                 </ScrollBar>
@@ -113,7 +132,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                 <div>
                     <div className={styles.commandsHeader}>
                         <div className={styles.commandsTitle}>
-                            Commands
+                            Comandos
                         </div>
                     </div>
                 </div>
@@ -141,8 +160,8 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                                 <>
                                     <div>
                                         <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
-                                        File {command.filename} transferred
-                                        to {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}`}
+                                        O ficheiro {command.filename} foi transferido
+                                        para o host {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''} com sucesso`}
                                     </div>
                                 </>
                             }
@@ -155,7 +174,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                     this.rightControlsScrollbar = ref;
                 }}>
                     <button className={`btn-floating btn-flat btn-small`}
-                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Encolher'}
+                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Esconder'}
                             data-place='left'
                             onClick={this.toggleCommands}>
                         <i className='material-icons'>{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
@@ -184,17 +203,12 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
     }
 
     private dateFormat = (date: Date) => {
-        let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        let day = date.getDate();
-
-        let monthIndex = date.getMonth();
-        let monthName = monthNames[monthIndex];
-
-        let year = date.getFullYear().toString().substr(-2);
-
-        let millis = this.pad(date.getMilliseconds(), 3);
-
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const day = date.getDate();
+        const monthIndex = date.getMonth();
+        const monthName = monthNames[monthIndex];
+        const year = date.getFullYear().toString().substr(-2);
+        const millis = this.pad(date.getMilliseconds(), 3);
         return `${day}/${monthName}/${year} ${date.toLocaleTimeString()}.${millis}`;
     }
 

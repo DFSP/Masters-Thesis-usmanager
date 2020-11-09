@@ -79,6 +79,8 @@ public class PrometheusService {
 		catch (RestClientException e) {
 			log.error("Failed to get stat {} from prometheus on {}: {}", prometheusQuery, hostAddress, e.getMessage());
 		}
+		log.info("Prometheus query {} at node {} got value {}", prometheusQuery.getQuery(), hostAddress.toSimpleString(),
+			value.isEmpty() ? 0 : Double.parseDouble(value));
 		return value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
 	}
 

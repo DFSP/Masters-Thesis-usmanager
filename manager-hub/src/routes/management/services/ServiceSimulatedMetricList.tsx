@@ -89,7 +89,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                               emptyMessage={`Sem regras simuladas associadas`}
+                               emptyMessage={`Sem métricas simuladas associadas`}
                                data={this.props.simulatedMetricsName}
                                dropdown={{
                                    id: 'simulatedMetrics',

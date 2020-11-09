@@ -127,7 +127,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                                 <DividerContextMenuItem/>
                             </>
                             : undefined}
-                        <LinkedContextMenuItem option={'Details'}
+                        <LinkedContextMenuItem option={'Detalhes'}
                                                pathname={link?.to.pathname}
                                                state={{data: link?.to.state}}/>
                     </>}
@@ -146,14 +146,14 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                             data={this.props.link?.to.state}
                             disabled={loading}
                             onClick={confirmationDialog ? undefined : this.onDelete}>
-                            {this.props.delete.textButton || 'Delete'}
+                            {this.props.delete.textButton || 'Apagar'}
                         </MenuItem>
                     </div>}
                 </ContextMenu>
                 {this.props.delete !== undefined
                 && confirmationDialog
                 && <ConfirmDialog id={id}
-                                  message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${title}`}`}
+                                  message={`${this.props.delete.confirmMessage || `${this.props.delete.textButton?.toLowerCase() || 'apagar'} ${title}`}`}
                                   confirmCallback={this.onDelete}/>}
             </>
         )

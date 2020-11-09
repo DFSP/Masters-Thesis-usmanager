@@ -24,9 +24,11 @@
 
 package pt.unl.fct.miei.usmanagement.manager.operators;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public enum OperatorEnum {
 
 	NOT_EQUAL_TO("!="),
@@ -38,22 +40,8 @@ public enum OperatorEnum {
 
 	private final String symbol;
 
-	OperatorEnum(String symbol) {
-		this.symbol = symbol;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	@JsonCreator
-	public static OperatorEnum forValues(@JsonProperty("symbol") String symbol) {
-		for (OperatorEnum operator : OperatorEnum.values()) {
-			if (operator.symbol.equalsIgnoreCase(symbol)) {
-				return operator;
-			}
-		}
-		return null;
+	public static OperatorEnum getOperator(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
 	}
 
 }

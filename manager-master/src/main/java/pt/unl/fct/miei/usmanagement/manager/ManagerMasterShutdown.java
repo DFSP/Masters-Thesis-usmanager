@@ -87,11 +87,6 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 			log.error("Failed to stop all containers: {}", e.getMessage());
 		}
 		try {
-			cloudHostsService.terminateInstances();
-		} catch (Exception e) {
-			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
-		}
-		try {
 			dockerSwarmService.destroySwarm();
 		} catch (Exception e) {
 			log.error("Failed to completely destroy swarm: {}", e.getMessage());
@@ -100,6 +95,11 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 			containersService.stopDockerApiProxies();
 		} catch (Exception e) {
 			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
+		}
+		try {
+			cloudHostsService.terminateInstances();
+		} catch (Exception e) {
+			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
 		}
 		hostsEventsService.reset();
 		servicesEventsService.reset();

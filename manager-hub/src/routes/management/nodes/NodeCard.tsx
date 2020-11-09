@@ -75,9 +75,9 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`O nó <a href=/nós/${node.id}><b>${node.id}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
+            super.toast(`O nó <a href='/nós/${node.id}'><b>${node.id}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Não foi possível remover o nó <a href=/nós/${node.id}><b>${node.id}</b></a> do swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó <a href='/nós/${node.id}'><b>${node.id}</b></a> do swarm`, 10000, reason, true);
         }
         if (this.mounted) {
             this.setState({loading: false});
@@ -106,9 +106,9 @@ class NodeCard extends BaseComponent<Props, State> {
                          margin={'10px 0'}
                          hoverable
                          delete={{
-                             textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
+                             textButton: (node as INode).state === 'down' ? 'Remover do swarm' : 'Sair do swarm',
                              url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
-                             confirmMessage: (node as INode).state === 'down' ? `to remove ${node.id} from the swarm` : `${node.id} to leave the swarm`,
+                             confirmMessage: (node as INode).state === 'down' ? `remover o nó ${node.id} do swarm` : `${node.id} irá sair permanentemente do swarm`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                          }}

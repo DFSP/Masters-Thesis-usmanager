@@ -82,7 +82,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Não foi possível parar o contentor <a href=/contentores/${container.containerId}><b>${container.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor <a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -131,7 +131,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/contentores/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -139,7 +139,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/contentores/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -159,7 +159,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/contentores/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/contentores/${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} to container </span><a href=/contentores/${container.containerId}>${container.containerId}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -167,7 +167,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/contentores/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -220,13 +220,13 @@ class ContainerCard extends BaseComponent<Props, State> {
         const CardContainer = Card<IContainer>();
         return <CardContainer id={`container-${container.containerId}`}
                               title={container.containerId.toString()}
-                              link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
+                              link={{to: {pathname: `/contentores/${container.containerId}`, state: container}}}
                               height={'215px'}
                               margin={'10px 0'}
                               hoverable
                               delete={{
                                   textButton: 'Parar',
-                                  confirmMessage: `to stop container ${container.containerId}`,
+                                  confirmMessage: `parar contentor ${container.containerId}`,
                                   url: `containers/${container.containerId}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure

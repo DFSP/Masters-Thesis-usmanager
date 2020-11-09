@@ -38,7 +38,7 @@ const Rules = () =>
         <AddButton button={{text: 'Nova condição ou regra'}}
                    dropdown={{
                        id: 'addRuleOrCondition',
-                       title: 'Adicionar regra aplicada a...',
+                       title: 'Regra aplicada a...',
                        data: [
                            {text: 'hosts', pathname: '/regras/hosts/nova regra?new'},
                            {text: 'aplicações', pathname: '/regras/aplicações/nova regra?new'},
@@ -49,7 +49,7 @@ const Rules = () =>
                    }}/>
         <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesConditionCollapsible"}
-                         title={'Conditions'}
+                         title={'Condições'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
@@ -67,7 +67,7 @@ const Rules = () =>
         </div>
         <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesAppCollapsible"}
-                         title={'Apps'}
+                         title={'Aplicações'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
@@ -76,7 +76,7 @@ const Rules = () =>
         </div>
         <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesServiceCollapsible"}
-                         title={'Services'}
+                         title={'Serviços'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
@@ -85,7 +85,7 @@ const Rules = () =>
         </div>
         <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesContainerCollapsible"}
-                         title={'Containers'}
+                         title={'Contentores'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>

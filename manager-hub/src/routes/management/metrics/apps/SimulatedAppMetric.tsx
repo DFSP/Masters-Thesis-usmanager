@@ -304,12 +304,12 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
                                 ? <Field key={index}
                                          id={key}
                                          type='checkbox'
-                                         checkbox={{label: 'override real metrics'}}/>
+                                         checkbox={{label: 'Sobrepor às métricas obtidas'}}/>
                                 : key === 'active'
                                     ? <Field key={index}
                                              id={key}
                                              type='checkbox'
-                                             checkbox={{label: 'active'}}/>
+                                             checkbox={{label: 'Ativo'}}/>
                                     : key === 'minimumValue' || key === 'maximumValue'
                                         ? <Field key={index}
                                                  id={key}

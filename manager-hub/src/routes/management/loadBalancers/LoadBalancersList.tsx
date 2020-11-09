@@ -54,7 +54,7 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
             <CardList<ILoadBalancer>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não há nenhum contentor de balanceamento de carga a executar"}
+                emptyMessage={"Não existem contentores de balanceamento de carga a executar"}
                 list={this.props.loadBalancers}
                 card={this.loadBalancer}
                 predicate={this.predicate}/>

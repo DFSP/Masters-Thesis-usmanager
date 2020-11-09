@@ -32,6 +32,7 @@ import Field from "../../../../components/form/Field";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
 import {IReply} from "../../../../utils/api";
 import {IEdgeHost} from "./EdgeHost";
+import {getEdgeHostAddress, IHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): INewSshCommand => ({
     background: false,
@@ -40,7 +41,7 @@ const buildNewSshCommand = (): INewSshCommand => ({
 });
 
 interface EdgeHostSshCommandProps {
-    edgeHost: Partial<IEdgeHost>;
+    edgeHost: IEdgeHost;
 }
 
 interface DispatchToProps {
@@ -66,7 +67,7 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                       values={command}
                       isNew
                       post={{
-                          textButton: 'Execute',
+                          textButton: 'Executar',
                           url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/ssh`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure
@@ -74,19 +75,20 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                     <Field key='background'
                            id='background'
                            type='checkbox'
-                           checkbox={{label: 'execute in the background'}}/>
+                           checkbox={{label: 'executar em background'}}/>
                     <Field key='command'
                            id='command'
                            label='command'/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>
+                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>
             </>
         );
     }
 
     private onPostSuccess = (reply: IReply<ISshCommand>): void => {
         const command = reply.data;
-        const timestampedCommand = {...command, timestamp: Date.now()};
+        const edgeHost = this.props.edgeHost;
+        const timestampedCommand = {...command, hostAddress: getEdgeHostAddress(edgeHost), timestamp: Date.now()};
         this.props.addCommand(timestampedCommand);
         this.sshPanel.current?.scrollToTop();
     };

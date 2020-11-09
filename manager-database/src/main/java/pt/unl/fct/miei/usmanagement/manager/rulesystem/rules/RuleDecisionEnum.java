@@ -24,6 +24,8 @@
 
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
+import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+
 public enum RuleDecisionEnum {
 
 	NONE,
@@ -31,6 +33,11 @@ public enum RuleDecisionEnum {
 	REPLICATE,
 	MIGRATE,
 	OVERWORK,
-	UNDERWORK
+	UNDERWORK;
+
+
+	public static RuleDecisionEnum getOperator(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

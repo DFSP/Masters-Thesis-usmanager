@@ -145,16 +145,16 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/servidores de registo/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href='/servidores de registo/${registrationServer.containerId}'><b>${registrationServer.containerId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.containerId)
             }
         } else {
             registrationServers = registrationServers.reverse();
-            super.toast(`<span class="green-text">Launched ${registrationServers.length} registration-servers:<br/><b class="white-text">${registrationServers.map(registrationServer => `Container ${registrationServer.containerId} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.containerId} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
-                this.props.history.push('/registration-servers');
+                this.props.history.push('/servidores de registo');
             }
         }
         this.props.addRegistrationServers(registrationServers);
@@ -164,14 +164,14 @@ class RegistrationServer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o servidor de registo`, 10000, reason, true);
 
     private onDeleteSuccess = (registrationServer: IRegistrationServer): void => {
-        super.toast(`<span class="green-text">Registration server <b class="white-text">${registrationServer.containerId}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.containerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/registration-servers`)
+            this.props.history.push(`/servidores de registo`)
         }
     };
 
     private onDeleteFailure = (reason: string, registrationServer: IRegistrationServer): void =>
-        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.containerId}</b>` : `<a href=/servidores de registo/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.containerId}</b>` : `<a href='/servidores de registo/${registrationServer.containerId}'><b>${registrationServer.containerId}</b></a>`}`, 10000, reason, true);
 
     private updateRegistrationServer = (registrationServer: IRegistrationServer) => {
         registrationServer = Object.values(normalize(registrationServer, Schemas.REGISTRATION_SERVER).entities.registrationServers || {})[0];
@@ -244,7 +244,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
                     ? <Field key={index}
                              id={key}
                              label={key}
-                             icon={{linkedTo: '/containers/' + (formRegistrationServer as Partial<IRegistrationServer>).containerId}}/>
+                             icon={{linkedTo: '/contentores/' + (formRegistrationServer as Partial<IRegistrationServer>).containerId}}/>
                     : key === 'created'
                     ? <Field key={index}
                              id={key}
@@ -289,6 +289,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
                           fields={this.getFields(registrationServer)}
                           values={registrationServer}
                           isNew={isNew(this.props.location.search)}
+                          showSaveButton={false}
                           post={{
                               textButton: 'Executar',
                               url: 'registration-server',

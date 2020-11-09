@@ -118,7 +118,8 @@ public class AwsService {
 						.filter(this::isUsManagerInstance).forEach(instances::add);
 					request.setNextToken(result.getNextToken());
 				} while (result.getNextToken() != null);
-			} catch (SdkClientException e) {
+			}
+			catch (SdkClientException e) {
 				log.error(e.getMessage());
 			}
 		});
@@ -127,18 +128,29 @@ public class AwsService {
 
 	public Instance getInstance(String id, AwsRegion region) {
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
-		DescribeInstancesResult result;
+		DescribeInstancesResult result = null;
 		do {
-			result = getEC2Client(region).describeInstances(request);
-			Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
-				.flatMap(List::stream).filter(this::isUsManagerInstance).findFirst();
-			if (instance.isPresent()) {
-				return instance.get();
+			for (int i = 0; i < 3; i++) {
+				try {
+					result = getEC2Client(region).describeInstances(request);
+					Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
+						.flatMap(List::stream).filter(this::isUsManagerInstance).findFirst();
+					if (instance.isPresent()) {
+						return instance.get();
+					}
+				}
+				catch (Exception e) {
+					log.error("Unable to get instance {} from region {}: {} retrying...", id, region, e.getMessage());
+					Timing.sleep(100, TimeUnit.MILLISECONDS);
+				}
+			}
+			if (result == null) {
+				throw new ManagerException("Unable to reach instance %s on region %s", id, region.getRegion());
 			}
 			request.setNextToken(result.getNextToken());
 		} while (result.getNextToken() != null);
 
-		throw new ManagerException("Instance with id %s not found", id);
+		throw new ManagerException("Instance with id %s not found on region %s", id, region.getRegion());
 	}
 
 	public List<AwsSimpleInstance> getSimpleInstances() {

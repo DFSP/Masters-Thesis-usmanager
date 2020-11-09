@@ -148,7 +148,7 @@ class ServiceCard extends BaseComponent<Props, State> {
                             margin={'10px 0'}
                             hoverable
                             delete={{
-                                confirmMessage: `to delete service ${service.serviceName}`,
+                                confirmMessage: `apagar serviço ${service.serviceName}`,
                                 url: `services/${service.serviceName}`,
                                 successCallback: this.onDeleteSuccess,
                                 failureCallback: this.onDeleteFailure

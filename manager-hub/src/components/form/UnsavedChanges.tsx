@@ -27,7 +27,7 @@ import styles from "./UnsavedChanges.module.css";
 
 const UnsavedChanges: React.FC = () =>
     <div className={`${styles.container}`}>
-        <div className={`${styles.message}`}>Don't forget to save your changes</div>
+        <div className={`${styles.message}`}>Modificações não guardadas</div>
     </div>;
 
 export default UnsavedChanges;

@@ -133,15 +133,15 @@
         width: 100vw
     }
     100% {
-        left: 200px;
-        width: calc(100vw - 200px)
+        left: 225px;
+        width: calc(100vw - 225px)
     }
 }
 
 @keyframes expand {
     0% {
-        left: 200px;
-        width: calc(100vw - 200px)
+        left: 225px;
+        width: calc(100vw - 225px)
     }
     100% {
         left: 0;

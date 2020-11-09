@@ -279,7 +279,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
         formContext.setValue(id, value, validate);
     };
 
-    private onSelect = (id: string, formContext: IFormContext) => (value: string) => {
+    private onSelect = (id: string, formContext: IFormContext) => (value?: string) => {
         formContext.setValue(id, value);
     };
 

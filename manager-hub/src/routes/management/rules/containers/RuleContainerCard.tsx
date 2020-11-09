@@ -73,7 +73,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleContainer: IRuleContainer): void => {
-        super.toast(`Não foi possível remover a regra <a href=/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href='/regras/contentores/${ruleContainer.name}'><b>${ruleContainer.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -101,7 +101,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
         const CardRuleContainer = Card<IRuleContainer>();
         return <CardRuleContainer id={`container-rule-${rule.id}`}
                                   title={rule.name}
-                                  link={{to: {pathname: `/regras/containers/${rule.name}`, state: rule}}}
+                                  link={{to: {pathname: `/regras/contentores/${rule.name}`, state: rule}}}
                                   height={'85px'}
                                   margin={'10px 0'}
                                   hoverable

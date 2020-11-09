@@ -37,7 +37,7 @@ type ILink = { link: string, name: string, sub?: ILink[] }
 const sidenavManagementLinks: ILink[] = [
     {link: '/aplicações', name: 'Aplicações'},
     {link: '/serviços', name: 'Serviços'},
-    {link: '/contentores docker', name: 'Contentores docker'},
+    {link: '/contentores', name: 'Contentores'},
     {
         link: '/hosts', name: 'Hosts', sub: [
             {link: '/cloud', name: 'Instâncias cloud'},
@@ -45,7 +45,7 @@ const sidenavManagementLinks: ILink[] = [
         ]
     },
     {link: '/nós', name: 'Nós'},
-    {link: '/regions', name: 'Regiões'},
+    {link: '/regiões', name: 'Regiões'},
     {
         link: '/regras', name: 'Regras', sub: [
             {link: '/condições', name: 'Condições'},
@@ -56,7 +56,7 @@ const sidenavManagementLinks: ILink[] = [
         ]
     },
     {
-        link: '/regras simuladas', name: 'Métricas simuladas', sub: [
+        link: '/métricas simuladas', name: 'Métricas simuladas', sub: [
             {link: '/hosts', name: 'Métricas de hosts'},
             {link: '/aplicações', name: 'Métricas de aplicações'},
             {link: '/serviços', name: 'Métricas de serviços'},
@@ -65,7 +65,7 @@ const sidenavManagementLinks: ILink[] = [
     },
     {link: '/balanceamento de carga', name: 'Balanceamento de carga'},
     {link: '/servidores de registo', name: 'Servidores de registo'},
-    {link: '/gestores locais', name: 'Gestores'},
+    {link: '/gestores locais', name: 'Gestores locais'},
     {link: '/secure shell', name: 'Secure shell'},
     {link: '/configurações', name: 'Configurações'},
     {link: '/logs', name: 'Logs'},
@@ -128,7 +128,7 @@ class Sidenav extends React.Component<Props, {}> {
         })(this.props.component);
         return (
             <ul id='slide-out' className='sidenav sidenav-fixed no-shadows'
-                style={this.props.sidenav.user ? {width: 200, transition: 'width .25s'} : {
+                style={this.props.sidenav.user ? {width: 225, transition: 'width .25s'} : {
                     width: 0,
                     transition: 'width .25s'
                 }} ref={this.sidenav}>

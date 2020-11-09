@@ -33,6 +33,7 @@ import Field from "../../../../components/form/Field";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
 import {IReply} from "../../../../utils/api";
 import {ICloudHost} from "./CloudHost";
+import {getCloudHostAddress, IHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): INewSshCommand => ({
     background: false,
@@ -41,7 +42,7 @@ const buildNewSshCommand = (): INewSshCommand => ({
 });
 
 interface CloudHostSshCommandProps {
-    cloudHost: Partial<ICloudHost>;
+    cloudHost: ICloudHost;
 }
 
 interface DispatchToProps {
@@ -55,7 +56,7 @@ class CloudHostSshCommand extends BaseComponent<Props, {}> {
     private sshPanel = createRef<any>();
 
     private commandFilter = (command: ICommand | IFileTransfer) =>
-       command.hostAddress.publicIpAddress === this.props.cloudHost.publicIpAddress
+        command.hostAddress.publicIpAddress === this.props.cloudHost.publicIpAddress
 
     public render() {
         const command = buildNewSshCommand();
@@ -67,27 +68,28 @@ class CloudHostSshCommand extends BaseComponent<Props, {}> {
                       values={command}
                       isNew
                       post={{
-                          textButton: 'Execute',
-                          url: `hosts/cloud/${this.props.cloudHost?.instanceId}/ssh`,
+                          textButton: 'Executar',
+                          url: `hosts/cloud/${this.props.cloudHost?.publicIpAddress}/ssh`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure
                       }}>
                     <Field key='background'
                            id='background'
                            type='checkbox'
-                           checkbox={{label: 'execute in the background'}}/>
+                           checkbox={{label: 'executar em background'}}/>
                     <Field key='command'
                            id='command'
                            label='command'/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>
+                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getCloudHostAddress(this.props.cloudHost)}/>
             </>
         );
     }
 
     private onPostSuccess = (reply: IReply<ISshCommand>): void => {
         const command = reply.data;
-        const timestampedCommand = {...command, timestamp: Date.now()};
+        const cloudHost = this.props.cloudHost;
+        const timestampedCommand: ICommand = {...command, hostAddress: getCloudHostAddress(cloudHost), timestamp: Date.now()};
         this.props.addCommand(timestampedCommand);
         this.sshPanel.current?.scrollToTop();
     };

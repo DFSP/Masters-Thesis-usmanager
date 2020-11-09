@@ -26,6 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.users;
 
 public enum UserRoleEnum {
 
-	ROLE_SYS_ADMIN
+	ROLE_SYS_ADMIN;
+
+	public static UserRoleEnum getRole(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

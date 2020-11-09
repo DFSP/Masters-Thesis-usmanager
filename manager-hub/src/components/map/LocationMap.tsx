@@ -134,17 +134,18 @@ export default class LocationMap extends React.Component<Props, State> {
             </ReactTooltip>
         </>;
         return <>
+            <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
             {resizable &&
             <>
                 <button className={`modal-trigger btn-floating btn-flat right`}
-                        data-for='button-tooltip' data-tip="Ecrã inteiro" data-place={'top'}
+                        data-for='dark-tooltip' data-tip="Ecrã inteiro" data-place={'top'}
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className="material-icons">fullscreen</i>
                 </button>
                 {this.buttons('top')}
                 <Dialog id={'fullscreen-modal'}
-                        title={'Location'}
+                        title={'Selecionar a localização'}
                         fullscreen
                         locked
                         footer={false}

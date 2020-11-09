@@ -46,7 +46,7 @@ html {
 
 .content {
     flex: 1 0 auto;
-    padding-left: 200px;
+    padding-left: 225px;
 }
 
 @media only screen and (max-width: 992px) {
@@ -152,7 +152,7 @@ nav li {
 
 .sidenav {
     background: #282828;
-    width: 200px;
+    width: 225px;
     height: 100vh;
     z-index: 998;
     overflow: hidden;
@@ -164,6 +164,31 @@ nav li {
 
 .sidenav li:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn, .btn-large, .btn-small, .btn-flat {
+    text-transform: capitalize;
+    font-size: 15px;
+}
+
+.tabs .tab {
+    text-transform: capitalize;
+}
+
+.tabs .tab a {
+    font-size: 15px;
+}
+
+.datepicker-controls .select-month input {
+    width: 90px;
+}
+
+.timepicker-footer .confirmation-btns button:first-child {
+    display: none;
+}
+
+.datepicker-cancel, .timepicker-cancel {
+    display: none;
 }
 
 .sidenav-trigger {

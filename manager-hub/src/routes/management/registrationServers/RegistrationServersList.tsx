@@ -54,7 +54,7 @@ class RegistrationServersList extends BaseComponent<Props, {}> {
             <CardList<IRegistrationServer>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não há servidores de registo a executar"}
+                emptyMessage={"Não existem servidores de registo a executar"}
                 list={this.props.registrationServers}
                 card={this.registrationServer}
                 predicate={this.predicate}/>

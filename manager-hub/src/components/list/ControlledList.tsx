@@ -201,7 +201,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                 .map(item => item?.isChecked || false)
                                 .every(checked => !checked)}
                             onClick={this.onRemove}>
-                        {removeButtonText || 'Remove'}
+                        {removeButtonText || 'Remover'}
                     </button>}
                 </div>
                 <DataList

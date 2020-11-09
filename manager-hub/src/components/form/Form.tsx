@@ -29,7 +29,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import {isEqual, isEqualWith} from "lodash";
+import {isEqual, isEqualWith, omit} from "lodash";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
@@ -38,6 +38,7 @@ import {Method} from "axios";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import BaseComponent from "../BaseComponent";
+import ReactTooltip from "react-tooltip";
 
 export interface IFormModal {
     id: string,
@@ -260,6 +261,7 @@ class Form extends BaseComponent<Props, State> {
         if (prevProps.showSaveButton !== this.props.showSaveButton
             || prevState.values !== this.state.values
             || prevState.savedValues !== this.state.savedValues) {
+            console.log(this.props.showSaveButton, this.props.isNew, this.saveRequired(), this.state.savedValues, this.state.values)
             this.setState({
                 saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()
             })
@@ -304,9 +306,10 @@ class Form extends BaseComponent<Props, State> {
         } = this.props;
         return (
             <>
+                <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 {this.props.delete && confirmationDialog && (
                     <ConfirmDialog id={'confirm-delete'}
-                                   message={`${this.props.delete.confirmMessage || `to ${this.props.delete.textButton?.toLowerCase() || 'delete'} ${values[id]}`}`}
+                                   message={`${this.props.delete.confirmMessage || `${this.props.delete.textButton?.toLowerCase() || 'apagar'} ${values[id]}`}`}
                                    confirmCallback={this.onClickDelete}/>)}
                 <form onSubmit={this.handleSubmit} noValidate>
                     {(controlsMode === undefined || controlsMode === 'top') && (
@@ -368,13 +371,13 @@ class Form extends BaseComponent<Props, State> {
                                                     type="button"
                                                     data-target='confirm-delete'
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
-                                                    {this.props.delete?.textButton || 'Delete'}
+                                                    {this.props.delete?.textButton || 'Apagar'}
                                                 </button>)}
                                             {!loading && (
                                                 <button
                                                     className={`btn-flat btn-small green-text slide inline-button`}
                                                     /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
-                                                    /*style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}*/
+                                                    style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}
                                                     disabled={!saveRequired}>
                                                     {(editable !== undefined && this.props.post?.textButton) || 'Guardar'}
                                                 </button>)}
@@ -395,7 +398,7 @@ class Form extends BaseComponent<Props, State> {
                                         className={`${styles.controlButton} btn-flat btn-small red-text right slide inline-button`}
                                         type="button"
                                         onClick={this.cancelRequest}>
-                                        Cancel
+                                        Cancelar
                                     </button>
                                 )}
                                 {dropdown && (
@@ -464,17 +467,17 @@ class Form extends BaseComponent<Props, State> {
                                 <button className={`btn-flat red-text inline-button`}
                                         type="button"
                                         onClick={this.clearValues}>
-                                    Clear
+                                    Apagar
                                 </button>
                                 <button
                                     className={`modal-close btn-flat red-text inline-button`}
                                     type="button">
-                                    Cancel
+                                    Cancelar
                                 </button>
                                 <button className={`btn-flat green-text inline-button`}
                                         type="button"
                                         onClick={this.onModalConfirm}>
-                                    Confirm
+                                    Confirmar
                                 </button>
                             </div>
                         </div>
@@ -494,7 +497,7 @@ class Form extends BaseComponent<Props, State> {
         this.dropdownScrollbar?.updateScroll();
 
     private saveRequired = () => {
-        return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
+        return !isEqualWith(omit(this.state.savedValues, 'id'), omit(this.state.values, 'id'), (first, second) =>
             ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
                 || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
                 || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)

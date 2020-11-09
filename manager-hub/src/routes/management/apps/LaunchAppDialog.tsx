@@ -59,7 +59,7 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
     public render() {
         const location = this.state.selectedPosition ? [this.state.selectedPosition] : [];
         return <Dialog id={'launch-app-modal'}
-                       title={'Select location'}
+                       title={'Selecionar a localização'}
                        fullscreen={true}
                        locked={true}
                        confirmCallback={this.launchAppConfirm}>

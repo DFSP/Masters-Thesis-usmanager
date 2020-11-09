@@ -89,7 +89,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
-            emptyMessage={`Sem hosts cloud associados`}
+            emptyMessage={`Sem instâncias cloud associadas`}
             data={this.props.simulatedMetricCloudHosts}
             dropdown={{
                 id: 'cloudHosts',

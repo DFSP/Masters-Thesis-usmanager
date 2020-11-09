@@ -174,7 +174,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     private onDeleteSuccess = (condition: IRuleCondition): void => {
         super.toast(`<span class="green-text">A condição <b class="white-text">${condition.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/regras/conditions`)
+            this.props.history.push(`/regras/condições`)
         }
     };
 

@@ -312,6 +312,13 @@ public class HostsService {
 		return hostAddress;
 	}
 
+	public HostAddress completeConnectionInfo(HostAddress hostAddress) {
+		if (hostAddress.hasConnectionInfo()) {
+			return hostAddress;
+		}
+		return completeHostAddress(hostAddress);
+	}
+
 	public HostAddress completeHostAddress(HostAddress hostAddress) {
 		if (hostAddress.isComplete()) {
 			return hostAddress;
@@ -321,13 +328,19 @@ public class HostsService {
 		}
 		catch (EntityNotFoundException ignored1) {
 			try {
-				return edgeHostsService.getEdgeHostByAddress(hostAddress).getAddress();
+				return cloudHostsService.getCloudHostByIp(hostAddress.getPublicIpAddress()).getAddress();
 			}
 			catch (EntityNotFoundException ignored2) {
 				try {
-					return edgeHostsService.getEdgeHostByHostname(hostAddress.getHostname()).getAddress();
-				} catch (EntityNotFoundException e) {
-					throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
+					return edgeHostsService.getEdgeHostByAddress(hostAddress).getAddress();
+				}
+				catch (EntityNotFoundException ignored3) {
+					try {
+						return edgeHostsService.getEdgeHostByHostname(hostAddress.getHostname()).getAddress();
+					}
+					catch (EntityNotFoundException e) {
+						throw new EntityNotFoundException("Host", "hostAddress", hostAddress.toString());
+					}
 				}
 			}
 		}
@@ -450,23 +463,24 @@ public class HostsService {
 	}
 
 	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
-		String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
-		String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
-		Path outputFilePath = Paths.get(path);
-		try {
-			Files.createDirectories(outputFilePath.getParent());
-			if (outputFile == null) {
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
-				Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
-			}
-		}
-		catch (IOException e) {
-			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
-		}
 		if (Objects.equals(this.masterHostAddress, hostAddress)) {
+			String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
+			String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
+			Path outputFilePath = Paths.get(path);
+			try {
+				Files.createDirectories(outputFilePath.getParent());
+				if (outputFile == null) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
+					Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
+				}
+			}
+			catch (IOException e) {
+				log.error("Failed to store output of background command {}: {}", command, e.getMessage());
+			}
 			bashService.executeCommandInBackground(command, outputFilePath);
-		} else {
-			sshService.executeCommandInBackground(command, hostAddress, outputFilePath);
+		}
+		else {
+			sshService.executeCommandInBackground(command, hostAddress);
 		}
 	}
 

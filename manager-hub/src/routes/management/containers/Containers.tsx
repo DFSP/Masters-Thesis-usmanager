@@ -63,8 +63,8 @@ class Containers extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton button={{text: 'Executar contentor'}}
-                           pathname={'/contentores/executar?new'}/>
+                <AddButton button={{text: 'Lançar contentor'}}
+                           pathname={'/contentores/lançar contentor?new'}/>
                 <ActionButton icon={'sync'}
                               tooltip={{text: 'Sincronizar contentores da base de dados com o docker swarm', position: 'bottom'}}
                               clickCallback={this.reloadContainers}/>

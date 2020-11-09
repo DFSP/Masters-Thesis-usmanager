@@ -72,7 +72,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, condition: IRuleCondition): void => {
-        super.toast(`Não foi possível remover a condição <a href=/regras/condições/${condition.name}><b>${condition.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a condição <a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,7 +84,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
         const CardRuleCondition = Card<IRuleCondition>();
         return <CardRuleCondition id={`condition-${condition.id}`}
                                   title={condition.name.toString()}
-                                  link={{to: {pathname: `/regras/conditions/${condition.name}`, state: condition}}}
+                                  link={{to: {pathname: `/regras/condições/${condition.name}`, state: condition}}}
                                   height={'150px'}
                                   margin={'10px 0'}
                                   hoverable

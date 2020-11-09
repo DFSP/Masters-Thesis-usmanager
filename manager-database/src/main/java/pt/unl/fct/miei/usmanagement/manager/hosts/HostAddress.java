@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.hosts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -81,6 +82,11 @@ public class HostAddress implements Serializable {
 	@JsonIgnore
 	public String getHostname() {
 		return publicDnsName != null ? publicDnsName : publicIpAddress;
+	}
+
+	@JsonIgnore
+	public boolean hasConnectionInfo() {
+		return username != null && publicIpAddress != null;
 	}
 
 	@JsonIgnore

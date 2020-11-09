@@ -123,7 +123,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 onSelect: this.onSelectApp,
                 formModal: {
                     id: 'serviceApp',
-                    title: 'Add app',
+                    title: 'Indicar a ordem de lançamento',
                     fields: this.getModalFields(),
                     values: this.getModalValues(),
                     content: this.serviceAppModal,
@@ -237,7 +237,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'number'}/>
                 {list && !!list.length &&
                 <Collapsible id={'otherServicesList'}
-                             title={'Other services\' launch order'}
+                             title={'Ordem de lançamento dos outros serviços desta aplicação'}
                              active
                              onChange={this.updateModalScrollbar}>
                     <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>

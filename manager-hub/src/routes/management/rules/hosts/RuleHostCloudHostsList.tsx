@@ -85,7 +85,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                               emptyMessage={`Sem hosts cloud associados`}
+                               emptyMessage={`Sem instâncias cloud associadas`}
                                data={this.props.ruleCloudHosts}
                                dropdown={{
                                    id: 'cloudHosts',

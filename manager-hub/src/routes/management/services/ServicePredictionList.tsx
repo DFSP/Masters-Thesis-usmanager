@@ -111,7 +111,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
             dataKey={['name']}
             formModal={{
                 id: 'servicePrediction',
-                title: 'Add prediction',
+                title: 'Adicionar previsão',
                 fields: this.getFields(),
                 values: emptyPrediction(),
                 content: this.predictionModal,

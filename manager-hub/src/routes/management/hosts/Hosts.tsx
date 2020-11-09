@@ -30,13 +30,31 @@ import CloudHostsList from "./cloud/CloudHostsList";
 import EdgeHostsList from "./edge/EdgeHostsList";
 import Collapsible from "../../../components/collapsible/Collapsible";
 import {ICoordinates} from "../../../components/map/LocationMap";
+import {IEdgeHost} from "./edge/EdgeHost";
+import {ICloudHost} from "./cloud/CloudHost";
+
+export const getEdgeHostAddress = (host: IEdgeHost) => ({
+    username: host.username,
+    publicIpAddress: host.publicIpAddress,
+    privateIpAddress: host.privateIpAddress,
+    publicDnsName: host.publicDnsName,
+    coordinates: host.coordinates,
+})
+
+export const getCloudHostAddress = (host: ICloudHost) => ({
+    username: 'ubuntu',
+    publicIpAddress: host.publicIpAddress,
+    privateIpAddress: host.privateIpAddress,
+    publicDnsName: host.publicDnsName,
+    coordinates: host.awsRegion?.coordinates,
+})
 
 export interface IHostAddress {
     username: string | undefined;
     publicDnsName: string | undefined;
     publicIpAddress: string;
     privateIpAddress: string | undefined;
-    coordinates: ICoordinates;
+    coordinates: ICoordinates | undefined;
 }
 
 const Hosts = () =>

@@ -33,6 +33,7 @@ import {ReduxState} from "../../../../reducers";
 import {addCommand, loadScripts} from "../../../../actions";
 import {connect} from "react-redux";
 import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
+import {getCloudHostAddress, IHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
     hostAddress: undefined,
@@ -49,7 +50,7 @@ interface DispatchToProps {
 }
 
 interface SshFileProps {
-    cloudHost: Partial<ICloudHost>;
+    cloudHost: ICloudHost;
 }
 
 type Props = SshFileProps & StateToProps & DispatchToProps;
@@ -90,14 +91,15 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
                                values: this.props.scripts,
                            }}/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>
+                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getCloudHostAddress(this.props.cloudHost)}/>
             </>
         );
     }
 
     private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
         super.toast(`<span class="green-text">File uploaded</span>`);
-        const transfer = {...args, timestamp: Date.now()};
+        const cloudHost = this.props.cloudHost;
+        const transfer = {...args, hostAddress: getCloudHostAddress(cloudHost), timestamp: Date.now()};
         this.props.addCommand(transfer);
         this.sshPanel.current?.scrollToTop();
     };

@@ -355,17 +355,17 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                     ? <Field key={index}
                                              id={key}
                                              type='checkbox'
-                                             checkbox={{label: 'override real metrics'}}/>
+                                             checkbox={{label: 'Sobrepor às métricas obtidas'}}/>
                                     : key === 'generic'
                                         ? <Field key={index}
                                                  id={key}
                                                  type='checkbox'
-                                                 checkbox={{label: 'apply to all hosts', checkCallback: this.isGenericSelected}}/>
+                                                 checkbox={{label: 'Aplicar a todos os hosts', checkCallback: this.isGenericSelected}}/>
                                         : key === 'active'
                                             ? <Field key={index}
                                                      id={key}
                                                      type='checkbox'
-                                                     checkbox={{label: 'active'}}/>
+                                                     checkbox={{label: 'ativo'}}/>
                                             : <Field key={index}
                                                      id={key}
                                                      label={key}/>

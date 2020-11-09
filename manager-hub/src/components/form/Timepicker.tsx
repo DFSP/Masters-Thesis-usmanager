@@ -23,7 +23,7 @@
  */
 
 import React, {createRef} from "react";
-import M, {TimepickerOptions} from "materialize-css";
+import M, {DatepickerOptions, TimepickerOptions} from "materialize-css";
 import {zeroPad} from "../../utils/text";
 
 interface Props {
@@ -63,26 +63,33 @@ export class Timepicker extends React.Component<Props, State> {
         const {className, id, name, value, disabled, onChange} = this.props;
         return (
             <input className={`timepicker ${className}`}
-                   type="text"
+                   type='text'
                    id={id}
                    name={name}
                    value={value || ''}
                    disabled={disabled}
-                   autoComplete="off"
+                   autoComplete='off'
                    onChange={onChange}
                    ref={this.timepicker}/>
         )
     }
 
     private initTimepicker = (): void => {
-        M.Timepicker.init(this.timepicker.current as Element, {
+        const options: Partial<TimepickerOptions> = {
+            i18n: {
+                cancel: 'Cancelar',
+                done: 'Confirmar',
+                clear: 'Apagar',
+            },
             twelveHour: false,
             defaultTime: this.props.value,
-            showClearBtn: true,
+            /*showClearBtn: true,*/
+            autoClose: true,
             onSelect: this.onSelect,
             onCloseEnd: this.onClose,
             ...this.props.options
-        });
+        };
+        M.Timepicker.init(this.timepicker.current as Element, options);
     };
 
     private onClose = () =>

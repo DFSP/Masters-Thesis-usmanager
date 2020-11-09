@@ -366,7 +366,7 @@ import {
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
-import {keys, merge, pick} from 'lodash';
+import {keys, merge, pick, isEqual} from 'lodash';
 import {IApp} from "../routes/management/apps/App";
 import {IAddAppService, IAppService} from "../routes/management/apps/AppServicesList";
 import {IService} from "../routes/management/services/Service";
@@ -393,6 +393,7 @@ import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 import {ISshCommand} from "../routes/management/ssh/SshCommand";
 import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
+import { IHostAddress } from "../routes/management/hosts/Hosts";
 
 export type EntitiesState = {
     apps: {
@@ -643,6 +644,7 @@ export type EntitiesAction = {
         assignedHosts?: string[],
         logs?: ILogs[],
         commands?: ISshCommand[],
+        hostAddress?: IHostAddress,
     },
 };
 
@@ -3923,9 +3925,16 @@ const entities = (state: EntitiesState = {
             }
             break;
         case CLEAR_COMMANDS:
+            let commands: (ICommand | IFileTransfer)[];
+            const hostAddress = data?.hostAddress;
+            if (hostAddress) {
+                commands = state.commands.filter(command => command.hostAddress.publicIpAddress !== hostAddress.publicIpAddress);
+            } else {
+                commands = []
+            }
             return {
                 ...state,
-                commands: []
+                commands
             }
         default:
             return state;

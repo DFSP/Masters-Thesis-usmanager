@@ -76,7 +76,7 @@ class SshCommand extends BaseComponent<Props, {}> {
                   values={command}
                   isNew
                   post={{
-                      textButton: 'Execute',
+                      textButton: 'Executar',
                       url: 'ssh/execute',
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure
@@ -84,7 +84,7 @@ class SshCommand extends BaseComponent<Props, {}> {
                 <Field key='background'
                        id='background'
                        type='checkbox'
-                       checkbox={{label: 'execute in the background'}}/>
+                       checkbox={{label: 'executar em background'}}/>
                 <Field<Partial<IHostAddress>> key='sshHostAddress'
                                               id='hostAddress'
                                               label='hostAddress'

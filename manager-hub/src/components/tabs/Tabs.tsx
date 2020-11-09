@@ -180,7 +180,7 @@ class Tabs extends React.Component<Props, State> {
                 this.stopRightScrollTimer();
             }
             this.setState({previousScrollRight: tabs.scrollLeft});
-            tabs.scrollTo(tabs.scrollLeft + 10, 0);
+            tabs.scrollTo(tabs.scrollLeft + 15, 0);
             this.shouldShowScrollLeft();
             this.shouldShowScrollRight();
         } else {
@@ -202,7 +202,7 @@ class Tabs extends React.Component<Props, State> {
                 this.stopLeftScrollTimer();
             }
             this.setState({previousScrollLeft: tabs.scrollLeft});
-            tabs.scrollTo(tabs.scrollLeft - 10, 0);
+            tabs.scrollTo(tabs.scrollLeft - 15, 0);
             this.shouldShowScrollLeft();
             this.shouldShowScrollRight();
         } else {
@@ -211,7 +211,6 @@ class Tabs extends React.Component<Props, State> {
     }
 
     private setLeftScrollTimer = () => {
-
         this.stopRightScrollTimer();
         this.leftScrollTimer = setInterval(this.executeLeftScroll, 25)
     }

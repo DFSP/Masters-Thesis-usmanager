@@ -93,8 +93,8 @@ public class SshService {
 	}
 
 	private SSHClient initClient(HostAddress hostAddress) throws IOException {
-		if (!hostAddress.isComplete()) {
-			hostAddress = hostsService.completeHostAddress(hostAddress);
+		if (!hostAddress.hasConnectionInfo()) {
+			hostAddress = hostsService.completeConnectionInfo(hostAddress);
 		}
 		String publicKeyFile;
 		try {
@@ -212,6 +212,11 @@ public class SshService {
 		return new SshCommandResult(hostAddress, command, exitStatus, output, error);
 	}
 
+	public void executeCommandInBackground(String command, HostAddress hostAddress) {
+		String executeCommand = String.format("nohup %s 1>/dev/null 2>/dev/null &", command);
+		executeCommandSync(executeCommand, hostAddress);
+	}
+
 	public boolean hasConnection(HostAddress hostAddress) {
 		log.info("Checking connectivity to {}", hostAddress);
 		try (SSHClient client = initClient(hostAddress);
@@ -229,24 +234,4 @@ public class SshService {
 		return scriptPaths.keySet();
 	}
 
-	public void executeCommandInBackground(String command, HostAddress hostAddress, Path outputFilePath) {
-		String executeCommand = String.format("nohup %s > %s", command, outputFilePath.toString());
-		executeCommandAsync(executeCommand, hostAddress);
-	}
-
-	public void executeCommandInBackground(String command, HostAddress hostAddress) {
-		String filename = String.valueOf(System.currentTimeMillis());
-		String filepath = String.format("%s/logs/commands/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), filename);
-		Path path = Path.of(filepath);
-		try {
-			Files.createDirectories(path.getParent());
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
-			Files.write(path, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
-		}
-		catch (IOException e) {
-			log.error("Failed to store output of background command {}: {}", command, e.getMessage());
-			throw new ManagerException("Failed to store output of background command %s: %s", command, e.getMessage());
-		}
-		executeCommandInBackground(command, hostAddress, path);
-	}
 }

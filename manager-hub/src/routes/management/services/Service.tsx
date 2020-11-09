@@ -270,7 +270,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (service: IService, reason: string): void =>
-        super.toast(`Não foi possível guardar as aplicações associadas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as aplicações associadas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceDependency = (dependency: string): void => {
         this.setState({
@@ -301,7 +301,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveDependenciesFailure = (service: IService, reason: string): void =>
-        super.toast(`Não foi possível guardar as dependências do serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as dependências do serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServicePrediction = (prediction: IPrediction): void => {
         this.setState({
@@ -332,7 +332,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSavePredictionsFailure = (service: IService, reason: string): void =>
-        super.toast(`Não foi possível guardar as previsões atribuídas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as previsões atribuídas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceRule = (rule: string): void => {
         this.setState({
@@ -363,7 +363,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (service: IService, reason: string): void =>
-        super.toast(`Não foi possível guardar as regras associadas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private addServiceSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -394,7 +394,7 @@ class Service extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (service: IService, reason: string): void =>
-        super.toast(`Não foi possível guardar as métricas simuladas do serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/'${service.serviceName}><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas do serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private updateService = (service: IService) => {
         service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];

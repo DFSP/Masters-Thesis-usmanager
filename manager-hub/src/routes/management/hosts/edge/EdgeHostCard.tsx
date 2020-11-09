@@ -73,7 +73,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
-        super.toast(`Não foi possível remover o edge host <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover o edge host <a href='/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}'><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -132,7 +132,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                              margin={'10px 0'}
                              hoverable
                              delete={{
-                                 confirmMessage: `to delete edge host ${edgeHost.publicIpAddress}`,
+                                 confirmMessage: `apagar host ${edgeHost.publicIpAddress}`,
                                  url: `hosts/edge/${edgeHost.publicIpAddress}`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure,

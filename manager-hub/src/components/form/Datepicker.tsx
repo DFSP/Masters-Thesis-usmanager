@@ -31,13 +31,13 @@ interface Props {
     name: string;
     value: string;
     disabled?: boolean;
-    onSelect: (date: string) => void;
+    onSelect: (date?: string) => void;
     onChange: (e: React.FormEvent<HTMLInputElement>) => void;
     options?: Partial<DatepickerOptions>;
 }
 
 interface State {
-    selectedDate: string;
+    selectedDate?: string;
 }
 
 export class Datepicker extends React.Component<Props, State> {
@@ -59,27 +59,46 @@ export class Datepicker extends React.Component<Props, State> {
         return (
             <input
                 className={`datepicker ${className}`}
-                type="text"
+                type='text'
                 id={id}
                 name={name}
                 value={value || ''}
                 disabled={disabled}
-                autoComplete="off"
-                onChange={onChange}
+                autoComplete='off'
+                onSelect={onChange}
                 ref={this.datepicker}/>
         );
     }
 
+
+    private clear = () => {
+        this.setState({selectedDate: undefined});
+    }
+
     private initDatepicker = (): void => {
-        M.Datepicker.init(this.datepicker.current as Element, {
+        const options: Partial<DatepickerOptions> = {
+            i18n: {
+                cancel: 'Cancelar',
+                done: 'Confirmar',
+                clear: 'Apagar',
+                months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                nextMonth: 'Próximo Mês',
+                previousMonth: 'Mês Anterior',
+                monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                weekdays: [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado' ],
+                weekdaysShort: [ 'Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb' ],
+                weekdaysAbbrev: [ 'D', 'S', 'T', 'Q', 'Q', 'S', 'S' ],
+            },
             format: 'dd/mm/yyyy',
             minDate: new Date(),
             defaultDate: new Date(this.props.value),
-            showClearBtn: true,
+            /*showClearBtn: true,*/
+            autoClose: true,
             onSelect: this.onSelect,
             onClose: this.onClose,
             ...this.props.options
-        });
+        }
+        M.Datepicker.init(this.datepicker.current as Element, options)
     };
 
     private onClose = () =>

@@ -176,7 +176,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     private onDeleteSuccess = (ruleContainer: IRuleContainer): void => {
         super.toast(`<span class="green-text">A regra <b class="white-text">${ruleContainer.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/regras/containers`);
+            this.props.history.push(`/regras/contentores`);
         }
     };
 

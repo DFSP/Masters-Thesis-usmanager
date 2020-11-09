@@ -27,6 +27,7 @@ import React, {createRef} from "react";
 import M, {ModalOptions} from "materialize-css";
 import {IValues} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
+import ReactTooltip from "react-tooltip";
 
 interface DialogProps {
     id: string;
@@ -88,6 +89,7 @@ export default class Dialog extends BaseComponent<Props, State> {
         const {fullscreen} = this.state;
         return (
             <div id={id} className={`modal dialog ${fullscreen ? 'modal-fullscreen' : ''}`} ref={this.modal}>
+                <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 <div className="modal-content">
                     {title && (
                         <>
@@ -95,6 +97,7 @@ export default class Dialog extends BaseComponent<Props, State> {
                                 {title}
                                 {!fullscreen && (
                                     <button className='btn-floating btn-flat right'
+                                            data-for='dark-tooltip' data-tip="Ecrã inteiro" data-place={'top'}
                                             onClick={this.toggleFullScreen}
                                             type='button'>
                                         <i className="material-icons">fullscreen</i>
@@ -130,13 +133,13 @@ export default class Dialog extends BaseComponent<Props, State> {
                             <button
                                 className={`modal-close btn-flat red-text inline-button`}
                                 type="button">
-                                Cancel
+                                Cancelar
                             </button>
                             {confirmCallback &&
                             <button className={`btn-flat green-text inline-button`}
                                     type="button"
                                     onClick={this.confirmCallback}>
-                                Confirm
+                                Confirmar
                             </button>}
                         </div>
                     </div>}

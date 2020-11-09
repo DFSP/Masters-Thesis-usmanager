@@ -66,7 +66,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (loadBalancer: ILoadBalancer): void => {
-        super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.containerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -74,7 +74,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
-        super.toast(`Não foi possível para a instância do balanceamento de carga<a href=/balanceamento de carga/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível para a instância do balanceamento de carga<a href='/balanceamento de carga/${loadBalancer.containerId}'><b>${loadBalancer.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

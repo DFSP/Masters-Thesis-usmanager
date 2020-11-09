@@ -72,7 +72,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void => {
-        super.toast(`Não foi possível remover a região <a href=/regiões/${region.region}><b>${region.region}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a região <a href='/regiões/${region.region}'><b>${region.region}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,7 +84,7 @@ class RegionCard extends BaseComponent<Props, State> {
         const CardRegion = Card<IRegion>();
         return <CardRegion id={`region-${region.region}`}
                            title={region.region}
-                           link={{to: {pathname: `/regions/${region.region}`, state: region}}}
+                           link={{to: {pathname: `/regiões/${region.region}`, state: region}}}
                            height={'85px'}
                            margin={'10px 0'}
                            hoverable

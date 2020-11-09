@@ -73,7 +73,7 @@ class RuleAppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleApp: IRuleApp): void => {
-        super.toast(`Não foi possível remover a regra <a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

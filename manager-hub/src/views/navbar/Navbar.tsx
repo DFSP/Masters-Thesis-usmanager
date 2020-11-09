@@ -87,7 +87,7 @@ class Navbar extends React.Component<Props, State> {
         let logoStyle;
         if (showSidenav && !loggingIn) {
             logoStyle = {
-                paddingLeft: '200px', marginLeft: '-74px', marginRight: "24px"
+                paddingLeft: '225px', marginLeft: '-74px', marginRight: "24px"
             };
             if (this.state.animate) {
                 logoStyle = {...logoStyle, transition: "padding-left .25s, margin-left .25s"}

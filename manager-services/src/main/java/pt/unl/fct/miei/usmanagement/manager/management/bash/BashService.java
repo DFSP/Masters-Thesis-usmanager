@@ -122,7 +122,7 @@ public class BashService {
 	}
 
 	public void executeCommandInBackground(String command, Path outputFilePath) {
-		String executeCommand = String.format("nohup %s > /dev/null", command);
+		String executeCommand = String.format("nohup %s >/dev/null", command);
 		ProcessBuilder builder = new ProcessBuilder("bash", "-c", executeCommand);
 		builder.redirectOutput(outputFilePath.toFile());
 		builder.redirectError(outputFilePath.toFile());

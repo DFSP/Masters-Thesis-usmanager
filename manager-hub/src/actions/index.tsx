@@ -46,6 +46,7 @@ import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager"
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
+import {IHostAddress} from "../routes/management/hosts/Hosts";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -2154,9 +2155,10 @@ export const addCommand = (command: ICommand | IFileTransfer) => (
 );
 
 export const CLEAR_COMMANDS = 'CLEAR_COMMANDS';
-export const clearCommands = () => (
+export const clearCommands = (hostAddress?: IHostAddress) => (
     {
-        type: CLEAR_COMMANDS
+        type: CLEAR_COMMANDS,
+        data: {hostAddress: hostAddress}
     }
 );
 

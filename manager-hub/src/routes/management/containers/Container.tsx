@@ -254,7 +254,7 @@ class Container extends BaseComponent<Props, State> {
         let containers = reply.data;
         if (containers.length === 1) {
             const container = containers[0];
-            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no nó ${container.publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no nó ${container.publicIpAddress}</span>`);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
@@ -281,7 +281,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private replicateButton = () =>
         <>
@@ -289,7 +289,7 @@ class Container extends BaseComponent<Props, State> {
                 className={`btn-flat btn-small blue-text dropdown-trigger ${formStyles.formButton}`}
                 data-target={`replicate-dropdown-host-address`}
                 ref={(ref) => this.initDropdown(ref)}>
-                Replicate
+                Replicar
             </button>
             {this.chooseHostAddressDropdown('replicate-dropdown-host-address', this.replicate)}
         </>
@@ -300,7 +300,7 @@ class Container extends BaseComponent<Props, State> {
                 className={`btn-flat btn-small blue-text dropdown-trigger ${formStyles.formButton}`}
                 data-target={`migrate-dropdown-host-address`}
                 ref={(ref) => this.initDropdown(ref)}>
-                Migrate
+                Migrar
             </button>
             {this.chooseHostAddressDropdown('migrate-dropdown-host-address', this.migrate)}
         </>
@@ -340,14 +340,14 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/'${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -367,14 +367,14 @@ class Container extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/'${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href='/contentores/'${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} to container </span><a href='/contentores/'${container.containerId}>${container.containerId}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/'${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -409,7 +409,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Não foi possível guardar as regras associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private addContainerSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -440,7 +440,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Não foi possível guardar as métricas simuladas associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -738,7 +738,7 @@ class Container extends BaseComponent<Props, State> {
                           loading={this.state.loading}
                           saveEntities={this.saveEntities}
                           switchDropdown={isNewContainer ? {
-                              options: currentForm === 'Usando o endereço' ? ['Usando o endereço'] : ['Usando a localização'],
+                              options: currentForm === 'Usando o endereço' ? ['Usando a localização'] : ['Usando o endereço'],
                               onSwitch: this.switchForm
                           } : undefined}>
                         {this.formFields(formContainer || {}, isNewContainer)}
@@ -787,7 +787,7 @@ class Container extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => ([
         {
-            title: 'Contentor docker',
+            title: 'Contentor',
             id: 'container',
             content: () => this.container(),
             active: this.props.location.state?.selected === 'container'

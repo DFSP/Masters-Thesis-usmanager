@@ -35,7 +35,7 @@ management:
       exposure:
         include: info, health, metrics, mappings
 manager:
-  mode: local
+  mode: global
   master:
     monitor-period: 30000
     tests:
@@ -115,6 +115,12 @@ symmetricds:
     exclude:
       startsWith: sym, logging
       endsWith: events
+
+#logging:
+#  level:
+#    com:
+#      baeldung:
+#        testloglevel=DEBUG:
 
 #debug: true
 #trace: true

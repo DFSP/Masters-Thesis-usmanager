@@ -73,7 +73,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void => {
-        super.toast(`Não foi possível remover a métrica simulada <a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada <a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

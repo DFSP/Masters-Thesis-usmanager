@@ -65,7 +65,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (workerManager: IWorkerManager): void => {
-        super.toast(`<span class="green-text">Worker-manager <b class="white-text">${workerManager.id}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O Gestor local <b class="white-text">${workerManager.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, workerManager: IWorkerManager): void => {
-        super.toast(`Não foi possível para o gestor local <a href=/gestores locais/${workerManager.id}><b>${workerManager.id}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível para o gestor local <a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
