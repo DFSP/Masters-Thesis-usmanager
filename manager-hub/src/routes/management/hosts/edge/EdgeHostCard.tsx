@@ -65,7 +65,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
-        super.toast(`Unable to delete edge host <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover o edge host <a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,32 +84,32 @@ class EdgeHostCard extends BaseComponent<Props, State> {
         const publicIpAddress = edgeHost.publicIpAddress;
         return [
             <LinkedContextMenuItem
-                option={'Modify rules'}
+                option={'Modificar a lista de regras'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'rules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
+                option={'Ver a lista de regras genéricas'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'genericRules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
+                option={'Modificar a lista das métricas simuladas'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'simulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
+                option={'Ver a lista das métricas simuladas genéricas'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'genericSimulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
-                option={'Execute command'}
+                option={'Executar comandos'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'ssh'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
-                option={'Upload file'}
+                option={'Carregar ficheiros'}
                 pathname={`/hosts/edge/${publicIpAddress}`}
                 selected={'sftp'}
                 state={edgeHost}/>

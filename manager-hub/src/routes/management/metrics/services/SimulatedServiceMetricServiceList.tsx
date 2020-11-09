@@ -90,12 +90,12 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
-            emptyMessage={`Services list is empty`}
+            emptyMessage={`Sem serviços associados`}
             data={this.props.simulatedMetricServices}
             dropdown={{
                 id: 'services',
-                title: 'Add service',
-                empty: 'No services to add',
+                title: 'Selecionar o serviço',
+                empty: 'Não há serviços disponíveis',
                 data: this.getSelectableServices()
             }}
             show={this.service}
@@ -139,7 +139,7 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/services/${service}`}
+                    <Link to={`/serviços/${service}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -162,7 +162,7 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove service`, 10000, reason, true);
+        super.toast(`Não foi possível remover o serviço`, 10000, reason, true);
 
     private getSelectableServices = () => {
         const {services, simulatedMetricServices, unsavedServices} = this.props;

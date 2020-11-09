@@ -120,7 +120,7 @@ class Region extends BaseComponent<Props, State> {
 
     /*private onPostSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regions/${region.region}><b>${region.region}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regiões/${region.region}><b>${region.region}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRegion(region);
         if (this.mounted) {
             this.updateRegion(region);
@@ -129,11 +129,11 @@ class Region extends BaseComponent<Props, State> {
     };*/
 
     /*private onPostFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to save region <b>${region.region}</b>`, 10000, reason, true);*/
+        super.toast(`Não foi possível guardar a região <b>${region.region}</b>`, 10000, reason, true);*/
 
     /*private onPutSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regions/${region.region}><b>${region.name}</b></a>`} region have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à região ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href=/regiões/${region.region}><b>${region.name}</b></a>`} foram guardadas com sucesso</span>`);
         const previousRegion = this.getRegion();
         if (previousRegion?.id) {
             this.props.updateRegion(previousRegion as IRegion, region)
@@ -145,17 +145,17 @@ class Region extends BaseComponent<Props, State> {
     };*/
 
     /*private onPutFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to update region ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
+        super.toast(`Não foi possível atualizar a região ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regiões/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.region}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A região <b class="white-text">${region.region}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regions`);
         }
     };*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void =>
-        super.toast(`Unable to delete region ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
+        super.toast(`Não foi possível remover a região ${this.mounted ? `<b>${region.region}</b>` : `<a href=/regiões/${region.name}><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
     /*private updateRegion = (region: IRegion) => {
         region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
@@ -239,7 +239,7 @@ class Region extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Region',
+            title: 'Região',
             id: 'region',
             content: () => this.region(),
             active: this.props.location.state?.selected === 'region'

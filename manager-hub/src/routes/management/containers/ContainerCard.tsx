@@ -74,7 +74,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         this.props.container || this.state.container;
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O contentor <b class="white-text">${container.containerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -82,7 +82,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Unable to stop container <a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor <a href=/contentores/${container.containerId}><b>${container.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -96,8 +96,8 @@ class ContainerCard extends BaseComponent<Props, State> {
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Replicate'}
                                                        state={container}
-                                                       header={'Choose host address'}
-                                                       emptyMessage={'No hosts to select'}
+                                                       header={'Selecionar o endereço'}
+                                                       emptyMessage={'Não há hosts disponíveis'}
                                                        submenus={Object.values(this.props.nodes.data)}
                                                        error={this.props.nodes.error}
                                                        menuToString={(option: INode) => `${option.publicIpAddress + (option.labels['privateIpAddress'] ? " (" + option.labels['privateIpAddress'] + ")" : '')}`}
@@ -105,8 +105,8 @@ class ContainerCard extends BaseComponent<Props, State> {
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Migrate'}
                                                        state={container}
-                                                       header={'Choose host address'}
-                                                       emptyMessage={'No hosts to select'}
+                                                       header={'Selecionar o endereço'}
+                                                       emptyMessage={'Não há hosts disponíveis'}
                                                        submenus={Object.entries(this.props.nodes.data)
                                                            .filter(([_, node]) => node.publicIpAddress !== container.publicIpAddress && node.labels['privateIpAddress'] !== container.privateIpAddress)
                                                            .map(([_, node]) => node)}
@@ -131,7 +131,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/contentores/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -139,7 +139,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to replicate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/contentores/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -159,7 +159,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/containers/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/contentores/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/contentores/${container.containerId}>${container.containerId}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -167,7 +167,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to migrate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/contentores/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -177,38 +177,38 @@ class ContainerCard extends BaseComponent<Props, State> {
         const container = this.getContainer();
         return [
             <LinkedContextMenuItem
-                option={'View ports'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Ver as portas associadas'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'ports'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'View labels'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Ver as labels'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'containerLabels'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'Check logs'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Ver as logs'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'logs'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'Modify rules'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Modificar a lista de regras'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'rules'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Ver a lista de regras genéricas'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'genericServiceRules'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Modificar a lista das métricas simuladas'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'simulatedMetrics'}
                 state={container}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
-                pathname={`/containers/${container.containerId}`}
+                option={'Ver a lista das métricas simuladas genéricas'}
+                pathname={`/contentores/${container.containerId}`}
                 selected={'genericSimulatedMetrics'}
                 state={container}/>
         ];
@@ -225,7 +225,7 @@ class ContainerCard extends BaseComponent<Props, State> {
                               margin={'10px 0'}
                               hoverable
                               delete={{
-                                  textButton: 'Stop',
+                                  textButton: 'Parar',
                                   confirmMessage: `to stop container ${container.containerId}`,
                                   url: `containers/${container.containerId}`,
                                   successCallback: this.onDeleteSuccess,

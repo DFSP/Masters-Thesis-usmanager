@@ -34,7 +34,7 @@ export interface IPagedList<T> {
     paginate: {
         pagesize: {
             initial: number,
-            options?: ('Everything' | number)[],
+            options?: ('Tudo' | number)[],
         },
         page?: {
             index?: number,
@@ -78,13 +78,13 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
             <div className={'list'}>
                 {paginate.pagesize.options && (
                     <div className={'pagination-dropdown'}>
-                        <Dropdown<(number | 'Everything')>
+                        <Dropdown<(number | 'Tudo')>
                             id={'pageSize'}
                             name={'pageSize'}
-                            value={this.state.pagesize === Number.MAX_VALUE ? 'Everything' : this.state.pagesize?.toString()}
+                            value={this.state.pagesize === Number.MAX_VALUE ? 'Tudo' : this.state.pagesize?.toString()}
                             onChange={this.setPageSize}
                             dropdown={{
-                                defaultValue: 'Page size',
+                                defaultValue: 'Tamanho da página',
                                 values: paginate.pagesize.options,
                                 optionToString: this.pageSizeOption
                             }}>
@@ -121,7 +121,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
     private setPageSize = (e: React.FormEvent<HTMLSelectElement>) => {
         const selectedPageSize = e.currentTarget.value;
         let pagesize: number;
-        if (selectedPageSize === 'Everything') {
+        if (selectedPageSize === 'Tudo') {
             pagesize = Number.MAX_VALUE;
         } else {
             pagesize = parseInt(selectedPageSize);
@@ -134,6 +134,6 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         })
     };
 
-    private pageSizeOption = (option: (number | 'Everything')): string =>
+    private pageSizeOption = (option: (number | 'Tudo')): string =>
         option.toString();
 }

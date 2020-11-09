@@ -85,12 +85,12 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                               emptyMessage={`Edge hosts list is empty`}
+                               emptyMessage={`Sem hosts edge associados`}
                                data={this.props.ruleEdgeHosts}
                                dropdown={{
                                    id: 'edgeHosts',
-                                   title: 'Add edge host',
-                                   empty: 'No edge hosts to add',
+                                   title: 'Selecionar o host',
+                                   empty: 'Não existe nenhum host disponível na edge',
                                    data: this.getSelectableEdgeHostNames()
                                }}
                                show={this.edgeHost}
@@ -157,7 +157,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove edge host`, 10000, reason, true);
+        super.toast(`Não foi possível remover o host`, 10000, reason, true);
 
     private getSelectableEdgeHostNames = () => {
         const {edgeHosts, ruleEdgeHosts, unsavedEdgeHosts} = this.props;

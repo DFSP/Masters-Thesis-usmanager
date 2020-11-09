@@ -55,13 +55,13 @@ class Apps extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton button={{text: 'New app'}}
-                           pathname={'/apps/new_app?new'}/>
+                <AddButton button={{text: 'Nova aplicação'}}
+                           pathname={'/aplicações/nova aplicação?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<IApp>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"No apps to display"}
+                        emptyMessage={"Sem aplicações para mostrar"}
                         list={this.props.apps}
                         card={this.app}
                         predicate={this.predicate}/>

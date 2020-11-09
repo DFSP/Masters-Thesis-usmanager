@@ -56,7 +56,7 @@ class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
         return (
             <SimulatedMetricsList isLoading={this.props.isLoading}
                                   error={this.props.error}
-                                  emptyMessage={`Generic simulated metrics list is empty`}
+                                  emptyMessage={`Não há nenhuma métrica simulada que se aplique a todos os hosts`}
                                   list={this.props.genericSimulatedHostMetrics}
                                   show={this.simulatedMetric}/>
         );
@@ -67,7 +67,7 @@ class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
             <div className={`${styles.linkedItemContent}`}>
                 <span>{simulatedMetric}</span>
             </div>
-            <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
+            <Link to={`/métricas simuladas/hosts/${simulatedMetric}`}
                   className={`${styles.link}`}>
                 <i className={`${styles.linkIcon} material-icons right`}>link</i>
             </Link>

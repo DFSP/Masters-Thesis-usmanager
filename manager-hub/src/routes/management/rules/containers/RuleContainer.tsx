@@ -144,7 +144,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleContainer>): void => {
         const ruleContainer = reply.data;
-        super.toast(`<span class="green-text">Container rule ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleContainer(ruleContainer);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -154,11 +154,11 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to save container rule <b>${ruleContainer.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra <b>${ruleContainer.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleContainer>): void => {
         const ruleContainer = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleContainer);
         const previousRuleContainer = this.getRuleContainer();
         if (previousRuleContainer?.id) {
@@ -171,17 +171,17 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to update container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleContainer: IRuleContainer): void => {
-        super.toast(`<span class="green-text">Container rule <b class="white-text">${ruleContainer.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleContainer.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/rules/containers`);
+            this.props.history.push(`/regras/containers`);
         }
     };
 
     private onDeleteFailure = (reason: string, ruleContainer: IRuleContainer): void =>
-        super.toast(`Unable to delete container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/regras/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -221,7 +221,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleContainer: IRuleContainer, reason: string): void =>
-        super.toast(`Unable to save conditions of container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/regras/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleContainer = (container: string): void => {
         const containerId = container.split(" - ")[1]
@@ -256,7 +256,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     };
 
     private onSaveContainersFailure = (ruleContainer: IRuleContainer, reason: string): void =>
-        super.toast(`Unable to save containers of container rule ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os contentores associados à regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/regras/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleContainer = (ruleContainer: IRuleContainer) => {
         ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];
@@ -332,10 +332,10 @@ class RuleContainer extends BaseComponent<Props, State> {
                                                     label={key}
                                                     type="dropdown"
                                                     dropdown={{
-                                                        defaultValue: "Choose decision",
+                                                        defaultValue: "Selecionar a decisão",
                                                         values: this.getSelectableDecisions(),
                                                         optionToString: this.decisionDropdownOption,
-                                                        emptyMessage: 'No decisions available'
+                                                        emptyMessage: 'Não existem decisões disponíveis'
                                                     }}/>
                                 : <Field key={index}
                                          id={key}
@@ -367,19 +367,19 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Container rule',
+            title: 'Regra',
             id: 'containerRule',
             content: () => this.containerRule(),
             active: this.props.location.state?.selected === 'containerRule'
         },
         {
-            title: 'Conditions',
+            title: 'Condições',
             id: 'ruleConditions',
             content: () => this.conditions(),
             active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
-            title: 'Containers',
+            title: 'Contentores',
             id: 'containers',
             content: () => this.containers(),
             active: this.props.location.state?.selected === 'containers'

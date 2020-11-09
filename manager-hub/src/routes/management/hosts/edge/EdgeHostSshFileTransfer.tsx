@@ -85,9 +85,9 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
                            label='filename'
                            type='dropdown'
                            dropdown={{
-                               defaultValue: 'Select filename',
+                               defaultValue: 'Selecionar o ficheiro',
+                               emptyMessage: 'Não há ficheiros disponíveis',
                                values: this.props.scripts,
-                               emptyMessage: 'No scripts available'
                            }}/>
                 </Form>
                 <SshPanel ref={this.sshPanel} filter={this.commandFilter}/>

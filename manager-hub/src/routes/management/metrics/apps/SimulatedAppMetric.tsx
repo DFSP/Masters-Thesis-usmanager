@@ -148,7 +148,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedAppMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Simulated app metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedAppMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -158,11 +158,11 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedAppMetric: ISimulatedAppMetric): void =>
-        super.toast(`Unable to save simulated app metric <b>${simulatedAppMetric.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas <b>${simulatedAppMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedAppMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated app metric have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedAppMetric = this.getSimulatedAppMetric();
         if (previousSimulatedAppMetric.id) {
@@ -175,17 +175,17 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedAppMetric): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated app metric`, 10000, reason, true);
+        super.toast(`Náo foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedAppMetric): void => {
-        super.toast(`<span class="green-text">Simulated app metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/simulated-metrics/Apps`);
+            this.props.history.push(`/métricas simuladas/aplicações`);
         }
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedAppMetric): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated app metric`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedApps.length;
@@ -223,7 +223,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (simulatedMetric: ISimulatedAppMetric, reason: string): void =>
-        super.toast(`Unable to save apps of simulated app metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as aplicações associadas à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedAppMetric = (simulatedAppMetric: ISimulatedAppMetric) => {
         simulatedAppMetric = Object.values(normalize(simulatedAppMetric, Schemas.SIMULATED_APP_METRIC).entities.simulatedAppMetrics || {})[0];
@@ -295,10 +295,10 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
                                                  label='field'
                                                  type='dropdown'
                                                  dropdown={{
-                                                     defaultValue: "Select field",
+                                                     defaultValue: "Selecionar o campo",
                                                      values: Object.values(this.props.fields),
                                                      optionToString: this.fieldOption,
-                                                     emptyMessage: 'No fields available'
+                                                     emptyMessage: 'Não há campos disponíveis'
                                                  }}/>
                                 : key === 'override'
                                 ? <Field key={index}
@@ -335,13 +335,13 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Simulated metric',
+            title: 'Métricas simuladas',
             id: 'simulatedAppMetric',
             content: () => this.simulatedAppMetric(),
             active: this.props.location.state?.selected === 'simulatedAppMetric'
         },
         {
-            title: 'Apps',
+            title: 'Aplicações',
             id: 'apps',
             content: () => this.apps(),
             active: this.props.location.state?.selected === 'apps'

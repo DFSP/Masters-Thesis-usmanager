@@ -54,7 +54,7 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
             <CardList<IEdgeHost>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No edge hosts to display"}
+                emptyMessage={"Não há nenhum host edge para mostrar"}
                 list={this.props.edgeHosts}
                 card={this.edgeHost}
                 predicate={this.predicate}/>

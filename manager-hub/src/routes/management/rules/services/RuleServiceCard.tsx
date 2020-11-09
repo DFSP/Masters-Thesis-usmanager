@@ -65,7 +65,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
-        super.toast(`<span class="green-text">Service rule <b class="white-text">${ruleService.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleService.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleService: IRuleService): void => {
-        super.toast(`Unable to delete <a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a> service rule`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,8 +83,8 @@ class RuleServiceCard extends BaseComponent<Props, State> {
         const {rule} = this.props;
         const menuItems = [
             <LinkedContextMenuItem
-                option={'Modify conditions'}
-                pathname={`/rules/services/${rule.name}`}
+                option={'Modificar as condições associadas'}
+                pathname={`/regras/serviços/${rule.name}`}
                 selected={'ruleConditions'}
                 state={rule}/>
         ];
@@ -92,7 +92,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
             menuItems.push(
                 <LinkedContextMenuItem
                     option={'Modify services'}
-                    pathname={`/rules/services/${rule.name}`}
+                    pathname={`/regras/serviços/${rule.name}`}
                     selected={'services'}
                     state={rule}/>
             );
@@ -106,7 +106,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
         const CardRuleService = Card<IRuleService>();
         return <CardRuleService id={`service-rule-${rule.id}`}
                                 title={rule.name}
-                                link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
+                                link={{to: {pathname: `/regras/serviços/${rule.name}`, state: rule}}}
                                 height={'120px'}
                                 margin={'10px 0'}
                                 hoverable

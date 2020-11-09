@@ -86,12 +86,12 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedAppMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedAppMetricError || this.props.error : undefined}
-            emptyMessage={`Apps list is empty`}
+            emptyMessage={`Sem aplicações associadas`}
             data={this.props.simulatedMetricApps}
             dropdown={{
                 id: 'apps',
-                title: 'Add app',
-                empty: 'No apps to add',
+                title: 'Selecionar a aplicação',
+                empty: 'Não há aplicações disponíveis',
                 data: this.getSelectableApps()
             }}
             show={this.app}
@@ -135,7 +135,7 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/apps/${app}`}
+                    <Link to={`/aplicações/${app}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -158,7 +158,7 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove app`, 10000, reason, true);
+        super.toast(`Não foi possível remover a aplicação`, 10000, reason, true);
 
     private getSelectableApps = () => {
         const {apps, simulatedMetricApps, unsavedApps} = this.props;

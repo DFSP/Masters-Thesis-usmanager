@@ -54,7 +54,7 @@ class RulesHostList extends BaseComponent<Props, {}> {
             <CardList<IRuleHost>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No cloud host rules to display"}
+                emptyMessage={"Não existem regras aplicadas sobre hosts cloud"}
                 list={this.props.hostRules}
                 card={this.rule}
                 predicate={this.predicate}/>

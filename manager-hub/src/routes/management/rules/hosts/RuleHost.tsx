@@ -157,7 +157,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleHost>): void => {
         const ruleHost = reply.data;
-        super.toast(`<span class="green-text">Host rule ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleHost(ruleHost);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -167,11 +167,11 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to save host rule <b>${ruleHost.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra <b>${ruleHost.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleHost>): void => {
         const ruleHost = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleHost);
         const previousRuleHost = this.getRuleHost();
         if (previousRuleHost.id) {
@@ -184,17 +184,17 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to update host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleHost: IRuleHost): void => {
-        super.toast(`<span class="green-text">Host rule <b class="white-text">${ruleHost.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleHost.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/rules/hosts`)
+            this.props.history.push(`/regras/hosts`)
         }
     };
 
     private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Unable to delete host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -236,7 +236,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save conditions of host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associados à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleCloudHost = (cloudHost: string): void =>
         this.setState({
@@ -266,7 +266,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveCloudHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save cloud hosts of host rule ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as instâncias associadas à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleEdgeHost = (edgeHost: string): void =>
         this.setState({
@@ -296,8 +296,8 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveEdgeHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Unable to save edge hosts of host rule ${this.mounted ?
-            <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os hosts associados à regra ${this.mounted ?
+            <b>${ruleHost.name}</b> : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleHost = (ruleHost: IRuleHost) => {
         ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
@@ -376,10 +376,10 @@ class RuleHost extends BaseComponent<Props, State> {
                                                     label={key}
                                                     type="dropdown"
                                                     dropdown={{
-                                                        defaultValue: "Choose decision",
+                                                        defaultValue: "Selecionar a decisão",
                                                         values: this.getSelectableDecisions(),
                                                         optionToString: this.decisionDropdownOption,
-                                                        emptyMessage: 'No decisions available'
+                                                        emptyMessage: 'Não há decisões disponíveis'
                                                     }}/>
                                 : key === 'generic'
                                 ? <Field key={index}
@@ -423,26 +423,26 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Host rule',
+            title: 'Regra',
             id: 'hostRule',
             content: () => this.hostRule(),
             active: this.props.location.state?.selected === 'hostRule'
         },
         {
-            title: 'Conditions',
+            title: 'Condições',
             id: 'ruleConditions',
             content: () => this.conditions(),
             active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
-            title: 'Cloud hosts',
+            title: 'Instâncias cloud',
             id: 'cloudHosts',
             content: () => this.cloudHosts(),
             disabled: this.state.isGeneric,
             active: this.props.location.state?.selected === 'cloudHosts'
         },
         {
-            title: 'Edge hosts',
+            title: 'Hosts edge',
             id: 'edgeHosts',
             content: () => this.edgeHosts(),
             disabled: this.state.isGeneric,

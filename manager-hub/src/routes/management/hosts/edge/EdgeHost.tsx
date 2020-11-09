@@ -170,7 +170,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
         const edgeHost = reply.data;
         const hostname = edgeHost.publicIpAddress;
-        super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">O host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} foi configurado com sucesso</span>`);
         this.props.addEdgeHost(edgeHost);
         this.saveEntities(edgeHost);
         if (this.mounted) {
@@ -180,12 +180,12 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
-        super.toast(`Unable to save <b>${edgeHost.publicIpAddress}</b> edge host`, 10000, reason, true);
+        super.toast(`Não foi possível guardar o host <b>${edgeHost.publicIpAddress}</b>`, 10000, reason, true);
 
     /*private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
         const edgeHost = reply.data;
         const hostname = edgeHost.publicIpAddress;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações ao host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(edgeHost);
         const previousEdgeHost = this.getEdgeHost();
         if (previousEdgeHost.id) {
@@ -198,17 +198,17 @@ class EdgeHost extends BaseComponent<Props, State> {
     };*/
 
     /*private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);*/
+        super.toast(`Não foi possível atualizar o host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);*/
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">O edge host <b class="white-text">${edgeHost.publicIpAddress}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/hosts/edge`)
         }
     };
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`} edge host`, 10000, reason, true);
+        super.toast(`Não foi possível remover o edge host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -248,7 +248,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
-        super.toast(`Unable to save rules of edge host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas ao host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
 
     private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
         this.setState({
@@ -279,7 +279,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of edge host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas ao host ${this.mounted ? `<b>${edgeHost.publicIpAddress}</b>` : `<a href=/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`}`, 10000, reason, true);
 
     private updateEdgeHost = (edgeHost: IEdgeHost) => {
         edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
@@ -361,8 +361,8 @@ class EdgeHost extends BaseComponent<Props, State> {
                                                   label={key}
                                                   valueToString={this.regionOption}
                                                   dropdown={{
-                                                      defaultValue: "Select region",
-                                                      emptyMessage: "No regions to select",
+                                                      defaultValue: "Selecionar a região",
+                                                      emptyMessage: "Não há regiões disponíveis",
                                                       values: Object.values(this.props.regions),
                                                       optionToString: this.regionOption
                                                   }}/>
@@ -421,31 +421,31 @@ class EdgeHost extends BaseComponent<Props, State> {
     private tabs = (): Tab[] => {
         const tabs = [
             {
-                title: 'Edge host',
+                title: 'Host edge',
                 id: 'edgeHost',
                 content: () => this.edgeHost(),
                 active: this.props.location.state?.selected === 'edgeHost'
             },
             {
-                title: 'Rules',
+                title: 'Regras',
                 id: 'rules',
                 content: () => this.rules(),
                 active: this.props.location.state?.selected === 'rules'
             },
             {
-                title: 'Generic rules',
+                title: 'Regras genéricas',
                 id: 'genericRules',
                 content: () => this.genericRules(),
                 active: this.props.location.state?.selected === 'genericRules'
             },
             {
-                title: 'Simulated metrics',
+                title: 'Métricas simuladas',
                 id: 'simulatedMetrics',
                 content: () => this.simulatedMetrics(),
                 active: this.props.location.state?.selected === 'simulatedMetrics'
             },
             {
-                title: 'Generic simulated metrics',
+                title: 'Métricas simuladas genéricas',
                 id: 'genericSimulatedMetrics',
                 content: () => this.genericSimulatedMetrics(),
                 active: this.props.location.state?.selected === 'genericSimulatedMetrics'
@@ -453,13 +453,13 @@ class EdgeHost extends BaseComponent<Props, State> {
         ];
         if (!this.isNew()) {
             tabs.push({
-                title: 'Execute command',
+                title: 'Executar comandos',
                 id: 'ssh',
                 content: () => this.ssh(),
                 active: this.props.location.state?.selected === 'ssh'
             });
             tabs.push({
-                title: 'Upload file',
+                title: 'Carregar ficheiros',
                 id: 'sftp',
                 content: () => this.sftp(),
                 active: this.props.location.state?.selected === 'sftp'

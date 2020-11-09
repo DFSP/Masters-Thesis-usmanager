@@ -94,13 +94,13 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 interface State {
     registrationServer?: IRegistrationServer,
     formRegistrationServer?: IRegistrationServer,
-    currentForm: 'On regions' | 'On host',
+    currentForm: 'Por regiões' | 'Num endereço',
 }
 
 class RegistrationServer extends BaseComponent<Props, State> {
 
     state: State = {
-        currentForm: 'On regions'
+        currentForm: 'Por regiões'
     };
     private mounted = false;
 
@@ -145,7 +145,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">Registration server launched on container ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href=/servidores de registo/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.containerId)
@@ -161,7 +161,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Unable to launch registration server`, 10000, reason, true);
+        super.toast(`Não foi possível lançar o servidor de registo`, 10000, reason, true);
 
     private onDeleteSuccess = (registrationServer: IRegistrationServer): void => {
         super.toast(`<span class="green-text">Registration server <b class="white-text">${registrationServer.containerId}</b> successfully stopped</span>`);
@@ -171,7 +171,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, registrationServer: IRegistrationServer): void =>
-        super.toast(`Unable to stop registration-server ${this.mounted ? `<b>${registrationServer.containerId}</b>` : `<a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.containerId}</b>` : `<a href=/servidores de registo/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`}`, 10000, reason, true);
 
     private updateRegistrationServer = (registrationServer: IRegistrationServer) => {
         registrationServer = Object.values(normalize(registrationServer, Schemas.REGISTRATION_SERVER).entities.registrationServers || {})[0];
@@ -219,7 +219,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         const {currentForm} = this.state;
         return (
             isNew ?
-                currentForm === 'On regions'
+                currentForm === 'Por regiões'
                     ?
                     <Field key={'regions'}
                            id={'regions'}
@@ -233,10 +233,10 @@ class RegistrationServer extends BaseComponent<Props, State> {
                                                       label={'hostAddress'}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          defaultValue: "Select host address",
+                                                          defaultValue: "Selecionar o endereço",
                                                           values: this.getSelectableHosts(),
                                                           optionToString: this.hostAddressesDropdown,
-                                                          emptyMessage: 'No hosts to select'
+                                                          emptyMessage: 'Náo há hosts disponíveis'
                                                       }}/>
                     </>
                 : formRegistrationServer && Object.entries(formRegistrationServer).map((([key, value], index) =>
@@ -257,8 +257,8 @@ class RegistrationServer extends BaseComponent<Props, State> {
                                           label={key}
                                           valueToString={this.regionOption}
                                           dropdown={{
-                                              defaultValue: "Select region",
-                                              emptyMessage: "No regions to select",
+                                              defaultValue: "Selecionar a região",
+                                              emptyMessage: "Não há regiões disponíveis",
                                               values: [(formRegistrationServer as IRegistrationServer).region],
                                               optionToString: this.regionOption
                                           }}/>
@@ -268,14 +268,14 @@ class RegistrationServer extends BaseComponent<Props, State> {
         );
     };
 
-    private switchForm = (formId: 'On regions' | 'On host') =>
+    private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
     private registrationServer = () => {
         const {isLoading, error, newRegistrationServerRegion, newRegistrationServerHost} = this.props;
         const {currentForm} = this.state;
         const isNewRegistrationServer = this.isNew();
-        const registrationServer = isNewRegistrationServer ? (currentForm === 'On regions' ? newRegistrationServerRegion : newRegistrationServerHost) : this.getRegistrationServer();
+        const registrationServer = isNewRegistrationServer ? (currentForm === 'Por regiões' ? newRegistrationServerRegion : newRegistrationServerHost) : this.getRegistrationServer();
         const formRegistrationServer = this.getFormRegistrationServer();
         // @ts-ignore
         const registrationServerKey: (keyof IRegistrationServer) = formRegistrationServer && Object.keys(formRegistrationServer)[0];
@@ -290,19 +290,19 @@ class RegistrationServer extends BaseComponent<Props, State> {
                           values={registrationServer}
                           isNew={isNew(this.props.location.search)}
                           post={{
-                              textButton: 'launch',
+                              textButton: 'Executar',
                               url: 'registration-server',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
                           delete={{
-                              textButton: 'Stop',
+                              textButton: 'Parar',
                               url: `containers/${(registrationServer as IRegistrationServer).containerId}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
                           switchDropdown={isNewRegistrationServer ? {
-                              options: currentForm === 'On regions' ? ['On host'] : ['On regions'],
+                              options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
                               onSwitch: this.switchForm
                           } : undefined}>
                         {this.formFields(isNewRegistrationServer, formRegistrationServer)}
@@ -314,7 +314,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Registration Server',
+            title: 'Servidor de registo',
             id: 'registrationServer',
             content: () => this.registrationServer(),
             active: this.props.location.state?.selected === 'registrationServer'

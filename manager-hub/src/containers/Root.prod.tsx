@@ -76,6 +76,12 @@ import {ReduxState} from "../reducers";
 import Settings from "../routes/management/settings/Settings";
 import MonitoringSettings from "../routes/monitoring/settings/Settings";
 import DataManagementSettings from "../routes/dataManagement/settings/Settings";
+import WorkerManager from "../routes/management/workerManagers/WorkerManager";
+import WorkerManagers from "../routes/management/workerManagers/WorkerManagers";
+import RuleApp from "../routes/management/rules/apps/RuleApp";
+import RulesApp from "../routes/management/rules/apps/RulesApp";
+import SimulatedAppMetrics from "../routes/management/metrics/apps/SimulatedAppMetrics";
+import SimulatedAppMetric from "../routes/management/metrics/apps/SimulatedAppMetric";
 
 interface RootContainerProps {
     store: any;
@@ -88,65 +94,71 @@ interface StateToProps {
 type Props = StateToProps & RootContainerProps;
 
 export const managementAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-    "/home": {title: 'Microservices dynamic system management', component: ManagementLanding},
-    "/apps": {component: Apps, search: true},
-    "/apps/:name": {component: App},
-    "/services": {component: Services, search: true},
-    "/services/:name": {component: Service},
-    "/services/service": {component: Service},
-    "/containers": {component: Containers, search: true},
-    "/containers/:id": {component: Container},
+    "/gestor": {title: 'Gestão dinâmica de microservicos na cloud e edge', component: ManagementLanding},
+    "/aplicações": {component: Apps, search: true},
+    "/aplicações/:name": {component: App},
+    "/serviços": {component: Services, search: true},
+    "/serviços/:name": {component: Service},
+    "/serviços/service": {component: Service},
+    "/contentores docker": {component: Containers, search: true},
+    "/contentores docker/:id": {component: Container},
     "/hosts": {component: Hosts, search: true},
     "/hosts/cloud": {component: CloudHosts},
     "/hosts/cloud/:instanceId": {component: CloudHost},
     "/hosts/edge": {component: EdgeHosts},
     "/hosts/edge/:hostname": {component: EdgeHost},
-    "/nodes": {component: Nodes, search: true},
-    "/nodes/:id": {component: Node},
-    "/rules": {component: Rules, search: true},
-    "/rules/hosts": {component: RulesHost, search: true},
-    "/rules/hosts/:name": {component: RuleHost},
-    "/rules/services": {component: RulesService, search: true},
-    "/rules/services/:name": {component: RuleService},
-    "/rules/containers": {component: RulesContainer, search: true},
-    "/rules/containers/:name": {component: RuleContainer},
-    "/rules/conditions": {component: RuleConditions, search: true},
-    "/rules/conditions/:name": {component: Condition},
-    "/simulated-metrics": {component: SimulatedMetrics, search: true},
-    "/simulated-metrics/services": {component: SimulatedServiceMetrics, search: true},
-    "/simulated-metrics/services/:name": {component: SimulatedServiceMetric},
-    "/simulated-metrics/containers": {component: SimulatedContainerMetrics, search: true},
-    "/simulated-metrics/containers/:name": {component: SimulatedContainerMetric},
-    "/simulated-metrics/hosts": {component: SimulatedHostMetrics, search: true},
-    "/simulated-metrics/hosts/:name": {component: SimulatedHostMetric},
-    "/regions": {component: Regions, search: true},
-    "/regions/:name": {component: Region},
-    "/load-balancers": {component: LoadBalancers, search: true},
-    "/load-balancers/:id": {component: LoadBalancer},
-    "/registration-servers": {component: RegistrationServers, search: true},
-    "/registration-servers/:id": {component: RegistrationServer},
-    "/ssh": {component: Ssh},
-    "/settings": {component: Settings},
+    "/nós": {component: Nodes, search: true},
+    "/nós/:id": {component: Node},
+    "/regras": {component: Rules, search: true},
+    "/regras/hosts": {component: RulesHost, search: true},
+    "/regras/hosts/:name": {component: RuleHost},
+    "/regras/aplicações": {component: RulesApp, search: true},
+    "/regras/aplicações/:name": {component: RuleApp},
+    "/regras/serviços": {component: RulesService, search: true},
+    "/regras/serviços/:name": {component: RuleService},
+    "/regras/contentores": {component: RulesContainer, search: true},
+    "/regras/contentores/:name": {component: RuleContainer},
+    "/regras/condições": {component: RuleConditions, search: true},
+    "/regras/condições/:name": {component: Condition},
+    "/métricas simuladas": {component: SimulatedMetrics, search: true},
+    "/métricas simuladas/hosts": {component: SimulatedHostMetrics, search: true},
+    "/métricas simuladas/hosts/:name": {component: SimulatedHostMetric},
+    "/métricas simuladas/aplicações": {component: SimulatedAppMetrics, search: true},
+    "/métricas simuladas/aplicações/:name": {component: SimulatedAppMetric},
+    "/métricas simuladas/services": {component: SimulatedServiceMetrics, search: true},
+    "/métricas simuladas/services/:name": {component: SimulatedServiceMetric},
+    "/métricas simuladas/contentores": {component: SimulatedContainerMetrics, search: true},
+    "/métricas simuladas/contentores/:name": {component: SimulatedContainerMetric},
+    "/regiões": {component: Regions, search: true},
+    "/regiões/:name": {component: Region},
+    "/balanceamento de carga": {component: LoadBalancers, search: true},
+    "/balanceamento de carga/:id": {component: LoadBalancer},
+    "/servidores de registo": {component: RegistrationServers, search: true},
+    "/servidores de registo/:id": {component: RegistrationServer},
+    "/gestores locais": {component: WorkerManagers, search: true},
+    "/gestores locais/:id": {component: WorkerManager},
+    "/secure shell": {component: Ssh},
+    "/configurações": {component: Settings},
     "/logs": {component: ManagementLogs, search: true},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
 export const monitoringAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-    "/home": {title: 'Microservices dynamic system monitoring', component: MonitoringLanding},
+    "/gestor": {title: 'Monitorização', component: MonitoringLanding},
     "/settings": {component: MonitoringSettings},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
-export const dataAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
-    "/home": {title: 'Microservices dynamic system data management', component: DataManagementLanding},
+export const dataManagementAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
+    "/gestor": {title: 'Dados', component: DataManagementLanding},
     "/settings": {component: DataManagementSettings},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
-export type IComponent = 'Management' | 'Monitoring' | 'Data';
+export type IComponent = 'Gestão' | 'Monitorização' | 'Dados';
 
 export const components: IComponent[] = [
-    'Management', 'Monitoring', 'Data'
+    'Gestão', 'Monitorização', 'Dados'
 ];
 
 class Root extends React.Component<Props, {}> {
@@ -158,12 +170,12 @@ class Root extends React.Component<Props, {}> {
     public render() {
         let routes = (function (component) {
             switch (component) {
-                case "Management":
+                case "Gestão":
                     return managementAuthenticatedRoutes;
-                case "Monitoring":
+                case "Monitorização":
                     return monitoringAuthenticatedRoutes;
-                case "Data":
-                    return dataAuthenticatedRoutes;
+                case "Dados":
+                    return dataManagementAuthenticatedRoutes;
             }
         })(this.props.component);
         return (

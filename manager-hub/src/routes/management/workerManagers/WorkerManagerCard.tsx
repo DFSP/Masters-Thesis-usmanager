@@ -73,7 +73,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, workerManager: IWorkerManager): void => {
-        super.toast(`Unable to stop worker-manager <a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível para o gestor local <a href=/gestores locais/${workerManager.id}><b>${workerManager.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,12 +83,12 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
         const {workerManager} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'View associated container'}
-                pathname={`/containers/${workerManager.container.containerId}`}
+                option={'Ver os contentores associados'}
+                pathname={`/contentores/${workerManager.container.containerId}`}
                 state={workerManager}/>,
             <LinkedContextMenuItem
-                option={'Modify assigned hosts'}
-                pathname={`/worker-managers/${workerManager.id}`}
+                option={'Modificar os hosts geridos'}
+                pathname={`/gestores locais/${workerManager.id}`}
                 selected={'assignHosts'}
                 state={workerManager}/>,
         ];
@@ -100,12 +100,12 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
         const CardWorkerManager = Card<IWorkerManager>();
         return <CardWorkerManager id={`worker-manager-${workerManager.id}`}
                                   title={workerManager.id.toString()}
-                                  link={{to: {pathname: `/worker-managers/${workerManager.id}`, state: workerManager}}}
+                                  link={{to: {pathname: `/gestores locais/${workerManager.id}`, state: workerManager}}}
                                   height={'175px'}
                                   margin={'10px 0'}
                                   hoverable
                                   delete={{
-                                      textButton: 'Stop',
+                                      textButton: 'Parar',
                                       url: `worker-managers/${workerManager?.id}`,
                                       successCallback: this.onStopSuccess,
                                       failureCallback: this.onStopFailure,

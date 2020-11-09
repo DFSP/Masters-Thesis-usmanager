@@ -30,8 +30,8 @@ import WorkerManagersList from "./WorkerManagersList";
 
 const WorkerManagers: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Launch worker-manager'}}
-                   pathname={'/worker-managers/launch?new'}/>
+        <AddButton button={{text: 'Executar gestor local'}}
+                   pathname={'/gestores locais/executar?new'}/>
         <div className={`${styles.container}`}>
             <WorkerManagersList/>
         </div>

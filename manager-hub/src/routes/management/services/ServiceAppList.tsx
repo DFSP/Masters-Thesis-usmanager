@@ -111,14 +111,14 @@ class ServiceAppList extends BaseComponent<Props, State> {
         return <ControlledList<string | IAddServiceApp>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-            emptyMessage='Apps list is empty'
+            emptyMessage='Sem aplicações associadas'
             data={this.props.serviceApps}
             sort={this.sort}
             dataKey={['name']}
             dropdown={{
                 id: 'apps',
-                title: 'Add app',
-                empty: 'No apps to add',
+                title: 'Selecionar a aplicação',
+                empty: 'Não existem aplicações disponíveis',
                 data: this.getSelectableAppsNames(),
                 onSelect: this.onSelectApp,
                 formModal: {
@@ -174,7 +174,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/apps/${appName}`} className={`${listItemStyles.link}`}>
+                    <Link to={`/aplicações/${appName}`} className={`${listItemStyles.link}`}>
                         <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
                     </Link>
                 )}
@@ -198,7 +198,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to delete app`, 10000, reason, true);
+        super.toast(`Não foi possível remover a aplicação`, 10000, reason, true);
 
     private getSelectableAppsNames = () => {
         const {apps, serviceApps, unsavedApps} = this.props;

@@ -12,4 +12,4 @@ FROM alpine
 
 COPY --from=build /app/registration-client /app/registration-client
 
-CMD ./registration-client
+CMD ./app/registration-client

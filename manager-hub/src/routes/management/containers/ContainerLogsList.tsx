@@ -71,7 +71,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
                 {!!logs.length && (
                     <div className='smallControlsContainer'>
                         <button className='btn-floating btn-flat btn-small right'
-                                data-for='dark-tooltip' data-tip="Reload" data-place='bottom'
+                                data-for='dark-tooltip' data-tip="Recarregar" data-place='bottom'
                                 type="button"
                                 onClick={this.reloadLogs}>
                             <i className="large material-icons">sync</i>
@@ -80,7 +80,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
                 <div className={styles.logsListContainer}>
                     <LogsList isLoading={this.props.isLoadingContainer || this.props.isLoading}
                               error={this.props.loadContainerError || this.props.error}
-                              emptyMessage={`No logs available`}
+                              emptyMessage={`Logs não estão disponíveis`}
                               list={logs}
                               show={this.log}
                               paginate={{

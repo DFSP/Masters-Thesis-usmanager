@@ -56,7 +56,7 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
         return (
             <RulesList isLoading={this.props.isLoading}
                        error={this.props.error}
-                       emptyMessage={`Generic service rules list is empty`}
+                       emptyMessage={`Não há nenhuma regra que se aplique a todos os serviços`}
                        list={this.props.genericServiceRules}
                        show={this.rule}/>
         );
@@ -67,7 +67,7 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
             <div className={`${styles.linkedItemContent}`}>
                 <span>{rule}</span>
             </div>
-            <Link to={`/rules/services/${rule}`}
+            <Link to={`/regras/serviços/${rule}`}
                   className={`${styles.link}`}>
                 <i className={`${styles.linkIcon} material-icons right`}>link</i>
             </Link>

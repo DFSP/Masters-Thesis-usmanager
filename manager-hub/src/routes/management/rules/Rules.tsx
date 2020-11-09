@@ -35,16 +35,16 @@ import RulesAppList from "./apps/RulesAppList";
 
 const Rules = () =>
     <MainLayout>
-        <AddButton button={{text: 'New condition/rule'}}
+        <AddButton button={{text: 'Nova condição ou regra'}}
                    dropdown={{
                        id: 'addRuleOrCondition',
-                       title: 'Select menu',
+                       title: 'Adicionar regra aplicada a...',
                        data: [
-                           {text: 'Condition', pathname: '/rules/conditions/new_condition?new'},
-                           {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new'},
-                           {text: 'App rule', pathname: '/rules/apps/new_app_rule?new'},
-                           {text: 'Service rule', pathname: '/rules/services/new_service_rule?new'},
-                           {text: 'Container rule', pathname: '/rules/containers/new_container_rule?new'},
+                           {text: 'hosts', pathname: '/regras/hosts/nova regra?new'},
+                           {text: 'aplicações', pathname: '/regras/aplicações/nova regra?new'},
+                           {text: 'serviços', pathname: '/regras/serviços/nova regra?new'},
+                           {text: 'contentores', pathname: '/regras/contentores/nova regra?new'},
+                           {text: 'ou adicionar condição', pathname: '/regras/condições/nova condição?new'},
                        ],
                    }}/>
         <div className={`${styles.collapsibleContainer}`}>

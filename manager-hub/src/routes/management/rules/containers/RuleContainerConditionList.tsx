@@ -86,12 +86,12 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
-            emptyMessage={`Conditions list is empty`}
+            emptyMessage={`Sem condições associadas`}
             data={this.props.ruleConditions}
             dropdown={{
                 id: 'conditions',
-                title: 'Add condition',
-                empty: 'No conditions to add',
+                title: 'Selecionar a condição',
+                empty: 'Não existem condições disponíveis',
                 data: this.getSelectableConditionNames()
             }}
             show={this.condition}
@@ -135,7 +135,7 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/rules/conditions/${condition}`}
+                    <Link to={`/rules/condições/${condition}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -158,7 +158,7 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to delete condition`, 10000, reason, true);
+        super.toast(`Não foi possível remover a condição`, 10000, reason, true);
 
     private getSelectableConditionNames = () => {
         const {conditions, ruleConditions, unsavedConditions} = this.props;

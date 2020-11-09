@@ -44,7 +44,7 @@ export default class ContainerLabelsList extends BaseComponent<Props, {}> {
         return (
             <LabelsList isLoading={this.props.isLoadingContainer}
                         error={this.props.loadContainerError}
-                        emptyMessage={`No labels associated`}
+                        emptyMessage={`Sem labels associadas`}
                         list={this.labels()}
                         show={this.label}/>
         );

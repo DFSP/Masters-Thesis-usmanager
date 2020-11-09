@@ -101,14 +101,14 @@ interface State {
     workerManager?: IWorkerManager,
     formWorkerManager?: IWorkerManager,
     unsavedHosts: string[],
-    currentForm: 'On regions' | 'On host',
+    currentForm: 'Por regiões' | 'Num endereço',
 }
 
 class WorkerManager extends BaseComponent<Props, State> {
 
     state: State = {
         unsavedHosts: [],
-        currentForm: 'On regions'
+        currentForm: 'Por regiões'
     };
     private mounted = false;
 
@@ -155,7 +155,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         if (workerManagers.length === 1) {
             const workerManager = workerManagers[0];
             const publicIpAddress = workerManager.container.publicIpAddress;
-            super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
+            super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href=/gestores locais/${workerManager.id}><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
             this.saveEntities(workerManager);
             if (this.mounted) {
                 this.updateWorkerManager(workerManager);
@@ -165,24 +165,24 @@ class WorkerManager extends BaseComponent<Props, State> {
             workerManagers = workerManagers.reverse();
             super.toast(`<span class="green-text">Launched ${workerManagers.length} worker-managers:<br/><b class="white-text">${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Container ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
-                this.props.history.push("/worker-managers");
+                this.props.history.push("/gestores locais");
             }
         }
         this.props.addWorkerManagers(workerManagers);
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Unable to launch worker-manager`, 10000, reason, true);
+        super.toast(`Não foi possível lançar o gestor local`, 10000, reason, true);
 
     private onDeleteSuccess = (workerManager: IWorkerManager): void => {
-        super.toast(`<span class="green-text">Worker-manager <b class="white-text">${workerManager.id}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O gestor local <b class="white-text">${workerManager.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/worker-managers`)
+            this.props.history.push(`/gestores locais`)
         }
     };
 
     private onDeleteFailure = (reason: string, workerManager: IWorkerManager): void =>
-        super.toast(`Unable to stop ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`} worker-manager`, 10000, reason, true);
+        super.toast(`Não foi possível parar o gestor local ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/gestores locais/${workerManager.id}><b>${workerManager.id}</b></a>`}`, 10000, reason, true);
 
     private updateWorkerManager = (workerManager: IWorkerManager) => {
         workerManager = Object.values(normalize(workerManager, Schemas.WORKER_MANAGER).entities.workerManagers || {})[0];
@@ -228,7 +228,7 @@ class WorkerManager extends BaseComponent<Props, State> {
     };
 
     private onSaveHostsFailure = (workerManager: IWorkerManager, reason: string): void =>
-        super.toast(`Unable to save assigned hosts of worker-manager ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/worker-managers/${workerManager.id}><b>${workerManager.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os hosts atribuídos ao gestor local ${this.mounted ? `<b>${workerManager.id}</b>` : `<a href=/gestores locais/${workerManager.id}><b>${workerManager.id}</b></a>`}`, 10000, reason, true);
 
     private getFields = (workerManager: INewWorkerManagerRegion | INewWorkerManagerHost | IWorkerManager): IFields =>
         Object.entries(workerManager).map(([key, value]) => {
@@ -272,7 +272,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         const {currentForm} = this.state;
         return (
             isNew ?
-                currentForm === 'On regions'
+                currentForm === 'Por regiões'
                     ?
                     <Field key={'regions'}
                            id={'regions'}
@@ -286,10 +286,10 @@ class WorkerManager extends BaseComponent<Props, State> {
                                                       label={'hostAddress'}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          defaultValue: "Select host address",
+                                                          defaultValue: 'Selecionar endereço',
+                                                          emptyMessage: 'Nenhum host disponível',
                                                           values: this.getSelectableHosts(),
                                                           optionToString: this.hostAddressesDropdown,
-                                                          emptyMessage: 'No hosts to select'
                                                       }}/>
                     </>
                 : formWorkerManager && Object.entries(formWorkerManager).map((([key, value], index) =>
@@ -299,7 +299,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                                            id={key}
                                            label={key + " id"}
                                            valueToString={this.containerIdField}
-                                           icon={{linkedTo: `/containers/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
+                                           icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
                         <Field<IContainer>
                             key={index + 1} // index + 1 is ok unless there are more fields after this one
                             id={key}
@@ -312,14 +312,14 @@ class WorkerManager extends BaseComponent<Props, State> {
         );
     };
 
-    private switchForm = (formId: 'On regions' | 'On host') =>
+    private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
     private workerManager = () => {
         const {isLoading, error, newWorkerManagerRegion, newWorkerManagerHost} = this.props;
         const {currentForm} = this.state;
         const isNewWorkerManager = this.isNew();
-        const workerManager = isNewWorkerManager ? (currentForm === 'On regions' ? newWorkerManagerRegion : newWorkerManagerHost) : this.getWorkerManager();
+        const workerManager = isNewWorkerManager ? (currentForm === 'Por regiões' ? newWorkerManagerRegion : newWorkerManagerHost) : this.getWorkerManager();
         const formWorkerManager = this.getFormWorkerManager();
         // @ts-ignore
         const workerManagerKey: (keyof IWorkerManager) = workerManager && Object.keys(workerManager)[0];
@@ -335,20 +335,20 @@ class WorkerManager extends BaseComponent<Props, State> {
                           isNew={isNew(this.props.location.search)}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
-                              textButton: isNew(this.props.location.search) ? 'launch' : 'save',
+                              textButton: isNew(this.props.location.search) ? 'Executar' : 'Guardar',
                               url: 'worker-managers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
                           delete={{
-                              textButton: 'Stop',
+                              textButton: 'Parar',
                               url: `worker-managers/${(workerManager as IWorkerManager).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
                           saveEntities={this.saveEntities}
                           switchDropdown={isNewWorkerManager ? {
-                              options: currentForm === 'On regions' ? ['On host'] : ['On regions'],
+                              options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
                               onSwitch: this.switchForm
                           } : undefined}>
                         {this.formFields(isNewWorkerManager, formWorkerManager)}
@@ -368,13 +368,13 @@ class WorkerManager extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Worker manager',
+            title: 'Gestor local',
             id: 'workerManager',
             content: () => this.workerManager(),
             active: this.props.location.state?.selected === 'workerManager'
         },
         {
-            title: 'Assigned hosts',
+            title: 'Hosts atribuídos',
             id: 'assignHosts',
             content: () => this.assignHosts(),
             active: this.props.location.state?.selected === 'assignHosts'

@@ -165,7 +165,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
                                               onClick={this.startCloudHost}/>);
         }
         if (isEqual(cloudHost.state, awsInstanceStates.RUNNING)) {
-            menus.push(<ActionContextMenuItem className='blue-text' option='Stop' state={cloudHost}
+            menus.push(<ActionContextMenuItem className='blue-text' option='Parar' state={cloudHost}
                                               onClick={this.stopCloudHost}/>);
         }
         if (!isEqual(cloudHost.state, awsInstanceStates.TERMINATED)
@@ -181,32 +181,32 @@ class CloudHostCard extends BaseComponent<Props, State> {
         const id = cloudHost.instanceId;
         return [
             <LinkedContextMenuItem
-                option={'Modify rules'}
+                option={'Modificar a lista de regras'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'rules'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
+                option={'Ver a lista de regras genéricas'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'genericContainerRules'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
+                option={'Modificar a lista das métricas simuladas'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'simulatedMetrics'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
+                option={'Ver a lista das métricas simuladas genéricas'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'genericSimulatedMetrics'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
-                option={'Execute command'}
+                option={'Executar comandos'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'ssh'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
-                option={'Upload file'}
+                option={'Carregar ficheiros'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'sftp'}
                 state={cloudHost}/>

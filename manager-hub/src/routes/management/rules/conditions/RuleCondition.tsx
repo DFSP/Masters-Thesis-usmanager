@@ -144,7 +144,7 @@ class RuleCondition extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleCondition>): void => {
         const condition = reply.data;
-        super.toast(`<span class="green-text">Condition ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">Condition ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/regras/condições/${condition.name}><b>${condition.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addCondition(condition);
         if (this.mounted) {
             this.updateCondition(condition);
@@ -153,11 +153,11 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to save condition <b>${condition.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a condição <b>${condition.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleCondition>): void => {
         const condition = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à condição ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/regras/condições/${condition.name}><b>${condition.name}</b></a>`} foram guardadas com sucesso</span>`);
         const previousCondition = this.getCondition();
         if (previousCondition?.id) {
             this.props.updateCondition(previousCondition as IRuleCondition, condition)
@@ -169,18 +169,18 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to update condition ${this.mounted ? `<b>${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível apagar a condição ${this.mounted ? `<b>${condition.name}</b>` : `<a href=/regras/condições/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (condition: IRuleCondition): void => {
-        super.toast(`<span class="green-text">Condition <b class="white-text">${condition.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A condição <b class="white-text">${condition.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/rules/conditions`)
+            this.props.history.push(`/regras/conditions`)
         }
     };
 
     private onDeleteFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Unable to delete condition ${this.mounted ?
-            <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover condition ${this.mounted ?
+            <b>${condition.name}</b> : `<a href=/regras/condições/${condition.name}><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private updateCondition = (condition: IRuleCondition) => {
         condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
@@ -254,30 +254,30 @@ class RuleCondition extends BaseComponent<Props, State> {
                                        label='field'
                                        type='dropdown'
                                        dropdown={{
-                                           defaultValue: "Select field",
+                                           defaultValue: "Selecionar o campo",
                                            values: Object.values(this.props.fields),
                                            optionToString: this.fieldOption,
-                                           emptyMessage: 'No fields available'
+                                           emptyMessage: 'Não há campos disponíveis'
                                        }}/>
                         <Field<IOperator> key='operators'
                                           id='operator'
                                           label='operator'
                                           type='dropdown'
                                           dropdown={{
-                                              defaultValue: "Select operator",
+                                              defaultValue: "Selecionar o operador",
                                               values: Object.values(this.props.operators),
                                               optionToString: this.operatorOption,
-                                              emptyMessage: 'No operators available'
+                                              emptyMessage: 'Não existem operadores disponíveis'
                                           }}/>
                         <Field<IValueMode> key='valueModes'
                                            id='valueMode'
                                            label='valueMode'
                                            type='dropdown'
                                            dropdown={{
-                                               defaultValue: 'Select value mode',
+                                               defaultValue: 'Selecionar o modo do valor',
                                                values: Object.values(this.props.valueModes),
                                                optionToString: this.valueModeOption,
-                                               emptyMessage: 'No value modes available'
+                                               emptyMessage: 'Não existem modos disponíveis'
                                            }}/>
                         <Field key='value' id='value' label='value' type="number"/>
                     </Form>
@@ -288,7 +288,7 @@ class RuleCondition extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Condition',
+            title: 'Condição',
             id: 'condition',
             content: () => this.condition(),
             active: this.props.location.state?.selected === 'condition'

@@ -124,7 +124,7 @@ interface State {
     node?: INode,
     formNode?: INode,
     loading: IFormLoading,
-    currentForm: 'On host' | 'On location',
+    currentForm: 'Num endereço' | 'On location',
     locations: Point[],
 }
 
@@ -132,7 +132,7 @@ class Node extends BaseComponent<Props, State> {
 
     state: State = {
         loading: undefined,
-        currentForm: 'On host',
+        currentForm: 'Num endereço',
         locations: []
     };
 
@@ -181,14 +181,14 @@ class Node extends BaseComponent<Props, State> {
         const nodes = reply.data;
         if (nodes.length === 1) {
             const node = nodes[0];
-            super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.publicIpAddress} has joined the swarm</span>`);
+            super.toast(`<span class="green-text">O host ${node.publicIpAddress} entrou no swarm no nó ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateNode(node);
                 this.props.history.replace(node.id.toString());
             }
         } else {
-            super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> have joined the swarm</span>`);
-            this.props.history.push("/nodes");
+            super.toast(`<span class="green-text">Os nós <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> entraram no swarm</span>`);
+            this.props.history.push("/nós");
         }
         this.props.addNodes(nodes);
     };
@@ -196,11 +196,11 @@ class Node extends BaseComponent<Props, State> {
     private onPostFailure = (reason: string, node: INewNodeHost | INewNodeLocation): void => {
         let message;
         if ("host" in node && node.host) {
-            message = `Unable to start node at ${node.host}`;
+            message = `Não foi possível começar o nó no host ${node.host}`;
         } else if ("coordinates" in node) {
-            message = `Unable to start node at ${node.coordinates}`;
+            message = `Não foi possível começar um nó na localização ${node.coordinates}`;
         } else {
-            message = `Unable to start node`;
+            message = `Não foi possível começar o nó`;
         }
         super.toast(message, 10000, reason, true);
     };
@@ -211,11 +211,11 @@ class Node extends BaseComponent<Props, State> {
         const previousAvailability = previousNode?.availability;
         const previousRole = previousNode?.role;
         if (node.availability !== previousAvailability) {
-            super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} availability has been changed to ${node.availability}</span>`);
+            super.toast(`<span class="green-text">A disponibilidade do nó ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`} foi alterada para ${node.availability}</span>`);
         } else if (node.role !== previousRole) {
-            super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'MANAGER' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
+            super.toast(`<span class="green-text">O nó ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`} foi ${previousRole === 'MANAGER' ? 'despromovido' : 'promovido'} a ${node.role}</span>`);
         } else {
-            super.toast(`<span class="green-text">Changes to node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} have been saved</span>`);
+            super.toast(`<span class="green-text">As alterações ao nó ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`} foram guardadas com sucesso</span>`);
         }
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -227,20 +227,20 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, node: INode): void =>
-        super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível mudar o cargo do nó ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">Host <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm.'}</span>`);
+        super.toast(`<span class="green-text">O host <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
         if (this.mounted) {
-            this.props.history.push(`/nodes`);
+            this.props.history.push(`/nós`);
         }
     };
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`Node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} was unable to leave the swarm`, 10000, reason, true);
+            super.toast(`O nó ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Unable to remove node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} from the swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nós/${node.id}><b>${node.id}</b></a>`} do swarm`, 10000, reason, true);
         }
     }
 
@@ -266,7 +266,7 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmSuccess = (node: INode) => {
-        super.toast(`<span class="green-text">Host</span> <b>${node?.publicIpAddress}</b> <span class="green-text">successfully rejoined the swarm as node</span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`}`);
+        super.toast(`<span class="green-text">Host</span> <b>${node?.publicIpAddress}</b> <span class="green-text">successfully rejoined the swarm as node</span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nós/${node?.id}><b>${node?.id}</b></a>`}`);
         if (this.mounted) {
             this.setState({loading: undefined});
             this.updateNode(node);
@@ -275,7 +275,7 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmFailure = (reason: string, node?: INode) => {
-        super.toast(`Node ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`} failed to rejoin the swarm`, 10000, reason, true);
+        super.toast(`Node ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nós/${node?.id}><b>${node?.id}</b></a>`} failed to rejoin the swarm`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -355,7 +355,7 @@ class Node extends BaseComponent<Props, State> {
         const {currentForm} = this.state;
         return (
             isNew ?
-                currentForm === 'On host'
+                currentForm === 'Num endereço'
                     ?
                     <>
                         <Field key={'role'}
@@ -363,7 +363,7 @@ class Node extends BaseComponent<Props, State> {
                                label={'role'}
                                type="dropdown"
                                dropdown={{
-                                   defaultValue: "Select role",
+                                   defaultValue: "Selecionar o cargo",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
                         <Field<string> key={'host'}
@@ -371,9 +371,9 @@ class Node extends BaseComponent<Props, State> {
                                        label={'host'}
                                        type="dropdown"
                                        dropdown={{
-                                           defaultValue: "Select host",
+                                           defaultValue: "Selecionar o host",
                                            values: this.getSelectableHosts(),
-                                           emptyMessage: 'No hosts to select'
+                                           emptyMessage: 'Náo há hosts disponíveis'
                                        }}/>
                     </>
                     :
@@ -383,7 +383,7 @@ class Node extends BaseComponent<Props, State> {
                                label={'role'}
                                type="dropdown"
                                dropdown={{
-                                   defaultValue: "Select role",
+                                   defaultValue: "Selecionar o cargo",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
                         <Field key='coordinates' id='coordinates' label='select position(s)' type='map'
@@ -402,7 +402,7 @@ class Node extends BaseComponent<Props, State> {
                                  label={'availability'}
                                  type="dropdown"
                                  dropdown={{
-                                     defaultValue: "Select availability",
+                                     defaultValue: "Selecionar a disponibilidade",
                                      values: ['ACTIVE', 'PAUSE', 'DRAIN']
                                  }}/>
                         : key === 'role' && formNode.state !== 'down'
@@ -411,7 +411,7 @@ class Node extends BaseComponent<Props, State> {
                                  label={'role'}
                                  type="dropdown"
                                  dropdown={{
-                                     defaultValue: "Select role",
+                                     defaultValue: "Selecionar o cargo",
                                      values: ['MANAGER', 'WORKER']
                                  }}
                                  disabled={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && formNode.role === 'MANAGER'
@@ -437,7 +437,7 @@ class Node extends BaseComponent<Props, State> {
         );
     };
 
-    private switchForm = (formId: 'On host' | 'On location') =>
+    private switchForm = (formId: 'Num endereço' | 'On location') =>
         this.setState({currentForm: formId});
 
     private showRejoinSwarmButton = (node: INode): boolean =>
@@ -452,7 +452,7 @@ class Node extends BaseComponent<Props, State> {
         const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
         const {currentForm, loading} = this.state;
         const isNewNode = this.isNew();
-        const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
+        const node = isNewNode ? (currentForm === 'Num endereço' ? newNodeHost : newNodeLocation) : this.getNode();
         const formNode = this.getFormNode();
         // @ts-ignore
         const nodeKey: (keyof INode) = node && Object.keys(node)[0];
@@ -469,7 +469,7 @@ class Node extends BaseComponent<Props, State> {
                               isNew={isNewNode}
                               loading={loading}
                               post={{
-                                  textButton: isNewNode ? 'Join swarm' : 'Save',
+                                  textButton: isNewNode ? 'Join swarm' : 'Guardar',
                                   url: 'nodes',
                                   successCallback: this.onPostSuccess,
                                   failureCallback: this.onPostFailure
@@ -492,7 +492,7 @@ class Node extends BaseComponent<Props, State> {
                                       failureCallback: this.onDeleteFailure
                                   }}
                               switchDropdown={isNewNode ? {
-                                  options: currentForm === 'On host' ? ['On location'] : ['On host'],
+                                  options: currentForm === 'Num endereço' ? ['On location'] : ['Num endereço'],
                                   onSwitch: this.switchForm
                               } : undefined}
                               customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
@@ -511,7 +511,7 @@ class Node extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => ([
         {
-            title: 'Node',
+            title: 'Nó',
             id: 'node',
             content: () => this.node(),
             active: this.props.location.state?.selected === 'node'

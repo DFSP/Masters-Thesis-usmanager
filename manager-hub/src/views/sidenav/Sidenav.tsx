@@ -35,48 +35,48 @@ import {IComponent} from "../../containers/Root.dev";
 type ILink = { link: string, name: string, sub?: ILink[] }
 
 const sidenavManagementLinks: ILink[] = [
-    {link: '/apps', name: 'Apps'},
-    {link: '/services', name: 'Services'},
-    {link: '/containers', name: 'Containers'},
+    {link: '/aplicações', name: 'Aplicações'},
+    {link: '/serviços', name: 'Serviços'},
+    {link: '/contentores docker', name: 'Contentores docker'},
     {
         link: '/hosts', name: 'Hosts', sub: [
-            {link: '/cloud', name: 'Cloud instances'},
-            {link: '/edge', name: 'Edge hosts'}
+            {link: '/cloud', name: 'Instâncias cloud'},
+            {link: '/edge', name: 'Edge'}
         ]
     },
-    {link: '/nodes', name: 'Nodes'},
-    {link: '/regions', name: 'Regions'},
+    {link: '/nós', name: 'Nós'},
+    {link: '/regions', name: 'Regiões'},
     {
-        link: '/rules', name: 'Rules', sub: [
-            {link: '/conditions', name: 'Conditions'},
-            {link: '/hosts', name: 'Host rules'},
-            {link: '/apps', name: 'App rules'},
-            {link: '/services', name: 'Service rules'},
-            {link: '/containers', name: 'Container rules'},
+        link: '/regras', name: 'Regras', sub: [
+            {link: '/condições', name: 'Condições'},
+            {link: '/hosts', name: 'Regras sobre hosts'},
+            {link: '/aplicações', name: 'Regras sobre aplicações'},
+            {link: '/serviços', name: 'Regras sobre serviços'},
+            {link: '/contentores', name: 'Regras sobre contentores'},
         ]
     },
     {
-        link: '/simulated-metrics', name: 'Simulated metrics', sub: [
-            {link: '/hosts', name: 'Host metrics'},
-            {link: '/apps', name: 'App metrics'},
-            {link: '/services', name: 'Service metrics'},
-            {link: '/containers', name: 'Container metrics'}
+        link: '/regras simuladas', name: 'Métricas simuladas', sub: [
+            {link: '/hosts', name: 'Métricas de hosts'},
+            {link: '/aplicações', name: 'Métricas de aplicações'},
+            {link: '/serviços', name: 'Métricas de serviços'},
+            {link: '/contentores', name: 'Métricas de contentores'}
         ]
     },
-    {link: '/load-balancers', name: 'Load balancers'},
-    {link: '/registration-servers', name: 'Registration servers'},
-    {link: '/worker-managers', name: 'Worker managers'},
-    {link: '/ssh', name: 'Ssh'},
-    {link: '/settings', name: 'Settings'},
+    {link: '/balanceamento de carga', name: 'Balanceamento de carga'},
+    {link: '/servidores de registo', name: 'Servidores de registo'},
+    {link: '/gestores locais', name: 'Gestores'},
+    {link: '/secure shell', name: 'Secure shell'},
+    {link: '/configurações', name: 'Configurações'},
     {link: '/logs', name: 'Logs'},
 ];
 
 const sidenavMonitoringLinks: ILink[] = [
-    {link: '/settings', name: 'Settings'},
+    {link: '/configurações', name: 'Configurações'},
 ];
 
 const sidenavDataManagementLinks: ILink[] = [
-    {link: '/settings', name: 'Settings'},
+    {link: '/configurações', name: 'Configurações'},
 ];
 
 interface StateToProps {
@@ -118,11 +118,11 @@ class Sidenav extends React.Component<Props, {}> {
     public render() {
         let links = (function (component) {
             switch (component) {
-                case "Management":
+                case "Gestão":
                     return sidenavManagementLinks;
-                case "Monitoring":
+                case "Monitorização":
                     return sidenavMonitoringLinks;
-                case "Data":
+                case "Dados":
                     return sidenavDataManagementLinks;
             }
         })(this.props.component);

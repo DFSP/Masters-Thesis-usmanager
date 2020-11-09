@@ -30,8 +30,8 @@ import SimulatedServiceMetricsList from "./SimulatedServiceMetricsList";
 
 const SimulatedServiceMetrics: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Add simulated service metric'}}
-                   pathname={'/simulated-metrics/services/add_simulated_metric?new'}/>
+        <AddButton button={{text: 'Nova métrica simulada'}}
+                   pathname={'/métricas simuladas/serviços/nova métrica simulada?new'}/>
         <div className={`${styles.container}`}>
             <SimulatedServiceMetricsList/>
         </div>

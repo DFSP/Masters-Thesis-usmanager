@@ -54,7 +54,7 @@ class SimulatedContainerMetricsList extends BaseComponent<Props, {}> {
             <CardList<ISimulatedContainerMetric>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No simulated container metrics to display"}
+                emptyMessage={"Sem métricas simuladas associadas"}
                 list={this.props.simulatedContainerMetrics}
                 card={this.simulatedContainerMetric}
                 predicate={this.predicate}/>

@@ -65,7 +65,7 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
-        super.toast(`<span class="green-text">Simulated service metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void => {
-        super.toast(`Unable to delete simulated service metric <a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada <a href=/métricas simuladas/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,8 +83,8 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
         const {simulatedServiceMetric} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify services'}
-                pathname={`/simulated-metrics/services/${simulatedServiceMetric.name}`}
+                option={'Alterar a lista de serviços'}
+                pathname={`/métricas simuladas/serviços/${simulatedServiceMetric.name}`}
                 selected={'services'}
                 state={simulatedServiceMetric}/>,
         ];
@@ -98,7 +98,7 @@ class SimulatedServiceMetricCard extends BaseComponent<Props, State> {
                                            title={simulatedServiceMetric.name}
                                            link={{
                                                to: {
-                                                   pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`,
+                                                   pathname: `/métricas simuladas/serviços/${simulatedServiceMetric.name}`,
                                                    state: simulatedServiceMetric
                                                }
                                            }}

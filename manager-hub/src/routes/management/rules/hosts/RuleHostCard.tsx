@@ -65,7 +65,7 @@ class RuleHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleHost: IRuleHost): void => {
-        super.toast(`<span class="green-text">Host rule <b class="white-text">${ruleHost.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleHost.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class RuleHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void => {
-        super.toast(`Unable to delete <a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a> host rule`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,21 +83,21 @@ class RuleHostCard extends BaseComponent<Props, State> {
         const {rule} = this.props;
         const menuItems = [
             <LinkedContextMenuItem
-                option={'Modify conditions'}
-                pathname={`/rules/hosts/${rule.name}`}
+                option={'Modificar as condições associadas'}
+                pathname={`/regras/hosts/${rule.name}`}
                 selected={'ruleConditions'}
                 state={rule}/>
         ];
         if (!rule.generic) {
             menuItems.push(
                 <LinkedContextMenuItem
-                    option={'Modify cloud hosts'}
-                    pathname={`/rules/hosts/${rule.name}`}
+                    option={'Modificar as instâncias associadas'}
+                    pathname={`/regras/hosts/${rule.name}`}
                     selected={'cloudHosts'}
                     state={rule}/>,
                 <LinkedContextMenuItem
-                    option={'Modify edge hosts'}
-                    pathname={`/rules/hosts/${rule.name}`}
+                    option={'Modificar os edge hosts associados'}
+                    pathname={`/regras/hosts/${rule.name}`}
                     selected={'edgeHosts'}
                     state={rule}/>
             );
@@ -111,7 +111,7 @@ class RuleHostCard extends BaseComponent<Props, State> {
         const CardRuleHost = Card<IRuleHost>();
         return <CardRuleHost id={`host-rule-${rule.id}`}
                              title={rule.name}
-                             link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
+                             link={{to: {pathname: `/regras/hosts/${rule.name}`, state: rule}}}
                              height={'120px'}
                              margin={'10px 0'}
                              hoverable

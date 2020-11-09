@@ -94,13 +94,13 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {
 interface State {
     loadBalancer?: ILoadBalancer,
     formLoadBalancer?: ILoadBalancer,
-    currentForm: 'On regions' | 'On host',
+    currentForm: 'Num endereço' | 'Por regiões',
 }
 
 class LoadBalancer extends BaseComponent<Props, State> {
 
     state: State = {
-        currentForm: 'On regions'
+        currentForm: 'Por regiões',
     };
     private mounted = false;
 
@@ -145,7 +145,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
         let loadBalancers = reply.data;
         if (loadBalancers.length === 1) {
             const loadBalancer = loadBalancers[0];
-            super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
+            super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/balanceamento de carga/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
             if (this.mounted) {
                 this.updateLoadBalancer(loadBalancer);
                 this.props.history.replace(loadBalancer.containerId)
@@ -154,24 +154,24 @@ class LoadBalancer extends BaseComponent<Props, State> {
             loadBalancers = loadBalancers.reverse();
             super.toast(`<span class="green-text">Launched ${loadBalancers.length} load-balancers:<br/><b class="white-text">${loadBalancers.map(loadBalancer => `Container ${loadBalancer.containerId} => Host ${loadBalancer.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
-                this.props.history.push('/load-balancers');
+                this.props.history.push('/balanceamento de carga');
             }
         }
         this.props.addLoadBalancers(loadBalancers);
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Unable to launch load-balancer`, 10000, reason, true);
+        super.toast(`Não foi possível lançar uma nova instância do balanceamento de carga`, 10000, reason, true);
 
     private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
         super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
         if (this.mounted) {
-            this.props.history.push(`/load-balancers`)
+            this.props.history.push(`/balanceamento de carga`)
         }
     };
 
     private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
-        super.toast(`Unable to stop load-balancer ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível para a instância do balanceamento de carga ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/balanceamento de carga/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`}`, 10000, reason, true);
 
     private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
         loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
@@ -182,7 +182,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
     private getFields = (loadBalancer: INewLoadBalancerRegion | INewLoadBalancerHost | ILoadBalancer): IFields => {
         if (this.isNew()) {
-            if (this.state.currentForm === 'On regions') {
+            if (this.state.currentForm === 'Por regiões') {
                 return {
                     regions: {
                         id: 'regions',
@@ -241,7 +241,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
         const {currentForm} = this.state;
         return (
             isNew ?
-                currentForm === 'On regions'
+                currentForm === 'Por regiões'
                     ?
                     <Field key={'regions'}
                            id={'regions'}
@@ -255,10 +255,10 @@ class LoadBalancer extends BaseComponent<Props, State> {
                                                       label={'hostAddress'}
                                                       type="dropdown"
                                                       dropdown={{
-                                                          defaultValue: "Select host address",
+                                                          defaultValue: "Selecionar o endereço",
+                                                          emptyMessage: 'Não há hosts disponíveis',
                                                           values: this.getSelectableHosts(),
                                                           optionToString: this.hostAddressesDropdown,
-                                                          emptyMessage: 'No hosts to select'
                                                       }}/>
                     </>
                 : formLoadBalancer && Object.entries(formLoadBalancer).map((([key, value], index) =>
@@ -279,8 +279,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
                                           label={key}
                                           valueToString={this.regionOption}
                                           dropdown={{
-                                              defaultValue: "Select region",
-                                              emptyMessage: "No regions to select",
+                                              defaultValue: "Selecionar a região",
+                                              emptyMessage: "Não há regiões disponíveis",
                                               values: [(formLoadBalancer as ILoadBalancer).region],
                                               optionToString: this.regionOption
                                           }}/>
@@ -290,14 +290,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
         );
     };
 
-    private switchForm = (formId: 'On regions' | 'On host') =>
+    private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
     private loadBalancer = () => {
         const {isLoading, error, newLoadBalancerRegion, newLoadBalancerHost} = this.props;
         const {currentForm} = this.state;
         const isNewLoadBalancer = this.isNew();
-        const loadBalancer = isNewLoadBalancer ? (currentForm === 'On regions' ? newLoadBalancerRegion : newLoadBalancerHost) : this.getLoadBalancer();
+        const loadBalancer = isNewLoadBalancer ? (currentForm === 'Por regiões' ? newLoadBalancerRegion : newLoadBalancerHost) : this.getLoadBalancer();
         const formLoadBalancer = this.getFormLoadBalancer();
         // @ts-ignore
         const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
@@ -312,19 +312,19 @@ class LoadBalancer extends BaseComponent<Props, State> {
                           values={loadBalancer}
                           isNew={isNew(this.props.location.search)}
                           post={{
-                              textButton: 'launch',
+                              textButton: 'Executar',
                               url: 'load-balancers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
                           delete={{
-                              textButton: 'Stop',
+                              textButton: 'Parar',
                               url: `containers/${(loadBalancer as ILoadBalancer).containerId}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
                           switchDropdown={isNewLoadBalancer ? {
-                              options: currentForm === 'On regions' ? ['On host'] : ['On regions'],
+                              options: currentForm === 'Por regiões' ? ['Por regiões'] : ['Num endereço'],
                               onSwitch: this.switchForm
                           } : undefined}>
                         {this.formFields(isNewLoadBalancer, formLoadBalancer)}
@@ -336,7 +336,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Load balancer',
+            title: 'Balanceamento de carga',
             id: 'loadBalancer',
             content: () => this.loadBalancer(),
             active: this.props.location.state?.selected === 'loadBalancer'

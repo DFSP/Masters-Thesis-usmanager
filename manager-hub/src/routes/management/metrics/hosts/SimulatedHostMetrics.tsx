@@ -30,8 +30,8 @@ import SimulatedHostMetricsList from "./SimulatedHostMetricsList";
 
 const SimulatedHostMetrics: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Add simulated host metric'}}
-                   pathname={'/simulated-metrics/hosts/add_simulated_metric?new'}/>
+        <AddButton button={{text: 'Nova métrica simulada'}}
+                   pathname={'/métricas simuladas/hosts/nova métrica simulada?new'}/>
         <div className={`${styles.container}`}>
             <SimulatedHostMetricsList/>
         </div>

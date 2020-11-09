@@ -80,11 +80,11 @@ class Breadcrumbs extends React.Component<Props, State> {
     private breadcrumbs = (props: Props): IBreadcrumbs => {
         let routes = (function (component) {
             switch (component) {
-                case "Management":
+                case "Gestão":
                     return managementAuthenticatedRoutes;
-                case "Monitoring":
+                case "Monitorização":
                     return monitoringAuthenticatedRoutes;
-                case "Data":
+                case "Dados":
                     return dataManagementAuthenticatedRoutes;
             }
         })(this.props.component);

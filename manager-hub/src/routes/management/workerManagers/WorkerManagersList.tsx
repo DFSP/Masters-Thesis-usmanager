@@ -54,7 +54,7 @@ class WorkerManagersList extends BaseComponent<Props, {}> {
             <CardList<IWorkerManager>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No worker-managers to display"}
+                emptyMessage={"Não existem gestores locais a executar"}
                 list={this.props.workerManagers}
                 card={this.workerManager}
                 predicate={this.predicate}/>

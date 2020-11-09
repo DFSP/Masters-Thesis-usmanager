@@ -150,7 +150,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Simulated container metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedContainerMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -160,11 +160,11 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedContainerMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Unable to save simulated container metric <b>${simulatedContainerMetric.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas <b>${simulatedContainerMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric have been saved</span>`);
+        super.toast(`<span class="green-text">As mudanças à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foram guardadas</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedContainerMetric = this.getSimulatedContainerMetric();
         if (previousSimulatedContainerMetric.id) {
@@ -177,17 +177,17 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Unable to update ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
-        super.toast(`<span class="green-text">Simulated container metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/simulated-metrics/Containers`);
+            this.props.history.push(`/métricas simuladas/contentores`);
         }
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void =>
-        super.toast(`Unable to delete ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedContainersIds.length;
@@ -229,7 +229,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveContainersFailure = (simulatedMetric: ISimulatedContainerMetric, reason: string): void =>
-        super.toast(`Unable to save containers of simulated container metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os contentores associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
         simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
@@ -301,10 +301,10 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                  label='field'
                                                  type='dropdown'
                                                  dropdown={{
-                                                     defaultValue: "Select field",
+                                                     defaultValue: "Selecionar o campo",
                                                      values: Object.values(this.props.fields),
                                                      optionToString: this.fieldOption,
-                                                     emptyMessage: 'No fields available'
+                                                     emptyMessage: 'Náo há campos disponíveis'
                                                  }}/>
                                 : key === 'override'
                                 ? <Field key={index}
@@ -343,13 +343,13 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Simulated metric',
+            title: 'Métricas simuladas',
             id: 'simulatedContainerMetric',
             content: () => this.simulatedContainerMetric(),
             active: this.props.location.state?.selected === 'simulatedContainerMetric'
         },
         {
-            title: 'Containers',
+            title: 'Contentores',
             id: 'containers',
             content: () => this.containers(),
             active: this.props.location.state?.selected === 'containers'

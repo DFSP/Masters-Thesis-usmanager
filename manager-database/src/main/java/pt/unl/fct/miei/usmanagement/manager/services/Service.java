@@ -40,9 +40,11 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -52,6 +54,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,9 +78,9 @@ public class Service {
 	@NotNull
 	private String dockerRepository;
 
-	private int defaultExternalPort;
+	private Integer defaultExternalPort;
 
-	private int defaultInternalPort;
+	private Integer defaultInternalPort;
 
 	private String defaultDb;
 
@@ -95,22 +98,26 @@ public class Service {
 	@NotNull
 	private ServiceTypeEnum serviceType;
 
-	private double expectedMemoryConsumption;
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Set<String> environment;
 
-	/*@NotNull
-  	private Double expectedCpuConsumption;
+	/*@ElementCollection
+	private Set<String> volumes;*/
 
+	private Double expectedMemoryConsumption;
+
+    /*private Double dockerImageSize;*/
+
+  	/*private Double expectedStorageConsumption;*/
+
+  	/*private Double expectedBandwidthConsumption;*/
+
+  	/*// Stateful services shouldn't migrate until all database replication/migration components are incorporated
   	@NotNull
-  	private Double expectedStorageConsumption;
+  	private boolean stateful;*/
 
-  	@NotNull
-  	private Double expectedBandwidthConsumption;
-
-  	// Stateful services shouldn't migrate until all database replication/migration components are incorporated
-  	@NotNull
-  	private boolean stateful;
-
-  	/*@Singular
+  	/*// Affinities to maybe dynamically calculate the dependencies
+  	@Singular
   	@JsonIgnore
   	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   	@JoinTable(name = "service_affinity",

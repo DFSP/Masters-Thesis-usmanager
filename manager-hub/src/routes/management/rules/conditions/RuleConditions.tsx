@@ -30,8 +30,8 @@ import RuleConditionsList from "./RuleConditionsList";
 
 const RuleConditions: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'New rule condition'}}
-                   pathname={'/rules/conditions/new_condition?new'}/>
+        <AddButton button={{text: 'Nova condição'}}
+                   pathname={'/regras/condições/nova condição?new'}/>
         <div className={`${styles.container}`}>
             <RuleConditionsList/>
         </div>

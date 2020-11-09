@@ -66,7 +66,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class='green-text'>App <b class='white-text'>${app.name}</b> successfully removed</span>`);
+        super.toast(`<span class='green-text'>A aplicação <b class='white-text'>${app.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -74,7 +74,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, app: IApp): void => {
-        super.toast(`Unable to delete <a href='/apps/${app.name}'><b>${app.name}</b></a> app`, 10000, reason, true);
+        super.toast(`Não foi possível remover a aplicação <a href='/aplicações/${app.name}'><b>${app.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,28 +84,28 @@ class AppCard extends BaseComponent<Props, State> {
         const {app} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify services'}
-                pathname={`/apps/${app.name}`}
+                option={'Modificar a lista de serviços'}
+                pathname={`/aplicações/${app.name}`}
                 selected={'services'}
                 state={app}/>,
             <LinkedContextMenuItem
-                option={'Modify rules'}
-                pathname={`/apps/${app.name}`}
+                option={'Modificar a lista de regras'}
+                pathname={`/aplicações/${app.name}`}
                 selected={'rules'}
                 state={app}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
-                pathname={`/apps/${app.name}`}
+                option={'Ver a lista de regras genéricas'}
+                pathname={`/aplicações/${app.name}`}
                 selected={'genericRules'}
                 state={app}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
-                pathname={`/apps/${app.name}`}
+                option={'Modificar a lista das métricas simuladas'}
+                pathname={`/aplicações/${app.name}`}
                 selected={'simulatedMetrics'}
                 state={app}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
-                pathname={`/apps/${app.name}`}
+                option={'Ver a lista das métricas simuladas genéricas'}
+                pathname={`/aplicações/${app.name}`}
                 selected={'genericSimulatedMetrics'}
                 state={app}/>
         ];
@@ -121,7 +121,7 @@ class AppCard extends BaseComponent<Props, State> {
         }
         return <CardApp id={`app-${app.name}`}
                         title={app.name}
-                        link={{to: {pathname: `/apps/${app.name}`, state: app}}}
+                        link={{to: {pathname: `/aplicações/${app.name}`, state: app}}}
                         height={'175px'}
                         margin={'10px 0'}
                         hoverable

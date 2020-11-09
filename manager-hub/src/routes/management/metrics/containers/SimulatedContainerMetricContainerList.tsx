@@ -91,12 +91,12 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedContainerMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedContainerMetricError || this.props.error : undefined}
-            emptyMessage={`Containers list is empty`}
+            emptyMessage={`Sem contentores associados`}
             data={this.props.simulatedMetricContainers}
             dropdown={{
                 id: 'containers',
-                title: 'Add container',
-                empty: 'No containers to add',
+                title: 'Selecionar o contentor',
+                empty: 'Não há contentores disponíveis',
                 data: this.getSelectableContainers()
             }}
             show={this.container}
@@ -164,7 +164,7 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove container`, 10000, reason, true);
+        super.toast(`Não foi possível remover o contentor`, 10000, reason, true);
 
     private getSelectableContainers = () => {
         const {containers, simulatedMetricContainers, unsavedContainersIds} = this.props;

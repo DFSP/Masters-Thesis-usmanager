@@ -85,12 +85,12 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                               emptyMessage={`Cloud hosts list is empty`}
+                               emptyMessage={`Sem hosts cloud associados`}
                                data={this.props.ruleCloudHosts}
                                dropdown={{
                                    id: 'cloudHosts',
-                                   title: 'Add cloud instance',
-                                   empty: 'No cloud instances to add',
+                                   title: 'Selecionar o host',
+                                   empty: 'Não existem instâncias cloud disponíveis',
                                    data: this.getSelectableCloudHostNames()
                                }}
                                show={this.cloudHost}
@@ -157,7 +157,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove cloud host`, 10000, reason, true);
+        super.toast(`Não foi possível remover a instância cloud`, 10000, reason, true);
 
     private getSelectableCloudHostNames = () => {
         const {cloudHosts, ruleCloudHosts, unsavedCloudHosts} = this.props;

@@ -85,12 +85,12 @@ class RuleHostConditionList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadHostRuleError || this.props.error : undefined}
-                               emptyMessage={`Conditions list is empty`}
+                               emptyMessage={`Sem condições associadas`}
                                data={this.props.ruleConditions}
                                dropdown={{
                                    id: 'conditions',
-                                   title: 'Add condition',
-                                   empty: 'No conditions to add',
+                                   title: 'Selecionar a condição',
+                                   empty: 'Não existe nenhuma condição disponível',
                                    data: this.getSelectableConditionNames()
                                }}
                                show={this.condition}
@@ -134,7 +134,7 @@ class RuleHostConditionList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/rules/conditions/${condition}`}
+                    <Link to={`/regras/condições/${condition}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -157,7 +157,7 @@ class RuleHostConditionList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove condition`, 10000, reason, true);
+        super.toast(`Não foi possível remover a condição`, 10000, reason, true);
 
     private getSelectableConditionNames = () => {
         const {conditions, ruleConditions, unsavedConditions} = this.props;

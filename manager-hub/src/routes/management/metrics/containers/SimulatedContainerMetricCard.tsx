@@ -65,7 +65,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedContainerMetric): void => {
-        super.toast(`<span class="green-text">Simulated container metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedContainerMetric): void => {
-        super.toast(`Unable to delete simulated container metric <a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover simulated container metric <a href=/métricas simuladas/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,8 +83,8 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
         const {simulatedContainerMetric} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify containers'}
-                pathname={`/simulated-metrics/containers/${simulatedContainerMetric.name}`}
+                option={'Alterar a lista de contentores'}
+                pathname={`/métricas simuladas/containers/${simulatedContainerMetric.name}`}
                 selected={'containers'}
                 state={simulatedContainerMetric}/>,
         ];
@@ -98,7 +98,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
                                              title={simulatedContainerMetric.name}
                                              link={{
                                                  to: {
-                                                     pathname: `/simulated-metrics/containers/${simulatedContainerMetric.name}`,
+                                                     pathname: `/métricas simuladas/containers/${simulatedContainerMetric.name}`,
                                                      state: simulatedContainerMetric
                                                  }
                                              }}

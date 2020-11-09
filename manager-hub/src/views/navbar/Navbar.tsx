@@ -113,7 +113,7 @@ class Navbar extends React.Component<Props, State> {
                             </a>}
                             <ul className="left">
                                 <li style={logoStyle} className={'hide-on-med-and-down'}>
-                                    <Link className="transparent brand-logo" to={"/home"}>
+                                    <Link className="transparent brand-logo" to={"/gestor"}>
                                         <img src={logo} alt=""/>
                                         Manager hub
                                     </Link>
@@ -128,7 +128,7 @@ class Navbar extends React.Component<Props, State> {
                                         value={this.props.component}
                                         onChange={this.changeComponent}
                                         dropdown={{
-                                            defaultValue: 'Component',
+                                            defaultValue: 'Componente',
                                             values: components,
                                             optionToString: this.componentOption
                                         }}>
@@ -152,7 +152,7 @@ class Navbar extends React.Component<Props, State> {
                                 </li>
                                 {!loggingIn && <li>
                                     <a className="red-text text-darken-4" onClick={this.handleLogout}>
-                                        <i className="material-icons right">logout</i> Logout
+                                        <i className="material-icons right">logout</i> Sair
                                     </a>
                                 </li>}
                             </ul>
@@ -183,7 +183,7 @@ class Navbar extends React.Component<Props, State> {
     private changeComponent = (e: React.FormEvent<HTMLSelectElement>) => {
         const selectedComponent = e.currentTarget.value as IComponent;
         this.props.changeComponent(selectedComponent);
-        this.props.history.push('/home');
+        this.props.history.push('/gestor');
     }
 }
 

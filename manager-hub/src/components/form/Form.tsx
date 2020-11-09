@@ -136,36 +136,36 @@ export const FormContext =
 
 export const requireGreaterOrEqualSize = (values: IValues, id: keyof IValues, size: number): string => {
     return values[id] === undefined || values[id] === null || values[id].length < size
-        ? `Number of ${camelCaseToSentenceCase(id as string)} must be at least ${size}`
+        ? `O número de ${camelCaseToSentenceCase(id as string)} deve ser pelo menos ${size}`
         : "";
 }
 
 export const requiredSize = (values: IValues, id: keyof IValues, size: number): string => {
     return values[id] === undefined || values[id] === null || values[id].length != size
-        ? `Number of ${camelCaseToSentenceCase(id as string)} must be ${size}`
+        ? `O número de ${camelCaseToSentenceCase(id as string)} deve ser exatamente ${size}`
         : "";
 }
 
 export const required = (values: IValues, id: keyof IValues): string => {
     return values[id] === undefined || values[id] === null || values[id] === ""
-        ? `${camelCaseToSentenceCase(id as string)} is required`
+        ? `${camelCaseToSentenceCase(id as string)} é obrigatório`
         : "";
 }
 
 export const notAllowed = (values: IValues, id: keyof IValues, args: any[]): string =>
     args.indexOf(values[id].toLowerCase()) !== -1
-        ? `${values[id]} is not allowed`
+        ? `${values[id]} não é permitido`
         : "";
 
 export const notValid = (values: IValues, id: keyof IValues, regularExpression: RegExp, name: string): string =>
     !regularExpression.test(String(values[id]).toLowerCase())
-        ? `${values[id]} is not a valid ${name}`
+        ? `${values[id]} não é um válido ${name}`
         : "";
 
 export const notValidIpAddress = (values: IValues, id: keyof IValues): string =>
     notValid(values, id,
         /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-        'ip address');
+        'endereço ip');
 
 export const notValidEmail = (values: IValues, id: keyof IValues): string =>
     notValid(values, id,
@@ -174,32 +174,32 @@ export const notValidEmail = (values: IValues, id: keyof IValues): string =>
 
 export const lengthLimit = (values: IValues, id: keyof IValues, size: number): string =>
     values[id].length > size
-        ? `Limited to ${size} characters`
+        ? `Máximo de ${size} caracteres`
         : "";
 
 export const trimmed = (values: IValues, id: keyof IValues): string =>
     typeof values[id] === 'string' && (values[id].startsWith(" ") || values[id].endsWith(" "))
-        ? `${camelCaseToSentenceCase(id as string)} can't start or end with spaces`
+        ? `${camelCaseToSentenceCase(id as string)} não pode começar nem acabar com espaços`
         : "";
 
 export const min = (values: IValues, id: keyof IValues, args: number): string =>
     values[id] < args
-        ? `Required minimum value of ${args}`
+        ? `Mínimo de ${args}`
         : "";
 
 export const max = (values: IValues, id: keyof IValues, args: number): string =>
     values[id] > args
-        ? `Required maximum value of ${args}`
+        ? `Máximo de ${args}`
         : "";
 
 export const number = (values: IValues, id: keyof IValues): string =>
     getTypeFromValue(values[id]) !== 'number'
-        ? `${camelCaseToSentenceCase(id as string)} is a number`
+        ? `${camelCaseToSentenceCase(id as string)} deve ser um número`
         : "";
 
 export const maxSize = (values: IValues, id: keyof IValues, args: any) =>
     values[id] && values[id].length >= args
-        ? `Limit of ${args} characters`
+        ? `Máximo de ${args} caracteres`
         : "";
 
 export const maxSizeAndTrimmed = (values: IValues, id: keyof IValues, args: any) =>
@@ -316,7 +316,7 @@ class Form extends BaseComponent<Props, State> {
                                     <>
                                         <button
                                             className={`dropdown-trigger btn-floating btn-flat btn-small right`}
-                                            data-for='dark-tooltip' data-tip={switchDropdown.title || 'Switch form'} data-place='bottom'
+                                            data-for='dark-tooltip' data-tip={switchDropdown.title || 'Alterar formulário'} data-place='bottom'
                                             data-target={`switch-dropdown`}
                                             type={'button'}
                                             ref={this.dropdown}>
@@ -326,7 +326,7 @@ class Form extends BaseComponent<Props, State> {
                                             className={`dropdown-content ${styles.dropdown}`}>
                                             <li className={`${styles.disabled}`}>
                                                 <a>
-                                                    {switchDropdown.title || 'Switch form'}
+                                                    {switchDropdown.title || 'Selecionar o tipo de formulário'}
                                                 </a>
                                             </li>
                                             <PerfectScrollbar ref={(ref) => {
@@ -347,7 +347,7 @@ class Form extends BaseComponent<Props, State> {
                                     ?
                                     <button
                                         className={`${styles.controlButton} btn-flat btn-small green-text left slide`}>
-                                        {this.props.post?.textButton || 'Save'}
+                                        {this.props.post?.textButton || 'Guardar'}
                                     </button>
                                     :
                                     <>
@@ -376,13 +376,13 @@ class Form extends BaseComponent<Props, State> {
                                                     /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
                                                     /*style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}*/
                                                     disabled={!saveRequired}>
-                                                    {(editable !== undefined && this.props.post?.textButton) || 'Save'}
+                                                    {(editable !== undefined && this.props.post?.textButton) || 'Guardar'}
                                                 </button>)}
                                         </div>
                                         {editable !== undefined && !loading && (
                                             <button
                                                 className={`btn-floating btn-flat btn-small right inline-button`}
-                                                data-for='dark-tooltip' data-tip="Edit" data-place='bottom'
+                                                data-for='dark-tooltip' data-tip="Editar" data-place='bottom'
                                                 type="button"
                                                 onClick={this.onClickEdit}>
                                                 <i className={`large material-icons ${this.state.isEditing ? (this.state.isValid ? 'green-text' : 'red-text') : ''}`}>edit</i>

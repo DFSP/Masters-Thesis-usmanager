@@ -152,7 +152,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Simulated service metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/serviços/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedServiceMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -162,11 +162,11 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, simulatedServiceMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to save simulated service metric <b>${simulatedServiceMetric.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a métrica simulada <b>${simulatedServiceMetric.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/serviços/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedServiceMetric = this.getSimulatedServiceMetric();
         if (previousSimulatedServiceMetric.id) {
@@ -179,17 +179,17 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to update simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/serviços/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
-        super.toast(`<span class="green-text">Simulated service metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/simulated-metrics/Services`);
+            this.props.history.push(`/métricas simuladas/Services`);
         }
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedServiceMetric): void =>
-        super.toast(`Unable to delete simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/serviços/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedServices.length;
@@ -227,7 +227,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (simulatedMetric: ISimulatedServiceMetric, reason: string): void =>
-        super.toast(`Unable to save services of simulated service metric ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os serviços associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/serviços/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
         simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
@@ -302,10 +302,10 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                                  label='field'
                                                  type='dropdown'
                                                  dropdown={{
-                                                     defaultValue: "Select field",
+                                                     defaultValue: "Selecionar o campo",
                                                      values: Object.values(this.props.fields),
                                                      optionToString: this.fieldOption,
-                                                     emptyMessage: 'No fields available'
+                                                     emptyMessage: 'Náo há campos disponíveis'
                                                  }}/>
                                 : key === 'minimumValue' || key === 'maximumValue'
                                 ? <Field key={index}
@@ -347,13 +347,13 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Simulated metric',
+            title: 'Métricas simuladas',
             id: 'simulatedServiceMetric',
             content: () => this.simulatedServiceMetric(),
             active: this.props.location.state?.selected === 'simulatedServiceMetric'
         },
         {
-            title: 'Services',
+            title: 'Serviços',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,

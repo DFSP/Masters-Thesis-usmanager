@@ -65,7 +65,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleContainer: IRuleContainer): void => {
-        super.toast(`<span class="green-text">Container rule <b class="white-text">${ruleContainer.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleContainer.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleContainer: IRuleContainer): void => {
-        super.toast(`Unable to delete container rule <a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href=/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,13 +83,13 @@ class RuleContainerCard extends BaseComponent<Props, State> {
         const {rule} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify conditions'}
-                pathname={`/rules/containers/${rule.name}`}
+                option={'Modificar as condições associadas'}
+                pathname={`/regras/contentores/${rule.name}`}
                 selected={'ruleConditions'}
                 state={rule}/>,
             <LinkedContextMenuItem
-                option={'Modify containers'}
-                pathname={`/rules/containers/${rule.name}`}
+                option={'Modificar a lista de contentores'}
+                pathname={`/regras/contentores/${rule.name}`}
                 selected={'containers'}
                 state={rule}/>
         ];
@@ -101,7 +101,7 @@ class RuleContainerCard extends BaseComponent<Props, State> {
         const CardRuleContainer = Card<IRuleContainer>();
         return <CardRuleContainer id={`container-rule-${rule.id}`}
                                   title={rule.name}
-                                  link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
+                                  link={{to: {pathname: `/regras/containers/${rule.name}`, state: rule}}}
                                   height={'85px'}
                                   margin={'10px 0'}
                                   hoverable

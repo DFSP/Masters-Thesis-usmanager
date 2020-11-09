@@ -63,16 +63,16 @@ class Containers extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton button={{text: 'Start container'}}
-                           pathname={'/containers/start_container?new'}/>
+                <AddButton button={{text: 'Executar contentor'}}
+                           pathname={'/contentores/executar?new'}/>
                 <ActionButton icon={'sync'}
-                              tooltip={{text: 'Sync containers', position: 'bottom'}}
+                              tooltip={{text: 'Sincronizar contentores da base de dados com o docker swarm', position: 'bottom'}}
                               clickCallback={this.reloadContainers}/>
                 <div className={`${styles.container}`}>
                     <CardList<IContainer>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"No containers to display"}
+                        emptyMessage={"Não há contentores para mostrar"}
                         list={this.props.containers}
                         card={this.container}
                         predicate={this.predicate}/>

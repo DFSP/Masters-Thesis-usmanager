@@ -54,13 +54,13 @@ class Regions extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                {/*<AddButton tooltip={{text: 'Add region', position: 'left'}}
-                           pathname={'/regions/new_region?new'}/>*/}
+                {/*<AddButton tooltip={{text: 'Adicionar região', position: 'left'}}
+                           pathname={'/regiões/nova região?new'}/>*/}
                 <div className={`${styles.container}`}>
                     <CardList<IRegion>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"No regions to display"}
+                        emptyMessage={"Nenhuma região para mostrar"}
                         list={this.props.regions}
                         card={this.region}
                         predicate={this.predicate}/>

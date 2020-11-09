@@ -201,7 +201,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ICloudHost>): void => {
         const cloudHost = reply.data;
-        super.toast(`<span class="green-text">Cloud instance ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} has started</span>`);
+        super.toast(`<span class="green-text">Uma nova instância com o id ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} foi configurada com sucesso</span>`);
         this.props.addCloudHost(cloudHost);
         this.saveEntities(cloudHost);
         if (this.mounted) {
@@ -211,7 +211,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Unable to start a new cloud instance`, 10000, reason, true);
+        super.toast(`Não foi possível configurar uma instância nova`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -251,7 +251,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (cloudHost: ICloudHost, reason: string): void =>
-        super.toast(`Unable to save rules of instance ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} `, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas à instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} `, 10000, reason, true);
 
     private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
         this.setState({
@@ -282,7 +282,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (cloudHost: ICloudHost, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of instance ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas à instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
 
     private startStopTerminateButtons = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -335,7 +335,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStartSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -346,7 +346,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Failed to start ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+        super.toast(`Não foi possível começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -362,7 +362,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStopSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">Successfully stopped ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} foi parada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -454,7 +454,7 @@ class CloudHost extends BaseComponent<Props, State> {
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
                               url: 'hosts/cloud',
-                              textButton: isNewCloudHost ? 'launch' : 'save',
+                              textButton: isNewCloudHost ? 'Executar' : 'Guardar',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
@@ -548,31 +548,31 @@ class CloudHost extends BaseComponent<Props, State> {
     private tabs = (): Tab[] => {
         const tabs = [
             {
-                title: 'Cloud host',
+                title: 'Instância cloud',
                 id: 'cloudHost',
                 content: () => this.cloudHost(),
                 active: this.props.location.state?.selected === 'cloudHost'
             },
             {
-                title: 'Rules',
+                title: 'Regras',
                 id: 'rules',
                 content: () => this.rules(),
                 active: this.props.location.state?.selected === 'rules'
             },
             {
-                title: 'Generic rules',
+                title: 'Regras genéricas',
                 id: 'genericRules',
                 content: () => this.genericRules(),
                 active: this.props.location.state?.selected === 'genericRules'
             },
             {
-                title: 'Simulated metrics',
+                title: 'Métricas simuladas',
                 id: 'simulatedMetrics',
                 content: () => this.simulatedMetrics(),
                 active: this.props.location.state?.selected === 'simulatedMetrics'
             },
             {
-                title: 'Generic simulated metrics',
+                title: 'Métricas simuladas genéricas',
                 id: 'genericSimulatedMetrics',
                 content: () => this.genericSimulatedMetrics(),
                 active: this.props.location.state?.selected === 'genericSimulatedMetrics'
@@ -580,13 +580,13 @@ class CloudHost extends BaseComponent<Props, State> {
         ];
         if (isEqual(this.getCloudHost().state, awsInstanceStates.RUNNING)) {
             tabs.push({
-                title: 'Execute command',
+                title: 'Executar comandos',
                 id: 'ssh',
                 content: () => this.ssh(),
                 active: this.props.location.state?.selected === 'ssh'
             });
             tabs.push({
-                title: 'Upload file',
+                title: 'Carregar ficheiros',
                 id: 'sftp',
                 content: () => this.sftp(),
                 active: this.props.location.state?.selected === 'sftp'

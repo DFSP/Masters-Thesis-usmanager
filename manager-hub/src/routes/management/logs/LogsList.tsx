@@ -68,8 +68,8 @@ class LogsList extends React.Component<Props, {}> {
             <>
                 <ActionButton icon={'cached'}
                               tooltip={{
-                                  activatedText: 'Deactivate automatic reload',
-                                  deactivatedText: 'Activate automatic reload every 15s',
+                                  activatedText: 'Desativar carregamento periódico',
+                                  deactivatedText: 'Ativar carregamento periódico a cada 15 segundos',
                                   position: 'bottom'
                               }}
                               clickCallback={this.onReloadClick}
@@ -78,11 +78,11 @@ class LogsList extends React.Component<Props, {}> {
                     <LogsList
                         isLoading={!this.reloadLogs && isLoading}
                         error={error}
-                        emptyMessage={'No logs to show'}
+                        emptyMessage={'Não há logs para mostrar'}
                         list={logs}
                         show={this.log}
                         paginate={{
-                            pagesize: {initial: 25, options: [5, 10, 25, 50, 100, 'Everything']},
+                            pagesize: {initial: 25, options: [5, 10, 25, 50, 100, 'Tudo']},
                             page: {last: true},
                             position: 'top-bottom'
                         }}

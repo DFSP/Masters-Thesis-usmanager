@@ -65,7 +65,7 @@ class SimulatedAppMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedAppMetric): void => {
-        super.toast(`<span class="green-text">Simulated app metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class SimulatedAppMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedAppMetric): void => {
-        super.toast(`Unable to delete simulated app metric <a href=/simulated-metrics/Apps/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada <a href=/métricas simuladas/aplicações/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,8 +83,8 @@ class SimulatedAppMetricCard extends BaseComponent<Props, State> {
         const {simulatedAppMetric} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify apps'}
-                pathname={`/simulated-metrics/apps/${simulatedAppMetric.name}`}
+                option={'Alterar a lista de aplicações'}
+                pathname={`/métricas simuladas/aplicações/${simulatedAppMetric.name}`}
                 selected={'apps'}
                 state={simulatedAppMetric}/>,
         ];
@@ -98,7 +98,7 @@ class SimulatedAppMetricCard extends BaseComponent<Props, State> {
                                        title={simulatedAppMetric.name}
                                        link={{
                                            to: {
-                                               pathname: `/simulated-metrics/apps/${simulatedAppMetric.name}`,
+                                               pathname: `/métricas simuladas/aplicações/${simulatedAppMetric.name}`,
                                                state: simulatedAppMetric
                                            }
                                        }}

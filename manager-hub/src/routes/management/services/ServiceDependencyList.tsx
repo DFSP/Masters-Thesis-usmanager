@@ -92,12 +92,12 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-                               emptyMessage={`Dependencies list is empty`}
+                               emptyMessage={`Nenhuma dependência`}
                                data={this.props.dependencies}
                                dropdown={{
                                    id: 'dependencies',
-                                   title: 'Add dependency',
-                                   empty: 'No dependencies to add',
+                                   title: 'Selecionar a dependência',
+                                   empty: 'Não existem aplicações disponíveis',
                                    data: this.getSelectableServicesNames()
                                }}
                                show={this.dependency}
@@ -142,7 +142,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/services/${dependency}`}
+                    <Link to={`/serviços/${dependency}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -165,7 +165,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to delete dependency`, 10000, reason, true);
+        super.toast(`Não foi possível remover a dependência`, 10000, reason, true);
 
     private getSelectableServicesNames = () => {
         const {services, service, dependencies, unsavedDependencies} = this.props;

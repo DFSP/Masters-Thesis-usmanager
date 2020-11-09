@@ -100,8 +100,8 @@ class Services extends BaseComponent<Props, State> {
         const {selectedApp} = this.state;
         return (
             <MainLayout>
-                <AddButton button={{text: 'New service'}}
-                           pathname={'/services/new_service?new'}/>
+                <AddButton button={{text: 'Novo serviço'}}
+                           pathname={'/serviços/novo serviço?new'}/>
                 {Object.keys(this.props.apps).length > 0 &&
                 <div className={styles.filterDropdown}>
                     <a className={`btn-flat red-text ${styles.clearButton}`} onClick={this.clearFilter}>
@@ -113,8 +113,8 @@ class Services extends BaseComponent<Props, State> {
                         value={this.state.selectedApp}
                         onChange={this.onChangeServicesFilter}
                         dropdown={{
-                            defaultValue: 'Filter by app',
-                            emptyMessage: 'No services to filter',
+                            defaultValue: 'Filtrar por aplicação',
+                            emptyMessage: 'Nenhuma aplicação encontrada',
                             values: ['System', ...Object.keys(this.props.apps)],
                         }}>
                     </Dropdown>
@@ -123,7 +123,7 @@ class Services extends BaseComponent<Props, State> {
                     <CardList<IService>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={selectedApp? `No services to display for ${selectedApp}` : "No services to display"}
+                        emptyMessage={selectedApp? `A aplicação ${selectedApp} não tem nenhum serviço associado` : "Sem serviços para mostrar"}
                         list={this.filteredServices()}
                         card={this.service}
                         predicate={this.predicate}/>

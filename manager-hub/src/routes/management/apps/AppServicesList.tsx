@@ -137,13 +137,13 @@ class AppServiceList extends BaseComponent<Props, State> {
             ref={this.controlledList}
             isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadAppError || this.props.error : undefined}
-            emptyMessage={`Services list is empty`}
+            emptyMessage={`Sem serviços associadas`}
             data={this.state.appServices}
             dataKey={['service', 'serviceName']}
             dropdown={{
                 id: 'appServices',
-                title: 'Add service',
-                empty: 'No services to add',
+                title: 'Selecionar o serviço',
+                empty: 'Não há serviços disponíveis',
                 data: this.getSelectableServicesNames(),
                 onSelect: this.onDropdownSelect,
                 formModal: {
@@ -201,7 +201,7 @@ class AppServiceList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/services/${serviceName}`}
+                    <Link to={`/serviços/${serviceName}`}
                           className={`${listItemStyles.link}`}>
                         <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -237,7 +237,7 @@ class AppServiceList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, services?: string[]): void =>
-        super.toast(`Unable to remove ${services?.length === 1 ? services[0] : 'services'} from <b>${this.props.app?.name}</b> app`, 10000, reason, true);
+        super.toast(`Não foi possível remover ${services?.length === 1 ? 'o serviço ' + services[0] : 'os serviços'} da aplicação <b>${this.props.app?.name}</b>`, 10000, reason, true);
 
     private getSelectableServicesNames = () => {
         const {appServices, services, unsavedServices} = this.props;

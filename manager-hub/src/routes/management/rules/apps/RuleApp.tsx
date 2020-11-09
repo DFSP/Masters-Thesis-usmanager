@@ -143,7 +143,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">App rule ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleApp(ruleApp);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -153,11 +153,11 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleApp: IRuleApp): void =>
-        super.toast(`Unable to save app rule <b>${ruleApp.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra <b>${ruleApp.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`} app rule have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleApp);
         const previousRuleApp = this.getRuleApp();
         if (previousRuleApp?.id) {
@@ -170,17 +170,17 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleApp: IRuleApp): void =>
-        super.toast(`Unable to update app rule ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleApp: IRuleApp): void => {
-        super.toast(`<span class="green-text">App rule <b class="white-text">${ruleApp.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleApp.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/rules/apps`);
+            this.props.history.push(`/regras/aplicações`);
         }
     };
 
     private onDeleteFailure = (reason: string, ruleApp: IRuleApp): void =>
-        super.toast(`Unable to delete app rule ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -206,7 +206,7 @@ class RuleApp extends BaseComponent<Props, State> {
     private saveRuleConditions = (rule: IRuleApp): void => {
         const {unsavedConditions} = this.state;
         if (unsavedConditions.length) {
-            postData(`rules/apps/${rule.name}/conditions`, unsavedConditions,
+            postData(`rules/aplicações/${rule.name}/conditions`, unsavedConditions,
                 () => this.onSaveConditionsSuccess(rule),
                 (reason) => this.onSaveConditionsFailure(rule, reason));
         }
@@ -220,7 +220,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleApp: IRuleApp, reason: string): void =>
-        super.toast(`Unable to save conditions of app rule ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleApp = (app: string): void =>
         this.setState({
@@ -250,7 +250,7 @@ class RuleApp extends BaseComponent<Props, State> {
     };
 
     private onSaveAppsFailure = (ruleApp: IRuleApp, reason: string): void =>
-        super.toast(`Unable to save apps of app rule ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as aplicações associadas à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleApp = (ruleApp: IRuleApp) => {
         ruleApp = Object.values(normalize(ruleApp, Schemas.RULE_APP).entities.appRules || {})[0];
@@ -326,10 +326,10 @@ class RuleApp extends BaseComponent<Props, State> {
                                                     label={key}
                                                     type="dropdown"
                                                     dropdown={{
-                                                        defaultValue: "Choose decision",
+                                                        defaultValue: "Selecionar a decisão",
                                                         values: this.getSelectableDecisions(),
                                                         optionToString: this.decisionDropdownOption,
-                                                        emptyMessage: 'No decisions available'
+                                                        emptyMessage: 'Não há nenhuma decisão disponível'
                                                     }}/>
                                 : <Field key={index}
                                          id={key}
@@ -360,19 +360,19 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'App rule',
+            title: 'Regra',
             id: 'appRule',
             content: () => this.appRule(),
             active: this.props.location.state?.selected === 'appRule'
         },
         {
-            title: 'Conditions',
+            title: 'Condições',
             id: 'ruleConditions',
             content: () => this.conditions(),
             active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
-            title: 'Apps',
+            title: 'Aplicações',
             id: 'apps',
             content: () => this.apps(),
             active: this.props.location.state?.selected === 'apps'

@@ -301,7 +301,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     private onAddFormModalInput = (input: any): void => {
         const key = this.getDataStateKey(input);
         if (Object.keys(this.state).includes(key)) {
-            return super.toast(`Unable to add ${key}`, 10000, 'already exists');
+            return super.toast(`Não foi possível adicionar ${key}`, 10000, 'porque já existe uma entidade com a mesma chave');
         }
         this.setState({[key]: {value: input, isChecked: false, isNew: true}});
         this.props.onAddInput?.(input);

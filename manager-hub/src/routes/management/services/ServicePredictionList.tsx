@@ -106,7 +106,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
         return <ControlledList<IPrediction>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
-            emptyMessage='Predictions list is empty'
+            emptyMessage='Sem previsões agendadas'
             data={this.props.predictions}
             dataKey={['name']}
             formModal={{
@@ -188,7 +188,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to delete prediction`, 10000, reason, true);
+        super.toast(`Não foi possível remover prediction`, 10000, reason, true);
 
     private getFields = (): IFields =>
         Object.entries(emptyPrediction()).map(([key, value]) => {

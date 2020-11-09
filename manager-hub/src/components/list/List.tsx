@@ -41,7 +41,7 @@ interface ListProps<T> {
     paginate?: {
         pagesize: {
             initial: number,
-            options?: ('Everything' | number)[],
+            options?: ('Tudo' | number)[],
         },
         page?: {
             index?: number,

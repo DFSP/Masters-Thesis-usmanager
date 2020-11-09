@@ -152,7 +152,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">Service rule ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} saved</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleService(ruleService);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -162,11 +162,11 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to save service rule<b>${ruleService.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a regra <b>${ruleService.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule have been saved</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleService);
         const previousRuleService = this.getRuleService();
         if (previousRuleService?.id) {
@@ -179,17 +179,17 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to update service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as alterações feitas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
-        super.toast(`<span class="green-text">Service rule <b class="white-text">${ruleService.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleService.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/rules/services`);
+            this.props.history.push(`/regras/serviços`);
         }
     };
 
     private onDeleteFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Unable to delete service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -229,7 +229,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Unable to save conditions of service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleService = (service: string): void =>
         this.setState({
@@ -259,7 +259,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Unable to save services of service rule ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os serviços associados à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleService = (ruleService: IRuleService) => {
         ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
@@ -338,10 +338,10 @@ class RuleService extends BaseComponent<Props, State> {
                                                     label={key}
                                                     type="dropdown"
                                                     dropdown={{
-                                                        defaultValue: "Choose decision",
+                                                        defaultValue: "Selecionar a decisão",
                                                         values: this.getSelectableDecisions(),
                                                         optionToString: this.decisionDropdownOption,
-                                                        emptyMessage: 'No decisions available'
+                                                        emptyMessage: 'Não há decisões disponíveis'
                                                     }}/>
                                 : key === 'generic'
                                 ? <Field key={index}
@@ -377,19 +377,19 @@ class RuleService extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Service rule',
+            title: 'Regra',
             id: 'serviceRule',
             content: () => this.serviceRule(),
             active: this.props.location.state?.selected === 'serviceRule'
         },
         {
-            title: 'Conditions',
+            title: 'Condições',
             id: 'ruleConditions',
             content: () => this.conditions(),
             active: this.props.location.state?.selected === 'ruleConditions'
         },
         {
-            title: 'Services',
+            title: 'Serviços',
             id: 'services',
             content: () => this.services(),
             disabled: this.state.isGeneric,

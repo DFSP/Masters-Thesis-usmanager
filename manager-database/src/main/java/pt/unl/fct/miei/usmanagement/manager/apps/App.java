@@ -66,6 +66,7 @@ public class App {
 	@Column(unique = true)
 	private String name;
 
+	@Column(length = 1024)
 	private String description;
 
 	@Singular

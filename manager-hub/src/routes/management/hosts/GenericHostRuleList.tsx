@@ -56,7 +56,7 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
         return (
             <RulesList isLoading={this.props.isLoading}
                        error={this.props.error}
-                       emptyMessage={`Generic host rules list is empty`}
+                       emptyMessage={`Não há nenhuma regra que se aplique a todos os hosts`}
                        list={this.props.genericHostRules}
                        show={this.rule}/>
         );
@@ -67,7 +67,7 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
             <div className={`${styles.linkedItemContent}`}>
                 <span>{rule}</span>
             </div>
-            <Link to={`/rules/hosts/${rule}`}
+            <Link to={`/regras/hosts/${rule}`}
                   className={`${styles.link}`}>
                 <i className={`${styles.linkIcon} material-icons right`}>link</i>
             </Link>

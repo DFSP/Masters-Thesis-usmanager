@@ -90,14 +90,14 @@ export default class LocationMap extends React.Component<Props, State> {
     private buttons = (tooltipPosition: string) => (
         <>
             <button className={`btn-floating btn-flat right`}
-                    data-for='dark-tooltip' data-tip="Center" data-place={tooltipPosition}
+                    data-for='dark-tooltip' data-tip="Centrar" data-place={tooltipPosition}
                     onClick={this.handleCenter}
                     type='button'>
                 <i className="material-icons">center_focus_weak</i>;
             </button>
             {this.props.onClear &&
             <button className={`btn-floating btn-flat right`}
-                    data-for='dark-tooltip' data-tip="Clear" data-place={tooltipPosition}
+                    data-for='dark-tooltip' data-tip="Limpar" data-place={tooltipPosition}
                     onClick={this.props.onClear}
                     type='button'>
                 <i className="material-icons">clear_all</i>;
@@ -137,7 +137,7 @@ export default class LocationMap extends React.Component<Props, State> {
             {resizable &&
             <>
                 <button className={`modal-trigger btn-floating btn-flat right`}
-                        data-for='button-tooltip' data-tip="Fullscreen" data-place={'top'}
+                        data-for='button-tooltip' data-tip="Ecrã inteiro" data-place={'top'}
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className="material-icons">fullscreen</i>

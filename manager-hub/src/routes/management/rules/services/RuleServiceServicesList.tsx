@@ -85,12 +85,12 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
-                               emptyMessage={`Services list is empty`}
+                               emptyMessage={`Sem serviços associadas`}
                                data={this.props.ruleServices}
                                dropdown={{
                                    id: 'services',
-                                   title: 'Add service',
-                                   empty: 'No services to add',
+                                   title: 'Selecionar o serviço',
+                                   empty: 'Não existe nenhum serviço disponível',
                                    data: this.getSelectableServiceNames()
                                }}
                                show={this.service}
@@ -134,7 +134,7 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/services/${service}`}
+                    <Link to={`/serviços/${service}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -157,7 +157,7 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove service`, 10000, reason, true);
+        super.toast(`Não foi possível remover o serviço`, 10000, reason, true);
 
     private getSelectableServiceNames = () => {
         const {services, ruleServices, unsavedServices} = this.props;

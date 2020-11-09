@@ -87,12 +87,12 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
-            emptyMessage={`Containers list is empty`}
+            emptyMessage={`Sem contentores associados`}
             data={this.props.ruleContainers}
             dropdown={{
                 id: 'containers',
-                title: 'Add container',
-                empty: 'No containers to add',
+                title: 'Selecionar o contentor',
+                empty: 'Não existem contentor disponíveis',
                 data: this.getSelectableContainers()
             }}
             show={this.container}
@@ -137,7 +137,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/containers/${container}`}
+                    <Link to={`/contentores/${container}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -160,7 +160,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove container`, 10000, reason, true);
+        super.toast(`Não foi possível remove o contentor`, 10000, reason, true);
 
     private getSelectableContainers = () => {
         const {containers, ruleContainers, unsavedContainersIds} = this.props;

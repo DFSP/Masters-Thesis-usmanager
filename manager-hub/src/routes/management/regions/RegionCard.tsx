@@ -64,7 +64,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">Region <b class="white-text">${region.region}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A região <b class="white-text">${region.region}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -72,7 +72,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }*/
 
     /*private onDeleteFailure = (reason: string, region: IRegion): void => {
-        super.toast(`Unable to delete region <a href=/regions/${region.region}><b>${region.region}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a região <a href=/regiões/${region.region}><b>${region.region}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

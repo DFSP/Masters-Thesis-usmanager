@@ -63,12 +63,12 @@ class Ssh extends React.Component<Props, {}> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Execute command',
+            title: 'Executar comandos',
             id: 'executeCommand',
             content: () => <SshCommand onExecuteCommand={this.addCommand}/>
         },
         {
-            title: 'Upload file',
+            title: 'Carregar ficheiros',
             id: 'uploadFile',
             content: () => <SshFile onTransferFile={this.addFileTransfer}/>
         }

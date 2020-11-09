@@ -99,7 +99,7 @@ class Landing extends React.Component<Props, State> {
         const centerButton =
             <>
                 <button className={`btn-floating btn-flat right ${styles.centerButton}`}
-                        data-for='tooltip' data-tip='Center' data-place='bottom'
+                        data-for='tooltip' data-tip='Centrar' data-place='bottom'
                         onClick={this.handleCenter}
                         type='button'>
                     <i className='material-icons'>center_focus_weak</i>;
@@ -112,7 +112,7 @@ class Landing extends React.Component<Props, State> {
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
                 <button className={`modal-trigger btn-floating btn-flat right`}
-                        data-for='tooltip' data-tip='Fullscreen' data-place='bottom'
+                        data-for='tooltip' data-tip='Ecrã inteiro' data-place='bottom'
                         data-target={'fullscreen-modal'}
                         type='button'>
                     <i className='material-icons'>fullscreen</i>
@@ -121,7 +121,7 @@ class Landing extends React.Component<Props, State> {
             </div>
             <MainLayout>
                 <Dialog id={'fullscreen-modal'}
-                        title={'Microservices dynamic system management'}
+                        title={'Gestão dinâmica de microservicos na cloud e edge'}
                         fullscreen
                         locked
                         footer={false}

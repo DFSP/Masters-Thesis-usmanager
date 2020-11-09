@@ -55,13 +55,13 @@ class Nodes extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
-                <AddButton button={{text: 'Add node'}}
-                           pathname={'/nodes/new_node?new'}/>
+                <AddButton button={{text: 'Adicionar nó'}}
+                           pathname={'/nós/novo nó?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<INode>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"No nodes to display"}
+                        emptyMessage={"O swarm está vazio. Nenhum nó para mostrar"}
                         list={this.props.nodes}
                         card={this.node}
                         predicate={this.predicate}/>

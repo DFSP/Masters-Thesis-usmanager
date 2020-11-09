@@ -90,10 +90,10 @@ class SshCommand extends BaseComponent<Props, {}> {
                                               label='hostAddress'
                                               type='dropdown'
                                               dropdown={{
-                                                  defaultValue: 'Select host address',
+                                                  defaultValue: 'Selecionar endereço',
                                                   values: this.getSelectableHosts(),
                                                   optionToString: this.hostAddressesDropdown,
-                                                  emptyMessage: 'No hosts available'
+                                                  emptyMessage: 'Nenhum host disponível'
                                               }}/>
                 <Field key='command'
                        id='command'
@@ -108,7 +108,7 @@ class SshCommand extends BaseComponent<Props, {}> {
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Command execution failed`, 10000, reason, true);
+        super.toast(`A execução do comando falhou`, 10000, reason, true);
 
     private getFields = (): IFields => (
         {

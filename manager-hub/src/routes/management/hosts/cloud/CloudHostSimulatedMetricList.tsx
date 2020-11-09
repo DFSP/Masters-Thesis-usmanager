@@ -89,12 +89,12 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingCloudHost || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadCloudHostError || this.props.error : undefined}
-                               emptyMessage={`Simulated metrics list is empty`}
+                               emptyMessage={`Sem métricas simuladas associadas`}
                                data={this.props.simulatedMetricsName}
                                dropdown={{
                                    id: 'simulatedMetrics',
-                                   title: 'Add simulated metric',
-                                   empty: 'No simulated metrics to add',
+                                   title: 'Selecionar métrica simulada',
+                                   empty: 'Não há métricas simulada disponíveis',
                                    data: this.getSelectableSimulatedMetrics()
                                }}
                                show={this.simulatedMetric}
@@ -138,7 +138,7 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/simulated-metrics/hosts/${simulatedMetric}`}
+                    <Link to={`/métricas simuladas/hosts/${simulatedMetric}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -161,7 +161,7 @@ class CloudHostSimulatedMetricList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to delete simulated metric`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada`, 10000, reason, true);
 
     private getSelectableSimulatedMetrics = () => {
         const {simulatedMetrics, simulatedMetricsName, unsavedSimulatedMetrics} = this.props;

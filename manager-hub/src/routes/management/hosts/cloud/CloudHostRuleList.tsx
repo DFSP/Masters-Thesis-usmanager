@@ -85,12 +85,12 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingCloudHost || this.props.isLoading : undefined}
                                error={!isNew ? this.props.loadCloudHostError || this.props.error : undefined}
-                               emptyMessage={`Rules list is empty`}
+                               emptyMessage={`Sem regras associadas`}
                                data={this.props.rulesName}
                                dropdown={{
                                    id: 'rules',
-                                   title: 'Add host rule',
-                                   empty: 'No rules to add',
+                                   title: 'Selecionar a regra',
+                                   empty: 'Não há regras disponíveis',
                                    data: this.getSelectableRules()
                                }}
                                show={this.rule}
@@ -134,7 +134,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/rules/hosts/${rule}`}
+                    <Link to={`/regras/hosts/${rule}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -157,7 +157,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, rules?: string[]): void =>
-        super.toast(`Unable to remove ${rules?.length === 1 ? rules[0] : 'rules'} from <b>${this.props.cloudHost?.instanceId}</b> cloud instance`, 10000, reason, true);
+        super.toast(`Não foi possível remover ${rules?.length === 1 ? 'a regra ' + rules[0] : 'as regras'} da instância <b>${this.props.cloudHost?.instanceId}</b>`, 10000, reason, true);
 
     private getSelectableRules = () => {
         const {rules, rulesName, unsavedRules} = this.props;

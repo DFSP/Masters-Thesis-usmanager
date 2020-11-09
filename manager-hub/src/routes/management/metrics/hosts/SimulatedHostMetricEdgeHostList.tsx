@@ -89,12 +89,12 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
-            emptyMessage={`Edge hosts list is empty`}
+            emptyMessage={`Sem hosts edge associados`}
             data={this.props.simulatedMetricEdgeHosts}
             dropdown={{
                 id: 'edgeHosts',
-                title: 'Add edge host',
-                empty: 'No edge hosts to add',
+                title: 'Selecionar o host',
+                empty: 'Não há hosts edge disponíveis',
                 data: this.getSelectableEdgeHosts()
             }}
             show={this.edgeHost}
@@ -162,7 +162,7 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove edge host`, 10000, reason, true);
+        super.toast(`Não foi possível remover o edge host`, 10000, reason, true);
 
     private getSelectableEdgeHosts = () => {
         const {edgeHosts, simulatedMetricEdgeHosts, unsavedEdgeHosts} = this.props;

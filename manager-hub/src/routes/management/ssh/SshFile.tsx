@@ -86,31 +86,31 @@ class SshFile extends BaseComponent<Props, {}> {
                                               label='hostAddress'
                                               type='dropdown'
                                               dropdown={{
-                                                  defaultValue: 'Select host address',
+                                                  defaultValue: 'Selecionar endereço',
+                                                  emptyMessage: 'Nenhum host disponível',
                                                   values: this.getSelectableHosts(),
                                                   optionToString: this.hostAddressesDropdown,
-                                                  emptyMessage: 'No hosts available'
                                               }}/>
                 <Field key='filename'
                        id='filename'
                        label='filename'
                        type='dropdown'
                        dropdown={{
-                           defaultValue: 'Select filename',
+                           defaultValue: 'Selecionar ficheiro',
+                           emptyMessage: 'Sem ficheiros para selecionar',
                            values: this.props.scripts,
-                           emptyMessage: 'No scripts available'
                        }}/>
             </Form>
         );
     }
 
     private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
-        super.toast(`<span class="green-text">File uploaded</span>`);
+        super.toast(`<span class="green-text">Ficheiro carregado</span>`);
         this.props.onTransferFile(args);
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Failed to upload file`, 10000, reason, true);
+        super.toast(`Falha ao tentar carregar o ficheiro`, 10000, reason, true);
 
     private getFields = (): IFields => (
         {

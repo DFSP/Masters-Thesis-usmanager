@@ -305,6 +305,7 @@ public class DockerContainersService {
 
 				List<String> containerEnvironment = new LinkedList<>();
 				containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
+				containerEnvironment.addAll(service.getEnvironment());
 				containerEnvironment.addAll(environment);
 
 				Map<String, String> containerLabels = new HashMap<>();

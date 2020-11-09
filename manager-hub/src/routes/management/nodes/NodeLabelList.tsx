@@ -44,7 +44,7 @@ export default class NodeLabelsList extends BaseComponent<Props, {}> {
         return (
             <LabelsList isLoading={this.props.isLoadingNode}
                         error={this.props.loadNodeError}
-                        emptyMessage={`No labels associated`}
+                        emptyMessage={`O nó não tem nenhuma label associada`}
                         list={this.labels()}
                         show={this.label}/>
         );

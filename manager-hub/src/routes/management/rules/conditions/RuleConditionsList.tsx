@@ -54,7 +54,7 @@ class RuleConditionsList extends BaseComponent<Props, {}> {
             <CardList<IRuleCondition>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No conditions to display"}
+                emptyMessage={"Não há nenhuma condição para mostrar"}
                 list={this.props.conditions}
                 card={this.condition}
                 predicate={this.predicate}/>

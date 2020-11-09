@@ -54,7 +54,7 @@ class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
             <CardList<ISimulatedHostMetric>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"No simulated host metrics to display"}
+                emptyMessage={"Não há nenhuma métrica simulada para hosts"}
                 list={this.props.simulatedHostMetrics}
                 card={this.simulatedHostMetric}
                 predicate={this.predicate}/>

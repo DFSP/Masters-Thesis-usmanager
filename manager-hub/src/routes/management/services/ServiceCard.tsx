@@ -66,7 +66,7 @@ class ServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (service: IService): void => {
-        super.toast(`<span class="green-text">Service <b class="white-text">${service.serviceName}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">O serviço <b class="white-text">${service.serviceName}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -74,7 +74,7 @@ class ServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, service: IService): void => {
-        super.toast(`Unable to delete <a href=/services/${service.serviceName}><b>${service.serviceName}</b></a> service`, 10000, reason, true);
+        super.toast(`Não foi possível remover <a href=/serviços/${service.serviceName}><b>${service.serviceName}</b></a> service`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,43 +84,43 @@ class ServiceCard extends BaseComponent<Props, State> {
         const {service} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify apps'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Modificar a lista de aplicações'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'apps'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'Modify dependencies'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Alterar as dependências'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'dependencies'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'View dependents'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Ver a lista de serviços dependentes'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'dependents'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'Modify predictions'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Adicionar ou remover previsões'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'predictions'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'Modify rules'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Modificar a lista de regras'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'serviceRules'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Ver a lista de regras genéricas'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'genericRules'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Modificar a lista das métricas simuladas'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'simulatedMetrics'}
                 state={service}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
-                pathname={`/services/${service.serviceName}`}
+                option={'Ver a lista das métricas simuladas genéricas'}
+                pathname={`/serviços/${service.serviceName}`}
                 selected={'genericSimulatedMetrics'}
                 state={service}/>
         ];
@@ -143,7 +143,7 @@ class ServiceCard extends BaseComponent<Props, State> {
         const replicasMessage = this.getReplicasMessage(service.minimumReplicas, service.maximumReplicas);
         return <CardService id={`service-${service.id}`}
                             title={service.serviceName}
-                            link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
+                            link={{to: {pathname: `/serviços/${service.serviceName}`, state: service}}}
                             height={'200px'}
                             margin={'10px 0'}
                             hoverable

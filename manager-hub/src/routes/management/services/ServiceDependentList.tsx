@@ -66,7 +66,7 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
         return (
             <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
                             error={this.props.loadServiceError || this.props.error}
-                            emptyMessage={`Dependents list is empty`}
+                            emptyMessage={`Sem dependentes`}
                             list={this.props.dependentNames}
                             show={this.dependent}/>
         );
@@ -84,7 +84,7 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
             <div className={`${styles.linkedItemContent}`}>
                 <span>{dependent}</span>
             </div>
-            <Link to={`/services/${dependent}`}
+            <Link to={`/serviços/${dependent}`}
                   className={`${styles.link}`}>
                 <i className={`${styles.linkIcon} material-icons right`}>link</i>
             </Link>

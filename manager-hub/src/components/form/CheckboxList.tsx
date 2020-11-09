@@ -92,7 +92,7 @@ export class CheckboxList extends React.Component<Props, State> {
                             <span/>
                         </label>
                     </p>
-                    : <Empty message={`No ${camelCaseToSentenceCase(name)} to select`}/>}
+                    : <Empty message={`Sem ${name} para selecionar`}/>}
                 {values.map((value, index) =>
                     this.item(index, value.value, value.checked)
                 )}

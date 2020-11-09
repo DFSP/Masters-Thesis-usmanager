@@ -99,7 +99,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                     this.leftControlsScrollbar = ref;
                 }}>
                     <button className='btn-floating btn-flat btn-small'
-                            data-for='tooltip' data-tip="Clear" data-place='top'
+                            data-for='tooltip' data-tip="Limpar" data-place='top'
                             onClick={this.props.clearCommands}>
                         <i className='material-icons grey-text'>delete_sweep</i>
                     </button>
@@ -155,7 +155,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                     this.rightControlsScrollbar = ref;
                 }}>
                     <button className={`btn-floating btn-flat btn-small`}
-                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Show' : 'Hide'}
+                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Encolher'}
                             data-place='left'
                             onClick={this.toggleCommands}>
                         <i className='material-icons'>{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>

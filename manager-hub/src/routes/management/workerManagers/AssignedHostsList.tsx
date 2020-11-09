@@ -89,12 +89,12 @@ class AssignedHostsList extends BaseComponent<Props, State> {
         return <ControlledList<string>
             isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadWorkerManagerError || this.props.error : undefined}
-            emptyMessage={`Assigned hosts list is empty`}
+            emptyMessage={`O gestor não tem hosts associados`}
             data={this.props.assignedHosts}
             dropdown={{
                 id: 'workerManagerHosts',
-                title: 'Assign host',
-                empty: 'No hosts to assign',
+                title: 'Atribuir o host',
+                empty: 'Não existem hosts disponíveis',
                 data: this.getSelectableHosts(),
             }}
             show={this.assignedHost}
@@ -105,7 +105,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
                 successCallback: this.onDeleteSuccess,
                 failureCallback: this.onDeleteFailure
             }}
-            removeButtonText={'Unassign'}
+            removeButtonText={'Deixar de gerir'}
             entitySaved={this.state.entitySaved}/>;
     }
 
@@ -139,7 +139,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/nodes/${assignedHost}`}
+                    <Link to={`/nós/${assignedHost}`}
                           className={`${listItemStyles.link}`}>
                         <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -164,7 +164,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, assignedHosts?: string[]): void =>
-        super.toast(`Unable to unassign worker-manager <b>${this.props.workerManager?.id}</b> from ${assignedHosts?.length === 1 ? assignedHosts[0] : 'hosts'}`, 10000, reason, true);
+        super.toast(`Não foi possível desassociar o gestor local <b>${this.props.workerManager?.id}</b> from ${assignedHosts?.length === 1 ? 'do host ' + assignedHosts[0] : 'dos hosts'}`, 10000, reason, true);
 
     private getSelectableHosts = () => {
         const {assignedHosts, nodes, unSavedHosts} = this.props;

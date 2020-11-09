@@ -86,12 +86,12 @@ class RuleAppAppsList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingRuleApp || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadRuleAppError || this.props.error : undefined}
-            emptyMessage={`Apps list is empty`}
+            emptyMessage={`Sem nenhuma aplicação associada`}
             data={this.props.ruleApps}
             dropdown={{
                 id: 'apps',
-                title: 'Add app',
-                empty: 'No apps to add',
+                title: 'Selecionar a aplicação',
+                empty: 'Não existem aplicações disponíveis',
                 data: this.getSelectableAppNames()
             }}
             show={this.app}
@@ -135,7 +135,7 @@ class RuleAppAppsList extends BaseComponent<Props, State> {
                     </label>
                 </div>
                 {!isNew && (
-                    <Link to={`/apps/${app}`}
+                    <Link to={`/aplicações/${app}`}
                           className={`${styles.link}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
                     </Link>
@@ -158,7 +158,7 @@ class RuleAppAppsList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove app`, 10000, reason, true);
+        super.toast(`Não foi possível remover a aplicação`, 10000, reason, true);
 
     private getSelectableAppNames = () => {
         const {apps, ruleApps, unsavedApps} = this.props;

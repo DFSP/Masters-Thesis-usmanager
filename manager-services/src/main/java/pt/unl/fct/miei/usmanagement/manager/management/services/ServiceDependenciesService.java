@@ -2,6 +2,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.services;
 
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencies;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 
 @Service
 public class ServiceDependenciesService {
@@ -12,7 +13,18 @@ public class ServiceDependenciesService {
 		this.serviceDependencies = serviceDependencies;
 	}
 
+	public ServiceDependency addDependency(ServiceDependency serviceDependency) {
+		return serviceDependencies.save(serviceDependency);
+	}
 
+	public ServiceDependency addDependency(pt.unl.fct.miei.usmanagement.manager.services.Service service,
+										   pt.unl.fct.miei.usmanagement.manager.services.Service dependency) {
+		ServiceDependency serviceDependency = ServiceDependency.builder()
+			.service(service)
+			.dependency(dependency)
+			.build();
+		return addDependency(serviceDependency);
+	}
 
 	public boolean hasDependency(pt.unl.fct.miei.usmanagement.manager.services.Service service,
 								 pt.unl.fct.miei.usmanagement.manager.services.Service dependency) {

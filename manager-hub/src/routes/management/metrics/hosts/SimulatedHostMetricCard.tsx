@@ -65,7 +65,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
-        super.toast(`<span class="green-text">Simulated host metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void => {
-        super.toast(`Unable to delete simulated host metric <a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada <a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,13 +83,13 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
         const {simulatedHostMetric} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify cloud hosts'}
-                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}`}
+                option={'Alterar a lista de instâncias cloud'}
+                pathname={`/métricas simuladas/hosts/${simulatedHostMetric.name}`}
                 selected={'cloudHosts'}
                 state={simulatedHostMetric}/>,
             <LinkedContextMenuItem
-                option={'Modify edge hosts'}
-                pathname={`/simulated-metrics/hosts/${simulatedHostMetric.name}`}
+                option={'Alterar a lista de edge hosts'}
+                pathname={`/métricas simuladas/hosts/${simulatedHostMetric.name}`}
                 selected={'edgeHosts'}
                 state={simulatedHostMetric}/>,
         ];
@@ -103,7 +103,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
                                         title={simulatedHostMetric.name}
                                         link={{
                                             to: {
-                                                pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`,
+                                                pathname: `/métricas simuladas/hosts/${simulatedHostMetric.name}`,
                                                 state: simulatedHostMetric
                                             }
                                         }}

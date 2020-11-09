@@ -89,12 +89,12 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
             error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
-            emptyMessage={`Cloud hosts list is empty`}
+            emptyMessage={`Sem hosts cloud associados`}
             data={this.props.simulatedMetricCloudHosts}
             dropdown={{
                 id: 'cloudHosts',
-                title: 'Add cloud host',
-                empty: 'No cloud hosts to add',
+                title: 'Selecionar o host',
+                empty: 'Não há hosts cloud disponíveis',
                 data: this.getSelectableCloudHosts()
             }}
             show={this.cloudHost}
@@ -162,7 +162,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Unable to remove cloud host`, 10000, reason, true);
+        super.toast(`Não foi possível remove a instância cloud`, 10000, reason, true);
 
     private getSelectableCloudHosts = () => {
         const {cloudHosts, simulatedMetricCloudHosts, unsavedCloudHosts} = this.props;

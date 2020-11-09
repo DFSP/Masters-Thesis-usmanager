@@ -39,8 +39,8 @@ import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
-    addContainers,
     addContainerRules,
+    addContainers,
     addContainerSimulatedMetrics,
     loadContainers,
     loadNodes,
@@ -76,7 +76,6 @@ import GenericServiceRuleList from "../services/GenericServiceRuleList";
 import {IRegion} from "../regions/Region";
 import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
-import Sidenav from "../../../views/sidenav/Sidenav";
 import ReactTooltip from "react-tooltip";
 
 export interface IContainer extends IDatabaseData {
@@ -182,7 +181,7 @@ interface State {
     defaultExternalPort: number,
     unsavedRules: string[],
     unsavedSimulatedMetrics: string[],
-    currentForm: 'On host' | 'On location',
+    currentForm: 'Usando o endereço' | 'Usando a localização',
 }
 
 class Container extends BaseComponent<Props, State> {
@@ -193,7 +192,7 @@ class Container extends BaseComponent<Props, State> {
         defaultExternalPort: 0,
         unsavedRules: [],
         unsavedSimulatedMetrics: [],
-        currentForm: 'On location',
+        currentForm: 'Usando a localização',
     };
     private mounted = false;
     private scrollbar: (ScrollBar | null) = null;
@@ -214,7 +213,7 @@ class Container extends BaseComponent<Props, State> {
             <MainLayout>
                 <ReactTooltip id='tooltip' effect='solid' type='light'/>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="container">
+                <div className='container'>
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -255,7 +254,7 @@ class Container extends BaseComponent<Props, State> {
         let containers = reply.data;
         if (containers.length === 1) {
             const container = containers[0];
-            super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at host ${container.publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no nó ${container.publicIpAddress}</span>`);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
@@ -263,26 +262,26 @@ class Container extends BaseComponent<Props, State> {
             }
         } else {
             containers = containers.reverse();
-            super.toast(`<span class="green-text">Launched ${containers.length} containers:<br/><b class="white-text">${containers.map(container => `${container.id} => Host ${container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>Foram lançados ${containers.length} contentores novos:<br/><b class='white-text'>${containers.map(container => `${container.id} => Host ${container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
-                this.props.history.push("/containers");
+                this.props.history.push("/contentores");
             }
         }
         this.props.addContainers(containers);
     };
 
     private onPostFailure = (reason: string, container: INewContainerHost): void =>
-        super.toast(`Unable to start container at <b>${container.hostAddress?.publicIpAddress}/${container.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível executar o contentor no host <b>${container.hostAddress?.publicIpAddress}/${container.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
+        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.containerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/containers`);
+            this.props.history.push(`/contentores`);
         }
     };
 
     private onDeleteFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Unable to stop container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private replicateButton = () =>
         <>
@@ -313,7 +312,7 @@ class Container extends BaseComponent<Props, State> {
                    className={`dropdown-content ${styles.dropdown}`}>
             <li className={`${styles.disabled}`}>
                 <a className={`${!nodes.length ? 'dropdown-empty' : ''}`}>
-                    {!nodes.length ? 'No nodes to select' : 'Choose host address'}
+                    {!nodes.length ? 'Sem nós disponíveis' : 'Selecionar o endereço'}
                 </a>
             </li>
             <PerfectScrollbar ref={(ref) => this.scrollbar = ref}>
@@ -341,14 +340,14 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to replicate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/'${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -368,14 +367,14 @@ class Container extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/containers/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/'${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href='/contentores/'${container.containerId}>${container.containerId}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Unable to migrate container ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/'${container?.containerId}><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -410,7 +409,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Unable to save rules of container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private addContainerSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -441,7 +440,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of container ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/'${container.containerId}><b>${container.containerId}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -476,7 +475,7 @@ class Container extends BaseComponent<Props, State> {
 
     private getFields = (container: INewContainerHost | INewContainerLocation | IContainer): IFields => {
         if (this.isNew()) {
-            return this.state.currentForm === 'On host'
+            return this.state.currentForm === 'Usando o endereço'
                 ? ({
                     ...this.commonFields(),
                     hostAddress: {
@@ -559,7 +558,7 @@ class Container extends BaseComponent<Props, State> {
     private regionOption = (region: IRegion) =>
         region.region;
 
-    private switchForm = (formId: 'On host' | 'On location') =>
+    private switchForm = (formId: 'Usando o endereço' | 'Usando a localização') =>
         this.setState({currentForm: formId});
 
     private getContainersMarkers = (): IMarker[] => {
@@ -585,7 +584,7 @@ class Container extends BaseComponent<Props, State> {
     private formFields = (formContainer: INewContainerHost | Partial<IContainer>, isNew: boolean): JSX.Element => {
         const {currentForm} = this.state;
         return isNew ?
-            currentForm === 'On host'
+            currentForm === 'Usando o endereço'
                 ?
                 <>
                     <Field key={'service'}
@@ -593,10 +592,10 @@ class Container extends BaseComponent<Props, State> {
                            label={'service'}
                            type={'dropdown'}
                            dropdown={{
-                               defaultValue: "Select service",
+                               defaultValue: "Selecionar o serviço",
+                               emptyMessage: 'Não há serviços disponíveis',
                                values: this.getSelectableServices(),
                                selectCallback: this.setDefaultPorts,
-                               emptyMessage: 'No services available'
                            }}/>
                     <Field key={'externalPort'}
                            id={'externalPort'}
@@ -611,10 +610,10 @@ class Container extends BaseComponent<Props, State> {
                                                   label={'hostAddress'}
                                                   type={'dropdown'}
                                                   dropdown={{
-                                                      defaultValue: "Select host address",
+                                                      defaultValue: "Selecionar o endereço",
+                                                      emptyMessage: 'Não há hosts disponíveis',
                                                       values: this.getSelectableHosts(),
                                                       optionToString: this.hostAddressesDropdown,
-                                                      emptyMessage: 'No hosts available'
                                                   }}/>
                 </>
                 :
@@ -624,10 +623,10 @@ class Container extends BaseComponent<Props, State> {
                            label={'service'}
                            type={'dropdown'}
                            dropdown={{
-                               defaultValue: "Select service",
+                               defaultValue: "Selecionar o serviço",
+                               emptyMessage: 'Não há serviços disponíveis',
                                values: this.getSelectableServices(),
                                selectCallback: this.setDefaultPorts,
-                               emptyMessage: 'No services available'
                            }}/>
                     <Field key={'externalPort'}
                            id={'externalPort'}
@@ -661,12 +660,12 @@ class Container extends BaseComponent<Props, State> {
                         : key === 'region'
                             ? <Field<IRegion> key={index}
                                               id={key}
-                                              type="dropdown"
+                                              type='dropdown'
                                               label={key}
                                               valueToString={this.regionOption}
                                               dropdown={{
-                                                  defaultValue: "Select region",
-                                                  emptyMessage: "No regions to select",
+                                                  defaultValue: "Selecionar a região",
+                                                  emptyMessage: "Não há regiões disponíveis",
                                                   values: [(formContainer as IContainer).region],
                                                   optionToString: this.regionOption
                                               }}/>
@@ -702,7 +701,7 @@ class Container extends BaseComponent<Props, State> {
                 externalPort: this.state.defaultExternalPort
             };
         }
-        const container = isNewContainer ? (currentForm === 'On host' ? newContainerHost : newContainerLocation) : this.getContainer();
+        const container = isNewContainer ? (currentForm === 'Usando o endereço' ? newContainerHost : newContainerLocation) : this.getContainer();
         const formContainer = this.getFormContainer();
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
@@ -718,7 +717,7 @@ class Container extends BaseComponent<Props, State> {
                           isNew={isNewContainer}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
-                              textButton: 'Launch',
+                              textButton: 'Executar',
                               url: 'containers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
@@ -726,7 +725,7 @@ class Container extends BaseComponent<Props, State> {
                         // delete button is never present on new nodes, so a type cast is safe
                           delete={container && (container as IContainer).type !== 'SINGLETON'
                               ? {
-                                  textButton: 'Stop',
+                                  textButton: 'Parar',
                                   url: `containers/${(container as IContainer).containerId}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
@@ -739,7 +738,7 @@ class Container extends BaseComponent<Props, State> {
                           loading={this.state.loading}
                           saveEntities={this.saveEntities}
                           switchDropdown={isNewContainer ? {
-                              options: currentForm === 'On host' ? ['On location'] : ['On host'],
+                              options: currentForm === 'Usando o endereço' ? ['Usando o endereço'] : ['Usando a localização'],
                               onSwitch: this.switchForm
                           } : undefined}>
                         {this.formFields(formContainer || {}, isNewContainer)}
@@ -788,13 +787,13 @@ class Container extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => ([
         {
-            title: 'Container',
+            title: 'Contentor docker',
             id: 'container',
             content: () => this.container(),
             active: this.props.location.state?.selected === 'container'
         },
         {
-            title: 'Ports',
+            title: 'Portas',
             id: 'ports',
             content: () => this.ports(),
             hidden: this.isNew(),
@@ -815,25 +814,25 @@ class Container extends BaseComponent<Props, State> {
             active: this.props.location.state?.selected === 'logs'
         },
         {
-            title: 'Rules',
+            title: 'Regras',
             id: 'rules',
             content: () => this.rules(),
             active: this.props.location.state?.selected === 'rules'
         },
         {
-            title: 'Generic rules',
+            title: 'Regras genéricas',
             id: 'genericContainerRules',
             content: () => this.genericRules(),
             active: this.props.location.state?.selected === 'genericServiceRules'
         },
         {
-            title: 'Simulated metrics',
+            title: 'Métricas simuladas',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
             active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
-            title: 'Generic simulated metrics',
+            title: 'Métricas simuladas genéricas',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
             active: this.props.location.state?.selected === 'genericSimulatedMetrics'

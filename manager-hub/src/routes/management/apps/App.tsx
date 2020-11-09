@@ -171,7 +171,7 @@ class App extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class='green-text'>App ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} saved</span>`);
+        super.toast(`<span class='green-text'>A aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addApp(app);
         this.saveEntities(app);
         if (this.mounted) {
@@ -181,11 +181,11 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to save app <b>${app.name}</b>`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a aplicação <b>${app.name}</b>`, 10000, reason, true);
 
     private onPutSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class='green-text'>Changes to ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} app have been saved</span>`);
+        super.toast(`<span class='green-text'>As mudanças à aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(app);
         const previousApp = this.getApp();
         if (previousApp.id) {
@@ -198,17 +198,17 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to update app ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class='green-text'>App <b class='white-text'>${app.name}</b> successfully removed</span>`);
+        super.toast(`<span class='green-text'>A aplicação <b class='white-text'>${app.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
-            this.props.history.push(`/apps`);
+            this.props.history.push(`/aplicações`);
         }
     };
 
     private onDeleteFailure = (reason: string, app: IApp): void =>
-        super.toast(`Unable to delete app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível apagar a aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedServices.length
@@ -256,7 +256,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save services of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os serviços associados à aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private addAppRule = (rule: string): void => {
         this.setState({
@@ -287,7 +287,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveRulesFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save rules of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas à aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private addAppSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -318,7 +318,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onSaveSimulatedMetricsFailure = (app: IApp, reason: string): void =>
-        super.toast(`Unable to save simulated metrics of app ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas à aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private launchButton = (): ICustomButton[] => {
         const buttons: ICustomButton[] = [];
@@ -347,10 +347,10 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onLaunchSuccess = (launchApp: ILaunchApp) => {
-        super.toast(`<span><span class='green-text'>Successfully launched services<br/>
+        super.toast(`<span><span class='green-text'>Os serviços foram lançados com sucesso nos seguintes contentores<br/>
         </span>${Object.entries(launchApp)
                 .map(([service, containers]) => `<b>${service}</b> ${containers.map(c =>
-                    `<a href='/containers/${c.containerId}'>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
+                    `<a href='/contentores/${c.containerId}'>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
             20000);
         if (this.mounted) {
             this.setState({loading: undefined});
@@ -358,9 +358,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onLaunchFailure = (reason: string, app: Partial<IApp>) => {
-        super.toast(`Failed to launch services of 
-        ${this.mounted ? `<b>${app.name}</b>` : `<a href='/apps/${app.name}'><b>${app.name}</b></a>`} app`,
-            10000, reason, true);
+        super.toast(`Não foi possível lançar todos os serviços da aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -480,38 +478,38 @@ class App extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'App',
+            title: 'Aplicação',
             id: 'app',
             content: () => this.app(),
             active: this.props.location.state?.selected === 'app'
         },
         {
-            title: 'Services',
+            title: 'Serviços',
             id: 'services',
             content: () => this.services(),
             active: this.props.location.state?.selected === 'services',
         },
         {
-            title: 'Rules',
+            title: 'Regras',
             id: 'appRules',
             content: () => this.rules(),
             active: this.props.location.state?.selected === 'rules'
         },
 
         {
-            title: 'Generic rules',
+            title: 'Regras genéricas',
             id: 'genericAppRules',
             content: () => this.genericRules(),
             active: this.props.location.state?.selected === 'genericRules'
         },
         {
-            title: 'Simulated metrics',
+            title: 'Métricas simuladas',
             id: 'simulatedMetrics',
             content: () => this.simulatedMetrics(),
             active: this.props.location.state?.selected === 'simulatedMetrics'
         },
         {
-            title: 'Generic simulated metrics',
+            title: 'Métricas simuladas genéricas',
             id: 'genericSimulatedMetrics',
             content: () => this.genericSimulatedMetrics(),
             active: this.props.location.state?.selected === 'genericSimulatedMetrics'

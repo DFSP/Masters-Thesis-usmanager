@@ -66,7 +66,7 @@ class NodeCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">Node <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm.'}</span>`);
+        super.toast(`<span class="green-text">O nó <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm.'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -75,9 +75,9 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`Node <a href=/nodes/${node.id}><b>${node.id}</b></a> was unable to leave the swarm`, 10000, reason, true);
+            super.toast(`O nó <a href=/nós/${node.id}><b>${node.id}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Unable to remove node <a href=/nodes/${node.id}><b>${node.id}</b></a> from the swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó <a href=/nós/${node.id}><b>${node.id}</b></a> do swarm`, 10000, reason, true);
         }
         if (this.mounted) {
             this.setState({loading: false});
@@ -88,8 +88,8 @@ class NodeCard extends BaseComponent<Props, State> {
         const {node} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'View labels'}
-                pathname={`/nodes/${node.id}`}
+                option={'Ver as labels associadas'}
+                pathname={`/nós/${node.id}`}
                 selected={'nodeLabels'}
                 state={node}/>,
         ];
@@ -101,7 +101,7 @@ class NodeCard extends BaseComponent<Props, State> {
         const CardNode = Card<INode>();
         return <CardNode id={`node-${node.id}`}
                          title={node.id.toString()}
-                         link={{to: {pathname: `/nodes/${node.id}`, state: node}}}
+                         link={{to: {pathname: `/nós/${node.id}`, state: node}}}
                          height={'150px'}
                          margin={'10px 0'}
                          hoverable

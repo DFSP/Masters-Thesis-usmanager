@@ -65,7 +65,7 @@ class RuleAppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleApp: IRuleApp): void => {
-        super.toast(`<span class="green-text">App rule <b class="white-text">${ruleApp.name}</b> successfully removed</span>`);
+        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleApp.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class RuleAppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, ruleApp: IRuleApp): void => {
-        super.toast(`Unable to delete app rule <a href=/rules/apps/${ruleApp.name}><b>${ruleApp.name}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra <a href=/regras/aplicações/${ruleApp.name}><b>${ruleApp.name}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -83,13 +83,13 @@ class RuleAppCard extends BaseComponent<Props, State> {
         const {rule} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Modify conditions'}
-                pathname={`/rules/apps/${rule.name}`}
+                option={'Modificar as condições associadas'}
+                pathname={`/regras/aplicações/${rule.name}`}
                 selected={'ruleConditions'}
                 state={rule}/>,
             <LinkedContextMenuItem
-                option={'Modify apps'}
-                pathname={`/rules/apps/${rule.name}`}
+                option={'Modificar a lista de aplicações'}
+                pathname={`/regras/aplicações/${rule.name}`}
                 selected={'apps'}
                 state={rule}/>
         ];
@@ -101,7 +101,7 @@ class RuleAppCard extends BaseComponent<Props, State> {
         const CardRuleApp = Card<IRuleApp>();
         return <CardRuleApp id={`app-rule-${rule.id}`}
                             title={rule.name}
-                            link={{to: {pathname: `/rules/apps/${rule.name}`, state: rule}}}
+                            link={{to: {pathname: `/regras/aplicações/${rule.name}`, state: rule}}}
                             height={'85px'}
                             margin={'10px 0'}
                             hoverable

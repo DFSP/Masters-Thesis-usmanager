@@ -66,7 +66,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (registrationServer: IRegistrationServer): void => {
-        super.toast(`<span class="green-text">Registration server <b class="white-text">${registrationServer.containerId}</b> successfully stopped</span>`);
+        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.containerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -74,7 +74,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, registrationServer: IRegistrationServer): void => {
-        super.toast(`Unable to stop registration-server <a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível para o servidor de registo <a href=/registration-servers/${registrationServer.containerId}><b>${registrationServer.containerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,38 +84,38 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
         const {registrationServer} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'View ports'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Ver as portas associadas'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'ports'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'View labels'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Ver as labels associadas'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'labels'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'Check logs'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Ver as logs'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'logs'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'Modify rules'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Modificar a lista de regras'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'rules'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'View generic rules'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Ver a lista de regras genéricas'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'genericContainerRules'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'Modify simulated metrics'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Modificar a lista das métricas simuladas'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'simulatedMetrics'}
                 state={registrationServer}/>,
             <LinkedContextMenuItem
-                option={'View generic simulated metrics'}
-                pathname={`/containers/${registrationServer.containerId}`}
+                option={'Ver a lista das métricas simuladas genéricas'}
+                pathname={`/contentores/${registrationServer.containerId}`}
                 selected={'genericSimulatedMetrics'}
                 state={registrationServer}/>
         ];
@@ -129,7 +129,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
                                        title={registrationServer.containerId.toString()}
                                        link={{
                                            to: {
-                                               pathname: `/registration-servers/${registrationServer.containerId}`,
+                                               pathname: `/servidores de registo/${registrationServer.containerId}`,
                                                state: registrationServer
                                            }
                                        }}
@@ -137,7 +137,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
                                        margin={'10px 0'}
                                        hoverable
                                        delete={{
-                                           textButton: 'Stop',
+                                           textButton: 'Parar',
                                            url: `containers/${registrationServer.containerId}`,
                                            successCallback: this.onStopSuccess,
                                            failureCallback: this.onStopFailure,

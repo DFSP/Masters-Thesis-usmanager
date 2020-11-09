@@ -44,7 +44,7 @@ export default class ContainerPortsList extends BaseComponent<Props, {}> {
         return (
             <PortsList isLoading={this.props.isLoadingContainer}
                        error={this.props.loadContainerError}
-                       emptyMessage={`No ports associated`}
+                       emptyMessage={`Sem portas associadas`}
                        list={this.ports()}
                        show={this.port}/>
         );
