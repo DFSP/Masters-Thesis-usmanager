@@ -281,8 +281,7 @@ public class HostsMonitoringService {
 		String serviceName = container.getFirst();
 		String containerId = container.getSecond();
 		if (!containerId.isEmpty()) {
-			ServiceEntity serviceConfig = servicesService.getService(serviceName);
-			double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
+			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 			HostAddress toHostAddress = hostsService.getAvailableHost(expectedMemoryConsumption, hostAddress);
 			// TODO porquê migrar logo um container?
 			containersService.migrateContainer(containerId, toHostAddress);

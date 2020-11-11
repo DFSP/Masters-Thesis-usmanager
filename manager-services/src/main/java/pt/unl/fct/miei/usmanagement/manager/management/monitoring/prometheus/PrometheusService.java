@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -54,34 +56,28 @@ public class PrometheusService {
 		this.restTemplate = new RestTemplate();
 	}
 
-	public Optional<Double> getStat(HostAddress hostAddress, PrometheusQueryEnum prometheusQuery) {
+	@Async
+	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
 		URI uri = UriComponentsBuilder
 			.fromHttpUrl(String.format(URL, hostAddress.getPublicIpAddress(), DEFAULT_PORT))
 			.queryParam("query", URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8))
 			.queryParam("time", Double.toString((System.currentTimeMillis() * 1.0) / 1000.0))
 			.build(true).toUri();
-		log.debug("Querying {} from prometheus: {}", prometheusQuery.name(), uri.toString());
-		try {
-			ResponseEntity<QueryOutput> response = restTemplate.getForEntity(uri, QueryOutput.class);
-			QueryOutput queryOutput = response.getBody();
-			if (queryOutput != null && Objects.equals(queryOutput.getStatus(), "success")) {
-				List<QueryResult> results = queryOutput.getData().getResult();
-				if (!results.isEmpty()) {
-					List<String> values = results.get(0).getValue();
-					if (values.size() == 2) {
-						// values.get(0) is the timestamp
-						value = values.get(1);
-					}
+
+		QueryOutput queryOutput = restTemplate.getForObject(uri, QueryOutput.class);
+		if (queryOutput != null && Objects.equals(queryOutput.getStatus(), "success")) {
+			List<QueryResult> results = queryOutput.getData().getResult();
+			if (!results.isEmpty()) {
+				List<String> values = results.get(0).getValue();
+				if (values.size() == 2) {
+					// values.get(0) is the timestamp
+					value = values.get(1);
 				}
 			}
 		}
-		catch (RestClientException e) {
-			log.error("Failed to get stat {} from prometheus on {}: {}", prometheusQuery, hostAddress, e.getMessage());
-		}
-		log.info("Prometheus query {} at node {} got value {}", prometheusQuery.getQuery(), hostAddress.toSimpleString(),
-			value.isEmpty() ? 0 : Double.parseDouble(value));
-		return value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
+		Optional<Double> stat = value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
+		return CompletableFuture.completedFuture(stat);
 	}
 
 }

@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
@@ -72,9 +73,11 @@ public class EdgeHost {
 	@NotNull
 	private String privateIpAddress;
 
+	@NaturalId
 	@NotNull
 	private String publicIpAddress;
 
+	@NaturalId
 	private String publicDnsName;
 
 	@NotNull

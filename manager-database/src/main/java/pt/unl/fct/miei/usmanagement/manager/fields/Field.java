@@ -66,7 +66,7 @@ public class Field {
 	@Column(unique = true)
 	private String name;
 
-	private PrometheusQueryEnum query;
+	private PrometheusQueryEnum prometheusQuery;
 
 	@Singular
 	@JsonIgnore

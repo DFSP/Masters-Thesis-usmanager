@@ -35,7 +35,6 @@ management:
       exposure:
         include: info, health, metrics, mappings
 manager:
-  mode: global
   master:
     monitor-period: 30000
     tests:
@@ -46,9 +45,8 @@ edge:
   access:
     key-file-path: src/main/resources/edge
 aws:
-  initial-max-instances: 2
-  max-retries: 10
-  delay-between-retries: 5000
+  initial-max-instances: 0
+  max-retries: 5
   connection-timeout: 180000
   access:
     key: AKIAS5UBHWDI3WO52EV5
@@ -113,14 +111,9 @@ rules:
 symmetricds:
   tables:
     exclude:
-      startsWith: sym, logging
+      startsWith: sym, logging, worker
       endsWith: events
-
-#logging:
-#  level:
-#    com:
-#      baeldung:
-#        testloglevel=DEBUG:
+      contains: monitoring
 
 #debug: true
 #trace: true

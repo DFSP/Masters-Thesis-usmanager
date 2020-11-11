@@ -88,6 +88,7 @@ public class Container {
 	@NotNull
 	private String image;
 
+	@Column(length = 516)
 	private String command;
 
 	private String network;

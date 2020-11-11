@@ -100,8 +100,7 @@ public class DockerSwarmService {
 				: Optional.empty();
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to get swarm work node id from {}: {}", hostAddress.toSimpleString(), e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to get swarm work node id from %s: %s", hostAddress.toSimpleString(), e.getMessage());
 		}
 	}
 
@@ -137,8 +136,7 @@ public class DockerSwarmService {
 			client.createNetwork(networkConfig);
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to get create overlay network: {}", e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to get create overlay network: %s", e.getMessage());
 		}
 	}
 
@@ -187,8 +185,7 @@ public class DockerSwarmService {
 			return nodesService.getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("{} was unable to join swarm: {}", hostAddress.toSimpleString(), e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("%s was unable to join swarm: %s", hostAddress.toSimpleString(), e.getMessage());
 		}
 	}
 
@@ -223,7 +220,7 @@ public class DockerSwarmService {
 		}
 		catch (DockerException | InterruptedException e) {
 			log.error("Host {} failed to leave swarm: {}", docker.getHost(), e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Host %s failed to leave swarm: %s", docker.getHost(), e.getMessage());
 		}
 		return Optional.empty();
 	}

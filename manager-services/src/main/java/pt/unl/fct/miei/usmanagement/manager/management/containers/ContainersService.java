@@ -457,6 +457,10 @@ public class ContainersService {
 		return containerId;
 	}
 
+	public void stopContainers() {
+		stopContainers(null);
+	}
+
 	public void stopContainers(Predicate<DockerContainer> containerPredicate) {
 		List<DockerContainer> containers = dockerContainersService.stopAll(containerPredicate);
 		containers.forEach(container -> deleteContainer(container.getId()));
@@ -495,7 +499,7 @@ public class ContainersService {
 	private void checkContainerDoesntExist(Container container) {
 		String containerId = container.getContainerId();
 		if (containers.hasContainer(containerId)) {
-			throw new DataIntegrityViolationException("Container '" + containerId + "' already exists");
+			throw new DataIntegrityViolationException("Container " + containerId + " already exists");
 		}
 	}
 

@@ -4,15 +4,19 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,21 +28,32 @@ public class ContainersRecoveryService {
 
 	private static final int STOP_CONTAINER_RECOVERY_ON_FAILURES = 3;
 	private static final long STOP_CONTAINER_RECOVERY_TIME_FRAME = TimeUnit.MINUTES.toMillis(10);
+	private static final int FIND_AVAILABLE_HOST_RETRIES = 5;
 
 	private final ServicesService servicesService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
+	private final SshService sshService;
 
-	public ContainersRecoveryService(ServicesService servicesService, HostsService hostsService, ContainersService containersService) {
+	public ContainersRecoveryService(ServicesService servicesService, HostsService hostsService,
+									 ContainersService containersService, SshService sshService) {
 		this.servicesService = servicesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
+		this.sshService = sshService;
 	}
 
 	void restoreCrashedContainers(List<Container> monitoringContainers, List<Container> synchronizedContainers) {
-		// TODO filter minimumReplicas > 0
 		monitoringContainers.parallelStream()
+			.filter(container -> {
+				try {
+					return servicesService.getService(container.getServiceName()).getMinimumReplicas() > 0;
+				} catch (EntityNotFoundException ignored) {
+					return false;
+				}
+			})
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
+			.distinct()
 			.forEach(this::restartContainerCloseTo);
 	}
 
@@ -86,13 +101,23 @@ public class ContainersRecoveryService {
 		recoveries.add(new ContainerRecovery(containerId, System.currentTimeMillis()));
 		Coordinates coordinates = container.getCoordinates();
 		String serviceName = container.getServiceName();
-		Service service = servicesService.getService(serviceName);
-		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-		Map<String, String> labels = Map.of(
-			ContainerConstants.Label.RECOVERY, new Gson().toJson(recoveries)
-		);
-		containersService.launchContainer(hostAddress, serviceName, Collections.emptyList(), labels);
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
+		List<HostAddress> excludedHosts = new LinkedList<>();
+		for (int i = 0; i < FIND_AVAILABLE_HOST_RETRIES; i++) {
+			HostAddress hostAddress = hostsService.getClosestCapableHostIgnoring(expectedMemoryConsumption, coordinates, excludedHosts);
+			if (hostAddress.equals(container.getHostAddress())) {
+				try {
+					Map<String, String> labels = Map.of(
+						ContainerConstants.Label.RECOVERY, new Gson().toJson(recoveries)
+					);
+					containersService.launchContainer(hostAddress, serviceName, Collections.emptyList(), labels);
+				}
+				catch (ManagerException e) {
+					excludedHosts.add(hostAddress);
+					log.error("Tried to recover container on unavailable host, retrying... ({}/{})", i, FIND_AVAILABLE_HOST_RETRIES);
+				}
+			}
+		}
 	}
 
 	// Restarts the container on the same host

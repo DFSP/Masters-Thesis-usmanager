@@ -8,6 +8,10 @@ ssh:
 edge:
   access:
     key-file-path: src/main/resources/edge
+cloud:
+  aws:
+    credentials:
+      instanceProfile: true
 aws:
   initial-max-instances: 2
   max-retries: 10

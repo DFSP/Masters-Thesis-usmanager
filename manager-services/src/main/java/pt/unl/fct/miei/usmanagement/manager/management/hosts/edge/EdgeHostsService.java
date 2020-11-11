@@ -136,6 +136,7 @@ public class EdgeHostsService {
 			}
 			catch (Exception e) {
 				log.error("Unable to setup new edge host: {}", e.getMessage());
+				log.info("Password is most likely wrong, try again");
 			}
 			java.util.Arrays.fill(password, ' ');
 		}

@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.ManagerProperties;
-import pt.unl.fct.miei.usmanagement.manager.Mode;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -72,7 +71,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -90,7 +89,6 @@ public class HostsService {
 	private final HostMetricsService hostMetricsService;
 	private final int maxWorkers;
 	private final int maxInstances;
-	private final Mode mode;
 	private HostAddress masterHostAddress;
 
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
@@ -108,7 +106,6 @@ public class HostsService {
 		this.hostMetricsService = hostMetricsService;
 		this.maxWorkers = dockerProperties.getSwarm().getInitialMaxWorkers();
 		this.maxInstances = awsProperties.getInitialMaxInstances();
-		this.mode = managerProperties.getMode();
 	}
 
 	public HostAddress setHostAddress() {
@@ -122,33 +119,29 @@ public class HostsService {
 
 	public HostAddress getMasterHostAddress() {
 		if (masterHostAddress == null) {
-			throw new MethodNotAllowedException("manager initialization did not finish");
+			throw new MethodNotAllowedException("Manager initialization did not finish");
 		}
 		return masterHostAddress;
 	}
 
 	public void clusterHosts() {
-		List<HostAddress> workerHosts = new LinkedList<>();
-		if (mode == null || mode == Mode.LOCAL) {
-			log.info("Clustering edge worker hosts into the swarm");
-			workerHosts.addAll(getLocalWorkerNodes().stream().map(EdgeHost::getAddress).collect(Collectors.toList()));
-			if (getLocalWorkerNodes().size() < 1) {
-				log.info("No edge worker hosts found");
-			}
+		log.info("Clustering edge worker hosts into the swarm");
+		List<HostAddress> workerHosts = getLocalWorkerNodes().stream().map(EdgeHost::getAddress)
+			.collect(Collectors.toCollection(LinkedList::new));
+		if (getLocalWorkerNodes().size() < 1) {
+			log.info("No edge worker hosts found");
 		}
-		if (mode == null || mode == Mode.GLOBAL) {
-			log.info("Clustering cloud hosts into the swarm");
-			workerHosts.addAll(getCloudWorkerNodes().stream().map(CloudHost::getAddress).collect(Collectors.toList()));
-			if (getCloudWorkerNodes().size() < 1) {
-				log.info("No cloud worker hosts found");
-			}
+		log.info("Clustering cloud hosts into the swarm");
+		workerHosts.addAll(getCloudWorkerNodes().stream().map(CloudHost::getAddress).collect(Collectors.toList()));
+		if (getCloudWorkerNodes().size() < 1) {
+			log.info("No cloud worker hosts found");
 		}
 		workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER));
 	}
 
 	private List<CloudHost> getCloudWorkerNodes() {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
-		int maxInstances = Math.min(this.maxInstances, maxWorkers);
+		int maxInstances = Math.min(maxWorkers, this.maxInstances);
 		List<CloudHost> cloudHosts = new ArrayList<>(maxInstances);
 		for (int i = 0; i < maxInstances; i++) {
 			cloudHosts.add(chooseCloudHost(null, false));
@@ -175,11 +168,13 @@ public class HostsService {
 
 	public SimpleNode setupHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
-		String dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
+		String dockerApiProxyContainerId = "";
 		SimpleNode node = null;
+		final int retries = 5;
 		int tries = 0;
 		do {
 			try {
+				dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
 				switch (role) {
 					case MANAGER:
 						node = setupSwarmManager(hostAddress);
@@ -192,11 +187,11 @@ public class HostsService {
 				}
 			}
 			catch (ManagerException e) {
-				log.error("Failed to setup {} with role {}: {}", hostAddress.toSimpleString(), role, e.getMessage());
-				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 second, then 2 seconds, then 3, etc
+				log.error("Failed to setup {} with role {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), role, e.getMessage(), tries, retries);
+				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 0 seconds, then 1 seconds, then 2 seconds, etc
 			}
-		} while (node == null && ++tries < 5);
-		if (node == null) {
+		} while (node == null && ++tries < retries);
+		if (dockerApiProxyContainerId.isEmpty() || node == null) {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
@@ -237,9 +232,14 @@ public class HostsService {
 	}
 
 	public HostAddress getCapableNode(double availableMemory, RegionEnum region) {
+		return getCapableNode(availableMemory, region, null);
+	}
+
+	public HostAddress getCapableNode(double availableMemory, RegionEnum region, Predicate<HostAddress> nodeFilter) {
 		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
-			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory))
+			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)
+				&& (nodeFilter == null || nodeFilter.test(node.getHostAddress())))
 			.map(SimpleNode::getHostAddress)
 			.collect(Collectors.toList());
 		HostAddress hostAddress;
@@ -257,9 +257,14 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestCapableHost(double availableMemory, Coordinates coordinates) {
-		List<EdgeHost> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
-		).collect(Collectors.toList());
+		return getClosestCapableHostIgnoring(availableMemory, coordinates, List.of());
+	}
+
+	public HostAddress getClosestCapableHostIgnoring(double availableMemory, Coordinates coordinates, List<HostAddress> hostAddresses) {
+		List<EdgeHost> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host -> {
+			HostAddress hostAddress = host.getAddress();
+			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory);
+		}).collect(Collectors.toList());
 		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
 			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
 		).collect(Collectors.toList());
@@ -498,43 +503,8 @@ public class HostsService {
 			}
 		}
 		catch (ManagerException e) {
-			throw new ManagerException("Unable to find currently used external ports at %s: %s ", hostAddress,
-				e.getMessage());
+			throw new ManagerException("Unable to find currently used external ports at %s: %s ", hostAddress, e.getMessage());
 		}
-	}
-
-	public boolean isValidIPAddress(String ip) {
-		// Regex for digit from 0 to 255.
-		String zeroTo255
-			= "(\\d{1,2}|(0|1)\\"
-			+ "d{2}|2[0-4]\\d|25[0-5])";
-
-		// Regex for a digit from 0 to 255 and
-		// followed by a dot, repeat 4 times.
-		// this is the regex to validate an IP address.
-		String regex
-			= zeroTo255 + "\\."
-			+ zeroTo255 + "\\."
-			+ zeroTo255 + "\\."
-			+ zeroTo255;
-
-		// Compile the ReGex
-		Pattern p = Pattern.compile(regex);
-
-		// If the IP address is empty
-		// return false
-		if (ip == null) {
-			return false;
-		}
-
-		// Pattern class contains matcher() method
-		// to find matching between given IP address
-		// and regular expression.
-		Matcher m = p.matcher(ip);
-
-		// Return if the IP address
-		// matched the ReGex
-		return m.matches();
 	}
 
 }

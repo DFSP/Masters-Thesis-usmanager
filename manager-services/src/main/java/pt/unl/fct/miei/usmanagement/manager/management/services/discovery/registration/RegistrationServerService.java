@@ -31,9 +31,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
+import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -42,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,13 +59,22 @@ public class RegistrationServerService {
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 	private final ContainersService containersService;
+	private final AwsService awsService;
+	private final RegionsService regionsService;
+	private final CloudHostsService cloudHostsService;
+
 	private final int port;
 
 	public RegistrationServerService(HostsService hostsService, ServicesService servicesService,
-									 @Lazy ContainersService containersService, RegistrationProperties registrationProperties) {
+									 @Lazy ContainersService containersService, AwsService awsService,
+									 RegionsService regionsService, CloudHostsService cloudHostsService,
+									 RegistrationProperties registrationProperties) {
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
+		this.awsService = awsService;
+		this.regionsService = regionsService;
+		this.cloudHostsService = cloudHostsService;
 		this.port = registrationProperties.getPort();
 	}
 
@@ -72,20 +87,33 @@ public class RegistrationServerService {
 
 		Map<String, String> customLabels = Collections.emptyMap();
 
-		List<HostAddress> registrationServerHosts = getRegistrationServers();
-		String registrationServers = getRegistrationServerAddresses(registrationServerHosts);
+		String registrationServers = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
 
-		return containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
+		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
+
+		AwsRegion awsRegion = regionsService.getAwsRegion(hostAddress.getRegion());
+		String instanceId = cloudHostsService.getCloudHostByAddress(hostAddress).getInstanceId();
+
+		String allocationId = awsService.getAllocatedElasticIps().get(awsRegion).getAllocationId();
+		try {
+			awsService.associateElasticIpAddress(allocationId, instanceId).get();
+		}
+		catch (InterruptedException | ExecutionException e) {
+			throw new ManagerException("Failed to associate elastic ip address to the registration server: %s", e.getMessage());
+		}
+
+		return container;
 	}
 
 	public List<Container> launchRegistrationServers(List<RegionEnum> regions) {
 		log.info("Launching registration servers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getService(REGISTRATION_SERVER).getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(REGISTRATION_SERVER);
 
 		List<HostAddress> availableHosts = regions.parallelStream()
-			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
+			.map(region ->
+				hostsService.getCapableNode(expectedMemoryConsumption, region, node -> cloudHostsService.hasCloudHost(node.getPublicIpAddress())))
 			.distinct()
 			.collect(Collectors.toList());
 
@@ -93,9 +121,7 @@ public class RegistrationServerService {
 
 		Map<String, String> customLabels = Collections.emptyMap();
 
-		List<HostAddress> registrationServerHosts = getRegistrationServers();
-		registrationServerHosts.addAll(availableHosts);
-		String registrationServers = getRegistrationServerAddresses(registrationServerHosts);
+		String registrationServers = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
 
 		Gson gson = new Gson();
@@ -125,9 +151,9 @@ public class RegistrationServerService {
 		).stream().map(Container::getHostAddress).collect(Collectors.toList());
 	}
 
-	private String getRegistrationServerAddresses(List<HostAddress> registrationServerHosts) {
-		return registrationServerHosts.stream()
-			.map(hostAddress -> String.format("http://%s:%s/eureka/", hostAddress.getPublicIpAddress(), port))
+	private String getRegistrationServerAddresses() {
+		return awsService.getAllocatedElasticIps().values().stream()
+			.map(address -> String.format("http://%s:%s/eureka/", address.getPublicIp(), port))
 			.collect(Collectors.joining(","));
 	}
 

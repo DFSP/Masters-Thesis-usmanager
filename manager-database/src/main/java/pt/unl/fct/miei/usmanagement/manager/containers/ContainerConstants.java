@@ -38,7 +38,6 @@ public final class ContainerConstants {
 		public static final String MASTER = "MASTER";
 
 		public static final class LoadBalancer {
-			public static final String SERVER_NAME = "SERVER_NAME";
 			public static final String SERVER = "SERVER";
 		}
 	}

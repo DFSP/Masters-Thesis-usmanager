@@ -29,17 +29,17 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -51,6 +51,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final ContainersService containersService;
 	private final DockerSwarmService dockerSwarmService;
 	private final CloudHostsService cloudHostsService;
+	private final AwsService awsService;
 	private final SymService symService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final ServicesMonitoringService servicesMonitoringService;
@@ -58,12 +59,13 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final ServicesEventsService servicesEventsService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 SymService symService, CloudHostsService cloudHostsService,
+								 AwsService awsService, SymService symService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService,
 								 ServicesMonitoringService servicesMonitoringService, HostsEventsService hostsEventsService,
 								 ServicesEventsService servicesEventsService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
+		this.awsService = awsService;
 		this.symService = symService;
 		this.cloudHostsService = cloudHostsService;
 		this.hostsMonitoringService = hostsMonitoringService;
@@ -83,23 +85,33 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 				return !Objects.equals(serviceName, DockerApiProxyService.DOCKER_API_PROXY);
 			};
 			containersService.stopContainers(containersPredicate);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Failed to stop all containers: {}", e.getMessage());
 		}
 		try {
+			cloudHostsService.terminateInstances();
+		}
+		catch (Exception e) {
+			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
+		}
+		try {
+			awsService.releaseElasticIpAddresses();
+		}
+		catch (Exception e) {
+			log.error("Failed to release elastic ip addresses: {}", e.getMessage());
+		}
+		try {
 			dockerSwarmService.destroySwarm();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Failed to completely destroy swarm: {}", e.getMessage());
 		}
 		try {
 			containersService.stopDockerApiProxies();
-		} catch (Exception e) {
-			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
 		}
-		try {
-			cloudHostsService.terminateInstances();
-		} catch (Exception e) {
-			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
+		catch (Exception e) {
+			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
 		}
 		hostsEventsService.reset();
 		servicesEventsService.reset();

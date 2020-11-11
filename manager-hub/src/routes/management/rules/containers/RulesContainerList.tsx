@@ -54,7 +54,7 @@ class RulesContainerList extends BaseComponent<Props, {}> {
             <CardList<IRuleContainer>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não há regras sobre contentores para mostrar"}
+                emptyMessage={"Não está definida nenhuma regra sobre contentores"}
                 list={this.props.containerRules}
                 card={this.rule}
                 predicate={this.predicate}/>

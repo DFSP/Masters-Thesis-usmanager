@@ -157,7 +157,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Não foi possível remover a instância cloud`, 10000, reason, true);
+        super.toast(`Não foi possível remover a instância`, 10000, reason, true);
 
     private getSelectableCloudHostNames = () => {
         const {cloudHosts, ruleCloudHosts, unsavedCloudHosts} = this.props;

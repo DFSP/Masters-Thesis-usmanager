@@ -408,7 +408,7 @@ public class ServicesMonitoringService {
 			startLocation = hostsService.getHostLocation(hostAddress);
 			log.info("Starting service {} from {} on the same host", serviceName, hostAddress);
 		}
-		double serviceExpectedMemoryConsumption = servicesService.getService(serviceName).getExpectedMemoryConsumption();
+		double serviceExpectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 		HostAddress selectedHostAddress = hostsService.getAvailableHost(serviceExpectedMemoryConsumption, startLocation);
 		String replicatedContainerId = containersService.replicateContainer(containerId, selectedHostAddress).getContainerId();
 		HostDetails selectedHostDetails = hostsService.getFullHostAddress(selectedHostAddress);

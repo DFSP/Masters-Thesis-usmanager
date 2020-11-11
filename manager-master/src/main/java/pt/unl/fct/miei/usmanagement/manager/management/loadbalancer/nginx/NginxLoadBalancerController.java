@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,11 @@ public class NginxLoadBalancerController {
 	@GetMapping
 	public List<NginxServiceServers> getServers() {
 		return nginxLoadBalancerService.getServers();
+	}
+
+	@GetMapping("/{region}/{service}")
+	public List<NginxServer> getServers(@PathVariable("region") String region, @PathVariable("service") String service) {
+		return nginxLoadBalancerService.getServers(RegionEnum.getRegion(region), service);
 	}
 
 	@PostMapping

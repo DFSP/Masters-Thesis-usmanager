@@ -26,10 +26,19 @@ import {ComposableMap, Geographies, Geography, Marker, Point, ZoomableGroup} fro
 import React, {createRef, memo} from "react";
 import * as d3Geo from "d3-geo";
 import {IMarker} from "./Marker";
+import {bindActionCreators} from "redux";
+import {updateSearch} from "../../actions";
+import {withRouter} from "react-router";
+import {connect} from "react-redux";
+import {ReduxState} from "../../reducers";
 
 const {geoPath} = d3Geo
 
-type Props = {
+interface StateToProps {
+    sidenavVisible: boolean;
+}
+
+type Props = StateToProps & {
     setTooltipContent: (tooltip: string) => void;
     onClick?: (marker: IMarker) => void;
     markers?: { coordinates: Point, marker: JSX.Element }[];
@@ -56,8 +65,8 @@ class MapChart extends React.Component<Props, State> {
         super(props);
         this.state = {
             scale: 1.0,
-            position: {coordinates: [0, 0], zoom: 1},
-            maxWidth: window.innerWidth,
+            position: {coordinates: [15, 0], zoom: 1},
+            maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225),
             maxHeight: window.innerHeight - 125,
         };
     }
@@ -71,14 +80,24 @@ class MapChart extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        this.calculateScale();
+        if (prevProps.sidenavVisible !== this.props.sidenavVisible && this.props.sidenavVisible) {
+            setTimeout(() => this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225)})), 150)
+        }
         if (this.props.center !== undefined && prevProps.center !== this.props.center) {
-            this.setState({position: {coordinates: [0, 0], zoom: 1}});
+            this.setState({position: {coordinates: [15, 0], zoom: 1}})
         }
         if (prevProps.zoomable !== this.props.zoomable) {
-            this.setState({position: {coordinates: this.props.position?.coordinates || [0, 0], zoom: 1}});
+            this.setState({position: {coordinates: this.props.position?.coordinates || [15, 0], zoom: 1}})
+        }
+        this.calculateScale();
+    }
+
+    getSnapshotBeforeUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): any | null {
+        if (prevProps.sidenavVisible !== this.props.sidenavVisible && !this.props.sidenavVisible) {
+            this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225)}))
         }
     }
+
 
     public componentWillUnmount() {
         if (global.window) {
@@ -87,8 +106,8 @@ class MapChart extends React.Component<Props, State> {
     }
 
     private handleResize = () => {
+        this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225), maxHeight: window.innerHeight - 125}))
         this.calculateScale();
-        this.setState(_ => ({maxWidth: window.innerWidth, maxHeight: window.innerHeight - 125}))
     }
 
 
@@ -179,4 +198,9 @@ class MapChart extends React.Component<Props, State> {
 
 }
 
-export default memo(MapChart);
+const mapStateToProps = (state: ReduxState): StateToProps => (
+    {
+        sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+    }
+);
+export default connect(mapStateToProps)(MapChart);

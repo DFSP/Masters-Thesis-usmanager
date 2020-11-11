@@ -31,6 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 
 import java.util.Arrays;
 import java.util.List;

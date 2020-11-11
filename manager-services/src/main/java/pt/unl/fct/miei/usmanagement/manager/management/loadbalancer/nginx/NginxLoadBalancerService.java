@@ -33,6 +33,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -51,11 +52,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -98,7 +102,7 @@ public class NginxLoadBalancerService {
 	public List<Container> launchLoadBalancers(List<RegionEnum> regions) {
 		log.info("Launching load balancers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(LOAD_BALANCER);
 
 		Gson gson = new Gson();
 		return regions.parallelStream()
@@ -131,7 +135,7 @@ public class NginxLoadBalancerService {
 	}
 
 	private Container launchLoadBalancer(RegionEnum region, NginxServer[] nginxServers) {
-		double availableMemory = servicesService.getService(LOAD_BALANCER).getExpectedMemoryConsumption();
+		double availableMemory = servicesService.getExpectedMemoryConsumption(LOAD_BALANCER);
 		HostAddress hostAddress = hostsService.getCapableNode(availableMemory, region);
 		return launchLoadBalancer(hostAddress, nginxServers);
 	}
@@ -175,33 +179,77 @@ public class NginxLoadBalancerService {
 	}
 
 	public List<NginxServiceServers> getServers() {
-		List<NginxServiceServers> servicesServers = new ArrayList<>();
+		List<CompletableFuture<List<NginxServiceServers>>> futureLoadBalancerServers = new LinkedList<>();
 		List<Container> loadBalancers = getLoadBalancers();
-		loadBalancers.parallelStream().forEach(loadBalancer -> {
-			String url = String.format("%s/servers", getLoadBalancerApiUrl(loadBalancer));
-			HttpEntity<String> request = new HttpEntity<>(headers);
-			ResponseEntity<NginxServiceServers[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServiceServers[].class);
-			NginxServiceServers[] responseBody = response.getBody();
-			if (responseBody != null) {
-				servicesServers.addAll(Arrays.asList(responseBody));
+		for (Container loadBalancer : loadBalancers) {
+			CompletableFuture<List<NginxServiceServers>> futureServers = getServers(loadBalancer);
+			futureLoadBalancerServers.add(futureServers);
+		}
+
+		CompletableFuture.allOf(futureLoadBalancerServers.toArray(new CompletableFuture[0])).join();
+
+		List<NginxServiceServers> servicesServers = new ArrayList<>();
+		for (CompletableFuture<List<NginxServiceServers>> loadBalancerServers : futureLoadBalancerServers) {
+			try {
+				List<NginxServiceServers> nginxServiceServers = loadBalancerServers.get();
+				servicesServers.addAll(nginxServiceServers);
 			}
-		});
+			catch (InterruptedException | ExecutionException e) {
+				log.error("Failed to get servers from all load-balancers: {}", e.getMessage());
+			}
+		}
 
 		return servicesServers;
 	}
 
-	private List<NginxServer> getServers(String serviceName, RegionEnum region) {
+	@Async
+	public CompletableFuture<List<NginxServiceServers>> getServers(Container loadBalancer) {
+		List<NginxServiceServers> servers = new ArrayList<>();
+		String url = String.format("%s/servers", getLoadBalancerApiUrl(loadBalancer));
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		ResponseEntity<NginxServiceServers[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServiceServers[].class);
+		NginxServiceServers[] responseBody = response.getBody();
+		if (responseBody != null) {
+			servers.addAll(Arrays.asList(responseBody));
+		}
+		return CompletableFuture.completedFuture(servers);
+	}
+
+	@Async
+	public CompletableFuture<List<NginxServer>> getServers(Container loadBalancer, String serviceName) {
 		List<NginxServer> servers = new ArrayList<>();
+		String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		ResponseEntity<NginxServer[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServer[].class);
+		NginxServer[] responseBody = response.getBody();
+		if (responseBody != null) {
+			servers.addAll(Arrays.asList(responseBody));
+		}
+
+		return CompletableFuture.completedFuture(servers);
+	}
+
+	public List<NginxServer> getServers(RegionEnum region, String serviceName) {
 		List<Container> loadBalancers = getLoadBalancers(region);
-		loadBalancers.parallelStream().forEach(loadBalancer -> {
-			String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
-			HttpEntity<String> request = new HttpEntity<>(headers);
-			ResponseEntity<NginxServer[]> response = restTemplate.exchange(url, HttpMethod.GET, request, NginxServer[].class);
-			NginxServer[] responseBody = response.getBody();
-			if (responseBody != null) {
-				servers.addAll(Arrays.asList(responseBody));
+
+		List<CompletableFuture<List<NginxServer>>> futureLoadBalancerServers = new ArrayList<>();
+		for (Container loadBalancer : loadBalancers) {
+			futureLoadBalancerServers.add(getServers(loadBalancer, serviceName));
+		}
+
+		CompletableFuture.allOf(futureLoadBalancerServers.toArray(new CompletableFuture[0])).join();
+
+		List<NginxServer> servers = new ArrayList<>();
+		for (CompletableFuture<List<NginxServer>> loadBalancerServers : futureLoadBalancerServers) {
+			try {
+				List<NginxServer> nginxServers = loadBalancerServers.get();
+				servers.addAll(nginxServers);
 			}
-		});
+			catch (InterruptedException | ExecutionException e) {
+				log.error("Failed to get servers for service {} from load-balancer", serviceName);
+			}
+		}
+
 		return servers;
 	}
 
@@ -209,7 +257,7 @@ public class NginxLoadBalancerService {
 		NginxServer nginxServer = new NginxServer(server, coordinates.getLatitude(), coordinates.getLongitude(), region.name());
 		List<Container> loadBalancers = getLoadBalancers(region);
 		if (loadBalancers.isEmpty()) {
-			Container container = launchLoadBalancer(region, new NginxServer[]{ nginxServer });
+			Container container = launchLoadBalancer(region, new NginxServer[]{nginxServer});
 			loadBalancers.add(container);
 		}
 		loadBalancers.parallelStream().forEach(loadBalancer -> {
@@ -218,7 +266,8 @@ public class NginxLoadBalancerService {
 			try {
 				restTemplate.postForEntity(url, request, NginxServer[].class);
 				log.info("Added server {} to load balancer {}", nginxServer, url);
-			} catch (HttpClientErrorException e) {
+			}
+			catch (HttpClientErrorException e) {
 				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, e.getMessage());
 			}
 		});
@@ -231,9 +280,9 @@ public class NginxLoadBalancerService {
 			String url = String.format("%s/%s/servers/%s", getLoadBalancerApiUrl(loadBalancer), serviceName, server);
 			try {
 				restTemplate.delete(url);
-			} catch (HttpClientErrorException e) {
-				throw new ManagerException("Failed to remove server %s of service %s from load balancer %s: %s", server, serviceName,
-					url, e.getMessage());
+			}
+			catch (HttpClientErrorException e) {
+				throw new ManagerException("Failed to remove server %s of service %s from load balancer %s: %s", server, serviceName, url, e.getMessage());
 			}
 		});
 		if (!containersService.hasContainers(region, serviceName)) {

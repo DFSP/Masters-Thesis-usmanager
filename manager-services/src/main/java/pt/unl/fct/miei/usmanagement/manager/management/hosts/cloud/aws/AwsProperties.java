@@ -41,7 +41,6 @@ public class AwsProperties {
 	private final Instance instance;
 	private int initialMaxInstances;
 	private int maxRetries;
-	private int delayBetweenRetries;
 	private int connectionTimeout;
 
 	public AwsProperties() {

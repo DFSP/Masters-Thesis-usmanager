@@ -72,7 +72,7 @@ class Containers extends BaseComponent<Props, {}> {
                     <CardList<IContainer>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"Não há contentores para mostrar"}
+                        emptyMessage={"Não existem contentores a executar"}
                         list={this.props.containers}
                         card={this.container}
                         predicate={this.predicate}/>

@@ -148,13 +148,14 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                             </label>
                         </p>
                     )}
-                    {!error && dropdown && (
+                    {dropdown && (
                         <>
                             <button
-                                className={`dropdown-trigger btn-floating btn-flat btn-small right ${styles.formButton}`}
+                                className={`dropdown-trigger btn-floating btn-flat btn-small right ${styles.button}`}
                                 data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
                                 data-target={`dropdown-${dropdown.id}`}
-                                ref={this.dropdown}>
+                                ref={this.dropdown}
+                                disabled={!!error}>
                                 <i className='material-icons'>add</i>
                             </button>
                             <ul id={`dropdown-${dropdown.id}`}
@@ -197,10 +198,10 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                             .some(checked => checked)
                             ? {transform: "scale(1)"}
                             : {transform: "scale(0)"}}*/
-                            disabled={!!error || Object.values(this.state)
-                                .map(item => item?.isChecked || false)
-                                .every(checked => !checked)}
-                            onClick={this.onRemove}>
+                                       disabled={!!error || Object.values(this.state)
+                                           .map(item => item?.isChecked || false)
+                                           .every(checked => !checked)}
+                                       onClick={this.onRemove}>
                         {removeButtonText || 'Remover'}
                     </button>}
                 </div>

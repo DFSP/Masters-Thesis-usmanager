@@ -89,6 +89,7 @@ public class Service {
 	@Min(0)
 	private Integer minimumReplicas;
 
+	@Builder.Default
 	@Min(0)
 	private Integer maximumReplicas = 0;
 

@@ -32,6 +32,7 @@
 .icon {
     color: #e51220;
     font-size: 4rem;
+    user-select: none;
 }
 
 .message {

@@ -254,7 +254,7 @@ class Container extends BaseComponent<Props, State> {
         let containers = reply.data;
         if (containers.length === 1) {
             const container = containers[0];
-            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no nó ${container.publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no host ${container.publicIpAddress}</span>`);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
@@ -270,8 +270,14 @@ class Container extends BaseComponent<Props, State> {
         this.props.addContainers(containers);
     };
 
-    private onPostFailure = (reason: string, container: INewContainerHost): void =>
-        super.toast(`Não foi possível executar o contentor no host <b>${container.hostAddress?.publicIpAddress}/${container.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
+    private onPostFailure = (reason: string, request: INewContainerHost | INewContainerLocation): void => {
+        if ('hostAddress' in request) {
+            super.toast(`Não foi possível iniciar o contentor no host <b>${request.hostAddress?.publicIpAddress}/${request.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
+        } else if ('coordinates' in request) {
+            super.toast(`Não foi possível iniciar o contentor na localização <b>${request.coordinates}</b>`, 10000, reason, true);
+        }
+    }
+
 
     private onDeleteSuccess = (container: IContainer): void => {
         super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.containerId}</b> foi parado com sucesso</span>`);
@@ -677,9 +683,11 @@ class Container extends BaseComponent<Props, State> {
                                              zoomable: true,
                                              labeled: true
                                          }}/>
-                                : <Field key={index}
-                                         id={key}
-                                         label={key}/>
+                                : key === 'command'
+                                    ? <Field key={index} id={key} label={key} type='multilinetext'/>
+                                    : <Field key={index}
+                                             id={key}
+                                             label={key}/>
                 )}
             </>;
     }
@@ -717,7 +725,7 @@ class Container extends BaseComponent<Props, State> {
                           isNew={isNewContainer}
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
-                              textButton: 'Executar',
+                              textButton: 'Iniciar',
                               url: 'containers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure

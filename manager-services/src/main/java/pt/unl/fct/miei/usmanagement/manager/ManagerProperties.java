@@ -35,6 +35,4 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("manager")
 public class ManagerProperties {
 
-	private Mode mode;
-
 }

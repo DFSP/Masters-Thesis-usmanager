@@ -103,8 +103,7 @@ public class WorkerManagersService {
 	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {
 		log.info("Launching worker managers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER)
-			.getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(WorkerManagerProperties.WORKER_MANAGER);
 
 		return regions.parallelStream()
 			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))

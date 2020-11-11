@@ -34,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -41,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
@@ -111,7 +113,7 @@ public class DatabaseLoader {
 								   ServiceRuleConditions serviceRuleConditions,
 								   DockerProperties dockerProperties, HostsEventsService hostsEventsService,
 								   ServicesEventsService servicesEventsService, HostsMonitoringService hostsMonitoringService,
-								   ServicesMonitoringService servicesMonitoringService) {
+								   ServicesMonitoringService servicesMonitoringService, ContainersService containersService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -377,7 +379,7 @@ public class DatabaseLoader {
 		catch (EntityNotFoundException ignored) {
 			ram = Field.builder()
 				.name("ram")
-				.query(PrometheusQueryEnum.MEMORY_USAGE)
+				.prometheusQuery(PrometheusQueryEnum.MEMORY_USAGE)
 				.build();
 			ram = fieldsService.addField(ram);
 		}
@@ -390,7 +392,7 @@ public class DatabaseLoader {
 		catch (EntityNotFoundException ignored) {
 			cpuPercentage = Field.builder()
 				.name("cpu-%")
-				.query(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
+				.prometheusQuery(PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
 				.build();
 			cpuPercentage = fieldsService.addField(cpuPercentage);
 		}
@@ -403,7 +405,7 @@ public class DatabaseLoader {
 		catch (EntityNotFoundException ignored) {
 			ramPercentage = Field.builder()
 				.name("ram-%")
-				.query(PrometheusQueryEnum.MEMORY_USAGE_PERCENTAGE)
+				.prometheusQuery(PrometheusQueryEnum.MEMORY_USAGE_PERCENTAGE)
 				.build();
 			ramPercentage = fieldsService.addField(ramPercentage);
 		}
@@ -488,7 +490,7 @@ public class DatabaseLoader {
 		catch (EntityNotFoundException ignored) {
 			latency = Field.builder()
 				.name("filesystem-available-space")
-				.query(PrometheusQueryEnum.FILESYSTEM_AVAILABLE_SPACE)
+				.prometheusQuery(PrometheusQueryEnum.FILESYSTEM_AVAILABLE_SPACE)
 				.build();
 			filesystemAvailableSpace = fieldsService.addField(latency);
 		}
@@ -733,7 +735,7 @@ public class DatabaseLoader {
 
 		EdgeHost danielHost;
 		try {
-			danielHost = edgeHostsService.getEdgeHostByDns("dpimenta.ddns.net");
+			danielHost = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
 		}
 		catch (EntityNotFoundException ignored) {
 			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
@@ -742,7 +744,7 @@ public class DatabaseLoader {
 				.username("daniel")
 				.publicIpAddress("2.82.208.89")
 				.privateIpAddress("192.168.1.83")
-				.publicDnsName("dpimenta.ddns.net")
+				.publicDnsName("danielfct.ddns.net")
 				.region(region)
 				.coordinates(coordinates)
 				.build());
@@ -784,7 +786,7 @@ public class DatabaseLoader {
 			service = servicesService.getService(appName);
 		}
 		catch (EntityNotFoundException ignored) {
-			String launchCommand = launch == null ? null : launch.stream().map(param -> "${" + Text.capitalize(param) + "}").collect(Collectors.joining(" "));
+			String launchCommand = launch == null ? null : launch.stream().map(param -> "${" + Text.capitalize(param) + "Host}").collect(Collectors.joining(" "));
 			service = Service.builder()
 				.serviceName(appName)
 				.dockerRepository(dockerHubUsername + "/" + appName)

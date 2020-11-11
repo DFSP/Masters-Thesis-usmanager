@@ -76,7 +76,7 @@ public class BashService {
 	}
 
 	public void cleanup(String... files) {
-		String cleanupCommand = String.format("rm -f" + Strings.repeat(" %s", files.length), files);
+		String cleanupCommand = String.format("rm -f" + Strings.repeat(" %s", files.length), (Object) files);
 		executeCommandSync(cleanupCommand);
 	}
 

@@ -317,6 +317,11 @@ public class ServicesService {
 		return services.getMaximumReplicas(serviceName);
 	}
 
+	public double getExpectedMemoryConsumption(String serviceName) {
+		Double memoryConsumption = getService(serviceName).getExpectedMemoryConsumption();
+		return memoryConsumption == null ? 0 : memoryConsumption;
+	}
+
 	private void checkServiceExists(Long serviceId) {
 		if (!services.hasService(serviceId)) {
 			throw new EntityNotFoundException(Service.class, "id", serviceId.toString());

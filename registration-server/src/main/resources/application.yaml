@@ -22,14 +22,18 @@
 # SOFTWARE.
 #
 
+server:
+  port: 8761
 eureka:
+  shouldBatchReplication: true
   client:
     serviceUrl:
-      defaultZone: ${zone:http://localhost:8761/eureka/}
+      defaultZone: >
+        ${zone:
+        http://18.193.175.164:7001/eureka,
+        }
   instance:
     appname: eureka-server
     hostname: ${host:localhost}
     instance-id: ${id:30b5f1e3d8cb54b548dae75d3a97e6a7f0657257} #sha1(eureka-server_127.0.0.1_8761)
     ip-address: ${ip:localhost}
-server:
-  port: ${port:8761}

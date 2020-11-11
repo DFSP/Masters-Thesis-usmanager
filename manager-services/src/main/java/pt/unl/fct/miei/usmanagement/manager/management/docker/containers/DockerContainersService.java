@@ -43,6 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -135,7 +136,8 @@ public class DockerContainersService {
 													 Map<String, String> dynamicLaunchParams) {
 		List<String> environment = Collections.emptyList();
 		Map<String, String> labels = Collections.emptyMap();
-		double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
+		Double memoryConsumption = service.getExpectedMemoryConsumption();
+		double expectedMemoryConsumption = memoryConsumption == null ? 0 : memoryConsumption;
 		int minimumReplicas = servicesService.getMinimumReplicasByServiceName(service.getServiceName());
 		List<DockerContainer> containers = new ArrayList<>(minimumReplicas);
 		for (int i = 0; i < minimumReplicas; i++) {
@@ -148,7 +150,7 @@ public class DockerContainersService {
 	}
 
 	public Optional<DockerContainer> launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
-		double expectedMemoryUsage = servicesService.getService(serviceName).getExpectedMemoryConsumption();
+		double expectedMemoryUsage = servicesService.getExpectedMemoryConsumption(serviceName);
 		HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryUsage, coordinates);
 		return launchContainer(hostAddress, serviceName, externalPort, internalPort);
 	}
@@ -237,7 +239,7 @@ public class DockerContainersService {
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
 		launchingContainer = true;
-		int retries = 5;
+		final int retries = 3;
 		String errorMessage = null;
 		try {
 			for (var i = 0; i < retries; i++) {
@@ -282,7 +284,9 @@ public class DockerContainersService {
 					.replace("${hostname}", hostAddress.getPublicIpAddress())
 					.replace("${externalPort}", String.valueOf(externalPort))
 					.replace("${internalPort}", String.valueOf(internalPort));
-				log.info("Launch command: {}", launchCommand);
+				if (!launchCommand.isEmpty()) {
+					log.info("Launch command: {}", launchCommand);
+				}
 
 				RegionEnum region = hostAddress.getRegion();
 				if (serviceDependenciesService.hasDependents(serviceName)) {
@@ -353,9 +357,12 @@ public class DockerContainersService {
 				}
 				catch (DockerException | InterruptedException e) {
 					errorMessage = e.getMessage();
-					log.error("Failed to start container: {}", errorMessage);
+					if (errorMessage.toLowerCase().contains("image not found")) {
+						throw new EntityNotFoundException("image", "name", serviceName);
+					}
+					log.error("Failed to start container: {}. Retrying... ({}/{})", errorMessage, i, retries);
 				}
-				Timing.sleep(i, TimeUnit.SECONDS);
+				Timing.sleep(i + 1, TimeUnit.SECONDS);
 			}
 		}
 		finally {
@@ -470,8 +477,7 @@ public class DockerContainersService {
 			return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Failed to get containers running at {}: {}", hostAddress.toSimpleString(), e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Failed to get containers running at %s: %s", hostAddress.toSimpleString(), e.getMessage());
 		}
 	}
 
@@ -500,8 +506,7 @@ public class DockerContainersService {
 			return dockerClient.inspectContainer(containerId);
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to get inspect container {}: {}", containerId, e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to get inspect container %s: %s", containerId, e.getMessage());
 		}
 	}
 
@@ -561,7 +566,9 @@ public class DockerContainersService {
 
 	public List<DockerContainer> stopAll(Predicate<DockerContainer> containersPredicate) {
 		List<DockerContainer> containers = getContainers();
-		containers.removeIf(Predicate.not(containersPredicate));
+		if (containersPredicate != null) {
+			containers.removeIf(Predicate.not(containersPredicate));
+		}
 		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
 		return containers;
 	}

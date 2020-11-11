@@ -25,17 +25,22 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,12 +60,27 @@ public class HostMetricsService {
 	}
 
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
-		List<Optional<Double>> metrics = List.of(
+		List<CompletableFuture<Optional<Double>>> futureMetrics = List.of(
 			PrometheusQueryEnum.TOTAL_MEMORY,
 			PrometheusQueryEnum.AVAILABLE_MEMORY,
 			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
-			.parallelStream().map(stat -> prometheusService.getStat(hostAddress, stat))
+			.stream().map(stat -> prometheusService.getStat(hostAddress, stat))
 			.collect(Collectors.toList());
+
+		CompletableFuture.allOf(futureMetrics.toArray(new CompletableFuture[0])).join();
+
+		List<Optional<Double>> metrics;
+		try {
+			metrics = new ArrayList<>();
+			for (CompletableFuture<Optional<Double>> futureMetric : futureMetrics) {
+				Optional<Double> metric = futureMetric.get();
+				metrics.add(metric);
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			log.error("Unable to get metrics from prometheus for host {}: {}", hostAddress.toSimpleString(), e.getMessage());
+			return false;
+		}
+
 		Optional<Double> totalRam = metrics.get(0);
 		Optional<Double> availableRam = metrics.get(1);
 		Optional<Double> cpuUsage = metrics.get(2);
@@ -81,18 +101,11 @@ public class HostMetricsService {
 		return false;
 	}
 
-	public Map<String, Double> getHostStats(HostAddress hostAddress) {
-		Map<String, Double> fieldsValues = new HashMap<>();
-
+	public Map<String, CompletableFuture<Optional<Double>>> getHostStats(HostAddress hostAddress) {
 		// Stats from prometheus (node exporter)
-		fieldsService.getFields().parallelStream()
-			.filter(field -> field.getQuery() != null)
-			.forEach(field -> {
-				Optional<Double> value = prometheusService.getStat(hostAddress, field.getQuery());
-				value.ifPresent(v -> fieldsValues.put(field.getName(), v));
-			});
-
-		return fieldsValues;
+		return fieldsService.getFields().stream()
+			.filter(field -> field.getPrometheusQuery() != null)
+			.collect(Collectors.toMap(Field::getName, field -> prometheusService.getStat(hostAddress, field.getPrometheusQuery())));
 	}
 
 }

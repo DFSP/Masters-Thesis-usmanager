@@ -74,7 +74,7 @@ public class NodesService {
 				.collect(Collectors.toList());
 		}
 		catch (DockerException | InterruptedException e) {
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to get nodes: %s", e.getMessage());
 		}
 	}
 
@@ -133,8 +133,7 @@ public class NodesService {
 			log.info("Deleted node {}", nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable remove node {} from the swarm: {}", nodeId, e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable remove node %s from the swarm: %s", nodeId, e.getMessage());
 		}
 	}
 
@@ -148,8 +147,7 @@ public class NodesService {
 			return nodeInfo.managerStatus() != null;
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to check if node {} is a manager: {}", nodeId, e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to check if node %s is a manager: %s", nodeId, e.getMessage());
 		}
 	}
 
@@ -159,8 +157,7 @@ public class NodesService {
 			return nodeInfo.managerStatus() == null;
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to check if node {} is a worker: {}", nodeId, e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to check if node %s is a worker: %s", nodeId, e.getMessage());
 		}
 	}
 
@@ -231,8 +228,7 @@ public class NodesService {
 			return getNode(nodeId);
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to update node {}: {}", nodeId, e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Unable to update node %s: %s", nodeId, e.getMessage());
 		}
 	}
 

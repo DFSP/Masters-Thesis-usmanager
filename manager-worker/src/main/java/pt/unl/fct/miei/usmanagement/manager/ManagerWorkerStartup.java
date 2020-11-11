@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
+import lombok.SneakyThrows;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -50,6 +51,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		this.hostsMonitoringService = hostsMonitoringService;*/
 	}
 
+	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
 		hostsService.setHostAddress();

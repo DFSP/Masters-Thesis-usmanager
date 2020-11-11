@@ -25,11 +25,9 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -48,9 +46,11 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitorings;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -63,6 +63,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -187,40 +189,77 @@ public class HostsMonitoringService {
 				}
 				catch (Exception e) {
 					log.error(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}, monitorPeriod, monitorPeriod);
 	}
 
 	private void monitorHostsTask() {
-		cloudHostsService.synchronizeDatabaseCloudHosts();
+		List<SimpleNode> nodes = nodesService.getReadyNodes();
+		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
+			.map(node -> getHostDecisions(node.getHostAddress()))
+			.collect(Collectors.toList());
+
+		CompletableFuture.allOf(futureHostDecisions.toArray(new CompletableFuture[0])).join();
 
 		List<HostDecisionResult> hostDecisions = new LinkedList<>();
+		List<HostAddress> successfulHostAddresses = new LinkedList<>();
+		for (CompletableFuture<HostDecisionResult> futureHostDecision : futureHostDecisions) {
+			try {
+				HostDecisionResult hostDecisionResult = futureHostDecision.get();
+				hostDecisions.add(hostDecisionResult);
+				successfulHostAddresses.add(hostDecisionResult.getHostAddress());
+			}
+			catch (InterruptedException | ExecutionException e) {
+				log.error("Failed to get decisions from all hosts: {}", e.getMessage());
+			}
+		}
 
-		List<SimpleNode> nodes = nodesService.getReadyNodes();
-		nodes.parallelStream().forEach(node -> {
-			HostAddress hostAddress = node.getHostAddress();
-			
-			// Metrics from prometheus (node_exporter)
-			Map<String, Double> stats = hostMetricsService.getHostStats(hostAddress);
+		// filter out unsuccessful hosts
+		nodes = nodes.stream().filter(simpleNode -> successfulHostAddresses.contains(simpleNode.getHostAddress()))
+			.collect(Collectors.toList());
 
-			// Simulated host metrics
-			Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
-				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
-				.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue));
-			stats.putAll(hostSimulatedFields);
-
-			stats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
-
-			HostDecisionResult hostDecisionResult = runRules(hostAddress, stats);
-			hostDecisions.add(hostDecisionResult);
-		});
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);
 		}
 		else {
 			log.info("No host decisions to process");
 		}
+	}
+
+	@Async
+	public CompletableFuture<HostDecisionResult> getHostDecisions(HostAddress hostAddress) {
+		// Metrics from prometheus (node_exporter)
+		Map<String, CompletableFuture<Optional<Double>>> futureStats = hostMetricsService.getHostStats(hostAddress);
+
+		CompletableFuture.allOf(futureStats.values().toArray(new CompletableFuture[0])).join();
+
+		Map<String, Optional<Double>> stats = futureStats.entrySet()
+			.stream()
+			.collect(Collectors.toMap(Map.Entry::getKey,
+				futureStat -> {
+					try {
+						return futureStat.getValue().get();
+					}
+					catch (InterruptedException | ExecutionException interruptedException) {
+						log.error("Unable to get value of field {} from host {}", futureStat.getKey(), hostAddress.toSimpleString());
+					}
+					return Optional.empty();
+				}));
+		Map<String, Double> validStats = stats.entrySet().stream()
+			.filter(stat -> stat.getValue().isPresent())
+			.collect(Collectors.toMap(Map.Entry::getKey, x -> x.getValue().get()));
+
+		// Simulated host metrics
+		Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
+			.stream().filter(metric -> metric.isActive() && (!validStats.containsKey(metric.getName()) || metric.isOverride()))
+			.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue));
+		validStats.putAll(hostSimulatedFields);
+
+		validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
+
+		return CompletableFuture.completedFuture(runRules(hostAddress, validStats));
 	}
 
 	private HostDecisionResult runRules(HostAddress hostAddress, Map<String, Double> newFields) {
@@ -249,7 +288,9 @@ public class HostsMonitoringService {
 
 	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<SimpleNode> nodes) {
 		List<HostDecisionResult> decisions = new LinkedList<>();
-		for (HostDecisionResult decision : hostDecisions) {
+		hostDecisions.forEach(futureDecision -> {
+			HostDecisionResult decision;
+			decision = futureDecision;
 			HostAddress hostAddress = decision.getHostAddress();
 			RuleDecisionEnum ruleDecision = decision.getDecision();
 			HostEvent hostEvent = hostsEventsService.saveHostEvent(hostAddress, ruleDecision.toString());
@@ -260,12 +301,12 @@ public class HostsMonitoringService {
 				HostDecision hostDecision = decisionsService.addHostDecision(hostAddress, ruleDecision.name(),
 					decision.getRuleId());
 				decisionsService.addHostDecisionValueFromFields(hostDecision, decision.getFields());
-				log.info("Host {} had decision {} as event #{}. Triggering action {} node", hostAddress, ruleDecision, hostEventCount, ruleDecision);
+				log.info("Host {} had decision {} as event #{}. Triggering action {}", hostAddress, ruleDecision, hostEventCount, ruleDecision);
 			}
 			else {
 				log.info("Host {} had decision {} as event #{}. Nothing to do", hostAddress, ruleDecision, hostEventCount);
 			}
-		}
+		});
 		if (!decisions.isEmpty()) {
 			executeDecisions(decisions, nodes.size());
 		}
@@ -299,8 +340,7 @@ public class HostsMonitoringService {
 		getRandomContainerToMigrateFrom(hostAddress).ifPresent(container -> {
 			String containerId = container.getContainerId();
 			String serviceName = container.getServiceName();
-			Service serviceConfig = servicesService.getService(serviceName);
-			double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
+			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 			Coordinates coordinates = container.getCoordinates();
 			HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 			containersService.migrateContainer(containerId, toHostAddress);
@@ -317,8 +357,7 @@ public class HostsMonitoringService {
 		containers.forEach(container -> {
 			String containerId = container.getContainerId();
 			String serviceName = container.getServiceName();
-			Service serviceConfig = servicesService.getService(serviceName);
-			double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
+			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 			// TODO does the memory consumption of containers initializing is taken into account?
 			HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 			containersService.migrateContainer(containerId, toHostAddress);

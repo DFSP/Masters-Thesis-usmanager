@@ -25,6 +25,7 @@
 import {Point} from "react-simple-maps";
 import React from "react";
 import {ICoordinates} from "./LocationMap";
+import styles from "./Marker.module.css";
 
 export interface IMarker extends ICoordinates {
     title: string,
@@ -64,12 +65,12 @@ export default function Marker({setTooltipContent, title, titleCoordinates, labe
                     onMouseEnter={() => setTooltipContent(tooltip)}
                     onMouseLeave={() => setTooltipContent("")}
                     onClick={onRemove}/>
-            <circle r={size} stroke="black" strokeWidth={size/2.5} fill="none" />
+            <circle r={size} stroke='black' strokeWidth={size / 2.5} fill='none'/>
             {label &&
             <text
-                textAnchor="middle"
-                y={size * 3.7}
-                style={{fontFamily: "system-ui", fill: "#5D5A6D", fontSize: size * 3, pointerEvents: "none"}}>
+                style={{fontFamily: "system-ui", fill: "#000", fontSize: size * 3, pointerEvents: "none"}}
+                textAnchor='middle'
+                y={size * 3.7}>
                 {label}
             </text>}
         </>

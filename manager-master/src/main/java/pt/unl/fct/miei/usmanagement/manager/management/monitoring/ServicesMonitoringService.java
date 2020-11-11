@@ -246,6 +246,7 @@ public class ServicesMonitoringService {
 
 		systemContainers.parallelStream()
 			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
+			.distinct()
 			.forEach(containersRecoveryService::restartContainer);
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
@@ -403,8 +404,7 @@ public class ServicesMonitoringService {
 				if (coordinates == null) {
 					coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
 				}
-				Service service = servicesService.getService(serviceName);
-				double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
+				double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 				HostAddress hostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 				log.info("Service {} has too few replicas ({}/{}). Starting another container close to {}",
 					serviceName, currentReplicas, minimumReplicas, hostAddress);
@@ -422,7 +422,7 @@ public class ServicesMonitoringService {
 						if (coordinates == null) {
 							coordinates = topPriorityDecisionResult.getHostAddress().getCoordinates();
 						}
-						double expectedMemoryConsumption = servicesService.getService(serviceName).getExpectedMemoryConsumption();
+						double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 						HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
 						String replicatedContainerId = containersService.replicateContainer(containerId, toHostAddress).getContainerId();
 						String result = String.format("replicated container %s of service %s to container %s on %s",

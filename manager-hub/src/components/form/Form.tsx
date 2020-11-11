@@ -258,21 +258,22 @@ class Form extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (prevProps.showSaveButton !== this.props.showSaveButton
-            || prevState.values !== this.state.values
-            || prevState.savedValues !== this.state.savedValues) {
-            console.log(this.props.showSaveButton, this.props.isNew, this.saveRequired(), this.state.savedValues, this.state.values)
-            this.setState({
-                saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()
-            })
-        }
         if (prevProps.values !== this.props.values) {
             this.setState(Object.keys(this.props.values).reduce((state: State, data: string) => {
                 if (!!this.props.values[data]) {
                     state.values[data] = this.props.values[data];
                 }
                 return state;
-            }, this.state));
+            }, this.state), () => {
+                this.setState({saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()})
+            });
+        }
+        if (prevProps.showSaveButton !== this.props.showSaveButton
+            || prevState.values !== this.state.values
+            || prevState.savedValues !== this.state.savedValues) {
+            this.setState({
+                saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()
+            })
         }
         if (prevProps.loading !== this.props.loading) {
             this.setState({loading: this.props.loading});

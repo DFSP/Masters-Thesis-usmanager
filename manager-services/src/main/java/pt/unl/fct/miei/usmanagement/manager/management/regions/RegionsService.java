@@ -21,28 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.services.management.regions;
+package pt.unl.fct.miei.usmanagement.manager.management.regions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.database.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.Region;
-import pt.unl.fct.miei.usmanagement.manager.database.regions.RegionRepository;
-import pt.unl.fct.miei.usmanagement.manager.services.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.util.ObjectUtils;
-
-import java.util.List;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 @Slf4j
 @Service
 public class RegionsService {
 
-	private final RegionRepository regions;
+	/*private final RegionRepository regions;
 
 	public RegionsService(RegionRepository regions) {
 		this.regions = regions;
@@ -107,7 +98,15 @@ public class RegionsService {
 		if (regions.hasRegion(region.getRegion())) {
 			throw new DataIntegrityViolationException("Region " + region.getRegion().getName() + " already exists");
 		}
+	}*/
+
+	public AwsRegion getAwsRegion(RegionEnum region) {
+		for (AwsRegion awsRegion : AwsRegion.getAwsRegions()) {
+			if (region == awsRegion.getRegion()) {
+				return awsRegion;
+			}
+		}
+		return null;
 	}
 
 }
-*/

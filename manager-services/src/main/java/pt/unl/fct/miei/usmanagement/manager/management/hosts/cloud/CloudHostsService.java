@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHosts;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
@@ -48,7 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.Iterator;
@@ -57,20 +57,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class CloudHostsService {
 
-	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 15000;
+	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 45000;
 
 	private final AwsService awsService;
 	private final HostRulesService hostRulesService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final HostsService hostsService;
 	private final NodesService nodesService;
+	private final DockerSwarmService dockerSwarmService;
 
 	private final CloudHosts cloudHosts;
 
@@ -82,12 +82,13 @@ public class CloudHostsService {
 							 @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							 @Lazy HostsService hostsService,
 							 @Lazy NodesService nodesService,
-							 CloudHosts cloudHosts) {
+							 @Lazy DockerSwarmService dockerSwarmService, CloudHosts cloudHosts) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.hostsService = hostsService;
 		this.nodesService = nodesService;
+		this.dockerSwarmService = dockerSwarmService;
 		this.cloudHosts = cloudHosts;
 		this.launchingInstance = false;
 	}
@@ -242,6 +243,10 @@ public class CloudHostsService {
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
 		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getAwsRegion(), wait);
+		HostAddress address = cloudHost.getAddress();
+		if (nodesService.isPartOfSwarm(address)) {
+			dockerSwarmService.leaveSwarm(address);
+		}
 		cloudHosts.delete(cloudHost);
 	}
 
@@ -252,8 +257,10 @@ public class CloudHostsService {
 	}
 
 	public List<CloudHost> synchronizeDatabaseCloudHosts() {
+		log.info("Synchronizing database cloud hosts with amazon");
 		List<CloudHost> cloudHosts = getCloudHosts();
 		if (launchingInstance) {
+			log.info("An instance is currently launching, stopping synchronization");
 			return cloudHosts;
 		}
 		List<Instance> awsInstances = awsService.getInstances();
@@ -292,6 +299,7 @@ public class CloudHostsService {
 				log.info("Added missing cloud host {}", instanceId);
 			}
 		});
+		log.info("Finished database synchronization");
 		return cloudHosts;
 	}
 

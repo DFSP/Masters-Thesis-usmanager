@@ -162,7 +162,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Não foi possível remove a instância cloud`, 10000, reason, true);
+        super.toast(`Não foi possível remove a instância`, 10000, reason, true);
 
     private getSelectableCloudHosts = () => {
         const {cloudHosts, simulatedMetricCloudHosts, unsavedCloudHosts} = this.props;

@@ -48,11 +48,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsServi
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.Security;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +88,7 @@ public class SshService {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
 
-	private SSHClient initClient(HostAddress hostAddress) throws IOException {
+	private SSHClient initClient(HostAddress hostAddress, int timeout) throws IOException {
 		if (!hostAddress.hasConnectionInfo()) {
 			hostAddress = hostsService.completeConnectionInfo(hostAddress);
 		}
@@ -111,12 +107,16 @@ public class SshService {
 			}
 			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
 		}
-		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), new File(publicKeyFile));
+		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), new File(publicKeyFile), timeout);
 	}
 
-	private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
+	private SSHClient initClient(HostAddress hostAddress) throws IOException {
+		return initClient(hostAddress, connectionTimeout);
+	}
+
+	private SSHClient initClient(String username, String hostname, File publicKeyFile, int timeout) throws IOException {
 		SSHClient sshClient = new SSHClient();
-		sshClient.setConnectTimeout(connectionTimeout);
+		sshClient.setConnectTimeout(timeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 		log.info("Logging in to host {}@{} using key {}", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
@@ -152,23 +152,31 @@ public class SshService {
 			sftpClient.put(new FileSystemFile(file), filename);
 		}
 		catch (IOException e) {
-			log.error("Failed to transfer file {} to {}: {}", filename, hostAddress.toSimpleString(), e.getMessage());
-			throw new ManagerException(e.getMessage());
+			throw new ManagerException("Failed to transfer file %s to %s: %s", filename, hostAddress.toSimpleString(), e.getMessage());
 		}
 	}
 
 	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress) {
-		return executeCommand(command, hostAddress, true);
+		return executeCommand(command, hostAddress, EXECUTE_COMMAND_TIMEOUT);
 	}
 
 	public void executeCommandAsync(String command, HostAddress hostAddress) {
-		executeCommand(command, hostAddress, false);
+		executeCommand(command, hostAddress, 0);
 	}
 
-	private SshCommandResult executeCommand(String command, HostAddress hostAddress, boolean wait) {
-		try (SSHClient sshClient = initClient(hostAddress);
-			 Session session = sshClient.startSession()) {
-			return executeCommand(session, command, hostAddress, wait);
+	public SshCommandResult executeCommand(String command, HostAddress hostAddress, SSHClient client, long timeout) {
+		try (Session session = client.startSession()) {
+			return executeCommand(session, command, hostAddress, timeout);
+		}
+		catch (IOException e) {
+			log.error("Failed to execute command {} on host {}: {}", command, hostAddress.toSimpleString(), e.getMessage());
+			return new SshCommandResult(hostAddress, command, -1, List.of(), List.of(e.getMessage()));
+		}
+	}
+
+	public SshCommandResult executeCommand(String command, HostAddress hostAddress, long timeout) {
+		try (SSHClient sshClient = initClient(hostAddress)) {
+			return executeCommand(command, hostAddress, sshClient, timeout);
 		}
 		catch (IOException e) {
 			log.error("Failed to execute command {} on host {}: {}", command, hostAddress.toSimpleString(), e.getMessage());
@@ -177,17 +185,17 @@ public class SshService {
 	}
 
 	public SshCommandResult executeCommandSync(String command, HostAddress hostAddress, char[] password) {
-		return executeCommand(command, hostAddress, password, true);
+		return executeCommand(command, hostAddress, password, EXECUTE_COMMAND_TIMEOUT);
 	}
 
 	public SshCommandResult executeCommandAsync(String command, HostAddress hostAddress, char[] password) {
-		return executeCommand(command, hostAddress, password, false);
+		return executeCommand(command, hostAddress, password, 0);
 	}
 
-	private SshCommandResult executeCommand(String command, HostAddress hostAddress, char[] password, boolean wait) {
+	private SshCommandResult executeCommand(String command, HostAddress hostAddress, char[] password, long timeout) {
 		try (SSHClient sshClient = initClient(hostAddress, password);
 			 Session session = sshClient.startSession()) {
-			return executeCommand(session, command, hostAddress, wait);
+			return executeCommand(session, command, hostAddress, timeout);
 		}
 		catch (IOException e) {
 			log.error("Unable to execute command: {}", e.getMessage());
@@ -195,16 +203,16 @@ public class SshService {
 		}
 	}
 
-	private SshCommandResult executeCommand(Session session, String command, HostAddress hostAddress, boolean wait) throws IOException {
+	private SshCommandResult executeCommand(Session session, String command, HostAddress hostAddress, long timeout) throws IOException {
 		if (!command.contains("sshpass")) {
 			// to avoid logging passwords
 			log.info("Executing: {}, at host {}", command, hostAddress);
 		}
 		Session.Command cmd = session.exec(command);
-		if (!wait) {
+		if (timeout == 0) {
 			return null;
 		}
-		cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
+		cmd.join(timeout, TimeUnit.MILLISECONDS);
 		int exitStatus = cmd.getExitStatus();
 		List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
 		List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));
@@ -228,6 +236,11 @@ public class SshService {
 			log.info("Failed to connect to {}: {}", hostAddress, e.getMessage());
 		}
 		return false;
+	}
+
+	public SSHClient waitAvailability(HostAddress hostAddress, int timeout) throws IOException {
+		log.info("Waiting for host {} to become available", hostAddress);
+		return initClient(hostAddress, timeout);
 	}
 
 	public Set<String> getScripts() {
