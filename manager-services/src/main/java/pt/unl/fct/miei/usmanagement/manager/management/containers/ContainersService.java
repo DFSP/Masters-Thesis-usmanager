@@ -68,8 +68,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ContainersService {
 
-	private final static int CONTAINERS_DATABASE_SYNC_INTERVAL = 15000;
-
 	private final DockerContainersService dockerContainersService;
 	private final ContainerRulesService containerRulesService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
@@ -77,8 +75,6 @@ public class ContainersService {
 	private final WorkerManagersService workerManagersService;
 
 	private final Containers containers;
-
-	private Timer syncDatabaseContainersTimer;
 
 	public ContainersService(DockerContainersService dockerContainersService,
 							 ContainerRulesService containerRulesService,
@@ -169,36 +165,6 @@ public class ContainersService {
 			.collect(Collectors.toList());
 	}
 
-	public List<Container> synchronizeDatabaseContainers() {
-		List<Container> containers = getContainers();
-		if (dockerContainersService.isLaunchingContainer()) {
-			return containers;
-		}
-		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
-		List<String> dockerContainerIds = dockerContainers
-			.stream().map(DockerContainer::getId).collect(Collectors.toList());
-		Iterator<Container> containerIterator = containers.iterator();
-		// Remove invalid container entities
-		while (containerIterator.hasNext()) {
-			Container container = containerIterator.next();
-			String containerId = container.getContainerId();
-			if (!dockerContainerIds.contains(containerId)) {
-				deleteContainer(containerId);
-				containerIterator.remove();
-				log.info("Removed invalid container {}", containerId);
-			}
-		}
-		// Add missing container entities
-		dockerContainers.forEach(dockerContainer -> {
-			String containerId = dockerContainer.getId();
-			if (!hasContainer(containerId)) {
-				Container container = addContainerFromDockerContainer(dockerContainer);
-				containers.add(container);
-				log.info("Added missing container {}", containerId);
-			}
-		});
-		return containers;
-	}
 
 	public Container launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(coordinates, serviceName, externalPort, internalPort);
@@ -500,28 +466,6 @@ public class ContainersService {
 		String containerId = container.getContainerId();
 		if (containers.hasContainer(containerId)) {
 			throw new DataIntegrityViolationException("Container " + containerId + " already exists");
-		}
-	}
-
-	public void initSyncDatabaseContainersTimer() {
-		syncDatabaseContainersTimer = new Timer("SyncDatabaseContainersTimer", true);
-		syncDatabaseContainersTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					synchronizeDatabaseContainers();
-				}
-				catch (ManagerException e) {
-					log.error(e.getMessage());
-				}
-			}
-		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
-	}
-
-	public void stopSyncDatabaseContainersTimer() {
-		if (syncDatabaseContainersTimer != null) {
-			syncDatabaseContainersTimer.cancel();
-			log.info("Stopped containers database synchronization");
 		}
 	}
 

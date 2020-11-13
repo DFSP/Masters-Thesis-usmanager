@@ -24,27 +24,41 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.workermanagers;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,15 +73,28 @@ public class WorkerManagersService {
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 
+	private final HttpHeaders headers;
+	private final RestTemplate restTemplate;
+	private final int port;
+
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
-								 HostsService hostsService, ServicesService servicesService) {
+								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
+								 WorkerManagerProperties workerManagerProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
+		String username = dockerProperties.getApiProxy().getUsername();
+		String password = dockerProperties.getApiProxy().getPassword();
+		byte[] auth = String.format("%s:%s", username, password).getBytes();
+		String basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
+		this.headers = new HttpHeaders();
+		this.headers.add("Authorization", basicAuthorization);
+		this.restTemplate = new RestTemplate();
+		this.port = workerManagerProperties.getPort();
 	}
 
 	public List<WorkerManager> getWorkerManagers() {
@@ -118,9 +145,12 @@ public class WorkerManagersService {
 	}
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
+		Gson gson = new Gson();
 		List<String> environment = new LinkedList<>(List.of(
-			ContainerConstants.Environment.ID + "=" + id,
-			ContainerConstants.Environment.MASTER + "=" + hostsService.getMasterHostAddress().getPublicIpAddress()));
+			ContainerConstants.Environment.WorkerManager.ID + "=" + id,
+			ContainerConstants.Environment.WorkerManager.MASTER + "=" + hostsService.getMasterHostAddress().getPublicIpAddress(),
+			ContainerConstants.Environment.WorkerManager.HOST_ADDRESS + "=" + gson.toJson(hostAddress)
+		));
 		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
 
@@ -180,6 +210,94 @@ public class WorkerManagersService {
 		if (!workerManagers.hasWorkerManager(id)) {
 			throw new EntityNotFoundException(WorkerManager.class, "id", id);
 		}
+	}
+
+	@Async
+	public CompletableFuture<List<Container>> getContainers(Container workerManager, boolean sync) {
+		List<Container> containers = new ArrayList<>();
+		String hostname = workerManager.getHostAddress().getPublicIpAddress();
+		String url = String.format("%s:%s/api/containers/%s", hostname, port, sync ? "sync" : "");
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
+		Container[] responseBody = response.getBody();
+		if (responseBody != null) {
+			containers.addAll(Arrays.asList(responseBody));
+		}
+		return CompletableFuture.completedFuture(containers);
+	}
+
+	public List<Container> getContainers() {
+		return getContainers(false);
+	}
+
+	public List<Container> getContainers(boolean sync) {
+		List<WorkerManager> workerManagers = getWorkerManagers();
+		List<CompletableFuture<List<Container>>> futureContainers =
+			workerManagers.stream().map(WorkerManager::getContainer).map(c -> getContainers(c, sync)).collect(Collectors.toList());
+
+		CompletableFuture.allOf(futureContainers.toArray(new CompletableFuture[0])).join();
+
+		List<Container> containers = new ArrayList<>();
+		for (CompletableFuture<List<Container>> futureContainer : futureContainers) {
+			try {
+				containers.addAll(futureContainer.get());
+			}
+			catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return containers;
+	}
+
+	public List<Container> synchronizeDatabaseContainers() {
+		return getContainers(true);
+	}
+
+	@Async
+	public CompletableFuture<List<Node>> getNodes(Container workerManager, boolean sync) {
+		List<Node> nodes = new ArrayList<>();
+		String hostname = workerManager.getHostAddress().getPublicIpAddress();
+		String url = String.format("%s:%s/api/nodes/%s", hostname, port, sync ? "sync" : "");
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
+		Node[] responseBody = response.getBody();
+		if (responseBody != null) {
+			nodes.addAll(Arrays.asList(responseBody));
+		}
+		return CompletableFuture.completedFuture(nodes);
+	}
+
+	public List<Node> getNodes() {
+		return getNodes(false);
+	}
+
+	public List<Node> syncNodes() {
+		return getNodes(true);
+	}
+
+	public List<Node> getNodes(boolean sync) {
+		List<WorkerManager> workerManagers = getWorkerManagers();
+		List<CompletableFuture<List<Node>>> futureNodes =
+			workerManagers.stream().map(WorkerManager::getContainer).map(c -> getNodes(c, sync)).collect(Collectors.toList());
+
+		CompletableFuture.allOf(futureNodes.toArray(new CompletableFuture[0])).join();
+
+		List<Node> nodes = new ArrayList<>();
+		for (CompletableFuture<List<Node>> futureNode : futureNodes) {
+			try {
+				nodes.addAll(futureNode.get());
+			}
+			catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return nodes;
+	}
+
+	public List<Node> synchronizeDatabaseNodes() {
+		return getNodes(true);
 	}
 
 }

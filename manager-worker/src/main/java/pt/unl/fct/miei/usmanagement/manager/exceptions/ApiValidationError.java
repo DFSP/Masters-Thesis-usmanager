@@ -1,15 +1,15 @@
 /*
  * MIT License
- *
+ *  
  * Copyright (c) 2020 manager
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,48 +22,27 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+// Adapted from https://github.com/brunocleite/spring-boot-exception-handling
 
-.left-nav-icons {
-    float: left !important;
-}
+package pt.unl.fct.miei.usmanagement.manager.exceptions;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+@AllArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = false)
+class ApiValidationError extends AbstractApiSubError {
 
-li.username {
-    margin-right: 10px;
-}
+	private String object;
+	private String field;
+	private Object rejectedValue;
+	private String message;
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
+	ApiValidationError(String object, String message) {
+		this.object = object;
+		this.message = message;
+	}
 
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
-
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

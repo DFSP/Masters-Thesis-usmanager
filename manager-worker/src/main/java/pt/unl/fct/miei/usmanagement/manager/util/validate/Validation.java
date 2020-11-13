@@ -22,48 +22,36 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.util.validate;
 
-.left-nav-icons {
-    float: left !important;
-}
+import lombok.experimental.UtilityClass;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+@UtilityClass
+public class Validation {
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+	public void validatePostRequest(String requestBodyId) {
+		if (requestBodyId != null && !requestBodyId.isEmpty()) {
+			throw new BadRequestException("Expected empty request body id, instead got %d", requestBodyId);
+		}
+	}
 
-li.username {
-    margin-right: 10px;
-}
+	public void validatePostRequest(Long requestBodyId) {
+		if (requestBodyId != null && requestBodyId > 0) {
+			throw new BadRequestException("Expected non positive request body id, instead got %d", requestBodyId);
+		}
+	}
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
+	public void validatePutRequest(String requestBodyId) {
+		if (requestBodyId == null || requestBodyId.isEmpty()) {
+			throw new BadRequestException("Expected non empty request body id");
+		}
+	}
 
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
+	public void validatePutRequest(Long requestBodyId) {
+		if (requestBodyId == null || requestBodyId < 1) {
+			throw new BadRequestException("Expected positive request body id, instead got %d", requestBodyId);
+		}
+	}
 
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

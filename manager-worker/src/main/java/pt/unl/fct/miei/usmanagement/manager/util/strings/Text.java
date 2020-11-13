@@ -22,48 +22,28 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.util.strings;
 
-.left-nav-icons {
-    float: left !important;
-}
+import lombok.experimental.UtilityClass;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+import java.util.Objects;
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+@UtilityClass
+public class Text {
 
-li.username {
-    margin-right: 10px;
-}
+	public boolean notEmptyEquals(String string1, String string2) {
+		return !isNullOrEmpty(string1) && Objects.equals(string1, string2);
+	}
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
+	public boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
 
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
+	public String capitalize(String str) {
+		if (str == null || str.length() < 1) {
+			return str;
+		}
+		return str.substring(0, 1).toUpperCase() + str.substring(1);
+	}
 
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

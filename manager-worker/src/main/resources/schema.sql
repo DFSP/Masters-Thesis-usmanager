@@ -22,21 +22,20 @@
  * SOFTWARE.
  */
 
+
 -- Logback: the reliable, generic, fast and flexible logging framework.
 -- Copyright (C) 1999-2010, QOS.ch. All rights reserved.
 --
 -- See http://logback.qos.ch/license.html for the applicable licensing
 -- conditions.
 
--- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
+-- This SQL
+-- script creates the required tables by ch.qos.logback.classic.db.DBAppender.
 --
 -- It is intended for H2 databases.
 
-DROP TABLE logging_event_exception IF EXISTS;
-DROP TABLE logging_event_property IF EXISTS;
-DROP TABLE logging_event IF EXISTS;
-
-CREATE TABLE logging_event
+DROP TABLE IF EXISTS LOGGING_EVENT CASCADE;
+CREATE TABLE LOGGING_EVENT
 (
     timestmp          BIGINT       NOT NULL,
     formatted_message LONGVARCHAR  NOT NULL,
@@ -55,8 +54,8 @@ CREATE TABLE logging_event
     event_id          IDENTITY     NOT NULL
 );
 
-
-CREATE TABLE logging_event_property
+DROP TABLE IF EXISTS LOGGING_EVENT_PROPERTY CASCADE;
+CREATE TABLE LOGGING_EVENT_PROPERTY
 (
     event_id     BIGINT       NOT NULL,
     mapped_key   VARCHAR(254) NOT NULL,
@@ -65,7 +64,8 @@ CREATE TABLE logging_event_property
     FOREIGN KEY (event_id) REFERENCES logging_event (event_id)
 );
 
-CREATE TABLE logging_event_exception
+DROP TABLE IF EXISTS LOGGING_EVENT_EXCEPTION CASCADE;
+CREATE TABLE LOGGING_EVENT_EXCEPTION
 (
     event_id   BIGINT       NOT NULL,
     i          SMALLINT     NOT NULL,

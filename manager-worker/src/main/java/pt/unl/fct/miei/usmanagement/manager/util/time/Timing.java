@@ -1,15 +1,15 @@
 /*
  * MIT License
- *
+ *  
  * Copyright (c) 2020 manager
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,48 +22,40 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.util.time;
 
-.left-nav-icons {
-    float: left !important;
-}
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BooleanSupplier;
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+@Slf4j
+@UtilityClass
+public class Timing {
 
-li.username {
-    margin-right: 10px;
-}
+	public void sleep(long time, TimeUnit timeUnit) {
+		try {
+			timeUnit.sleep(time);
+		}
+		catch (InterruptedException e) {
+			log.error("Unable to sleep {} {}: {}", time, timeUnit.name(), e.getMessage());
+		}
+	}
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
+	public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
+		wait(condition, 50, timeout);
+	}
 
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
+	public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
+		long start = System.currentTimeMillis();
+		while (!condition.getAsBoolean()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
+			}
+			Timing.sleep(sleep, TimeUnit.MILLISECONDS);
+		}
+	}
 
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

@@ -22,48 +22,35 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
-.left-nav-icons {
-    float: left !important;
-}
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+import java.util.List;
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+@RestController
+@RequestMapping("/events/hosts")
+public class HostEventsController {
 
-li.username {
-    margin-right: 10px;
-}
+	private final HostsEventsService hostsEventsService;
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
+	public HostEventsController(HostsEventsService hostsEventsService) {
+		this.hostsEventsService = hostsEventsService;
+	}
 
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
+	@GetMapping
+	public List<HostEvent> getHostEvents() {
+		return hostsEventsService.getHostEvents();
+	}
 
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
+	@GetMapping("/{hostname}")
+	public List<HostEvent> getHostEvents(@PathVariable String hostname) {
+		return hostsEventsService.getHostEventsByHostAddress(new HostAddress(hostname));
+	}
 
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

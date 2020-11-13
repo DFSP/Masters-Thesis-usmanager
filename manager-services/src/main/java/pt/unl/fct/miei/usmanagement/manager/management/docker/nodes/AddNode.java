@@ -22,48 +22,19 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
 
-.left-nav-icons {
-    float: left !important;
-}
+import lombok.Data;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+import java.util.List;
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+@Data
+final class AddNode {
 
-li.username {
-    margin-right: 10px;
-}
+	private String host;
+	private NodeRole role;
+	private List<Coordinates> coordinates;
 
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
-
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
-
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

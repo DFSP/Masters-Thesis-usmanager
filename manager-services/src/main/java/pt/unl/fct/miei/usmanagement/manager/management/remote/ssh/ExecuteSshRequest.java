@@ -22,48 +22,14 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.management.remote.ssh;
 
-.left-nav-icons {
-    float: left !important;
-}
+import lombok.Data;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+@Data
+public class ExecuteSshRequest {
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+	private final String command;
+	private final boolean background;
 
-li.username {
-    margin-right: 10px;
-}
-
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
-
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
-
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }

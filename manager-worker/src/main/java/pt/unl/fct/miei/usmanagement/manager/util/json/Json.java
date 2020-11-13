@@ -22,48 +22,17 @@
  * SOFTWARE.
  */
 
-.navbar-fixed {
-    z-index: 998;
-    box-sizing: border-box;
-}
+package pt.unl.fct.miei.usmanagement.manager.util.json;
 
-.left-nav-icons {
-    float: left !important;
-}
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-.left-nav-icons * {
-    margin-right: 10px;
-}
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Json {
 
-nav .nav-wrapper {
-    margin-right: 0 !important;
-}
+	String value() default "";
 
-li.username {
-    margin-right: 10px;
-}
-
-li.components {
-    margin-right: 20px;
-    width: 150px;
-}
-
-@media only screen and (max-width: 527px) {
-    .components {
-        display: none !important;
-    }
-}
-
-li.components .select-wrapper input.select-dropdown {
-    font-size: 14.5px;
-}
-
-li.components .dropdown-content li > a, .dropdown-content li > span {
-    font-size: 14.5px;
-}
-
-.brightnessButton {
-    float: left;
-    margin-right: 10px;
-    align-content: center;
 }
