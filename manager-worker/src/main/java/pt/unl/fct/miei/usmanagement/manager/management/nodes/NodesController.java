@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.nodes;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,9 +36,9 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.AddNode;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,16 +53,6 @@ public class NodesController {
 	public NodesController(NodesService nodesService, SyncService syncService) {
 		this.nodesService = nodesService;
 		this.syncService = syncService;
-	}
-
-	@GetMapping
-	public List<Node> getNodes() {
-		return nodesService.getNodes();
-	}
-
-	@GetMapping("/{id}")
-	public Node getNode(@PathVariable("id") String id) {
-		return nodesService.getNode(id);
 	}
 
 	@PostMapping
@@ -101,7 +90,7 @@ public class NodesController {
 	}
 
 	@PostMapping("/sync")
-	public List<Node> synchronizeDatabaseNodes() {
+	public List<Node> synchronizeNodesDatabase() {
 		return syncService.synchronizeNodesDatabase();
 	}
 

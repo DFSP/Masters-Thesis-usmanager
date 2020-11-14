@@ -28,8 +28,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Component

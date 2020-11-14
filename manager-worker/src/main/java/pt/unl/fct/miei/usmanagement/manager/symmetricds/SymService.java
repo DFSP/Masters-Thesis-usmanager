@@ -25,14 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.symmetricds;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jumpmind.db.model.Table;
-import org.jumpmind.symmetric.common.Constants;
 import org.jumpmind.symmetric.common.ParameterConstants;
-import org.jumpmind.symmetric.io.data.CsvData;
-import org.jumpmind.symmetric.io.data.DataContext;
-import org.jumpmind.symmetric.io.data.writer.DatabaseWriterFilterAdapter;
-import org.jumpmind.symmetric.io.data.writer.IDatabaseWriterErrorHandler;
-import org.jumpmind.symmetric.service.INodeService;
 import org.jumpmind.symmetric.web.ServerSymmetricEngine;
 import org.jumpmind.symmetric.web.SymmetricEngineHolder;
 import org.jumpmind.symmetric.web.WebConstants;
@@ -41,23 +34,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service

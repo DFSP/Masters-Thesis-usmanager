@@ -22,9 +22,6 @@
 # SOFTWARE.
 #
 
-EXTERNAL_ID: 45654ghgdftg546756ujytdg546
-HOST_ADDRESS: \{"username":"daniel","publicDnsName":"danielfct.ddns.net","publicIpAddress":"2.82.208.89","privateIpAddress":"192.168.1.83","coordinates":{"label":"Portugal","latitude":39.575097,"longitude":-8.909794},"region":"EUROPE","place":"EDGE"}
-REGISTRATION_URL: http://2.82.208.89:8080/api/sync
 server:
   port: 8081
   servlet:
@@ -63,21 +60,17 @@ management:
       exposure:
         include: info, health, metrics, mappings
 worker-manager:
-  id: ${id:}
-  master-hostname: ${master-hostname:}
-  monitor-period: 30000
-  port: 8080
+  monitor-period: 45000
   tests:
     enabled: ${tests:true}
 ssh:
   connection-timeout: 10000
 edge:
   access:
-    key-file-path: /edge
+    key-file-path: src/main/resources/edge
 aws:
   initial-max-instances: 2
-  max-retries: 10
-  delay-between-retries: 5000
+  max-retries: 5
   connection-timeout: 180000
   access:
     key: AKIAS5UBHWDI3WO52EV5
@@ -85,17 +78,17 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-05ae3ee68e1579013
     security-group: default
     key-pair: ec2
     type: t2.micro
     tag: us-manager
 container:
-  database:
-    deploy-delay: 5000
   delay-before-stop: 45000
   monitor-period: 60000
 docker:
+  install-script: src/main/resources/scripts/docker-install.sh/docker-install.sh
+  uninstall-script: src/main/resources/scripts/docker-uninstall.sh/docker-uninstall.sh
+  install-api-script: src/main/resources/scripts/docker-api-install.sh/docker-api-install.sh
   api:
     port: 2376
   api-proxy:
@@ -105,16 +98,15 @@ docker:
   hub:
     username: usmanager
   swarm:
-    manager: ${dockerManager:dpimenta.ddns.net}
-    max-workers: 1
+    initial-max-workers: 1
 registration:
   port: 8761
 prometheus:
   node-exporter:
     install-script: src/main/resources/scripts/node-exporter-install.sh
 decision:
-  start-host-on-events-count: 3
-  stop-host-on-events-count: 3
+  resolve-overworked-host-on-events-count: 3
+  resolve-underworked-host-on-events-count: 3
   replicate-container-on-event-count: 2
   migrate-container-on-event-count: 2
   stop-container-on-event-count: 3
@@ -125,25 +117,14 @@ host:
   minimum-hosts: 1
   monitor-period: 60000
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
-manager-master:
-  mode: LOCAL
-  monitor-period: 30000
-  tests:
-    enabled: ${tests:true}
 nginx-load-balancer:
-  api-url: /_/nginx-load-balancer-api/api
+  stop-delay: 300000
 location-request:
   port: 1919
   minimum-request-count-percentage: 15.0
 rules:
   service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
-symmetricds:
-  tables:
-    exclude:
-      startsWith: sym, logging
-
-#debug: true
 #trace: true
 #  level:
 #    org:
@@ -153,6 +134,7 @@ symmetricds:
 #        descriptor:
 #          sql:
 #            BasicBinder: TRACE
+#debug: true
 
 
 

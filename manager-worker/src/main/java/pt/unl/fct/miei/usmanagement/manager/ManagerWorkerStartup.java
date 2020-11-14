@@ -35,12 +35,10 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-/*import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.HostsMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.worker.management.monitoring.ServicesMonitoringService;*/
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
 @Component
@@ -68,7 +66,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS).substring(1); // TODO
+		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
 		String externalId = environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID);

@@ -38,10 +38,8 @@ import org.springframework.context.annotation.Configuration;
 public class ManagerWorkerProperties {
 
 	public static final String MANAGER_WORKER = "manager-worker";
-	private final Tests tests;
-	private String id;
-	private String masterHostname;
 	private int monitorPeriod;
+	private final Tests tests;
 
 	public ManagerWorkerProperties() {
 		this.tests = new Tests();
