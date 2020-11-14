@@ -85,7 +85,7 @@ class SimulatedAppMetricAppList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingSimulatedAppMetric || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadSimulatedAppMetricError || this.props.error : undefined}
+            error={this.props.loadSimulatedAppMetricError || (isNew ? undefined : this.props.error)}
             emptyMessage={`Sem aplicações associadas`}
             data={this.props.simulatedMetricApps}
             dropdown={{

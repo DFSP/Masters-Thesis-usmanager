@@ -1947,7 +1947,7 @@ const entities = (state: EntitiesState = {
         case UPDATE_NODE:
             if (data?.nodes && data.nodes?.length > 1) {
                 const previousNode = data.nodes[0];
-                const filteredNodes = Object.values(state.nodes.data).filter(node => node.id !== previousNode.id);
+                const filteredNodes = Object.values(state.nodes.data).filter(node => node.nodeId !== previousNode.nodeId);
                 const currentNode = {...previousNode, ...data.nodes[1]};
                 filteredNodes.push(currentNode);
                 const nodes = normalize(filteredNodes, Schemas.NODE_ARRAY).entities.nodes || {};
@@ -1963,7 +1963,7 @@ const entities = (state: EntitiesState = {
         case DELETE_NODE:
             if (data?.nodes?.length) {
                 const nodesToDelete = data.nodes[0];
-                const filteredNodes = Object.values(state.nodes.data).filter(node => node.id !== nodesToDelete.id);
+                const filteredNodes = Object.values(state.nodes.data).filter(node => node.nodeId !== nodesToDelete.nodeId);
                 const nodes = normalize(filteredNodes, Schemas.NODE_ARRAY).entities.nodes || {};
                 return {
                     ...state,

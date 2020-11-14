@@ -84,7 +84,7 @@ class AppSimulatedMetricList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadAppError || this.props.error : undefined}
+                               error={this.props.loadAppError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem métricas simuladas associadas`}
                                data={this.props.simulatedMetricsName}
                                dropdown={{

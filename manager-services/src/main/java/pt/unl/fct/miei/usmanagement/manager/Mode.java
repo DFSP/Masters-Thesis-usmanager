@@ -24,9 +24,15 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+
 public enum Mode {
 
 	LOCAL,
-	GLOBAL
+	GLOBAL;
+
+	public static Mode getMode(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -25,17 +25,20 @@
 package pt.unl.fct.miei.usmanagement.manager.management.location;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,12 +64,12 @@ public class LocationRequestsService {
 			.collect(Collectors.toMap(Map.Entry::getKey, e -> getServiceWeightedMiddlePoint(e.getValue())));
 	}
 
-	private Map<String, List<LocationWeight>> getLocationsWeight() {
+	public Map<String, List<LocationWeight>> getLocationsWeight() {
 		List<NodeLocationRequests> nodeLocationRequests = getNodesLocationRequests();
 
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
 		for (NodeLocationRequests requests : nodeLocationRequests) {
-			SimpleNode node = requests.getNode();
+			Node node = requests.getNode();
 			requests.getLocationRequests().forEach((service, count) -> {
 				List<LocationWeight> locationWeights = servicesLocationsWeights.get(service);
 				if (locationWeights == null) {
@@ -80,13 +83,13 @@ public class LocationRequestsService {
 		return servicesLocationsWeights;
 	}
 
-	private Coordinates getServiceWeightedMiddlePoint(List<LocationWeight> locationWeights) {
+	public Coordinates getServiceWeightedMiddlePoint(List<LocationWeight> locationWeights) {
 		int totalWeight = locationWeights.stream().mapToInt(LocationWeight::getWeight).sum();
 
 		double x = 0, y = 0, z = 0;
 
 		for (LocationWeight locationWeight : locationWeights) {
-			SimpleNode node = locationWeight.getNode();
+			Node node = locationWeight.getNode();
 			int weight = locationWeight.getWeight();
 			Coordinates coordinates = node.getCoordinates();
 			double latitude = coordinates.getLatitude();
@@ -119,14 +122,32 @@ public class LocationRequestsService {
 		return new Coordinates(latitude, longitude);
 	}
 
-	private List<NodeLocationRequests> getNodesLocationRequests() {
-		return nodesService.getReadyNodes().parallelStream()
-			.map(node -> new NodeLocationRequests(node, getNodeLocationRequests(node.getPublicIpAddress())))
+	public List<NodeLocationRequests> getNodesLocationRequests() {
+		List<FutureNodeLocationRequests> futureNodeLocationRequests = nodesService.getReadyNodes().stream()
+			.map(node -> new FutureNodeLocationRequests(node, getNodeLocationRequests(node.getPublicIpAddress())))
 			.collect(Collectors.toList());
+
+		CompletableFuture.allOf(futureNodeLocationRequests.stream().map(FutureNodeLocationRequests::getRequests)
+			.toArray(CompletableFuture[]::new)).join();
+
+		List<NodeLocationRequests> locationRequests = new ArrayList<>(futureNodeLocationRequests.size());
+		for (FutureNodeLocationRequests futureNodeLocationRequest : futureNodeLocationRequests) {
+			Node node = futureNodeLocationRequest.getNode();
+			try {
+				Map<String, Integer> locationRequest = futureNodeLocationRequest.getRequests().get();
+				locationRequests.add(new NodeLocationRequests(node, locationRequest));
+			}
+			catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return locationRequests;
 	}
 
+	@Async
 	@SuppressWarnings("unchecked")
-	private Map<String, Integer> getNodeLocationRequests(String hostname) {
+	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname) {
 		String url = String.format("http://%s:%s/api/locations/requests?aggregation", hostname, locationRequestsPort);
 		long currentRequestTime = System.currentTimeMillis();
 		if (lastRequestTime >= 0) {
@@ -143,7 +164,7 @@ public class LocationRequestsService {
 			log.error("Failed to get node {} location requests: {}", hostname, e.getMessage());
 		}
 
-		return locationMonitoringData;
+		return CompletableFuture.completedFuture(locationMonitoringData);
 	}
 
 }

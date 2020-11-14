@@ -39,6 +39,7 @@ import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.CascadeType;
@@ -134,7 +135,8 @@ public class CloudHost {
 
 	@JsonIgnore
 	public HostAddress getAddress() {
-		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress, awsRegion.getCoordinates(), awsRegion.getRegion());
+		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress,
+			awsRegion.getCoordinates(), awsRegion.getRegion(), PlaceEnum.CLOUD);
 	}
 
 

@@ -60,8 +60,8 @@ class ConfirmDialog extends React.Component<Props, {}> {
 
     private initModal = () => {
         M.Modal.init(this.modal.current as Element, {
-            /*startingTop: '38.5%',
-            endingTop: '38.5%',*/
+            startingTop: '20%',
+            endingTop: '20%',
             preventScrolling: false
         });
     }

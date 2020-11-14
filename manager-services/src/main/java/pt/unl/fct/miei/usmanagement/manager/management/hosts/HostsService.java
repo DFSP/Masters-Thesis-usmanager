@@ -24,10 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
+import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.ManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -40,11 +40,9 @@ import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsProperties;
@@ -55,6 +53,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.Pro
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
@@ -68,8 +67,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -78,6 +78,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class HostsService {
+
+	private static final int DELAY_BEFORE_HOST_SETUP = 2000;
 
 	private final NodesService nodesService;
 	private final ContainersService containersService;
@@ -89,13 +91,13 @@ public class HostsService {
 	private final HostMetricsService hostMetricsService;
 	private final int maxWorkers;
 	private final int maxInstances;
-	private HostAddress masterHostAddress;
+	private HostAddress managerHostAddress;
 
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
 						DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
 						CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
 						HostMetricsService hostMetricsService, DockerProperties dockerProperties,
-						AwsProperties awsProperties, ManagerProperties managerProperties) {
+						AwsProperties awsProperties) {
 		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
@@ -108,20 +110,45 @@ public class HostsService {
 		this.maxInstances = awsProperties.getInitialMaxInstances();
 	}
 
-	public HostAddress setHostAddress() {
+	public HostAddress setManagerHostAddress() {
 		String username = bashService.getUsername();
 		String publicIp = bashService.getPublicIp();
 		String privateIp = bashService.getPrivateIp();
-		this.masterHostAddress = completeHostAddress(new HostAddress(username, publicIp, privateIp));
-		log.info("Setting local address: {}", masterHostAddress.toString());
-		return masterHostAddress;
+		this.managerHostAddress = completeHostAddress(new HostAddress(username, publicIp, privateIp));
+		log.info("Setting manager host address: {}", managerHostAddress.toString());
+		return managerHostAddress;
 	}
 
-	public HostAddress getMasterHostAddress() {
-		if (masterHostAddress == null) {
+	public HostAddress setManagerHostAddress(HostAddress hostAddress) {
+		managerHostAddress = hostAddress;
+		return managerHostAddress;
+	}
+
+	public HostAddress getManagerHostAddress() {
+		if (managerHostAddress == null) {
 			throw new MethodNotAllowedException("Manager initialization did not finish");
 		}
-		return masterHostAddress;
+		return managerHostAddress;
+	}
+
+	public void scheduleSetupHost() {
+		new Timer("schedule-setup-host").schedule(new TimerTask() {
+			@Override
+			public void run() {
+				final int retries = 3;
+				for (int i = 0; i < retries; i++) {
+					try {
+						setupHost(managerHostAddress, NodeRole.MANAGER);
+					}
+					catch (Exception e) {
+						log.error("Failed to initialize manager {}: {}... retrying ({}/{})", managerHostAddress.toSimpleString(),
+							e.getMessage(), i + 1, retries);
+						e.printStackTrace();
+						Timing.sleep(DELAY_BEFORE_HOST_SETUP * (i + 1), TimeUnit.MILLISECONDS);
+					}
+				}
+			}
+		}, DELAY_BEFORE_HOST_SETUP);
 	}
 
 	public void clusterHosts() {
@@ -152,24 +179,24 @@ public class HostsService {
 	private List<EdgeHost> getLocalWorkerNodes() {
 		int maxWorkers = this.maxWorkers - nodesService.getReadyWorkers().size();
 		return edgeHostsService.getEdgeHosts().stream()
-			.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.masterHostAddress.getPublicIpAddress()))
-			.filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.masterHostAddress.getPrivateIpAddress()))
+			.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.managerHostAddress.getPublicIpAddress()))
+			.filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.managerHostAddress.getPrivateIpAddress()))
 			.filter(this::isEdgeHostRunning)
 			.limit(maxWorkers)
 			.collect(Collectors.toList());
 	}
 
 	public boolean isLocalhost(HostAddress hostAddress) {
-		String machinePublicIp = this.masterHostAddress.getPublicIpAddress();
-		String machinePrivateIp = this.masterHostAddress.getPrivateIpAddress();
+		String machinePublicIp = this.managerHostAddress.getPublicIpAddress();
+		String machinePrivateIp = this.managerHostAddress.getPrivateIpAddress();
 		return Objects.equals(machinePublicIp, hostAddress.getPublicIpAddress())
 			&& Objects.equals(machinePrivateIp, hostAddress.getPrivateIpAddress());
 	}
 
-	public SimpleNode setupHost(HostAddress hostAddress, NodeRole role) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node setupHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
 		String dockerApiProxyContainerId = "";
-		SimpleNode node = null;
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = null;
 		final int retries = 5;
 		int tries = 0;
 		do {
@@ -187,7 +214,7 @@ public class HostsService {
 				}
 			}
 			catch (ManagerException e) {
-				log.error("Failed to setup {} with role {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), role, e.getMessage(), tries, retries);
+				log.error("Failed to setup {} with role {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), role, e.getMessage(), tries + 1, retries);
 				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 0 seconds, then 1 seconds, then 2 seconds, etc
 			}
 		} while (node == null && ++tries < retries);
@@ -197,12 +224,12 @@ public class HostsService {
 		containersService.addContainer(dockerApiProxyContainerId);
 		List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
 			.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON));
-		executeCommandInBackground(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
+		executeBackgroundProcess(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
 
-	private SimpleNode setupSwarmManager(HostAddress hostAddress) {
-		SimpleNode node;
+	private pt.unl.fct.miei.usmanagement.manager.nodes.Node setupSwarmManager(HostAddress hostAddress) {
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node;
 		if (isLocalhost(hostAddress)) {
 			log.info("Setting up docker swarm leader");
 			dockerSwarmService.leaveSwarm(hostAddress);
@@ -214,13 +241,19 @@ public class HostsService {
 		return node;
 	}
 
-	private SimpleNode setupSwarmWorker(HostAddress hostAddress) {
+	private pt.unl.fct.miei.usmanagement.manager.nodes.Node setupSwarmWorker(HostAddress hostAddress) {
 		return joinSwarm(hostAddress, NodeRole.WORKER);
 	}
 
-	private SimpleNode joinSwarm(HostAddress hostAddress, NodeRole role) {
+	private pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role) {
 		try {
-			return nodesService.getHostNode(hostAddress);
+			Node node = dockerSwarmService.getHostNode(hostAddress);
+			try {
+				return nodesService.getNode(node.id());
+			}
+			catch (EntityNotFoundException ignored) {
+				return nodesService.addNode(node);
+			}
 		}
 		catch (EntityNotFoundException ignored) {
 			return dockerSwarmService.joinSwarm(hostAddress, role);
@@ -240,7 +273,7 @@ public class HostsService {
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)
 				&& (nodeFilter == null || nodeFilter.test(node.getHostAddress())))
-			.map(SimpleNode::getHostAddress)
+			.map(pt.unl.fct.miei.usmanagement.manager.nodes.Node::getHostAddress)
 			.collect(Collectors.toList());
 		HostAddress hostAddress;
 		if (nodes.size() > 0) {
@@ -365,7 +398,7 @@ public class HostsService {
 		}
 	}
 
-	public SimpleNode addHost(String host, NodeRole role) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addHost(String host, NodeRole role) {
 		HostAddress hostAddress;
 		try {
 			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(host);
@@ -386,17 +419,22 @@ public class HostsService {
 		return setupHost(hostAddress, role);
 	}
 
-	public SimpleNode addHost(Coordinates coordinates, NodeRole role) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addHost(Coordinates coordinates, NodeRole role) {
 		HostAddress hostAddress = getClosestInactiveHost(coordinates);
 		return setupHost(hostAddress, role);
 	}
 
 	public void removeHost(HostAddress hostAddress) {
-		containersService.getSystemContainers(hostAddress).stream()
-			.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
-			.forEach(c -> containersService.stopContainer(c.getContainerId()));
-		Optional<String> nodeId = dockerSwarmService.leaveSwarm(hostAddress);
-		nodeId.ifPresent(nodesService::removeNode);
+		if (nodesService.isPartOfSwarm(hostAddress)) {
+			/*containersService.getSystemContainers(hostAddress).parallelStream()
+				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.forEach(c -> containersService.stopContainer(c.getContainerId()));*/
+			nodesService.leaveHost(hostAddress);
+			nodesService.removeHost(hostAddress);
+			/*containersService.getSystemContainers(hostAddress).stream()
+				.filter(c -> Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.forEach(c -> containersService.stopContainer(c.getContainerId()));*/
+		}
 	}
 
 	private boolean isEdgeHostRunning(EdgeHost edgeHost) {
@@ -416,7 +454,7 @@ public class HostsService {
 				return cloudHostsService.startInstance(cloudHost, addToSwarm);
 			}
 		}
-		Coordinates coordinates = region == null ? masterHostAddress.getRegion().getCoordinates() : region.getCoordinates();
+		Coordinates coordinates = region == null ? managerHostAddress.getRegion().getCoordinates() : region.getCoordinates();
 		return cloudHostsService.launchInstance(coordinates);
 	}
 
@@ -431,7 +469,7 @@ public class HostsService {
 	private List<String> executeCommand(String command, HostAddress hostAddress, boolean wait) {
 		List<String> result = null;
 		String error = null;
-		if (Objects.equals(this.masterHostAddress, hostAddress)) {
+		if (Objects.equals(this.managerHostAddress, hostAddress)) {
 			// execute local command
 			if (wait) {
 				BashCommandResult bashCommandResult = bashService.executeCommandSync(command);
@@ -467,25 +505,21 @@ public class HostsService {
 		return result;
 	}
 
-	public void executeCommandInBackground(String command, HostAddress hostAddress, String outputFile) {
-		if (Objects.equals(this.masterHostAddress, hostAddress)) {
-			String file = outputFile == null ? String.valueOf(System.currentTimeMillis()) : outputFile;
-			String path = String.format("%s/logs/services/%s/%s.log", System.getProperty("user.dir"), hostAddress.getPublicIpAddress(), file);
-			Path outputFilePath = Paths.get(path);
-			try {
-				Files.createDirectories(outputFilePath.getParent());
-				if (outputFile == null) {
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yy HH:mm:ss.SSS");
-					Files.write(outputFilePath, (formatter.format(LocalDateTime.now()) + ": " + command + "\n\n").getBytes());
-				}
-			}
-			catch (IOException e) {
-				log.error("Failed to store output of background command {}: {}", command, e.getMessage());
-			}
-			bashService.executeCommandInBackground(command, outputFilePath);
+	public void executeBackgroundProcess(String command, HostAddress hostAddress, String outputFile) {
+		if (Objects.equals(this.managerHostAddress, hostAddress)) {
+			bashService.executeBackgroundProcess(command, outputFile);
 		}
 		else {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, outputFile);
+		}
+	}
+
+	public void stopBackgroundProcesses(HostAddress hostAddress) {
+		if (Objects.equals(this.managerHostAddress, hostAddress)) {
+			bashService.stopBackgroundProcesses();
+		}
+		else {
+			sshService.stopBackgroundProcesses(hostAddress);
 		}
 	}
 
@@ -506,5 +540,4 @@ public class HostsService {
 			throw new ManagerException("Unable to find currently used external ports at %s: %s ", hostAddress, e.getMessage());
 		}
 	}
-
 }

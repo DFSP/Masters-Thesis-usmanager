@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.management.hosts;
+package pt.unl.fct.miei.usmanagement.manager.hosts;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.AddEdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSftpRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSshRequest;
@@ -120,7 +120,7 @@ public class EdgeHostsController {
 		String command = request.getCommand();
 		HostAddress hostAddress = new HostAddress(hostname);
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

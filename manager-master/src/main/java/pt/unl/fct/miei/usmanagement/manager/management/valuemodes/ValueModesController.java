@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.List;
 

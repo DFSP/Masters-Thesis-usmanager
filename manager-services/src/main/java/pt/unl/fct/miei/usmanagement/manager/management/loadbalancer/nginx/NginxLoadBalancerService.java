@@ -260,33 +260,42 @@ public class NginxLoadBalancerService {
 			Container container = launchLoadBalancer(region, new NginxServer[]{nginxServer});
 			loadBalancers.add(container);
 		}
-		loadBalancers.parallelStream().forEach(loadBalancer -> {
-			String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
-			HttpEntity<NginxServer[]> request = new HttpEntity<>(new NginxServer[]{nginxServer}, headers);
-			try {
-				restTemplate.postForEntity(url, request, NginxServer[].class);
-				log.info("Added server {} to load balancer {}", nginxServer, url);
-			}
-			catch (HttpClientErrorException e) {
-				throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, e.getMessage());
-			}
-		});
+		loadBalancers.forEach(loadBalancer -> addServer(loadBalancer, nginxServer, serviceName));
+	}
+
+	@Async
+	public void addServer(Container loadBalancer, NginxServer nginxServer, String serviceName) {
+		String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
+		HttpEntity<NginxServer[]> request = new HttpEntity<>(new NginxServer[]{nginxServer}, headers);
+		try {
+			restTemplate.postForEntity(url, request, NginxServer[].class);
+			log.info("Added server {} to load balancer {}", nginxServer, url);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException("Failed to add server %s to load balancer %s: %s", nginxServer, url, e.getMessage());
+		}
 	}
 
 	public void removeServer(String serviceName, String server, RegionEnum region) {
 		log.info("Removing server {} of service {} from load balancer", server, serviceName);
 		List<Container> loadBalancers = getLoadBalancers(region);
-		loadBalancers.parallelStream().forEach(loadBalancer -> {
-			String url = String.format("%s/%s/servers/%s", getLoadBalancerApiUrl(loadBalancer), serviceName, server);
-			try {
-				restTemplate.delete(url);
-			}
-			catch (HttpClientErrorException e) {
-				throw new ManagerException("Failed to remove server %s of service %s from load balancer %s: %s", server, serviceName, url, e.getMessage());
-			}
-		});
-		if (!containersService.hasContainers(region, serviceName)) {
+		loadBalancers.parallelStream().forEach(loadBalancer -> removeServer(loadBalancer, serviceName, server));
+		if (!containersService.hasContainers(region)) {
 			initStopLoadBalancerTimer(region);
+		}
+	}
+
+	@Async
+	public void removeServer(Container loadBalancer, String serviceName, String server) {
+		String url = String.format("%s/%s/servers/%s", getLoadBalancerApiUrl(loadBalancer), serviceName, server);
+		try {
+			HttpEntity<String> request = new HttpEntity<>(headers);
+			restTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
+			log.info("Removed server {} from service {} from load balancer {}", server, serviceName, url);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException("Failed to remove server %s of service %s from load balancer %s: %s", server,
+				serviceName, url, e.getMessage());
 		}
 	}
 

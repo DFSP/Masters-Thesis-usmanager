@@ -28,7 +28,7 @@ import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 
 @Data
-final class AddEdgeHost {
+public final class AddEdgeHost {
 
 	private final String username;
 	private final char[] password;

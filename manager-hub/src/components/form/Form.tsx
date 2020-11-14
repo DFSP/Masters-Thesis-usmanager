@@ -29,15 +29,16 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {FieldProps, getTypeFromValue, IValidation} from "./Field";
 import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import {isEqual, isEqualWith, omit} from "lodash";
+import {isEqual, isEqualWith} from "lodash";
 import ActionProgressBar from "../actionloading/ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
 import {Method} from "axios";
 import {ReduxState} from "../../reducers";
-import {connect} from "react-redux";
+import {connect, Provider} from "react-redux";
 import BaseComponent from "../BaseComponent";
+import Navbar from "../../views/navbar/Navbar";
 import ReactTooltip from "react-tooltip";
 
 export interface IFormModal {
@@ -271,15 +272,16 @@ class Form extends BaseComponent<Props, State> {
         if (prevProps.showSaveButton !== this.props.showSaveButton
             || prevState.values !== this.state.values
             || prevState.savedValues !== this.state.savedValues) {
-            this.setState({
-                saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()
-            })
+            this.setState({saveRequired: this.props.showSaveButton || this.props.isNew || false})
+        }
+        if (prevState.values !== this.state.values || prevState.savedValues !== this.state.savedValues) {
+            this.setState({saveRequired: this.saveRequired()})
         }
         if (prevProps.loading !== this.props.loading) {
             this.setState({loading: this.props.loading});
         }
         if (prevProps.isNew !== this.props.isNew) {
-            this.setState({isEditing: this.props.isNew === undefined || this.props.isNew});
+            this.setState({isEditing: this.props.isNew === undefined || this.props.isNew, saveRequired: false});
         }
         this.initDropdown();
     }
@@ -305,8 +307,10 @@ class Form extends BaseComponent<Props, State> {
             id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
             children, confirmationDialog
         } = this.props;
+        console.log(this.props.values)
         return (
             <>
+                <ReactTooltip id='tooltip' effect='solid' type='light'/>
                 <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 {this.props.delete && confirmationDialog && (
                     <ConfirmDialog id={'confirm-delete'}
@@ -324,7 +328,7 @@ class Form extends BaseComponent<Props, State> {
                                             data-target={`switch-dropdown`}
                                             type={'button'}
                                             ref={this.dropdown}>
-                                            <i className="material-icons">keyboard_arrow_down</i>
+                                            <i className='material-icons'>keyboard_arrow_down</i>
                                         </button>
                                         <ul id='switch-dropdown'
                                             className={`dropdown-content ${styles.dropdown}`}>
@@ -369,7 +373,7 @@ class Form extends BaseComponent<Props, State> {
                                             {deletable !== undefined && !loading && (
                                                 <button
                                                     className={`${confirmationDialog ? 'modal-trigger' : ''} btn-flat btn-small red-text inline-button`}
-                                                    type="button"
+                                                    type='button'
                                                     data-target='confirm-delete'
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
                                                     {this.props.delete?.textButton || 'Apagar'}
@@ -386,8 +390,8 @@ class Form extends BaseComponent<Props, State> {
                                         {editable !== undefined && !loading && (
                                             <button
                                                 className={`btn-floating btn-flat btn-small right inline-button`}
-                                                data-for='dark-tooltip' data-tip="Editar" data-place='bottom'
-                                                type="button"
+                                                data-for='dark-tooltip' data-tip='Editar' data-place='bottom'
+                                                type='button'
                                                 onClick={this.onClickEdit}>
                                                 <i className={`large material-icons ${this.state.isEditing ? (this.state.isValid ? 'green-text' : 'red-text') : ''}`}>edit</i>
                                             </button>
@@ -397,7 +401,7 @@ class Form extends BaseComponent<Props, State> {
                                 {loading && (
                                     <button
                                         className={`${styles.controlButton} btn-flat btn-small red-text right slide inline-button`}
-                                        type="button"
+                                        type='button'
                                         onClick={this.cancelRequest}>
                                         Cancelar
                                     </button>
@@ -408,9 +412,9 @@ class Form extends BaseComponent<Props, State> {
                                             className={`dropdown-trigger btn-floating btn-flat btn-small right inline-button`}
                                             data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
                                             data-target={`dropdown-${dropdown.id}`}
-                                            type="button"
+                                            type='button'
                                             ref={this.dropdown}>
-                                            <i className="material-icons">add</i>
+                                            <i className='material-icons'>add</i>
                                         </button>
                                         <ul id={`dropdown-${dropdown.id}`}
                                             className={`dropdown-content ${styles.dropdown}`}>
@@ -466,17 +470,17 @@ class Form extends BaseComponent<Props, State> {
                             className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
                             <div>
                                 <button className={`btn-flat red-text inline-button`}
-                                        type="button"
+                                        type='button'
                                         onClick={this.clearValues}>
                                     Apagar
                                 </button>
                                 <button
                                     className={`modal-close btn-flat red-text inline-button`}
-                                    type="button">
+                                    type='button'>
                                     Cancelar
                                 </button>
                                 <button className={`btn-flat green-text inline-button`}
-                                        type="button"
+                                        type='button'
                                         onClick={this.onModalConfirm}>
                                     Confirmar
                                 </button>
@@ -498,29 +502,29 @@ class Form extends BaseComponent<Props, State> {
         this.dropdownScrollbar?.updateScroll();
 
     private saveRequired = () => {
-        return !isEqualWith(omit(this.state.savedValues, 'id'), omit(this.state.values, 'id'), (first, second) =>
-            ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
-                || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
-                || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)
-                || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
+        return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
+                ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
+                    || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
+                    || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)
+                    || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
     };
 
     private isRequired = (id: keyof IValues): boolean => {
         const {fields} = this.props;
         const field: FieldProps | undefined = fields[id];
-        const validation: IValidation | undefined = field!.validation;
+        const validation: IValidation | undefined = field?.validation;
         return validation?.rule.name.includes('required') || false
     }
 
     private validate = (id: keyof IValues): string => {
         const {fields} = this.props;
         const field: FieldProps | undefined = fields[id];
-        const validation: IValidation | undefined = field!.validation;
+        const validation: IValidation | undefined = field?.validation;
         const newError: string = validation ? validation.rule(this.state.values, id, validation.args) : "";
         if (newError !== "") {
             console.log("Validation of field " + field.id + ": " + newError);
         }
-        this.setState(_=> ({errors: {...this.state.errors, [id]: newError}, isValid: newError === ""}));
+        this.setState(_ => ({errors: {...this.state.errors, [id]: newError}, isValid: newError === ""}));
         return newError;
     };
 
@@ -529,7 +533,7 @@ class Form extends BaseComponent<Props, State> {
         Object.entries(this.props.fields).forEach(([fieldName, field]) => {
             const validateMessage = this.validate(fieldName);
             if (field.hidden && validateMessage.length) {
-                super.toast(`<div class="red-text">Validation failed:</div> ${validateMessage}`);
+                super.toast(`<div class='red-text'>Validation failed:</div> ${validateMessage}`);
             }
             errors[fieldName] = validateMessage;
         });
@@ -541,7 +545,7 @@ class Form extends BaseComponent<Props, State> {
 
     private isValid = (errors: IErrors) => {
         const isValid = Object.values(errors).every(error => !error);
-        this.setState(_=> ({isValid}));
+        this.setState(_ => ({isValid}));
         return isValid;
     }
 
@@ -590,7 +594,7 @@ class Form extends BaseComponent<Props, State> {
                         (reply) => {
                             post.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({savedValues: requestBody, loading: undefined});
+                                this.setState({values: reply.data as IValues, savedValues: reply.data as IValues, loading: undefined});
                             }
                         },
                         (reply) => {
@@ -610,7 +614,7 @@ class Form extends BaseComponent<Props, State> {
                         (reply) => {
                             put.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({savedValues: requestBody, loading: undefined});
+                                this.setState({values: reply.data as IValues, savedValues: reply.data as IValues, loading: undefined});
                             }
                         },
                         (reason) => {

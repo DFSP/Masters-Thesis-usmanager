@@ -30,10 +30,15 @@ import {EntitiesAction} from "../../../reducers/entities";
 import {connect} from "react-redux";
 import {INode} from "./Node";
 import CardItem from "../../../components/list/CardItem";
-import {deleteNode} from "../../../actions";
+import {deleteNode, updateNode} from "../../../actions";
+import ActionContextMenuItem from "../../../components/contextmenu/ActionContextMenuItem";
+import {IReply, putData} from "../../../utils/api";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../middleware/api";
 
 interface State {
     loading: boolean;
+    node?: INode,
 }
 
 interface NodeCardProps {
@@ -42,6 +47,7 @@ interface NodeCardProps {
 
 interface DispatchToProps {
     deleteNode: (node: INode) => EntitiesAction;
+    updateNode: (previousNode: INode, currentNode: INode) => void;
 }
 
 type Props = DispatchToProps & NodeCardProps;
@@ -65,55 +71,107 @@ class NodeCard extends BaseComponent<Props, State> {
         this.mounted = false;
     }
 
+    private getNode = () =>
+        this.props.node || this.state.node;
+
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">O nó <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm.'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm.'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteNode(node);
+        this.props.deleteNode(node)
     }
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`O nó <a href='/nós/${node.id}'><b>${node.id}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
+            super.toast(`O nó <a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Não foi possível remover o nó <a href='/nós/${node.id}'><b>${node.id}</b></a> do swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó <a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a> do swarm`, 10000, reason, true);
         }
         if (this.mounted) {
             this.setState({loading: false});
         }
     }
 
+    private topContextMenu = (): JSX.Element[] => {
+        const node = this.getNode();
+        const menus = [];
+        if (!((node as INode).labels?.['masterManager'] === 'true') && (node as INode).state !== 'down') {
+            menus.push(<ActionContextMenuItem
+                className='blue-text'
+                option='Sair do swarm'
+                state={node}
+                onClick={this.leaveSwarm}/>);
+        }
+        return menus;
+    }
+
     private contextMenu = (): JSX.Element[] => {
-        const {node} = this.props;
+        const node = this.getNode();
         return [
             <LinkedContextMenuItem
                 option={'Ver as labels associadas'}
-                pathname={`/nós/${node.id}`}
+                pathname={`/nós/${node.nodeId}`}
                 selected={'nodeLabels'}
                 state={node}/>,
         ];
     }
 
+    private leaveSwarm = () => {
+        const node = this.getNode();
+        const url = `nodes/${node?.publicIpAddress}/leave`;
+        this.setState({loading: true});
+        putData(url, undefined,
+            (reply: IReply<INode[]>) => this.onLeaveSuccess(reply.data),
+            (reason) => this.onLeaveFailure(reason, node));
+    };
+
+    private onLeaveSuccess = (nodes: INode[]) => {
+        const node = nodes[0];
+        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> foi removido com sucesso do swarm</span>`);
+        const previousNode = this.getNode();
+        if (previousNode?.id) {
+            this.props.updateNode(previousNode as INode, node)
+        }
+        if (this.mounted) {
+            this.updateNode(node);
+        }
+    };
+
+    private onLeaveFailure = (reason: string, node: Partial<INode>) => {
+        super.toast(`O nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    };
+
+    private updateNode = (node: INode) => {
+        node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
+        this.setState({node: node});
+    };
+
     public render() {
-        const {node} = this.props;
+        const node = this.getNode();
         const {loading} = this.state;
         const CardNode = Card<INode>();
-        return <CardNode id={`node-${node.id}`}
-                         title={node.id.toString()}
-                         link={{to: {pathname: `/nós/${node.id}`, state: node}}}
+        return <CardNode id={`node-${node.nodeId}`}
+                         title={node.nodeId.toString()}
+                         link={{to: {pathname: `/nós/${node.nodeId}`, state: node}}}
                          height={'150px'}
                          margin={'10px 0'}
                          hoverable
-                         delete={{
-                             textButton: (node as INode).state === 'down' ? 'Remover do swarm' : 'Sair do swarm',
-                             url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).publicIpAddress}/leave`,
-                             confirmMessage: (node as INode).state === 'down' ? `remover o nó ${node.id} do swarm` : `${node.id} irá sair permanentemente do swarm`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                         }}
                          loading={loading}
-                         bottomContextMenuItems={this.contextMenu()}>
+                         topContextMenuItems={this.topContextMenu()}
+                         bottomContextMenuItems={this.contextMenu()}
+                         delete={(node as INode).labels?.['masterManager'] === 'true' || (node as INode).state !== 'down'
+                             ? undefined
+                             : {
+                                 textButton: 'Remover do swarm',
+                                 url: `nodes/${(node as INode).nodeId}`,
+                                 confirmMessage: `remover o nó ${node?.nodeId} do swarm`,
+                                 successCallback: this.onDeleteSuccess,
+                                 failureCallback: this.onDeleteFailure
+                             }}>
             <CardItem key={'hostName'}
                       label={'Hostname'}
                       value={node.publicIpAddress}/>
@@ -132,7 +190,8 @@ class NodeCard extends BaseComponent<Props, State> {
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    deleteNode
+    deleteNode,
+    updateNode,
 };
 
 export default connect(null, mapDispatchToProps)(NodeCard);

@@ -191,11 +191,8 @@ class Region extends BaseComponent<Props, State> {
         /*const isNewRegion = this.isNew();*/
         return (
             <>
-                {/*{!isNewRegion && isLoading && <LoadingSpinner/>}*/}
                 {isLoading && <LoadingSpinner/>}
-                {/*{!isNewRegion && !isLoading && error && <Error message={error}/>}*/}
                 {!isLoading && error && <Error message={error}/>}
-                {/*{(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (*/}
                 {!isLoading && !error && region && (
                     /*@ts-ignore*/
                     <Form id={regionKey}

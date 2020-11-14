@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.symmetricds.node.host;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 public interface SymNodeHostsRepository extends JpaRepository<SymNodeHostEntity, SymNodeHostId> {
 
 }

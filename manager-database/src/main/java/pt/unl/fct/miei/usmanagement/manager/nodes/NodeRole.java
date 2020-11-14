@@ -22,11 +22,15 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes;
+package pt.unl.fct.miei.usmanagement.manager.nodes;
 
 public enum NodeRole {
 
 	MANAGER,
-	WORKER
+	WORKER;
+
+	public static NodeRole getNodeRole(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

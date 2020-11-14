@@ -39,8 +39,10 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,9 +55,14 @@ import java.util.Set;
 public class ContainersController {
 
 	private final ContainersService containersService;
+	private final WorkerManagersService workerManagersService;
+	private final SyncService syncService;
 
-	public ContainersController(ContainersService containersService) {
+	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
+								SyncService syncService) {
 		this.containersService = containersService;
+		this.workerManagersService = workerManagersService;
+		this.syncService = syncService;
 	}
 
 	@GetMapping
@@ -116,9 +123,12 @@ public class ContainersController {
 		return containersService.migrateContainer(id, hostAddress);
 	}
 
-	@PostMapping("/reload")
+	@PostMapping("/sync")
 	public List<Container> syncDatabaseContainers() {
-		return containersService.synchronizeDatabaseContainers();
+		List<Container> workerContainers = workerManagersService.synchronizeDatabaseContainers();
+		List<Container> containers = syncService.synchronizeContainersDatabase();
+		containers.addAll(workerContainers);
+		return containers;
 	}
 
 	@GetMapping("/{containerId}/logs")

@@ -31,11 +31,9 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
@@ -49,8 +47,10 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitorings;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -86,7 +86,6 @@ public class HostsMonitoringService {
 	private final ServicesService servicesService;
 	private final HostsEventsService hostsEventsService;
 	private final DecisionsService decisionsService;
-	private final CloudHostsService cloudHostsService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 
 	private final long monitorPeriod;
@@ -102,8 +101,8 @@ public class HostsMonitoringService {
 								  ContainersService containersService, HostRulesService hostRulesService,
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
-								  DecisionsService decisionsService, CloudHostsService cloudHostsService,
-								  HostSimulatedMetricsService hostSimulatedMetricsService, HostProperties hostProperties,
+								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
+								  SyncService syncService, HostProperties hostProperties,
 								  MasterManagerProperties masterManagerProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
@@ -115,7 +114,6 @@ public class HostsMonitoringService {
 		this.servicesService = servicesService;
 		this.hostsEventsService = hostsEventsService;
 		this.decisionsService = decisionsService;
-		this.cloudHostsService = cloudHostsService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.monitorPeriod = hostProperties.getMonitorPeriod();
 		this.resolveOverworkedHostOnEventsCount = hostProperties.getResolveOverworkedHostOnEventsCount();
@@ -196,7 +194,7 @@ public class HostsMonitoringService {
 	}
 
 	private void monitorHostsTask() {
-		List<SimpleNode> nodes = nodesService.getReadyNodes();
+		List<Node> nodes = nodesService.getReadyNodes(); // TODO only swarm nodes
 		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
 			.map(node -> getHostDecisions(node.getHostAddress()))
 			.collect(Collectors.toList());
@@ -249,7 +247,7 @@ public class HostsMonitoringService {
 				}));
 		Map<String, Double> validStats = stats.entrySet().stream()
 			.filter(stat -> stat.getValue().isPresent())
-			.collect(Collectors.toMap(Map.Entry::getKey, x -> x.getValue().get()));
+			.collect(Collectors.toMap(Map.Entry::getKey, s -> s.getValue().get()));
 
 		// Simulated host metrics
 		Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
@@ -286,7 +284,7 @@ public class HostsMonitoringService {
 		return hostRulesService.processHostEvent(hostAddress, hostEvent);
 	}
 
-	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<SimpleNode> nodes) {
+	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<Node> nodes) {
 		List<HostDecisionResult> decisions = new LinkedList<>();
 		hostDecisions.forEach(futureDecision -> {
 			HostDecisionResult decision;
@@ -351,19 +349,10 @@ public class HostsMonitoringService {
 	private void executeUnderworkedHostDecision(HostAddress hostAddress) {
 		// This action is triggered when the asking host is underworked
 		// To resolve that, we migrate all its containers to another close host, and then stop it
-		Coordinates coordinates = hostAddress.getCoordinates();
-		List<Container> containers = containersService.getAppContainers(hostAddress);
-		// TODO parallel?
-		containers.forEach(container -> {
-			String containerId = container.getContainerId();
-			String serviceName = container.getServiceName();
-			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
-			// TODO does the memory consumption of containers initializing is taken into account?
-			HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-			containersService.migrateContainer(containerId, toHostAddress);
-		});
+		List<Container> containers =  containersService.migrateHostContainers(hostAddress);
+		List<HostAddress> newHosts = containers.stream().map(Container::getHostAddress).collect(Collectors.toList());
 		hostsService.removeHost(hostAddress);
-		log.info("Resolved underworked host: Stopped {} and migrated containers {} to new hosts", hostAddress, containers);
+		log.info("Resolved underworked host: Stopped {} and migrated containers {} to hosts {}", hostAddress, containers, newHosts);
 	}
 
 	private Optional<Container> getRandomContainerToMigrateFrom(HostAddress hostAddress) {

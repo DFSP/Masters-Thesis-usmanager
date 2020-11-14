@@ -31,7 +31,7 @@ import RulesContainerList from "./RulesContainerList";
 const RulesContainer: React.FC = () =>
     <MainLayout>
         <AddButton button={{text: 'Nova regra'}}
-                   pathname={'/regras/contentores/nova regra?new'}/>
+                   pathname={'/regras/contentores/nova regra?new#rule'}/>
         <div className={`${styles.container}`}>
             <RulesContainerList/>
         </div>

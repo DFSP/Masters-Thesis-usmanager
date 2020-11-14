@@ -48,6 +48,7 @@ type Props = StateToProps & {
     position?: { coordinates: Point, zoom: number },
     center?: boolean;
     onZoom?: (zoom: number ) => void;
+    keepRatio?: boolean;
 }
 
 type State = {
@@ -80,7 +81,7 @@ class MapChart extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        if (prevProps.sidenavVisible !== this.props.sidenavVisible && this.props.sidenavVisible) {
+        if (this.props.keepRatio && prevProps.sidenavVisible !== this.props.sidenavVisible && this.props.sidenavVisible) {
             setTimeout(() => this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225)})), 150)
         }
         if (this.props.center !== undefined && prevProps.center !== this.props.center) {
@@ -93,7 +94,7 @@ class MapChart extends React.Component<Props, State> {
     }
 
     getSnapshotBeforeUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): any | null {
-        if (prevProps.sidenavVisible !== this.props.sidenavVisible && !this.props.sidenavVisible) {
+        if (this.props.keepRatio && prevProps.sidenavVisible !== this.props.sidenavVisible && !this.props.sidenavVisible) {
             this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225)}))
         }
     }

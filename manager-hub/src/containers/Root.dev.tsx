@@ -82,6 +82,8 @@ import RuleApp from "../routes/management/rules/apps/RuleApp";
 import RulesApp from "../routes/management/rules/apps/RulesApp";
 import SimulatedAppMetrics from "../routes/management/metrics/apps/SimulatedAppMetrics";
 import SimulatedAppMetric from "../routes/management/metrics/apps/SimulatedAppMetric";
+import Sidenav from "../views/sidenav/Sidenav";
+import ReactTooltip from "react-tooltip";
 
 interface RootContainerProps {
     store: any;
@@ -125,8 +127,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/métricas simuladas/hosts/:name": {component: SimulatedHostMetric},
     "/métricas simuladas/aplicações": {component: SimulatedAppMetrics, search: true},
     "/métricas simuladas/aplicações/:name": {component: SimulatedAppMetric},
-    "/métricas simuladas/services": {component: SimulatedServiceMetrics, search: true},
-    "/métricas simuladas/services/:name": {component: SimulatedServiceMetric},
+    "/métricas simuladas/serviços": {component: SimulatedServiceMetrics, search: true},
+    "/métricas simuladas/serviços/:name": {component: SimulatedServiceMetric},
     "/métricas simuladas/contentores": {component: SimulatedContainerMetrics, search: true},
     "/métricas simuladas/contentores/:name": {component: SimulatedContainerMetric},
     "/regiões": {component: Regions, search: true},
@@ -145,13 +147,13 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
 
 export const monitoringAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
     "/gestor": {title: 'Monitorização', component: MonitoringLanding},
-    "/settings": {component: MonitoringSettings},
+    "/configurações": {component: MonitoringSettings},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
 export const dataManagementAuthenticatedRoutes: { [path: string]: { title?: string, component: any, search?: boolean } } = {
     "/gestor": {title: 'Dados', component: DataManagementLanding},
-    "/settings": {component: DataManagementSettings},
+    "/configurações": {component: DataManagementSettings},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 
@@ -183,6 +185,8 @@ class Root extends React.Component<Props, {}> {
                 <Provider store={this.props.store}>
                     <LoadingBar showFastActions className="loading-bar"/>
                     <Navbar/>
+                    <ReactTooltip id='tooltip' effect='solid' type='light'/>
+                    <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                     <div className='main-content'>
                         <Switch>
                             <Route path="/" exact component={Login}/>

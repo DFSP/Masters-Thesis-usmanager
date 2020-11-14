@@ -92,7 +92,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IWorkerManager,
-    selected: 'workerManager' | 'assignHosts';
+    selected: 'worker-manager' | 'assignHosts';
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -325,9 +325,9 @@ class WorkerManager extends BaseComponent<Props, State> {
         const workerManagerKey: (keyof IWorkerManager) = workerManager && Object.keys(workerManager)[0];
         return (
             <>
-                {!isNewWorkerManager && isLoading && <LoadingSpinner/>}
-                {!isNewWorkerManager && !isLoading && error && <Error message={error}/>}
-                {(isNewWorkerManager || !isLoading) && (isNewWorkerManager || !error) && workerManager && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && workerManager && (
                     /*@ts-ignore*/
                     <Form id={workerManagerKey}
                           fields={this.getFields(workerManager)}
@@ -360,7 +360,7 @@ class WorkerManager extends BaseComponent<Props, State> {
 
     private assignHosts = (): JSX.Element =>
         <AssignedHostsList isLoadingWorkerManager={this.props.isLoading}
-                           loadWorkerManagerError={!this.isNew() ? this.props.error : undefined}
+                           loadWorkerManagerError={this.props.error}
                            workerManager={this.getWorkerManager()}
                            unSavedHosts={this.state.unsavedHosts}
                            onAssignHost={this.assignHost}
@@ -371,7 +371,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             title: 'Gestor local',
             id: 'workerManager',
             content: () => this.workerManager(),
-            active: this.props.location.state?.selected === 'workerManager'
+            active: this.props.location.state?.selected === 'worker-manager'
         },
         {
             title: 'Hosts atribuídos',

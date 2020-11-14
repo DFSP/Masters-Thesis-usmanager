@@ -136,7 +136,7 @@ class AppServiceList extends BaseComponent<Props, State> {
         return <ControlledList<IAppService | IAddAppService>
             ref={this.controlledList}
             isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadAppError || this.props.error : undefined}
+            error={this.props.loadAppError || (isNew ? undefined : this.props.error)}
             emptyMessage={`Sem serviços associadas`}
             data={this.state.appServices}
             dataKey={['service', 'serviceName']}

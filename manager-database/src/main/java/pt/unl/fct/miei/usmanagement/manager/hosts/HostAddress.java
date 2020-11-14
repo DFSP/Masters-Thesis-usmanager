@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class HostAddress implements Serializable {
 	private final String privateIpAddress;
 	private final Coordinates coordinates;
 	private final RegionEnum region;
+	private final PlaceEnum place;
 
 	public HostAddress() {
 		this(null);
@@ -67,16 +69,23 @@ public class HostAddress implements Serializable {
 	}
 
 	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates) {
-		this(username, publicIpAddress, privateIpAddress, coordinates, null);
+		this(username, publicIpAddress, privateIpAddress, coordinates, null, null);
 	}
 
-	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates, RegionEnum region) {
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates,
+					   RegionEnum region) {
+		this(username, publicIpAddress, privateIpAddress, coordinates, region, null);
+	}
+
+	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates,
+					   RegionEnum region, PlaceEnum place) {
 		this.username = username;
 		this.publicDnsName = null;
 		this.privateIpAddress = privateIpAddress;
 		this.publicIpAddress = publicIpAddress;
 		this.coordinates = coordinates;
 		this.region = region;
+		this.place = place;
 	}
 
 	@JsonIgnore
@@ -86,12 +95,13 @@ public class HostAddress implements Serializable {
 
 	@JsonIgnore
 	public boolean hasConnectionInfo() {
-		return username != null && publicIpAddress != null;
+		return username != null && publicIpAddress != null/* && privateIpAddress != null*/;
 	}
 
 	@JsonIgnore
 	public boolean isComplete() {
-		return username != null && publicIpAddress != null && privateIpAddress != null && coordinates != null && region != null;
+		return username != null && publicIpAddress != null && privateIpAddress != null && coordinates != null
+			&& region != null && place != null;
 	}
 
 	@Override
@@ -103,6 +113,7 @@ public class HostAddress implements Serializable {
 			+ (region == null ? "" : "/" + region.getRegion());
 	}
 
+	@JsonIgnore
 	public String toSimpleString() {
 		return (username == null ? "" : username + "@")
 			+ publicIpAddress

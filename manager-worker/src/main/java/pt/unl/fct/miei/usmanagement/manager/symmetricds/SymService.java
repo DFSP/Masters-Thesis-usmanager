@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -38,8 +38,10 @@ import org.jumpmind.symmetric.web.SymmetricEngineHolder;
 import org.jumpmind.symmetric.web.WebConstants;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import javax.servlet.ServletContext;
@@ -61,49 +63,41 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SymService {
 
-	private final SymDatabaseMonitor symDatabaseMonitor;
 
 	private final ServletContext servletContext;
 	private final DataSource dataSource;
 	private final ApplicationContext applicationContext;
 	private final DataSourceProperties dataSourceProperties;
-
-	private final String id;
-	private final String masterHostname;
-
-	private int tableCount;
+	private final Environment environment;
 
 	private ServerSymmetricEngine serverSymmetricEngine;
 
-	public SymService(SymDatabaseMonitor symDatabaseMonitor, ServletContext servletContext, DataSource dataSource,
-					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties,
-					  WorkerManagerProperties workerManagerProperties) {
-		this.symDatabaseMonitor = symDatabaseMonitor;
+	public SymService(ServletContext servletContext, DataSource dataSource, ApplicationContext applicationContext,
+					  DataSourceProperties dataSourceProperties, Environment environment) {
 		this.servletContext = servletContext;
 		this.dataSource = dataSource;
 		this.applicationContext = applicationContext;
 		this.dataSourceProperties = dataSourceProperties;
-		this.id = workerManagerProperties.getId();
-		this.masterHostname = workerManagerProperties.getMasterHostname();
+		this.environment = environment;
 	}
 
-	public void startSymmetricDSServer() throws IOException {
-		final SymmetricEngineHolder engineHolder = new SymmetricEngineHolder();
+	public void startSymmetricDsService(String externalId, String registrationUrl, HostAddress hostAddress) throws IOException {
+		SymmetricEngineHolder engineHolder = new SymmetricEngineHolder();
 
-		final Properties properties = new Properties();
-		final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		Properties properties = new Properties();
+		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 		try (InputStream is = classloader.getResourceAsStream("sym/sym-node.properties")) {
 			properties.load(is);
 		}
 		catch (IOException e) {
-			log.error("Failed load sym-node properties: {}", e.getMessage());
+			log.error("Failed to load sym-node properties: {}", e.getMessage());
 			throw e;
 		}
 
-		properties.setProperty(ParameterConstants.REGISTRATION_URL,
-			properties.getProperty(ParameterConstants.REGISTRATION_URL).replace("${master}", masterHostname));
-		properties.setProperty(ParameterConstants.EXTERNAL_ID,
-			properties.getProperty(ParameterConstants.EXTERNAL_ID).replace("${external-id}", id));
+		properties.setProperty(ParameterConstants.EXTERNAL_ID, externalId);
+		properties.setProperty(ParameterConstants.REGISTRATION_URL, registrationUrl);
+		String port = environment.getProperty("local.server.port");
+		properties.setProperty(ParameterConstants.SYNC_URL, String.format("http://%s:%s/api/sync", hostAddress.getPublicIpAddress(), port));
 
 		properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
 		properties.setProperty("db.url", dataSourceProperties.getUrl());
@@ -114,102 +108,12 @@ public class SymService {
 		engineHolder.getEngines().put(properties.getProperty(ParameterConstants.EXTERNAL_ID), serverSymmetricEngine);
 		engineHolder.setAutoStart(false);
 		servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, engineHolder);
-
 		serverSymmetricEngine.setup();
-
-    /*final MonitorFilter monitor = new MonitorFilter();
-    serverSymmetricEngine.getExtensionService().addExtensionPoint(monitor);*/
-
-		serverSymmetricEngine.getExtensionService().addExtensionPoint(symDatabaseMonitor);
-
 		serverSymmetricEngine.start();
-
-		//waitForInitialLoad(monitor);
-	}
-
-	private void waitForInitialLoad(MonitorFilter monitor) {
-
-		while (!serverSymmetricEngine.isRegistered()) {
-			System.err.println("Waiting for engine to register");
-			Timing.wait(2, TimeUnit.SECONDS);
-		}
-
-		INodeService nodeService = serverSymmetricEngine.getNodeService();
-		while (!nodeService.isDataLoadStarted()) {
-			System.err.println("Waiting for data load to start");
-			Timing.wait(1, TimeUnit.SECONDS);
-		}
-
-		long ts = System.currentTimeMillis();
-		DateFormat dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM);
-		if (!nodeService.isDataLoadCompleted()) {
-			System.err.println(String.format("Data load started at %s", dateFormat.format(new Date())));
-		}
-
-		Exception error = null;
-		while (!nodeService.isDataLoadCompleted()) {
-			printTables(monitor.tableQueue);
-			if ((error == null && monitor.error != null)
-				|| (error != null && monitor.error != null && !error.equals(monitor.error))) {
-				error = monitor.error;
-				System.err.println("Error occurred");
-			}
-
-			Timing.wait(500, TimeUnit.MILLISECONDS);
-		}
-
-		printTables(monitor.tableQueue);
-
-		System.err.println("******************************************");
-		System.err.println(
-			String.format("Data load complete at %s in %s seconds",
-				dateFormat.format(new Date()), (System.currentTimeMillis() - ts) / 1000));
-		System.err.println("******************************************");
-	}
-
-	private void printTables(List<String> tableQueue) {
-		while (tableQueue.size() > 0) {
-			String table = tableQueue.remove(0);
-			System.err.println("******************************************");
-			System.err.println("Loading " + table + ".  Current table count=" + ++tableCount);
-			System.err.println("******************************************");
-		}
 	}
 
 	public void stopSymmetricDSServer() {
 		serverSymmetricEngine.stop();
-	}
-
-	static class MonitorFilter extends DatabaseWriterFilterAdapter implements IDatabaseWriterErrorHandler {
-
-		private final Set<String> tablesEncountered = new HashSet<>();
-
-		private final List<String> tableQueue = Collections.synchronizedList(new ArrayList<>());
-
-		private Exception error;
-
-		@Override
-		public boolean beforeWrite(DataContext context, Table table, CsvData data) {
-			error = null;
-			if (context.getBatch().getChannelId().equals(Constants.CHANNEL_RELOAD)) {
-				if (!tablesEncountered.contains(table.getName())) {
-					tablesEncountered.add(table.getName());
-					tableQueue.add(table.getName());
-				}
-			}
-			return true;
-		}
-
-		@Override
-		public void afterWrite(DataContext context, Table table, CsvData data) {
-
-		}
-
-		@Override
-		public boolean handleError(DataContext context, Table table, CsvData data, Exception ex) {
-			error = ex;
-			return false;
-		}
 	}
 
 }

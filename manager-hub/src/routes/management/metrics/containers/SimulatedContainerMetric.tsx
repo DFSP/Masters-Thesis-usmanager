@@ -91,7 +91,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ISimulatedContainerMetric,
-    selected: 'simulatedContainerMetric' | 'containers',
+    selected: 'metric' | 'containers',
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -269,9 +269,9 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
         const isNewSimulatedContainerMetric = this.isNew();
         return (
             <>
-                {!isNewSimulatedContainerMetric && isLoading && <LoadingSpinner/>}
-                {!isNewSimulatedContainerMetric && !isLoading && error && <Error message={error}/>}
-                {(isNewSimulatedContainerMetric || !isLoading) && (isNewSimulatedContainerMetric || !error) && formSimulatedContainerMetric && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formSimulatedContainerMetric && (
                     /*@ts-ignore*/
                     <Form id={simulatedContainerMetricKey}
                           fields={this.getFields(formSimulatedContainerMetric)}
@@ -334,7 +334,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
     private containers = (): JSX.Element =>
         <SimulatedContainerMetricContainerList isLoadingSimulatedContainerMetric={this.props.isLoading}
-                                               loadSimulatedContainerMetricError={!this.isNew() ? this.props.error : undefined}
+                                               loadSimulatedContainerMetricError={this.props.error}
                                                simulatedContainerMetric={this.getSimulatedContainerMetric()}
                                                unsavedContainersIds={this.state.unsavedContainersIds}
                                                unsavedContainers={this.state.unsavedContainers}
@@ -346,7 +346,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
             title: 'Métricas simuladas',
             id: 'simulatedContainerMetric',
             content: () => this.simulatedContainerMetric(),
-            active: this.props.location.state?.selected === 'simulatedContainerMetric'
+            active: this.props.location.state?.selected === 'metric'
         },
         {
             title: 'Contentores',

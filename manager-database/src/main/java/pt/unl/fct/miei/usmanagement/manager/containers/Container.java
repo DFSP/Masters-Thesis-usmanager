@@ -40,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -51,7 +52,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -132,6 +135,10 @@ public class Container {
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
+
+	@ManyToOne
+	@JoinColumn(name = "workerManager_id")
+	private WorkerManager workerManager;
 
 	@JsonIgnore
 	public String getServiceName() {

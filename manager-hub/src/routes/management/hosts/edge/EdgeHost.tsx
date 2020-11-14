@@ -110,7 +110,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IEdgeHost,
-    selected: 'edgeHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp',
+    selected: 'edge-host' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp',
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -322,9 +322,9 @@ class EdgeHost extends BaseComponent<Props, State> {
         const isNewEdgeHost = this.isNew();
         return (
             <>
-                {!isNewEdgeHost && isLoading && <LoadingSpinner/>}
-                {!isNewEdgeHost && !isLoading && error && <Error message={error}/>}
-                {(isNewEdgeHost || !isLoading) && (isNewEdgeHost || !error) && formEdgeHost && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formEdgeHost && (
                     /*@ts-ignore*/
                     <Form id={edgeHostKey}
                           fields={this.getFields(formEdgeHost)}
@@ -392,7 +392,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
     private rules = (): JSX.Element =>
         <EdgeHostRuleList isLoadingEdgeHost={this.props.isLoading}
-                          loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
+                          loadEdgeHostError={this.props.error}
                           edgeHost={this.getEdgeHost()}
                           unsavedRules={this.state.unsavedRules}
                           onAddHostRule={this.addEdgeHostRule}
@@ -403,7 +403,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
     private simulatedMetrics = (): JSX.Element =>
         <EdgeHostSimulatedMetricList isLoadingEdgeHost={this.props.isLoading}
-                                     loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
+                                     loadEdgeHostError={this.props.error}
                                      edgeHost={this.getEdgeHost()}
                                      unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                      onAddSimulatedHostMetric={this.addHostSimulatedMetric}
@@ -424,7 +424,7 @@ class EdgeHost extends BaseComponent<Props, State> {
                 title: 'Host',
                 id: 'edgeHost',
                 content: () => this.edgeHost(),
-                active: this.props.location.state?.selected === 'edgeHost'
+                active: this.props.location.state?.selected === 'edge-host'
             },
             {
                 title: 'Regras',

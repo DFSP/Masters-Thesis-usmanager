@@ -83,7 +83,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IRuleContainer,
-    selected: 'containerRule' | 'ruleConditions' | 'containers'
+    selected: 'rule' | 'ruleConditions' | 'containers'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -300,9 +300,9 @@ class RuleContainer extends BaseComponent<Props, State> {
         const isNewRuleContainer = this.isNew();
         return (
             <>
-                {!isNewRuleContainer && isLoading && <LoadingSpinner/>}
-                {!isNewRuleContainer && !isLoading && error && <Error message={error}/>}
-                {(isNewRuleContainer || !isLoading) && (isNewRuleContainer || !error) && formRuleContainer && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formRuleContainer && (
                     /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleContainer)}
@@ -350,7 +350,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private conditions = (): JSX.Element =>
         <RuleContainerConditionList isLoadingRuleContainer={this.props.isLoading}
-                                    loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
+                                    loadRuleContainerError={this.props.error}
                                     ruleContainer={this.getRuleContainer()}
                                     unsavedConditions={this.state.unsavedConditions}
                                     onAddRuleCondition={this.addRuleCondition}
@@ -358,7 +358,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private containers = (): JSX.Element =>
         <RuleContainerContainersList isLoadingRuleContainer={this.props.isLoading}
-                                     loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
+                                     loadRuleContainerError={this.props.error}
                                      ruleContainer={this.getRuleContainer()}
                                      unsavedContainersIds={this.state.unsavedContainersIds}
                                      unsavedContainers={this.state.unsavedContainers}
@@ -370,7 +370,7 @@ class RuleContainer extends BaseComponent<Props, State> {
             title: 'Regra',
             id: 'containerRule',
             content: () => this.containerRule(),
-            active: this.props.location.state?.selected === 'containerRule'
+            active: this.props.location.state?.selected === 'rule'
         },
         {
             title: 'Condições',

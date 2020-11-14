@@ -28,7 +28,7 @@ import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 
 @Data
-final class AddCloudInstance {
+public final class AddCloudInstance {
 
 	private Coordinates coordinates;
 

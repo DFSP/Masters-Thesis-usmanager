@@ -48,6 +48,7 @@ interface Props {
     position?: { coordinates: Point, zoom: number },
     center?: boolean;
     resizable?: boolean;
+    keepRatio?: boolean;
 }
 
 interface State {
@@ -106,7 +107,7 @@ export default class LocationMap extends React.Component<Props, State> {
     );
 
     public render() {
-        const {onSelect, onDeselect, locations, marker, hover, clickHighlight, zoomable, position, resizable} = this.props;
+        const {onSelect, onDeselect, locations, marker, hover, clickHighlight, zoomable, position, resizable, keepRatio} = this.props;
         const {tooltip, markerSize} = this.state;
         const markers = locations.map((location, key): { coordinates: Point, marker: JSX.Element } => ({
             coordinates: [location.longitude, location.latitude],
@@ -127,14 +128,13 @@ export default class LocationMap extends React.Component<Props, State> {
         }));
         const map = <>
             <MapChart setTooltipContent={this.setTooltip} onClick={onSelect} markers={markers} hover={hover}
-                      clickHighlight={clickHighlight} zoomable={zoomable} position={position} center={this.center()}
+                      clickHighlight={clickHighlight} zoomable={zoomable} keepRatio={keepRatio} position={position} center={this.center()}
                       onZoom={this.resizeMarkers}/>
             <ReactTooltip html multiline>
                 {tooltip}
             </ReactTooltip>
         </>;
         return <>
-            <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
             {resizable &&
             <>
                 <button className={`modal-trigger btn-floating btn-flat right`}

@@ -35,10 +35,10 @@ import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
+import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
@@ -47,11 +47,12 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
@@ -94,15 +95,13 @@ public class DockerContainersService {
 	private final HostsService hostsService;
 
 	private final int dockerDelayBeforeStopContainer;
-
-	@Getter
-	private boolean launchingContainer;
+	private final ConfigurationsService configurationsService;
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService, ServicesService servicesService,
 								   ServiceDependenciesService serviceDependenciesService, NginxLoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   ContainerProperties containerProperties) {
+								   ContainerProperties containerProperties, ConfigurationsService configurationsService) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -112,7 +111,7 @@ public class DockerContainersService {
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
-		this.launchingContainer = false;
+		this.configurationsService = configurationsService;
 	}
 
 	public Map<String, List<DockerContainer>> launchApp(List<Service> services, Coordinates coordinates) {
@@ -238,12 +237,11 @@ public class DockerContainersService {
 													  ContainerTypeEnum containerType, List<String> environment,
 													  Map<String, String> labels,
 													  Map<String, String> dynamicLaunchParams) {
-		launchingContainer = true;
 		final int retries = 3;
 		String errorMessage = null;
+		Configuration config = null;
 		try {
 			for (var i = 0; i < retries; i++) {
-
 				if (!hostAddress.isComplete()) {
 					hostAddress = hostsService.completeHostAddress(hostAddress);
 				}
@@ -257,10 +255,7 @@ public class DockerContainersService {
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress()));
-					}
-					catch (ManagerException e) {
-						log.error(e.getMessage());
-					}
+					} catch (ManagerException ignored) { }
 					if (containers.size() > 0) {
 						DockerContainer container = containers.get(0);
 						log.info("Service {} is already running on container {} on host {}", serviceName, container.getId(), hostAddress);
@@ -307,6 +302,21 @@ public class DockerContainersService {
 					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
 				}
 
+				Optional<Service> optionalMemcached = servicesService.getDependencies(serviceName).stream()
+					.filter(s -> s.getServiceName().contains("memcached"))
+					.collect(Collectors.toList()).stream().findFirst();
+				if (optionalMemcached.isPresent()) {
+					Service memcached = optionalMemcached.get();
+					String memcachedServiceName = memcached.getServiceName();
+					String memcachedHost = getMemcachedHostForService(hostAddress, memcachedServiceName);
+					String outputLabel = memcached.getOutputLabel();
+					launchCommand = launchCommand.replace(outputLabel, memcachedHost);
+				}
+
+				for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
+					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
+				}
+
 				List<String> containerEnvironment = new LinkedList<>();
 				containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);
 				containerEnvironment.addAll(service.getEnvironment());
@@ -348,6 +358,7 @@ public class DockerContainersService {
 					dockerClient.pull(dockerRepository);
 					ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 					String containerId = containerCreation.id();
+					config = configurationsService.addConfiguration(containerId);
 					dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
 					dockerClient.startContainer(containerId);
 					if (ServiceTypeEnum.getServiceType(serviceType) == ServiceTypeEnum.FRONTEND) {
@@ -360,13 +371,15 @@ public class DockerContainersService {
 					if (errorMessage.toLowerCase().contains("image not found")) {
 						throw new EntityNotFoundException("image", "name", serviceName);
 					}
-					log.error("Failed to start container: {}. Retrying... ({}/{})", errorMessage, i, retries);
+					log.error("Failed to start container: {}. Retrying... ({}/{})", errorMessage, i + 1, retries);
 				}
 				Timing.sleep(i + 1, TimeUnit.SECONDS);
 			}
 		}
 		finally {
-			launchingContainer = false;
+			if (config != null) {
+				configurationsService.removeConfiguration(config);
+			}
 		}
 		throw new ManagerException("Failed to start container: %s", errorMessage);
 	}
@@ -379,7 +392,19 @@ public class DockerContainersService {
 			throw new ManagerException("Failed to launch database {} on host {}", databaseServiceName, hostAddress);
 		}
 		String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
-		log.info("Found database {} on host {}", address, hostAddress);
+		log.info("Using database {} on host {}", address, hostAddress);
+		return address;
+	}
+
+	private String getMemcachedHostForService(HostAddress hostAddress, String memcachedService) {
+		Container memcached = containersService.getHostContainersWithLabels(hostAddress,
+			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, memcachedService)))
+			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, memcachedService));
+		if (memcached == null) {
+			throw new ManagerException("Failed to launch memcached {} on host {}", memcachedService, hostAddress);
+		}
+		String address = memcached.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		log.info("Using memcached {} on host {}", address, hostAddress);
 		return address;
 	}
 
@@ -390,10 +415,6 @@ public class DockerContainersService {
 	}
 
 	public void stopContainer(String id, HostAddress hostAddress) {
-		this.stopContainer(id, hostAddress, null);
-	}
-
-	public void stopContainer(String id, HostAddress hostAddress, Integer delay) {
 		ContainerInfo containerInfo = inspectContainer(id, hostAddress);
 		String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
 		ServiceTypeEnum serviceType = ServiceTypeEnum.getServiceType(containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE));
@@ -403,9 +424,7 @@ public class DockerContainersService {
 			nginxLoadBalancerService.removeServer(serviceName, serviceAddress, region);
 		}
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
-			//TODO espera duas vezes no caso de migração!?!?
-			int delayBeforeStop = delay == null ? dockerDelayBeforeStopContainer : delay;
-			dockerClient.stopContainer(id, delayBeforeStop);
+			dockerClient.stopContainer(id, 0);
 			log.info("Stopped container {} ({}) on host {}", serviceName, id, hostAddress.toString());
 		}
 		catch (DockerException | InterruptedException e) {
@@ -454,13 +473,20 @@ public class DockerContainersService {
 			toHostAddress = hostsService.completeHostAddress(toHostAddress);
 		}
 		Optional<DockerContainer> replicaContainer = replicateContainer(container, toHostAddress);
-		new Timer("StopContainerTimer").schedule(new TimerTask() {
+		new Timer("stop-container-timer").schedule(new TimerTask() {
 			@Override
 			public void run() {
 				stopContainer(container);
 			}
 		}, dockerDelayBeforeStopContainer);
 		return replicaContainer;
+	}
+
+	public List<DockerContainer> getReadyContainers(DockerClient.ListContainersParam... filter) {
+		return nodesService.getReadyNodes().stream()
+			.map(node -> getContainers(node.getHostAddress(), filter))
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	public List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {
@@ -491,7 +517,7 @@ public class DockerContainersService {
 	}
 
 	private List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
-		return nodesService.getReadyNodes().stream()
+		return nodesService.getNodes().stream()
 			.map(node -> getContainers(node.getHostAddress(), filter))
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
@@ -569,8 +595,64 @@ public class DockerContainersService {
 		if (containersPredicate != null) {
 			containers.removeIf(Predicate.not(containersPredicate));
 		}
-		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress(), 0));
+		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress()));
 		return containers;
+	}
+
+	public List<DockerContainer> getHostContainers(HostAddress hostAddress) {
+		return getContainers().stream()
+			.filter(container -> container.getHostAddress().equals(hostAddress))
+			.collect(Collectors.toList());
+	}
+
+	public List<DockerContainer> getHostContainersWithLabels(HostAddress hostAddress, Set<Pair<String, String>> labels) {
+		List<DockerContainer> containers = getHostContainers(hostAddress);
+		return filterContainersWithLabels(containers, labels);
+	}
+
+	public List<DockerContainer> getDatabaseContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name())));
+	}
+
+	public List<DockerContainer> getDatabaseContainers(HostAddress hostAddress) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name())));
+	}
+
+	public List<DockerContainer> getSystemContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()))
+		);
+	}
+
+	public List<DockerContainer> getAppContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
+		);
+	}
+
+	public List<DockerContainer> getContainersWithLabels(Set<Pair<String, String>> labels) {
+		List<DockerContainer> containers = getContainers();
+		return filterContainersWithLabels(containers, labels);
+	}
+
+	private List<DockerContainer> filterContainersWithLabels(List<DockerContainer> containers,
+															 Set<Pair<String, String>> labels) {
+		List<String> labelKeys = labels.stream().map(Pair::getFirst).collect(Collectors.toList());
+		return containers.stream()
+			.filter(container -> {
+				for (Map.Entry<String, String> containerLabel : container.getLabels().entrySet()) {
+					String key = containerLabel.getKey();
+					String value = containerLabel.getValue();
+					if (labelKeys.contains(key) && !labels.contains(Pair.of(key, value))) {
+						return false;
+					}
+				}
+				return true;
+			})
+			.collect(Collectors.toList());
 	}
 
 }

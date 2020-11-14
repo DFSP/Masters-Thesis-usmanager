@@ -84,7 +84,7 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
+                               error={this.props.loadRuleServiceError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem condições associadas`}
                                data={this.props.ruleConditions}
                                dropdown={{

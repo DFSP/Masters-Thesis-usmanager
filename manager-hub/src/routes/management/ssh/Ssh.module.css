@@ -66,6 +66,10 @@
 .command {
 }
 
+.commandResult {
+    word-break: break-all;
+}
+
 .exitStatus {
     margin-left: 5px;
     color: #F44336;

@@ -22,8 +22,13 @@
 # SOFTWARE.
 #
 
+EXTERNAL_ID: 45654ghgdftg546756ujytdg546
+HOST_ADDRESS: \{"username":"daniel","publicDnsName":"danielfct.ddns.net","publicIpAddress":"2.82.208.89","privateIpAddress":"192.168.1.83","coordinates":{"label":"Portugal","latitude":39.575097,"longitude":-8.909794},"region":"EUROPE","place":"EDGE"}
+REGISTRATION_URL: http://2.82.208.89:8080/api/sync
 server:
   port: 8081
+  servlet:
+    context-path: /api
 spring:
   application:
     name: manager-master
@@ -31,6 +36,7 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
+    #url: jdbc:h2:file:./db/manager-worker-db;DB_CLOSE_ON_EXIT=FALSE
     url: jdbc:h2:mem:manager-worker-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
     username: sa
     password: admin
@@ -51,24 +57,6 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
-  kafka:
-    producer:
-      bootstrap-servers: ${master}:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      bootstrap-servers: ${master}:9092
-      group-id: manager-workers
-      auto-offset-reset: earliest
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-    properties:
-      spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-      spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-      spring:
-        json:
-          trusted:
-            packages: "*"
 management:
   endpoints:
     web:
@@ -78,6 +66,7 @@ worker-manager:
   id: ${id:}
   master-hostname: ${master-hostname:}
   monitor-period: 30000
+  port: 8080
   tests:
     enabled: ${tests:true}
 ssh:
@@ -107,10 +96,6 @@ container:
   delay-before-stop: 45000
   monitor-period: 60000
 docker:
-  install-script: docker-install.sh
-  install-script-path: src/main/resources/scripts/docker-install.sh
-  uninstall-script: docker-uninstall.sh
-  uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
   api:
     port: 2376
   api-proxy:
@@ -126,8 +111,7 @@ registration:
   port: 8761
 prometheus:
   node-exporter:
-    install-script: node-exporter-install.sh
-    install-script-path: src/main/resources/scripts/node-exporter-install.sh
+    install-script: src/main/resources/scripts/node-exporter-install.sh
 decision:
   start-host-on-events-count: 3
   stop-host-on-events-count: 3

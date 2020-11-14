@@ -91,7 +91,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ISimulatedAppMetric,
-    selected: 'simulatedAppMetric' | 'apps',
+    selected: 'metric' | 'apps',
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -263,9 +263,9 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
         const isNewSimulatedAppMetric = this.isNew();
         return (
             <>
-                {!isNewSimulatedAppMetric && isLoading && <LoadingSpinner/>}
-                {!isNewSimulatedAppMetric && !isLoading && error && <Error message={error}/>}
-                {(isNewSimulatedAppMetric || !isLoading) && (isNewSimulatedAppMetric || !error) && formSimulatedAppMetric && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formSimulatedAppMetric && (
                     /*@ts-ignore*/
                     <Form id={simulatedAppMetricKey}
                           fields={this.getFields(formSimulatedAppMetric)}
@@ -327,7 +327,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
 
     private apps = (): JSX.Element =>
         <SimulatedAppMetricAppsList isLoadingSimulatedAppMetric={this.props.isLoading}
-                                    loadSimulatedAppMetricError={!this.isNew() ? this.props.error : undefined}
+                                    loadSimulatedAppMetricError={this.props.error}
                                     simulatedAppMetric={this.getSimulatedAppMetric()}
                                     unsavedApps={this.state.unsavedApps}
                                     onAddApp={this.addSimulatedAppMetricApp}
@@ -338,7 +338,7 @@ class SimulatedAppMetric extends BaseComponent<Props, State> {
             title: 'Métricas simuladas',
             id: 'simulatedAppMetric',
             content: () => this.simulatedAppMetric(),
-            active: this.props.location.state?.selected === 'simulatedAppMetric'
+            active: this.props.location.state?.selected === 'metric'
         },
         {
             title: 'Aplicações',

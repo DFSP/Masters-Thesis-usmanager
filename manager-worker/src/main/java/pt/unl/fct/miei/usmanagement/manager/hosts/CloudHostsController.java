@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.management.hosts;
+package pt.unl.fct.miei.usmanagement.manager.hosts;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.AddCloudInstance;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSftpRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteSshRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.management.sync.SyncService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +49,7 @@ public class CloudHostsController {
 
 	@PostMapping("/sync")
 	public List<CloudHost> synchronizeDatabaseCloudHosts() {
-		return syncService.synchronizeDatabaseCloudHosts();
+		return syncService.synchronizeCloudHostsDatabase();
 	}
 
 	@GetMapping("/{instanceId}")
@@ -133,7 +133,7 @@ public class CloudHostsController {
 		String command = request.getCommand();
 		HostAddress hostAddress = new HostAddress(publicIpAddress);
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

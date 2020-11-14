@@ -33,9 +33,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -121,9 +122,11 @@ public class BashService {
 		}
 	}
 
-	public void executeCommandInBackground(String command, Path outputFilePath) {
-		String executeCommand = String.format("nohup %s >/dev/null", command);
+	public void executeBackgroundProcess(String command, String outputFile) {
+		String executeCommand = String.format("nohup %s >/dev/null 2>&1 & echo $! > /tmp/pid_%d.txt", command, System.currentTimeMillis());
 		ProcessBuilder builder = new ProcessBuilder("bash", "-c", executeCommand);
+		String file = String.format("%s_%d.log", outputFile == null ? "process" : outputFile, System.currentTimeMillis());
+		Path outputFilePath = Paths.get("/tmp/" + file);
 		builder.redirectOutput(outputFilePath.toFile());
 		builder.redirectError(outputFilePath.toFile());
 		try {
@@ -132,5 +135,19 @@ public class BashService {
 		catch (IOException e) {
 			log.error("Failed to execute command {} in the background: {}", command, e.getMessage());
 		}
+	}
+
+	public boolean stopBackgroundProcesses() {
+		String filesCommand = "ls /tmp | grep pid_*";
+		BashCommandResult filesCommandResult = executeCommand(filesCommand, true);
+		if (filesCommandResult == null || !filesCommandResult.isSuccessful()) {
+			return false;
+		}
+		List<String> files = filesCommandResult.getOutput();
+		String killCommand = files.stream().map(file -> "kill -9 `cat /tmp/" + file + "`").collect(Collectors.joining("; "));
+		executeCommand(killCommand, true);
+		String rmCommand = "rm -rf " + files.stream().map(file -> "/tmp/" + file).collect(Collectors.joining(" "));
+		BashCommandResult rmCommandResult = executeCommand(rmCommand, true);
+		return rmCommandResult != null && rmCommandResult.isSuccessful();
 	}
 }

@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.workermanagers;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -72,6 +73,7 @@ public class WorkerManagersService {
 	private final ContainersService containersService;
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
+	private final Environment environment;
 
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
@@ -80,13 +82,14 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 WorkerManagerProperties workerManagerProperties) {
+								 Environment environment, WorkerManagerProperties workerManagerProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
+		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
 		byte[] auth = String.format("%s:%s", username, password).getBytes();
@@ -145,11 +148,11 @@ public class WorkerManagersService {
 	}
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
-		Gson gson = new Gson();
 		List<String> environment = new LinkedList<>(List.of(
-			ContainerConstants.Environment.WorkerManager.ID + "=" + id,
-			ContainerConstants.Environment.WorkerManager.MASTER + "=" + hostsService.getMasterHostAddress().getPublicIpAddress(),
-			ContainerConstants.Environment.WorkerManager.HOST_ADDRESS + "=" + gson.toJson(hostAddress)
+			ContainerConstants.Environment.WorkerManager.EXTERNAL_ID + "=" + id,
+			ContainerConstants.Environment.WorkerManager.REGISTRATION_URL + "=" + getRegistrationUrl(),
+			ContainerConstants.Environment.WorkerManager.SYNC_URL + "=" + getSyncUrl(),
+			ContainerConstants.Environment.WorkerManager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress)
 		));
 		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
@@ -299,5 +302,19 @@ public class WorkerManagersService {
 	public List<Node> synchronizeDatabaseNodes() {
 		return getNodes(true);
 	}
+
+	private String getRegistrationUrl() {
+		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
+		String port = environment.getProperty("local.server.port");
+		return String.format("http://%s:%s/api/worker-managers/registration", hostname, port);
+	}
+
+	private String getSyncUrl() {
+		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
+		String port = environment.getProperty("local.server.port");
+		return String.format("http://%s:%s/api/worker-managers/sync", hostname, port);
+	}
+
+
 
 }

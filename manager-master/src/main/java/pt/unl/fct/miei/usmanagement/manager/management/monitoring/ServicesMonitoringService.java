@@ -27,14 +27,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoring;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -45,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequests
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.ServiceMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
@@ -53,10 +46,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceR
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerFieldAverage;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoring;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitorings;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -68,7 +65,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -94,7 +90,6 @@ public class ServicesMonitoringService {
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
-	private final ContainersRecoveryService containersRecoveryService;
 
 	private final long monitorPeriod;
 	private final int stopContainerOnEventCount;
@@ -113,7 +108,7 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ContainersRecoveryService containersRecoveryService, ContainerProperties containerProperties,
+									 ContainerProperties containerProperties,
 									 MasterManagerProperties masterManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
@@ -128,7 +123,6 @@ public class ServicesMonitoringService {
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
-		this.containersRecoveryService = containersRecoveryService;
 		this.monitorPeriod = containerProperties.getMonitorPeriod();
 		this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
 		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
@@ -230,7 +224,7 @@ public class ServicesMonitoringService {
 				try {
 					monitorServicesTask(interval);
 				}
-				catch (ManagerException e) { //FIXME change to Exception
+				catch (Exception e) {
 					log.error("Failed to execute monitor services task: {}", e.getMessage());
 				}
 			}
@@ -239,85 +233,71 @@ public class ServicesMonitoringService {
 
 	private void monitorServicesTask(int interval) {
 		List<Container> monitoringContainers = containersService.getAppContainers();
-		List<Container> systemContainers = containersService.getSystemContainers();
-		List<Container> synchronizedContainers = containersService.synchronizeDatabaseContainers();
-
-		containersRecoveryService.restoreCrashedContainers(monitoringContainers, synchronizedContainers);
-
-		systemContainers.parallelStream()
-			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
-			.distinct()
-			.forEach(containersRecoveryService::restartContainer);
 
 		Map<String, List<ServiceDecisionResult>> containersDecisions = new HashMap<>();
 
-		monitoringContainers.parallelStream().forEach(container -> {
-			if (synchronizedContainers.stream().noneMatch(c ->
-				Objects.equals(c.getContainerId(), container.getContainerId()) && Objects.equals(c.getHostAddress(), container.getHostAddress()))) {
-				containersService.launchContainer(container.getHostAddress(), container.getServiceName(), ContainerTypeEnum.SINGLETON);
+		monitoringContainers.forEach(container -> {
+
+			HostAddress hostAddress = container.getHostAddress();
+			String containerId = container.getContainerId();
+			String serviceName = container.getServiceName();
+
+			// Metrics from docker
+			Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
+
+			// Simulated app metrics
+			for (App app : servicesService.getApps(serviceName)) {
+				String appName = app.getName();
+				Map<String, Double> appSimulatedFields = appSimulatedMetricsService.getAppSimulatedMetricByApp(appName)
+					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+					.collect(Collectors.toMap(metric -> metric.getField().getName(), appSimulatedMetricsService::randomizeFieldValue));
+				stats.putAll(appSimulatedFields);
 			}
-			else {
-				HostAddress hostAddress = container.getHostAddress();
-				String containerId = container.getContainerId();
-				String serviceName = container.getServiceName();
 
-				// Metrics from docker
-				Map<String, Double> stats = serviceMetricsService.getContainerStats(hostAddress, containerId);
+			// Simulated service metrics
+			Map<String, Double> serviceSimulatedFields = serviceSimulatedMetricsService.getServiceSimulatedMetricByService(serviceName)
+				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+				.collect(Collectors.toMap(metric -> metric.getField().getName(), serviceSimulatedMetricsService::randomizeFieldValue));
+			stats.putAll(serviceSimulatedFields);
 
-				// Simulated app metrics
-				for (App app : servicesService.getApps(serviceName)) {
-					String appName = app.getName();
-					Map<String, Double> appSimulatedFields = appSimulatedMetricsService.getAppSimulatedMetricByApp(appName)
-						.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
-						.collect(Collectors.toMap(metric -> metric.getField().getName(), appSimulatedMetricsService::randomizeFieldValue));
-					stats.putAll(appSimulatedFields);
+			// Simulated container metrics
+			Map<String, Double> containerSimulatedFields = containerSimulatedMetricsService.getServiceSimulatedMetricByContainer(containerId)
+				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
+				.collect(Collectors.toMap(metric -> metric.getField().getName(), containerSimulatedMetricsService::randomizeFieldValue));
+			stats.putAll(containerSimulatedFields);
+
+			// Calculated metrics
+			Map<String, Double> calculatedMetrics = new HashMap<>(2);
+			if (stats.containsKey("rx-bytes")
+				&& !serviceSimulatedFields.containsKey("rx-bytes-per-sec")
+				&& !containerSimulatedFields.containsKey("rx-bytes-per-sec")) {
+				calculatedMetrics.put("rx-bytes", stats.get("rx-bytes"));
+			}
+			if (stats.containsKey("tx-bytes")
+				&& !serviceSimulatedFields.containsKey("tx-bytes-per-sec")
+				&& !containerSimulatedFields.containsKey("tx-bytes-per-sec")) {
+				calculatedMetrics.put("tx-bytes", stats.get("tx-bytes"));
+			}
+			calculatedMetrics.forEach((field, value) -> {
+				ServiceMonitoring monitoring = getContainerMonitoring(containerId, field);
+				double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
+				double bytesPerSec = Math.max(0, (value - lastValue) / interval);
+				stats.put(field + "-per-sec", bytesPerSec);
+			});
+
+			stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, stat, value));
+
+			if (!serviceName.equals(MasterManagerProperties.MASTER_MANAGER)
+				&& !serviceName.equals(WorkerManagerProperties.WORKER_MANAGER)) {
+				ServiceDecisionResult containerDecisionResult = runRules(hostAddress, containerId, serviceName, stats);
+				List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);
+				if (containerDecisions != null) {
+					containerDecisions.add(containerDecisionResult);
 				}
-				
-				// Simulated service metrics
-				Map<String, Double> serviceSimulatedFields = serviceSimulatedMetricsService.getServiceSimulatedMetricByService(serviceName)
-					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
-					.collect(Collectors.toMap(metric -> metric.getField().getName(), serviceSimulatedMetricsService::randomizeFieldValue));
-				stats.putAll(serviceSimulatedFields);
-
-				// Simulated container metrics
-				Map<String, Double> containerSimulatedFields = containerSimulatedMetricsService.getServiceSimulatedMetricByContainer(containerId)
-					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getName()) || metric.isOverride()))
-					.collect(Collectors.toMap(metric -> metric.getField().getName(), containerSimulatedMetricsService::randomizeFieldValue));
-				stats.putAll(containerSimulatedFields);
-
-				// Calculated metrics
-				Map<String, Double> calculatedMetrics = new HashMap<>(2);
-				if (stats.containsKey("rx-bytes")
-					&& !serviceSimulatedFields.containsKey("rx-bytes-per-sec")
-					&& !containerSimulatedFields.containsKey("rx-bytes-per-sec")) {
-					calculatedMetrics.put("rx-bytes", stats.get("rx-bytes"));
-				}
-				if (stats.containsKey("tx-bytes")
-					&& !serviceSimulatedFields.containsKey("tx-bytes-per-sec")
-					&& !containerSimulatedFields.containsKey("tx-bytes-per-sec")) {
-					calculatedMetrics.put("tx-bytes", stats.get("tx-bytes"));
-				}
-				calculatedMetrics.forEach((field, value) -> {
-					ServiceMonitoring monitoring = getContainerMonitoring(containerId, field);
-					double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
-					double bytesPerSec = Math.max(0, (value - lastValue) / interval);
-					stats.put(field + "-per-sec", bytesPerSec);
-				});
-
-				stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, stat, value));
-
-				if (!serviceName.equals(MasterManagerProperties.MASTER_MANAGER)
-					&& !serviceName.equals(WorkerManagerProperties.WORKER_MANAGER)) {
-					ServiceDecisionResult containerDecisionResult = runRules(hostAddress, containerId, serviceName, stats);
-					List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);
-					if (containerDecisions != null) {
-						containerDecisions.add(containerDecisionResult);
-					}
-					else {
-						containerDecisions = new LinkedList<>();
-						containerDecisions.add(containerDecisionResult);
-						containersDecisions.put(serviceName, containerDecisions);
-					}
+				else {
+					containerDecisions = new LinkedList<>();
+					containerDecisions.add(containerDecisionResult);
+					containersDecisions.put(serviceName, containerDecisions);
 				}
 			}
 		});

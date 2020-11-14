@@ -400,9 +400,9 @@ class App extends BaseComponent<Props, State> {
         const isNewApp = this.isNew();
         return (
             <>
-                {!isNewApp && isLoading && <LoadingSpinner/>}
-                {!isNewApp && !isLoading && error && <Error message={error}/>}
-                {(isNewApp || !isLoading) && (isNewApp || !error) && formApp && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formApp && (
                     <>
                         {/*@ts-ignore*/}
                         <Form id={appKey}
@@ -448,7 +448,7 @@ class App extends BaseComponent<Props, State> {
 
     private services = (): JSX.Element =>
         <AppServicesList isLoadingApp={this.props.isLoading}
-                         loadAppError={!this.isNew() ? this.props.error : undefined}
+                         loadAppError={this.props.error}
                          app={this.getApp()}
                          unsavedServices={this.state.unsavedServices}
                          onAddAppService={this.addAppService}
@@ -457,7 +457,7 @@ class App extends BaseComponent<Props, State> {
 
     private rules = (): JSX.Element =>
         <AppRuleList isLoadingApp={this.props.isLoading}
-                     loadAppError={!this.isNew() ? this.props.error : undefined}
+                     loadAppError={this.props.error}
                      app={this.getApp()}
                      unsavedRules={this.state.unsavedRules}
                      onAddAppRule={this.addAppRule}
@@ -468,7 +468,7 @@ class App extends BaseComponent<Props, State> {
 
     private simulatedMetrics = (): JSX.Element =>
         <AppSimulatedMetricList isLoadingApp={this.props.isLoading}
-                                loadAppError={!this.isNew() ? this.props.error : undefined}
+                                loadAppError={this.props.error}
                                 app={this.getApp()}
                                 unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                 onAddSimulatedAppMetric={this.addAppSimulatedMetric}

@@ -110,7 +110,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList<string | IAddServiceApp>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+            error={this.props.loadServiceError || (isNew ? undefined : this.props.error)}
             emptyMessage='Sem aplicações associadas'
             data={this.props.serviceApps}
             sort={this.sort}

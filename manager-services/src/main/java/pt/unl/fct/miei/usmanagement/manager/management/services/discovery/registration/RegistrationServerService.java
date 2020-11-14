@@ -31,10 +31,12 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
@@ -59,21 +61,19 @@ public class RegistrationServerService {
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 	private final ContainersService containersService;
-	private final AwsService awsService;
-	private final RegionsService regionsService;
+	private final ElasticIpsService elasticIpsService;
 	private final CloudHostsService cloudHostsService;
 
 	private final int port;
 
 	public RegistrationServerService(HostsService hostsService, ServicesService servicesService,
-									 @Lazy ContainersService containersService, AwsService awsService,
-									 RegionsService regionsService, CloudHostsService cloudHostsService,
+									 @Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
+									 CloudHostsService cloudHostsService,
 									 RegistrationProperties registrationProperties) {
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
-		this.awsService = awsService;
-		this.regionsService = regionsService;
+		this.elasticIpsService = elasticIpsService;
 		this.cloudHostsService = cloudHostsService;
 		this.port = registrationProperties.getPort();
 	}
@@ -92,12 +92,11 @@ public class RegistrationServerService {
 
 		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
 
-		AwsRegion awsRegion = regionsService.getAwsRegion(hostAddress.getRegion());
+		RegionEnum region = hostAddress.getRegion();
 		String instanceId = cloudHostsService.getCloudHostByAddress(hostAddress).getInstanceId();
-
-		String allocationId = awsService.getAllocatedElasticIps().get(awsRegion).getAllocationId();
+		String allocationId = elasticIpsService.getElasticIp(region).getAllocationId();
 		try {
-			awsService.associateElasticIpAddress(allocationId, instanceId).get();
+			elasticIpsService.associateElasticIpAddress(allocationId, instanceId).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
 			throw new ManagerException("Failed to associate elastic ip address to the registration server: %s", e.getMessage());
@@ -152,7 +151,7 @@ public class RegistrationServerService {
 	}
 
 	private String getRegistrationServerAddresses() {
-		return awsService.getAllocatedElasticIps().values().stream()
+		return elasticIpsService.getElasticIps().stream()
 			.map(address -> String.format("http://%s:%s/eureka/", address.getPublicIp(), port))
 			.collect(Collectors.joining(","));
 	}

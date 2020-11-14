@@ -93,7 +93,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ISimulatedServiceMetric,
-    selected: 'simulatedServiceMetric' | 'services',
+    selected: 'metric' | 'services',
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -270,9 +270,9 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
         const isNewSimulatedServiceMetric = this.isNew();
         return (
             <>
-                {!isNewSimulatedServiceMetric && isLoading && <LoadingSpinner/>}
-                {!isNewSimulatedServiceMetric && !isLoading && error && <Error message={error}/>}
-                {(isNewSimulatedServiceMetric || !isLoading) && (isNewSimulatedServiceMetric || !error) && formSimulatedServiceMetric && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formSimulatedServiceMetric && (
                     /*@ts-ignore*/
                     <Form id={simulatedServiceMetricKey}
                           fields={this.getFields(formSimulatedServiceMetric)}
@@ -339,7 +339,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
     private services = (): JSX.Element =>
         <SimulatedServiceMetricServiceList isLoadingSimulatedServiceMetric={this.props.isLoading}
-                                           loadSimulatedServiceMetricError={!this.isNew() ? this.props.error : undefined}
+                                           loadSimulatedServiceMetricError={this.props.error}
                                            simulatedServiceMetric={this.getSimulatedServiceMetric()}
                                            unsavedServices={this.state.unsavedServices}
                                            onAddService={this.addSimulatedServiceMetricService}
@@ -350,7 +350,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
             title: 'Métricas simuladas',
             id: 'simulatedServiceMetric',
             content: () => this.simulatedServiceMetric(),
-            active: this.props.location.state?.selected === 'simulatedServiceMetric'
+            active: this.props.location.state?.selected === 'metric'
         },
         {
             title: 'Serviços',

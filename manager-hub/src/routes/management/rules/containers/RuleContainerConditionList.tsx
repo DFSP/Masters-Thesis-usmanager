@@ -85,7 +85,7 @@ class RuleContainerConditionList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
+            error={this.props.loadRuleContainerError || (isNew ? undefined : this.props.error)}
             emptyMessage={`Sem condições associadas`}
             data={this.props.ruleConditions}
             dropdown={{

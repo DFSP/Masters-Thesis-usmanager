@@ -30,22 +30,27 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
-	private final DockerSwarmService dockerSwarmService;
 	private final SymService symService;
+	private final SyncService syncService;
+	private final DockerSwarmService dockerSwarmService;
 
-	public ManagerWorkerShutdown(DockerSwarmService dockerSwarmService, SymService symService) {
-		this.dockerSwarmService = dockerSwarmService;
+	public ManagerWorkerShutdown(SymService symService, SyncService syncService, DockerSwarmService dockerSwarmService) {
 		this.symService = symService;
+		this.syncService = syncService;
+		this.dockerSwarmService = dockerSwarmService;
 	}
 
 	@Override
 	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
-		dockerSwarmService.destroySwarm();
 		symService.stopSymmetricDSServer();
+		syncService.stopContainersDatabaseSynchronization();
+		syncService.stopNodesDatabaseSynchronization();
+		dockerSwarmService.destroySwarm();
 	}
 
 }

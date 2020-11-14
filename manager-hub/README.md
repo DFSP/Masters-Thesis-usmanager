@@ -49,6 +49,15 @@ docker run -it --rm -p 80:80 usmanager/manager-hub
 > Ubuntu 20.04.1 LTS
 > Chrome browser 86.0.4240.111 
 
+### Tunnelto
+
+Permite expor o servidor ao público através de um link:  
+Fazer download [aqui](https://github.com/agrinman/tunnelto/releases/download/0.1.9/tunnelto-linux.tar.gz).  
+Executar:
+```shell script
+tunnelto --port 3000
+```
+
 ### Ferramentas
 
 [<img src="https://i.imgur.com/LGowRP4.png" alt="" width="48" height="40">React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) - Adds React debugging tools to the Chrome Developer Tools

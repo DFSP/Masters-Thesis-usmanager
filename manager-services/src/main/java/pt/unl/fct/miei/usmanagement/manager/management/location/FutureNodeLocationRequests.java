@@ -28,11 +28,12 @@ import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Data
-final class NodeLocationRequests {
+final class FutureNodeLocationRequests {
 
 	private final Node node;
-	private final Map<String, Integer> locationRequests;
+	private final CompletableFuture<Map<String, Integer>> requests;
 
 }

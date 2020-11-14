@@ -25,6 +25,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import './index.scss'
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import * as serviceWorker from './serviceWorker';
 import Root from "./containers/Root";

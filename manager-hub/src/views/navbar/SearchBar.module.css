@@ -25,3 +25,9 @@
 .searchBar {
     padding: 12px !important;
 }
+
+@media only screen and (max-width: 1075px) {
+    .searchBarForm {
+        display: none !important;
+    }
+}

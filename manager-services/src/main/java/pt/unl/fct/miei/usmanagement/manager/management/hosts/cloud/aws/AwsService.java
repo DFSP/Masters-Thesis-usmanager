@@ -60,11 +60,13 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
+import javax.security.auth.login.Configuration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +84,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AwsService {
 
-	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(3);
+	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(10);
 
 	private final SshService sshService;
 	private final Map<AwsRegion, AmazonEC2> ec2Clients;
@@ -95,13 +97,15 @@ public class AwsService {
 	private final int awsConnectionTimeout;
 	private final String awsUsername;
 	private final RegionsService regionService;
+	private final ConfigurationsService configurationsService;
 
 	@Getter
-	private final Map<AwsRegion, Address> allocatedElasticIps;
+	private final Map<RegionEnum, Address> allocatedElasticIps;
 
-	public AwsService(SshService sshService, AwsProperties awsProperties, RegionsService regionService) {
+	public AwsService(SshService sshService, AwsProperties awsProperties, RegionsService regionService, ConfigurationsService configurationsService) {
 		this.sshService = sshService;
 		this.regionService = regionService;
+		this.configurationsService = configurationsService;
 		this.ec2Clients = new HashMap<>(AwsRegion.getAvailableRegionsCount());
 		String awsAccessKey = awsProperties.getAccess().getKey();
 		String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
@@ -185,7 +189,7 @@ public class AwsService {
 					.findFirst().orElseThrow(() -> new EntityNotFoundException(Instance.class, "id", id, "region", region.getName()));
 			}
 			catch (Exception e) {
-				log.error("Unable to get instance {} on region {}: {}. Retrying... ({}/{})", id, region, e.getMessage(), i, awsMaxRetries);
+				log.error("Unable to get instance {} on region {}: {}. Retrying... ({}/{})", id, region, e.getMessage(), i + 1, awsMaxRetries);
 				Timing.sleep(i + 1, TimeUnit.SECONDS);
 			}
 		}
@@ -201,6 +205,7 @@ public class AwsService {
 		String instanceId;
 		try {
 			instanceId = launchInstance(region).get();
+			configurationsService.addConfiguration(instanceId);
 		}
 		catch (InterruptedException | ExecutionException e) {
 			throw new ManagerException("Unable to launch instance on region: %s", region.getName(), e.getMessage());
@@ -212,7 +217,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			throw new ManagerException("Timeout while waiting for instance %s to boot: ", instance, e.getMessage());
+			throw new ManagerException("Timeout while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
 		}
 		return instance;
 	}
@@ -244,7 +249,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			log.error("Unable wait for instance {} to boot: {}", instanceId, e.getMessage());
+			throw new ManagerException("Timeout while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
 		}
 		return instance;
 	}
@@ -326,8 +331,7 @@ public class AwsService {
 			log.error("Failed to set instance {} to {} state: {}", id, state.getState(), e.getMessage());
 		}
 
-		throw new ManagerException("Unable to set instance state %d within %d tries",
-			state.getState(), awsMaxRetries);
+		throw new ManagerException("Unable to set instance state %d within %d tries", state.getState(), awsMaxRetries);
 	}
 
 	private Instance waitInstanceState(String instanceId, AwsInstanceState state, AwsRegion region) {
@@ -360,63 +364,20 @@ public class AwsService {
 			Objects.equals(tag.getKey(), awsInstanceTag) && Objects.equals(tag.getValue(), "true"));
 	}
 
-	@Async
-	public CompletableFuture<String> allocateElasticIpAddress(AwsRegion region) {
-		final AmazonEC2 ec2 = getEC2Client(region);
-
+	public String allocateElasticIpAddress(RegionEnum region) {
+		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		AllocateAddressRequest allocateRequest = new AllocateAddressRequest().withDomain(DomainType.Vpc);
 		AllocateAddressResult allocateResponse = ec2.allocateAddress(allocateRequest);
-		String allocationId = allocateResponse.getAllocationId();
-
-		return CompletableFuture.completedFuture(allocationId);
+		return allocateResponse.getAllocationId();
 	}
 
-	public void allocateElasticIpAddresses() {
-		Map<AwsRegion, List<Address>> addresses = getElasticIpAddresses();
-
-		RegionEnum[] regions = RegionEnum.values();
-
-		Map<AwsRegion, CompletableFuture<String>> futureElasticIpAddresses = new HashMap<>(regions.length);
-		for (RegionEnum region : regions) {
-			AwsRegion awsRegion = regionService.getAwsRegion(region);
-			List<Address> regionAddresses = addresses.get(awsRegion);
-			if (regionAddresses != null && regionAddresses.size() > 0 && regionAddresses.get(0).getAssociationId() == null) {
-				Address address = regionAddresses.get(0);
-				futureElasticIpAddresses.put(awsRegion, CompletableFuture.completedFuture(address.getAllocationId()));
-			}
-			else {
-				futureElasticIpAddresses.put(awsRegion, allocateElasticIpAddress(awsRegion));
-			}
-		}
-
-		CompletableFuture.allOf(futureElasticIpAddresses.values().toArray(new CompletableFuture[0])).join();
-
-		for (Map.Entry<AwsRegion, CompletableFuture<String>> futureElasticIpAddress : futureElasticIpAddresses.entrySet()) {
-			AwsRegion awsRegion = futureElasticIpAddress.getKey();
-			try {
-				futureElasticIpAddress.getValue().get();
-			}
-			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to allocate elastic ip address for region %s: %s", awsRegion, e.getMessage());
-			}
-		}
-
-		Map<AwsRegion, Address> elasticIpAddresses = getElasticIpAddresses().entrySet().stream()
-			.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get(0)));
-		allocatedElasticIps.putAll(elasticIpAddresses);
-	}
-
-	@Async
-	public CompletableFuture<AssociateAddressResult> associateElasticIpAddress(String allocationId, String instanceId) {
+	public AssociateAddressResult associateElasticIpAddress(String allocationId, String instanceId) {
 		final AmazonEC2 ec2 = getEC2Client();
-
 		AssociateAddressRequest associateRequest = new AssociateAddressRequest()
 			.withInstanceId(instanceId)
 			.withAllocationId(allocationId);
-
-		AssociateAddressResult associateResult = ec2.associateAddress(associateRequest);
-
-		return CompletableFuture.completedFuture(associateResult);
+		return ec2.associateAddress(associateRequest);
 	}
 
 	@Async
@@ -426,51 +387,10 @@ public class AwsService {
 		return CompletableFuture.completedFuture(result.getAddresses());
 	}
 
-	public Map<AwsRegion, List<Address>> getElasticIpAddresses() {
-		Map<AwsRegion, CompletableFuture<List<Address>>> futureElasticIpAddresses = new HashMap<>();
-		for (RegionEnum region : RegionEnum.values()) {
-			AwsRegion awsRegion = regionService.getAwsRegion(region);
-			futureElasticIpAddresses.put(awsRegion, getElasticIpAddresses(awsRegion));
-		}
-
-		CompletableFuture.allOf(futureElasticIpAddresses.values().toArray(new CompletableFuture[0])).join();
-
-		Map<AwsRegion, List<Address>> elasticIpAddresses = new HashMap<>(futureElasticIpAddresses.size());
-		for (Map.Entry<AwsRegion, CompletableFuture<List<Address>>> futureElasticIpAddress : futureElasticIpAddresses.entrySet()) {
-			AwsRegion region = futureElasticIpAddress.getKey();
-			try {
-				List<Address> addresses = futureElasticIpAddress.getValue().get();
-				elasticIpAddresses.put(region, addresses);
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Failed to get elastic ip addresses from region {}: {}", region, e.getMessage());
-			}
-		}
-
-		return elasticIpAddresses;
-	}
-
-	@Async
-	public CompletableFuture<ReleaseAddressResult> releaseElasticIpAddress(String allocationId, AwsRegion region) {
-		final AmazonEC2 ec2 = getEC2Client(region);
+	public ReleaseAddressResult releaseElasticIpAddress(String allocationId, RegionEnum region) {
+		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		ReleaseAddressRequest request = new ReleaseAddressRequest().withAllocationId(allocationId);
-		ReleaseAddressResult result = ec2.releaseAddress(request);
-		log.info("Released elastic ip {}", allocationId);
-		return CompletableFuture.completedFuture(result);
-	}
-
-	public void releaseElasticIpAddresses() {
-		List<CompletableFuture<ReleaseAddressResult>> futureReleases = new LinkedList<>();
-
-		for (Map.Entry<AwsRegion, List<Address>> addresses : getElasticIpAddresses().entrySet()) {
-			AwsRegion region = addresses.getKey();
-			List<CompletableFuture<ReleaseAddressResult>> regionFutureReleases = addresses.getValue().stream()
-				.map(Address::getAllocationId)
-				.map(allocationId -> releaseElasticIpAddress(allocationId, region))
-				.collect(Collectors.toList());
-			futureReleases.addAll(regionFutureReleases);
-		}
-
-		CompletableFuture.allOf(futureReleases.toArray(new CompletableFuture[0])).join();
+		return ec2.releaseAddress(request);
 	}
 }

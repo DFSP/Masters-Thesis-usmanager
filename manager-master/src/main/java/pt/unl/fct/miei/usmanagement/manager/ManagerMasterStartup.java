@@ -32,46 +32,33 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
-
-import java.util.List;
-import java.util.Map;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
 @Component
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final HostsService hostsService;
-	private final CloudHostsService cloudHostsService;
-	private final ContainersService containersService;
-	private final AwsService awsService;
-	private final RegistrationServerService registrationServerService;
+	private final SyncService syncService;
+	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final SymService symService;
 
 	public ManagerMasterStartup(@Lazy HostsService hostsService,
-								@Lazy CloudHostsService cloudHostsService,
-								@Lazy ContainersService containersService,
-								@Lazy AwsService awsService,
-								@Lazy RegistrationServerService registrationServerService,
+								@Lazy SyncService syncService, @Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
 								SymService symService) {
 		this.hostsService = hostsService;
-		this.cloudHostsService = cloudHostsService;
-		this.containersService = containersService;
-		this.awsService = awsService;
-		this.registrationServerService = registrationServerService;
+		this.syncService = syncService;
+		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.symService = symService;
@@ -80,16 +67,16 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		HostAddress hostAddress = hostsService.setHostAddress();
+		HostAddress hostAddress = hostsService.setManagerHostAddress();
+		symService.startSymmetricDsService(hostAddress);
+		elasticIpsService.allocateElasticIpAddresses();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
-		containersService.synchronizeDatabaseContainers();
 		hostsService.clusterHosts();
-		awsService.allocateElasticIpAddresses();
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
-		cloudHostsService.initSyncDatabaseCloudHostsTimer();
-		containersService.initSyncDatabaseContainersTimer();
-		symService.startSymmetricDSServer(hostAddress);
+		syncService.startCloudHostsDatabaseSynchronization();
+		syncService.startContainersDatabaseSynchronization();
+		syncService.startNodesDatabaseSynchronization();
 	}
 
 }

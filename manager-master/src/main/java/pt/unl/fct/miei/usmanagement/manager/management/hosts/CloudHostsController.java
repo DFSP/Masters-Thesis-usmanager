@@ -18,6 +18,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResu
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,10 +29,12 @@ public class CloudHostsController {
 
 	private final CloudHostsService cloudHostsService;
 	private final SshService sshService;
+	private final SyncService syncService;
 
-	public CloudHostsController(CloudHostsService cloudHostsService, SshService sshService) {
+	public CloudHostsController(CloudHostsService cloudHostsService, SshService sshService, SyncService syncService) {
 		this.cloudHostsService = cloudHostsService;
 		this.sshService = sshService;
+		this.syncService = syncService;
 	}
 
 	@PostMapping
@@ -46,7 +49,7 @@ public class CloudHostsController {
 
 	@PostMapping("/sync")
 	public List<CloudHost> synchronizeDatabaseCloudHosts() {
-		return cloudHostsService.synchronizeDatabaseCloudHosts();
+		return syncService.synchronizeCloudHostsDatabase();
 	}
 
 	@GetMapping("/{instanceId}")
@@ -70,7 +73,7 @@ public class CloudHostsController {
 	}
 
 	@GetMapping("/{instanceId}/rules/{ruleName}")
-	public HostRule getCloudHostRule(@PathVariable String instanceId, String ruleName) {
+	public HostRule getCloudHostRule(@PathVariable String instanceId, @PathVariable String ruleName) {
 		return cloudHostsService.getRule(instanceId, ruleName);
 	}
 
@@ -130,7 +133,7 @@ public class CloudHostsController {
 		String command = request.getCommand();
 		HostAddress hostAddress = new HostAddress(publicIpAddress);
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

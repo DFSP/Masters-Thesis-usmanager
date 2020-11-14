@@ -85,7 +85,7 @@ class RuleAppAppsList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList
             isLoading={!isNew ? this.props.isLoadingRuleApp || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadRuleAppError || this.props.error : undefined}
+            error={this.props.loadRuleAppError || (isNew ? undefined : this.props.error)}
             emptyMessage={`Sem nenhuma aplicação associada`}
             data={this.props.ruleApps}
             dropdown={{

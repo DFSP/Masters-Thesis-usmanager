@@ -25,12 +25,12 @@
 package pt.unl.fct.miei.usmanagement.manager.management.location;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 @Data
-final class LocationWeight {
+public final class LocationWeight {
 
-	private final SimpleNode node;
+	private final Node node;
 	private final int weight;
 
 }

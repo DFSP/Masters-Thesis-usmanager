@@ -36,7 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHosts;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
@@ -158,7 +158,7 @@ public class EdgeHostsService {
 			}
 			catch (Exception e) {
 				edgeHosts.delete(edgeHostEntity);
-				throw new ManagerException("Unable to setup new edge host: {}", e.getMessage());
+				throw new ManagerException("Unable to setup new edge host: %s", e.getMessage());
 			}
 			finally {
 				java.util.Arrays.fill(password, ' ');

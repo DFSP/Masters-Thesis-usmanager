@@ -58,9 +58,11 @@ func GetBestInstance(thisInstance *Instance, instances []*Instance) data.Instanc
 		return distanceToOne < distanceToAnother
 	})
 
-	// always choose closest?
-	// randomize between the x closest?
-	// randomize between the instances within a distance range? 100 km?
+	// ?number=x&range=d
+	// always choose closest
+	// randomize between the x closest
+	// randomize between the instances within a distance range? 100 km
+	// TODO
 
 	instance := instances[0]
 	return data.InstanceEndpoint{

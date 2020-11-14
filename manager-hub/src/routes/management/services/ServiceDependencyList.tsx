@@ -91,7 +91,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+                               error={this.props.loadServiceError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Nenhuma dependência`}
                                data={this.props.dependencies}
                                dropdown={{

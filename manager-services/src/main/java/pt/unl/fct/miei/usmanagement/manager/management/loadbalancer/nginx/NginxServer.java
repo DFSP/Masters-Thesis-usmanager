@@ -33,7 +33,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-final class NginxServer implements Serializable {
+public final class NginxServer implements Serializable {
 
 	private static final long serialVersionUID = -7203502424143183821L;
 

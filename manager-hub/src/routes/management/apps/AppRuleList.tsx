@@ -84,7 +84,7 @@ class AppRuleList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadAppError || this.props.error : undefined}
+                               error={this.props.loadAppError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem regras associadas`}
                                data={this.props.rulesName}
                                dropdown={{

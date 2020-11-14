@@ -1,3 +1,6 @@
+server:
+  servlet:
+    context-path: /api
 spring:
   application:
     name: manager-master
@@ -26,9 +29,6 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
-server:
-  servlet:
-    context-path: /api
 management:
   endpoints:
     web:
@@ -64,12 +64,9 @@ container:
   delay-before-stop: 45000
   monitor-period: 60000
 docker:
-  install-script: docker-install.sh
-  install-script-path: src/main/resources/scripts/docker-install.sh
-  uninstall-script: docker-uninstall.sh
-  uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
-  install-api-script: docker-api-install.sh
-  install-api-script-path: src/main/resources/scripts/docker-api-install.sh
+  install-script: src/main/resources/scripts/docker-install.sh/docker-install.sh
+  uninstall-script: src/main/resources/scripts/docker-uninstall.sh/docker-uninstall.sh
+  install-api-script: src/main/resources/scripts/docker-api-install.sh/docker-api-install.sh
   api:
     port: 2376
   api-proxy:
@@ -85,8 +82,7 @@ registration:
   port: 8761
 prometheus:
   node-exporter:
-    install-script: node-exporter-install.sh
-    install-script-path: src/main/resources/scripts/node-exporter-install.sh
+    install-script: src/main/resources/scripts/node-exporter-install.sh
 decision:
   resolve-overworked-host-on-events-count: 3
   resolve-underworked-host-on-events-count: 3
@@ -101,7 +97,8 @@ host:
   monitor-period: 60000
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 nginx-load-balancer:
-  api-url: /_/nginx-load-balancer-api/api
+  stop-delay: 300000
+
 location-request:
   port: 1919
   minimum-request-count-percentage: 15.0
@@ -111,10 +108,11 @@ rules:
 symmetricds:
   tables:
     exclude:
-      startsWith: sym, logging, worker
+      startsWith: sym, logging, container, node, worker
       endsWith: events
       contains: monitoring
-
+worker-manager:
+  port: 8081
 #debug: true
 #trace: true
 #  level:

@@ -25,9 +25,15 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
 
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+
 public enum EventType {
 
 	CONTAINER,
-	HOST
+	HOST;
+
+	public static EventType getEventType(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

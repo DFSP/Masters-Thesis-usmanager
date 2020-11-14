@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.CascadeType;
@@ -136,7 +137,7 @@ public class EdgeHost {
 
 	@JsonIgnore
 	public HostAddress getAddress() {
-		return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress, coordinates, region);
+		return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress, coordinates, region, PlaceEnum.EDGE);
 	}
 
 	@Override

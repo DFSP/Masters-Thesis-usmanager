@@ -84,7 +84,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IRuleApp,
-    selected: 'appRule' | 'ruleConditions' | 'apps'
+    selected: 'rule' | 'ruleConditions' | 'apps'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -294,9 +294,9 @@ class RuleApp extends BaseComponent<Props, State> {
         const isNewRuleApp = this.isNew();
         return (
             <>
-                {!isNewRuleApp && isLoading && <LoadingSpinner/>}
-                {!isNewRuleApp && !isLoading && error && <Error message={error}/>}
-                {(isNewRuleApp || !isLoading) && (isNewRuleApp || !error) && formRuleApp && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formRuleApp && (
                     /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleApp)}
@@ -344,7 +344,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private conditions = (): JSX.Element =>
         <RuleAppConditionList isLoadingRuleApp={this.props.isLoading}
-                              loadRuleAppError={!this.isNew() ? this.props.error : undefined}
+                              loadRuleAppError={this.props.error}
                               ruleApp={this.getRuleApp()}
                               unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
@@ -352,7 +352,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private apps = (): JSX.Element =>
         <RuleAppAppsList isLoadingRuleApp={this.props.isLoading}
-                         loadRuleAppError={!this.isNew() ? this.props.error : undefined}
+                         loadRuleAppError={this.props.error}
                          ruleApp={this.getRuleApp()}
                          unsavedApps={this.state.unsavedApps}
                          onAddRuleApp={this.addRuleApp}
@@ -363,7 +363,7 @@ class RuleApp extends BaseComponent<Props, State> {
             title: 'Regra',
             id: 'appRule',
             content: () => this.appRule(),
-            active: this.props.location.state?.selected === 'appRule'
+            active: this.props.location.state?.selected === 'rule'
         },
         {
             title: 'Condições',

@@ -30,7 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import java.util.List;
 
 @Data
-final class LaunchNginxLoadBalancer {
+public final class LaunchNginxLoadBalancer {
 
 	private HostAddress hostAddress;
 	private List<String> regions;

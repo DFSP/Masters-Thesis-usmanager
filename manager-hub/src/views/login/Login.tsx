@@ -113,7 +113,7 @@ class Login extends BaseComponent<Props, State> {
                 registerSuccessfulLogin(username, password);
                 this.props.history.push(`/gestor`);
             }).catch((e: AxiosError) => {
-            super.toast(`O login falhou`, 7500, e.response?.status === 401 ? 'Username e/ou password inválido' : e.message, true, true);
+            super.toast(`Autenticação falhou`, 7500, e.response?.status === 401 ? 'Username e/ou password inválido' : e.message, true, true);
         })
     };
 

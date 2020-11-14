@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes;
+package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,14 +32,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,52 +49,44 @@ import java.util.Objects;
 public class NodesController {
 
 	private final NodesService nodesService;
-	private final HostsService hostsService;
 	private final DockerSwarmService dockerSwarmService;
+	private final WorkerManagersService workerManagersService;
+	private final SyncService syncService;
 
-	public NodesController(NodesService nodesService, HostsService hostsService, DockerSwarmService dockerSwarmService) {
+	public NodesController(NodesService nodesService, DockerSwarmService dockerSwarmService, WorkerManagersService workerManagersService, SyncService syncService) {
 		this.nodesService = nodesService;
-		this.hostsService = hostsService;
+		this.workerManagersService = workerManagersService;
 		this.dockerSwarmService = dockerSwarmService;
+		this.syncService = syncService;
 	}
 
 	@GetMapping
-	public List<SimpleNode> getNodes() {
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
 		return nodesService.getNodes();
 	}
 
 	@GetMapping("/{id}")
-	public SimpleNode getNode(@PathVariable("id") String id) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(@PathVariable("id") String id) {
 		return nodesService.getNode(id);
 	}
 
 	@PostMapping
-	public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
+	public List<Node> addNodes(@RequestBody AddNode addNode) {
 		NodeRole role = addNode.getRole();
 		String host = addNode.getHost();
 		List<Coordinates> coordinates = addNode.getCoordinates();
-		List<SimpleNode> nodes = new ArrayList<>();
-		if (host != null) {
-			SimpleNode node = hostsService.addHost(host, role);
-			nodes.add(node);
-		}
-		else if (coordinates != null) {
-			for (Coordinates coordinate : coordinates) {
-				SimpleNode node = hostsService.addHost(coordinate, role);
-				nodes.add(node);
-			}
-		} else {
+		if (host == null && coordinates == null) {
 			throw new BadRequestException("Expected host address or coordinates to start nodes");
 		}
-		return nodes;
+		return nodesService.addNodes(role, host, coordinates);
 	}
 
 	@PutMapping("/{id}")
-	public SimpleNode updateNode(@PathVariable String id, @RequestBody SimpleNode node) {
-		if (!Objects.equals(id, node.getId())) {
+	public Node updateNode(@PathVariable String id, @RequestBody Node node) {
+		if (!Objects.equals(id, node.getNodeId())) {
 			throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
 		}
-		return nodesService.updateNode(id, node);
+		return nodesService.updateNodeSpecs(id, node);
 	}
 
 	@DeleteMapping("/{id}")
@@ -102,13 +95,21 @@ public class NodesController {
 	}
 
 	@PostMapping("/{id}/join")
-	public SimpleNode rejoinSwarm(@PathVariable("id") String id) {
-		return dockerSwarmService.rejoinSwarm(id);
+	public Node rejoinSwarm(@PathVariable("id") String id) {
+		return nodesService.rejoinSwarm(id);
 	}
 
-	@DeleteMapping("/{hostname}/leave")
-	public void leaveSwarm(@PathVariable("hostname") String hostname) {
-		dockerSwarmService.leaveSwarm(new HostAddress(hostname));
+	@PutMapping("/{hostname}/leave")
+	public List<Node> leaveSwarm(@PathVariable("hostname") String hostname) {
+		return nodesService.leaveHost(new HostAddress(hostname));
+	}
+
+	@PostMapping("/sync")
+	public List<Node> synchronizeDatabaseCloudHosts() {
+		List<Node> workerNodes = workerManagersService.synchronizeDatabaseNodes();
+		List<Node> nodes = syncService.synchronizeNodesDatabase();
+		nodes.addAll(workerNodes);
+		return nodes;
 	}
 
 }

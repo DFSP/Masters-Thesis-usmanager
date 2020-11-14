@@ -31,7 +31,7 @@ import RulesAppList from "./RulesAppList";
 const RulesApp: React.FC = () =>
     <MainLayout>
         <AddButton button={{text: 'Nova regra'}}
-                   pathname={'/regras/aplicações/nova regra?new'}/>
+                   pathname={'/regras/aplicações/nova regra?new#rule'}/>
         <div className={`${styles.app}`}>
             <RulesAppList/>
         </div>

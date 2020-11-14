@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -63,6 +64,11 @@ public class WorkerManager {
 	@NotNull
 	@OneToOne(cascade = CascadeType.REMOVE)
 	private Container container;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "workerManager", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Container> managedContainers;
 
 	@Singular
 	@JsonIgnore

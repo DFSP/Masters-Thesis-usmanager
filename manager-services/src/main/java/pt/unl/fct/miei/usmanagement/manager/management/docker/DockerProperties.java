@@ -43,11 +43,8 @@ public class DockerProperties {
 	private final Hub hub;
 	private final Swarm swarm;
 	private String installScript;
-	private String installScriptPath;
 	private String uninstallScript;
-	private String uninstallScriptPath;
 	private String installApiScript;
-	private String installApiScriptPath;
 	private String repository;
 
 	public DockerProperties() {

@@ -120,7 +120,7 @@ public class EdgeHostsController {
 		String command = request.getCommand();
 		HostAddress hostAddress = new HostAddress(hostname);
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

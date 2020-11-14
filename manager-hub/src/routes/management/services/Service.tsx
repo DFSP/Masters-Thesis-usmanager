@@ -118,7 +118,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IService,
-    selected: 'services' | 'apps' | 'dependencies' | 'dependents' | 'predictions' | 'serviceRules' | 'genericRules'
+    selected: 'service' | 'apps' | 'dependencies' | 'dependents' | 'predictions' | 'serviceRules' | 'genericRules'
         | 'simulatedMetrics' | 'genericSimulatedMetrics'
 }
 
@@ -433,9 +433,9 @@ class Service extends BaseComponent<Props, State> {
         const isNewService = this.isNew();
         return (
             <>
-                {!isNewService && isLoading && <LoadingSpinner/>}
-                {!isNewService && !isLoading && error && <Error message={error}/>}
-                {(isNewService || !isLoading) && (isNewService || !error) && formService && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formService && (
                     /*@ts-ignore*/
                     <Form id={serviceKey}
                           fields={this.getFields(formService)}
@@ -482,7 +482,7 @@ class Service extends BaseComponent<Props, State> {
 
     private apps = (): JSX.Element =>
         <ServiceAppList isLoadingService={this.props.isLoading}
-                        loadServiceError={!this.isNew() ? this.props.error : undefined}
+                        loadServiceError={this.props.error}
                         service={this.getService()}
                         unsavedApps={this.state.unsavedApps}
                         onAddServiceApp={this.addServiceApp}
@@ -490,7 +490,7 @@ class Service extends BaseComponent<Props, State> {
 
     private dependencies = (): JSX.Element =>
         <ServiceDependencyList isLoadingService={this.props.isLoading}
-                               loadServiceError={!this.isNew() ? this.props.error : undefined}
+                               loadServiceError={this.props.error}
                                service={this.getService()}
                                unsavedDependencies={this.state.unsavedDependencies}
                                onAddServiceDependency={this.addServiceDependency}
@@ -498,12 +498,12 @@ class Service extends BaseComponent<Props, State> {
 
     private dependents = (): JSX.Element =>
         <ServiceDependentList isLoadingService={this.props.isLoading}
-                              loadServiceError={!this.isNew() ? this.props.error : undefined}
+                              loadServiceError={this.props.error}
                               service={this.getService()}/>;
 
     private predictions = (): JSX.Element =>
         <ServicePredictionList isLoadingService={this.props.isLoading}
-                               loadServiceError={!this.isNew() ? this.props.error : undefined}
+                               loadServiceError={this.props.error}
                                service={this.getService()}
                                unsavedPredictions={this.state.unsavedPredictions}
                                onAddServicePrediction={this.addServicePrediction}
@@ -511,7 +511,7 @@ class Service extends BaseComponent<Props, State> {
 
     private rules = (): JSX.Element =>
         <ServiceRuleList isLoadingService={this.props.isLoading}
-                         loadServiceError={!this.isNew() ? this.props.error : undefined}
+                         loadServiceError={this.props.error}
                          service={this.getService()}
                          unsavedRules={this.state.unsavedRules}
                          onAddServiceRule={this.addServiceRule}
@@ -522,7 +522,7 @@ class Service extends BaseComponent<Props, State> {
 
     private simulatedMetrics = (): JSX.Element =>
         <ServiceSimulatedMetricList isLoadingService={this.props.isLoading}
-                                    loadServiceError={!this.isNew() ? this.props.error : undefined}
+                                    loadServiceError={this.props.error}
                                     service={this.getService()}
                                     unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                     onAddSimulatedServiceMetric={this.addServiceSimulatedMetric}
@@ -536,7 +536,7 @@ class Service extends BaseComponent<Props, State> {
             title: 'Serviços',
             id: 'service',
             content: () => this.service(),
-            active: this.props.location.state?.selected === 'services'
+            active: this.props.location.state?.selected === 'service'
         },
         {
             title: 'Aplicações',

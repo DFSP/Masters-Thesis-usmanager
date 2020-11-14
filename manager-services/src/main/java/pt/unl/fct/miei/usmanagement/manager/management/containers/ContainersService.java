@@ -40,8 +40,10 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
@@ -49,18 +51,17 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,8 @@ public class ContainersService {
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 	private final DockerApiProxyService dockerApiProxyService;
 	private final WorkerManagersService workerManagersService;
+	private final ServicesService servicesService;
+	private final HostsService hostsService;
 
 	private final Containers containers;
 
@@ -80,13 +83,15 @@ public class ContainersService {
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
-							 Containers containers) {
+							 ServicesService servicesService, HostsService hostsService, Containers containers) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
 		this.dockerApiProxyService = dockerApiProxyService;
-		this.containers = containers;
 		this.workerManagersService = workerManagersService;
+		this.servicesService = servicesService;
+		this.hostsService = hostsService;
+		this.containers = containers;
 	}
 
 	public Container addContainerFromDockerContainer(DockerContainer dockerContainer) {
@@ -125,6 +130,10 @@ public class ContainersService {
 
 	public List<Container> getContainers() {
 		return containers.findAll();
+	}
+
+	public List<Container> getContainers(WorkerManager workerManager) {
+		return containers.findByWorkerManager(workerManager);
 	}
 
 	public Container getContainer(String containerId) {
@@ -469,4 +478,17 @@ public class ContainersService {
 		}
 	}
 
+	public List<Container> migrateHostContainers(HostAddress hostAddress) {
+		Coordinates coordinates = hostAddress.getCoordinates();
+		List<Container> containers = new LinkedList<>();
+		getAppContainers(hostAddress).forEach(container -> {
+			String containerId = container.getContainerId();
+			String serviceName = container.getServiceName();
+			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
+			HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
+			Container c = migrateContainer(containerId, toHostAddress);
+			containers.add(c);
+		});
+		return containers;
+	}
 }

@@ -22,221 +22,275 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes;
+package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
 
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerException;
+import com.google.gson.Gson;
 import com.spotify.docker.client.messages.swarm.Node;
-import com.spotify.docker.client.messages.swarm.NodeInfo;
-import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Nodes;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
+import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class NodesService {
 
-
 	private final DockerSwarmService dockerSwarmService;
+	private final HostsService hostsService;
+	private final ContainersService containersService;
+	private final DockerApiProxyService dockerApiProxyService;
 
-	public NodesService(DockerSwarmService dockerSwarmService) {
+	private final Nodes nodes;
+
+	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
+						@Lazy ContainersService containersService, DockerApiProxyService dockerApiProxyService, Nodes nodes) {
 		this.dockerSwarmService = dockerSwarmService;
+		this.hostsService = hostsService;
+		this.containersService = containersService;
+		this.dockerApiProxyService = dockerApiProxyService;
+		this.nodes = nodes;
 	}
 
-	public List<SimpleNode> getNodes() {
-		return getNodes(null);
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
+		return nodes.findAll();
 	}
 
-	private List<SimpleNode> getNodes(Predicate<Node> filter) {
-		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			Stream<Node> nodeStream = swarmManager.listNodes().stream();
-			if (filter != null) {
-				nodeStream = nodeStream.filter(filter);
+	private List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes(Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
+		return filter == null ? getNodes() : getNodes().stream().filter(filter).collect(Collectors.toList());
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(String id) {
+		return nodes.findNodeByNodeId(id).orElseThrow(() ->
+			new EntityNotFoundException(Node.class, "id", id));
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getHostNodes(HostAddress hostAddress) {
+		return nodes.findByPublicIpAddress(hostAddress.getPublicIpAddress());
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getActiveNodes() {
+		return nodes.findByAvailability(NodeAvailability.ACTIVE);
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getActiveNodes(Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
+		return filter == null ? getActiveNodes() : getActiveNodes().stream().filter(filter).collect(Collectors.toList());
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getReadyNodes() {
+		return nodes.findByState("ready");
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getReadyNodes(Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
+		return filter == null ? getReadyNodes() : getReadyNodes().stream().filter(node -> node.getRegion() != null).collect(Collectors.toList());
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getReadyManagers() {
+		return nodes.findByStateAndManagerStatusIsNotNull("ready");
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getReadyWorkers() {
+		return nodes.findByStateAndManagerStatusIsNull("ready");
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNode(Node swarmNode) {
+		checkNodeDoesntExist(swarmNode);
+		log.info("Saving node {}", ToStringBuilder.reflectionToString(swarmNode));
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
+		return nodes.save(node);
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> addNodes(NodeRole role, String host, List<Coordinates> coordinates) {
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = new ArrayList<>();
+		if (host != null) {
+			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = hostsService.addHost(host, role);
+			nodes.add(node);
+			/*Node n = hostsService.addHost(host, role);
+			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(n);
+			nodes.add(this.nodes.save(node));*/
+		}
+		else if (coordinates != null) {
+			for (Coordinates coordinate : coordinates) {
+				pt.unl.fct.miei.usmanagement.manager.nodes.Node node = hostsService.addHost(coordinate, role);
+				nodes.add(node);
 			}
-			return nodeStream
-				.map(n -> new SimpleNode(n.id(), n.status().addr(),
-					NodeAvailability.valueOf(n.spec().availability().toUpperCase()),
-					NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index(), n.spec().labels(),
-					n.status().state()))
-				.collect(Collectors.toList());
 		}
-		catch (DockerException | InterruptedException e) {
-			throw new ManagerException("Unable to get nodes: %s", e.getMessage());
-		}
+		return nodes;
 	}
 
-	public SimpleNode getNode(String id) {
-		return getNodes(node -> Objects.equals(node.id(), id)).stream()
-			.findFirst()
-			.orElseThrow(() -> new EntityNotFoundException(SimpleNode.class, "id", id));
-	}
-
-	public SimpleNode getHostNode(HostAddress hostAddress) {
-		String publicIpAddress = hostAddress.getPublicIpAddress();
-		return getNodes(node -> Objects.equals(node.status().addr(), publicIpAddress)).stream()
-			.findFirst()
-			.orElseThrow(() -> new EntityNotFoundException(SimpleNode.class, "hostAddress", hostAddress.toString()));
-	}
-
-	public List<SimpleNode> getActiveNodes() {
-		return getActiveNodes(null);
-	}
-
-	public List<SimpleNode> getActiveNodes(Predicate<Node> filter) {
-		Predicate<Node> activeFilter = n -> n.spec().availability().equalsIgnoreCase("active");
-		Predicate<Node> nodesFilter = filter == null ? activeFilter : filter.and(activeFilter);
-		return getReadyNodes(nodesFilter);
-	}
-
-	public List<SimpleNode> getReadyNodes() {
-		return getReadyNodes(null);
-	}
-
-	public List<SimpleNode> getReadyNodes(Predicate<Node> filter) {
-		Predicate<Node> readyFilter = n -> n.status().state().equals("ready");
-		Predicate<Node> nodesFilter = filter == null ? readyFilter : filter.and(readyFilter);
-		return getNodes(nodesFilter).stream().filter(node -> node.getRegion() != null).collect(Collectors.toList());
-	}
-
-	public List<SimpleNode> getReadyManagers() {
-		return getReadyNodes(node -> node.managerStatus() != null);
-	}
-
-	public List<SimpleNode> getReadyWorkers() {
-		return getReadyNodes(node -> node.managerStatus() == null);
-	}
-
-	private void removeNodes(Predicate<Node> filter) {
-		getNodes(filter).forEach(n -> removeNode(n.getId()));
-	}
-
-	public void removeHostNodes(String hostname) {
-		removeNodes(n -> Objects.equals(n.status().addr(), hostname));
+	public void removeHost(HostAddress hostAddress) {
+		dockerSwarmService.removeHostNodes(hostAddress);
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
+		this.nodes.deleteAll(nodes);
 	}
 
 	public void removeNode(String nodeId) {
-		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			swarmManager.deleteNode(nodeId, true);
-			log.info("Deleted node {}", nodeId);
-		}
-		catch (DockerException | InterruptedException e) {
-			throw new ManagerException("Unable remove node %s from the swarm: %s", nodeId, e.getMessage());
-		}
+		dockerSwarmService.removeNode(nodeId);
+		deleteNode(nodeId);
+	}
+
+	public void deleteNode(String nodeId) {
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		nodes.delete(node);
 	}
 
 	public boolean isPartOfSwarm(HostAddress hostAddress) {
-		return getNodes(n -> Objects.equals(n.status().addr(), hostAddress.getPublicIpAddress())).size() > 0;
+		return dockerSwarmService.isPartOfSwarm(hostAddress);
 	}
 
 	public boolean isManager(String nodeId) {
-		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
-			return nodeInfo.managerStatus() != null;
-		}
-		catch (DockerException | InterruptedException e) {
-			throw new ManagerException("Unable to check if node %s is a manager: %s", nodeId, e.getMessage());
-		}
+		return dockerSwarmService.isManager(nodeId);
 	}
 
 	public boolean isWorker(String nodeId) {
-		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
-			return nodeInfo.managerStatus() == null;
-		}
-		catch (DockerException | InterruptedException e) {
-			throw new ManagerException("Unable to check if node %s is a worker: %s", nodeId, e.getMessage());
-		}
+		return dockerSwarmService.isWorker(nodeId);
 	}
 
-	public SimpleNode changeAvailability(String nodeId, NodeAvailability newAvailability) {
-		SimpleNode node = getNode(nodeId);
-		NodeSpec nodeSpec = NodeSpec.builder()
-			.availability(newAvailability.name())
-			.role(node.getRole().name())
-			.build();
-		return updateNode(node, nodeSpec);
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node changeAvailability(String nodeId, NodeAvailability newAvailability) {
+		dockerSwarmService.changeAvailability(nodeId, newAvailability);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		node.setAvailability(newAvailability);
+		nodes.save(node);
+		return node;
 	}
 
-	public SimpleNode changeRole(String nodeId, NodeRole newRole) {
-		SimpleNode node = getNode(nodeId);
-		NodeSpec nodeSpec = NodeSpec.builder()
-			.availability(node.getAvailability().name())
-			.role(newRole.name())
-			.build();
-		return updateNode(node, nodeSpec);
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node changeRole(String nodeId, NodeRole newRole) {
+		dockerSwarmService.changeRole(nodeId, newRole);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		node.setRole(newRole);
+		nodes.save(node);
+		return node;
 	}
 
-	public SimpleNode addLabel(String nodeId, String label, String value) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addLabel(String nodeId, String label, String value) {
 		return addLabels(nodeId, Map.of(label, value));
 	}
 
-	public SimpleNode addLabels(String nodeId, Map<String, String> labels) {
-		log.info("Adding labels {} to node {}", labels, nodeId);
-		SimpleNode node = getNode(nodeId);
-		Map<String, String> nodeLabels = new HashMap<>(node.getLabels());
-		nodeLabels.putAll(labels);
-		NodeSpec nodeSpec = NodeSpec.builder()
-			.availability(node.getAvailability().name())
-			.role(node.getRole().name())
-			.labels(nodeLabels)
-			.build();
-		return updateNode(node, nodeSpec);
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addLabels(String nodeId, Map<String, String> newLabels) {
+		dockerSwarmService.addLabels(nodeId, newLabels);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		Map<String, String> labels = node.getLabels();
+		labels.putAll(newLabels);
+		node.setLabels(labels);
+		nodes.save(node);
+		return node;
 	}
 
-	public SimpleNode removeLabel(String nodeId, String label) {
-		log.info("Removing label {} from node {}", label, nodeId);
-		SimpleNode node = getNode(nodeId);
-		Map<String, String> labels = new HashMap<>(node.getLabels());
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node removeLabel(String nodeId, String label) {
+		dockerSwarmService.removeLabel(nodeId, label);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		Map<String, String> labels = node.getLabels();
 		labels.remove(label);
-		NodeSpec nodeSpec = NodeSpec.builder()
-			.availability(node.getAvailability().name())
-			.role(node.getRole().name())
-			.labels(labels)
-			.build();
-		return updateNode(node, nodeSpec);
+		node.setLabels(labels);
+		nodes.save(node);
+		return node;
 	}
 
-	public SimpleNode updateNode(String nodeId, SimpleNode newNode) {
-		SimpleNode node = getNode(nodeId);
-		log.info("Updating node {} to node {}", ToStringBuilder.reflectionToString(node),
-			ToStringBuilder.reflectionToString(newNode));
-		NodeSpec nodeSpec = NodeSpec.builder()
-			.availability(newNode.getAvailability().name().toLowerCase())
-			.role(newNode.getRole().name().toLowerCase())
-			.labels(newNode.getLabels())
-			.build();
-		return updateNode(node, nodeSpec);
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
+		return nodes.save(node);
 	}
 
-	private SimpleNode updateNode(SimpleNode node, NodeSpec nodeSpec) {
-		String nodeId = node.getId();
-		try (DockerClient swarmManager = dockerSwarmService.getSwarmLeader()) {
-			swarmManager.updateNode(nodeId, node.getVersion(), nodeSpec);
-			return getNode(nodeId);
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNodeSpecs(String nodeId,
+																		   pt.unl.fct.miei.usmanagement.manager.nodes.Node newNode) {
+		Node swarmNode = dockerSwarmService.updateNode(nodeId, newNode.getAvailability().name(), newNode.getRole().name(),
+			newNode.getLabels());
+		newNode = fromSwarmNode(swarmNode);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		log.info("Updating node {} with {}", ToStringBuilder.reflectionToString(node), ToStringBuilder.reflectionToString(newNode));
+		log.info("Node before copying properties: {}", ToStringBuilder.reflectionToString(node));
+		ObjectUtils.copyValidProperties(newNode, node);
+		log.info("Node after copying properties: {}", ToStringBuilder.reflectionToString(node));
+		return nodes.save(node);
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node rejoinSwarm(String nodeId) {
+		return dockerSwarmService.rejoinSwarm(nodeId);
+		/*Node swarmNode = dockerSwarmService.rejoinSwarm(nodeId);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
+		nodes.delete(node);
+		return addNodeFromSwarmNode(swarmNode);*/
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNodeFromSwarmNode(Node swarmNode) {
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node newNode = fromSwarmNode(swarmNode);
+		return nodes.save(newNode);
+	}
+
+	public boolean hasNode(String nodeId) {
+		return nodes.hasNode(nodeId);
+	}
+
+	public void reset() {
+		nodes.deleteAll();
+		log.info("Clearing all nodes");
+	}
+
+	private void checkNodeDoesntExist(Node node) {
+		String nodeId = node.id();
+		if (nodes.hasNode(nodeId)) {
+			throw new DataIntegrityViolationException("Node " + nodeId + " already exists");
 		}
-		catch (DockerException | InterruptedException e) {
-			throw new ManagerException("Unable to update node %s: %s", nodeId, e.getMessage());
-		}
 	}
 
+	private pt.unl.fct.miei.usmanagement.manager.nodes.Node fromSwarmNode(Node node) {
+		com.spotify.docker.client.messages.swarm.ManagerStatus status = node.managerStatus();
+		return pt.unl.fct.miei.usmanagement.manager.nodes.Node.builder()
+			.nodeId(node.id())
+			.publicIpAddress(node.status().addr())
+			.availability(NodeAvailability.getNodeAvailability(node.spec().availability()))
+			.role(NodeRole.getNodeRole(node.spec().role()))
+			.version(node.version().index())
+			.state(node.status().state())
+			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
+			.labels(node.spec().labels())
+			.build();
+	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> leaveHost(HostAddress hostAddress) {
+		containersService.migrateHostContainers(hostAddress);
+		containersService.getSystemContainers(hostAddress).parallelStream()
+			.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+			.forEach(c -> containersService.stopContainer(c.getContainerId()));
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
+		dockerSwarmService.leaveSwarm(hostAddress);
+		dockerApiProxyService.stopDockerApiProxy(hostAddress);
+		hostsService.stopBackgroundProcesses(hostAddress);
+		nodes.forEach(node -> node.setState("down"));
+		this.nodes.saveAll(nodes);
+		return nodes;
+	}
+
+	public HostAddress getNodeAddress(Node node) {
+		String username = node.spec().labels().get(NodeConstants.Label.USERNAME);
+		String publicIpAddress = node.status().addr();
+		String privateIpAddress = node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+		RegionEnum region = RegionEnum.getRegion(node.spec().labels().get(NodeConstants.Label.REGION));
+		Gson gson = new Gson();
+		Coordinates coordinates = gson.fromJson(node.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
+		PlaceEnum place = PlaceEnum.getPlace(node.spec().labels().get(NodeConstants.Label.PLACE));
+		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region);
+	}
 }

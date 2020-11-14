@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.ips;
+package pt.unl.fct.miei.usmanagement.manager.eips;
 
 
 import lombok.AccessLevel;
@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -28,11 +29,16 @@ public class ElasticIp {
 	@GeneratedValue
 	private Long id;
 
+	@NotNull
 	private RegionEnum region;
 
+	@NotNull
 	private String allocationId;
 
+	@NotNull
 	private String publicIp;
+
+	private String associationId;
 
 	@Override
 	public int hashCode() {

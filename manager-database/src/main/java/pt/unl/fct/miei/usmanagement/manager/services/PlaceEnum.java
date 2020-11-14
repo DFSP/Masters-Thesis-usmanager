@@ -27,6 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.services;
 public enum PlaceEnum {
 
 	CLOUD,
-	EDGE,
+	EDGE;
+
+	public static PlaceEnum getPlace(String name) {
+		return valueOf(name.toUpperCase().replace(" ", "_"));
+	}
 
 }

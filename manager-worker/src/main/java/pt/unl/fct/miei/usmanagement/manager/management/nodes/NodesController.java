@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
+package pt.unl.fct.miei.usmanagement.manager.management.nodes;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.AddNode;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.management.sync.SyncService;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,22 +49,20 @@ import java.util.Objects;
 public class NodesController {
 
 	private final NodesService nodesService;
-	private final DockerSwarmService dockerSwarmService;
 	private final SyncService syncService;
 
-	public NodesController(NodesService nodesService, DockerSwarmService dockerSwarmService, SyncService syncService) {
+	public NodesController(NodesService nodesService, SyncService syncService) {
 		this.nodesService = nodesService;
 		this.syncService = syncService;
-		this.dockerSwarmService = dockerSwarmService;
 	}
 
 	@GetMapping
-	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
+	public List<Node> getNodes() {
 		return nodesService.getNodes();
 	}
 
 	@GetMapping("/{id}")
-	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(@PathVariable("id") String id) {
+	public Node getNode(@PathVariable("id") String id) {
 		return nodesService.getNode(id);
 	}
 
@@ -98,12 +97,12 @@ public class NodesController {
 
 	@DeleteMapping("/{hostname}/leave")
 	public void leaveSwarm(@PathVariable("hostname") String hostname) {
-		dockerSwarmService.leaveSwarm(new HostAddress(hostname));
+		nodesService.leaveHost(new HostAddress(hostname));
 	}
 
 	@PostMapping("/sync")
-	public List<Node> synchronizeDatabaseCloudHosts() {
-		return syncService.synchronizeDatabaseNodes();
+	public List<Node> synchronizeDatabaseNodes() {
+		return syncService.synchronizeNodesDatabase();
 	}
 
 }

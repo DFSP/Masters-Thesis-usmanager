@@ -86,7 +86,7 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
+                               error={this.props.loadEdgeHostError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem regras associadas`}
                                data={this.props.rulesNames}
                                dropdown={{

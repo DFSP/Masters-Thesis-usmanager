@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
+package pt.unl.fct.miei.usmanagement.manager.nodes;
 
 public final class NodeConstants {
 

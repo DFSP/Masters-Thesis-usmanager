@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.management.remote.ssh;
+package pt.unl.fct.miei.usmanagement.manager.management.ssh;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteHostSftpRequest;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.ExecuteHostSshRequest;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 
 import java.util.Set;
 
@@ -48,7 +52,7 @@ public class SshController {
 		String command = request.getCommand();
 		HostAddress hostAddress = request.getHostAddress();
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

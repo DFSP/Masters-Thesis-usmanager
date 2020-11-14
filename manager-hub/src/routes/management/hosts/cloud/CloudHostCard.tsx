@@ -85,7 +85,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStartSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -96,7 +96,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Failed to start ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+        super.toast(`Não foi possível começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -161,7 +161,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
         const cloudHost = this.getCloudHost();
         const menus = [];
         if (isEqual(cloudHost.state, awsInstanceStates.STOPPED)) {
-            menus.push(<ActionContextMenuItem className='green-text' option='Começar' state={cloudHost}
+            menus.push(<ActionContextMenuItem className='green-text' option='Ligar' state={cloudHost}
                                               onClick={this.startCloudHost}/>);
         }
         if (isEqual(cloudHost.state, awsInstanceStates.RUNNING)) {
@@ -231,6 +231,10 @@ class CloudHostCard extends BaseComponent<Props, State> {
                               loading={loading}
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>
+            {cloudHost.publicIpAddress &&
+            <CardItem key={'instanceId'}
+                      label={'Instance id'}
+                      value={`${cloudHost.instanceId}`}/>}
             <CardItem key={'imageId'}
                       label={'Image id'}
                       value={`${cloudHost.imageId}`}/>

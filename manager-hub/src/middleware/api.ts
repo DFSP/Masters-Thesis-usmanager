@@ -195,7 +195,7 @@ const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefi
 const edgeHosts = new schema.Array(edgeHost);
 
 const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
-    idAttribute: (node: INode) => node.id.toString()
+    idAttribute: (node: INode) => node.nodeId.toString()
 });
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {

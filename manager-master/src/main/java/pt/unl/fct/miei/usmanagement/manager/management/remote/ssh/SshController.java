@@ -48,7 +48,7 @@ public class SshController {
 		String command = request.getCommand();
 		HostAddress hostAddress = request.getHostAddress();
 		if (request.isBackground()) {
-			sshService.executeCommandInBackground(command, hostAddress);
+			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
 		}
 		else {

@@ -32,7 +32,8 @@ import CardList from "../../../components/list/CardList";
 import {INode} from "./Node";
 import styles from './Nodes.module.css'
 import BaseComponent from "../../../components/BaseComponent";
-import {loadNodes} from "../../../actions";
+import {loadNodes, syncNodes} from "../../../actions";
+import ActionButton from "../../../components/list/ActionButton";
 
 interface StateToProps {
     isLoading: boolean
@@ -42,6 +43,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     loadNodes: (id?: string) => any;
+    syncNodes: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -55,8 +57,11 @@ class Nodes extends BaseComponent<Props, {}> {
     public render() {
         return (
             <MainLayout>
+                <ActionButton icon={'sync'}
+                              tooltip={{text: 'Sincronizar os nós na base de dados com o docker swarm', position: 'bottom'}}
+                              clickCallback={this.syncNodes}/>
                 <AddButton button={{text: 'Adicionar nó'}}
-                           pathname={'/nós/novo nó?new'}/>
+                           pathname={'/nós/novo nó?new#node'}/>
                 <div className={`${styles.container}`}>
                     <CardList<INode>
                         isLoading={this.props.isLoading}
@@ -71,13 +76,17 @@ class Nodes extends BaseComponent<Props, {}> {
     }
 
     private node = (node: INode): JSX.Element =>
-        <NodeCard key={node.id} node={node}/>;
+        <NodeCard key={node.nodeId} node={node}/>;
 
     private predicate = (node: INode, search: string): boolean =>
-        node.id.toString().toLowerCase().includes(search)
+        node.nodeId.toString().toLowerCase().includes(search)
         || node.publicIpAddress.toLowerCase().includes(search)
         || node.state.toLowerCase().includes(search)
         || node.role.toLowerCase().includes(search);
+
+    private syncNodes = () => {
+        this.props.syncNodes();
+    };
 
 }
 
@@ -91,6 +100,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
 
 const mapDispatchToProps: DispatchToProps = {
     loadNodes,
+    syncNodes
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Nodes);

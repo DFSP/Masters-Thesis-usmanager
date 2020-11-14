@@ -34,7 +34,6 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -42,11 +41,11 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
@@ -80,6 +79,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditio
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.users.User;
 import pt.unl.fct.miei.usmanagement.manager.users.UserRoleEnum;
 import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
@@ -99,21 +99,17 @@ import java.util.stream.Collectors;
 public class DatabaseLoader {
 
 	@Bean
-	CommandLineRunner initDatabase(UsersService usersService,
-								   ServicesService servicesService,
-								   AppsService appsService, AppServices appServices,
-								   ServiceDependenciesService serviceDependenciesService, /*RegionsService regionsService,*/
-								   EdgeHostsService edgeHostsService, CloudHostsService cloudHostsService,
-								   ComponentTypesService componentTypesService,
+	CommandLineRunner initDatabase(UsersService usersService, ServicesService servicesService, AppsService appsService,
+								   AppServices appServices, ServiceDependenciesService serviceDependenciesService,
+		/*RegionsService regionsService,*/EdgeHostsService edgeHostsService, ComponentTypesService componentTypesService,
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
-								   HostRuleConditions hostRuleConditions,
-								   ServiceRulesService serviceRulesService,
-								   ServiceRuleConditions serviceRuleConditions,
-								   DockerProperties dockerProperties, HostsEventsService hostsEventsService,
-								   ServicesEventsService servicesEventsService, HostsMonitoringService hostsMonitoringService,
-								   ServicesMonitoringService servicesMonitoringService, ContainersService containersService) {
+								   HostRuleConditions hostRuleConditions, ServiceRulesService serviceRulesService,
+								   ServiceRuleConditions serviceRuleConditions, DockerProperties dockerProperties,
+								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
+								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
+								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -154,7 +150,11 @@ public class DatabaseLoader {
 
 			List<EdgeHost> edgeHosts = loadEdgeHosts(edgeHostsService);
 
-			List<CloudHost> cloudHosts = loadCloudHosts(cloudHostsService);
+			List<CloudHost> cloudHosts = loadCloudHosts(syncService);
+
+			nodesService.reset();
+
+			elasticIpsService.reset();
 		};
 	}
 
@@ -726,8 +726,8 @@ public class DatabaseLoader {
 		return componentTypesMap;
 	}
 
-	private List<CloudHost> loadCloudHosts(CloudHostsService cloudHostsService) {
-		return cloudHostsService.synchronizeDatabaseCloudHosts();
+	private List<CloudHost> loadCloudHosts(SyncService syncService) {
+		return syncService.synchronizeCloudHostsDatabase();
 	}
 
 	private List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {

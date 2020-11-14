@@ -24,6 +24,10 @@
 
 package pt.unl.fct.miei.usmanagement.manager.containers;
 
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
+
 public final class ContainerConstants {
 
 	private ContainerConstants() {
@@ -34,11 +38,16 @@ public final class ContainerConstants {
 		public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
 		public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
 		public static final String PROXY_PASS = "PROXY_PASS";
-		public static final String ID = "ID";
-		public static final String MASTER = "MASTER";
 
 		public static final class LoadBalancer {
 			public static final String SERVER = "SERVER";
+		}
+		
+		public static final class WorkerManager {
+			public static final String EXTERNAL_ID = "EXTERNAL_ID";
+			public static final String REGISTRATION_URL = "REGISTRATION_URL";
+			public static final String SYNC_URL = "SYNC_URL";
+			public static final String HOST_ADDRESS = "HOST_ADDRESS";
 		}
 	}
 

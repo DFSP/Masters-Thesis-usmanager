@@ -10,10 +10,8 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -33,14 +31,12 @@ public class ContainersRecoveryService {
 	private final ServicesService servicesService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
-	private final SshService sshService;
 
 	public ContainersRecoveryService(ServicesService servicesService, HostsService hostsService,
-									 ContainersService containersService, SshService sshService) {
+									 ContainersService containersService) {
 		this.servicesService = servicesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
-		this.sshService = sshService;
 	}
 
 	void restoreCrashedContainers(List<Container> monitoringContainers, List<Container> synchronizedContainers) {
@@ -114,7 +110,7 @@ public class ContainersRecoveryService {
 				}
 				catch (ManagerException e) {
 					excludedHosts.add(hostAddress);
-					log.error("Tried to recover container on unavailable host, retrying... ({}/{})", i, FIND_AVAILABLE_HOST_RETRIES);
+					log.error("Tried to recover container on unavailable host, retrying... ({}/{})", i + 1, FIND_AVAILABLE_HOST_RETRIES);
 				}
 			}
 		}

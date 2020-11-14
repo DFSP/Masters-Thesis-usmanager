@@ -85,7 +85,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IRuleService,
-    selected: 'serviceRule' | 'ruleConditions' | 'services'
+    selected: 'rule' | 'ruleConditions' | 'services'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -306,9 +306,9 @@ class RuleService extends BaseComponent<Props, State> {
         const isNewRuleService = this.isNew();
         return (
             <>
-                {!isNewRuleService && isLoading && <LoadingSpinner/>}
-                {!isNewRuleService && !isLoading && error && <Error message={error}/>}
-                {(isNewRuleService || !isLoading) && (isNewRuleService || !error) && formRuleService && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formRuleService && (
                     /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleService)}
@@ -361,7 +361,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private conditions = (): JSX.Element =>
         <RuleServiceConditionList isLoadingRuleService={this.props.isLoading}
-                                  loadRuleServiceError={!this.isNew() ? this.props.error : undefined}
+                                  loadRuleServiceError={this.props.error}
                                   ruleService={this.getRuleService()}
                                   unsavedConditions={this.state.unsavedConditions}
                                   onAddRuleCondition={this.addRuleCondition}
@@ -369,7 +369,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private services = (): JSX.Element =>
         <RuleServiceServicesList isLoadingRuleService={this.props.isLoading}
-                                 loadRuleServiceError={!this.isNew() ? this.props.error : undefined}
+                                 loadRuleServiceError={this.props.error}
                                  ruleService={this.getRuleService()}
                                  unsavedServices={this.state.unsavedServices}
                                  onAddRuleService={this.addRuleService}
@@ -380,7 +380,7 @@ class RuleService extends BaseComponent<Props, State> {
             title: 'Regra',
             id: 'serviceRule',
             content: () => this.serviceRule(),
-            active: this.props.location.state?.selected === 'serviceRule'
+            active: this.props.location.state?.selected === 'rule'
         },
         {
             title: 'Condições',

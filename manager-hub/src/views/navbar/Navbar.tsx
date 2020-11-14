@@ -34,6 +34,8 @@ import {ReduxState} from "../../reducers";
 import {components, IComponent, managementAuthenticatedRoutes} from "../../containers/Root.dev";
 import {getLoggedInUser, logout} from "../../utils/auth";
 import {Dropdown} from "../../components/form/Dropdown";
+import {isDarkMode, toggleBrightness} from "../../utils/bightnessMode";
+import ReactTooltip from "react-tooltip";
 
 const logo = require("../../resources/images/logo.png");
 
@@ -51,6 +53,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps;
 
 interface State {
     animate: boolean;
+    darkMode: boolean;
 }
 
 class Navbar extends React.Component<Props, State> {
@@ -59,6 +62,7 @@ class Navbar extends React.Component<Props, State> {
         super(props);
         this.state = {
             animate: false,
+            darkMode: isDarkMode(),
         }
     }
 
@@ -74,6 +78,12 @@ class Navbar extends React.Component<Props, State> {
         if (!this.state.animate && prevSidenavVisibility !== currentSidenavVisibility) {
             this.setState({animate: true});
         }
+        ReactTooltip.rebuild();
+    }
+
+    private toggleBrightness = () => {
+        toggleBrightness();
+        this.setState({darkMode: isDarkMode()})
     }
 
     public render() {
@@ -101,27 +111,33 @@ class Navbar extends React.Component<Props, State> {
             }
         }
         return (
-            <header role="navigation">
-                <div className="navbar-fixed">
-                    <nav className="no-shadows">
-                        <div className="nav-wrapper row">
+            <header role='navigation'>
+                <div className='navbar-fixed'>
+                    <nav className='no-shadows'>
+                        <div className='nav-wrapper row'>
                             {!loggingIn &&
-                            <a className="sidenav-trigger transparent btn-floating btn-flat btn-small"
-                               data-target="slide-out"
+                            <a className='sidenav-trigger transparent btn-floating btn-flat btn-small'
+                               data-target='slide-out'
                                onClick={this.handleSidenav}>
-                                <i className="material-icons">menu</i>
+                                <i className='material-icons'>menu</i>
                             </a>}
-                            <ul className="left">
-                                <li style={logoStyle} className={'hide-on-med-and-down'}>
-                                    <Link className="transparent brand-logo" to={"/gestor"}>
-                                        <img src={logo} alt=""/>
+                            <ul className='left'>
+                                <li style={logoStyle} className='hide-on-med-and-down'>
+                                    <Link className='transparent brand-logo' to={"/gestor"}>
+                                        <img src={logo} alt=''/>
                                         Manager hub
                                     </Link>
                                 </li>
                             </ul>
                             {showSearchbar && <SearchBar/>}
-                            <ul className="right">
-                                {!loggingIn && <li className="components">
+                            <ul className='right'>
+                                {<button className={`btn-floating btn-flat btn-small brightnessButton`}
+                                         key={this.state.darkMode ? 'dark-mode' : 'light-mode'}
+                                         data-for='tooltip' data-tip={this.state.darkMode ? 'Modo claro' : 'Modo escuro'}
+                                         data-place='bottom' onClick={this.toggleBrightness}>
+                                    <i className='material-icons'>{this.state.darkMode ? 'brightness_4' : 'brightness_7'}</i>
+                                </button>}
+                                {!loggingIn && <li className='components'>
                                     <Dropdown<IComponent>
                                         id={'components'}
                                         name={'components'}
@@ -134,25 +150,25 @@ class Navbar extends React.Component<Props, State> {
                                         }}>
                                     </Dropdown>
                                 </li>}
-                                <li className="username">
+                                <li className='username'>
                                     {loggedInUser}
                                 </li>
                                 <li>
-                                    <a data-for='tooltip' data-tip="GitHub" data-place='bottom'
-                                       href="https://github.com/usmanager/" target="_blank" rel="noopener noreferrer">
-                                        <i className="material-icons"><GoMarkGithub/></i>
+                                    <a data-for='tooltip' data-tip='GitHub' data-place='bottom'
+                                       href='https://github.com/usmanager/' target='_blank' rel='noopener noreferrer'>
+                                        <i className='material-icons'><GoMarkGithub/></i>
                                     </a>
                                 </li>
                                 <li>
-                                    <a data-for='tooltip' data-tip="Docker Hub" data-place='bottom'
-                                       href="https://hub.docker.com/orgs/usmanager" target="_blank"
-                                       rel="noopener noreferrer">
-                                        <i className="material-icons"><FaDocker/></i>
+                                    <a data-for='tooltip' data-tip='Docker Hub' data-place='bottom'
+                                       href='https://hub.docker.com/orgs/usmanager' target='_blank'
+                                       rel='noopener noreferrer'>
+                                        <i className='material-icons'><FaDocker/></i>
                                     </a>
                                 </li>
                                 {!loggingIn && <li>
-                                    <a className="red-text text-darken-4" onClick={this.handleLogout}>
-                                        <i className="material-icons right">logout</i> Sair
+                                    <a className='red-text text-darken-4' onClick={this.handleLogout}>
+                                        <i className='material-icons right'>logout</i> Sair
                                     </a>
                                 </li>}
                             </ul>

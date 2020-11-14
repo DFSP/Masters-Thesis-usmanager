@@ -88,7 +88,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IRuleHost,
-    selected: 'hostRule' | 'ruleConditions' | 'cloudHosts' | 'edgeHosts'
+    selected: 'rule' | 'ruleConditions' | 'cloudHosts' | 'edgeHosts'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -344,9 +344,9 @@ class RuleHost extends BaseComponent<Props, State> {
         const isNewRuleHost = this.isNew();
         return (
             <>
-                {!isNewRuleHost && isLoading && <LoadingSpinner/>}
-                {!isNewRuleHost && !isLoading && error && <Error message={error}/>}
-                {(isNewRuleHost || !isLoading) && (isNewRuleHost || !error) && formRuleHost && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formRuleHost && (
                     /*@ts-ignore*/
                     <Form id={ruleKey}
                           fields={this.getFields(formRuleHost)}
@@ -399,7 +399,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private conditions = (): JSX.Element =>
         <HostRuleConditionList isLoadingHostRule={this.props.isLoading}
-                               loadHostRuleError={!this.isNew() ? this.props.error : undefined}
+                               loadHostRuleError={this.props.error}
                                ruleHost={this.getRuleHost()}
                                unsavedConditions={this.state.unsavedConditions}
                                onAddRuleCondition={this.addRuleCondition}
@@ -407,7 +407,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private cloudHosts = (): JSX.Element =>
         <HostRuleCloudHostsList isLoadingHostRule={this.props.isLoading}
-                                loadHostRuleError={!this.isNew() ? this.props.error : undefined}
+                                loadHostRuleError={this.props.error}
                                 ruleHost={this.getRuleHost()}
                                 unsavedCloudHosts={this.state.unsavedCloudHosts}
                                 onAddRuleCloudHost={this.addRuleCloudHost}
@@ -415,7 +415,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private edgeHosts = (): JSX.Element =>
         <HostRuleEdgeHostsList isLoadingHostRule={this.props.isLoading}
-                               loadHostRuleError={!this.isNew() ? this.props.error : undefined}
+                               loadHostRuleError={this.props.error}
                                ruleHost={this.getRuleHost()}
                                unsavedEdgeHosts={this.state.unsavedEdgeHosts}
                                onAddRuleEdgeHost={this.addRuleEdgeHost}
@@ -426,7 +426,7 @@ class RuleHost extends BaseComponent<Props, State> {
             title: 'Regra',
             id: 'hostRule',
             content: () => this.hostRule(),
-            active: this.props.location.state?.selected === 'hostRule'
+            active: this.props.location.state?.selected === 'rule'
         },
         {
             title: 'Condições',

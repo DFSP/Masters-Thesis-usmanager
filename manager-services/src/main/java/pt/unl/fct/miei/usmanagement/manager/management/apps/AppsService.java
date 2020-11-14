@@ -93,10 +93,10 @@ public class AppsService {
 		App app = getApp(appName);
 		log.info("Updating app {} with {}",
 			ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
-		log.info("Service before copying properties: {}",
+		log.info("App before copying properties: {}",
 			ToStringBuilder.reflectionToString(app));
 		ObjectUtils.copyValidProperties(newApp, app);
-		log.info("Service after copying properties: {}",
+		log.info("App after copying properties: {}",
 			ToStringBuilder.reflectionToString(app));
 		return apps.save(app);
 	}

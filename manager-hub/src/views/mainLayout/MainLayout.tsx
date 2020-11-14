@@ -60,8 +60,6 @@ class MainLayout extends React.Component<Props, {}> {
         return (
             <div>
                 <Sidenav/>
-                <ReactTooltip id='tooltip' effect='solid' type='light'/>
-                <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
                     <div className="row col s12">
                         {/* @ts-ignore*/}

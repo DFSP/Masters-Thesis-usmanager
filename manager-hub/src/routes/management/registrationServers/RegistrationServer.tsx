@@ -86,7 +86,7 @@ interface MatchParams {
 
 interface LocationState {
     data: IRegistrationServer,
-    selected: 'registrationServer';
+    selected: 'registration-server';
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -200,7 +200,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
 
     private getSelectableHosts = (): Partial<IHostAddress>[] =>
         Object.entries(this.props.nodes)
-            .filter(([_, node]) => node.state === 'ready')
+            .filter(([_, node]) => node.state === 'ready' && node.labels['place'] === 'CLOUD')
             .map(([_, node]) =>
                 ({
                     username: node.labels['username'],
@@ -281,9 +281,9 @@ class RegistrationServer extends BaseComponent<Props, State> {
         const registrationServerKey: (keyof IRegistrationServer) = formRegistrationServer && Object.keys(formRegistrationServer)[0];
         return (
             <>
-                {!isNewRegistrationServer && isLoading && <LoadingSpinner/>}
-                {!isNewRegistrationServer && !isLoading && error && <Error message={error}/>}
-                {(isNewRegistrationServer || !isLoading) && (isNewRegistrationServer || !error) && registrationServer && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && registrationServer && (
                     /*@ts-ignore*/
                     <Form id={registrationServerKey}
                           fields={this.getFields(registrationServer)}
@@ -318,7 +318,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
             title: 'Servidor de registo',
             id: 'registrationServer',
             content: () => this.registrationServer(),
-            active: this.props.location.state?.selected === 'registrationServer'
+            active: this.props.location.state?.selected === 'registration-server'
         },
     ];
 

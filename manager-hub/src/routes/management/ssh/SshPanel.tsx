@@ -150,7 +150,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
                                         <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
                                     </div>
                                     {command.error !== null && command.output !== null &&
-                                    <div dangerouslySetInnerHTML={{
+                                    <div className={styles.commandResult} dangerouslySetInnerHTML={{
                                         __html:
                                             ((command.exitStatus === 0 && command.error.length && command.error[0] === "") ? command.output.join("\n") : command.error.join("\n"))
                                                 .replace(/(?:\r\n|\r|\n)/g, '<br/>')

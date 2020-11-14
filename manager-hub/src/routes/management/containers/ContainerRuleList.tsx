@@ -84,7 +84,7 @@ class ContainerRuleList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingContainer || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadContainerError || this.props.error : undefined}
+                               error={this.props.loadContainerError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem regras associadas`}
                                data={this.props.rulesName}
                                dropdown={{

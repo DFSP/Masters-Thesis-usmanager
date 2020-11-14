@@ -35,7 +35,6 @@ public enum RuleDecisionEnum {
 	OVERWORK,
 	UNDERWORK;
 
-
 	public static RuleDecisionEnum getOperator(String name) {
 		return valueOf(name.toUpperCase().replace(" ", "_"));
 	}

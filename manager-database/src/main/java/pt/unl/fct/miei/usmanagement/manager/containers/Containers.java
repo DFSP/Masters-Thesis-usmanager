@@ -29,6 +29,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,4 +67,5 @@ public interface Containers extends JpaRepository<Container, Long> {
 		+ "where c.containerId = :containerId")
 	boolean hasContainer(@Param("containerId") String containerId);
 
+	List<Container> findByWorkerManager(WorkerManager workerManager);
 }

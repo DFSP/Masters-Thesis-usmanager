@@ -88,7 +88,7 @@ class ContainerSimulatedMetricList extends BaseComponent<Props, State> {
     public render() {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingContainer || this.props.isLoading : undefined}
-                               error={!isNew ? this.props.loadContainerError || this.props.error : undefined}
+                               error={this.props.loadContainerError || (isNew ? undefined : this.props.error)}
                                emptyMessage={`Sem métricas simuladas associadas`}
                                data={this.props.simulatedMetricsName}
                                dropdown={{

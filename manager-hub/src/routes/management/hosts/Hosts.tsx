@@ -57,6 +57,8 @@ export interface IHostAddress {
     coordinates: ICoordinates | undefined;
 }
 
+export type place = 'CLOUD' | 'EDGE';
+
 const Hosts = () =>
     <MainLayout>
         <AddButton button={{text: 'Novo host'}}
@@ -64,8 +66,8 @@ const Hosts = () =>
                        id: 'hosts',
                        title: 'Selecionar a localização',
                        data: [
-                           {text: 'Cloud', pathname: '/hosts/cloud/nova instância?new'},
-                           {text: 'Edge', pathname: '/hosts/edge/adicionar host?new'}
+                           {text: 'Cloud', pathname: '/hosts/cloud/nova instância?new#cloud-host'},
+                           {text: 'Edge', pathname: '/hosts/edge/adicionar host?new#edge-host'}
                        ],
                    }}/>
         <div className={`${styles.container}`}>

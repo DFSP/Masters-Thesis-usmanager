@@ -31,15 +31,17 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -51,27 +53,31 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final ContainersService containersService;
 	private final DockerSwarmService dockerSwarmService;
 	private final CloudHostsService cloudHostsService;
-	private final AwsService awsService;
+	private final ElasticIpsService elasticIpsService;
 	private final SymService symService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsEventsService hostsEventsService;
 	private final ServicesEventsService servicesEventsService;
+	private final NodesService nodesService;
+	private final SyncService syncService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 AwsService awsService, SymService symService, CloudHostsService cloudHostsService,
-								 HostsMonitoringService hostsMonitoringService,
-								 ServicesMonitoringService servicesMonitoringService, HostsEventsService hostsEventsService,
-								 ServicesEventsService servicesEventsService) {
+								 ElasticIpsService elasticIpsService, SymService symService, CloudHostsService cloudHostsService,
+								 HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
+								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
+								 NodesService nodesService, SyncService syncService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
-		this.awsService = awsService;
+		this.elasticIpsService = elasticIpsService;
 		this.symService = symService;
 		this.cloudHostsService = cloudHostsService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsEventsService = hostsEventsService;
 		this.servicesEventsService = servicesEventsService;
+		this.nodesService = nodesService;
+		this.syncService = syncService;
 	}
 
 	@Override
@@ -79,6 +85,9 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		symService.stopSymmetricDSServer();
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
+		syncService.stopCloudHostsDatabaseSynchronization();
+		syncService.stopContainersDatabaseSynchronization();
+		syncService.stopNodesDatabaseSynchronization();
 		try {
 			Predicate<DockerContainer> containersPredicate = (dockerContainer) -> {
 				String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
@@ -96,7 +105,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
 		}
 		try {
-			awsService.releaseElasticIpAddresses();
+			elasticIpsService.releaseElasticIpAddresses();
 		}
 		catch (Exception e) {
 			log.error("Failed to release elastic ip addresses: {}", e.getMessage());
@@ -117,6 +126,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		servicesEventsService.reset();
 		hostsMonitoringService.reset();
 		servicesMonitoringService.reset();
+		nodesService.reset();
 	}
 
 }

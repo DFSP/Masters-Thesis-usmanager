@@ -225,9 +225,9 @@ class RuleCondition extends BaseComponent<Props, State> {
         const isNewRuleCondition = this.isNew();
         return (
             <>
-                {!isNewRuleCondition && isLoading && <LoadingSpinner/>}
-                {!isNewRuleCondition && !isLoading && error && <Error message={error}/>}
-                {(isNewRuleCondition || !isLoading) && (isNewRuleCondition || !error) && formCondition && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && formCondition && (
                     /*@ts-ignore*/
                     <Form id={conditionKey}
                           fields={this.getFields(formCondition)}

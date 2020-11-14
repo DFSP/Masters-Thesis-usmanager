@@ -31,7 +31,7 @@ import SimulatedContainerMetricsList from "./SimulatedContainerMetricsList";
 const SimulatedContainerMetrics: React.FC = () =>
     <MainLayout>
         <AddButton button={{text: 'Nova métrica simulada'}}
-                   pathname={'/métricas simuladas/contentores/nova métrica simulada?new'}/>
+                   pathname={'/métricas simuladas/contentores/nova métrica?new#metric'}/>
         <div className={`${styles.container}`}>
             <SimulatedContainerMetricsList/>
         </div>

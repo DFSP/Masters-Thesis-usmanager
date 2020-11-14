@@ -31,6 +31,7 @@ import org.jumpmind.symmetric.web.SymmetricEngineHolder;
 import org.jumpmind.symmetric.web.WebConstants;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.node.SymNodesRepository;
@@ -73,6 +74,7 @@ public class SymService {
 	private final SymNodeIdentitiesRepository symNodeIdentitiesRepository;
 	private final SymNodesSecurityRepository symNodesSecurityRepository;
 	private final SymNodesRepository symNodesRepository;
+	private final Environment environment;
 
 	private final ServletContext servletContext;
 	private final DataSource dataSource;
@@ -90,7 +92,7 @@ public class SymService {
 					  SymNodeHostsRepository symNodeHostsRepository,
 					  SymNodeIdentitiesRepository symNodeIdentitiesRepository,
 					  SymNodesSecurityRepository symNodesSecurityRepository,
-					  SymNodesRepository symNodesRepository, ServletContext servletContext, DataSource dataSource,
+					  SymNodesRepository symNodesRepository, Environment environment, ServletContext servletContext, DataSource dataSource,
 					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties,
 					  SymmetricDSProperties symmetricDSProperties) {
 		this.symTriggerRoutersRepository = symTriggerRoutersRepository;
@@ -102,6 +104,7 @@ public class SymService {
 		this.symNodeIdentitiesRepository = symNodeIdentitiesRepository;
 		this.symNodesSecurityRepository = symNodesSecurityRepository;
 		this.symNodesRepository = symNodesRepository;
+		this.environment = environment;
 		this.servletContext = servletContext;
 		this.dataSource = dataSource;
 		this.applicationContext = applicationContext;
@@ -109,7 +112,7 @@ public class SymService {
 		this.symmetricDSProperties = symmetricDSProperties;
 	}
 
-	public void startSymmetricDSServer(HostAddress hostAddress) throws SQLException, IOException {
+	public void startSymmetricDsService(HostAddress hostAddress) throws SQLException, IOException {
 		SymmetricEngineHolder holder = new SymmetricEngineHolder();
 
 		Properties properties = new Properties();
@@ -118,13 +121,12 @@ public class SymService {
 			properties.load(is);
 		}
 		catch (IOException e) {
-			log.error("Failed load sym-node properties: {}", e.getMessage());
+			log.error("Failed to load sym-node properties: {}", e.getMessage());
 			throw e;
 		}
 
-		properties.setProperty(ParameterConstants.SYNC_URL,
-			properties.getProperty(ParameterConstants.SYNC_URL)
-				.replace("${hostname}", hostAddress.getPublicIpAddress()));
+		String port = environment.getProperty("local.server.port");
+		properties.setProperty(ParameterConstants.SYNC_URL, String.format("http://%s:%s/api/sync", hostAddress.getPublicIpAddress(), port));
 		properties.setProperty("db.driver", dataSourceProperties.getDriverClassName());
 		properties.setProperty("db.url", dataSourceProperties.getUrl());
 		properties.setProperty("db.user", dataSourceProperties.getUsername());
@@ -185,17 +187,17 @@ public class SymService {
 		// Default router sends all data from master to workers
 		symRoutersRepository.save(SymRouterEntity.builder()
 			.routerId("master-to-worker")
-			.sourceNodeGroupId("master-manager")
-			.targetNodeGroupId("worker-manager")
+			.sourceNodeGroupId("manager-master")
+			.targetNodeGroupId("manager-worker")
 			.routerType("default")
 			.createTime(LocalDateTime.now())
 			.lastUpdateTime(LocalDateTime.now())
 			.build());
-		// Column match router will subset data from master-manager to a specific worker
+		// Column match router will subset data from manager-master to a specific worker
 		symRoutersRepository.save(SymRouterEntity.builder()
 			.routerId("master-to-one-worker")
-			.sourceNodeGroupId("master-manager")
-			.targetNodeGroupId("worker-manager")
+			.sourceNodeGroupId("manager-master")
+			.targetNodeGroupId("manager-worker")
 			.routerType("column")
 			.routerExpression("WORKER_ID=:EXTERNAL_ID or OLD_WORKER_ID=:EXTERNAL_ID")
 			.createTime(LocalDateTime.now())
@@ -204,8 +206,8 @@ public class SymService {
 		// Default router sends all data from workers to manager
 		symRoutersRepository.save(SymRouterEntity.builder()
 			.routerId("worker-to-master")
-			.sourceNodeGroupId("worker-manager")
-			.targetNodeGroupId("master-manager")
+			.sourceNodeGroupId("manager-worker")
+			.targetNodeGroupId("manager-master")
 			.routerType("default")
 			.createTime(LocalDateTime.now())
 			.lastUpdateTime(LocalDateTime.now())
@@ -225,27 +227,27 @@ public class SymService {
 	}
 
 	private void loadNodeGroupLinks() {
-		// master-manager sends changes to worker-manager when worker pulls from the master
+		// manager-master sends changes to manager-worker when worker pulls from the master
 		symNodeGroupLinksRepository.save(SymNodeGroupLinkEntity.builder()
-			.sourceNodeGroupId("master-manager")
-			.targetNodeGroupId("worker-manager")
+			.sourceNodeGroupId("manager-master")
+			.targetNodeGroupId("manager-worker")
 			.dataEventAction("W")
 			.build());
-		// worker-manager sends changes to master-manager when worker pushes to the master
+		// manager-worker sends changes to manager-master when worker pushes to the master
 		symNodeGroupLinksRepository.save(SymNodeGroupLinkEntity.builder()
-			.sourceNodeGroupId("worker-manager")
-			.targetNodeGroupId("master-manager")
+			.sourceNodeGroupId("manager-worker")
+			.targetNodeGroupId("manager-master")
 			.dataEventAction("P")
 			.build());
 	}
 
 	private void loadNodeGroups() {
 		symNodeGroupsRepository.save(SymNodeGroupEntity.builder()
-			.nodeGroupId("master-manager")
+			.nodeGroupId("manager-master")
 			.description("A master manager node. Available at the cloud.")
 			.build());
 		symNodeGroupsRepository.save(SymNodeGroupEntity.builder()
-			.nodeGroupId("worker-manager")
+			.nodeGroupId("manager-worker")
 			.description("A worker manager node. Available at the edge.")
 			.build());
 	}
@@ -279,6 +281,16 @@ public class SymService {
 			}
 		}
 		return tablesNames;
+	}
+
+	private int countRepetitions(String string, char c) {
+		int count = 0;
+		for (int i = 0; i < string.length(); i++) {
+			if (string.charAt(i) == c) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 }

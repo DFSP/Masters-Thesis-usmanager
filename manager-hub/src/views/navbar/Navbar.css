@@ -48,7 +48,7 @@ li.components {
     width: 150px;
 }
 
-@media only screen and (max-width: 527px) {
+@media only screen and (max-width: 577px) {
     .components {
         display: none !important;
     }
@@ -64,6 +64,9 @@ li.components .dropdown-content li > a, .dropdown-content li > span {
 
 .brightnessButton {
     float: left;
-    margin-right: 10px;
+    margin-right: 20px;
+    margin-top: 10px;
     align-content: center;
+    align-self: center;
+    align-items: center;
 }

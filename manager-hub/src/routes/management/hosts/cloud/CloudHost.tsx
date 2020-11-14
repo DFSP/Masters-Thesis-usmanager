@@ -140,7 +140,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ICloudHost,
-    selected: 'cloudHost' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp'
+    selected: 'cloud-host' | 'rules' | 'genericRules' | 'simulatedMetrics' | 'genericSimulatedMetrics' | 'ssh' | 'sftp'
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -291,9 +291,9 @@ class CloudHost extends BaseComponent<Props, State> {
         if (isEqual(state, awsInstanceStates.STOPPED)) {
             buttons.push({
                 button:
-                    <button className={`btn-flat btn-small blue-text ${formStyles.formButton}`}
+                    <button className={`btn-flat btn-small green-text ${formStyles.formButton}`}
                             onClick={this.startCloudHost}>
-                        Start
+                        Ligar
                     </button>
             });
         }
@@ -443,9 +443,9 @@ class CloudHost extends BaseComponent<Props, State> {
         const cloudHostKey: (keyof ICloudHost) = formCloudHost && Object.keys(formCloudHost)[0];
         return (
             <>
-                {!isNewCloudHost && isLoading && <LoadingSpinner/>}
-                {!isNewCloudHost && !isLoading && error && <Error message={error}/>}
-                {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && cloudHost && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && cloudHost && (
                     /*@ts-ignore*/
                     <Form id={cloudHostKey}
                           fields={this.getFields(cloudHost)}
@@ -519,7 +519,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private rules = (): JSX.Element =>
         <CloudHostRuleList isLoadingCloudHost={this.props.isLoading}
-                           loadCloudHostError={!this.isNew() ? this.props.error : undefined}
+                           loadCloudHostError={this.props.error}
                            cloudHost={this.getCloudHost()}
                            unsavedRules={this.state.unsavedRules}
                            onAddHostRule={this.addCloudHostRule}
@@ -530,7 +530,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private simulatedMetrics = (): JSX.Element =>
         <CloudHostSimulatedMetricList isLoadingCloudHost={this.props.isLoading}
-                                      loadCloudHostError={!this.isNew() ? this.props.error : undefined}
+                                      loadCloudHostError={this.props.error}
                                       cloudHost={this.getCloudHost()}
                                       unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                       onAddSimulatedHostMetric={this.addHostSimulatedMetric}
@@ -551,7 +551,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 title: 'Instância',
                 id: 'cloudHost',
                 content: () => this.cloudHost(),
-                active: this.props.location.state?.selected === 'cloudHost'
+                active: this.props.location.state?.selected === 'cloud-host'
             },
             {
                 title: 'Regras',

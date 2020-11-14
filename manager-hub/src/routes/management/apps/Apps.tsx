@@ -56,7 +56,7 @@ class Apps extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 <AddButton button={{text: 'Nova aplicação'}}
-                           pathname={'/aplicações/nova aplicação?new'}/>
+                           pathname={'/aplicações/nova aplicação?new#app'}/>
                 <div className={`${styles.container}`}>
                     <CardList<IApp>
                         isLoading={this.props.isLoading}

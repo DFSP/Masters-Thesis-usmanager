@@ -485,7 +485,7 @@ export function deleteContainer(container: IContainer): EntitiesAction {
 export const reloadContainers = () => ({
     [CALL_API]: {
         types: [CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE],
-        endpoint: `containers/reload`,
+        endpoint: `containers/sync`,
         schema: Schemas.CONTAINER_ARRAY,
         entity: 'containers',
         method: 'post'
@@ -886,6 +886,16 @@ export function deleteNode(node: INode): EntitiesAction {
         data: {nodes: [node]}
     }
 }
+
+export const syncNodes = () => ({
+    [CALL_API]: {
+        types: [NODES_REQUEST, NODES_SUCCESS, NODES_FAILURE],
+        endpoint: `nodes/sync`,
+        schema: Schemas.NODE_ARRAY,
+        entity: 'nodes',
+        method: 'post'
+    }
+});
 
 export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
 export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';

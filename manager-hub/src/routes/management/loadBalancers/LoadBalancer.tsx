@@ -86,7 +86,7 @@ interface MatchParams {
 
 interface LocationState {
     data: ILoadBalancer,
-    selected: 'loadBalancer';
+    selected: 'load-balancer';
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams, {}, LocationState>;
@@ -303,9 +303,9 @@ class LoadBalancer extends BaseComponent<Props, State> {
         const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
         return (
             <>
-                {!isNewLoadBalancer && isLoading && <LoadingSpinner/>}
-                {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
-                {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && loadBalancer && (
+                {isLoading && <LoadingSpinner/>}
+                {!isLoading && error && <Error message={error}/>}
+                {!isLoading && !error && loadBalancer && (
                     /*@ts-ignore*/
                     <Form id={loadBalancerKey}
                           fields={this.getFields(loadBalancer)}
@@ -340,7 +340,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
             title: 'Balanceamento de carga',
             id: 'loadBalancer',
             content: () => this.loadBalancer(),
-            active: this.props.location.state?.selected === 'loadBalancer'
+            active: this.props.location.state?.selected === 'load-balancer'
         },
     ];
 

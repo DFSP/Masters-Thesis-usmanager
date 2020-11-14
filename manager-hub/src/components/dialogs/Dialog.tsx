@@ -89,6 +89,7 @@ export default class Dialog extends BaseComponent<Props, State> {
         const {fullscreen} = this.state;
         return (
             <div id={id} className={`modal dialog ${fullscreen ? 'modal-fullscreen' : ''}`} ref={this.modal}>
+                <ReactTooltip id='tooltip' effect='solid' type='light'/>
                 <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
                 <div className="modal-content">
                     {title && (

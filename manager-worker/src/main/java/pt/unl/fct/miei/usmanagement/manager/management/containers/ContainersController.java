@@ -39,9 +39,9 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
-import pt.unl.fct.miei.usmanagement.manager.management.sync.SyncService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,9 +119,9 @@ public class ContainersController {
 		return containersService.migrateContainer(id, hostAddress);
 	}
 
-	@PostMapping("/reload")
+	@PostMapping("/sync")
 	public List<Container> syncDatabaseContainers() {
-		return syncService.synchronizeDatabaseContainers();
+		return syncService.synchronizeContainersDatabase();
 	}
 
 	@GetMapping("/{containerId}/logs")

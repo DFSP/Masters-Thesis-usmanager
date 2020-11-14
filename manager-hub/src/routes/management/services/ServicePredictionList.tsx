@@ -105,7 +105,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList<IPrediction>
             isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
-            error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
+            error={this.props.loadServiceError || (isNew ? undefined : this.props.error)}
             emptyMessage='Sem previsões agendadas'
             data={this.props.predictions}
             dataKey={['name']}

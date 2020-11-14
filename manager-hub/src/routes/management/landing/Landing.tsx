@@ -26,7 +26,7 @@ import React from 'react';
 import MainLayout from '../../../views/mainLayout/MainLayout';
 import styles from './Landing.module.css';
 import LocationMap from "../../../components/map/LocationMap";
-import {loadContainers} from "../../../actions";
+import {loadCloudHosts, loadContainers, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
@@ -34,15 +34,21 @@ import {IContainer} from "../containers/Container";
 import {IMarker} from "../../../components/map/Marker";
 import {Error} from "../../../components/errors/Error";
 import ReactTooltip from "react-tooltip";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 interface StateToProps {
     isLoading: boolean;
     error?: string | null;
     containers: { [key: string]: IContainer };
+    cloudHosts: { [key: string]: ICloudHost };
+    edgeHosts: { [key: string]: IEdgeHost };
 }
 
 interface DispatchToProps {
     loadContainers: () => void;
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -62,6 +68,8 @@ class Landing extends React.Component<Props, State> {
 
     public componentDidMount() {
         this.props.loadContainers();
+        this.props.loadCloudHosts();
+        this.props.loadEdgeHosts();
         this.reloadData = setInterval(this.props.loadContainers, 15000);
     }
 
@@ -76,11 +84,14 @@ class Landing extends React.Component<Props, State> {
         this.setState({center: !this.state.center})
 
     private getContainersMarkers = (): IMarker[] => {
+        if (this.props.isLoading) {
+            return [];
+        }
         const containers: IContainer[] = Object.values(this.props.containers);
-        const markers = new Map<String, IMarker>();
+        const containerMarkers = new Map<String, IMarker>();
         containers.forEach(container => {
             const publicIpAddress = container.publicIpAddress;
-            const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
+            const marker = containerMarkers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
             if (marker.title === '') {
                 marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
             }
@@ -88,9 +99,30 @@ class Landing extends React.Component<Props, State> {
             marker.label = publicIpAddress;
             marker.latitude = container.coordinates.latitude;
             marker.longitude = container.coordinates.longitude;
-            markers.set(publicIpAddress, marker);
+            containerMarkers.set(publicIpAddress, marker);
         });
-        return Array.from(markers.values());
+
+        const cloudHosts: ICloudHost[] = Object.values(this.props.cloudHosts);
+        const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) => !containerMarkers.has(host.publicIpAddress))
+            .map(host => ({
+                title: host.awsRegion.name + ' (' + host.awsRegion.zone + ')' + '<br/>' + host.instanceId.substr(0, 10) + '<br/>',
+                label: host.publicIpAddress,
+                latitude: host.awsRegion.coordinates.latitude,
+                longitude: host.awsRegion.coordinates.longitude,
+                color: 'green'
+            }))
+        
+        const edgeHosts: IEdgeHost[] = Object.values(this.props.edgeHosts);
+        const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.publicIpAddress))
+            .map(host => ({
+                title: host.coordinates.label + '<br/>' + host.publicIpAddress + '<br/>',
+                label: host.publicIpAddress,
+                latitude: host.coordinates.latitude,
+                longitude: host.coordinates.longitude,
+                color: 'green'
+            }))
+        
+        return [...Array.from(containerMarkers.values()), ...cloudHostsMarkers, ...edgeHostsMarkers];
     }
 
     public render() {
@@ -107,7 +139,7 @@ class Landing extends React.Component<Props, State> {
             </>;
         const map = <>
             {error && <Error message={error}/>}
-            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover/>}
+            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover keepRatio/>}
         </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>
@@ -139,15 +171,21 @@ function mapStateToProps(state: ReduxState): StateToProps {
     const isLoading = state.entities.containers.isLoadingContainers;
     const error = state.entities.containers.loadContainersError;
     const containers = state.entities.containers.data;
+    const cloudHosts = state.entities.hosts.cloud.data;
+    const edgeHosts = state.entities.hosts.edge.data;
     return {
         isLoading,
         error,
         containers,
+        cloudHosts,
+        edgeHosts
     }
 }
 
 const mapDispatchToProps: DispatchToProps = {
     loadContainers,
+    loadCloudHosts,
+    loadEdgeHosts
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Landing);

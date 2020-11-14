@@ -25,13 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.management.location;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.nodes.SimpleNode;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 import java.util.Map;
 
 @Data
-final class NodeLocationRequests {
+public final class NodeLocationRequests {
 
-	private final SimpleNode node;
+	private final Node node;
 	private final Map<String, Integer> locationRequests;
+
 }

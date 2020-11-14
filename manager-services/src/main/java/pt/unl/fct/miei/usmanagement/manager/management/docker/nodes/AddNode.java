@@ -31,7 +31,7 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import java.util.List;
 
 @Data
-final class AddNode {
+public final class AddNode {
 
 	private String host;
 	private NodeRole role;

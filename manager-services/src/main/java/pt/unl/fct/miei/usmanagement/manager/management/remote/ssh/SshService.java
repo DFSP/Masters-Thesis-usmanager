@@ -39,21 +39,24 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusProperties;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -78,14 +81,33 @@ public class SshService {
 		this.connectionTimeout = sshProperties.getConnectionTimeout();
 		this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
 		this.hostsService = hostsService;
-		PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
-		this.scriptPaths = Map.of(
-			dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
-			dockerProperties.getUninstallScript(), dockerProperties.getUninstallScriptPath(),
-			dockerProperties.getInstallApiScript(), dockerProperties.getInstallApiScriptPath(),
-			nodeExporterProperties.getInstallScript(), nodeExporterProperties.getInstallScriptPath()
-		);
+		this.scriptPaths = new HashMap<>();
+		this.initScripts(dockerProperties, prometheusProperties);
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+	}
+
+	private void initScripts(DockerProperties dockerProperties, PrometheusProperties prometheusProperties) {
+		PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
+		String dockerInstallScript = dockerProperties.getInstallScript();
+		if (dockerInstallScript != null) {
+			String[] dockerInstallScriptPaths = dockerInstallScript.split("/");
+			this.scriptPaths.put(dockerInstallScriptPaths[dockerInstallScriptPaths.length - 1], dockerInstallScript);
+		}
+		String dockerUninstallScript = dockerProperties.getUninstallScript();
+		if (dockerUninstallScript != null) {
+			String[] dockerUninstallScriptPaths = dockerUninstallScript.split("/");
+			this.scriptPaths.put(dockerUninstallScriptPaths[dockerUninstallScriptPaths.length - 1], dockerUninstallScript);
+		}
+		String dockerApiInstallScript = dockerProperties.getInstallApiScript();
+		if (dockerApiInstallScript != null) {
+			String[] dockerApiInstallScriptPaths = dockerApiInstallScript.split("/");
+			this.scriptPaths.put(dockerApiInstallScriptPaths[dockerApiInstallScriptPaths.length - 1], dockerApiInstallScript);
+		}
+		String nodeExporterApiInstallScript = nodeExporterProperties.getInstallScript();
+		if (nodeExporterApiInstallScript != null) {
+			String[] nodeExporterApiInstallScriptPaths = nodeExporterProperties.getInstallScript().split("/");
+			this.scriptPaths.put(nodeExporterApiInstallScriptPaths[nodeExporterApiInstallScriptPaths.length - 1], nodeExporterApiInstallScript);
+		}
 	}
 
 	private SSHClient initClient(HostAddress hostAddress, int timeout) throws IOException {
@@ -174,6 +196,10 @@ public class SshService {
 		}
 	}
 
+	public SshCommandResult executeCommand(String command, HostAddress hostAddress) {
+		return executeCommand(command, hostAddress, EXECUTE_COMMAND_TIMEOUT);
+	}
+
 	public SshCommandResult executeCommand(String command, HostAddress hostAddress, long timeout) {
 		try (SSHClient sshClient = initClient(hostAddress)) {
 			return executeCommand(command, hostAddress, sshClient, timeout);
@@ -220,9 +246,24 @@ public class SshService {
 		return new SshCommandResult(hostAddress, command, exitStatus, output, error);
 	}
 
-	public void executeCommandInBackground(String command, HostAddress hostAddress) {
-		String executeCommand = String.format("nohup %s 1>/dev/null 2>/dev/null &", command);
+	public void executeBackgroundProcess(String command, HostAddress hostAddress, String outputFile) {
+		String file = String.format("%s_%d.log", outputFile == null ? "process" : outputFile, System.currentTimeMillis());
+		String executeCommand = String.format("nohup %s >/tmp/%s 2>&1 & echo $! > /tmp/pid_%d.txt", command, file, System.currentTimeMillis());
 		executeCommandSync(executeCommand, hostAddress);
+	}
+
+	public boolean stopBackgroundProcesses(HostAddress hostAddress) {
+		String filesCommand = "ls /tmp | grep pid_*";
+		SshCommandResult filesCommandResult = executeCommand(filesCommand, hostAddress);
+		if (filesCommandResult == null || !filesCommandResult.isSuccessful()) {
+			return false;
+		}
+		List<String> files = filesCommandResult.getOutput();
+		String killCommand = files.stream().map(file -> "kill -9 `cat /tmp/" + file + "`").collect(Collectors.joining("; "));
+		executeCommand(killCommand, hostAddress);
+		String rmCommand = "rm -rf " + files.stream().map(file -> "/tmp/" + file).collect(Collectors.joining(" "));
+		SshCommandResult rmCommandResult = executeCommand(rmCommand, hostAddress);
+		return rmCommandResult != null && rmCommandResult.isSuccessful();
 	}
 
 	public boolean hasConnection(HostAddress hostAddress) {

@@ -137,74 +137,71 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
         const DataList = List<T>();
         return (
             <div>
-                <div className='controlsContainer'>
-                    {!error && data.length > 0 && (
-                        <p className={`${styles.noLabelCheckbox}`}>
-                            <label>
-                                <input type='checkbox'
-                                       onChange={this.handleGlobalCheckbox}
-                                       ref={this.globalCheckbox}/>
-                                <span/>
-                            </label>
-                        </p>
-                    )}
-                    {dropdown && (
-                        <>
-                            <button
-                                className={`dropdown-trigger btn-floating btn-flat btn-small right ${styles.button}`}
-                                data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
-                                data-target={`dropdown-${dropdown.id}`}
-                                ref={this.dropdown}
-                                disabled={!!error}>
-                                <i className='material-icons'>add</i>
-                            </button>
-                            <ul id={`dropdown-${dropdown.id}`}
-                                className={`dropdown-content ${styles.dropdown}`}>
-                                <li className={`${styles.disabled}`}>
-                                    <a className={`${!dropdown?.data.length ? 'dropdown-empty' : ''}`}>
-                                        {dropdown.data.length ? dropdown.title : dropdown.empty}
-                                    </a>
-                                </li>
-                                <PerfectScrollbar ref={(ref) => {
-                                    this.scrollbar = ref;
-                                }}>
-                                    {dropdown.data.map((data, index) =>
-                                        <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                                            <a className={dropdown?.formModal ? 'modal-trigger' : ''}
-                                               data-target={dropdown.formModal?.id}>
-                                                {data}
-                                            </a>
-                                        </li>
-                                    )}
-                                </PerfectScrollbar>
-                            </ul>
-                            {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
-                        </>
-                    )}
-                    {(!error && formModal &&
-                        <>
-                            <button
-                                className={`modal-trigger btn-floating btn-flat btn-small right ${styles.button}`}
-                                data-for='dark-tooltip' data-tip={formModal.title} data-place='bottom'
-                                data-target={formModal.id}>
-                                <i className='material-icons'>add</i>
-                            </button>
-                            {this.inputDialog(formModal)}
-                        </>
-                    )}
-                    {!error && <button className={`btn-flat btn-small red-text right ${styles.button}`}
+                {!error && <div className='controlsContainer'>
+                    {data.length > 0 &&
+                    <p className={`${styles.noLabelCheckbox}`}>
+                        <label>
+                            <input type='checkbox'
+                                   onChange={this.handleGlobalCheckbox}
+                                   ref={this.globalCheckbox}/>
+                            <span/>
+                        </label>
+                    </p>}
+                    {dropdown &&
+                    <>
+                        <button
+                            className={`dropdown-trigger btn-floating btn-flat btn-small right ${styles.button}`}
+                            data-for='dark-tooltip' data-tip={dropdown.title} data-place='bottom'
+                            data-target={`dropdown-${dropdown.id}`}
+                            ref={this.dropdown}
+                            disabled={!!error}>
+                            <i className='material-icons'>add</i>
+                        </button>
+                        <ul id={`dropdown-${dropdown.id}`}
+                            className={`dropdown-content ${styles.dropdown}`}>
+                            <li className={`${styles.disabled}`}>
+                                <a className={`${!dropdown?.data.length ? 'dropdown-empty' : ''}`}>
+                                    {dropdown.data.length ? dropdown.title : dropdown.empty}
+                                </a>
+                            </li>
+                            <PerfectScrollbar ref={(ref) => {
+                                this.scrollbar = ref;
+                            }}>
+                                {dropdown.data.map((data, index) =>
+                                    <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
+                                        <a className={dropdown?.formModal ? 'modal-trigger' : ''}
+                                           data-target={dropdown.formModal?.id}>
+                                            {data}
+                                        </a>
+                                    </li>
+                                )}
+                            </PerfectScrollbar>
+                        </ul>
+                        {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
+                    </>}
+                    {formModal &&
+                    <>
+                        <button
+                            className={`modal-trigger btn-floating btn-flat btn-small right ${styles.button}`}
+                            data-for='dark-tooltip' data-tip={formModal.title} data-place='bottom'
+                            data-target={formModal.id}>
+                            <i className='material-icons'>add</i>
+                        </button>
+                        {this.inputDialog(formModal)}
+                    </>}
+                    {<button className={`btn-flat btn-small red-text right ${styles.button}`}
                         /*style={!error && Object.values(this.state)
                             .map(item => item?.isChecked || false)
                             .some(checked => checked)
                             ? {transform: "scale(1)"}
                             : {transform: "scale(0)"}}*/
-                                       disabled={!!error || Object.values(this.state)
-                                           .map(item => item?.isChecked || false)
-                                           .every(checked => !checked)}
-                                       onClick={this.onRemove}>
+                             disabled={!!error || Object.values(this.state)
+                                 .map(item => item?.isChecked || false)
+                                 .every(checked => !checked)}
+                             onClick={this.onRemove}>
                         {removeButtonText || 'Remover'}
                     </button>}
-                </div>
+                </div>}
                 <DataList
                     isLoading={isLoading}
                     error={error}

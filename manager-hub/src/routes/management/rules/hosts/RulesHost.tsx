@@ -31,7 +31,7 @@ import RulesHostList from "./RulesHostList";
 const RulesHost: React.FC = () =>
     <MainLayout>
         <AddButton button={{text: 'Nova regra'}}
-                   pathname={'/regras/hosts/nova regra?new'}/>
+                   pathname={'/regras/hosts/nova regra?new#rule'}/>
         <div className={`${styles.container}`}>
             <RulesHostList/>
         </div>
