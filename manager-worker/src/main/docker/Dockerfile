@@ -15,6 +15,7 @@ COPY manager-worker/pom.xml .
 RUN mvn -DskipTests clean package
 
 FROM adoptopenjdk/openjdk11:alpine-jre
+RUN apk add bash
 WORKDIR /app
 COPY --from=build /usr/src/app/target/*.jar manager-worker.jar
 EXPOSE 8080

@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -65,6 +66,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,11 +86,13 @@ public class WorkerManagersService {
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
 	private final int port;
+	private final int threads;
 
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 Environment environment, WorkerManagerProperties workerManagerProperties) {
+								 Environment environment, WorkerManagerProperties workerManagerProperties,
+								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
@@ -104,6 +108,7 @@ public class WorkerManagersService {
 		this.headers.add("Authorization", basicAuthorization);
 		this.restTemplate = new RestTemplate();
 		this.port = workerManagerProperties.getPort();
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public List<WorkerManager> getWorkerManagers() {
@@ -121,7 +126,7 @@ public class WorkerManagersService {
 	}
 
 	public List<WorkerManager> getWorkerManagers(RegionEnum region) {
-		return workerManagers.getByContainer_Region(region);
+		return workerManagers.getByRegion(region);
 	}
 
 	public WorkerManager getRegionWorkerManager(RegionEnum region) {
@@ -133,14 +138,14 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager saveWorkerManager(Container container) {
-		return workerManagers.save(WorkerManager.builder().container(container).build());
+		return workerManagers.save(WorkerManager.builder().container(container).region(container.getRegion()).build());
 	}
 
 	public WorkerManager launchWorkerManager(HostAddress hostAddress) {
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
-		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).build();
+		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).region(container.getRegion()).build();
 		return workerManagers.save(workerManager);
 	}
 
@@ -149,14 +154,22 @@ public class WorkerManagersService {
 
 		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(WorkerManagerProperties.WORKER_MANAGER);
 
-		return regions.stream()
-			.map(region -> hostsService.getCapableHost(expectedMemoryConsumption, region))
-			.distinct()
-			.map(hostAddress -> {
-				// avoid launching another worker manager on the same region
-				List<WorkerManager> workerManagers = getWorkerManagers(hostAddress.getRegion());
-				return !workerManagers.isEmpty() ? workerManagers.get(0) : launchWorkerManager(hostAddress);
-			}).collect(Collectors.toList());
+		try {
+			return new ForkJoinPool(threads).submit(() ->
+				regions.parallelStream().map(region -> {
+					List<WorkerManager> regionWorkerManagers = getWorkerManagers(region);
+					if (regionWorkerManagers.size() > 0) {
+						return regionWorkerManagers.get(0);
+					}
+					else {
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
+						return launchWorkerManager(hostAddress);
+					}
+				}).collect(Collectors.toList())).get();
+		}
+		catch (InterruptedException | ExecutionException e) {
+			throw new ManagerException("Unable to launch worker managers: %s", e.getMessage());
+		}
 	}
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {

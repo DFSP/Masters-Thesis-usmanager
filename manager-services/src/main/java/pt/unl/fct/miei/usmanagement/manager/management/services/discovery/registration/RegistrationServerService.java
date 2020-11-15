@@ -110,17 +110,6 @@ public class RegistrationServerService {
 
 		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(REGISTRATION_SERVER);
 
-		List<HostAddress> availableHosts = null;
-		try {
-			availableHosts = new ForkJoinPool(threads).submit(() -> regions.parallelStream()
-				.map(region ->
-					hostsService.getCapableHost(expectedMemoryConsumption, region, node -> cloudHostsService.hasCloudHost(node.getPublicIpAddress())))
-				.distinct()
-				.collect(Collectors.toList())).get();
-		}
-		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to launch registration servers on regions {}: {}", e.getMessage());
-		}
 
 		List<String> customEnvs = Collections.emptyList();
 
@@ -129,18 +118,27 @@ public class RegistrationServerService {
 		String registrationServers = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
 
+
 		Gson gson = new Gson();
-		return availableHosts.stream()
-			.map(hostAddress -> {
-				// avoid launching another registration server on the same region
-				List<Container> containers = containersService.getContainersWithLabels(Set.of(
-					Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-					Pair.of(ContainerConstants.Label.REGION, gson.toJson(hostAddress.getRegion()))
-				));
-				return !containers.isEmpty() ?
-					containers.get(0)
-					: containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
-			}).collect(Collectors.toList());
+		try {
+			return new ForkJoinPool(threads).submit(() ->
+				regions.parallelStream().map(region -> {
+					List<Container> regionRegistrationServers = containersService.getContainersWithLabels(Set.of(
+						Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
+						Pair.of(ContainerConstants.Label.REGION, gson.toJson(region))
+					));
+					if (regionRegistrationServers.size() > 0) {
+						return regionRegistrationServers.get(0);
+					}
+					else {
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
+						return containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
+					}
+				}).collect(Collectors.toList())).get();
+		}
+		catch (InterruptedException | ExecutionException e) {
+			throw new ManagerException("Unable to launch registration servers at regions {}: {}", regions, e.getMessage());
+		}
 	}
 
 	private List<HostAddress> getRegistrationServers() {

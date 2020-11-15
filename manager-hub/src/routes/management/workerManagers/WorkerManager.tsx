@@ -32,7 +32,13 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addWorkerManagers, assignWorkerManagerHosts, loadNodes, loadRegions, loadWorkerManagers} from "../../../actions";
+import {
+    addWorkerManagers,
+    assignWorkerManagerHosts,
+    loadNodes,
+    loadRegions,
+    loadWorkerManagers
+} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply, postData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
@@ -48,6 +54,7 @@ import {IRegion} from "../regions/Region";
 
 export interface IWorkerManager extends IDatabaseData {
     container: IContainer,
+    region: IRegion,
     assignedHosts?: string[],
 }
 
@@ -127,7 +134,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         return (
             <MainLayout>
                 {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
-                <div className="container">
+                <div className='container'>
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -155,7 +162,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         if (workerManagers.length === 1) {
             const workerManager = workerManagers[0];
             const publicIpAddress = workerManager.container.publicIpAddress;
-            super.toast(`<span class="green-text">Worker-manager ${this.mounted ? `<b class="white-text">${workerManager.id}</b>` : `<a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>Worker-manager ${this.mounted ? `<b class='white-text'>${workerManager.id}</b>` : `<a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
             this.saveEntities(workerManager);
             if (this.mounted) {
                 this.updateWorkerManager(workerManager);
@@ -163,7 +170,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             }
         } else {
             workerManagers = workerManagers.reverse();
-            super.toast(`<span class="green-text">Launched ${workerManagers.length} worker-managers:<br/><b class="white-text">${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>Launched ${workerManagers.length} worker-managers:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push("/gestores locais");
             }
@@ -175,7 +182,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o gestor local`, 10000, reason, true);
 
     private onDeleteSuccess = (workerManager: IWorkerManager): void => {
-        super.toast(`<span class="green-text">O gestor local <b class="white-text">${workerManager.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O gestor local <b class='white-text'>${workerManager.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/gestores locais`)
         }
@@ -268,6 +275,9 @@ class WorkerManager extends BaseComponent<Props, State> {
     private containerPublicIpAddressField = (container: IContainer) =>
         container.publicIpAddress;
 
+    private regionOption = (region: IRegion) =>
+        region.region;
+
     private formFields = (isNew: boolean, formWorkerManager?: Partial<IWorkerManager>) => {
         const {currentForm} = this.state;
         return (
@@ -284,7 +294,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                         <Field<Partial<IHostAddress>> key={'hostAddress'}
                                                       id={'hostAddress'}
                                                       label={'hostAddress'}
-                                                      type="dropdown"
+                                                      type='dropdown'
                                                       dropdown={{
                                                           defaultValue: 'Selecionar endereço',
                                                           emptyMessage: 'Nenhum host disponível',
@@ -301,11 +311,23 @@ class WorkerManager extends BaseComponent<Props, State> {
                                            valueToString={this.containerIdField}
                                            icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
                         <Field<IContainer>
-                            key={index + 1} // index + 1 is ok unless there are more fields after this one
+                            key={5000}
                             id={key}
                             label={"host"}
                             valueToString={this.containerPublicIpAddressField}/>
                     </>
+                    : key === 'region'
+                    ? <Field<IRegion> key={index}
+                                      id={key}
+                                      type="dropdown"
+                                      label={key}
+                                      valueToString={this.regionOption}
+                                      dropdown={{
+                                          defaultValue: "Selecionar a região",
+                                          emptyMessage: "Não há regiões disponíveis",
+                                          values: Object.values(this.props.regions),
+                                          optionToString: this.regionOption
+                                      }}/>
                     : <Field key={index}
                              id={key}
                              label={key}/>))
@@ -382,7 +404,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             active: this.props.location.state?.selected === 'worker-manager'
         },
         {
-            title: 'Hosts atribuídos',
+            title: 'Hosts geridos',
             id: 'assignHosts',
             content: () => this.assignHosts(),
             active: this.props.location.state?.selected === 'assignHosts'

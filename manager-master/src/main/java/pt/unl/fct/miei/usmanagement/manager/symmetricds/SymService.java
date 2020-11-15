@@ -222,6 +222,7 @@ public class SymService {
 				.channelId("default")
 				.lastUpdateTime(LocalDateTime.now())
 				.createTime(LocalDateTime.now())
+				.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)
 				.build())
 		);
 	}

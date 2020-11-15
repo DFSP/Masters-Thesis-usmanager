@@ -35,6 +35,7 @@ import lombok.Singular;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -64,6 +65,9 @@ public class WorkerManager {
 	@NotNull
 	@OneToOne(cascade = CascadeType.REMOVE)
 	private Container container;
+
+	@NotNull
+	private RegionEnum region;
 
 	@Singular
 	@JsonIgnore

@@ -111,19 +111,19 @@ public class NginxLoadBalancerService {
 		Gson gson = new Gson();
 		try {
 			return new ForkJoinPool(threads).submit(() ->
-				regions.parallelStream()
-					.map(region -> hostsService.getCapableHost(expectedMemoryConsumption, region))
-					.distinct()
-					.map(hostAddress -> {
-						// avoid launching another load balancer on the same region
-						List<Container> containers = containersService.getContainersWithLabels(Set.of(
-							Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
-							Pair.of(ContainerConstants.Label.REGION, gson.toJson(hostAddress.getRegion()))
-						));
-						return !containers.isEmpty() ?
-							containers.get(0)
-							: launchLoadBalancer(hostAddress);
-					}).collect(Collectors.toList())).get();
+				regions.parallelStream().map(region -> {
+					List<Container> regionLoadBalancers = containersService.getContainersWithLabels(Set.of(
+						Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
+						Pair.of(ContainerConstants.Label.REGION, gson.toJson(region))
+					));
+					if (regionLoadBalancers.size() > 0) {
+						return regionLoadBalancers.get(0);
+					}
+					else {
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
+						return launchLoadBalancer(hostAddress);
+					}
+				}).collect(Collectors.toList())).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
 			throw new ManagerException("Unable to launch load balancers at regions {}: {}", regions, e.getMessage());

@@ -118,6 +118,9 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
             <CardItem key={'host'}
                       label={'Host'}
                       value={workerManager.container.publicIpAddress}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={workerManager.region.region}/>
         </CardWorkerManager>
     }
 

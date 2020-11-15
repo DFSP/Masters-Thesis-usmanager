@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
@@ -75,6 +76,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
+		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		String externalId = environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID);
 		String registrationUrl = environment.getProperty(ContainerConstants.Environment.WorkerManager.REGISTRATION_URL);
 		symService.startSymmetricDsService(externalId, registrationUrl, hostAddress);

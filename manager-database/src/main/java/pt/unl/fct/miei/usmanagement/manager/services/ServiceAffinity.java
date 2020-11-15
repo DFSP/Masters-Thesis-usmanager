@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/*
 
 package pt.unl.fct.miei.usmanagement.manager.services;
 
@@ -82,3 +83,4 @@ public class ServiceAffinity {
 	}
 
 }
+*/

@@ -104,9 +104,9 @@ rules:
 symmetricds:
   tables:
     exclude:
-      startsWith: sym, logging, container, node
+      startsWith: sym, logging, container, node, worker, users
       endsWith: events
-      contains: monitoring
+      contains: monitoring, configurations
 worker-manager:
   port: 8081
 parallelism:
