@@ -38,10 +38,13 @@ import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
@@ -49,6 +52,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsServi
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 
@@ -60,6 +64,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,6 +123,14 @@ public class WorkerManagersService {
 		return workerManagers.getByContainer_Region(region);
 	}
 
+	public WorkerManager getRegionWorkerManager(RegionEnum region) {
+		List<WorkerManager> workerManagers = getWorkerManagers(region);
+		if (workerManagers.isEmpty()) {
+			workerManagers.addAll(launchWorkerManagers(List.of(region)));
+		}
+		return workerManagers.get(0);
+	}
+
 	public WorkerManager saveWorkerManager(Container container) {
 		return workerManagers.save(WorkerManager.builder().container(container).build());
 	}
@@ -135,15 +148,13 @@ public class WorkerManagersService {
 
 		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(WorkerManagerProperties.WORKER_MANAGER);
 
-		return regions.parallelStream()
-			.map(region -> hostsService.getCapableNode(expectedMemoryConsumption, region))
+		return regions.stream()
+			.map(region -> hostsService.getCapableHost(expectedMemoryConsumption, region))
 			.distinct()
 			.map(hostAddress -> {
 				// avoid launching another worker manager on the same region
 				List<WorkerManager> workerManagers = getWorkerManagers(hostAddress.getRegion());
-				return !workerManagers.isEmpty() ?
-					workerManagers.get(0)
-					: launchWorkerManager(hostAddress);
+				return !workerManagers.isEmpty() ? workerManagers.get(0) : launchWorkerManager(hostAddress);
 			}).collect(Collectors.toList());
 	}
 
@@ -219,7 +230,7 @@ public class WorkerManagersService {
 	public CompletableFuture<List<Container>> getContainers(Container workerManager, boolean sync) {
 		List<Container> containers = new ArrayList<>();
 		String hostname = workerManager.getHostAddress().getPublicIpAddress();
-		String url = String.format("%s:%s/api/containers/%s", hostname, port, sync ? "sync" : "");
+		String url = String.format("http://%s:%s/api/containers/%s", hostname, port, sync ? "sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
 		Container[] responseBody = response.getBody();
@@ -257,11 +268,70 @@ public class WorkerManagersService {
 		return getContainers(true);
 	}
 
+
+	@Async
+	public CompletableFuture<List<Container>> launchContainer(LaunchContainerRequest launchContainerRequest,
+															  WorkerManager workerManager) {
+		String url = String.format("http://%s:%s/api/containers", workerManager.getContainer().getPublicIpAddress(), port);
+		HttpEntity<?> request = new HttpEntity<>(launchContainerRequest, headers);
+		ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
+		Container[] responseBody = response.getBody();
+		List<Container> containers = new ArrayList<>();
+		if (responseBody != null) {
+			containers.addAll(Arrays.asList(responseBody));
+		}
+		return CompletableFuture.completedFuture(containers);
+	}
+
+	public List<Container> launchContainers(LaunchContainerRequest launchContainerRequest) {
+		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+		List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
+		List<Container> containers = new ArrayList<>();
+		final int retries = 5;
+		int tries = 0;
+		do {
+			try {
+				if (hostAddress != null) {
+					RegionEnum region = hostAddress.getRegion();
+					WorkerManager workerManager = getRegionWorkerManager(region);
+					containers.addAll(launchContainer(launchContainerRequest, workerManager).get());
+				}
+				else if (coordinates != null) {
+					List<CompletableFuture<List<Container>>> futureContainers = coordinates.stream().map(c -> {
+						RegionEnum region = RegionEnum.getClosestRegion(c);
+						WorkerManager workerManager = getRegionWorkerManager(region);
+						return launchContainer(launchContainerRequest, workerManager);
+					}).collect(Collectors.toList());
+
+					CompletableFuture.allOf(futureContainers.toArray(new CompletableFuture[0])).join();
+
+					for (CompletableFuture<List<Container>> futureWorkerContainers : futureContainers) {
+						try {
+							containers.addAll(futureWorkerContainers.get());
+						}
+						catch (InterruptedException | ExecutionException e) {
+							throw new ManagerException("Failed to launch containers on all regions");
+						}
+					}
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Failed to launch containers: {}... retrying ({}/{})", e.getMessage(), tries + 1, retries);
+				Timing.sleep(tries + 1, TimeUnit.SECONDS);
+			}
+		} while (containers.isEmpty() && ++tries < retries);
+
+		if (containers.isEmpty()) {
+			throw new ManagerException("Failed to launch containers");
+		}
+
+		return containers;
+	}
+
 	@Async
 	public CompletableFuture<List<Node>> getNodes(Container workerManager, boolean sync) {
 		List<Node> nodes = new ArrayList<>();
 		String hostname = workerManager.getHostAddress().getPublicIpAddress();
-		String url = String.format("%s:%s/api/nodes/%s", hostname, port, sync ? "sync" : "");
+		String url = String.format("http://%s:%s/api/nodes/%s", hostname, port, sync ? "sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
 		Node[] responseBody = response.getBody();
@@ -306,15 +376,14 @@ public class WorkerManagersService {
 	private String getRegistrationUrl() {
 		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
 		String port = environment.getProperty("local.server.port");
-		return String.format("http://%s:%s/api/worker-managers/registration", hostname, port);
+		return String.format("http://%s:%s/api/registration", hostname, port);
 	}
 
 	private String getSyncUrl() {
 		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
 		String port = environment.getProperty("local.server.port");
-		return String.format("http://%s:%s/api/worker-managers/sync", hostname, port);
+		return String.format("http://%s:%s/api/sync", hostname, port);
 	}
-
 
 
 }

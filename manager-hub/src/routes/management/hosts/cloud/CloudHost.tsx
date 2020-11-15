@@ -58,6 +58,7 @@ import {IMarker} from "../../../../components/map/Marker";
 import CloudHostSshCommand from "./CloudHostSshCommand";
 import CloudHostSshFileTransfer from "./CloudHostSshFileTransfer";
 import { isEqual } from "lodash";
+import {IRegion} from "../../regions/Region";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -112,6 +113,7 @@ export const awsInstanceStates = {
 export interface IAwsRegion {
     zone: string,
     name: string,
+    region: IRegion,
     coordinates: ICoordinates,
     available?: boolean,
 }

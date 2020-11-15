@@ -77,7 +77,7 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
                       isNew={true}
                       post={{
                           textButton: 'Upload',
-                          url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/sftp`,
+                          url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/${this.props.edgeHost?.privateIpAddress}/sftp`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure
                       }}>
@@ -91,7 +91,7 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
                                values: this.props.scripts,
                            }}/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>
+                {this.props.edgeHost && <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
             </>
         );
     }

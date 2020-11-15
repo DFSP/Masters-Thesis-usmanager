@@ -156,7 +156,8 @@ public class DecisionsService {
 	public HostDecision addHostDecision(HostAddress hostAddress, String decisionName, long ruleId) {
 		HostRule rule = hostRulesService.getRule(ruleId);
 		pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision = getHostPossibleDecision(decisionName);
-		HostDecision hostDecision = HostDecision.builder().hostAddress(hostAddress).rule(rule).decision(decision).build();
+		HostDecision hostDecision = HostDecision.builder().publicIpAddress(hostAddress.getPublicIpAddress())
+			.privateIpAddress(hostAddress.getPrivateIpAddress()).rule(rule).decision(decision).build();
 		return hostDecisions.save(hostDecision);
 	}
 
@@ -198,7 +199,8 @@ public class DecisionsService {
 	}
 
 	public List<HostDecision> getHostDecisions(HostAddress hostAddress) {
-		return hostDecisions.findByHostAddress(hostAddress);
+		return hostDecisions.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress());
 	}
 
 }

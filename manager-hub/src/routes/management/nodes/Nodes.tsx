@@ -66,7 +66,7 @@ class Nodes extends BaseComponent<Props, {}> {
                     <CardList<INode>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={"O swarm está vazio. Nenhum nó para mostrar"}
+                        emptyMessage={"Não existem nós conhecidos"}
                         list={this.props.nodes}
                         card={this.node}
                         predicate={this.predicate}/>

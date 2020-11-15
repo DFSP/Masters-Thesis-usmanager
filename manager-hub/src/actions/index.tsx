@@ -724,9 +724,9 @@ export const EDGE_HOST_FAILURE = 'EDGE_HOST_FAILURE';
 export const loadEdgeHosts = (hostname?: string) => (dispatch: any) => {
     return dispatch(fetchEdgeHosts(hostname));
 };
-const fetchEdgeHosts = (hostname?: string) => ({
+const fetchEdgeHosts = (publicIpAddress?: string, privateIpAddress?: string) => ({
     [CALL_API]:
-        !hostname
+        !publicIpAddress || !privateIpAddress
             ? {
                 types: [EDGE_HOSTS_REQUEST, EDGE_HOSTS_SUCCESS, EDGE_HOSTS_FAILURE],
                 endpoint: `hosts/edge`,
@@ -735,7 +735,7 @@ const fetchEdgeHosts = (hostname?: string) => ({
             }
             : {
                 types: [EDGE_HOST_REQUEST, EDGE_HOST_SUCCESS, EDGE_HOST_FAILURE],
-                endpoint: `hosts/edge/${hostname}`,
+                endpoint: `hosts/edge/${publicIpAddress}/${privateIpAddress}`,
                 schema: Schemas.EDGE_HOST,
                 entity: 'edgeHosts'
             }
@@ -770,15 +770,15 @@ export function deleteEdgeHost(edgeHost: IEdgeHost): EntitiesAction {
 export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
 export const EDGE_HOST_RULES_SUCCESS = 'EDGE_HOST_RULES_SUCCESS';
 export const EDGE_HOST_RULES_FAILURE = 'EDGE_HOST_RULES_FAILURE';
-export const loadEdgeHostRules = (hostname: string) => (dispatch: any) => {
-    return dispatch(fetchEdgeHostRules(hostname));
+export const loadEdgeHostRules = (publicIpAddress: string, privateIpAddress: string) => (dispatch: any) => {
+    return dispatch(fetchEdgeHostRules(publicIpAddress, privateIpAddress));
 };
-const fetchEdgeHostRules = (hostname: string) => ({
+const fetchEdgeHostRules = (publicIpAddress: string, privateIpAddress: string) => ({
     [CALL_API]: {
         types: [EDGE_HOST_RULES_REQUEST, EDGE_HOST_RULES_SUCCESS, EDGE_HOST_RULES_FAILURE],
-        endpoint: `hosts/edge/${hostname}/rules`,
+        endpoint: `hosts/edge/${publicIpAddress}/${privateIpAddress}/rules`,
         schema: Schemas.EDGE_HOST_RULE_ARRAY,
-        entity: hostname
+        entity: publicIpAddress + "-" + privateIpAddress
     }
 });
 export const ADD_EDGE_HOST_RULES = 'ADD_EDGE_HOST_RULES';
@@ -804,15 +804,15 @@ export function removeEdgeHostRules(hostname: string, rules: string[]): Entities
 export const EDGE_HOST_SIMULATED_METRICS_REQUEST = 'EDGE_HOST_SIMULATED_METRICS_REQUEST';
 export const EDGE_HOST_SIMULATED_METRICS_SUCCESS = 'EDGE_HOST_SIMULATED_METRICS_SUCCESS';
 export const EDGE_HOST_SIMULATED_METRICS_FAILURE = 'EDGE_HOST_SIMULATED_METRICS_FAILURE';
-export const loadEdgeHostSimulatedMetrics = (hostname: string) => (dispatch: any) => {
-    return dispatch(fetchEdgeHostSimulatedMetrics(hostname));
+export const loadEdgeHostSimulatedMetrics = (publicIpAddress: string, privateIpAddress: string) => (dispatch: any) => {
+    return dispatch(fetchEdgeHostSimulatedMetrics(publicIpAddress, privateIpAddress));
 };
-const fetchEdgeHostSimulatedMetrics = (hostname: string) => ({
+const fetchEdgeHostSimulatedMetrics = (publicIpAddress: string, privateIpAddress: string) => ({
     [CALL_API]: {
         types: [EDGE_HOST_SIMULATED_METRICS_REQUEST, EDGE_HOST_SIMULATED_METRICS_SUCCESS, EDGE_HOST_SIMULATED_METRICS_FAILURE],
-        endpoint: `hosts/edge/${hostname}/simulated-metrics`,
+        endpoint: `hosts/edge/${publicIpAddress}/${privateIpAddress}/simulated-metrics`,
         schema: Schemas.EDGE_HOST_SIMULATED_METRIC_ARRAY,
-        entity: hostname
+        entity: publicIpAddress + "-" + privateIpAddress
     }
 });
 export const ADD_EDGE_HOST_SIMULATED_METRICS = 'ADD_EDGE_HOST_SIMULATED_METRICS';

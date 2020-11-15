@@ -25,14 +25,17 @@
 package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -40,6 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -52,6 +56,24 @@ public class ContainersController {
 	public ContainersController(ContainersService containersService, SyncService syncService) {
 		this.containersService = containersService;
 		this.syncService = syncService;
+	}
+
+	@GetMapping
+	public List<Container> getContainers(@RequestParam(required = false) String serviceName) {
+		List<Container> containers;
+		if (serviceName != null) {
+			containers = containersService.getContainersWithLabels(
+				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
+		}
+		else {
+			containers = containersService.getContainers();
+		}
+		return containers;
+	}
+
+	@GetMapping("/{id}")
+	public Container getContainer(@PathVariable String id) {
+		return containersService.getContainer(id);
 	}
 
 	@PostMapping

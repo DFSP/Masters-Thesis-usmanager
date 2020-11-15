@@ -72,11 +72,10 @@ public class EdgeHost {
 	private String username;
 
 	@NotNull
-	private String privateIpAddress;
-
-	@NaturalId
-	@NotNull
 	private String publicIpAddress;
+
+	@NotNull
+	private String privateIpAddress;
 
 	@NaturalId
 	private String publicDnsName;

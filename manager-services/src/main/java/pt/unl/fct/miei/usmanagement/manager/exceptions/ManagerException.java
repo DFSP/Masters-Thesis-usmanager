@@ -27,7 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.exceptions;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ManagerException extends RuntimeException {
+public final class ManagerException extends RuntimeException {
 
 	public ManagerException(String s, Object... args) {
 		super(args.length > 0 ? String.format(s, args) : s);

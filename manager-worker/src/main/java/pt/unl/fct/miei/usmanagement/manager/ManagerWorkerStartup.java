@@ -66,6 +66,12 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		if (environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS) == null
+			|| environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID) == null
+			|| environment.getProperty(ContainerConstants.Environment.WorkerManager.REGISTRATION_URL) == null) {
+			System.out.println("usage: host_address, external_id and registration_url must be set");
+			System.exit(1);
+		}
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);

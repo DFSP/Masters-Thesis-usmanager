@@ -24,19 +24,18 @@ Gere um conjunto de nós e containers na edge.
 <sup>Alterar os valores dos argumentos, conforme necessário:</sup>
 
 #### Local
+
 ```shell script
-mvn spring-boot:run -Dspring-boot.run.arguments="--id=001 --master=127.0.0.1"
-```
-ou
-```shell script
-export ID=001 MASTER=127.0.0.1
+export EXTERNAL_ID=001 
+export HOST_ADDRESS='{"username":"...","publicDnsName":"...","publicIpAddress":"...","privateIpAddress":"...","coordinates":{"label":"Portugal","latitude":...,"longitude":...},"region":"EUROPE","place":"..."}'
+export REGISTRATION_URL=http://...:8080/api/sync
 mvn spring-boot:run
 ```
 
 #### Docker
 ```shell script
 docker build -f src/main/docker/Dockerfile . -t manager-worker
-docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 manager-worker
+docker run --rm -p 8081:8081 -e EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... manager-worker
 ```
 
 ##### Hub

@@ -53,32 +53,35 @@ public interface EdgeHosts extends JpaRepository<EdgeHost, Long> {
 
 	@Query("select r "
 		+ "from EdgeHost h join h.hostRules r "
-		+ "where r.generic = false and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
-	List<HostRule> getRules(@Param("hostname") String hostname);
+		+ "where r.generic = false and h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
+	List<HostRule> getRules(@Param("publicIpAddress") String publicIpAddress, @Param("privateIpAddress") String privateIpAddress);
 
 
 	@Query("select r "
 		+ "from EdgeHost h join h.hostRules r "
 		+ "where r.generic = false "
-		+ "and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
+		+ "and h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress "
 		+ "and r.name = :ruleName")
-	Optional<HostRule> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
+	Optional<HostRule> getRule(@Param("publicIpAddress") String publicIpAddress, @Param("privateIpAddress") String privateIpAddress,
+							   @Param("ruleName") String ruleName);
 
 	@Query("select m "
 		+ "from EdgeHost h join h.simulatedHostMetrics m "
-		+ "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
-	List<HostSimulatedMetric> getSimulatedMetrics(@Param("hostname") String hostname);
+		+ "where h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
+	List<HostSimulatedMetric> getSimulatedMetrics(@Param("publicIpAddress") String publicIpAddress,
+												  @Param("privateIpAddress") String privateIpAddress);
 
 	@Query("select m "
 		+ "from EdgeHost h join h.simulatedHostMetrics m "
-		+ "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
+		+ "where h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress "
 		+ "and m.name = :simulatedMetricName")
-	Optional<HostSimulatedMetric> getSimulatedMetric(@Param("hostname") String hostname,
+	Optional<HostSimulatedMetric> getSimulatedMetric(@Param("publicIpAddress") String publicIpAddress,
+													 @Param("privateIpAddress") String privateIpAddress,
 													 @Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select case when count(h) > 0 then true else false end "
 		+ "from EdgeHost h "
-		+ "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
-	boolean hasEdgeHost(@Param("hostname") String hostname);
+		+ "where h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
+	boolean hasEdgeHost(@Param("publicIpAddress") String publicIpAddress, @Param("privateIpAddress") String privateIpAddress);
 
 }

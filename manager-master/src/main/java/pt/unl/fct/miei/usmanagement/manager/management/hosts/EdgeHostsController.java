@@ -41,9 +41,9 @@ public class EdgeHostsController {
 		return edgeHostsService.getEdgeHosts();
 	}
 
-	@GetMapping("/{hostname}")
-	public EdgeHost getEdgeHost(@PathVariable String hostname) {
-		return edgeHostsService.getEdgeHostByHostname(hostname);
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}")
+	public EdgeHost getEdgeHost(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return edgeHostsService.getEdgeHostByAddress(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 	@PostMapping
@@ -53,72 +53,72 @@ public class EdgeHostsController {
 			addEdgeHost.getPrivateIpAddress(), addEdgeHost.getPublicDnsName(), addEdgeHost.getCoordinates());
 	}
 
-	@PutMapping("/{hostname}")
-	public EdgeHost updateEdgeHost(@PathVariable String hostname, @RequestBody EdgeHost edgeHost) {
+	@PutMapping("/{publicIpAddress}/{privateIpAddress}")
+	public EdgeHost updateEdgeHost(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody EdgeHost edgeHost) {
 		Validation.validatePutRequest(edgeHost.getId());
-		return edgeHostsService.updateEdgeHost(hostname, edgeHost);
+		return edgeHostsService.updateEdgeHost(new HostAddress(publicIpAddress, privateIpAddress), edgeHost);
 	}
 
-	@DeleteMapping("/{hostname}")
-	public void deleteEdgeHost(@PathVariable String hostname) {
-		edgeHostsService.deleteEdgeHost(hostname);
+	@DeleteMapping("/{publicIpAddress}/{privateIpAddress}")
+	public void deleteEdgeHost(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		edgeHostsService.deleteEdgeHost(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
-	@GetMapping("/{hostname}/rules")
-	public List<HostRule> getEdgeHostRules(@PathVariable String hostname) {
-		return edgeHostsService.getRules(hostname);
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/rules")
+	public List<HostRule> getEdgeHostRules(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return edgeHostsService.getRules(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
-	@GetMapping("/{hostname}/rules/{ruleName}")
-	public HostRule getEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
-		return edgeHostsService.getRule(hostname, ruleName);
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/rules/{ruleName}")
+	public HostRule getEdgeHostRule(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @PathVariable String ruleName) {
+		return edgeHostsService.getRule(new HostAddress(publicIpAddress, privateIpAddress), ruleName);
 	}
 
-	@PostMapping("/{hostname}/rules")
-	public void addEdgeHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
-		edgeHostsService.addRules(hostname, Arrays.asList(rules));
+	@PostMapping("/{publicIpAddress}/{privateIpAddress}/rules")
+	public void addEdgeHostRules(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody String[] rules) {
+		edgeHostsService.addRules(new HostAddress(publicIpAddress, privateIpAddress), Arrays.asList(rules));
 	}
 
-	@DeleteMapping("/{hostname}/rules")
-	public void removeEdgeHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
-		edgeHostsService.removeRules(hostname, Arrays.asList(rules));
+	@DeleteMapping("/{publicIpAddress}/{privateIpAddress}/rules")
+	public void removeEdgeHostRules(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody String[] rules) {
+		edgeHostsService.removeRules(new HostAddress(publicIpAddress, privateIpAddress), Arrays.asList(rules));
 	}
 
-	@DeleteMapping("/{hostname}/rules/{ruleName}")
-	public void removeEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
-		edgeHostsService.removeRule(hostname, ruleName);
+	@DeleteMapping("/{publicIpAddress}/{privateIpAddress}/rules/{ruleName}")
+	public void removeEdgeHostRule(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @PathVariable String ruleName) {
+		edgeHostsService.removeRule(new HostAddress(publicIpAddress, privateIpAddress), ruleName);
 	}
 
-	@GetMapping("/{hostname}/simulated-metrics")
-	public List<HostSimulatedMetric> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
-		return edgeHostsService.getSimulatedMetrics(hostname);
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/simulated-metrics")
+	public List<HostSimulatedMetric> getEdgeHostSimulatedMetrics(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return edgeHostsService.getSimulatedMetrics(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
-	@GetMapping("/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public HostSimulatedMetric getEdgeHostSimulatedMetric(@PathVariable String hostname,
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/simulated-metrics/{simulatedMetricName}")
+	public HostSimulatedMetric getEdgeHostSimulatedMetric(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress,
 														  @PathVariable String simulatedMetricName) {
-		return edgeHostsService.getSimulatedMetric(hostname, simulatedMetricName);
+		return edgeHostsService.getSimulatedMetric(new HostAddress(publicIpAddress, privateIpAddress), simulatedMetricName);
 	}
 
-	@PostMapping("/{hostname}/simulated-metrics")
-	public void addEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
-		edgeHostsService.addSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+	@PostMapping("/{publicIpAddress}/{privateIpAddress}/simulated-metrics")
+	public void addEdgeHostSimulatedMetrics(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody String[] simulatedMetrics) {
+		edgeHostsService.addSimulatedMetrics(new HostAddress(publicIpAddress, privateIpAddress), Arrays.asList(simulatedMetrics));
 	}
 
-	@DeleteMapping("/{hostname}/simulated-metrics")
-	public void removeEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
-		edgeHostsService.removeSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+	@DeleteMapping("/{publicIpAddress}/{privateIpAddress}/simulated-metrics")
+	public void removeEdgeHostSimulatedMetrics(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody String[] simulatedMetrics) {
+		edgeHostsService.removeSimulatedMetrics(new HostAddress(publicIpAddress, privateIpAddress), Arrays.asList(simulatedMetrics));
 	}
 
-	@DeleteMapping("/{hostname}/simulated-metrics/{simulatedMetricName}")
-	public void removeEdgeHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
-		edgeHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
+	@DeleteMapping("/{publicIpAddress}/{privateIpAddress}/simulated-metrics/{simulatedMetricName}")
+	public void removeEdgeHostSimulatedMetric(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @PathVariable String simulatedMetricName) {
+		edgeHostsService.removeSimulatedMetric(new HostAddress(publicIpAddress, privateIpAddress), simulatedMetricName);
 	}
 
-	@PostMapping("/{hostname}/ssh")
-	public SshCommandResult execute(@PathVariable String hostname, @RequestBody ExecuteSshRequest request) {
+	@PostMapping("/{publicIpAddress}/{privateIpAddress}/ssh")
+	public SshCommandResult execute(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody ExecuteSshRequest request) {
 		String command = request.getCommand();
-		HostAddress hostAddress = new HostAddress(hostname);
+		HostAddress hostAddress = new HostAddress(publicIpAddress, privateIpAddress);
 		if (request.isBackground()) {
 			sshService.executeBackgroundProcess(command, hostAddress, null);
 			return new SshCommandResult(hostAddress, command, -1, null, null);
@@ -128,9 +128,9 @@ public class EdgeHostsController {
 		}
 	}
 
-	@PostMapping("/{hostname}/sftp")
-	public void upload(@PathVariable String hostname, @RequestBody ExecuteSftpRequest request) {
-		sshService.uploadFile(new HostAddress(hostname), request.getFilename());
+	@PostMapping("/{publicIpAddress}/{privateIpAddress}/sftp")
+	public void upload(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress, @RequestBody ExecuteSftpRequest request) {
+		sshService.uploadFile(new HostAddress(publicIpAddress, privateIpAddress), request.getFilename());
 	}
 
 }

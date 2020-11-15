@@ -152,7 +152,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleService(ruleService);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -166,7 +166,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleService);
         const previousRuleService = this.getRuleService();
         if (previousRuleService?.id) {
@@ -179,7 +179,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Não foi possível guardar as alterações feitas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as alterações feitas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
         super.toast(`<span class="green-text">A regra <b class="white-text">${ruleService.name}</b> foi apagada com sucesso</span>`);
@@ -189,7 +189,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleService: IRuleService): void =>
-        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -229,7 +229,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associadas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleService = (service: string): void =>
         this.setState({
@@ -259,7 +259,7 @@ class RuleService extends BaseComponent<Props, State> {
     };
 
     private onSaveServicesFailure = (ruleService: IRuleService, reason: string): void =>
-        super.toast(`Não foi possível guardar os serviços associados à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/regras/serviços/${ruleService.name}><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os serviços associados à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleService = (ruleService: IRuleService) => {
         ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];

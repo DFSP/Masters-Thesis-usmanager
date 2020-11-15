@@ -65,7 +65,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}</b> foi removido com sucesso</span>`);
+        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void => {
-        super.toast(`Não foi possível remover o edge host <a href='/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}'><b>${edgeHost.publicDnsName || edgeHost.publicIpAddress}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível remover o edge host <a href='/hosts/edge/${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}'><b>${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -82,35 +82,36 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     private contextMenu = (): JSX.Element[] => {
         const {edgeHost} = this.props;
         const publicIpAddress = edgeHost.publicIpAddress;
+        const privateIpAddress = edgeHost.privateIpAddress;
         return [
             <LinkedContextMenuItem
                 option={'Modificar a lista de regras'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'rules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista de regras genéricas'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'genericRules'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista das métricas simuladas'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'simulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista das métricas simuladas genéricas'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'genericSimulatedMetrics'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Executar comandos'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'ssh'}
                 state={edgeHost}/>,
             <LinkedContextMenuItem
                 option={'Carregar ficheiros'}
-                pathname={`/hosts/edge/${publicIpAddress}`}
+                pathname={`/hosts/edge/${publicIpAddress}-${privateIpAddress}`}
                 selected={'sftp'}
                 state={edgeHost}/>
         ];
@@ -121,10 +122,10 @@ class EdgeHostCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardEdgeHost = Card<IEdgeHost>();
         return <CardEdgeHost id={`edgeHost-${edgeHost.id}`}
-                             title={edgeHost.publicIpAddress}
+                             title={edgeHost.publicIpAddress + '/' + edgeHost.privateIpAddress}
                              link={{
                                  to: {
-                                     pathname: `/hosts/edge/${edgeHost.publicIpAddress}`,
+                                     pathname: `/hosts/edge/${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}`,
                                      state: edgeHost
                                  }
                              }}
@@ -133,7 +134,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
                              hoverable
                              delete={{
                                  confirmMessage: `apagar host ${edgeHost.publicIpAddress}`,
-                                 url: `hosts/edge/${edgeHost.publicIpAddress}`,
+                                 url: `hosts/edge/${edgeHost.publicIpAddress}/${edgeHost.privateIpAddress}`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure,
                              }}

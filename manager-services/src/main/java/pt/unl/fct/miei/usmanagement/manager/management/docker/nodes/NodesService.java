@@ -31,6 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -38,7 +39,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersServ
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -62,17 +63,18 @@ public class NodesService {
 	private final DockerSwarmService dockerSwarmService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
-	private final DockerApiProxyService dockerApiProxyService;
 
 	private final Nodes nodes;
 
+	private final int threads;
+
 	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
-						@Lazy ContainersService containersService, DockerApiProxyService dockerApiProxyService, Nodes nodes) {
+						@Lazy ContainersService containersService, Nodes nodes, ParallelismProperties parallelismProperties) {
 		this.dockerSwarmService = dockerSwarmService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
-		this.dockerApiProxyService = dockerApiProxyService;
 		this.nodes = nodes;
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
@@ -118,8 +120,8 @@ public class NodesService {
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNode(Node swarmNode) {
 		checkNodeDoesntExist(swarmNode);
-		log.info("Saving node {}", ToStringBuilder.reflectionToString(swarmNode));
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
+		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
 		return nodes.save(node);
 	}
 
@@ -271,12 +273,14 @@ public class NodesService {
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> leaveHost(HostAddress hostAddress) {
 		containersService.migrateHostContainers(hostAddress);
-		containersService.getSystemContainers(hostAddress).parallelStream()
-			.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
-			.forEach(c -> containersService.stopContainer(c.getContainerId()));
+		new ForkJoinPool(threads).execute(() ->
+			containersService.getSystemContainers(hostAddress).parallelStream()
+				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.forEach(c -> containersService.stopContainer(c.getContainerId()))
+		);
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		dockerSwarmService.leaveSwarm(hostAddress);
-		dockerApiProxyService.stopDockerApiProxy(hostAddress);
+		containersService.stopDockerApiProxy(hostAddress);
 		hostsService.stopBackgroundProcesses(hostAddress);
 		nodes.forEach(node -> node.setState("down"));
 		this.nodes.saveAll(nodes);

@@ -166,8 +166,8 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
 
     private getSelectableEdgeHosts = () => {
         const {edgeHosts, simulatedMetricEdgeHosts, unsavedEdgeHosts} = this.props;
-        return Object.keys(edgeHosts).filter(edgeHost => !simulatedMetricEdgeHosts.includes(edgeHost)
-            && !unsavedEdgeHosts.includes(edgeHost));
+        return Object.values(edgeHosts).filter(edgeHost => !simulatedMetricEdgeHosts.includes(edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress)
+            && !unsavedEdgeHosts.includes(edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress)).map(edgeHost => edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress);
     };
 
 }

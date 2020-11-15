@@ -32,7 +32,7 @@ import {INode} from "./Node";
 import CardItem from "../../../components/list/CardItem";
 import {deleteNode, updateNode} from "../../../actions";
 import ActionContextMenuItem from "../../../components/contextmenu/ActionContextMenuItem";
-import {IReply, putData} from "../../../utils/api";
+import {IReply, postData, putData} from "../../../utils/api";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 
@@ -96,12 +96,20 @@ class NodeCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const node = this.getNode();
         const menus = [];
-        if (!((node as INode).labels?.['masterManager'] === 'true') && (node as INode).state !== 'down') {
-            menus.push(<ActionContextMenuItem
-                className='blue-text'
-                option='Sair do swarm'
-                state={node}
-                onClick={this.leaveSwarm}/>);
+        if (!((node as INode).labels?.['masterManager'] === 'true')) {
+            if ((node as INode).state !== 'down') {
+                menus.push(<ActionContextMenuItem
+                    className='blue-text'
+                    option='Sair do swarm'
+                    state={node}
+                    onClick={this.leaveSwarm}/>);
+            } else {
+                menus.push(<ActionContextMenuItem
+                    className='green-text'
+                    option='Re-entrar no swarm'
+                    state={node}
+                    onClick={this.rejoinSwarm}/>);
+            }
         }
         return menus;
     }
@@ -140,6 +148,33 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onLeaveFailure = (reason: string, node: Partial<INode>) => {
         super.toast(`O nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
+        if (this.mounted) {
+            this.setState({loading: false});
+        }
+    };
+
+    private rejoinSwarm = () => {
+        const node = this.getNode();
+        const url = `nodes/${node?.nodeId}/join`;
+        this.setState({loading: true});
+        postData(url, {},
+            (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
+            (reason: string) => this.onRejoinSwarmFailure(reason, node));
+    };
+
+    private onRejoinSwarmSuccess = (node: INode) => {
+        super.toast(`<span class='green-text'>O host </span> <b>${node?.publicIpAddress}</b> <span class='green-text'>re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`}`);
+        const previousNode = this.getNode();
+        if (previousNode?.id) {
+            this.props.updateNode(previousNode as INode, node)
+        }
+        if (this.mounted) {
+            this.updateNode(node);
+        }
+    };
+
+    private onRejoinSwarmFailure = (reason: string, node?: INode) => {
+        super.toast(`O nó ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`} não conseguiu re-entrar no swarm`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

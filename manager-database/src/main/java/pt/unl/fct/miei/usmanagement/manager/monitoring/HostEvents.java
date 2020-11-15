@@ -32,6 +32,6 @@ import java.util.List;
 
 public interface HostEvents extends JpaRepository<HostEvent, Long> {
 
-	List<HostEvent> findByHostAddress(@Param("hostAddress") HostAddress hostAddress);
+	List<HostEvent> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
 }

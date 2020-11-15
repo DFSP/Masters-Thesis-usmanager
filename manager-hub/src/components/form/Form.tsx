@@ -307,7 +307,6 @@ class Form extends BaseComponent<Props, State> {
             id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
             children, confirmationDialog
         } = this.props;
-        console.log(this.props.values)
         return (
             <>
                 <ReactTooltip id='tooltip' effect='solid' type='light'/>

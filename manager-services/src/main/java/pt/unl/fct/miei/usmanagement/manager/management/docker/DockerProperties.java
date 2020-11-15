@@ -88,7 +88,6 @@ public class DockerProperties {
 	@Setter
 	public static final class Swarm {
 
-		private String manager;
 		private int initialMaxWorkers;
 
 	}

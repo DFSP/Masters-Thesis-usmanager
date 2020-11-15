@@ -31,10 +31,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import javax.persistence.Basic;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -56,10 +60,11 @@ public class HostMonitoring {
 	@GeneratedValue
 	private Long id;
 
-	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
 	@NotNull
-	@Lob
-	private HostAddress host;
+	public String publicIpAddress;
+
+	@NotNull
+	public String privateIpAddress;
 
 	@NotNull
 	private String field;

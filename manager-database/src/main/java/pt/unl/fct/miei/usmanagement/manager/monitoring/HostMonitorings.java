@@ -27,26 +27,28 @@ package pt.unl.fct.miei.usmanagement.manager.monitoring;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.List;
 
 public interface HostMonitorings extends JpaRepository<HostMonitoring, Long> {
 
-	List<HostMonitoring> getByHost(@Param("host") HostAddress hostAddress);
+	List<HostMonitoring> getByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
-	HostMonitoring getByHostAndFieldIgnoreCase(@Param("host") HostAddress hostAddress, @Param("field") String field);
-
-	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
-		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
-		+ "from HostMonitoring m "
-		+ "where m.host = :host")
-	List<HostFieldAverage> getHostMonitoringFieldsAverage(@Param("host") HostAddress hostAddress);
+	HostMonitoring getByPublicIpAddressAndPrivateIpAddressAndFieldIgnoreCase(String publicIpAddress, String privateIpAddress,
+																			 String field);
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
-		+ "HostFieldAverage(m.host, m.field, m.sumValue / m.count, m.count) "
+		+ "HostFieldAverage(m.publicIpAddress, m.privateIpAddress, m.field, m.sumValue / m.count, m.count) "
 		+ "from HostMonitoring m "
-		+ "where m.host = :host and m.field = :field")
-	HostFieldAverage getHostMonitoringFieldAverage(@Param("host") HostAddress hostAddress, @Param("field") String field);
+		+ "where m.publicIpAddress = :publicIpAddress and m.privateIpAddress = :privateIpAddress")
+	List<HostFieldAverage> getHostMonitoringFieldsAverage(@Param("publicIpAddress") String publicIpAddress,
+														  @Param("privateIpAddress") String privateIpAddress);
 
+	@Query("select new pt.unl.fct.miei.usmanagement.manager.monitoring."
+		+ "HostFieldAverage(m.publicIpAddress, m.privateIpAddress, m.field, m.sumValue / m.count, m.count) "
+		+ "from HostMonitoring m "
+		+ "where m.publicIpAddress = :publicIpAddress and m.privateIpAddress = :privateIpAddress and m.field = :field")
+	HostFieldAverage getHostMonitoringFieldAverage(@Param("publicIpAddress") String publicIpAddress,
+												   @Param("privateIpAddress") String privateIpAddress,
+												   @Param("field") String field);
 }

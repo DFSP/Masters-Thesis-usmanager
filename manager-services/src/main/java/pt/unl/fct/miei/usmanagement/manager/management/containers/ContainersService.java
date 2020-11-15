@@ -29,14 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.containers.Containers;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.containers.Containers;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -76,14 +79,18 @@ public class ContainersService {
 	private final WorkerManagersService workerManagersService;
 	private final ServicesService servicesService;
 	private final HostsService hostsService;
+	private final ConfigurationsService configurationsService;
 
 	private final Containers containers;
+
+	private final int threads;
 
 	public ContainersService(DockerContainersService dockerContainersService,
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
-							 ServicesService servicesService, HostsService hostsService, Containers containers) {
+							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService, Containers containers,
+							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
@@ -91,7 +98,9 @@ public class ContainersService {
 		this.workerManagersService = workerManagersService;
 		this.servicesService = servicesService;
 		this.hostsService = hostsService;
+		this.configurationsService = configurationsService;
 		this.containers = containers;
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public Container addContainerFromDockerContainer(DockerContainer dockerContainer) {
@@ -173,7 +182,6 @@ public class ContainersService {
 			})
 			.collect(Collectors.toList());
 	}
-
 
 	public Container launchContainer(Coordinates coordinates, String serviceName, int externalPort, int internalPort) {
 		Optional<DockerContainer> container = dockerContainersService.launchContainer(coordinates, serviceName, externalPort, internalPort);
@@ -292,7 +300,8 @@ public class ContainersService {
 			Container container = getContainer(id);
 			dockerContainersService.stopContainer(container);
 			deleteContainer(id);
-		} catch (ManagerException e) {
+		}
+		catch (ManagerException e) {
 			log.error("Failed to stop container {}: {}", id, e.getMessage());
 		}
 	}
@@ -302,7 +311,8 @@ public class ContainersService {
 		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
 			try {
 				workerManagersService.deleteWorkerManagerByContainer(container);
-			} catch (EntityNotFoundException e) {
+			}
+			catch (EntityNotFoundException e) {
 				log.error("Failed to delete worker-manager associated with container {}", id);
 			}
 		}
@@ -313,13 +323,14 @@ public class ContainersService {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
-		);
+		).stream().filter(container -> !configurationsService.isConfiguring(container.getContainerId())).collect(Collectors.toList());
 	}
 
 	public List<Container> getAppContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
-			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())));
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())))
+			.stream().filter(container -> !configurationsService.isConfiguring(container.getContainerId())).collect(Collectors.toList());
 	}
 
 	public List<Container> getDatabaseContainers() {
@@ -381,8 +392,7 @@ public class ContainersService {
 	}
 
 	public void removeRule(String containerId, String ruleName) {
-		checkContainerExists(containerId);
-		containerRulesService.removeContainer(ruleName, containerId);
+		removeRules(containerId, List.of(ruleName));
 	}
 
 	public void removeRules(String containerId, List<String> ruleNames) {
@@ -403,8 +413,7 @@ public class ContainersService {
 	}
 
 	public void addSimulatedMetric(String containerId, String simulatedMetricName) {
-		checkContainerExists(containerId);
-		containerSimulatedMetricsService.addContainer(simulatedMetricName, containerId);
+		addSimulatedMetrics(containerId, List.of(simulatedMetricName));
 	}
 
 	public void addSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
@@ -414,8 +423,7 @@ public class ContainersService {
 	}
 
 	public void removeSimulatedMetric(String containerId, String simulatedMetricName) {
-		checkContainerExists(containerId);
-		containerSimulatedMetricsService.removeContainer(simulatedMetricName, containerId);
+		removeSimulatedMetrics(containerId, List.of(simulatedMetricName));
 	}
 
 	public void removeSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
@@ -444,9 +452,19 @@ public class ContainersService {
 	public void stopDockerApiProxies() {
 		List<Container> dockerApiProxies = getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY)));
-		dockerApiProxies.parallelStream().forEach(dockerApiProxy -> {
-			dockerApiProxyService.stopDockerApiProxy(dockerApiProxy.getHostAddress());
-			containers.delete(dockerApiProxy);
+		new ForkJoinPool(threads).execute(() ->
+			dockerApiProxies.parallelStream().forEach(dockerApiProxy -> {
+				dockerApiProxyService.stopDockerApiProxy(dockerApiProxy.getHostAddress());
+				containers.delete(dockerApiProxy);
+			}));
+	}
+
+	public void stopDockerApiProxy(HostAddress hostAddress) {
+		getHostContainersWithLabels(hostAddress, Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY))
+		).stream().findFirst().ifPresent(container -> {
+			dockerApiProxyService.stopDockerApiProxy(hostAddress);
+			containers.delete(container);
 		});
 	}
 
@@ -490,5 +508,9 @@ public class ContainersService {
 			containers.add(c);
 		});
 		return containers;
+	}
+
+	public void reset() {
+		containers.deleteAll();
 	}
 }

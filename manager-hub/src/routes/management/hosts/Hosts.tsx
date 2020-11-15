@@ -39,6 +39,7 @@ export const getEdgeHostAddress = (host: IEdgeHost) => ({
     privateIpAddress: host.privateIpAddress,
     publicDnsName: host.publicDnsName,
     coordinates: host.coordinates,
+    region: host.region,
 })
 
 export const getCloudHostAddress = (host: ICloudHost) => ({
@@ -47,6 +48,7 @@ export const getCloudHostAddress = (host: ICloudHost) => ({
     privateIpAddress: host.privateIpAddress,
     publicDnsName: host.publicDnsName,
     coordinates: host.awsRegion?.coordinates,
+    region: host.awsRegion.region
 })
 
 export interface IHostAddress {

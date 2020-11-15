@@ -125,6 +125,8 @@ location-request:
 rules:
   service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
+parallelism:
+  threads: 8
 #trace: true
 #  level:
 #    org:

@@ -55,4 +55,5 @@ public interface WorkerManagers extends JpaRepository<WorkerManager, String> {
 	List<EdgeHost> getEdgeHosts(@Param("id") String id);
 
 	List<WorkerManager> getByContainer_Region(RegionEnum region);
+
 }

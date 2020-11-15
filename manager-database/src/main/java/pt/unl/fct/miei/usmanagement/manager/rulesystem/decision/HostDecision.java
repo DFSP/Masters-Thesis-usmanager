@@ -46,6 +46,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Objects;
@@ -72,8 +73,11 @@ public class HostDecision {
 	@JoinColumn(name = "rule_id")
 	private HostRule rule;
 
-	@Lob
-	private HostAddress hostAddress;
+	@NotNull
+	private String publicIpAddress;
+
+	@NotNull
+	private String privateIpAddress;
 
 	@Basic
 	private Timestamp timestamp;

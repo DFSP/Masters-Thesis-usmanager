@@ -128,19 +128,22 @@ public class HostsMonitoringService {
 	}
 
 	public List<HostMonitoring> getHostMonitoring(HostAddress hostAddress) {
-		return hostsMonitoring.getByHost(hostAddress);
+		return hostsMonitoring.getByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress());
 	}
 
 	public HostMonitoring getHostMonitoring(HostAddress hostAddress, String field) {
-		return hostsMonitoring.getByHostAndFieldIgnoreCase(hostAddress, field);
+		return hostsMonitoring.getByPublicIpAddressAndPrivateIpAddressAndFieldIgnoreCase(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress(), field);
 	}
 
 	public void saveHostMonitoring(HostAddress hostAddress, String field, double value) {
 		HostMonitoring hostMonitoring = getHostMonitoring(hostAddress, field);
 		Timestamp updateTime = Timestamp.from(Instant.now());
 		if (hostMonitoring == null) {
-			hostMonitoring = HostMonitoring.builder().host(hostAddress).field(field)
-				.minValue(value).maxValue(value).sumValue(value).lastValue(value).count(1).lastUpdate(updateTime).build();
+			hostMonitoring = HostMonitoring.builder().publicIpAddress(hostAddress.getPublicIpAddress())
+				.privateIpAddress(hostAddress.getPrivateIpAddress()).field(field).minValue(value).maxValue(value)
+				.sumValue(value).lastValue(value).count(1).lastUpdate(updateTime).build();
 		}
 		else {
 			hostMonitoring.update(value, updateTime);
@@ -152,16 +155,17 @@ public class HostsMonitoringService {
 	}
 
 	public List<HostFieldAverage> getHostMonitoringFieldsAverage(HostAddress hostAddress) {
-		return hostsMonitoring.getHostMonitoringFieldsAverage(hostAddress);
+		return hostsMonitoring.getHostMonitoringFieldsAverage(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
 	public HostFieldAverage getHostMonitoringFieldAverage(HostAddress hostAddress, String field) {
-		return hostsMonitoring.getHostMonitoringFieldAverage(hostAddress, field);
+		return hostsMonitoring.getHostMonitoringFieldAverage(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), field);
 	}
 
 	public void saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
 		HostMonitoringLog hostMonitoringLog = HostMonitoringLog.builder()
-			.host(hostAddress)
+			.publicIpAddress(hostAddress.getPublicIpAddress())
+			.privateIpAddress(hostAddress.getPrivateIpAddress())
 			.field(field)
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
@@ -174,7 +178,8 @@ public class HostsMonitoringService {
 	}
 
 	public List<HostMonitoringLog> getHostMonitoringLogs(HostAddress hostAddress) {
-		return hostMonitoringLogs.findByHost(hostAddress);
+		return hostMonitoringLogs.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress());
 	}
 
 	public void initHostMonitorTimer() {

@@ -166,12 +166,14 @@ public class DockerSwarmService {
 		return hostsService.addHost(hostAddress.getPublicIpAddress(), role);
 	}
 
-	public pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role, boolean rejoin) {
 		String leaderAddress = hostsService.getManagerHostAddress().getPublicIpAddress();
 		try (DockerClient leaderClient = getSwarmLeader();
 			 DockerClient nodeClient = dockerCoreService.getDockerClient(hostAddress)) {
-			leaveSwarm(nodeClient);
-			nodesService.removeHost(hostAddress);
+			if (!rejoin) {
+				leaveSwarm(nodeClient);
+				nodesService.removeHost(hostAddress);
+			}
 			log.info("{} is joining the swarm as {}", hostAddress, role);
 			String joinToken;
 			switch (role) {
@@ -238,7 +240,7 @@ public class DockerSwarmService {
 				if (isManager && managers != null && managers > 1) {
 					changeRole(nodeId, NodeRole.WORKER);
 				}
-				docker.leaveSwarm(true);
+				docker.leaveSwarm();
 				log.info("{} ({}) left the swarm", docker.getHost(), nodeId);
 				return Optional.of(nodeId);
 			}
@@ -252,16 +254,12 @@ public class DockerSwarmService {
 	public void destroySwarm() {
 		try {
 			DockerClient swarmLeader = getSwarmLeader();
-			swarmLeader.listNodes().parallelStream()
-				.filter(node -> node.spec().labels().get(NodeConstants.Label.MASTER_MANAGER) == null)
-				.forEach(this::leaveSwarm);
-			// leader must be the last one to leave
-			leaveSwarm(swarmLeader);
-			nodesService.reset();
+			swarmLeader.leaveSwarm(true);
 		}
 		catch (DockerException | InterruptedException e) {
 			log.error("Failed to destroy swarm: {}", e.getMessage());
 		}
+		nodesService.reset();
 	}
 
 	public List<Node> getNodes() {
@@ -312,7 +310,7 @@ public class DockerSwarmService {
 		Predicate<Node> readyFilter = n -> n.status().state().equals("ready");
 		Predicate<Node> nodesFilter = filter == null ? readyFilter : filter.and(readyFilter);
 		return getNodes(nodesFilter).stream()
-			.filter(node -> node.spec().labels().get(NodeConstants.Label.REGION) != null)
+			.filter(node -> !configurationsService.isConfiguring(node.id()))
 			.collect(Collectors.toList());
 	}
 

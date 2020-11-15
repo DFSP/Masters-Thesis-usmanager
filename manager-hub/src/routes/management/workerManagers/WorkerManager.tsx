@@ -322,7 +322,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         const workerManager = isNewWorkerManager ? (currentForm === 'Por regiões' ? newWorkerManagerRegion : newWorkerManagerHost) : this.getWorkerManager();
         const formWorkerManager = this.getFormWorkerManager();
         // @ts-ignore
-        const workerManagerKey: (keyof IWorkerManager) = workerManager && Object.keys(workerManager)[0];
+        const workerManagerKey: (keyof IWorkerManager) = formWorkerManager && Object.keys(formWorkerManager)[0];
         return (
             <>
                 {isLoading && <LoadingSpinner/>}

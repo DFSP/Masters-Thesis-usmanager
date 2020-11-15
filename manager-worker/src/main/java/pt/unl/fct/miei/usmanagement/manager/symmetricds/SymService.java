@@ -95,7 +95,9 @@ public class SymService {
 	}
 
 	public void stopSymmetricDSServer() {
-		serverSymmetricEngine.stop();
+		if (serverSymmetricEngine != null) {
+			serverSymmetricEngine.stop();
+		}
 	}
 
 }

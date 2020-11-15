@@ -32,9 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class EntityNotFoundException extends RuntimeException {
+public final class EntityNotFoundException extends RuntimeException {
 
-	public EntityNotFoundException(Class clazz, String... searchParamsMap) {
+	public EntityNotFoundException(Class<?> clazz, String... searchParamsMap) {
 		super(generateMessage(clazz.getSimpleName(), toMap(String.class, String.class, searchParamsMap)));
 	}
 

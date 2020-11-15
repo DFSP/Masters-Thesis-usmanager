@@ -190,7 +190,7 @@ const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', und
 const cloudHosts = new schema.Array(cloudHost);
 
 const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
-    idAttribute: (host: IEdgeHost) => host.publicIpAddress
+    idAttribute: (host: IEdgeHost) => host.publicIpAddress + '-' + host.privateIpAddress
 });
 const edgeHosts = new schema.Array(edgeHost);
 

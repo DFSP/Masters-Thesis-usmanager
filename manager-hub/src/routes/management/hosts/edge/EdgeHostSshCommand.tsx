@@ -68,7 +68,7 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                       isNew
                       post={{
                           textButton: 'Executar',
-                          url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/ssh`,
+                          url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/${this.props.edgeHost?.privateIpAddress}/ssh`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure
                       }}>
@@ -80,7 +80,7 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                            id='command'
                            label='command'/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>
+                {this.props.edgeHost && <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
             </>
         );
     }
@@ -88,7 +88,8 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
     private onPostSuccess = (reply: IReply<ISshCommand>): void => {
         const command = reply.data;
         const edgeHost = this.props.edgeHost;
-        const timestampedCommand = {...command, hostAddress: getEdgeHostAddress(edgeHost), timestamp: Date.now()};
+        const hostAddress =  getEdgeHostAddress(edgeHost);
+        const timestampedCommand = {...command, hostAddress: hostAddress, timestamp: Date.now()};
         this.props.addCommand(timestampedCommand);
         this.sshPanel.current?.scrollToTop();
     };

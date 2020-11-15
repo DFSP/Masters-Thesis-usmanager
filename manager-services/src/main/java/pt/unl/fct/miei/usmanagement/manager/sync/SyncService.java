@@ -82,7 +82,7 @@ public class SyncService {
 	}
 
 	public List<CloudHost> synchronizeCloudHostsDatabase() {
-		log.info("Synchronizing cloud hosts data with amazon");
+		log.debug("Synchronizing cloud hosts data with amazon");
 		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts();
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
@@ -93,7 +93,7 @@ public class SyncService {
 			CloudHost cloudHost = cloudHostsIterator.next();
 			String instanceId = cloudHost.getInstanceId();
 			if (configurationsService.isConfiguring(instanceId)) {
-				log.info("Instance {} is currently being configured, skipping", instanceId);
+				log.debug("Instance {} is currently being configured, skipping", instanceId);
 				continue;
 			}
 			if (!awsInstancesIds.containsKey(instanceId)) {
@@ -123,11 +123,9 @@ public class SyncService {
 					CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
 					cloudHosts.add(cloudHost);
 				}
-			} else {
-				log.info("Instance {} is currently being configured, skipping", instanceId);
 			}
 		});
-		log.info("Finished cloud hosts synchronization");
+		log.debug("Finished cloud hosts synchronization");
 		return cloudHosts;
 	}
 
@@ -152,7 +150,7 @@ public class SyncService {
 	}
 
 	public List<Container> synchronizeContainersDatabase() {
-		log.info("Synchronizing containers database with docker swarm");
+		log.debug("Synchronizing containers database with docker swarm");
 
 		List<Container> containers = containersService.getContainers();
 		List<DockerContainer> dockerContainers = dockerContainersService.getReadyContainers();
@@ -162,7 +160,7 @@ public class SyncService {
 		for (DockerContainer dockerContainer : dockerContainers) {
 			String containerId = dockerContainer.getId();
 			if (configurationsService.isConfiguring(containerId)) {
-				log.info("Container {} is currently being configured, skipping", containerId);
+				log.debug("Container {} is currently being configured, skipping", containerId);
 				continue;
 			}
 			if (!containerIds.contains(containerId)) {
@@ -187,7 +185,7 @@ public class SyncService {
 			}
 		}
 
-		log.info("Finished containers synchronization");
+		log.debug("Finished containers synchronization");
 		return containers;
 	}
 
@@ -212,7 +210,7 @@ public class SyncService {
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> synchronizeNodesDatabase() {
-		log.info("Synchronizing nodes database with docker swarm");
+		log.debug("Synchronizing nodes database with docker swarm");
 
 		List<Node> swarmNodes = dockerSwarmService.getNodes();
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getNodes();
@@ -222,7 +220,7 @@ public class SyncService {
 		for (Node swarmNode : swarmNodes) {
 			String nodeId = swarmNode.id();
 			if (configurationsService.isConfiguring(nodeId)) {
-				log.info("Node {} is currently being configured, skipping", nodeId);
+				log.debug("Node {} is currently being configured, skipping", nodeId);
 				continue;
 			}
 			if (!nodeIds.contains(nodeId)) {
@@ -270,7 +268,7 @@ public class SyncService {
 			}
 		}
 
-		log.info("Finished nodes synchronization");
+		log.debug("Finished nodes synchronization");
 		return nodes;
 	}
 

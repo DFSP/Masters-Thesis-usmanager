@@ -498,6 +498,11 @@ textarea.materialize-textarea[readonly="readonly"] {
     color: white;
 }
 
+[type="checkbox"]:not(:checked):disabled+span:not(.lever):before {
+    border: 2px solid #5a5a5a;
+    background-color: transparent;
+}
+
 /*.dropdown-content {
     width: 200px !important;
 }*/

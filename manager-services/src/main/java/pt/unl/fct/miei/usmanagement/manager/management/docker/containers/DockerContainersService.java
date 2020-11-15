@@ -38,6 +38,7 @@ import com.spotify.docker.client.messages.PortBinding;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -74,6 +75,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -97,11 +99,14 @@ public class DockerContainersService {
 	private final int dockerDelayBeforeStopContainer;
 	private final ConfigurationsService configurationsService;
 
+	private final int threads;
+
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService, ServicesService servicesService,
 								   ServiceDependenciesService serviceDependenciesService, NginxLoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   ContainerProperties containerProperties, ConfigurationsService configurationsService) {
+								   ContainerProperties containerProperties, ConfigurationsService configurationsService,
+								   ParallelismProperties parallelismProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -112,6 +117,7 @@ public class DockerContainersService {
 		this.hostsService = hostsService;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public Map<String, List<DockerContainer>> launchApp(List<Service> services, Coordinates coordinates) {
@@ -359,7 +365,9 @@ public class DockerContainersService {
 					ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 					String containerId = containerCreation.id();
 					config = configurationsService.addConfiguration(containerId);
-					dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
+					if (containerType != ContainerTypeEnum.SINGLETON) {
+						dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
+					}
 					dockerClient.startContainer(containerId);
 					if (ServiceTypeEnum.getServiceType(serviceType) == ServiceTypeEnum.FRONTEND) {
 						nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());
@@ -595,7 +603,9 @@ public class DockerContainersService {
 		if (containersPredicate != null) {
 			containers.removeIf(Predicate.not(containersPredicate));
 		}
-		containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress()));
+		new ForkJoinPool(threads).execute(() ->
+			containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress()))
+		);
 		return containers;
 	}
 

@@ -159,7 +159,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} to container </span><a href=/contentores/${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class="green-text">O contentor ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} foi migrado para o contentor </span><a href='/contentores/${container.containerId}'>${container.containerId}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }

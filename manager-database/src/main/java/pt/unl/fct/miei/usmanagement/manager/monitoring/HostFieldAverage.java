@@ -30,7 +30,8 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 @Data
 public class HostFieldAverage {
 
-	private final HostAddress hostAddress;
+	private final String publicIpAddress;
+	private final String privateIpAddress;
 	private final String field;
 	private final double average;
 	private final long count;

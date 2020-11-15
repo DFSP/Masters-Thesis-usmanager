@@ -70,9 +70,9 @@ public class DecisionsController {
 		return decisionsService.getHostsPossibleDecisions();
 	}
 
-	@GetMapping("/hosts/{hostname}")
-	public List<HostDecision> getHostDecisions(@PathVariable String hostname) {
-		return decisionsService.getHostDecisions(new HostAddress(hostname));
+	@GetMapping("/hosts/{publicIpAddress}/{privateIpAddress}")
+	public List<HostDecision> getHostDecisions(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return decisionsService.getHostDecisions(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 }

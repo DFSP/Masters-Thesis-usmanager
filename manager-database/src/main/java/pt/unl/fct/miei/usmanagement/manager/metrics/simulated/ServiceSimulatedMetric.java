@@ -79,11 +79,11 @@ public class ServiceSimulatedMetric {
 	private double maximumValue;
 
 	@NotNull
-	private boolean override;
-
-	@NotNull
 	private boolean generic;
 
+	@NotNull
+	private boolean override;
+	
 	@NotNull
 	private boolean active;
 

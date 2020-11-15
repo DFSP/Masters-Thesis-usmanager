@@ -58,10 +58,11 @@ public class HostMonitoringLog {
 	@GeneratedValue
 	private Long id;
 
-	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
 	@NotNull
-	@Lob
-	private HostAddress host;
+	private String publicIpAddress;
+
+	@NotNull
+	private String privateIpAddress;
 
 	@NotNull
 	private String field;

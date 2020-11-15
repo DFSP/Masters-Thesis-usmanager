@@ -91,7 +91,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
                                    id: 'edgeHosts',
                                    title: 'Selecionar o host',
                                    empty: 'Não existe nenhum host disponível na edge',
-                                   data: this.getSelectableEdgeHostNames()
+                                   data: this.getSelectableEdgeHosts()
                                }}
                                show={this.edgeHost}
                                onAdd={this.onAdd}
@@ -159,10 +159,10 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
     private onDeleteFailure = (reason: string): void =>
         super.toast(`Não foi possível remover o host`, 10000, reason, true);
 
-    private getSelectableEdgeHostNames = () => {
+    private getSelectableEdgeHosts = () => {
         const {edgeHosts, ruleEdgeHosts, unsavedEdgeHosts} = this.props;
-        return Object.keys(edgeHosts)
-            .filter(edgeHost => !ruleEdgeHosts.includes(edgeHost) && !unsavedEdgeHosts.includes(edgeHost));
+        return Object.values(edgeHosts).filter(edgeHost => !ruleEdgeHosts.includes(edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress)
+            && !unsavedEdgeHosts.includes(edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress)).map(edgeHost => edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress);
     };
 
 }

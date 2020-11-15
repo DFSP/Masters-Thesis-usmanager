@@ -48,9 +48,9 @@ public class HostEventsController {
 		return hostsEventsService.getHostEvents();
 	}
 
-	@GetMapping("/{hostname}")
-	public List<HostEvent> getHostEvents(@PathVariable String hostname) {
-		return hostsEventsService.getHostEventsByHostAddress(new HostAddress(hostname));
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}")
+	public List<HostEvent> getHostEvents(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return hostsEventsService.getHostEventsByHostAddress(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 }

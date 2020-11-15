@@ -223,29 +223,29 @@ public class HostRulesService {
 		return rules.getEdgeHosts(ruleName);
 	}
 
-	public void addEdgeHost(String ruleName, String hostname) {
-		addEdgeHosts(ruleName, List.of(hostname));
+	public void addEdgeHost(String ruleName, HostAddress hostAddress) {
+		addEdgeHosts(ruleName, List.of(hostAddress));
 	}
 
-	public void addEdgeHosts(String ruleName, List<String> hostnames) {
-		log.info("Adding edge hosts {} to rule {}", hostnames, ruleName);
+	public void addEdgeHosts(String ruleName, List<HostAddress> hostAddresses) {
+		log.info("Adding edge hosts {} to rule {}", hostAddresses, ruleName);
 		HostRule rule = getRule(ruleName);
-		hostnames.forEach(hostname -> {
-			EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+		hostAddresses.forEach(hostAddress -> {
+			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			edgeHost.addRule(rule);
 		});
 		rules.save(rule);
 		setLastUpdateHostRules();
 	}
 
-	public void removeEdgeHost(String ruleName, String hostname) {
-		removeEdgeHosts(ruleName, List.of(hostname));
+	public void removeEdgeHost(String ruleName, HostAddress hostAddress) {
+		removeEdgeHosts(ruleName, List.of(hostAddress));
 	}
 
-	public void removeEdgeHosts(String ruleName, List<String> hostnames) {
-		log.info("Removing edge hosts {} from rule {}", hostnames, ruleName);
+	public void removeEdgeHosts(String ruleName, List<HostAddress> hostAddresses) {
+		log.info("Removing edge hosts {} from rule {}", hostAddresses, ruleName);
 		HostRule rule = getRule(ruleName);
-		hostnames.forEach(hostname -> edgeHostsService.getEdgeHostByHostname(hostname).removeRule(rule));
+		hostAddresses.forEach(hostAddress -> edgeHostsService.getEdgeHostByAddress(hostAddress).removeRule(rule));
 		rules.save(rule);
 		setLastUpdateHostRules();
 	}

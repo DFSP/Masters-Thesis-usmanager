@@ -135,7 +135,7 @@ public class EdgeHostsService {
 				break;
 			}
 			catch (Exception e) {
-				log.error("Unable to setup new edge host: {}", e.getMessage());
+				log.error("Unable to setup new edge host");
 				log.info("Password is most likely wrong, try again");
 			}
 			java.util.Arrays.fill(password, ' ');
@@ -194,8 +194,8 @@ public class EdgeHostsService {
 		}*/
 	}
 
-	public EdgeHost updateEdgeHost(String hostname, EdgeHost newEdgeHost) {
-		EdgeHost edgeHost = getEdgeHostByHostname(hostname);
+	public EdgeHost updateEdgeHost(HostAddress hostAddress, EdgeHost newEdgeHost) {
+		EdgeHost edgeHost = getEdgeHostByAddress(hostAddress);
 		log.info("Updating edgeHost {} with {}",
 			ToStringBuilder.reflectionToString(edgeHost),
 			ToStringBuilder.reflectionToString(newEdgeHost));
@@ -203,76 +203,72 @@ public class EdgeHostsService {
 		return edgeHosts.save(edgeHost);
 	}
 
-	public void deleteEdgeHost(String hostname) {
-		EdgeHost edgeHost = getEdgeHostByHostname(hostname);
+	public void deleteEdgeHost(HostAddress hostAddress) {
+		EdgeHost edgeHost = getEdgeHostByAddress(hostAddress);
 		edgeHosts.delete(edgeHost);
 		deleteEdgeHostConfig(edgeHost);
 	}
 
-	public List<HostRule> getRules(String hostname) {
-		checkHostExists(hostname);
-		return edgeHosts.getRules(hostname);
+	public List<HostRule> getRules(HostAddress hostAddress) {
+		checkHostExists(hostAddress);
+		return edgeHosts.getRules(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
-	public HostRule getRule(String hostname, String ruleName) {
-		checkHostExists(hostname);
-		return edgeHosts.getRule(hostname, ruleName).orElseThrow(() ->
+	public HostRule getRule(HostAddress hostAddress, String ruleName) {
+		checkHostExists(hostAddress);
+		return edgeHosts.getRule(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), ruleName).orElseThrow(() ->
 			new EntityNotFoundException(HostRule.class, "ruleName", ruleName)
 		);
 	}
 
-	public void addRule(String hostname, String ruleName) {
-		checkHostExists(hostname);
-		hostRulesService.addEdgeHost(ruleName, hostname);
+	public void addRule(HostAddress hostAddress, String ruleName) {
+		addRules(hostAddress, List.of(ruleName));
 	}
 
-	public void addRules(String hostname, List<String> ruleNames) {
-		checkHostExists(hostname);
-		ruleNames.forEach(rule -> hostRulesService.addEdgeHost(rule, hostname));
+	public void addRules(HostAddress hostAddress, List<String> ruleNames) {
+		checkHostExists(hostAddress);
+		ruleNames.forEach(rule -> hostRulesService.addEdgeHost(rule, hostAddress));
 	}
 
-	public void removeRule(String hostname, String ruleName) {
-		checkHostExists(hostname);
-		hostRulesService.removeEdgeHost(ruleName, hostname);
+	public void removeRule(HostAddress hostAddress, String ruleName) {
+		removeRules(hostAddress, List.of(ruleName));
 	}
 
-	public void removeRules(String hostname, List<String> ruleNames) {
-		checkHostExists(hostname);
-		ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
+	public void removeRules(HostAddress hostAddress, List<String> ruleNames) {
+		checkHostExists(hostAddress);
+		ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostAddress));
 	}
 
-	public List<HostSimulatedMetric> getSimulatedMetrics(String hostname) {
-		checkHostExists(hostname);
-		return edgeHosts.getSimulatedMetrics(hostname);
+	public List<HostSimulatedMetric> getSimulatedMetrics(HostAddress hostAddress) {
+		checkHostExists(hostAddress);
+		return edgeHosts.getSimulatedMetrics(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
-	public HostSimulatedMetric getSimulatedMetric(String hostname, String simulatedMetricName) {
-		checkHostExists(hostname);
-		return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
+	public HostSimulatedMetric getSimulatedMetric(HostAddress hostAddress, String simulatedMetricName) {
+		checkHostExists(hostAddress);
+		return edgeHosts.getSimulatedMetric(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), simulatedMetricName).orElseThrow(() ->
 			new EntityNotFoundException(HostSimulatedMetric.class, "simulatedMetricName", simulatedMetricName)
 		);
 	}
 
-	public void addSimulatedMetric(String hostname, String simulatedMetricName) {
-		checkHostExists(hostname);
-		hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
+	public void addSimulatedMetric(HostAddress hostAddress, String simulatedMetricName) {
+		addSimulatedMetrics(hostAddress, List.of(simulatedMetricName));
 	}
 
-	public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-		checkHostExists(hostname);
+	public void addSimulatedMetrics(HostAddress hostAddress, List<String> simulatedMetricNames) {
+		checkHostExists(hostAddress);
 		simulatedMetricNames.forEach(simulatedMetric ->
-			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
+			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostAddress));
 	}
 
-	public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
-		checkHostExists(hostname);
-		hostSimulatedMetricsService.addEdgeHost(simulatedMetricName, hostname);
+	public void removeSimulatedMetric(HostAddress hostAddress, String simulatedMetricName) {
+		removeSimulatedMetrics(hostAddress, List.of(simulatedMetricName));
 	}
 
-	public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
-		checkHostExists(hostname);
+	public void removeSimulatedMetrics(HostAddress hostAddress, List<String> simulatedMetricNames) {
+		checkHostExists(hostAddress);
 		simulatedMetricNames.forEach(simulatedMetric ->
-			hostSimulatedMetricsService.addEdgeHost(simulatedMetric, hostname));
+			hostSimulatedMetricsService.removeEdgeHost(simulatedMetric, hostAddress));
 	}
 
 	public void assignWorkerManager(WorkerManager workerManager, String edgeHost) {
@@ -290,20 +286,19 @@ public class EdgeHostsService {
 		edgeHosts.save(edgeHostEntity);
 	}
 
-	public boolean hasEdgeHost(String hostname) {
-		return edgeHosts.hasEdgeHost(hostname);
+	public boolean hasEdgeHost(HostAddress hostAddress) {
+		return edgeHosts.hasEdgeHost(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
-	private void checkHostExists(String hostname) {
-		if (!hasEdgeHost(hostname)) {
-			throw new EntityNotFoundException(EdgeHost.class, "hostname", hostname);
+	private void checkHostExists(HostAddress hostAddress) {
+		if (!hasEdgeHost(hostAddress)) {
+			throw new EntityNotFoundException(EdgeHost.class, "hostAddress", hostAddress.toSimpleString());
 		}
 	}
 
 	private void checkHostDoesntExist(EdgeHost edgeHost) {
-		String hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
-		if (edgeHosts.hasEdgeHost(hostname)) {
-			throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
+		if (edgeHosts.hasEdgeHost(edgeHost.getPublicIpAddress(), edgeHost.getPrivateIpAddress())) {
+			throw new DataIntegrityViolationException("Edge host " + edgeHost.getPublicIpAddress() + "/" + edgeHost.getPrivateIpAddress() + " already exists");
 		}
 	}
 

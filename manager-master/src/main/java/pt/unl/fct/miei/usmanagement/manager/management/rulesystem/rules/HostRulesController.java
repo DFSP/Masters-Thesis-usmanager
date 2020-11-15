@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
@@ -41,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rules/hosts")
@@ -131,17 +133,30 @@ public class HostRulesController {
 
 	@PostMapping("/{ruleName}/edge-hosts")
 	public void addRuleEdgeHosts(@PathVariable String ruleName, @RequestBody List<String> edgeHosts) {
-		hostRulesService.addEdgeHosts(ruleName, edgeHosts);
+		// TODO parameter List of HostAddress instead
+		List<HostAddress> hostAddresses = edgeHosts.stream().map(edgeHost -> {
+			String[] addresses = edgeHost.split("-");
+			return new HostAddress(addresses[0], addresses[1]);
+		}).collect(Collectors.toList());
+		hostRulesService.addEdgeHosts(ruleName, hostAddresses);
 	}
 
 	@DeleteMapping("/{ruleName}/edge-hosts")
 	public void removeRuleEdgeHosts(@PathVariable String ruleName, @RequestBody List<String> edgeHosts) {
-		hostRulesService.removeEdgeHosts(ruleName, edgeHosts);
+		// TODO parameter List of HostAddress instead
+		List<HostAddress> hostAddresses = edgeHosts.stream().map(edgeHost -> {
+			String[] addresses = edgeHost.split("-");
+			return new HostAddress(addresses[0].trim(), addresses[1].trim());
+		}).collect(Collectors.toList());
+		hostRulesService.removeEdgeHosts(ruleName, hostAddresses);
 	}
 
-	@DeleteMapping("/{ruleName}/edge-hosts/{hostname}")
-	public void removeRuleEdgeHosts(@PathVariable String ruleName, @PathVariable String hostname) {
-		hostRulesService.removeEdgeHost(ruleName, hostname);
+	@DeleteMapping("/{ruleName}/edge-hosts/{edgeHost}")
+	public void removeRuleEdgeHosts(@PathVariable String ruleName, @PathVariable String edgeHost) {
+		// TODO 2 path variables publicIpAddress and privateIpAddress
+		String publicIpAddress = edgeHost.split("-")[0];
+		String privateIpAddress = edgeHost.split("-")[1];
+		hostRulesService.removeEdgeHost(ruleName, new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 }

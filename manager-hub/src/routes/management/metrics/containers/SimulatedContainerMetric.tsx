@@ -247,7 +247,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                 [key]: {
                     id: key,
                     label: key,
-                    validation: {rule: requiredAndTrimmed}
+                    validation: key === 'generic' || key === 'active' || key === 'override' ? undefined : {rule: requiredAndTrimmed}
                 }
             };
         }).reduce((fields, field) => {

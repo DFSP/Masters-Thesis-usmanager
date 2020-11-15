@@ -41,6 +41,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -56,9 +57,11 @@ public class HostEvent {
 	@GeneratedValue
 	private Long id;
 
-	@JsonIgnoreProperties({"publicDnsName", "coordinates", "region"})
-	@Lob
-	private HostAddress hostAddress;
+	@NotNull
+	private String publicIpAddress;
+
+	@NotNull
+	private String privateIpAddress;
 
 	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne

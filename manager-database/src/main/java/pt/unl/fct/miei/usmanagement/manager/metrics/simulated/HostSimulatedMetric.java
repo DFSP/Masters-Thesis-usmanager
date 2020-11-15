@@ -81,10 +81,10 @@ public class HostSimulatedMetric {
 	private double maximumValue;
 
 	@NotNull
-	private boolean override;
+	private boolean generic;
 
 	@NotNull
-	private boolean generic;
+	private boolean override;
 
 	@NotNull
 	private boolean active;

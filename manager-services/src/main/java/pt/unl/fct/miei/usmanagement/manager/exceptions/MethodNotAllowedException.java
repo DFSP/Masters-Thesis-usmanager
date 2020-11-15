@@ -24,7 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.exceptions;
 
-public class MethodNotAllowedException extends ManagerException {
+public final class MethodNotAllowedException extends RuntimeException {
 
 	public MethodNotAllowedException(String message) {
 		super(message);

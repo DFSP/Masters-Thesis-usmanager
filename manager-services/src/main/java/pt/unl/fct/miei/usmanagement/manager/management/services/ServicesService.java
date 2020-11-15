@@ -251,8 +251,7 @@ public class ServicesService {
 	}
 
 	public void addRule(String serviceName, String ruleName) {
-		checkServiceExists(serviceName);
-		serviceRulesService.addService(ruleName, serviceName);
+		addRules(serviceName, List.of(ruleName));
 	}
 
 	public void addRules(String serviceName, List<String> ruleNames) {
@@ -261,8 +260,7 @@ public class ServicesService {
 	}
 
 	public void removeRule(String serviceName, String ruleName) {
-		checkServiceExists(serviceName);
-		serviceRulesService.removeService(ruleName, serviceName);
+		removeRules(serviceName, List.of(ruleName));
 	}
 
 	public void removeRules(String serviceName, List<String> ruleNames) {
@@ -283,8 +281,7 @@ public class ServicesService {
 	}
 
 	public void addSimulatedMetric(String serviceName, String simulatedMetricName) {
-		checkServiceExists(serviceName);
-		serviceSimulatedMetricsService.addService(simulatedMetricName, serviceName);
+		addSimulatedMetrics(serviceName, List.of(simulatedMetricName));
 	}
 
 	public void addSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {

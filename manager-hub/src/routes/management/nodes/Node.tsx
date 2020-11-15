@@ -46,14 +46,13 @@ import {IReply, postData, putData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
 import IDatabaseData from "../../../components/IDatabaseData";
 import {Point} from "react-simple-maps";
 import {ICoordinates} from "../../../components/map/LocationMap";
 import {IMarker} from "../../../components/map/Marker";
-import {isEqual} from "lodash";
 
 export interface INode extends IDatabaseData {
     nodeId: string;
@@ -62,6 +61,7 @@ export interface INode extends IDatabaseData {
     availability: string;
     role: string;
     version: number;
+    coordinates?: ICoordinates
     labels: INodeLabel;
     managerStatus: IManagerStatus;
 }
@@ -163,7 +163,7 @@ class Node extends BaseComponent<Props, State> {
     public render() {
         return (
             <MainLayout>
-                <div className="container">
+                <div className='container'>
                     <Tabs {...this.props} tabs={this.tabs()}/>
                 </div>
             </MainLayout>
@@ -190,13 +190,13 @@ class Node extends BaseComponent<Props, State> {
         const nodes = reply.data;
         if (nodes.length === 1) {
             const node = nodes[0];
-            super.toast(`<span class="green-text">O host ${node.publicIpAddress} entrou no swarm com o id ${this.mounted ? `<b class="white-text">${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`}</span>`);
+            super.toast(`<span class='green-text'>O host ${node.publicIpAddress} entrou no swarm com o id ${this.mounted ? `<b class='white-text'>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateNode(node);
                 this.props.history.replace(node.nodeId.toString());
             }
         } else {
-            super.toast(`<span class="green-text">Os nós <b class="white-text">${nodes.map(node => `${node.publicIpAddress} => ${node.nodeId}`)}</b> entraram no swarm</span>`);
+            super.toast(`<span class='green-text'>Os nós <b class='white-text'>${nodes.map(node => `${node.publicIpAddress} => ${node.nodeId}`)}</b> entraram no swarm</span>`);
             this.props.history.push("/nós");
         }
         this.props.addNodes(nodes);
@@ -220,11 +220,11 @@ class Node extends BaseComponent<Props, State> {
         const previousAvailability = previousNode?.availability;
         const previousRole = previousNode?.role;
         if (node.availability !== previousAvailability) {
-            super.toast(`<span class="green-text">A disponibilidade do nó ${this.mounted ? `<b class="white-text">${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foi alterada para ${node.availability}</span>`);
+            super.toast(`<span class='green-text'>A disponibilidade do nó ${this.mounted ? `<b class='white-text'>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foi alterada para ${node.availability}</span>`);
         } else if (node.role !== previousRole) {
-            super.toast(`<span class="green-text">O nó ${this.mounted ? `<b class="white-text">${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foi ${previousRole === 'MANAGER' ? 'despromovido' : 'promovido'} a ${node.role}</span>`);
+            super.toast(`<span class='green-text'>O nó ${this.mounted ? `<b class='white-text'>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foi ${previousRole === 'MANAGER' ? 'despromovido' : 'promovido'} a ${node.role}</span>`);
         } else {
-            super.toast(`<span class="green-text">As alterações ao nó ${this.mounted ? `<b class="white-text">${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foram guardadas com sucesso</span>`);
+            super.toast(`<span class='green-text'>As alterações ao nó ${this.mounted ? `<b class='white-text'>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} foram guardadas com sucesso</span>`);
         }
         if (previousNode?.nodeId) {
             this.props.updateNode(previousNode as INode, node)
@@ -239,7 +239,7 @@ class Node extends BaseComponent<Props, State> {
         super.toast(`Não foi possível mudar o cargo do nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class="green-text">O host <b class="white-text">${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
+        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
         if (this.mounted) {
             this.props.history.push(`/nós`);
         }
@@ -249,7 +249,7 @@ class Node extends BaseComponent<Props, State> {
         if (node.state === 'active') {
             super.toast(`O nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Não foi possível remover o nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href=nós/${node.nodeId}><b>${node.nodeId}</b></a>`} do swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} do swarm`, 10000, reason, true);
         }
     }
 
@@ -292,7 +292,7 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmSuccess = (node: INode) => {
-        super.toast(`<span class="green-text">O host </span> <b>${node?.publicIpAddress}</b> <span class="green-text">re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`}`);
+        super.toast(`<span class='green-text'>O host </span> <b>${node?.publicIpAddress}</b> <span class='green-text'>re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`}`);
         if (this.mounted) {
             this.setState({loading: undefined});
             this.updateNode(node);
@@ -309,7 +309,7 @@ class Node extends BaseComponent<Props, State> {
 
     private leaveSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.publicIpAddress}/leave`;
+        const url = `nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
         this.setState({loading: {method: 'post', url: url}});
         putData(url, undefined,
             (reply: IReply<INode[]>) => this.onLeaveSuccess(reply.data),
@@ -318,7 +318,7 @@ class Node extends BaseComponent<Props, State> {
 
     private onLeaveSuccess = (nodes: INode[]) => {
         const node = nodes[0];
-        super.toast(`<span class="green-text">O host <b class="white-text">${node.publicIpAddress}</b> foi removido com sucesso do swarm}</span>`);
+        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> foi removido com sucesso do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -337,9 +337,10 @@ class Node extends BaseComponent<Props, State> {
 
     private updateNode = (node: INode) => {
         node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
+        node = addCoordinates(node);
         const formNode = {...node};
         removeFields(formNode);
-        this.setState({node: node, formNode: formNode});
+        this.setState({node: node, formNode: formNode, loading: undefined});
     };
 
     private getFields = (node: INewNodeHost | INewNodeLocation | INode): IFields =>
@@ -415,7 +416,7 @@ class Node extends BaseComponent<Props, State> {
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}
-                               type="dropdown"
+                               type='dropdown'
                                dropdown={{
                                    defaultValue: "Selecionar o cargo",
                                    values: ['MANAGER', 'WORKER']
@@ -423,7 +424,7 @@ class Node extends BaseComponent<Props, State> {
                         <Field<string> key={'host'}
                                        id={'host'}
                                        label={'host'}
-                                       type="dropdown"
+                                       type='dropdown'
                                        dropdown={{
                                            defaultValue: "Selecionar o host",
                                            values: this.getSelectableHosts(),
@@ -435,7 +436,7 @@ class Node extends BaseComponent<Props, State> {
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}
-                               type="dropdown"
+                               type='dropdown'
                                dropdown={{
                                    defaultValue: "Selecionar o cargo",
                                    values: ['MANAGER', 'WORKER']
@@ -454,7 +455,7 @@ class Node extends BaseComponent<Props, State> {
                         ? <Field key={'availability'}
                                  id={'availability'}
                                  label={'availability'}
-                                 type="dropdown"
+                                 type='dropdown'
                                  dropdown={{
                                      defaultValue: "Selecionar a disponibilidade",
                                      values: ['ACTIVE', 'PAUSE', 'DRAIN']
@@ -463,7 +464,7 @@ class Node extends BaseComponent<Props, State> {
                         ? <Field key={'role'}
                                  id={'role'}
                                  label={'role'}
-                                 type="dropdown"
+                                 type='dropdown'
                                  dropdown={{
                                      defaultValue: "Selecionar o cargo",
                                      values: ['MANAGER', 'WORKER']
@@ -501,7 +502,7 @@ class Node extends BaseComponent<Props, State> {
         const node = isNewNode ? (currentForm === 'Num endereço' ? newNodeHost : newNodeLocation) : this.getNode();
         const formNode = this.getFormNode();
         // @ts-ignore
-        const nodeKey: (keyof INode) = node && Object.keys(node)[0];
+        const nodeKey: (keyof INode) = formNode && Object.keys(formNode)[0];
         return (
             <>
                 {isLoading && <LoadingSpinner/>}
@@ -575,11 +576,17 @@ class Node extends BaseComponent<Props, State> {
 
 }
 
-
 function removeFields(node: Partial<INode>) {
     delete node["id"];
     delete node["labels"];
     delete node["managerStatus"];
+}
+
+function addCoordinates(node: INode) {
+    if (node.labels['coordinates']) {
+        node = {...node, coordinates: JSON.parse(node.labels['coordinates'])};
+    }
+    return node;
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -591,9 +598,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     let node: INode & { coordinates?: ICoordinates } | undefined = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
     let formNode;
     if (node) {
-        if (node.labels['coordinates']) {
-            node = {...node, coordinates: JSON.parse(node.labels['coordinates'])};
-        }
+        node = addCoordinates(node);
         formNode = {...node};
         removeFields(formNode);
     }

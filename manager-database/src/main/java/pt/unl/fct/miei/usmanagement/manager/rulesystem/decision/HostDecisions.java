@@ -31,6 +31,6 @@ import java.util.List;
 
 public interface HostDecisions extends JpaRepository<HostDecision, Long> {
 
-	List<HostDecision> findByHostAddress(HostAddress hostAddress);
+	List<HostDecision> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
 }

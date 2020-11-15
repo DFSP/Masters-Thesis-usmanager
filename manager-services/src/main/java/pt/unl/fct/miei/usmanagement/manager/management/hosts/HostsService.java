@@ -28,6 +28,7 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -41,7 +42,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
@@ -57,12 +57,6 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +64,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -92,12 +88,13 @@ public class HostsService {
 	private final int maxWorkers;
 	private final int maxInstances;
 	private HostAddress managerHostAddress;
+	private final int threads;
 
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
 						DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
 						CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
 						HostMetricsService hostMetricsService, DockerProperties dockerProperties,
-						AwsProperties awsProperties) {
+						AwsProperties awsProperties, ParallelismProperties parallelismProperties) {
 		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
@@ -108,6 +105,7 @@ public class HostsService {
 		this.hostMetricsService = hostMetricsService;
 		this.maxWorkers = dockerProperties.getSwarm().getInitialMaxWorkers();
 		this.maxInstances = awsProperties.getInitialMaxInstances();
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public HostAddress setManagerHostAddress() {
@@ -163,7 +161,8 @@ public class HostsService {
 		if (getCloudWorkerNodes().size() < 1) {
 			log.info("No cloud worker hosts found");
 		}
-		workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER));
+		new ForkJoinPool(threads).execute(() ->
+			workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER)));
 	}
 
 	private List<CloudHost> getCloudWorkerNodes() {
@@ -195,13 +194,21 @@ public class HostsService {
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node setupHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
-		String dockerApiProxyContainerId = "";
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = null;
+		String dockerApiProxyContainerId = "";
 		final int retries = 5;
 		int tries = 0;
 		do {
+			log.info("Launching docker api proxy container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
+			Timing.sleep(tries, TimeUnit.SECONDS); // waits 0 seconds, then 1 seconds, then 2 seconds, etc
+		} while (dockerApiProxyContainerId.isEmpty() && ++tries < retries);
+		if (dockerApiProxyContainerId.isEmpty()) {
+			throw new ManagerException("Failed to launch docker api proxy at %s", hostAddress.toSimpleString());
+		}
+		tries = 0;
+		do {
 			try {
-				dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
 				switch (role) {
 					case MANAGER:
 						node = setupSwarmManager(hostAddress);
@@ -215,15 +222,16 @@ public class HostsService {
 			}
 			catch (ManagerException e) {
 				log.error("Failed to setup {} with role {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), role, e.getMessage(), tries + 1, retries);
-				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 0 seconds, then 1 seconds, then 2 seconds, etc
+				Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
 			}
 		} while (node == null && ++tries < retries);
-		if (dockerApiProxyContainerId.isEmpty() || node == null) {
+		if (node == null) {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
-		List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
-			.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON));
+		new ForkJoinPool(threads).execute(() ->
+			List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
+				.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON)));
 		executeBackgroundProcess(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
@@ -246,9 +254,17 @@ public class HostsService {
 	}
 
 	private pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role) {
+		log.info("Host {} is joining swarm as role {}", hostAddress.toSimpleString(), role);
 		try {
 			Node node = dockerSwarmService.getHostNode(hostAddress);
+			if (node.status().state().equalsIgnoreCase("down")) {
+				log.info("Host {} is already part of the swarm as node {}, but state down", hostAddress.toSimpleString(), node.id());
+				pt.unl.fct.miei.usmanagement.manager.nodes.Node newNode = dockerSwarmService.joinSwarm(hostAddress, role, true);
+				nodesService.removeNode(node.id());
+				return newNode;
+			}
 			try {
+				log.info("Host {} is already part of the swarm as node {}", hostAddress.toSimpleString(), node.id());
 				return nodesService.getNode(node.id());
 			}
 			catch (EntityNotFoundException ignored) {
@@ -256,7 +272,7 @@ public class HostsService {
 			}
 		}
 		catch (EntityNotFoundException ignored) {
-			return dockerSwarmService.joinSwarm(hostAddress, role);
+			return dockerSwarmService.joinSwarm(hostAddress, role, false);
 		}
 	}
 
@@ -264,12 +280,13 @@ public class HostsService {
 		return getClosestCapableHost(availableMemory, region.getCoordinates());
 	}
 
-	public HostAddress getCapableNode(double availableMemory, RegionEnum region) {
-		return getCapableNode(availableMemory, region, null);
+	public HostAddress getCapableHost(double availableMemory, RegionEnum region) {
+		return getCapableHost(availableMemory, region, null);
 	}
 
-	public HostAddress getCapableNode(double availableMemory, RegionEnum region, Predicate<HostAddress> nodeFilter) {
-		log.info("Looking for node on region {} with at least {} memory available and <90% cpu usage", region.getRegion(), availableMemory);
+	public HostAddress getCapableHost(double availableMemory, RegionEnum region, Predicate<HostAddress> nodeFilter) {
+		log.info("Looking for node on region {} with <90% memory available and <90% cpu usage to launch service with {} expected ram usage",
+			region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)
 				&& (nodeFilter == null || nodeFilter.test(node.getHostAddress())))
@@ -284,7 +301,6 @@ public class HostsService {
 		else {
 			log.info("No nodes found, joining a new cloud node at {}", region);
 			hostAddress = chooseCloudHost(region, true).getAddress();
-			setupHost(hostAddress, NodeRole.WORKER);
 		}
 		return hostAddress;
 	}
@@ -298,9 +314,16 @@ public class HostsService {
 			HostAddress hostAddress = host.getAddress();
 			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory);
 		}).collect(Collectors.toList());
-		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts().parallelStream().filter(host ->
-			hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
-		).collect(Collectors.toList());
+		List<CloudHost> cloudHosts;
+		try {
+			cloudHosts = new ForkJoinPool(threads).submit(() ->
+				cloudHostsService.getCloudHosts().parallelStream().filter(host ->
+					hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
+				).collect(Collectors.toList())).get();
+		}
+		catch (InterruptedException | ExecutionException e) {
+			throw new ManagerException("Unable to get closest capable hosts: {}", e.getMessage());
+		}
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}
 

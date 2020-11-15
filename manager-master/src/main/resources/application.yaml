@@ -59,8 +59,6 @@ aws:
     type: t2.micro
     tag: us-manager
 container:
-  database:
-    deploy-delay: 5000
   delay-before-stop: 45000
   monitor-period: 60000
 docker:
@@ -76,7 +74,6 @@ docker:
   hub:
     username: usmanager
   swarm:
-    manager: ${dockerManager:dpimenta.ddns.net}
     initial-max-workers: 1
 registration:
   port: 8761
@@ -98,7 +95,6 @@ host:
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 nginx-load-balancer:
   stop-delay: 300000
-
 location-request:
   port: 1919
   minimum-request-count-percentage: 15.0
@@ -113,13 +109,13 @@ symmetricds:
       contains: monitoring
 worker-manager:
   port: 8081
-#debug: true
-#trace: true
+parallelism:
+  threads: 8
+
+
+#logging:
 #  level:
 #    org:
 #      hibernate:
-#        sql: DEBUG
-#      type:
-#        descriptor:
-#          sql:
-#            BasicBinder: TRACE
+#        SQL=DEBUG:#trace: debug
+#debug: true

@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -52,13 +52,14 @@ public class HostsEventsService {
 	}
 
 	public List<HostEvent> getHostEventsByHostAddress(HostAddress hostAddress) {
-		return hostEvents.findByHostAddress(hostAddress);
+		return hostEvents.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
 	public HostEvent saveHostEvent(HostAddress hostAddress, String decisionName) {
 		Decision decision = decisionsService.getHostPossibleDecision(decisionName);
 		HostEvent hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
-			.orElseGet(() -> HostEvent.builder().hostAddress(hostAddress).decision(decision).count(0).build());
+			.orElseGet(() -> HostEvent.builder().publicIpAddress(hostAddress.getPublicIpAddress())
+				.privateIpAddress(hostAddress.getPrivateIpAddress()).decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
 			hostEvent.setCount(1);

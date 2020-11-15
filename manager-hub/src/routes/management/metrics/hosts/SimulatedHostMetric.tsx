@@ -158,7 +158,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedHostMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedHostMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -172,7 +172,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<ISimulatedHostMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedHostMetric = this.getSimulatedHostMetric();
         if (previousSimulatedHostMetric.id) {
@@ -185,7 +185,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void =>
-        super.toast(`Não foi possível guardar as alterações feitas à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as alterações feitas à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
         super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
@@ -195,7 +195,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, simulatedMetric: ISimulatedHostMetric): void =>
-        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedCloudHosts.length
@@ -235,7 +235,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveCloudHostsFailure = (simulatedMetric: ISimulatedHostMetric, reason: string): void =>
-        super.toast(`Não foi possível guardar as instâncias associadas à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as instâncias associadas à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private addSimulatedHostMetricEdgeHost = (edgeHost: string): void => {
         this.setState({
@@ -266,7 +266,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     };
 
     private onSaveEdgeHostsFailure = (simulatedMetric: ISimulatedHostMetric, reason: string): void =>
-        super.toast(`Não foi possível guardar os hosts associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/métricas simuladas/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
+        super.toast(`Não foi possível guardar os hosts associados à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/hosts/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
         simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
@@ -284,7 +284,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                 [key]: {
                     id: key,
                     label: key,
-                    validation: {rule: requiredAndTrimmed}
+                    validation: key === 'generic' || key === 'active' || key === 'override' ? undefined : {rule: requiredAndTrimmed}
                 }
             };
         }).reduce((fields, field) => {

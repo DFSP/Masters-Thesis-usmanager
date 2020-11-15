@@ -157,7 +157,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleHost>): void => {
         const ruleHost = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleHost(ruleHost);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -171,7 +171,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleHost>): void => {
         const ruleHost = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleHost);
         const previousRuleHost = this.getRuleHost();
         if (previousRuleHost.id) {
@@ -184,7 +184,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Não foi possível atualizar a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleHost: IRuleHost): void => {
         super.toast(`<span class="green-text">A regra <b class="white-text">${ruleHost.name}</b> foi apagada com sucesso</span>`);
@@ -194,7 +194,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void =>
-        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível remover a regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedConditions.length
@@ -236,7 +236,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveConditionsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Não foi possível guardar as condições associados à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as condições associados à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleCloudHost = (cloudHost: string): void =>
         this.setState({
@@ -266,7 +266,7 @@ class RuleHost extends BaseComponent<Props, State> {
     };
 
     private onSaveCloudHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
-        super.toast(`Não foi possível guardar as instâncias associadas à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as instâncias associadas à regra ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private addRuleEdgeHost = (edgeHost: string): void =>
         this.setState({
@@ -297,7 +297,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
     private onSaveEdgeHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
         super.toast(`Não foi possível guardar os hosts associados à regra ${this.mounted ?
-            <b>${ruleHost.name}</b> : `<a href=/regras/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
+            <b>${ruleHost.name}</b> : `<a href='/regras/hosts/${ruleHost.name}'><b>${ruleHost.name}</b></a>`}`, 10000, reason, true);
 
     private updateRuleHost = (ruleHost: IRuleHost) => {
         ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];

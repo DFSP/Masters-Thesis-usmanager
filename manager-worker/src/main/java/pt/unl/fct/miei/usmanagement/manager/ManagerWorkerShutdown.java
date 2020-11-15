@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.lang.NonNull;
@@ -32,6 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmS
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
+@Slf4j
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
@@ -50,7 +52,11 @@ public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedE
 		symService.stopSymmetricDSServer();
 		syncService.stopContainersDatabaseSynchronization();
 		syncService.stopNodesDatabaseSynchronization();
-		dockerSwarmService.destroySwarm();
+		try {
+			dockerSwarmService.destroySwarm();
+		} catch (Exception e) {
+			log.error("Failed to destroy the swarm: {}", e.getMessage());
+		}
 	}
 
 }

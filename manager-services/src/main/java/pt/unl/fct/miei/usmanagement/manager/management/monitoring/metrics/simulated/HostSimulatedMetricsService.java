@@ -153,28 +153,28 @@ public class HostSimulatedMetricsService {
 			new EntityNotFoundException(EdgeHost.class, "hostname", hostname));
 	}
 
-	public void addEdgeHost(String simulatedMetricName, String hostname) {
-		addEdgeHosts(simulatedMetricName, List.of(hostname));
+	public void addEdgeHost(String simulatedMetricName, HostAddress hostAddress) {
+		addEdgeHosts(simulatedMetricName, List.of(hostAddress));
 	}
 
-	public void addEdgeHosts(String simulatedMetricName, List<String> hostnames) {
-		log.info("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
+	public void addEdgeHosts(String simulatedMetricName, List<HostAddress> hostAddresses) {
+		log.info("Adding edge hosts {} to simulated metric {}", hostAddresses, simulatedMetricName);
 		HostSimulatedMetric hostMetric = getHostSimulatedMetric(simulatedMetricName);
-		hostnames.forEach(hostname -> {
-			EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+		hostAddresses.forEach(hostAddress -> {
+			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			edgeHost.addHostSimulatedMetric(hostMetric);
 		});
 		hostSimulatedMetrics.save(hostMetric);
 	}
 
-	public void removeEdgeHost(String simulatedMetricName, String instanceId) {
-		removeEdgeHosts(simulatedMetricName, List.of(instanceId));
+	public void removeEdgeHost(String simulatedMetricName, HostAddress hostAddress) {
+		removeEdgeHosts(simulatedMetricName, List.of(hostAddress));
 	}
 
-	public void removeEdgeHosts(String simulatedMetricName, List<String> instanceIds) {
-		log.info("Removing edge hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
+	public void removeEdgeHosts(String simulatedMetricName, List<HostAddress> hostAddresses) {
+		log.info("Removing edge hosts {} from simulated metric {}", hostAddresses, simulatedMetricName);
 		HostSimulatedMetric hostMetric = getHostSimulatedMetric(simulatedMetricName);
-		instanceIds.forEach(instanceId -> edgeHostsService.getEdgeHostByHostname(instanceId).removeHostSimulatedMetric(hostMetric));
+		hostAddresses.forEach(hostAddress -> edgeHostsService.getEdgeHostByAddress(hostAddress).removeHostSimulatedMetric(hostMetric));
 		hostSimulatedMetrics.save(hostMetric);
 	}
 

@@ -40,7 +40,7 @@ public class ContainersRecoveryService {
 	}
 
 	void restoreCrashedContainers(List<Container> monitoringContainers, List<Container> synchronizedContainers) {
-		monitoringContainers.parallelStream()
+		monitoringContainers.stream()
 			.filter(container -> {
 				try {
 					return servicesService.getService(container.getServiceName()).getMinimumReplicas() > 0;

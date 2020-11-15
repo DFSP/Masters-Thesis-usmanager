@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -56,6 +57,7 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,13 +74,16 @@ public class CloudHostsService {
 
 	private final CloudHosts cloudHosts;
 
+	private final int threads;
+
 	public CloudHostsService(@Lazy AwsService awsService,
 							 @Lazy HostRulesService hostRulesService,
 							 @Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							 @Lazy HostsService hostsService,
 							 @Lazy NodesService nodesService,
 							 @Lazy DockerSwarmService dockerSwarmService,
-							 ConfigurationsService configurationsService, CloudHosts cloudHosts) {
+							 ConfigurationsService configurationsService, CloudHosts cloudHosts,
+							 ParallelismProperties parallelismProperties) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
@@ -87,6 +92,7 @@ public class CloudHostsService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.cloudHosts = cloudHosts;
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public List<CloudHost> getCloudHosts() {
@@ -259,9 +265,9 @@ public class CloudHostsService {
 	}
 
 	public void terminateInstances() {
-		awsService.getInstances().parallelStream()
+		new ForkJoinPool(threads).execute(() -> awsService.getInstances().parallelStream()
 			.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
-			.forEach(instance -> terminateInstance(instance.getInstanceId(), false));
+			.forEach(instance -> terminateInstance(instance.getInstanceId(), false)));
 	}
 
 
@@ -288,8 +294,7 @@ public class CloudHostsService {
 	}
 
 	public void removeRule(String hostname, String ruleName) {
-		checkCloudHostExists(hostname);
-		hostRulesService.removeCloudHost(ruleName, hostname);
+		removeRules(hostname, List.of(ruleName));
 	}
 
 	public void removeRules(String hostname, List<String> ruleNames) {
@@ -309,25 +314,23 @@ public class CloudHostsService {
 		);
 	}
 
-	public void addSimulatedMetric(String instanceId, String simulatedMetricName) {
-		checkCloudHostExists(instanceId);
-		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
+	public void addSimulatedMetric(String hostname, String simulatedMetricName) {
+		addSimulatedMetrics(hostname, List.of(simulatedMetricName));
 	}
 
-	public void addSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
-		checkCloudHostExists(instanceId);
+	public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+		checkCloudHostExists(hostname);
 		simulatedMetricNames.forEach(simulatedMetric ->
-			hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
+			hostSimulatedMetricsService.addCloudHost(simulatedMetric, hostname));
 	}
 
-	public void removeSimulatedMetric(String instanceId, String simulatedMetricName) {
-		checkCloudHostExists(instanceId);
-		hostSimulatedMetricsService.addCloudHost(simulatedMetricName, instanceId);
+	public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
+		removeSimulatedMetrics(hostname, List.of(simulatedMetricName));
 	}
 
-	public void removeSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
-		checkCloudHostExists(instanceId);
-		simulatedMetricNames.forEach(simulatedMetric -> hostSimulatedMetricsService.addCloudHost(simulatedMetric, instanceId));
+	public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+		checkCloudHostExists(hostname);
+		simulatedMetricNames.forEach(simulatedMetric -> hostSimulatedMetricsService.removeCloudHost(simulatedMetric, hostname));
 	}
 
 	public void assignWorkerManager(WorkerManager workerManager, String hostname) {
@@ -361,7 +364,6 @@ public class CloudHostsService {
 			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
 		}
 		AwsRegion region = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
-		log.info("Instance placement {} is on aws region {}", placement.getAvailabilityZone(), region.name());
 		return region;
 	}
 

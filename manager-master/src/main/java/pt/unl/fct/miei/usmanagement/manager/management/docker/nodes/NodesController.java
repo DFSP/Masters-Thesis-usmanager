@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
@@ -49,14 +48,12 @@ import java.util.Objects;
 public class NodesController {
 
 	private final NodesService nodesService;
-	private final DockerSwarmService dockerSwarmService;
 	private final WorkerManagersService workerManagersService;
 	private final SyncService syncService;
 
-	public NodesController(NodesService nodesService, DockerSwarmService dockerSwarmService, WorkerManagersService workerManagersService, SyncService syncService) {
+	public NodesController(NodesService nodesService, WorkerManagersService workerManagersService, SyncService syncService) {
 		this.nodesService = nodesService;
 		this.workerManagersService = workerManagersService;
-		this.dockerSwarmService = dockerSwarmService;
 		this.syncService = syncService;
 	}
 
@@ -99,9 +96,10 @@ public class NodesController {
 		return nodesService.rejoinSwarm(id);
 	}
 
-	@PutMapping("/{hostname}/leave")
-	public List<Node> leaveSwarm(@PathVariable("hostname") String hostname) {
-		return nodesService.leaveHost(new HostAddress(hostname));
+	@PutMapping("/{publicIpAddress}/{privateIpAddress}/leave")
+	public List<Node> leaveSwarm(@PathVariable("publicIpAddress") String publicIpAddress,
+								 @PathVariable("privateIpAddress") String privateIpAddress) {
+		return nodesService.leaveHost(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 	@PostMapping("/sync")

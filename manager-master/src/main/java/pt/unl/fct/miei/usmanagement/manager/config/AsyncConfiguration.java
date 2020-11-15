@@ -12,8 +12,8 @@ public class AsyncConfiguration {
 	@Bean
 	public Executor executor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(5);
-		executor.setMaxPoolSize(5);
+		executor.setCorePoolSize(8);
+		executor.setMaxPoolSize(8);
 		executor.setQueueCapacity(100);
 		executor.initialize();
 		return executor;

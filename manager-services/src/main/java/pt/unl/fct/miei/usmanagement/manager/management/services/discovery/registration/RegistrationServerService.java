@@ -29,18 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
-import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -50,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,17 +63,19 @@ public class RegistrationServerService {
 	private final CloudHostsService cloudHostsService;
 
 	private final int port;
+	private final int threads;
 
 	public RegistrationServerService(HostsService hostsService, ServicesService servicesService,
 									 @Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
 									 CloudHostsService cloudHostsService,
-									 RegistrationProperties registrationProperties) {
+									 RegistrationProperties registrationProperties, ParallelismProperties parallelismProperties) {
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
 		this.cloudHostsService = cloudHostsService;
 		this.port = registrationProperties.getPort();
+		this.threads = parallelismProperties.getThreads();
 	}
 
 	public Container launchRegistrationServer(RegionEnum region) {
@@ -110,11 +110,17 @@ public class RegistrationServerService {
 
 		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(REGISTRATION_SERVER);
 
-		List<HostAddress> availableHosts = regions.parallelStream()
-			.map(region ->
-				hostsService.getCapableNode(expectedMemoryConsumption, region, node -> cloudHostsService.hasCloudHost(node.getPublicIpAddress())))
-			.distinct()
-			.collect(Collectors.toList());
+		List<HostAddress> availableHosts = null;
+		try {
+			availableHosts = new ForkJoinPool(threads).submit(() -> regions.parallelStream()
+				.map(region ->
+					hostsService.getCapableHost(expectedMemoryConsumption, region, node -> cloudHostsService.hasCloudHost(node.getPublicIpAddress())))
+				.distinct()
+				.collect(Collectors.toList())).get();
+		}
+		catch (InterruptedException | ExecutionException e) {
+			throw new ManagerException("Unable to launch registration servers on regions {}: {}", e.getMessage());
+		}
 
 		List<String> customEnvs = Collections.emptyList();
 

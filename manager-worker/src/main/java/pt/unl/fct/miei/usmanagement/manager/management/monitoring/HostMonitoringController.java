@@ -50,19 +50,20 @@ public class HostMonitoringController {
 		return hostsMonitoringService.getHostsMonitoring();
 	}
 
-	@GetMapping("/{hostname}")
-	public List<HostMonitoring> getHostMonitoring(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostMonitoring(new HostAddress(hostname));
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}")
+	public List<HostMonitoring> getHostMonitoring(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return hostsMonitoringService.getHostMonitoring(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
-	@GetMapping("/{hostname}/fields?average")
-	public List<HostFieldAverage> getHostMonitoringFieldsAverage(@PathVariable String hostname) {
-		return hostsMonitoringService.getHostMonitoringFieldsAverage(new HostAddress(hostname));
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/fields")
+	public List<HostFieldAverage> getHostMonitoringFieldsAverage(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress) {
+		return hostsMonitoringService.getHostMonitoringFieldsAverage(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
-	@GetMapping("/{hostname}/fields/{field}?average")
-	public HostFieldAverage getHostMonitoringFieldAverage(@PathVariable String hostname, @PathVariable String field) {
-		return hostsMonitoringService.getHostMonitoringFieldAverage(new HostAddress(hostname), field);
+	@GetMapping("/{publicIpAddress}/{privateIpAddress}/fields/{field}")
+	public HostFieldAverage getHostMonitoringFieldAverage(@PathVariable String publicIpAddress, @PathVariable String privateIpAddress,
+														  @PathVariable String field) {
+		return hostsMonitoringService.getHostMonitoringFieldAverage(new HostAddress(publicIpAddress, privateIpAddress), field);
 	}
 
 	@GetMapping("/logs")

@@ -36,15 +36,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -85,26 +82,7 @@ public class ContainersController {
 
 	@PostMapping
 	public List<Container> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
-		String serviceName = launchContainerRequest.getService();
-		int internalPort = launchContainerRequest.getInternalPort();
-		int externalPort = launchContainerRequest.getExternalPort();
-		HostAddress hostAddress = launchContainerRequest.getHostAddress();
-		List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
-		List<Container> containers = new ArrayList<>();
-		if (hostAddress != null) {
-			Container container = containersService.launchContainer(hostAddress, serviceName, internalPort, externalPort);
-			containers.add(container);
-		}
-		else if (coordinates != null) {
-			for (Coordinates coordinate : coordinates) {
-				Container container = containersService.launchContainer(coordinate, serviceName, internalPort, externalPort);
-				containers.add(container);
-			}
-		}
-		else {
-			throw new BadRequestException("Expected host address or coordinates to start containers");
-		}
-		return containers;
+		return workerManagersService.launchContainers(launchContainerRequest);
 	}
 
 	@DeleteMapping("/{id}")
@@ -119,7 +97,6 @@ public class ContainersController {
 
 	@PostMapping("/{id}/migrate")
 	public Container migrateContainer(@PathVariable String id, @RequestBody HostAddress hostAddress) {
-		log.info("{}", hostAddress);
 		return containersService.migrateContainer(id, hostAddress);
 	}
 

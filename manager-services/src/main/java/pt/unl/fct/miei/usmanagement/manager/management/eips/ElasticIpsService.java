@@ -8,6 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIps;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -160,8 +161,7 @@ public class ElasticIpsService {
 	public CompletableFuture<ReleaseAddressResult> releaseElasticIpAddress(String allocationId, RegionEnum region) {
 		ReleaseAddressResult result = awsService.releaseElasticIpAddress(allocationId, region);
 		ElasticIp elasticIp = getElasticIp(allocationId);
-		elasticIp.setAllocationId(null);
-		elasticIps.save(elasticIp);
+		elasticIps.delete(elasticIp);
 		log.info("Released elastic ip {}", allocationId);
 		return CompletableFuture.completedFuture(result);
 	}
@@ -179,11 +179,8 @@ public class ElasticIpsService {
 		}
 
 		CompletableFuture.allOf(futureReleases.toArray(new CompletableFuture[0])).join();
-
-		reset();
 	}
 
-	@Transactional
 	public void reset() {
 		elasticIps.deleteAll();
 		log.info("Clearing all elastic ips");

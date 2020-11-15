@@ -41,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
@@ -109,7 +110,8 @@ public class DatabaseLoader {
 								   ServiceRuleConditions serviceRuleConditions, DockerProperties dockerProperties,
 								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
-								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService) {
+								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService,
+								   ContainersService containersService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -151,6 +153,8 @@ public class DatabaseLoader {
 			List<EdgeHost> edgeHosts = loadEdgeHosts(edgeHostsService);
 
 			List<CloudHost> cloudHosts = loadCloudHosts(syncService);
+
+			containersService.reset();
 
 			nodesService.reset();
 
@@ -792,7 +796,7 @@ public class DatabaseLoader {
 				.dockerRepository(dockerHubUsername + "/" + appName)
 				.defaultExternalPort(defaultExternalPort)
 				.defaultInternalPort(defaultInternalPort)
-				.launchCommand(String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand: ""))
+				.launchCommand(String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand : ""))
 				.minimumReplicas(1)
 				.outputLabel(String.format("${%sHost}", serviceName))
 				.environment(environment)

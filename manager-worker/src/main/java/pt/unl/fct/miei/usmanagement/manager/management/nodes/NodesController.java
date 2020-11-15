@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.nodes;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,6 +54,16 @@ public class NodesController {
 	public NodesController(NodesService nodesService, SyncService syncService) {
 		this.nodesService = nodesService;
 		this.syncService = syncService;
+	}
+
+	@GetMapping
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
+		return nodesService.getNodes();
+	}
+
+	@GetMapping("/{id}")
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(@PathVariable("id") String id) {
+		return nodesService.getNode(id);
 	}
 
 	@PostMapping

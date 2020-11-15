@@ -32,12 +32,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/simulated-metrics/hosts")
@@ -108,19 +110,32 @@ public class HostSimulatedMetricsController {
 	@PostMapping("/{simulatedMetricName}/edge-hosts")
 	public void addHostSimulatedMetricEdgeHosts(@PathVariable String simulatedMetricName,
 												@RequestBody List<String> edgeHosts) {
-		hostSimulatedMetricsService.addEdgeHosts(simulatedMetricName, edgeHosts);
+		// TODO parameter List of HostAddress instead
+		List<HostAddress> hostAddresses = edgeHosts.stream().map(edgeHost -> {
+			String[] addresses = edgeHost.split("-");
+			return new HostAddress(addresses[0], addresses[1]);
+		}).collect(Collectors.toList());
+		hostSimulatedMetricsService.addEdgeHosts(simulatedMetricName, hostAddresses);
 	}
 
 	@DeleteMapping("/{simulatedMetricName}/edge-hosts")
 	public void removeHostSimulatedMetricEdgeHosts(@PathVariable String simulatedMetricName,
 												   @RequestBody List<String> edgeHosts) {
-		hostSimulatedMetricsService.removeEdgeHosts(simulatedMetricName, edgeHosts);
+		// TODO parameter List of HostAddress instead
+		List<HostAddress> hostAddresses = edgeHosts.stream().map(edgeHost -> {
+			String[] addresses = edgeHost.split("-");
+			return new HostAddress(addresses[0], addresses[1]);
+		}).collect(Collectors.toList());
+		hostSimulatedMetricsService.removeEdgeHosts(simulatedMetricName, hostAddresses);
 	}
 
-	@DeleteMapping("/{simulatedMetricName}/edge-hosts/{hostname}")
+	@DeleteMapping("/{simulatedMetricName}/edge-hosts/{edgeHost}")
 	public void removeHostSimulatedMetricEdgeHost(@PathVariable String simulatedMetricName,
-												  @PathVariable String hostname) {
-		hostSimulatedMetricsService.removeEdgeHost(simulatedMetricName, hostname);
+												  @PathVariable String edgeHost) {
+		// TODO 2 path variables publicIpAddress and privateIpAddress
+		String publicIpAddress = edgeHost.split("-")[0];
+		String privateIpAddress = edgeHost.split("-")[1];
+		hostSimulatedMetricsService.removeEdgeHost(simulatedMetricName, new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 }
