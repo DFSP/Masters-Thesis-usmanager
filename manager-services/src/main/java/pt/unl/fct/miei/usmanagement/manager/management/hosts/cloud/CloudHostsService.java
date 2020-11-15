@@ -265,11 +265,10 @@ public class CloudHostsService {
 	}
 
 	public void terminateInstances() {
-		new ForkJoinPool(threads).execute(() -> awsService.getInstances().parallelStream()
+		awsService.getInstances().parallelStream()
 			.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
-			.forEach(instance -> terminateInstance(instance.getInstanceId(), false)));
+			.forEach(instance -> terminateInstance(instance.getInstanceId(), false));
 	}
-
 
 	public List<HostRule> getRules(String hostname) {
 		checkCloudHostExists(hostname);

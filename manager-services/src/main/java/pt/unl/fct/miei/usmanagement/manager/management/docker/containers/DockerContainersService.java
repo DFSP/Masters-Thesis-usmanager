@@ -490,13 +490,6 @@ public class DockerContainersService {
 		return replicaContainer;
 	}
 
-	public List<DockerContainer> getReadyContainers(DockerClient.ListContainersParam... filter) {
-		return nodesService.getReadyNodes().stream()
-			.map(node -> getContainers(node.getHostAddress(), filter))
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
-	}
-
 	public List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {
 		return getAllContainers(filter);
 	}

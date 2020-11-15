@@ -84,9 +84,6 @@ class Landing extends React.Component<Props, State> {
         this.setState({center: !this.state.center})
 
     private getContainersMarkers = (): IMarker[] => {
-        if (this.props.isLoading) {
-            return [];
-        }
         const containers: IContainer[] = Object.values(this.props.containers);
         const containerMarkers = new Map<String, IMarker>();
         containers.forEach(container => {

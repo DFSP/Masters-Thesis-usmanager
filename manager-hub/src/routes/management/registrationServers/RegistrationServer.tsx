@@ -271,6 +271,13 @@ class RegistrationServer extends BaseComponent<Props, State> {
     private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
+    private onPost = (registrationServers: IRegistrationServer[]) => {
+        if (registrationServers.length == 1) {
+            return registrationServers[0];
+        }
+        return registrationServers;
+    }
+
     private registrationServer = () => {
         const {isLoading, error, newRegistrationServerRegion, newRegistrationServerHost} = this.props;
         const {currentForm} = this.state;
@@ -294,7 +301,8 @@ class RegistrationServer extends BaseComponent<Props, State> {
                               textButton: 'Executar',
                               url: 'registration-server',
                               successCallback: this.onPostSuccess,
-                              failureCallback: this.onPostFailure
+                              failureCallback: this.onPostFailure,
+                              result: this.onPost,
                           }}
                           delete={{
                               textButton: 'Parar',

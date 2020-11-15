@@ -75,7 +75,7 @@ class NodeCard extends BaseComponent<Props, State> {
         this.props.node || this.state.node;
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm.'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -136,7 +136,7 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onLeaveSuccess = (nodes: INode[]) => {
         const node = nodes[0];
-        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> foi removido com sucesso do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.publicIpAddress}</b> saiu do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)

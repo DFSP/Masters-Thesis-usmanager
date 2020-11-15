@@ -239,7 +239,7 @@ class Node extends BaseComponent<Props, State> {
         super.toast(`Não foi possível mudar o cargo do nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
         if (this.mounted) {
             this.props.history.push(`/nós`);
         }
@@ -318,7 +318,7 @@ class Node extends BaseComponent<Props, State> {
 
     private onLeaveSuccess = (nodes: INode[]) => {
         const node = nodes[0];
-        super.toast(`<span class='green-text'>O host <b class='white-text'>${node.publicIpAddress}</b> foi removido com sucesso do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> foi removido com sucesso do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -495,6 +495,12 @@ class Node extends BaseComponent<Props, State> {
     private switchForm = (formId: 'Num endereço' | 'Escolher localização') =>
         this.setState({currentForm: formId});
 
+    private onPostReply = (nodes: INode[]) => {
+        let node = nodes[0];
+        node = addCoordinates(node);
+        return node;
+    }
+
     private node = () => {
         const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
         const {currentForm, loading} = this.state;
@@ -519,7 +525,8 @@ class Node extends BaseComponent<Props, State> {
                                   textButton: isNewNode ? 'Entrar no swarm' : 'Guardar',
                                   url: 'nodes',
                                   successCallback: this.onPostSuccess,
-                                  failureCallback: this.onPostFailure
+                                  failureCallback: this.onPostFailure,
+                                  result: this.onPostReply,
                               }}
                             // modify button is never present on new nodes, so a type cast is safe
                               put={(node as INode).state === 'down'

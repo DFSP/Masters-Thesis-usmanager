@@ -89,7 +89,7 @@ class AssignedHostsList extends BaseComponent<Props, State> {
         return <ControlledList<string>
             isLoading={!isNew ? this.props.isLoadingWorkerManager || this.props.isLoading : undefined}
             error={this.props.loadWorkerManagerError || (isNew ? undefined : this.props.error)}
-            emptyMessage={`O gestor não tem hosts associados`}
+            emptyMessage={`O gestor não gere nenhum host`}
             data={this.props.assignedHosts}
             dropdown={{
                 id: 'workerManagerHosts',

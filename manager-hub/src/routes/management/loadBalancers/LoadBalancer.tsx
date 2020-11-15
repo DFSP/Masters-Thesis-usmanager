@@ -293,6 +293,13 @@ class LoadBalancer extends BaseComponent<Props, State> {
     private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
+    private onPost = (loadBalancers: ILoadBalancer[]) => {
+        if (loadBalancers.length == 1) {
+            return loadBalancers[0];
+        }
+        return loadBalancers;
+    }
+
     private loadBalancer = () => {
         const {isLoading, error, newLoadBalancerRegion, newLoadBalancerHost} = this.props;
         const {currentForm} = this.state;
@@ -316,7 +323,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
                               textButton: 'Executar',
                               url: 'load-balancers',
                               successCallback: this.onPostSuccess,
-                              failureCallback: this.onPostFailure
+                              failureCallback: this.onPostFailure,
+                              result: this.onPost
                           }}
                           delete={{
                               textButton: 'Parar',

@@ -61,6 +61,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -159,6 +160,9 @@ public class WorkerManagersService {
 	}
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
+		if (!hostAddress.isComplete()) {
+			hostAddress = hostsService.completeHostAddress(hostAddress);
+		}
 		List<String> environment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.WorkerManager.EXTERNAL_ID + "=" + id,
 			ContainerConstants.Environment.WorkerManager.REGISTRATION_URL + "=" + getRegistrationUrl(),
@@ -190,11 +194,13 @@ public class WorkerManagersService {
 	// host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
 	public void assignHost(String workerManagerId, String hostname) {
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
-		try {
-			cloudHostsService.assignWorkerManager(workerManager, hostname);
-		}
-		catch (EntityNotFoundException ignored) {
-			edgeHostsService.assignWorkerManager(workerManager, hostname);
+		if (!Objects.equals(hostsService.getHostAddress(hostname), workerManager.getContainer().getHostAddress())) {
+			try {
+				cloudHostsService.assignWorkerManager(workerManager, hostname);
+			}
+			catch (EntityNotFoundException ignored) {
+				edgeHostsService.assignWorkerManager(workerManager, hostname);
+			}
 		}
 	}
 
@@ -314,7 +320,8 @@ public class WorkerManagersService {
 						}
 					}
 				}
-			} catch (InterruptedException | ExecutionException e) {
+			}
+			catch (InterruptedException | ExecutionException e) {
 				log.error("Failed to launch containers: {}... retrying ({}/{})", e.getMessage(), tries + 1, retries);
 				Timing.sleep(tries + 1, TimeUnit.SECONDS);
 			}
@@ -376,7 +383,7 @@ public class WorkerManagersService {
 	private String getRegistrationUrl() {
 		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
 		String port = environment.getProperty("local.server.port");
-		return String.format("http://%s:%s/api/registration", hostname, port);
+		return String.format("http://%s:%s/api/sync", hostname, port);
 	}
 
 	private String getSyncUrl() {

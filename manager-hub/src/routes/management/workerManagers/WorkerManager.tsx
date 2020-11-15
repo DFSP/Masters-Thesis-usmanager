@@ -315,6 +315,13 @@ class WorkerManager extends BaseComponent<Props, State> {
     private switchForm = (formId: 'Por regiões' | 'Num endereço') =>
         this.setState({currentForm: formId});
 
+    private onPost = (workerManagers: IWorkerManager[]) => {
+        if (workerManagers.length == 1) {
+            return workerManagers[0];
+        }
+        return workerManagers;
+    }
+
     private workerManager = () => {
         const {isLoading, error, newWorkerManagerRegion, newWorkerManagerHost} = this.props;
         const {currentForm} = this.state;
@@ -338,7 +345,8 @@ class WorkerManager extends BaseComponent<Props, State> {
                               textButton: isNew(this.props.location.search) ? 'Executar' : 'Guardar',
                               url: 'worker-managers',
                               successCallback: this.onPostSuccess,
-                              failureCallback: this.onPostFailure
+                              failureCallback: this.onPostFailure,
+                              result: this.onPost,
                           }}
                           delete={{
                               textButton: 'Parar',
@@ -384,7 +392,6 @@ class WorkerManager extends BaseComponent<Props, State> {
 }
 
 function removeFields(workerManager: Partial<IWorkerManager>) {
-    delete workerManager["id"];
     delete workerManager["assignedHosts"];
 }
 

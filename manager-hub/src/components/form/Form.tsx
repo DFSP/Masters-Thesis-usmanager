@@ -59,6 +59,7 @@ export type RestOperation = {
     url: string,
     successCallback: (reply?: any, args?: any) => void,
     failureCallback: (reason: string, args?: any) => void,
+    result?: (reply: any) => any;
 }
 
 export type IFields = {
@@ -307,6 +308,8 @@ class Form extends BaseComponent<Props, State> {
             id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
             children, confirmationDialog
         } = this.props;
+        console.log(id)
+        console.log(values)
         return (
             <>
                 <ReactTooltip id='tooltip' effect='solid' type='light'/>
@@ -593,7 +596,8 @@ class Form extends BaseComponent<Props, State> {
                         (reply) => {
                             post.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({values: reply.data as IValues, savedValues: reply.data as IValues, loading: undefined});
+                                const data = post.result?.(reply.data) || reply.data;
+                                this.setState({values: data as IValues, savedValues: data as IValues, loading: undefined});
                             }
                         },
                         (reply) => {
@@ -613,7 +617,8 @@ class Form extends BaseComponent<Props, State> {
                         (reply) => {
                             put.successCallback(reply, requestBody);
                             if (this.mounted) {
-                                this.setState({values: reply.data as IValues, savedValues: reply.data as IValues, loading: undefined});
+                                const data = put.result?.(reply.data) || reply.data;
+                                this.setState({values: data as IValues, savedValues: data as IValues, loading: undefined});
                             }
                         },
                         (reason) => {

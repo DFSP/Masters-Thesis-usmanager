@@ -104,7 +104,7 @@ rules:
 symmetricds:
   tables:
     exclude:
-      startsWith: sym, logging, container, node, worker
+      startsWith: sym, logging, container, node
       endsWith: events
       contains: monitoring
 worker-manager:
