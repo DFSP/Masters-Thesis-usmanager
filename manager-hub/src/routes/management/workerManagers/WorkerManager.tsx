@@ -162,7 +162,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         if (workerManagers.length === 1) {
             const workerManager = workerManagers[0];
             const publicIpAddress = workerManager.container.publicIpAddress;
-            super.toast(`<span class='green-text'>Worker-manager ${this.mounted ? `<b class='white-text'>${workerManager.id}</b>` : `<a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`} launched at ${publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O gestor local foi lançado no host ${publicIpAddress} com o id ${this.mounted ? `<b class='white-text'>${workerManager.id}</b>` : `<a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`}</span>`);
             this.saveEntities(workerManager);
             if (this.mounted) {
                 this.updateWorkerManager(workerManager);
@@ -170,7 +170,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             }
         } else {
             workerManagers = workerManagers.reverse();
-            super.toast(`<span class='green-text'>Launched ${workerManagers.length} worker-managers:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>${workerManagers.length == 1 ? 'Foi lançado' : 'Foram lançados'} ${workerManagers.length} ${workerManagers.length == 1 ? 'gestor local' : 'gestores locais'}:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push("/gestores locais");
             }

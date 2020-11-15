@@ -167,7 +167,8 @@ public class HostsMonitoringService {
 
 	public void saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
 		HostMonitoringLog hostMonitoringLog = HostMonitoringLog.builder()
-			.host(hostAddress)
+			.publicIpAddress(hostAddress.getPublicIpAddress())
+			.privateIpAddress(hostAddress.getPrivateIpAddress())
 			.field(field)
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
@@ -180,7 +181,8 @@ public class HostsMonitoringService {
 	}
 
 	public List<HostMonitoringLog> getHostMonitoringLogs(HostAddress hostAddress) {
-		return hostMonitoringLogs.findByHost(hostAddress);
+		return hostMonitoringLogs.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
+			hostAddress.getPrivateIpAddress());
 	}
 
 	public void initHostMonitorTimer() {
