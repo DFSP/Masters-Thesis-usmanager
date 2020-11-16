@@ -24,13 +24,16 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
+import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
@@ -51,23 +54,29 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final HostsMonitoringService hostsMonitoringService;
 	private final SymService symService;
 
+	private final Environment environment;
+
 	public ManagerMasterStartup(@Lazy HostsService hostsService,
 								@Lazy SyncService syncService, @Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								SymService symService) {
+								SymService symService, Environment environment) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.symService = symService;
+		this.environment = environment;
 	}
 
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		HostAddress hostAddress = hostsService.setManagerHostAddress();
+		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
+		HostAddress hostAddress = hostAddressJson == null
+			? hostsService.setManagerHostAddress()
+			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
 		symService.startSymmetricDsService(hostAddress);
 		elasticIpsService.allocateElasticIpAddresses();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);

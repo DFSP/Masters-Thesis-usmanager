@@ -240,7 +240,11 @@ public class HostsService {
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node;
 		if (isLocalhost(hostAddress)) {
 			log.info("Setting up docker swarm leader");
-			dockerSwarmService.leaveSwarm(hostAddress);
+			try  {
+				dockerSwarmService.leaveSwarm(hostAddress);
+			} catch (Exception e) {
+				log.error("Failed to leave swarm: {}", e.getMessage());
+			}
 			node = dockerSwarmService.initSwarm();
 		}
 		else {

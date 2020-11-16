@@ -109,6 +109,7 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
         if (value === undefined) {
             return <FaMapMarkedAlt/>;
         }
+        console.log(value)
         const regionName = (typeof value === 'string' ? value : (value as IRegion).region).toLowerCase();
         if (regionName.includes('america')) {
             return <FaGlobeAmericas/>;

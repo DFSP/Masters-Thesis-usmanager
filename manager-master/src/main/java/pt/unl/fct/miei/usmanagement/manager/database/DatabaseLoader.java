@@ -65,6 +65,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
@@ -111,7 +112,7 @@ public class DatabaseLoader {
 								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService,
-								   ContainersService containersService) {
+								   ContainersService containersService, WorkerManagersService workerManagersService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -153,6 +154,8 @@ public class DatabaseLoader {
 			List<EdgeHost> edgeHosts = loadEdgeHosts(edgeHostsService);
 
 			List<CloudHost> cloudHosts = loadCloudHosts(syncService);
+
+			workerManagersService.reset();
 
 			containersService.reset();
 

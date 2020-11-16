@@ -56,7 +56,7 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
         return (
             <RulesList isLoading={this.props.isLoading}
                        error={this.props.error}
-                       emptyMessage={`Não há nenhuma regra que se aplique a todos os serviços`}
+                       emptyMessage={`Não existem regras que se apliquem a todos os serviços`}
                        list={this.props.genericServiceRules}
                        show={this.rule}/>
         );

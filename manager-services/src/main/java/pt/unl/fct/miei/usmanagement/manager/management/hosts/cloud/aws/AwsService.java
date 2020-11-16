@@ -217,7 +217,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			throw new ManagerException("Timeout while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
+			throw new ManagerException("Timeout while waiting for instance %s to boot", instance.getInstanceId());
 		}
 		return instance;
 	}
@@ -249,7 +249,7 @@ public class AwsService {
 			waitToBoot(instance);
 		}
 		catch (TimeoutException e) {
-			throw new ManagerException("Timeout while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
+			throw new ManagerException("Timeout while waiting for instance %s to boot", instance.getInstanceId());
 		}
 		return instance;
 	}

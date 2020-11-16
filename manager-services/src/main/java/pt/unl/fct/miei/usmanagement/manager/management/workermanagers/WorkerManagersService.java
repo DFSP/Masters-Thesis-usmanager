@@ -34,6 +34,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -131,6 +132,8 @@ public class WorkerManagersService {
 
 	public WorkerManager getRegionWorkerManager(RegionEnum region) {
 		List<WorkerManager> workerManagers = getWorkerManagers(region);
+		log.info(region.name());
+		log.info(workerManagers.toString());
 		if (workerManagers.isEmpty()) {
 			workerManagers.addAll(launchWorkerManagers(List.of(region)));
 		}
@@ -142,6 +145,9 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager launchWorkerManager(HostAddress hostAddress) {
+		if (!hostAddress.isComplete()) {
+			hostAddress = hostsService.completeHostAddress(hostAddress);
+		}
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
@@ -173,9 +179,6 @@ public class WorkerManagersService {
 	}
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
-		if (!hostAddress.isComplete()) {
-			hostAddress = hostsService.completeHostAddress(hostAddress);
-		}
 		List<String> environment = new LinkedList<>(List.of(
 			ContainerConstants.Environment.WorkerManager.EXTERNAL_ID + "=" + id,
 			ContainerConstants.Environment.WorkerManager.REGISTRATION_URL + "=" + getRegistrationUrl(),
@@ -248,15 +251,20 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Container>> getContainers(Container workerManager, boolean sync) {
 		List<Container> containers = new ArrayList<>();
-		String hostname = workerManager.getHostAddress().getPublicIpAddress();
-		String url = String.format("http://%s:%s/api/containers/%s", hostname, port, sync ? "sync" : "");
+		String address = workerManager.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/containers%s", address, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
-		ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
-		Container[] responseBody = response.getBody();
-		if (responseBody != null) {
-			containers.addAll(Arrays.asList(responseBody));
+		try {
+			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
+			Container[] responseBody = response.getBody();
+			if (responseBody != null) {
+				containers.addAll(Arrays.asList(responseBody));
+			}
+			return CompletableFuture.completedFuture(containers);
 		}
-		return CompletableFuture.completedFuture(containers);
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
 	}
 
 	public List<Container> getContainers() {
@@ -293,13 +301,18 @@ public class WorkerManagersService {
 															  WorkerManager workerManager) {
 		String url = String.format("http://%s:%s/api/containers", workerManager.getContainer().getPublicIpAddress(), port);
 		HttpEntity<?> request = new HttpEntity<>(launchContainerRequest, headers);
-		ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
-		Container[] responseBody = response.getBody();
-		List<Container> containers = new ArrayList<>();
-		if (responseBody != null) {
-			containers.addAll(Arrays.asList(responseBody));
+		try {
+			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
+			Container[] responseBody = response.getBody();
+			List<Container> containers = new ArrayList<>();
+			if (responseBody != null) {
+				containers.addAll(Arrays.asList(responseBody));
+			}
+			return CompletableFuture.completedFuture(containers);
 		}
-		return CompletableFuture.completedFuture(containers);
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
 	}
 
 	public List<Container> launchContainers(LaunchContainerRequest launchContainerRequest) {
@@ -311,15 +324,22 @@ public class WorkerManagersService {
 		do {
 			try {
 				if (hostAddress != null) {
+					if (!hostAddress.isComplete()) {
+						hostAddress = hostsService.completeHostAddress(hostAddress);
+					}
 					RegionEnum region = hostAddress.getRegion();
 					WorkerManager workerManager = getRegionWorkerManager(region);
 					containers.addAll(launchContainer(launchContainerRequest, workerManager).get());
+					containers.forEach(container -> container.setWorkerManager(workerManager));
+					// TODO
 				}
 				else if (coordinates != null) {
 					List<CompletableFuture<List<Container>>> futureContainers = coordinates.stream().map(c -> {
 						RegionEnum region = RegionEnum.getClosestRegion(c);
 						WorkerManager workerManager = getRegionWorkerManager(region);
-						return launchContainer(launchContainerRequest, workerManager);
+						CompletableFuture<List<Container>> workerContainers = launchContainer(launchContainerRequest, workerManager);
+						//TODO
+						return workerContainers;
 					}).collect(Collectors.toList());
 
 					CompletableFuture.allOf(futureContainers.toArray(new CompletableFuture[0])).join();
@@ -350,15 +370,20 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Node>> getNodes(Container workerManager, boolean sync) {
 		List<Node> nodes = new ArrayList<>();
-		String hostname = workerManager.getHostAddress().getPublicIpAddress();
-		String url = String.format("http://%s:%s/api/nodes/%s", hostname, port, sync ? "sync" : "");
+		String address = workerManager.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/nodes%s", address, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
-		ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
-		Node[] responseBody = response.getBody();
-		if (responseBody != null) {
-			nodes.addAll(Arrays.asList(responseBody));
+		try {
+			ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
+			Node[] responseBody = response.getBody();
+			if (responseBody != null) {
+				nodes.addAll(Arrays.asList(responseBody));
+			}
+			return CompletableFuture.completedFuture(nodes);
 		}
-		return CompletableFuture.completedFuture(nodes);
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
 	}
 
 	public List<Node> getNodes() {
@@ -393,6 +418,51 @@ public class WorkerManagersService {
 		return getNodes(true);
 	}
 
+	@Async
+	public CompletableFuture<String> getContainerLogs(WorkerManager workerManager) {
+		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/containers/logs", address);
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		try {
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+			String logs = response.getBody();
+			return CompletableFuture.completedFuture(logs);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	@Async
+	public CompletableFuture<Container> replicateContainer(WorkerManager workerManager, String containerId, HostAddress toHostAddress) {
+		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/containers/%s/replicate", address, containerId);
+		try {
+			HttpEntity<?> request = new HttpEntity<>(toHostAddress, headers);
+			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
+			Container container = response.getBody();
+			return CompletableFuture.completedFuture(container);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	@Async
+	public CompletableFuture<Container> migrateContainer(WorkerManager workerManager, String containerId, HostAddress hostAddress) {
+		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/containers/%s/migrate", address, containerId);
+		HttpEntity<?> request = new HttpEntity<>(hostAddress, headers);
+		try {
+			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
+			Container container = response.getBody();
+			return CompletableFuture.completedFuture(container);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
 	private String getRegistrationUrl() {
 		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
 		String port = environment.getProperty("local.server.port");
@@ -405,5 +475,20 @@ public class WorkerManagersService {
 		return String.format("http://%s:%s/api/sync", hostname, port);
 	}
 
+	public void reset() {
+		workerManagers.deleteAll();
+	}
 
+	@Async
+	public void stopContainer(WorkerManager workerManager, String containerId) {
+		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String url = String.format("http://%s/api/containers/%s", address, containerId);
+		HttpEntity<String> request = new HttpEntity<>(headers);
+		try {
+			restTemplate.exchange(url, HttpMethod.DELETE, request, Container.class);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
 }

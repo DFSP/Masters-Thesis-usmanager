@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -274,16 +275,38 @@ public class ContainersService {
 
 	public Container replicateContainer(String id, HostAddress toHostAddress) {
 		Container containerEntity = getContainer(id);
-		Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
-		return container.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Unable to replicate container %s", id));
+		WorkerManager workerManager = containerEntity.getWorkerManager();
+		if (workerManager != null) {
+			try {
+				return workerManagersService.replicateContainer(workerManager, id, toHostAddress).get();
+			}
+			catch (InterruptedException | ExecutionException e) {
+				throw new ManagerException("Failed to replicate container {} at worker manager {}: {}", id, workerManager.getId(), e.getMessage());
+			}
+		}
+		else {
+			Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
+			return container.map(this::addContainerFromDockerContainer)
+				.orElseThrow(() -> new ManagerException("Unable to replicate container %s", id));
+		}
 	}
 
 	public Container migrateContainer(String id, HostAddress hostAddress) {
 		Container container = getContainer(id);
-		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
-		return dockerContainer.map(this::addContainerFromDockerContainer)
-			.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
+		WorkerManager workerManager = container.getWorkerManager();
+		if (workerManager != null) {
+			try {
+				return workerManagersService.migrateContainer(workerManager, id, hostAddress).get();
+			}
+			catch (InterruptedException | ExecutionException e) {
+				throw new ManagerException("Failed to migrate container {} at worker manager {}: {}", id, workerManager.getId(), e.getMessage());
+			}
+		}
+		else {
+			Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
+			return dockerContainer.map(this::addContainerFromDockerContainer)
+				.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
+		}
 	}
 
 	public Map<String, List<Container>> launchApp(List<Service> services, Coordinates coordinates) {
@@ -296,26 +319,36 @@ public class ContainersService {
 	}
 
 	public void stopContainer(String id) {
+		Container container = getContainer(id);
+		WorkerManager workerManager = container.getWorkerManager();
 		try {
-			Container container = getContainer(id);
-			dockerContainersService.stopContainer(container);
-			deleteContainer(id);
+			if (workerManager != null) {
+				workerManagersService.stopContainer(workerManager, id);
+				if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
+					try {
+						workerManagersService.deleteWorkerManagerByContainer(container);
+					}
+					catch (EntityNotFoundException e) {
+						log.error("Failed to delete worker-manager associated with container {}", id);
+					}
+				}
+			}
+			else {
+				dockerContainersService.stopContainer(container);
+				deleteContainer(container);
+			}
 		}
 		catch (ManagerException e) {
 			log.error("Failed to stop container {}: {}", id, e.getMessage());
 		}
 	}
 
+	public void deleteContainer(Container container) {
+		containers.delete(container);
+	}
+
 	public void deleteContainer(String id) {
 		Container container = getContainer(id);
-		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
-			try {
-				workerManagersService.deleteWorkerManagerByContainer(container);
-			}
-			catch (EntityNotFoundException e) {
-				log.error("Failed to delete worker-manager associated with container {}", id);
-			}
-		}
 		containers.delete(container);
 	}
 
@@ -361,19 +394,30 @@ public class ContainersService {
 
 	public String getLogs(String containerId) {
 		Container container = getContainer(containerId);
-		String logs = dockerContainersService.getContainerLogs(container);
-		if (logs != null) {
-			String path = String.format("./logs/services/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
-			Path logsPath = Paths.get(path);
+		WorkerManager workerManager = container.getWorkerManager();
+		if (workerManager != null) {
 			try {
-				Files.createDirectories(logsPath.getParent());
-				Files.write(logsPath, logs.getBytes());
+				return workerManagersService.getContainerLogs(workerManager).get();
 			}
-			catch (IOException e) {
-				log.error("Failed to get container {} logs: {}", containerId, e.getMessage());
+			catch (InterruptedException | ExecutionException e) {
+				throw new ManagerException("Failed to get logs of container {} from worker manager {}: {}", container, workerManager.getId(), e.getMessage());
 			}
 		}
-		return logs;
+		else {
+			String logs = dockerContainersService.getContainerLogs(container);
+			if (logs != null) {
+				String path = String.format("./logs/services/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
+				Path logsPath = Paths.get(path);
+				try {
+					Files.createDirectories(logsPath.getParent());
+					Files.write(logsPath, logs.getBytes());
+				}
+				catch (IOException e) {
+					log.error("Failed to get container {} logs: {}", containerId, e.getMessage());
+				}
+			}
+			return logs;
+		}
 	}
 
 	public List<ContainerRule> getRules(String containerId) {

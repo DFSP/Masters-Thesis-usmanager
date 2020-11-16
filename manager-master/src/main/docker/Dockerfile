@@ -13,9 +13,12 @@ WORKDIR /usr/src/app
 COPY manager-master/src src
 COPY manager-master/pom.xml .
 RUN mvn -DskipTests clean package
+RUN sh src/main/resources/script/docker-install.sh && sh src/main/resources/script/docker-api-install.sh
 
 FROM adoptopenjdk/openjdk11:alpine-jre
-RUN apk add bash
+RUN apk add bash util-linux && \
+sh src/main/docker/scripts/docker-install-dockerfile.sh src/main/docker/scripts/docker-api-install-dockerfile.sh && \
+docker ls
 WORKDIR /app
 COPY --from=build /usr/src/app/target/*.jar manager-master.jar
 EXPOSE 8080

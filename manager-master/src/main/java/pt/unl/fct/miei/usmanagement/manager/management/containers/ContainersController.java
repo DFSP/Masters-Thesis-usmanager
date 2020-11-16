@@ -67,7 +67,8 @@ public class ContainersController {
 		List<Container> containers;
 		if (serviceName != null) {
 			containers = containersService.getContainersWithLabels(
-				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
+				Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName))
+			);
 		}
 		else {
 			containers = containersService.getContainers();

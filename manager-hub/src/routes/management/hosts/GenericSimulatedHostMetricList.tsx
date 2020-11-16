@@ -56,7 +56,7 @@ class GenericSimulatedHostMetricList extends BaseComponent<Props, {}> {
         return (
             <SimulatedMetricsList isLoading={this.props.isLoading}
                                   error={this.props.error}
-                                  emptyMessage={`Não há nenhuma métrica simulada que se aplique a todos os hosts`}
+                                  emptyMessage={`Não existem métricas simuladas que se apliquem a todos os hosts`}
                                   list={this.props.genericSimulatedHostMetrics}
                                   show={this.simulatedMetric}/>
         );

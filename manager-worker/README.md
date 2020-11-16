@@ -31,10 +31,11 @@ export HOST_ADDRESS='{"username":"...","publicDnsName":"...","publicIpAddress":"
 export REGISTRATION_URL=http://...:8080/api/sync
 mvn spring-boot:run
 ```
+<sup>Ver a estrutura do [HOST_ADDRESS](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/hosts/HostAddress.java).</sup>
 
 #### Docker
 ```shell script
-docker build -f src/main/docker/Dockerfile . -t manager-worker
+docker build -f ../manager-worker/src/main/docker/Dockerfile .. -t manager-worker
 docker run --rm -p 8081:8081 -e EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... manager-worker
 ```
 

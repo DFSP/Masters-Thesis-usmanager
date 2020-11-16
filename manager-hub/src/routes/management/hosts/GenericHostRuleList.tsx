@@ -56,7 +56,7 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
         return (
             <RulesList isLoading={this.props.isLoading}
                        error={this.props.error}
-                       emptyMessage={`Não há nenhuma regra que se aplique a todos os hosts`}
+                       emptyMessage={`Não existem regras que se apliquem a todos os hosts`}
                        list={this.props.genericHostRules}
                        show={this.rule}/>
         );
