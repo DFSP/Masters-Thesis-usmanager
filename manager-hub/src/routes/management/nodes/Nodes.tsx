@@ -61,7 +61,7 @@ class Nodes extends BaseComponent<Props, {}> {
                               tooltip={{text: 'Sincronizar os nós na base de dados com o docker swarm', position: 'bottom'}}
                               clickCallback={this.syncNodes}/>
                 <AddButton button={{text: 'Adicionar nó'}}
-                           pathname={'/nós/novo nó?new#node'}/>
+                           pathname={'/nós/novo nó?new'}/>
                 <div className={`${styles.container}`}>
                     <CardList<INode>
                         isLoading={this.props.isLoading}

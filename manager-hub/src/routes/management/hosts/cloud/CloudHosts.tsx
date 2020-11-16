@@ -47,7 +47,7 @@ class CloudHosts extends BaseComponent<Props, {}> {
                               tooltip={{text: 'Sincronizar as instâncias cloud na base de dados com a amazon', position: 'bottom'}}
                               clickCallback={this.syncCloudInstances}/>
                 <AddButton button={{text: 'Iniciar instância'}}
-                           pathname={'/hosts/cloud/nova instância?new#cloud-host'}/>
+                           pathname={'/hosts/cloud/nova instância?new'}/>
                 <div className={`${styles.container}`}>
                     <CloudHostsList/>
                 </div>

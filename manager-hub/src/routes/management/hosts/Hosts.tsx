@@ -68,8 +68,8 @@ const Hosts = () =>
                        id: 'hosts',
                        title: 'Selecionar a localização',
                        data: [
-                           {text: 'Cloud', pathname: '/hosts/cloud/nova instância?new#cloud-host'},
-                           {text: 'Edge', pathname: '/hosts/edge/adicionar host?new#edge-host'}
+                           {text: 'Cloud', pathname: '/hosts/cloud/nova instância?new'},
+                           {text: 'Edge', pathname: '/hosts/edge/adicionar host?new'}
                        ],
                    }}/>
         <div className={`${styles.container}`}>

@@ -32,9 +32,11 @@ import com.spotify.docker.client.messages.AttachedNetwork;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerInfo;
+import com.spotify.docker.client.messages.ContainerMount;
 import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
+import com.spotify.docker.client.shaded.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
@@ -68,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -241,8 +244,7 @@ public class DockerContainersService {
 
 	private Optional<DockerContainer> launchContainer(HostAddress hostAddress, Service service,
 													  ContainerTypeEnum containerType, List<String> environment,
-													  Map<String, String> labels,
-													  Map<String, String> dynamicLaunchParams) {
+													  Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
 		final int retries = 3;
 		String errorMessage = null;
 		Configuration config = null;
@@ -340,10 +342,12 @@ public class DockerContainersService {
 				containerLabels.put(ContainerConstants.Label.REGION, region.name());
 				containerLabels.putAll(labels);
 
+				Set<String> volumes = service.getVolumes();
+
 				log.info("host = {}, internalPort = {}, externalPort = {}, containerName = {}, "
-						+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}",
+						+ "dockerRepository = {}, launchCommand = {}, envs = {}, labels = {}, volumes = {}",
 					hostAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
-					containerLabels);
+					containerLabels, volumes);
 
 				HostConfig hostConfig = HostConfig.builder()
 					.autoRemove(true)
@@ -355,6 +359,7 @@ public class DockerContainersService {
 					.hostConfig(hostConfig)
 					.hostname(serviceName)
 					.env(containerEnvironment)
+					.volumes(volumes)
 					.labels(containerLabels);
 				ContainerConfig containerConfig = launchCommand.isEmpty()
 					? containerBuilder.build()
@@ -565,6 +570,9 @@ public class DockerContainersService {
 		ContainerTypeEnum type = ContainerTypeEnum.getContainerType(container.labels().get(ContainerConstants.Label.CONTAINER_TYPE));
 		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
+		ImmutableList<ContainerMount> containerMounts = container.mounts();
+		Set<String> mounts = new HashSet<>();
+		containerMounts.forEach(mount -> mounts.add(mount.source().replace(":", "") + ":" + mount.destination()));
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
 		RegionEnum region = RegionEnum.getRegion(container.labels().get(ContainerConstants.Label.REGION));
 		List<ContainerPortMapping> ports = container.ports().stream()
@@ -572,7 +580,7 @@ public class DockerContainersService {
 			.collect(Collectors.toList());
 		Map<String, String> labels = container.labels();
 		return new DockerContainer(id, type, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
-			coordinates, region, ports, labels);
+			mounts, coordinates, region, ports, labels);
 	}
 
 	public String getContainerLogs(Container container) {

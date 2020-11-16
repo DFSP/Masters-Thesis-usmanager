@@ -88,6 +88,7 @@ export interface IContainer extends IDatabaseData {
     network: string;
     publicIpAddress: string;
     privateIpAddress: string;
+    mounts: string[];
     ports: IContainerPort[];
     labels: IContainerLabel;
     region: IRegion;
@@ -560,6 +561,19 @@ class Container extends BaseComponent<Props, State> {
         return null;
     }
 
+    private workerManagerLink = (workerManagerId: string) => {
+        console.log(workerManagerId)
+        /*const cloudHost = Object.values(this.props.cloudHosts).filter(c => c.publicIpAddress === publicIpAddress)[0];
+        if (cloudHost) {
+            return '/hosts/cloud/' + cloudHost.instanceId;
+        }
+        const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
+        if (edgeHost) {
+            return '/hosts/edge/' + edgeHost.publicIpAddress;
+        }*/
+        return null;
+    }
+
     private regionOption = (region: IRegion) =>
         region.region;
 
@@ -683,10 +697,18 @@ class Container extends BaseComponent<Props, State> {
                                              labeled: true
                                          }}/>
                                 : key === 'command'
-                                    ? <Field key={index} id={key} label={key} type='multilinetext'/>
-                                    : <Field key={index}
+                                    ? <Field key={index}
                                              id={key}
-                                             label={key}/>
+                                             label={key}
+                                             type='multilinetext'/>
+                                    : key === 'workerManager'
+                                        ? <Field key={index}
+                                                 id={key}
+                                                 label={key}
+                                                 icon={{linkedTo: this.workerManagerLink}}/>
+                                        : <Field key={index}
+                                               id={key}
+                                               label={key}/>
                 )}
             </>;
     }

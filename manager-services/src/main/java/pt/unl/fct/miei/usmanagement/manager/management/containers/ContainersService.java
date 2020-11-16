@@ -119,6 +119,7 @@ public class ContainersService {
 				.network(dockerContainer.getNetwork())
 				.publicIpAddress(dockerContainer.getPublicIpAddress())
 				.privateIpAddress(dockerContainer.getPrivateIpAddress())
+				.mounts(dockerContainer.getMounts())
 				.ports(dockerContainer.getPorts())
 				.labels(dockerContainer.getLabels())
 				.coordinates(dockerContainer.getCoordinates())
@@ -349,6 +350,14 @@ public class ContainersService {
 
 	public void deleteContainer(String id) {
 		Container container = getContainer(id);
+		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
+			try {
+				workerManagersService.deleteWorkerManagerByContainer(container);
+			}
+			catch (EntityNotFoundException e) {
+				log.error("Failed to delete worker-manager associated with container {}", id);
+			}
+		}
 		containers.delete(container);
 	}
 

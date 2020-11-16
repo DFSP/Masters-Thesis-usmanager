@@ -78,12 +78,6 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		try {
-			cloudHostsService.terminateInstances();
-		}
-		catch (Exception e) {
-			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
-		}
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()

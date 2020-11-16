@@ -104,6 +104,10 @@ public class Container {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
+	private Set<String> mounts;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
 	private List<ContainerPortMapping> ports;
 
 	@MapKeyColumn(name = "LABEL_KEY", length = 64)
@@ -114,6 +118,10 @@ public class Container {
 
 	@NotNull
 	private RegionEnum region;
+
+	@ManyToOne
+	@JoinColumn(name = "workerManager_id")
+	private WorkerManager workerManager;
 
 	@NotNull
 	private Coordinates coordinates;
@@ -136,9 +144,6 @@ public class Container {
 	)
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
 
-	@ManyToOne
-	@JoinColumn(name = "workerManager_id")
-	private WorkerManager workerManager;
 
 	@JsonIgnore
 	public String getServiceName() {

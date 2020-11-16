@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -88,6 +89,7 @@ public class WorkerManagersService {
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 	private final DockerSwarmService dockerSwarmService;
+	private final BashService bashService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -98,7 +100,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 DockerSwarmService dockerSwarmService, Environment environment, WorkerManagerProperties workerManagerProperties,
+								 DockerSwarmService dockerSwarmService, BashService bashService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
@@ -107,6 +109,7 @@ public class WorkerManagersService {
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.dockerSwarmService = dockerSwarmService;
+		this.bashService = bashService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -501,15 +504,16 @@ public class WorkerManagersService {
 
 	public void init() {
 		HostAddress hostAddress = hostsService.getManagerHostAddress();
-		new Timer("schedule-setup-host").schedule(new TimerTask() {
+		new Timer("schedule-setup-worker").schedule(new TimerTask() {
 			@Override
 			public void run() {
 				final int retries = 3;
 				for (int i = 0; i < retries; i++) {
 					try {
 						log.info("Setting up worker manager docker");
-						dockerSwarmService.leaveSwarm(hostAddress);
+						bashService.executeCommandSync("docker swarm leave --force");
 						dockerSwarmService.initSwarm();
+						return;
 					}
 					catch (ManagerException e) {
 						log.error("Failed to setup worker manager {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), e.getMessage(), i + 1, retries);

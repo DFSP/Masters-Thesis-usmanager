@@ -66,7 +66,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
-import javax.security.auth.login.Configuration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -351,11 +350,12 @@ public class AwsService {
 	public void waitToBoot(Instance instance) throws TimeoutException {
 		HostAddress hostAddress = new HostAddress(awsUsername, instance.getPublicIpAddress(), instance.getPrivateIpAddress());
 		try {
+			log.info("{}", BOOT_TIMEOUT);
 			SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
-			sshService.executeCommand("whoami", hostAddress, client, TimeUnit.SECONDS.toMillis(30));
+			sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
 		}
 		catch (IOException e) {
-			throw new TimeoutException("Timeout while waiting for new instance to boot");
+			throw new TimeoutException();
 		}
 	}
 

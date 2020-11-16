@@ -31,7 +31,7 @@ import SimulatedHostMetricsList from "./SimulatedHostMetricsList";
 const SimulatedHostMetrics: React.FC = () =>
     <MainLayout>
         <AddButton button={{text: 'Nova métrica simulada'}}
-                   pathname={'/métricas simuladas/hosts/nova métrica?new#metric'}/>
+                   pathname={'/métricas simuladas/hosts/nova métrica?new'}/>
         <div className={`${styles.container}`}>
             <SimulatedHostMetricsList/>
         </div>

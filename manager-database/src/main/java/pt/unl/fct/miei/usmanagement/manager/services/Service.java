@@ -102,8 +102,8 @@ public class Service {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Set<String> environment;
 
-	/*@ElementCollection
-	private Set<String> volumes;*/
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Set<String> volumes;
 
 	private Double expectedMemoryConsumption;
 

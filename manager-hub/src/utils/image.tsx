@@ -30,7 +30,7 @@ import {
     FaDatabase,
     FaDocker,
     FaDoorClosed,
-    FaDoorOpen,
+    FaDoorOpen, FaFile,
     FaGlobe,
     FaGlobeAfrica,
     FaGlobeAmericas,
@@ -66,6 +66,12 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 // https://materializecss.com/icons.html
 export const mapLabelToIcon = (label: string, value: any): string | JSX.Element => {
     label = label.toLowerCase().replace(' *', '');
+    if (label === 'mounts') {
+        return <FaFile/>;
+    }
+    if (label.includes('worker')) {
+        return 'group_work';
+    }
     if (label === 'type') {
        if (value === 'BY_REQUEST') {
            return <FaVolumeOff/>;
@@ -109,7 +115,6 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
         if (value === undefined) {
             return <FaMapMarkedAlt/>;
         }
-        console.log(value)
         const regionName = (typeof value === 'string' ? value : (value as IRegion).region).toLowerCase();
         if (regionName.includes('america')) {
             return <FaGlobeAmericas/>;

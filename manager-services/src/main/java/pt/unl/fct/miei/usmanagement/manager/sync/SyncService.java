@@ -93,7 +93,7 @@ public class SyncService {
 			CloudHost cloudHost = cloudHostsIterator.next();
 			String instanceId = cloudHost.getInstanceId();
 			if (configurationsService.isConfiguring(instanceId)) {
-				log.debug("Instance {} is currently being configured, skipping", instanceId);
+				log.info("Instance {} is currently being configured, skipping", instanceId);
 				continue;
 			}
 			if (!awsInstancesIds.containsKey(instanceId)) {

@@ -236,8 +236,8 @@ public class DockerSwarmService {
 			if (isNode) {
 				String nodeId = docker.info().swarm().nodeId();
 				boolean isManager = docker.info().swarm().controlAvailable();
-				Integer managers = docker.info().swarm().managers();
-				if (isManager && managers != null && managers > 1) {
+				/*Integer managers = docker.info().swarm().managers();*/
+				if (isManager/* && managers != null && managers > 1*/) {
 					changeRole(nodeId, NodeRole.WORKER);
 				}
 				docker.leaveSwarm();

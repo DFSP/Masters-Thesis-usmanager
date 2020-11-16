@@ -101,7 +101,7 @@ class Services extends BaseComponent<Props, State> {
         return (
             <MainLayout>
                 <AddButton button={{text: 'Novo serviço'}}
-                           pathname={'/serviços/novo serviço?new#service'}/>
+                           pathname={'/serviços/novo serviço?new'}/>
                 {Object.keys(this.props.apps).length > 0 &&
                 <div className={styles.filterDropdown}>
                     <a className={`btn-flat red-text ${styles.clearButton}`} onClick={this.clearFilter}>

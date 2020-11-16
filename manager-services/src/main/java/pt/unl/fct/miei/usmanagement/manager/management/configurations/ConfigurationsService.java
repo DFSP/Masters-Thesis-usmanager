@@ -52,4 +52,8 @@ public class ConfigurationsService {
 	public boolean isConfiguring(String id) {
 		return configurations.isConfiguring(id);
 	}
+
+	public void reset() {
+		configurations.deleteAll();
+	}
 }

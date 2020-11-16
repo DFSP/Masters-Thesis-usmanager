@@ -40,11 +40,11 @@ const Rules = () =>
                        id: 'addRuleOrCondition',
                        title: 'Regra aplicada a...',
                        data: [
-                           {text: 'hosts', pathname: '/regras/hosts/nova regra?new#rule'},
-                           {text: 'aplicações', pathname: '/regras/aplicações/nova regra?new#rule'},
-                           {text: 'serviços', pathname: '/regras/serviços/nova regra?new#rule'},
-                           {text: 'contentores', pathname: '/regras/contentores/nova regra?new#rule'},
-                           {text: 'ou adicionar condição', pathname: '/regras/condições/nova condição?new#rule'},
+                           {text: 'hosts', pathname: '/regras/hosts/nova regra?new'},
+                           {text: 'aplicações', pathname: '/regras/aplicações/nova regra?new'},
+                           {text: 'serviços', pathname: '/regras/serviços/nova regra?new'},
+                           {text: 'contentores', pathname: '/regras/contentores/nova regra?new'},
+                           {text: 'ou adicionar condição', pathname: '/regras/condições/nova condição?new'},
                        ],
                    }}/>
         <div className={`${styles.collapsibleContainer}`}>

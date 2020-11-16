@@ -39,10 +39,10 @@ const SimulatedMetrics = () =>
                        id: 'simulatedMetrics',
                        title: 'Selecionar o tipo de métrica...',
                        data: [
-                           {text: 'aplicada a hosts', pathname: '/métricas simuladas/hosts/nova métrica?new#metric'},
-                           {text: 'aplicada a aplicações', pathname: '/métricas simuladas/aplicações/nova métrica?new#metric'},
-                           {text: 'aplicada a serviços', pathname: '/métricas simuladas/serviços/nova métrica?new#metric'},
-                           {text: 'aplicada a contentores', pathname: '/métricas simuladas/contentores/nova métrica?new#metric'},
+                           {text: 'aplicada a hosts', pathname: '/métricas simuladas/hosts/nova métrica?new'},
+                           {text: 'aplicada a aplicações', pathname: '/métricas simuladas/aplicações/nova métrica?new'},
+                           {text: 'aplicada a serviços', pathname: '/métricas simuladas/serviços/nova métrica?new'},
+                           {text: 'aplicada a contentores', pathname: '/métricas simuladas/contentores/nova métrica?new'},
                        ],
                    }}/>
         <div className={`${styles.container}`}>

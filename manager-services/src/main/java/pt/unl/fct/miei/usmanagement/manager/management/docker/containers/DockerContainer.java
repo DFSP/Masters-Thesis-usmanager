@@ -34,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 public final class DockerContainer {
@@ -49,6 +50,7 @@ public final class DockerContainer {
 	private final String status;
 	private final String publicIpAddress;
 	private final String privateIpAddress;
+	private final Set<String> mounts;
 	private final Coordinates coordinates;
 	private final RegionEnum region;
 	private final List<ContainerPortMapping> ports;

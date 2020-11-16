@@ -41,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
@@ -112,7 +113,8 @@ public class DatabaseLoader {
 								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService,
-								   ContainersService containersService, WorkerManagersService workerManagersService) {
+								   ContainersService containersService, WorkerManagersService workerManagersService,
+								   ConfigurationsService configurationsService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -162,6 +164,8 @@ public class DatabaseLoader {
 			nodesService.reset();
 
 			elasticIpsService.reset();
+
+			configurationsService.reset();
 		};
 	}
 
@@ -1586,6 +1590,7 @@ public class DatabaseLoader {
 				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 				.outputLabel("${workerManagerHost}")
 				.serviceType(ServiceTypeEnum.SYSTEM)
+				.volumes(Set.of("/var/run/docker.sock:/var/run/docker.sock"))
 				.build();
 			workerManager = servicesService.addService(workerManager);
 		}

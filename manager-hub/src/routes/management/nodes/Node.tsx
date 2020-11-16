@@ -401,7 +401,7 @@ class Node extends BaseComponent<Props, State> {
         }
         const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
         if (edgeHost) {
-            return '/hosts/edge/' + edgeHost.publicIpAddress;
+            return '/hosts/edge/' + edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress;
         }
         return null;
     }

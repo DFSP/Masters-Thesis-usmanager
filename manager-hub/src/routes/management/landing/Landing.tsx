@@ -33,9 +33,9 @@ import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
 import {IMarker} from "../../../components/map/Marker";
 import {Error} from "../../../components/errors/Error";
-import ReactTooltip from "react-tooltip";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
+import {isEqual} from 'lodash';
 
 interface StateToProps {
     isLoading: boolean;
@@ -100,7 +100,8 @@ class Landing extends React.Component<Props, State> {
         });
 
         const cloudHosts: ICloudHost[] = Object.values(this.props.cloudHosts);
-        const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) => !containerMarkers.has(host.publicIpAddress))
+        const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) => !containerMarkers.has(host.publicIpAddress)
+            && !isEqual(host.state, awsInstanceStates.SHUTTING_DOWN) && !isEqual(host.state, awsInstanceStates.TERMINATED))
             .map(host => ({
                 title: host.awsRegion.name + ' (' + host.awsRegion.zone + ')' + '<br/>' + host.instanceId.substr(0, 10) + '<br/>',
                 label: host.publicIpAddress,
@@ -108,7 +109,7 @@ class Landing extends React.Component<Props, State> {
                 longitude: host.awsRegion.coordinates.longitude,
                 color: 'green'
             }))
-        
+
         const edgeHosts: IEdgeHost[] = Object.values(this.props.edgeHosts);
         const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.publicIpAddress))
             .map(host => ({
@@ -118,7 +119,7 @@ class Landing extends React.Component<Props, State> {
                 longitude: host.coordinates.longitude,
                 color: 'green'
             }))
-        
+
         return [...Array.from(containerMarkers.values()), ...cloudHostsMarkers, ...edgeHostsMarkers];
     }
 
