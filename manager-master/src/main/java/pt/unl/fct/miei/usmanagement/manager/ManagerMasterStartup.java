@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
@@ -48,6 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final HostsService hostsService;
+	private final CloudHostsService cloudHostsService;
 	private final SyncService syncService;
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
@@ -57,11 +59,14 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final Environment environment;
 
 	public ManagerMasterStartup(@Lazy HostsService hostsService,
-								@Lazy SyncService syncService, @Lazy ElasticIpsService elasticIpsService,
+								@Lazy CloudHostsService cloudHostsService,
+								@Lazy SyncService syncService,
+								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
 								SymService symService, Environment environment) {
 		this.hostsService = hostsService;
+		this.cloudHostsService = cloudHostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
@@ -73,10 +78,17 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		try {
+			cloudHostsService.terminateInstances();
+		}
+		catch (Exception e) {
+			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
+		}
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
 			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
+		log.info(new Gson().toJson(hostAddress));
 		symService.startSymmetricDsService(hostAddress);
 		elasticIpsService.allocateElasticIpAddresses();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);

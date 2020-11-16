@@ -18,8 +18,9 @@ Gere um conjunto de nós e containers na edge.
 ## Executar
 
 ##### Argumentos
-- id - id do worker-manager, deve ser único, para que seja diferenciado dos outros worker-managers
-- master - hostname do master-manager 
+- EXTERNAL_ID - id do gestor, deve ser único, para que seja diferenciado dos outros gestores locais.
+- HOST_ADDRESS - endereço associado ao gestor, em formato json, [ver estrutura](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/hosts/HostAddress.java).
+- REGISTRATION_URL - url de registo no gestor principal, especificado no seu [sym-node.properties](../manager-master/src/main/resources/sym/sym-node.properties).
 
 <sup>Alterar os valores dos argumentos, conforme necessário:</sup>
 
@@ -31,23 +32,17 @@ export HOST_ADDRESS='{"username":"...","publicDnsName":"...","publicIpAddress":"
 export REGISTRATION_URL=http://...:8080/api/sync
 mvn spring-boot:run
 ```
-<sup>Ver a estrutura do [HOST_ADDRESS](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/hosts/HostAddress.java).</sup>
 
 #### Docker
 ```shell script
 docker build -f ../manager-worker/src/main/docker/Dockerfile .. -t manager-worker
-docker run --rm -p 8081:8081 -e EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... manager-worker
+docker run --rm -p 8081:8081 -v /var/run/docker.sock:/var/run/docker.sock -e EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... manager-worker
 ```
 
 ##### Hub
 ```shell script
-docker run --rm -p 8081:8081 -e id=worker-1 -e master=127.0.0.1 usmanager/manager-worker
+docker run --rm -p 8081:8081 -e -v /var/run/docker.sock:/var/run/docker.sock EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... usmanager/manager-worker
 ```
-
-## Cloud
-
-Lançar a aplicação na cloud (aws):
-- https://aws.amazon.com/pt/blogs/devops/deploying-a-spring-boot-application-on-aws-using-aws-elastic-beanstalk/
 
 ## Licença
 

@@ -48,6 +48,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
@@ -64,6 +65,8 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -76,12 +79,15 @@ import java.util.stream.Stream;
 @Service
 public class WorkerManagersService {
 
+	private static final int DELAY_BEFORE_SWARM_SETUP = 2000;
+
 	private final WorkerManagers workerManagers;
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
 	private final ContainersService containersService;
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
+	private final DockerSwarmService dockerSwarmService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -92,7 +98,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 Environment environment, WorkerManagerProperties workerManagerProperties,
+								 DockerSwarmService dockerSwarmService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
@@ -100,6 +106,7 @@ public class WorkerManagersService {
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
+		this.dockerSwarmService = dockerSwarmService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -491,4 +498,26 @@ public class WorkerManagersService {
 			throw new ManagerException(e.getMessage());
 		}
 	}
+
+	public void init() {
+		HostAddress hostAddress = hostsService.getManagerHostAddress();
+		new Timer("schedule-setup-host").schedule(new TimerTask() {
+			@Override
+			public void run() {
+				final int retries = 3;
+				for (int i = 0; i < retries; i++) {
+					try {
+						log.info("Setting up worker manager docker");
+						dockerSwarmService.leaveSwarm(hostAddress);
+						dockerSwarmService.initSwarm();
+					}
+					catch (ManagerException e) {
+						log.error("Failed to setup worker manager {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), e.getMessage(), i + 1, retries);
+						Timing.sleep(i + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+					}
+				}
+			}
+		}, DELAY_BEFORE_SWARM_SETUP);
+	}
+
 }

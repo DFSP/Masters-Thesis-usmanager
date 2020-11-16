@@ -86,9 +86,9 @@ container:
   delay-before-stop: 45000
   monitor-period: 60000
 docker:
-  install-script: src/main/resources/scripts/docker-install.sh/docker-install.sh
+  install-script: src/main/resources/scripts/dockerfile-docker-install.sh/dockerfile-docker-install.sh
   uninstall-script: src/main/resources/scripts/docker-uninstall.sh/docker-uninstall.sh
-  install-api-script: src/main/resources/scripts/docker-api-install.sh/docker-api-install.sh
+  install-api-script: src/main/resources/scripts/dockerfile-docker-api-install.sh/dockerfile-docker-api-install.sh
   api:
     port: 2376
   api-proxy:

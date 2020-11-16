@@ -75,8 +75,6 @@ import java.util.stream.Collectors;
 @Service
 public class HostsService {
 
-	private static final int DELAY_BEFORE_HOST_SETUP = 2000;
-
 	private final NodesService nodesService;
 	private final ContainersService containersService;
 	private final DockerSwarmService dockerSwarmService;
@@ -127,26 +125,6 @@ public class HostsService {
 			throw new MethodNotAllowedException("Manager initialization did not finish");
 		}
 		return managerHostAddress;
-	}
-
-	public void scheduleSetupHost() {
-		new Timer("schedule-setup-host").schedule(new TimerTask() {
-			@Override
-			public void run() {
-				final int retries = 3;
-				for (int i = 0; i < retries; i++) {
-					try {
-						setupHost(managerHostAddress, NodeRole.MANAGER);
-					}
-					catch (Exception e) {
-						log.error("Failed to initialize manager {}: {}... retrying ({}/{})", managerHostAddress.toSimpleString(),
-							e.getMessage(), i + 1, retries);
-						e.printStackTrace();
-						Timing.sleep(DELAY_BEFORE_HOST_SETUP * (i + 1), TimeUnit.MILLISECONDS);
-					}
-				}
-			}
-		}, DELAY_BEFORE_HOST_SETUP);
 	}
 
 	public void clusterHosts() {
@@ -243,7 +221,7 @@ public class HostsService {
 			try  {
 				dockerSwarmService.leaveSwarm(hostAddress);
 			} catch (Exception e) {
-				log.error("Failed to leave swarm: {}", e.getMessage());
+				log.error(e.getMessage());
 			}
 			node = dockerSwarmService.initSwarm();
 		}

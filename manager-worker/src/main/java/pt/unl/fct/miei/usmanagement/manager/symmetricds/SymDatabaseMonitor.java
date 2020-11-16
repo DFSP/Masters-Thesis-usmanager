@@ -43,6 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 
 import java.util.Map;
@@ -56,6 +57,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 	private final HostsService hostsService;
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
+	private final WorkerManagersService workerManagersService;
 	private final Environment environment;
 
 	private boolean setupScheduled;
@@ -63,10 +65,12 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 	private EdgeHost oldEdgeHost;
 
 	SymDatabaseMonitor(HostsService hostsService, CloudHostsService cloudHostsService,
-					   EdgeHostsService edgeHostsService, Environment environment) {
+					   EdgeHostsService edgeHostsService, WorkerManagersService workerManagersService,
+					   Environment environment) {
 		this.hostsService = hostsService;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
+		this.workerManagersService = workerManagersService;
 		this.environment = environment;
 		this.setupScheduled = false;
 	}
@@ -133,7 +137,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 				&& "services".equalsIgnoreCase(tableName) && data.getDataEventType().equals(DataEventType.INSERT)) {
 				String serviceName = data.toColumnNameValuePairs(table.getColumnNames(), CsvData.ROW_DATA).get("SERVICE_NAME");
 				if (serviceName != null && serviceName.contains("nginx-basic-auth-proxy")) {
-					hostsService.scheduleSetupHost();
+					workerManagersService.init();
 					setupScheduled = true;
 				}
 			}

@@ -1,4 +1,5 @@
 FROM maven:3.6.0-jdk-11-slim AS build
+
 WORKDIR /usr/src/app/manager-database
 COPY manager-database/src ./src
 COPY manager-database/pom.xml ./pom.xml
@@ -14,10 +15,9 @@ COPY manager-worker/src src
 COPY manager-worker/pom.xml .
 RUN mvn -DskipTests clean package
 
-FROM adoptopenjdk/openjdk11:alpine-jre
-RUN apk add bash util-linux && \
-sh src/main/docker/scripts/docker-install-dockerfile.sh src/main/docker/scripts/docker-api-install-dockerfile.sh && \
-docker ls
+FROM adoptopenjdk/openjdk11:ubuntu-jre
+COPY manager-worker/src/main/docker/scripts scripts
+RUN sh scripts/dockerfile-docker-install.sh scripts/dockerfile-docker-api-install.sh
 WORKDIR /app
 COPY --from=build /usr/src/app/target/*.jar manager-worker.jar
 EXPOSE 8080
