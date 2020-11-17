@@ -47,6 +47,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "service_affinity")
 public class ServiceAffinity {
 

@@ -82,7 +82,7 @@ class Containers extends BaseComponent<Props, {}> {
     }
 
     private container = (container: IContainer): JSX.Element =>
-        <ContainerCard key={container.containerId} container={container}
+        <ContainerCard key={container.id} container={container}
                        nodes={{
                            data: Object.values(this.props.nodes),
                            isLoading: this.props.isLoadingNodes,
@@ -90,7 +90,7 @@ class Containers extends BaseComponent<Props, {}> {
                        }}/>;
 
     private predicate = (container: IContainer, search: string): boolean =>
-        container.containerId.toString().toLowerCase().includes(search)
+        container.id.toString().toLowerCase().includes(search)
         || container.type.toLowerCase().includes(search)
         || container.names.filter(name => name.includes(search)).length > 0
         || container.publicIpAddress.toLowerCase().includes(search)

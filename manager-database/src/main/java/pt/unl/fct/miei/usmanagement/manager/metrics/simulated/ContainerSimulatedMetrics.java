@@ -38,12 +38,12 @@ public interface ContainerSimulatedMetrics extends JpaRepository<ContainerSimula
 
 	@Query("select m "
 		+ "from ContainerSimulatedMetric m join m.containers c "
-		+ "where c.containerId = :containerId")
+		+ "where c.id = :containerId")
 	List<ContainerSimulatedMetric> findByContainer(@Param("containerId") String containerId);
 
 	@Query("select m "
 		+ "from ContainerSimulatedMetric m join m.containers c "
-		+ "where c.containerId = :containerId and lower(m.field.name) = lower(:field)")
+		+ "where c.id = :containerId and lower(m.field.name) = lower(:field)")
 	Optional<ContainerSimulatedMetric> findByContainerAndField(@Param("containerId") String containerId,
 															   @Param("field") String field);
 
@@ -59,7 +59,7 @@ public interface ContainerSimulatedMetrics extends JpaRepository<ContainerSimula
 
 	@Query("select c "
 		+ "from ContainerSimulatedMetric m join m.containers c "
-		+ "where lower(m.name) = lower(:simulatedMetricName) and c.containerId = :containerId")
+		+ "where lower(m.name) = lower(:simulatedMetricName) and c.id = :containerId")
 	Optional<Container> getContainer(@Param("simulatedMetricName") String simulatedMetricName,
 									 @Param("containerId") String containerId);
 

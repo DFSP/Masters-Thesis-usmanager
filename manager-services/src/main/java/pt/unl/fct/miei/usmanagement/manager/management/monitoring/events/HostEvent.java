@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
 @RequiredArgsConstructor
 @Getter
@@ -36,6 +37,6 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 @EqualsAndHashCode(callSuper = true)
 public final class HostEvent extends Event {
 
-	private final HostAddress hostAddress;
+	private final Node node;
 
 }

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
@@ -55,6 +56,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "apps")
 public class App {
 

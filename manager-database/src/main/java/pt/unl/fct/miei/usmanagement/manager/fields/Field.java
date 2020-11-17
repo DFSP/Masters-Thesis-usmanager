@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -55,6 +56,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "fields")
 public class Field {
 

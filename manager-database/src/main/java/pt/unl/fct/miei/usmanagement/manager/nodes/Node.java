@@ -8,8 +8,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -18,7 +20,6 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -31,14 +32,13 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "nodes")
 public class Node {
 
 	@Id
-	@GeneratedValue
-	private Long id;
-
-	private String nodeId;
+	@NaturalId
+	private String id;
 
 	private String publicIpAddress;
 

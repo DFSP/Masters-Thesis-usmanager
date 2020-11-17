@@ -34,37 +34,37 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import java.util.List;
 import java.util.Optional;
 
-public interface Containers extends JpaRepository<Container, Long> {
+public interface Containers extends JpaRepository<Container, String> {
 
-	Optional<Container> findByContainerIdStartingWith(@Param("containerId") String containerId);
+	Optional<Container> findByIdStartingWith(@Param("containerId") String containerId);
 
 	List<Container> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
 	@Query("select r "
 		+ "from Container c join c.containerRules r "
-		+ "where c.containerId = :containerId")
+		+ "where c.id = :containerId")
 	List<ContainerRule> getRules(@Param("containerId") String containerId);
 
 	@Query("select r "
 		+ "from Container c join c.containerRules r "
-		+ "where c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
+		+ "where c.id = :containerId and lower(r.name) = lower(:ruleName)")
 	List<ContainerRule> getRule(@Param("containerId") String containerId,
 								@Param("ruleName") String ruleName);
 
 	@Query("select m "
 		+ "from Container c join c.simulatedContainerMetrics m "
-		+ "where c.containerId = :containerId")
+		+ "where c.id = :containerId")
 	List<ContainerSimulatedMetric> getSimulatedMetrics(@Param("containerId") String containerId);
 
 	@Query("select m "
 		+ "from Container c join c.simulatedContainerMetrics m "
-		+ "where c.containerId = :containerId and lower(m.name) = lower(:simulatedMetricName)")
+		+ "where c.id = :containerId and lower(m.name) = lower(:simulatedMetricName)")
 	Optional<ContainerSimulatedMetric> getSimulatedMetric(@Param("containerId") String containerId,
 														  @Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select case when count(c) > 0 then true else false end "
 		+ "from Container c "
-		+ "where c.containerId = :containerId")
+		+ "where c.id = :containerId")
 	boolean hasContainer(@Param("containerId") String containerId);
 
 	List<Container> findByWorkerManager(WorkerManager workerManager);

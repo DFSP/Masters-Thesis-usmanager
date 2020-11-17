@@ -76,7 +76,7 @@ class ContainerRuleList extends BaseComponent<Props, State> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        if (!prevProps.container?.containerId && this.props.container?.containerId) {
+        if (!prevProps.container?.id && this.props.container?.id) {
             this.setState({entitySaved: true});
         }
     }
@@ -97,7 +97,7 @@ class ContainerRuleList extends BaseComponent<Props, State> {
                                onAdd={this.onAdd}
                                onRemove={this.onRemove}
                                onDelete={{
-                                   url: `containers/${this.props.container?.containerId}/rules`,
+                                   url: `containers/${this.props.container?.id}/rules`,
                                    successCallback: this.onDeleteSuccess,
                                    failureCallback: this.onDeleteFailure
                                }}
@@ -105,14 +105,14 @@ class ContainerRuleList extends BaseComponent<Props, State> {
     }
 
     private loadEntities = () => {
-        if (this.props.container?.containerId) {
-            const {containerId} = this.props.container;
-            this.props.loadContainerRules(containerId);
+        if (this.props.container?.id) {
+            const {id} = this.props.container;
+            this.props.loadContainerRules(id.toString());
         }
     };
 
     private isNew = () =>
-        this.props.container?.containerId === undefined;
+        this.props.container?.id === undefined;
 
     private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
@@ -150,9 +150,9 @@ class ContainerRuleList extends BaseComponent<Props, State> {
         this.props.onRemoveContainerRules(rules);
 
     private onDeleteSuccess = (rules: string[]): void => {
-        if (this.props.container?.containerId) {
-            const {containerId} = this.props.container;
-            this.props.removeContainerRules(containerId, rules);
+        if (this.props.container?.id) {
+            const {id} = this.props.container;
+            this.props.removeContainerRules(id.toString(), rules);
         }
     };
 
@@ -167,7 +167,7 @@ class ContainerRuleList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ContainerRuleListProps): StateToProps {
-    const containerId = ownProps.container?.containerId;
+    const containerId = ownProps.container?.id;
     const container = containerId && state.entities.containers.data[containerId];
     const rulesName = container && container.containerRules;
     return {

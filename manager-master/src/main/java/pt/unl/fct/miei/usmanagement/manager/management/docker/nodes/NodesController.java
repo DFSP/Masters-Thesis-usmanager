@@ -80,7 +80,7 @@ public class NodesController {
 
 	@PutMapping("/{id}")
 	public Node updateNode(@PathVariable String id, @RequestBody Node node) {
-		if (!Objects.equals(id, node.getNodeId())) {
+		if (!Objects.equals(id, node.getId())) {
 			throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
 		}
 		return nodesService.updateNodeSpecs(id, node);

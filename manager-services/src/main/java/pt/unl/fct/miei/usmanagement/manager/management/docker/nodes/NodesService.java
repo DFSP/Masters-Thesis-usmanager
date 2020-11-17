@@ -28,8 +28,6 @@ import com.google.gson.Gson;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -48,12 +46,7 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Nodes;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
-import javax.persistence.MapKeyColumn;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +85,7 @@ public class NodesService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node getNode(String id) {
-		return nodes.findNodeByNodeId(id).orElseThrow(() ->
+		return nodes.findNodeById(id).orElseThrow(() ->
 			new EntityNotFoundException(Node.class, "id", id));
 	}
 
@@ -150,7 +143,7 @@ public class NodesService {
 	}
 
 	public void removeHost(HostAddress hostAddress) {
-		getHostNodes(hostAddress).forEach(node -> removeNode(node.getNodeId()));
+		getHostNodes(hostAddress).forEach(node -> removeNode(node.getId()));
 	}
 
 	public void removeNode(String nodeId) {
@@ -224,8 +217,6 @@ public class NodesService {
 		Node swarmNode = dockerSwarmService.updateNode(nodeId, newNode.getAvailability().name(), newNode.getRole().name(),
 			newNode.getLabels());
 		newNode = fromSwarmNode(swarmNode);
-		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
-		newNode.setId(node.getId());
 		log.info("Saving node {}", ToStringBuilder.reflectionToString(newNode));
 		return nodes.save(newNode);
 	}
@@ -262,7 +253,7 @@ public class NodesService {
 	private pt.unl.fct.miei.usmanagement.manager.nodes.Node fromSwarmNode(Node node) {
 		com.spotify.docker.client.messages.swarm.ManagerStatus status = node.managerStatus();
 		return pt.unl.fct.miei.usmanagement.manager.nodes.Node.builder()
-			.nodeId(node.id())
+			.id(node.id())
 			.publicIpAddress(node.status().addr())
 			.availability(NodeAvailability.getNodeAvailability(node.spec().availability()))
 			.role(NodeRole.getNodeRole(node.spec().role()))
@@ -278,7 +269,7 @@ public class NodesService {
 		new ForkJoinPool(threads).execute(() ->
 			containersService.getSystemContainers(hostAddress).parallelStream()
 				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
-				.forEach(c -> containersService.stopContainer(c.getContainerId()))
+				.forEach(c -> containersService.stopContainer(c.getId()))
 		);
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		dockerSwarmService.leaveSwarm(hostAddress);

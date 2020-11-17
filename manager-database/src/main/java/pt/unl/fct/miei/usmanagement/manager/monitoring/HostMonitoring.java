@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -53,6 +54,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "host_monitoring")
 public class HostMonitoring {
 

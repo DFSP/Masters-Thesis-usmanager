@@ -351,7 +351,7 @@ class App extends BaseComponent<Props, State> {
         super.toast(`<span><span class='green-text'>Os serviços foram lançados com sucesso nos seguintes contentores<br/>
         </span>${Object.entries(launchApp)
                 .map(([service, containers]) => `<b>${service}</b> ${containers.map(c =>
-                    `<a href='/contentores/${c.containerId}'>${c.containerId}</a>`).join(', ')}`).join('<br/>')}</span>`,
+                    `<a href='/contentores/${c.id}'>${c.id}</a>`).join(', ')}`).join('<br/>')}</span>`,
             20000);
         if (this.mounted) {
             this.setState({loading: undefined});

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
@@ -58,6 +59,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "conditions")
 public class Condition {
 

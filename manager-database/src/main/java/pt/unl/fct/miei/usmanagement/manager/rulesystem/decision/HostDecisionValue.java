@@ -30,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.Entity;
@@ -46,6 +47,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "host_decision_values")
 public class HostDecisionValue {
 

@@ -58,7 +58,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
     }
 
     public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-        if (prevProps.container?.containerId !== this.props.container?.containerId) {
+        if (prevProps.container?.id !== this.props.container?.id) {
             this.loadEntities();
         }
     }
@@ -99,9 +99,9 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
     };
 
     private reloadLogs = () => {
-        if (this.props.container?.containerId) {
-            const {containerId} = this.props.container;
-            this.props.loadContainerLogs(containerId);
+        if (this.props.container?.id) {
+            const {id} = this.props.container;
+            this.props.loadContainerLogs(id.toString());
         }
     };
 
@@ -126,8 +126,8 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: PortsListProps): StateToProps {
-    const containerId = ownProps.container?.containerId;
-    const container = containerId && state.entities.containers.data[containerId];
+    const containerId = ownProps.container?.id;
+    const container = containerId?.toString() && state.entities.containers.data[containerId];
     const logs = container && container.logs;
     return {
         isLoading: state.entities.containers.isLoadingLogs,

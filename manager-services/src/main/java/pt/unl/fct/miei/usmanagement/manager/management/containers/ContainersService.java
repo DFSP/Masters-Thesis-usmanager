@@ -55,10 +55,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +106,7 @@ public class ContainersService {
 		}
 		catch (EntityNotFoundException e) {
 			Container container = Container.builder()
-				.containerId(dockerContainer.getId())
+				.id(dockerContainer.getId())
 				.type(dockerContainer.getType())
 				.created(dockerContainer.getCreated())
 				.names(dockerContainer.getNames())
@@ -158,7 +154,7 @@ public class ContainersService {
 	}
 
 	public Container getContainer(String containerId) {
-		return containers.findByContainerIdStartingWith(containerId).orElseThrow(() ->
+		return containers.findByIdStartingWith(containerId).orElseThrow(() ->
 			new EntityNotFoundException(Container.class, "containerId", containerId));
 	}
 
@@ -361,14 +357,14 @@ public class ContainersService {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()))
-		).stream().filter(container -> !configurationsService.isConfiguring(container.getContainerId())).collect(Collectors.toList());
+		).stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
 	}
 
 	public List<Container> getAppContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name())))
-			.stream().filter(container -> !configurationsService.isConfiguring(container.getContainerId())).collect(Collectors.toList());
+			.stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
 	}
 
 	public List<Container> getDatabaseContainers() {
@@ -516,7 +512,7 @@ public class ContainersService {
 	}
 
 	private void checkContainerDoesntExist(Container container) {
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		if (containers.hasContainer(containerId)) {
 			throw new DataIntegrityViolationException("Container " + containerId + " already exists");
 		}
@@ -526,7 +522,7 @@ public class ContainersService {
 		Coordinates coordinates = hostAddress.getCoordinates();
 		List<Container> containers = new LinkedList<>();
 		getAppContainers(hostAddress).forEach(container -> {
-			String containerId = container.getContainerId();
+			String containerId = container.getId();
 			String serviceName = container.getServiceName();
 			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 			HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);

@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
@@ -48,6 +49,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "service_monitoring_logs")
 public class ServiceMonitoringLog {
 

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -56,6 +57,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "service_rules")
 public class ServiceRule {
 

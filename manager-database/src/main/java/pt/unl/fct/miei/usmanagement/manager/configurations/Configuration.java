@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "configurations")
 public class Configuration {
 

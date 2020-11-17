@@ -180,7 +180,7 @@ const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', 
 });
 
 const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
-    idAttribute: (container: IContainer) => container.containerId
+    idAttribute: (container: IContainer) => container.id.toString()
 });
 const containers = new schema.Array(container);
 
@@ -195,7 +195,7 @@ const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefi
 const edgeHosts = new schema.Array(edgeHost);
 
 const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
-    idAttribute: (node: INode) => node.nodeId.toString()
+    idAttribute: (node: INode) => node.id.toString()
 });
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
@@ -267,11 +267,11 @@ const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new s
 const containerSimulatedMetrics = new schema.Array(simulatedContainerMetric);
 
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
-    idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.containerId
+    idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.id.toString()
 });
 
 const registrationServer: schema.Entity<IRegistrationServer> = new schema.Entity('registrationServers', undefined, {
-    idAttribute: (registrationServer: IRegistrationServer) => registrationServer.containerId
+    idAttribute: (registrationServer: IRegistrationServer) => registrationServer.id.toString()
 });
 
 const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerManagers', undefined, {

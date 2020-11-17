@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.Event;
@@ -184,13 +185,12 @@ public class DroolsService {
 
 	public HostDecisionResult evaluate(HostEvent event) {
 		Decision hostDecision = new Decision();
-		HostAddress hostAddress = event.getHostAddress();
+		HostAddress hostAddress = event.getNode().getHostAddress();
 		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostAddress);
 		hostRuleSession.getGlobals().set("hostDecision", hostDecision);
 		hostRuleSession.execute(event);
 		long ruleId = getRuleFired(hostRuleSession.getAgendaEventListeners());
-		return new HostDecisionResult(hostAddress, hostDecision.getDecision(), ruleId, event.getFields(),
-			hostDecision.getPriority());
+		return new HostDecisionResult(hostAddress, hostDecision.getDecision(), ruleId, event.getFields(), hostDecision.getPriority());
 	}
 
 	private long getRuleFired(Collection<AgendaEventListener> agendaEvents) {

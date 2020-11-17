@@ -30,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -47,6 +48,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @IdClass(LoggingEventExceptionId.class)
 @Table(name = "logging_event_exception")
 public class LoggingEventException {

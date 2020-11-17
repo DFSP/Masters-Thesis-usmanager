@@ -145,14 +145,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
         let loadBalancers = reply.data;
         if (loadBalancers.length === 1) {
             const loadBalancer = loadBalancers[0];
-            super.toast(`<span class="green-text">O balanceamento de carga ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href='/balanceamento de carga/${loadBalancer.containerId}'><b>${loadBalancer.containerId}</b></a>`} foi iniciado</span>`);
+            super.toast(`<span class="green-text">O balanceamento de carga ${this.mounted ? `<b class="white-text">${loadBalancer.id}</b>` : `<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`} foi iniciado</span>`);
             if (this.mounted) {
                 this.updateLoadBalancer(loadBalancer);
-                this.props.history.replace(loadBalancer.containerId)
+                this.props.history.replace(loadBalancer.id.toString())
             }
         } else {
             loadBalancers = loadBalancers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${loadBalancers.length} balanceadores de carga: <br/><b class="white-text">${loadBalancers.map(loadBalancer => `Contentor ${loadBalancer.containerId} => Host ${loadBalancer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${loadBalancers.length} balanceadores de carga: <br/><b class="white-text">${loadBalancers.map(loadBalancer => `Contentor ${loadBalancer.id} => Host ${loadBalancer.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/balanceamento de carga');
             }
@@ -164,14 +164,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar uma nova instância do balanceamento de carga`, 10000, reason, true);
 
     private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
-        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.containerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/balanceamento de carga`)
         }
     };
 
     private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
-        super.toast(`Não foi possível para a instância do balanceamento de carga ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href='/balanceamento de carga/${loadBalancer.containerId}'><b>${loadBalancer.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível para a instância do balanceamento de carga ${this.mounted ? `<b>${loadBalancer.id}</b>` : `<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`}`, 10000, reason, true);
 
     private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
         loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
@@ -262,11 +262,11 @@ class LoadBalancer extends BaseComponent<Props, State> {
                                                       }}/>
                     </>
                 : formLoadBalancer && Object.entries(formLoadBalancer).map((([key, value], index) =>
-                key === 'containerId'
+                key === 'id'
                     ? <Field key={index}
                              id={key}
                              label={key}
-                             icon={{linkedTo: '/contentores/' + (formLoadBalancer as Partial<ILoadBalancer>).containerId}}/>
+                             icon={{linkedTo: '/contentores/' + (formLoadBalancer as Partial<ILoadBalancer>).id}}/>
                     : key === 'created'
                     ? <Field key={index}
                              id={key}
@@ -328,7 +328,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                           }}
                           delete={{
                               textButton: 'Parar',
-                              url: `containers/${(loadBalancer as ILoadBalancer).containerId}`,
+                              url: `containers/${(loadBalancer as ILoadBalancer).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
@@ -355,7 +355,6 @@ class LoadBalancer extends BaseComponent<Props, State> {
 }
 
 function removeFields(loadBalancer: Partial<ILoadBalancer>) {
-    delete loadBalancer["id"];
     delete loadBalancer["ports"];
     delete loadBalancer["labels"];
     delete loadBalancer["logs"];

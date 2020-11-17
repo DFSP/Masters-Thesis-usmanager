@@ -32,6 +32,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
@@ -51,6 +52,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "host_monitoring_logs")
 public class HostMonitoringLog {
 

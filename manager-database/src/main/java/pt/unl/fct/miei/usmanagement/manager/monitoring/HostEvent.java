@@ -31,6 +31,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
@@ -50,12 +52,13 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "host_events")
 public class HostEvent {
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	@NaturalId
+	private String id;
 
 	@NotNull
 	private String publicIpAddress;

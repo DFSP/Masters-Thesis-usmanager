@@ -30,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import javax.persistence.Entity;
@@ -46,6 +47,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "service_rule_conditions")
 public class ServiceRuleCondition {
 

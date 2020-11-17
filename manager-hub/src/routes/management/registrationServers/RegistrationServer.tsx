@@ -145,14 +145,14 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.containerId}</b>` : `<a href='/servidores de registo/${registrationServer.containerId}'><b>${registrationServer.containerId}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
-                this.props.history.replace(registrationServer.containerId)
+                this.props.history.replace(registrationServer.id.toString())
             }
         } else {
             registrationServers = registrationServers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.containerId} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.id} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/servidores de registo');
             }
@@ -164,14 +164,14 @@ class RegistrationServer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o servidor de registo`, 10000, reason, true);
 
     private onDeleteSuccess = (registrationServer: IRegistrationServer): void => {
-        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.containerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/servidores de registo`)
         }
     };
 
     private onDeleteFailure = (reason: string, registrationServer: IRegistrationServer): void =>
-        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.containerId}</b>` : `<a href='/servidores de registo/${registrationServer.containerId}'><b>${registrationServer.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}`, 10000, reason, true);
 
     private updateRegistrationServer = (registrationServer: IRegistrationServer) => {
         registrationServer = Object.values(normalize(registrationServer, Schemas.REGISTRATION_SERVER).entities.registrationServers || {})[0];
@@ -240,11 +240,11 @@ class RegistrationServer extends BaseComponent<Props, State> {
                                                       }}/>
                     </>
                 : formRegistrationServer && Object.entries(formRegistrationServer).map((([key, value], index) =>
-                key === 'containerId'
+                key === 'id'
                     ? <Field key={index}
                              id={key}
                              label={key}
-                             icon={{linkedTo: '/contentores/' + (formRegistrationServer as Partial<IRegistrationServer>).containerId}}/>
+                             icon={{linkedTo: '/contentores/' + (formRegistrationServer as Partial<IRegistrationServer>).id}}/>
                     : key === 'created'
                     ? <Field key={index}
                              id={key}
@@ -306,7 +306,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
                           }}
                           delete={{
                               textButton: 'Parar',
-                              url: `containers/${(registrationServer as IRegistrationServer).containerId}`,
+                              url: `containers/${(registrationServer as IRegistrationServer).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
@@ -333,7 +333,6 @@ class RegistrationServer extends BaseComponent<Props, State> {
 }
 
 function removeFields(registrationServer: Partial<IRegistrationServer>) {
-    delete registrationServer["id"];
     delete registrationServer["ports"];
     delete registrationServer["labels"];
     delete registrationServer["logs"];

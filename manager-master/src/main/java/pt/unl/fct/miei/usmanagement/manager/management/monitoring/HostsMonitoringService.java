@@ -201,7 +201,7 @@ public class HostsMonitoringService {
 	private void monitorHostsTask() {
 		List<Node> nodes = nodesService.getReadyNodes(); // TODO only swarm nodes
 		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
-			.map(node -> getHostDecisions(node.getHostAddress()))
+			.map(node -> getHostDecisions(node))
 			.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureHostDecisions.toArray(new CompletableFuture[0])).join();
@@ -232,7 +232,9 @@ public class HostsMonitoringService {
 	}
 
 	@Async
-	public CompletableFuture<HostDecisionResult> getHostDecisions(HostAddress hostAddress) {
+	public CompletableFuture<HostDecisionResult> getHostDecisions(Node node) {
+		HostAddress hostAddress = node.getHostAddress();
+
 		// Metrics from prometheus (node_exporter)
 		Map<String, CompletableFuture<Optional<Double>>> futureStats = hostMetricsService.getHostStats(hostAddress);
 
@@ -262,12 +264,13 @@ public class HostsMonitoringService {
 
 		validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
 
-		return CompletableFuture.completedFuture(runRules(hostAddress, validStats));
+		return CompletableFuture.completedFuture(runRules(node, validStats));
 	}
 
-	private HostDecisionResult runRules(HostAddress hostAddress, Map<String, Double> newFields) {
+	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {
+		HostAddress hostAddress = node.getHostAddress();
 
-		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent = new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(hostAddress);
+		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent = new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 
 		getHostMonitoring(hostAddress)
@@ -286,7 +289,7 @@ public class HostsMonitoringService {
 				hostEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 			});
 
-		return hostRulesService.processHostEvent(hostAddress, hostEvent);
+		return hostRulesService.processHostEvent(node, hostEvent);
 	}
 
 	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<Node> nodes) {
@@ -341,7 +344,7 @@ public class HostsMonitoringService {
 		// This action is triggered when the asking host is overflowed with work
 		// To resolve that, we migrate one of its containers to another host
 		getRandomContainerToMigrateFrom(hostAddress).ifPresent(container -> {
-			String containerId = container.getContainerId();
+			String containerId = container.getId();
 			String serviceName = container.getServiceName();
 			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 			Coordinates coordinates = container.getCoordinates();

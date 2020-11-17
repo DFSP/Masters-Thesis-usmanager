@@ -155,11 +155,29 @@ public class SymService {
 		this.loadTriggers();
 		this.loadRouters();
 		this.loadTriggerRouters();
+
+		/*CONFLICT_ID
+		SOURCE_NODE_GROUP_ID
+		TARGET_NODE_GROUP_ID
+		TARGET_CHANNEL_ID
+		TARGET_CATALOG_NAME
+		TARGET_SCHEMA_NAME
+		TARGET_TABLE_NAME
+		DETECT_TYPE
+		DETECT_EXPRESSION
+		RESOLVE_TYPE
+		PING_BACK
+		RESOLVE_CHANGES_ONLY
+		RESOLVE_ROW_ONLY
+		CREATE_TIME
+		LAST_UPDATE_BY
+		LAST_UPDATE_TIME
+*/
+
 	}
 
-
 	private void loadTriggerRouters() throws SQLException {
-		getMasterTables().forEach(table ->
+		getMasterToWorkerTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId(table)
 				.routerId("master-to-worker")
@@ -169,7 +187,7 @@ public class SymService {
 				.build())
 		);
 
-		getWorkerTables().forEach(table ->
+		getWorkerToMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId(table)
 				.routerId("worker-to-master")
@@ -177,17 +195,6 @@ public class SymService {
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
 		);
-
-    /*insert into sym_trigger_router (trigger_id, router_id, initial_load_order, initial_load_select, create_time,
-        last_update_time)
-    values ('rules', 'master-to-one-worker', 1, 'worker_id=''$(externalId)''', current_timestamp, current_timestamp);*/
-
-    /*insert into sym_trigger_router (trigger_id, router_id, initial_load_order, last_update_time, create_time)
-    values ('apps', 'worker-to-master', 2, current_timestamp, current_timestamp);
-
-    insert into sym_trigger_router (trigger_id, router_id, initial_load_order, last_update_time, create_time)
-    values ('rules', 'worker-to-master', 2, current_timestamp, current_timestamp);*/
-
 	}
 
 	private void loadRouters() {
@@ -222,7 +229,7 @@ public class SymService {
 	}
 
 	private void loadTriggers() throws SQLException {
-		this.getMasterTables().forEach(table ->
+		this.getMasterToWorkerTables().forEach(table ->
 			symTriggersRepository.save(SymTriggerEntity.builder()
 				.triggerId(table)
 				.sourceTableName(table)
@@ -230,6 +237,16 @@ public class SymService {
 				.lastUpdateTime(LocalDateTime.now())
 				.createTime(LocalDateTime.now())
 				/*.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)*/
+				.build())
+		);
+
+		this.getWorkerToMasterTables().forEach(table ->
+			symTriggersRepository.save(SymTriggerEntity.builder()
+				.triggerId(table)
+				.sourceTableName(table)
+				.channelId("default")
+				.lastUpdateTime(LocalDateTime.now())
+				.createTime(LocalDateTime.now())
 				.build())
 		);
 	}
@@ -272,9 +289,8 @@ public class SymService {
 		symNodesRepository.deleteAll();
 	}
 
-	private List<String> getMasterTables() throws SQLException {
-		DatabaseMetaData metaData;
-		metaData = dataSource.getConnection().getMetaData();
+	private List<String> getMasterToWorkerTables() throws SQLException {
+		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
 		List<String> tablesNames = new LinkedList<>();
 		List<String> excludingStartsWith = symmetricDSProperties.getTables().getExclude().getStartsWith();
@@ -291,16 +307,20 @@ public class SymService {
 		return tablesNames;
 	}
 
-	private List<String> getWorkerTables() throws SQLException {
-		DatabaseMetaData metaData;
-		metaData = dataSource.getConnection().getMetaData();
+	private List<String> getWorkerToMasterTables() throws SQLException {
+		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
 		List<String> tablesNames = new LinkedList<>();
 		while (tables.next()) {
 			String tableName = tables.getString("TABLE_NAME").toLowerCase();
-			if (tableName.startsWith("container") || tableName.startsWith("node") || tableName.contains("event")
-				|| tableName.contains("monitoring") || tableName.equalsIgnoreCase("host_decisions")
-				|| tableName.equalsIgnoreCase("host_decision_values") || tableName.equalsIgnoreCase("service_decisions")
+			if (tableName.startsWith("container")
+				|| tableName.startsWith("node")
+				|| tableName.contains("event")
+				|| tableName.equalsIgnoreCase("host_monitoring_logs")
+				|| tableName.equalsIgnoreCase("service_monitoring_logs")
+				|| tableName.equalsIgnoreCase("host_decisions")
+				|| tableName.equalsIgnoreCase("host_decision_values")
+				|| tableName.equalsIgnoreCase("service_decisions")
 				|| tableName.equalsIgnoreCase("service_decision_values")) {
 				tablesNames.add(tableName);
 			}

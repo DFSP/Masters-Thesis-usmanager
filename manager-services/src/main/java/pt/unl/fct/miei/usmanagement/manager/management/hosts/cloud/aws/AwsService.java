@@ -350,7 +350,6 @@ public class AwsService {
 	public void waitToBoot(Instance instance) throws TimeoutException {
 		HostAddress hostAddress = new HostAddress(awsUsername, instance.getPublicIpAddress(), instance.getPrivateIpAddress());
 		try {
-			log.info("{}", BOOT_TIMEOUT);
 			SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
 			sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
 		}

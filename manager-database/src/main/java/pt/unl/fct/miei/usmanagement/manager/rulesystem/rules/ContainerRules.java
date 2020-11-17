@@ -39,7 +39,7 @@ public interface ContainerRules extends JpaRepository<ContainerRule, Long> {
 
 	@Query("select r "
 		+ "from ContainerRule r join r.containers c "
-		+ "where c.containerId like concat(:containerId, '%')")
+		+ "where c.id like concat(:containerId, '%')")
 	List<ContainerRule> findByContainerIdStartingWith(@Param("containerId") String containerId);
 
 	@Query("select case when count(r) > 0 then true else false end "
@@ -65,7 +65,7 @@ public interface ContainerRules extends JpaRepository<ContainerRule, Long> {
 
 	@Query("select c "
 		+ "from ContainerRule r join r.containers c "
-		+ "where r.name = :ruleName and c.containerId = :containerId")
+		+ "where r.name = :ruleName and c.id = :containerId")
 	Optional<Container> getContainer(@Param("ruleName") String ruleName,
 									 @Param("containerId") String containerId);
 

@@ -170,7 +170,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             }
         } else {
             workerManagers = workerManagers.reverse();
-            super.toast(`<span class='green-text'>${workerManagers.length == 1 ? 'Foi lançado' : 'Foram lançados'} ${workerManagers.length} ${workerManagers.length == 1 ? 'gestor local' : 'gestores locais'}:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.containerId}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>${workerManagers.length == 1 ? 'Foi lançado' : 'Foram lançados'} ${workerManagers.length} ${workerManagers.length == 1 ? 'gestor local' : 'gestores locais'}:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.id}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push("/gestores locais");
             }
@@ -270,7 +270,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
 
     private containerIdField = (container: IContainer) =>
-        container.containerId;
+        container.id.toString();
 
     private containerPublicIpAddressField = (container: IContainer) =>
         container.publicIpAddress;
@@ -309,7 +309,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                                            id={key}
                                            label={key + " id"}
                                            valueToString={this.containerIdField}
-                                           icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).container?.containerId}`}}/>
+                                           icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).container?.id}`}}/>
                         <Field<IContainer>
                             key={5000}
                             id={key}

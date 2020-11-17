@@ -138,7 +138,7 @@ public class WorkerManagersService {
 
 	public WorkerManager getWorkerManager(Container container) {
 		return workerManagers.getByContainer(container).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManager.class, "containerEntity", container.getContainerId()));
+			new EntityNotFoundException(WorkerManager.class, "containerEntity", container.getId()));
 	}
 
 	public List<WorkerManager> getWorkerManagers(RegionEnum region) {
@@ -214,7 +214,7 @@ public class WorkerManagersService {
 		container.setWorkerManager(null);
 		containersService.updateContainer(container);
 		workerManagers.delete(workerManager);
-		containersService.stopContainer(container.getContainerId());
+		containersService.stopContainer(container.getId());
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {

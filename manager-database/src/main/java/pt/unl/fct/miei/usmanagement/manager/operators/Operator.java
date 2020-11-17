@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
@@ -54,6 +55,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "operators")
 public class Operator {
 

@@ -427,7 +427,7 @@ public class DockerContainersService {
 	}
 
 	public void stopContainer(Container container) {
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		HostAddress hostAddress = container.getHostAddress();
 		stopContainer(containerId, hostAddress);
 	}
@@ -451,7 +451,7 @@ public class DockerContainersService {
 	}
 
 	public Optional<DockerContainer> replicateContainer(Container container, HostAddress toHostAddress) {
-		return replicateContainer(container.getContainerId(), container.getHostAddress(), toHostAddress);
+		return replicateContainer(container.getId(), container.getHostAddress(), toHostAddress);
 	}
 
 	public Optional<DockerContainer> replicateContainer(String id, HostAddress fromHostAddress, HostAddress toHostAddress) {
@@ -549,10 +549,10 @@ public class DockerContainersService {
 
 	public Optional<ContainerStats> getContainerStats(Container container, HostAddress hostAddress) {
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
-			return Optional.of(dockerClient.stats(container.getContainerId()));
+			return Optional.of(dockerClient.stats(container.getId()));
 		}
 		catch (DockerException | InterruptedException e) {
-			log.error("Unable to get stats of container {}: {}", container.getContainerId(), e.getMessage());
+			log.error("Unable to get stats of container {}: {}", container.getId(), e.getMessage());
 		}
 		return Optional.empty();
 	}
@@ -590,7 +590,7 @@ public class DockerContainersService {
 
 	public String getContainerLogs(Container container) {
 		HostAddress hostAddress = container.getHostAddress();
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		String logs = null;
 		try (DockerClient docker = dockerCoreService.getDockerClient(hostAddress);
 			 LogStream stream = docker.logs(containerId, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {

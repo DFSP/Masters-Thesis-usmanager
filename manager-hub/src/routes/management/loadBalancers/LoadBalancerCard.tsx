@@ -66,7 +66,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (loadBalancer: ILoadBalancer): void => {
-        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.containerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -74,7 +74,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
-        super.toast(`Não foi possível para a instância do balanceamento de carga<a href='/balanceamento de carga/${loadBalancer.containerId}'><b>${loadBalancer.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível para a instância do balanceamento de carga<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -85,37 +85,37 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Ver as portas associadas'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'ports'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Ver as labels associadas'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'labels'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Ver as logs'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'logs'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista de regras'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'rules'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista de regras genéricas'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'genericContainerRules'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista das métricas simuladas'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'simulatedMetrics'}
                 state={loadBalancer}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista das métricas simuladas genéricas'}
-                pathname={`/contentores/${loadBalancer.containerId}`}
+                pathname={`/contentores/${loadBalancer.id}`}
                 selected={'genericSimulatedMetrics'}
                 state={loadBalancer}/>
         ];
@@ -126,10 +126,10 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardLoadBalancer = Card<IContainer>();
         return <CardLoadBalancer id={`load-balancer-${loadBalancer.id}`}
-                                 title={loadBalancer.containerId.toString()}
+                                 title={loadBalancer.id.toString()}
                                  link={{
                                      to: {
-                                         pathname: `/balanceamento de carga/${loadBalancer.containerId}`,
+                                         pathname: `/balanceamento de carga/${loadBalancer.id}`,
                                          state: loadBalancer
                                      }
                                  }}
@@ -138,7 +138,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
                                  hoverable
                                  delete={{
                                      textButton: 'Parar',
-                                     url: `containers/${loadBalancer.containerId}`,
+                                     url: `containers/${loadBalancer.id}`,
                                      successCallback: this.onStopSuccess,
                                      failureCallback: this.onStopFailure,
                                  }}

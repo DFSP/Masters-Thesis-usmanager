@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
@@ -67,15 +68,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "containers")
 public class Container {
 
 	@Id
-	@GeneratedValue
-	private Long id;
-
 	@NaturalId
-	private String containerId;
+	private String id;
 
 	@NotNull
 	private ContainerTypeEnum type;

@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Entity;
@@ -47,6 +48,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "users")
 public class User {
 

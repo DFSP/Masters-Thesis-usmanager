@@ -34,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
@@ -263,7 +264,8 @@ public class HostRulesService {
 		}
 	}
 
-	public HostDecisionResult processHostEvent(HostAddress hostAddress, HostEvent hostEvent) {
+	public HostDecisionResult processHostEvent(Node node, HostEvent hostEvent) {
+		HostAddress hostAddress = node.getHostAddress();
 		if (droolsService.shouldCreateNewHostRuleSession(hostAddress, lastUpdateHostRules.get())) {
 			List<Rule> rules = generateHostRules(hostAddress);
 			Map<Long, String> drools = droolsService.executeDroolsRules(hostEvent, rules, hostRuleTemplateFile);
@@ -276,7 +278,7 @@ public class HostRulesService {
 		//FIXME what about cloud hosts?
 		List<HostRule> hostRules = getRules(hostAddress);
 		List<Rule> rules = new ArrayList<>(hostRules.size());
-		log.info("Generating host rules... (count: {})", rules.size());
+		log.info("Generating host rules... (count: {})", hostRules.size());
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
 		return rules;
 	}

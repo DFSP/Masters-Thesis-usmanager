@@ -79,7 +79,6 @@ import {IMarker} from "../../../components/map/Marker";
 import ReactTooltip from "react-tooltip";
 
 export interface IContainer extends IDatabaseData {
-    containerId: string;
     type: ContainerType;
     created: number;
     names: string[];
@@ -254,11 +253,11 @@ class Container extends BaseComponent<Props, State> {
         let containers = reply.data;
         if (containers.length === 1) {
             const container = containers[0];
-            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`} começou a sua execução com sucesso no host ${container.publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`} começou a sua execução com sucesso no host ${container.publicIpAddress}</span>`);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
-                this.props.history.replace(container.containerId);
+                this.props.history.replace(container.id.toString());
             }
         } else {
             containers = containers.reverse();
@@ -280,14 +279,14 @@ class Container extends BaseComponent<Props, State> {
 
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.containerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/contentores`);
         }
     };
 
     private onDeleteFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`}`, 10000, reason, true);
 
     private replicateButton = () =>
         <>
@@ -338,7 +337,7 @@ class Container extends BaseComponent<Props, State> {
         const hostAddress = decodeHTML((event.target as HTMLLIElement).innerHTML).split(' (');
         const publicIpAddress = hostAddress[0];
         const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1);
-        const url = `containers/${container?.containerId}/replicate`;
+        const url = `containers/${container?.id}/replicate`;
         this.setState({loading: {method: 'post', url: url}});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
@@ -346,14 +345,14 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -364,7 +363,7 @@ class Container extends BaseComponent<Props, State> {
         const hostAddress = decodeHTML((event.target as HTMLLIElement).innerHTML).split(' (');
         const publicIpAddress = hostAddress[0];
         const privateIpAddress = hostAddress[1]?.substr(0, hostAddress[1].length - 1)
-        const url = `containers/${container?.containerId}/migrate`;
+        const url = `containers/${container?.id}/migrate`;
         this.setState({loading: {method: 'post', url: url}});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
@@ -373,14 +372,14 @@ class Container extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} to container </span><a href='/contentores/'${container.containerId}>${container.containerId}</a>`, 15000);
+        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} to container </span><a href='/contentores/'${container.id}>${container.id}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -401,21 +400,21 @@ class Container extends BaseComponent<Props, State> {
     private saveContainerRules = (container: IContainer): void => {
         const {unsavedRules} = this.state;
         if (unsavedRules.length) {
-            postData(`containers/${container.containerId}/rules`, unsavedRules,
+            postData(`containers/${container.id}/rules`, unsavedRules,
                 () => this.onSaveRulesSuccess(container),
                 (reason) => this.onSaveRulesFailure(container, reason));
         }
     };
 
     private onSaveRulesSuccess = (container: IContainer): void => {
-        this.props.addContainerRules(container.containerId, this.state.unsavedRules);
+        this.props.addContainerRules(container.id.toString(), this.state.unsavedRules);
         if (this.mounted) {
             this.setState({unsavedRules: []});
         }
     };
 
     private onSaveRulesFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Não foi possível guardar as regras associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as regras associadas ao contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`}`, 10000, reason, true);
 
     private addContainerSimulatedMetric = (simulatedMetric: string): void => {
         this.setState({
@@ -432,21 +431,21 @@ class Container extends BaseComponent<Props, State> {
     private saveContainerSimulatedMetrics = (container: IContainer): void => {
         const {unsavedSimulatedMetrics} = this.state;
         if (unsavedSimulatedMetrics.length) {
-            postData(`containers/${container.containerId}/simulated-metrics`, unsavedSimulatedMetrics,
+            postData(`containers/${container.id}/simulated-metrics`, unsavedSimulatedMetrics,
                 () => this.onSaveSimulatedMetricsSuccess(container),
                 (reason) => this.onSaveSimulatedMetricsFailure(container, reason));
         }
     };
 
     private onSaveSimulatedMetricsSuccess = (container: IContainer): void => {
-        this.props.addContainerSimulatedMetrics(container.containerId, this.state.unsavedSimulatedMetrics);
+        this.props.addContainerSimulatedMetrics(container.id.toString(), this.state.unsavedSimulatedMetrics);
         if (this.mounted) {
             this.setState({unsavedSimulatedMetrics: []});
         }
     };
 
     private onSaveSimulatedMetricsFailure = (container: IContainer, reason: string): void =>
-        super.toast(`Não foi possível guardar as métricas simuladas associadas ao contentor ${this.mounted ? `<b>${container.containerId}</b>` : `<a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar as métricas simuladas associadas ao contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`}`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -590,7 +589,7 @@ class Container extends BaseComponent<Props, State> {
                 if (marker.title === '') {
                     marker.title += container.coordinates.label + '<br/>';
                 }
-                marker.title += container.containerId.substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+                marker.title += container.id.toString().substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
                 marker.label = publicIpAddress;
                 marker.latitude = container.coordinates.latitude;
                 marker.longitude = container.coordinates.longitude;
@@ -755,7 +754,7 @@ class Container extends BaseComponent<Props, State> {
                           delete={container && (container as IContainer).type !== 'SINGLETON'
                               ? {
                                   textButton: 'Parar',
-                                  url: `containers/${(container as IContainer).containerId}`,
+                                  url: `containers/${(container as IContainer).id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }
@@ -871,7 +870,6 @@ class Container extends BaseComponent<Props, State> {
 }
 
 function removeFields(container: Partial<IContainer>) {
-    delete container["id"];
     delete container["ports"];
     delete container["labels"];
     delete container["logs"];

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -57,6 +58,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "host_rules")
 public class HostRule {
 

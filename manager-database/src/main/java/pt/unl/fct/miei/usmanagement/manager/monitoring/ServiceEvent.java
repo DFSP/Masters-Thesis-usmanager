@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
@@ -47,6 +48,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "service_events")
 public class ServiceEvent {
 

@@ -48,13 +48,13 @@ public class ContainersRecoveryService {
 					return false;
 				}
 			})
-			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getContainerId(), container.getContainerId())))
+			.filter(container -> synchronizedContainers.stream().noneMatch(c -> Objects.equals(c.getId(), container.getId())))
 			.distinct()
 			.forEach(this::restartContainerCloseTo);
 	}
 
 	List<ContainerRecovery> getContainerRecoveries(Container container) {
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		log.info("Recovering crashed container {}={}", container.getServiceName(), containerId);
 		List<ContainerRecovery> recoveries = new ArrayList<>();
 		String previousRecoveries = container.getLabels().get(ContainerConstants.Label.RECOVERY);
@@ -87,7 +87,7 @@ public class ContainersRecoveryService {
 
 	// Restarts the container on a host close to where it used to be running
 	void restartContainerCloseTo(Container container) {
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		List<ContainerRecovery> recoveries = getContainerRecoveries(container);
 		if (shouldStopContainerRecovering(recoveries)) {
 			log.info("Stopping recovery of crashed container {} {}... crashed too many times in a short period of time",
@@ -118,7 +118,7 @@ public class ContainersRecoveryService {
 
 	// Restarts the container on the same host
 	void restartContainer(Container container) {
-		String containerId = container.getContainerId();
+		String containerId = container.getId();
 		List<ContainerRecovery> recoveries = getContainerRecoveries(container);
 		if (shouldStopContainerRecovering(recoveries)) {
 			log.info("Stopping recovery of crashed container {} {}... crashed too many times in a short period of time",

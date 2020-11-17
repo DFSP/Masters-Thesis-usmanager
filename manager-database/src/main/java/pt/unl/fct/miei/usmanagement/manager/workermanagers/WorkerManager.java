@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -58,6 +59,7 @@ import java.util.concurrent.CompletableFuture;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Table(name = "worker_managers")
 public class WorkerManager {
 

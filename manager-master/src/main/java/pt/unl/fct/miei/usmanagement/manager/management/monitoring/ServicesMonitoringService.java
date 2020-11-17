@@ -239,7 +239,7 @@ public class ServicesMonitoringService {
 		monitoringContainers.forEach(container -> {
 
 			HostAddress hostAddress = container.getHostAddress();
-			String containerId = container.getContainerId();
+			String containerId = container.getId();
 			String serviceName = container.getServiceName();
 
 			// Metrics from docker
@@ -404,7 +404,7 @@ public class ServicesMonitoringService {
 						}
 						double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
 						HostAddress toHostAddress = hostsService.getClosestCapableHost(expectedMemoryConsumption, coordinates);
-						String replicatedContainerId = containersService.replicateContainer(containerId, toHostAddress).getContainerId();
+						String replicatedContainerId = containersService.replicateContainer(containerId, toHostAddress).getId();
 						String result = String.format("replicated container %s of service %s to container %s on %s",
 							containerId, serviceName, replicatedContainerId, toHostAddress);
 						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);

@@ -75,7 +75,7 @@ class NodeCard extends BaseComponent<Props, State> {
         this.props.node || this.state.node;
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm'}</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm'}</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -84,9 +84,9 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onDeleteFailure = (reason: string, node: INode): void => {
         if (node.state === 'active') {
-            super.toast(`O nó <a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
+            super.toast(`O nó <a href='/nós/${node.id}'><b>${node.id}</b></a> não conseguiu sair do swarm`, 10000, reason, true);
         } else if (node.state === 'down') {
-            super.toast(`Não foi possível remover o nó <a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a> do swarm`, 10000, reason, true);
+            super.toast(`Não foi possível remover o nó <a href='/nós/${node.id}'><b>${node.id}</b></a> do swarm`, 10000, reason, true);
         }
         if (this.mounted) {
             this.setState({loading: false});
@@ -119,7 +119,7 @@ class NodeCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Ver as labels associadas'}
-                pathname={`/nós/${node.nodeId}`}
+                pathname={`/nós/${node.id}`}
                 selected={'nodeLabels'}
                 state={node}/>,
         ];
@@ -147,7 +147,7 @@ class NodeCard extends BaseComponent<Props, State> {
     };
 
     private onLeaveFailure = (reason: string, node: Partial<INode>) => {
-        super.toast(`O nó ${this.mounted ? `<b>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
+        super.toast(`O nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} não conseguiu sair do swarm`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -155,7 +155,7 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private rejoinSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.nodeId}/join`;
+        const url = `nodes/${node?.id}/join`;
         this.setState({loading: true});
         postData(url, {},
             (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
@@ -163,7 +163,7 @@ class NodeCard extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmSuccess = (node: INode) => {
-        super.toast(`<span class='green-text'>O host </span> <b>${node?.publicIpAddress}</b> <span class='green-text'>re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`}`);
+        super.toast(`<span class='green-text'>O host </span> <b>${node?.publicIpAddress}</b> <span class='green-text'>re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href='/nós/${node?.id}'><b>${node?.id}</b></a>`}`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -174,7 +174,7 @@ class NodeCard extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmFailure = (reason: string, node?: INode) => {
-        super.toast(`O nó ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`} não conseguiu re-entrar no swarm`, 10000, reason, true);
+        super.toast(`O nó ${this.mounted ? `<b>${node?.id}</b>` : `<a href='/nós/${node?.id}'><b>${node?.id}</b></a>`} não conseguiu re-entrar no swarm`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -189,9 +189,9 @@ class NodeCard extends BaseComponent<Props, State> {
         const node = this.getNode();
         const {loading} = this.state;
         const CardNode = Card<INode>();
-        return <CardNode id={`node-${node.nodeId}`}
-                         title={node.nodeId.toString()}
-                         link={{to: {pathname: `/nós/${node.nodeId}`, state: node}}}
+        return <CardNode id={`node-${node.id}`}
+                         title={node.id.toString()}
+                         link={{to: {pathname: `/nós/${node.id}`, state: node}}}
                          height={'150px'}
                          margin={'10px 0'}
                          hoverable
@@ -202,8 +202,8 @@ class NodeCard extends BaseComponent<Props, State> {
                              ? undefined
                              : {
                                  textButton: 'Remover do swarm',
-                                 url: `nodes/${(node as INode).nodeId}`,
-                                 confirmMessage: `remover o nó ${node?.nodeId} do swarm`,
+                                 url: `nodes/${(node as INode).id}`,
+                                 confirmMessage: `remover o nó ${node?.id} do swarm`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure
                              }}>

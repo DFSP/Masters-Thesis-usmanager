@@ -62,7 +62,7 @@ class RegistrationServersList extends BaseComponent<Props, {}> {
     }
 
     private registrationServer = (registrationServer: IRegistrationServer): JSX.Element =>
-        <RegistrationServerCard key={registrationServer.containerId} registrationServer={registrationServer}/>;
+        <RegistrationServerCard key={registrationServer.id} registrationServer={registrationServer}/>;
 
     private predicate = (registrationServer: IRegistrationServer, search: string): boolean =>
         registrationServer.publicIpAddress.toLowerCase().includes(search);

@@ -74,7 +74,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         this.props.container || this.state.container;
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class="green-text">O contentor <b class="white-text">${container.containerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O contentor <b class="white-text">${container.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -82,7 +82,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Não foi possível parar o contentor <a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o contentor <a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -123,7 +123,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;
         const privateIpAddress = node.labels['privateIpAddress'];
-        const url = `containers/${container?.containerId}/replicate`;
+        const url = `containers/${container?.id}/replicate`;
         this.setState({loading: true});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
@@ -131,7 +131,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.containerId}'><b>${container.containerId}</b></a>`, 15000);
+        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -139,7 +139,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -150,7 +150,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;
         const privateIpAddress = node.labels['privateIpAddress'];
-        const url = `containers/${container?.containerId}/migrate`;
+        const url = `containers/${container?.id}/migrate`;
         this.setState({loading: true});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
@@ -159,7 +159,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">O contentor ${this.mounted ? parentContainer?.containerId : `<a href='/contentores/${parentContainer?.containerId}'>${parentContainer?.containerId}</a>`} foi migrado para o contentor </span><a href='/contentores/${container.containerId}'>${container.containerId}</a>`, 15000);
+        super.toast(`<span class="green-text">O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o contentor </span><a href='/contentores/${container.id}'>${container.id}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -167,7 +167,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href='/contentores/${container?.containerId}'><b>${container?.containerId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -178,37 +178,37 @@ class ContainerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Ver as portas associadas'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'ports'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Ver as labels'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'containerLabels'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Ver as logs'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'logs'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista de regras'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'rules'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista de regras genéricas'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'genericServiceRules'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista das métricas simuladas'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'simulatedMetrics'}
                 state={container}/>,
             <LinkedContextMenuItem
                 option={'Ver a lista das métricas simuladas genéricas'}
-                pathname={`/contentores/${container.containerId}`}
+                pathname={`/contentores/${container.id}`}
                 selected={'genericSimulatedMetrics'}
                 state={container}/>
         ];
@@ -218,16 +218,16 @@ class ContainerCard extends BaseComponent<Props, State> {
         const container = this.getContainer();
         const {loading} = this.state;
         const CardContainer = Card<IContainer>();
-        return <CardContainer id={`container-${container.containerId}`}
-                              title={container.containerId.toString()}
-                              link={{to: {pathname: `/contentores/${container.containerId}`, state: container}}}
+        return <CardContainer id={`container-${container.id}`}
+                              title={container.id.toString()}
+                              link={{to: {pathname: `/contentores/${container.id}`, state: container}}}
                               height={'215px'}
                               margin={'10px 0'}
                               hoverable
                               delete={{
                                   textButton: 'Parar',
-                                  confirmMessage: `parar contentor ${container.containerId}`,
-                                  url: `containers/${container.containerId}`,
+                                  confirmMessage: `parar contentor ${container.id}`,
+                                  url: `containers/${container.id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }}
