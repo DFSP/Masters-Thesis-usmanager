@@ -30,7 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.List;
 
-public interface HostEvents extends JpaRepository<HostEvent, String> {
+public interface HostEvents extends JpaRepository<HostEvent, Long> {
 
 	List<HostEvent> findByPublicIpAddressAndPrivateIpAddress(String publicIpAddress, String privateIpAddress);
 
