@@ -59,10 +59,12 @@ public class HostsEventsService {
 	}
 
 	public HostEvent saveHostEvent(HostAddress hostAddress, String decisionName) {
+		HostAddress managerHostAddress = hostsService.getManagerHostAddress();
 		Decision decision = decisionsService.getHostPossibleDecision(decisionName);
 		HostEvent hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
-			.orElseGet(() -> HostEvent.builder().manager(hostsService.getManagerHostAddress()).publicIpAddress(hostAddress.getPublicIpAddress())
-				.privateIpAddress(hostAddress.getPrivateIpAddress()).decision(decision).count(0).build());
+			.orElseGet(() -> HostEvent.builder().publicIpAddress(hostAddress.getPublicIpAddress()).privateIpAddress(hostAddress.getPrivateIpAddress())
+				.managerPublicIpAddress(managerHostAddress.getPublicIpAddress()).managerPrivateIpAddress(managerHostAddress.getPrivateIpAddress())
+				.decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
 			hostEvent.setCount(1);

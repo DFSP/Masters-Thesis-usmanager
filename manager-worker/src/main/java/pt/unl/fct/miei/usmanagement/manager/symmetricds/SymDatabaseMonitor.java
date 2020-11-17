@@ -145,7 +145,7 @@ class SymDatabaseMonitor extends DatabaseWriterFilterAdapter implements IDatabas
 	}
 
 	private void updateHost(HostAddress hostAddress, String oldWorkerId, String newWorkerId) {
-		String externalId = environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID);
+		String externalId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
 		log.info("Inserted a host {}: {} -> {} ({})", hostAddress.toSimpleString(), oldWorkerId, newWorkerId, externalId);
 		if (hostAddress.getPublicIpAddress() != null) {
 			// host is running

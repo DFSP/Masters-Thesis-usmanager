@@ -42,8 +42,8 @@ public final class ContainerConstants {
 		public static final class LoadBalancer {
 			public static final String SERVER = "SERVER";
 		}
-		
-		public static final class WorkerManager {
+
+		public static final class Manager {
 			public static final String EXTERNAL_ID = "EXTERNAL_ID";
 			public static final String REGISTRATION_URL = "REGISTRATION_URL";
 			public static final String SYNC_URL = "SYNC_URL";

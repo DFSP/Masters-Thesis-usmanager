@@ -69,7 +69,7 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
     if (label === 'mounts') {
         return <FaFile/>;
     }
-    if (label.includes('worker')) {
+    if (label.includes('manager')) {
         return 'group_work';
     }
     if (label === 'type') {

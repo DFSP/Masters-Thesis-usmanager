@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
@@ -62,9 +63,12 @@ public class ServicesEventsService {
 	}
 
 	public ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
+		HostAddress managerHostAddress = hostsService.getManagerHostAddress();
 		Decision decision = decisionsService.getServicePossibleDecision(decisionName);
 		ServiceEvent event = getServiceEventsByContainerId(containerId).stream().findFirst().orElseGet(() ->
-			ServiceEvent.builder().manager(hostsService.getManagerHostAddress()).containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
+			ServiceEvent.builder().containerId(containerId).serviceName(serviceName)
+				.managerPublicIpAddress(managerHostAddress.getPublicIpAddress()).managerPrivateIpAddress(managerHostAddress.getPrivateIpAddress())
+				.decision(decision).count(0).build());
 		if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
 			event.setDecision(decision);
 			event.setCount(1);

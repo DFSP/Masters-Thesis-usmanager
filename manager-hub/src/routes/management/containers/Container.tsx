@@ -270,13 +270,8 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, request: INewContainerHost | INewContainerLocation): void => {
-        if ('hostAddress' in request) {
-            super.toast(`Não foi possível iniciar o contentor no host <b>${request.hostAddress?.publicIpAddress}/${request.hostAddress?.privateIpAddress}</b>`, 10000, reason, true);
-        } else if ('coordinates' in request) {
-            super.toast(`Não foi possível iniciar o contentor na localização <b>${request.coordinates}</b>`, 10000, reason, true);
-        }
+        super.toast(`Não foi possível iniciar o contentor</b>`, 10000, reason, true);
     }
-
 
     private onDeleteSuccess = (container: IContainer): void => {
         super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.id}</b> foi parado com sucesso</span>`);

@@ -21,6 +21,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsSimple
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -155,8 +156,6 @@ public class SyncService {
 	public List<Container> synchronizeContainersDatabase() {
 		log.debug("Synchronizing containers database with docker swarm");
 
-		log.info(heartbeatService.lastHeartbeats().toString());
-
 		List<Container> containers = containersService.getContainers();
 		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
 
@@ -174,21 +173,23 @@ public class SyncService {
 			}
 		}
 
-		/*// Remove invalid containers
-		List<String> dockerContainerIds = dockerContainers.stream().map(DockerContainer::getId).collect(Collectors.toList());
+		// Remove invalid containers
 		Iterator<Container> containerIterator = containers.iterator();
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
-			String containerId = container.getContainerId();
-			if (configurationsService.isConfiguring(containerId)) {
+			String containerId = container.getId();
+			String managerId = container.getManagerId();
+			if (managerId == null) {
 				continue;
 			}
-			if (!dockerContainerIds.contains(containerId)) {
+			Heartbeat heartbeat = heartbeatService.lastHeartbeat(managerId);
+			log.info(heartbeat.toString());
+			if (heartbeat.getHeartbeatTime().isAfter(LocalDateTime.now().plusSeconds(60))) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
 			}
-		}*/
+		}
 
 		log.debug("Finished containers synchronization");
 		return containers;

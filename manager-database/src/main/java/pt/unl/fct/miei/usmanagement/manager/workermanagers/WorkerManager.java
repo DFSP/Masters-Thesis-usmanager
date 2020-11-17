@@ -73,10 +73,10 @@ public class WorkerManager {
 	@NotNull
 	private RegionEnum region;
 
-	@Singular
+/*	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "workerManager", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Container> managedContainers;
+	private Set<Container> managedContainers;*/
 
 	@Singular
 	@JsonIgnore

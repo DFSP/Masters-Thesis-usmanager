@@ -175,10 +175,6 @@ public class WorkerManagersService {
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
 		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).region(container.getRegion()).build();
-		/*container.setWorkerManager(workerManager);
-		log.info("Container {}", ToStringBuilder.reflectionToString(container));
-		log.info("Worker {}", ToStringBuilder.reflectionToString(workerManager));
-		containersService.updateContainer(container);*/
 		nodesService.removeHost(hostAddress);
 		return workerManagers.save(workerManager);
 	}
@@ -208,10 +204,10 @@ public class WorkerManagersService {
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
 		List<String> environment = new LinkedList<>(List.of(
-			ContainerConstants.Environment.WorkerManager.EXTERNAL_ID + "=" + id,
-			ContainerConstants.Environment.WorkerManager.REGISTRATION_URL + "=" + getRegistrationUrl(),
-			ContainerConstants.Environment.WorkerManager.SYNC_URL + "=" + getSyncUrl(),
-			ContainerConstants.Environment.WorkerManager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress)
+			ContainerConstants.Environment.Manager.EXTERNAL_ID + "=" + id,
+			ContainerConstants.Environment.Manager.REGISTRATION_URL + "=" + getRegistrationUrl(),
+			ContainerConstants.Environment.Manager.SYNC_URL + "=" + getSyncUrl(),
+			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress)
 		));
 		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
@@ -219,8 +215,6 @@ public class WorkerManagersService {
 	public void stopWorkerManager(String workerManagerId) {
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		Container container = workerManager.getContainer();
-		container.setWorkerManager(null);
-		containersService.updateContainer(container);
 		workerManagers.delete(workerManager);
 		containersService.stopContainer(container.getId());
 	}
@@ -362,8 +356,7 @@ public class WorkerManagersService {
 					RegionEnum region = hostAddress.getRegion();
 					WorkerManager workerManager = getRegionWorkerManager(region);
 					List<Container> workerContainers = launchContainer(launchContainerRequest, workerManager).get();
-					workerContainers.forEach(container -> container.setWorkerManager(workerManager));
-					containers.addAll(containersService.addContainers(workerContainers));
+					containers.addAll(workerContainers);
 				}
 				else if (coordinates != null) {
 					List<WorkerManager> regionWorkerManagers = coordinates.stream().map(c -> {
@@ -378,14 +371,13 @@ public class WorkerManagersService {
 					CompletableFuture.allOf(futureContainers.values().toArray(new CompletableFuture[0])).join();
 
 					for (Map.Entry<WorkerManager, CompletableFuture<List<Container>>> futureWorkerContainers : futureContainers.entrySet()) {
+						WorkerManager workerManager = futureWorkerContainers.getKey();
 						try {
-							WorkerManager workerManager = futureWorkerContainers.getKey();
 							List<Container> workerContainers = futureWorkerContainers.getValue().get();
-							workerContainers.forEach(container -> container.setWorkerManager(workerManager));
-							containers.addAll(containersService.addContainers(workerContainers));
+							containers.addAll(workerContainers);
 						}
 						catch (InterruptedException | ExecutionException e) {
-							throw new ManagerException("Failed to launch containers on all regions");
+							throw new ManagerException("Failed to launch containers on worker from region {}", workerManager.getRegion());
 						}
 					}
 				}
@@ -470,7 +462,8 @@ public class WorkerManagersService {
 	}
 
 	@Async
-	public CompletableFuture<Container> replicateContainer(WorkerManager workerManager, String containerId, HostAddress toHostAddress) {
+	public CompletableFuture<Container> replicateContainer(String managerId, String containerId, HostAddress toHostAddress) {
+		WorkerManager workerManager = getWorkerManager(managerId);
 		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
 		String url = String.format("http://%s/api/containers/%s/replicate", address, containerId);
 		try {
@@ -485,7 +478,8 @@ public class WorkerManagersService {
 	}
 
 	@Async
-	public CompletableFuture<Container> migrateContainer(WorkerManager workerManager, String containerId, HostAddress hostAddress) {
+	public CompletableFuture<Container> migrateContainer(String managerId, String containerId, HostAddress hostAddress) {
+		WorkerManager workerManager = getWorkerManager(managerId);
 		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
 		String url = String.format("http://%s/api/containers/%s/migrate", address, containerId);
 		HttpEntity<?> request = new HttpEntity<>(hostAddress, headers);

@@ -66,17 +66,17 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		if (environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS) == null
-			|| environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID) == null
-			|| environment.getProperty(ContainerConstants.Environment.WorkerManager.REGISTRATION_URL) == null) {
+		if (environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS) == null
+			|| environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID) == null
+			|| environment.getProperty(ContainerConstants.Environment.Manager.REGISTRATION_URL) == null) {
 			System.out.println("usage: host_address, external_id and registration_url must be set");
 			System.exit(1);
 		}
-		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.WorkerManager.HOST_ADDRESS);
+		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
-		String externalId = environment.getProperty(ContainerConstants.Environment.WorkerManager.EXTERNAL_ID);
-		String registrationUrl = environment.getProperty(ContainerConstants.Environment.WorkerManager.REGISTRATION_URL);
+		String externalId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
+		String registrationUrl = environment.getProperty(ContainerConstants.Environment.Manager.REGISTRATION_URL);
 		symService.startSymmetricDsService(externalId, registrationUrl, hostAddress);
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();

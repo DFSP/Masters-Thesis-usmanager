@@ -67,5 +67,5 @@ public interface Containers extends JpaRepository<Container, String> {
 		+ "where c.id = :containerId")
 	boolean hasContainer(@Param("containerId") String containerId);
 
-	List<Container> findByWorkerManager(WorkerManager workerManager);
+	List<Container> findByManagerId(String managerId);
 }

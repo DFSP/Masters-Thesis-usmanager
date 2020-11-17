@@ -39,6 +39,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -59,13 +60,17 @@ public class ServiceEvent {
 	private Long id;
 
 	@NotNull
-	private HostAddress manager;
-
-	@NotNull
 	private String containerId;
 
 	@NotNull
 	private String serviceName;
+
+	@NotNull
+	private String managerPublicIpAddress;
+
+	@NotNull
+	private String managerPrivateIpAddress;
+
 
 	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne

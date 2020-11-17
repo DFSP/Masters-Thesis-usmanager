@@ -95,7 +95,6 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     public render() {
         const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map, checkbox, validation} = this.props;
         const getError = (errors: IErrors): string => (errors ? errors[id] : '');
-        console.log(validation)
         const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
             const hasErrors = getError(errors);
             if (hasErrors) {
@@ -245,7 +244,6 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     private getMapFieldMarkers = (values: any, markers?: IMarker[], valueToMarkers?: (v: T[]) => IMarker[]) => {
         markers = markers || [];
-        console.log(values)
         if (!values) {
             return markers;
         }

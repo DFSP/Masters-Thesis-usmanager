@@ -118,7 +118,6 @@ public class RegistrationServerService {
 		String registrationServers = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
 
-
 		Gson gson = new Gson();
 		try {
 			return new ForkJoinPool(threads).submit(() ->
@@ -137,7 +136,7 @@ public class RegistrationServerService {
 				}).collect(Collectors.toList())).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to launch registration servers at regions {}: {}", regions, e.getMessage());
+			throw new ManagerException("Unable to launch registration servers at regions %s: %s", regions, e.getMessage());
 		}
 	}
 

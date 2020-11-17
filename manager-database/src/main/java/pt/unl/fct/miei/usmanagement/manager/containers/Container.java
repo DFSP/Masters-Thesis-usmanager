@@ -117,9 +117,13 @@ public class Container {
 	@NotNull
 	private RegionEnum region;
 
+	private String managerId;
+
+/*
 	@ManyToOne
 	@JoinColumn(name = "workerManager_id")
 	private WorkerManager workerManager;
+*/
 
 	@NotNull
 	private Coordinates coordinates;

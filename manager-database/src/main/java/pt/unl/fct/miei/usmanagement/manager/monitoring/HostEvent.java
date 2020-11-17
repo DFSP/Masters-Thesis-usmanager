@@ -60,13 +60,16 @@ public class HostEvent {
 	private Long id;
 
 	@NotNull
-	private HostAddress manager;
-
-	@NotNull
 	private String publicIpAddress;
 
 	@NotNull
 	private String privateIpAddress;
+
+	@NotNull
+	private String managerPublicIpAddress;
+
+	@NotNull
+	private String managerPrivateIpAddress;
 
 	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne

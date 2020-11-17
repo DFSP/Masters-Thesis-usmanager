@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.containers;
 import com.spotify.docker.client.messages.ContainerStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
@@ -77,6 +78,7 @@ public class ContainersService {
 	private final ServicesService servicesService;
 	private final HostsService hostsService;
 	private final ConfigurationsService configurationsService;
+	private final Environment environment;
 
 	private final Containers containers;
 
@@ -86,7 +88,7 @@ public class ContainersService {
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
-							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService, Containers containers,
+							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService, Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -96,6 +98,7 @@ public class ContainersService {
 		this.servicesService = servicesService;
 		this.hostsService = hostsService;
 		this.configurationsService = configurationsService;
+		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
 	}
@@ -120,6 +123,7 @@ public class ContainersService {
 				.labels(dockerContainer.getLabels())
 				.coordinates(dockerContainer.getCoordinates())
 				.region(dockerContainer.getRegion())
+				.managerId(environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID))
 				.build();
 			return addContainer(container);
 		}
@@ -150,7 +154,7 @@ public class ContainersService {
 	}
 
 	public List<Container> getContainers(WorkerManager workerManager) {
-		return containers.findByWorkerManager(workerManager);
+		return containers.findByManagerId(workerManager.getId());
 	}
 
 	public Container getContainer(String containerId) {
@@ -282,13 +286,13 @@ public class ContainersService {
 
 	public Container replicateContainer(String id, HostAddress toHostAddress) {
 		Container containerEntity = getContainer(id);
-		WorkerManager workerManager = containerEntity.getWorkerManager();
-		if (workerManager != null) {
+		String managerId = containerEntity.getManagerId();
+		if (managerId != null && !managerId.equalsIgnoreCase("manager-master")) {
 			try {
-				return workerManagersService.replicateContainer(workerManager, id, toHostAddress).get();
+				return workerManagersService.replicateContainer(managerId, id, toHostAddress).get();
 			}
 			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to replicate container {} at worker manager {}: {}", id, workerManager.getId(), e.getMessage());
+				throw new ManagerException("Failed to replicate container {} at worker manager {}: {}", id, managerId, e.getMessage());
 			}
 		}
 		else {
@@ -300,13 +304,13 @@ public class ContainersService {
 
 	public Container migrateContainer(String id, HostAddress hostAddress) {
 		Container container = getContainer(id);
-		WorkerManager workerManager = container.getWorkerManager();
-		if (workerManager != null) {
+		String managerId = container.getManagerId();
+		if (managerId != null && !managerId.equalsIgnoreCase("manager-master")) {
 			try {
-				return workerManagersService.migrateContainer(workerManager, id, hostAddress).get();
+				return workerManagersService.migrateContainer(managerId, id, hostAddress).get();
 			}
 			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to migrate container {} at worker manager {}: {}", id, workerManager.getId(), e.getMessage());
+				throw new ManagerException("Failed to migrate container {} at worker manager {}: {}", id, managerId, e.getMessage());
 			}
 		}
 		else {
