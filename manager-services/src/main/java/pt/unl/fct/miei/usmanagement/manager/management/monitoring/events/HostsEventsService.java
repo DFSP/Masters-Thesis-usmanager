@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvents;
@@ -41,10 +42,12 @@ public class HostsEventsService {
 
 	private final HostEvents hostEvents;
 	private final DecisionsService decisionsService;
+	private final HostsService hostsService;
 
-	public HostsEventsService(HostEvents hostEvents, DecisionsService decisionsService) {
+	public HostsEventsService(HostEvents hostEvents, DecisionsService decisionsService, HostsService hostsService) {
 		this.hostEvents = hostEvents;
 		this.decisionsService = decisionsService;
+		this.hostsService = hostsService;
 	}
 
 	public List<HostEvent> getHostEvents() {
@@ -58,7 +61,7 @@ public class HostsEventsService {
 	public HostEvent saveHostEvent(HostAddress hostAddress, String decisionName) {
 		Decision decision = decisionsService.getHostPossibleDecision(decisionName);
 		HostEvent hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst()
-			.orElseGet(() -> HostEvent.builder().publicIpAddress(hostAddress.getPublicIpAddress())
+			.orElseGet(() -> HostEvent.builder().manager(hostsService.getManagerHostAddress()).publicIpAddress(hostAddress.getPublicIpAddress())
 				.privateIpAddress(hostAddress.getPrivateIpAddress()).decision(decision).count(0).build());
 		if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
 			hostEvent.setDecision(decision);
@@ -75,4 +78,9 @@ public class HostsEventsService {
 		hostEvents.deleteAll();
 	}
 
+	public void deleteEvents(HostAddress hostAddress) {
+		List<HostEvent> events = getHostEventsByHostAddress(hostAddress);
+		log.info("Deleting events {} from host {}", events, hostAddress.toSimpleString());
+		hostEvents.deleteAll(events);
+	}
 }

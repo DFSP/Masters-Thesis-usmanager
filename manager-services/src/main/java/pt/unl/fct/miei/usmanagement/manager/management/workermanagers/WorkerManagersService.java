@@ -55,6 +55,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmS
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -94,6 +96,8 @@ public class WorkerManagersService {
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
 	private final NodesService nodesService;
+	private final HostsEventsService hostsEventsService;
+	private final ServicesEventsService servicesEventsService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -104,7 +108,9 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService, Environment environment, WorkerManagerProperties workerManagerProperties,
+								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
+								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
+								 Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
@@ -115,6 +121,8 @@ public class WorkerManagersService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
+		this.hostsEventsService = hostsEventsService;
+		this.servicesEventsService = servicesEventsService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();

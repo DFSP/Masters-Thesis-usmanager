@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvents;
@@ -40,10 +41,12 @@ public class ServicesEventsService {
 
 	private final ServiceEvents serviceEvents;
 	private final DecisionsService decisionsService;
+	private final HostsService hostsService;
 
-	public ServicesEventsService(ServiceEvents serviceEvents, DecisionsService decisionsService) {
+	public ServicesEventsService(ServiceEvents serviceEvents, DecisionsService decisionsService, HostsService hostsService) {
 		this.serviceEvents = serviceEvents;
 		this.decisionsService = decisionsService;
+		this.hostsService = hostsService;
 	}
 
 	public List<ServiceEvent> getServiceEvents() {
@@ -61,7 +64,7 @@ public class ServicesEventsService {
 	public ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
 		Decision decision = decisionsService.getServicePossibleDecision(decisionName);
 		ServiceEvent event = getServiceEventsByContainerId(containerId).stream().findFirst().orElseGet(() ->
-			ServiceEvent.builder().containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
+			ServiceEvent.builder().manager(hostsService.getManagerHostAddress()).containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
 		if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
 			event.setDecision(decision);
 			event.setCount(1);
@@ -86,4 +89,5 @@ public class ServicesEventsService {
 		log.info("Clearing all service events");
 		serviceEvents.deleteAll();
 	}
+
 }

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -56,8 +58,13 @@ public class ServiceEvent {
 	@GeneratedValue
 	private Long id;
 
+	@NotNull
+	private HostAddress manager;
+
+	@NotNull
 	private String containerId;
 
+	@NotNull
 	private String serviceName;
 
 	@JsonIgnoreProperties({"componentType"})

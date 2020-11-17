@@ -60,6 +60,9 @@ public class HostEvent {
 	private Long id;
 
 	@NotNull
+	private HostAddress manager;
+
+	@NotNull
 	private String publicIpAddress;
 
 	@NotNull
