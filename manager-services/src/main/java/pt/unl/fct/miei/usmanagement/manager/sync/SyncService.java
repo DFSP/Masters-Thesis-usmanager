@@ -262,6 +262,13 @@ public class SyncService {
 					log.info("Synchronized node {} manager status from {} to {}", nodeId, savedManagerStatus, currentManagerStatus);
 					updated = true;
 				}
+				String savedState = node.getState();
+				String currentState = swarmNode.status().state();
+				if (!currentState.equalsIgnoreCase(savedState)) {
+					node.setState(currentState);
+					log.info("Synchronized node {} state from {} to {}", nodeId, savedState, currentState);
+					updated = true;
+				}
 				if (updated) {
 					nodesService.updateNode(node);
 				}

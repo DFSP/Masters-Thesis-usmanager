@@ -327,10 +327,10 @@ public class DockerSwarmService {
 		getNodes(filter).forEach(n -> nodesService.removeNode(n.id()));
 	}
 
-	public void removeHostNodes(HostAddress hostAddress) {
+	/*public void removeHostNodes(HostAddress hostAddress) {
 		removeNodes(n -> Objects.equals(n.status().addr(), hostAddress.getPublicIpAddress())
 			&& Objects.equals(n.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS), hostAddress.getPrivateIpAddress()));
-	}
+	}*/
 
 	public void removeNode(String nodeId) {
 		try (DockerClient swarmManager = getSwarmLeader()) {

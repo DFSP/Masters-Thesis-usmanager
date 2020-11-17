@@ -159,7 +159,7 @@ public class SymService {
 
 
 	private void loadTriggerRouters() throws SQLException {
-		this.getDatabaseTablesToReplicate().forEach(table ->
+		getMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId(table)
 				.routerId("master-to-worker")
@@ -168,6 +168,16 @@ public class SymService {
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
 		);
+
+		getWorkerTables().forEach(table ->
+			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
+				.triggerId(table)
+				.routerId("worker-to-master")
+				.createTime(LocalDateTime.now())
+				.lastUpdateTime(LocalDateTime.now())
+				.build())
+		);
+
     /*insert into sym_trigger_router (trigger_id, router_id, initial_load_order, initial_load_select, create_time,
         last_update_time)
     values ('rules', 'master-to-one-worker', 1, 'worker_id=''$(externalId)''', current_timestamp, current_timestamp);*/
@@ -177,10 +187,7 @@ public class SymService {
 
     insert into sym_trigger_router (trigger_id, router_id, initial_load_order, last_update_time, create_time)
     values ('rules', 'worker-to-master', 2, current_timestamp, current_timestamp);*/
-		// worker-to-master
-		// - containers
-		// - hosts
-		// - events/decisions/metrics
+
 	}
 
 	private void loadRouters() {
@@ -215,14 +222,14 @@ public class SymService {
 	}
 
 	private void loadTriggers() throws SQLException {
-		this.getDatabaseTablesToReplicate().forEach(table ->
+		this.getMasterTables().forEach(table ->
 			symTriggersRepository.save(SymTriggerEntity.builder()
 				.triggerId(table)
 				.sourceTableName(table)
 				.channelId("default")
 				.lastUpdateTime(LocalDateTime.now())
 				.createTime(LocalDateTime.now())
-				.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)
+				/*.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)*/
 				.build())
 		);
 	}
@@ -265,7 +272,7 @@ public class SymService {
 		symNodesRepository.deleteAll();
 	}
 
-	private List<String> getDatabaseTablesToReplicate() throws SQLException {
+	private List<String> getMasterTables() throws SQLException {
 		DatabaseMetaData metaData;
 		metaData = dataSource.getConnection().getMetaData();
 		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
@@ -278,6 +285,23 @@ public class SymService {
 			if ((excludingStartsWith == null || excludingStartsWith.stream().noneMatch(tableName::startsWith))
 				&& (excludingEndsWith == null || excludingEndsWith.stream().noneMatch(tableName::endsWith))
 				&& (excludingContains == null || excludingContains.stream().noneMatch(tableName::contains))) {
+				tablesNames.add(tableName);
+			}
+		}
+		return tablesNames;
+	}
+
+	private List<String> getWorkerTables() throws SQLException {
+		DatabaseMetaData metaData;
+		metaData = dataSource.getConnection().getMetaData();
+		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+		List<String> tablesNames = new LinkedList<>();
+		while (tables.next()) {
+			String tableName = tables.getString("TABLE_NAME").toLowerCase();
+			if (tableName.startsWith("container") || tableName.startsWith("node") || tableName.contains("event")
+				|| tableName.contains("monitoring") || tableName.equalsIgnoreCase("host_decisions")
+				|| tableName.equalsIgnoreCase("host_decision_values") || tableName.equalsIgnoreCase("service_decisions")
+				|| tableName.equalsIgnoreCase("service_decision_values")) {
 				tablesNames.add(tableName);
 			}
 		}

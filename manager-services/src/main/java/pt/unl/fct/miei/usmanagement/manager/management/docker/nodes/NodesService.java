@@ -150,9 +150,7 @@ public class NodesService {
 	}
 
 	public void removeHost(HostAddress hostAddress) {
-		dockerSwarmService.removeHostNodes(hostAddress);
-		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
-		this.nodes.deleteAll(nodes);
+		getHostNodes(hostAddress).forEach(node -> removeNode(node.getNodeId()));
 	}
 
 	public void removeNode(String nodeId) {

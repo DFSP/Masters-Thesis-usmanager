@@ -139,6 +139,11 @@ public class ContainersService {
 		return containers.save(container);
 	}
 
+	public List<Container> addContainers(List<Container> containers) {
+		log.info("Saving containers {}", containers);
+		return this.containers.saveAll(containers);
+	}
+
 	public Container updateContainer(Container container) {
 		log.info("Updating container {}", ToStringBuilder.reflectionToString(container));
 		return containers.save(container);
@@ -394,30 +399,7 @@ public class ContainersService {
 
 	public String getLogs(String containerId) {
 		Container container = getContainer(containerId);
-		WorkerManager workerManager = container.getWorkerManager();
-		if (workerManager != null) {
-			try {
-				return workerManagersService.getContainerLogs(workerManager).get();
-			}
-			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to get logs of container {} from worker manager {}: {}", container, workerManager.getId(), e.getMessage());
-			}
-		}
-		else {
-			String logs = dockerContainersService.getContainerLogs(container);
-			if (logs != null) {
-				String path = String.format("./logs/services/%s%s.log", container.getPublicIpAddress(), container.getNames().get(0));
-				Path logsPath = Paths.get(path);
-				try {
-					Files.createDirectories(logsPath.getParent());
-					Files.write(logsPath, logs.getBytes());
-				}
-				catch (IOException e) {
-					log.error("Failed to get container {} logs: {}", containerId, e.getMessage());
-				}
-			}
-			return logs;
-		}
+		return dockerContainersService.getContainerLogs(container);
 	}
 
 	public List<ContainerRule> getRules(String containerId) {

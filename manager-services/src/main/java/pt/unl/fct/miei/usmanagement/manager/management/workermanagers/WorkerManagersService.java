@@ -50,6 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
@@ -66,6 +67,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -91,6 +93,7 @@ public class WorkerManagersService {
 	private final ServicesService servicesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
+	private final NodesService nodesService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -101,7 +104,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
 								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 DockerSwarmService dockerSwarmService, BashService bashService, Environment environment, WorkerManagerProperties workerManagerProperties,
+								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.cloudHostsService = cloudHostsService;
@@ -111,6 +114,7 @@ public class WorkerManagersService {
 		this.servicesService = servicesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
+		this.nodesService = nodesService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -163,8 +167,11 @@ public class WorkerManagersService {
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
 		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).region(container.getRegion()).build();
-		container.setWorkerManager(workerManager);
-		containersService.updateContainer(container);
+		/*container.setWorkerManager(workerManager);
+		log.info("Container {}", ToStringBuilder.reflectionToString(container));
+		log.info("Worker {}", ToStringBuilder.reflectionToString(workerManager));
+		containersService.updateContainer(container);*/
+		nodesService.removeHost(hostAddress);
 		return workerManagers.save(workerManager);
 	}
 
@@ -346,24 +353,28 @@ public class WorkerManagersService {
 					}
 					RegionEnum region = hostAddress.getRegion();
 					WorkerManager workerManager = getRegionWorkerManager(region);
-					containers.addAll(launchContainer(launchContainerRequest, workerManager).get());
-					containers.forEach(container -> container.setWorkerManager(workerManager));
-					// TODO
+					List<Container> workerContainers = launchContainer(launchContainerRequest, workerManager).get();
+					workerContainers.forEach(container -> container.setWorkerManager(workerManager));
+					containers.addAll(containersService.addContainers(workerContainers));
 				}
 				else if (coordinates != null) {
-					List<CompletableFuture<List<Container>>> futureContainers = coordinates.stream().map(c -> {
+					List<WorkerManager> regionWorkerManagers = coordinates.stream().map(c -> {
 						RegionEnum region = RegionEnum.getClosestRegion(c);
-						WorkerManager workerManager = getRegionWorkerManager(region);
-						CompletableFuture<List<Container>> workerContainers = launchContainer(launchContainerRequest, workerManager);
-						//TODO
-						return workerContainers;
+						return getRegionWorkerManager(region);
 					}).collect(Collectors.toList());
+					Map<WorkerManager, CompletableFuture<List<Container>>> futureContainers = regionWorkerManagers.stream().collect(Collectors.toMap(
+						workerManager -> workerManager,
+						workerManager -> launchContainer(launchContainerRequest, workerManager)
+					));
 
-					CompletableFuture.allOf(futureContainers.toArray(new CompletableFuture[0])).join();
+					CompletableFuture.allOf(futureContainers.values().toArray(new CompletableFuture[0])).join();
 
-					for (CompletableFuture<List<Container>> futureWorkerContainers : futureContainers) {
+					for (Map.Entry<WorkerManager, CompletableFuture<List<Container>>> futureWorkerContainers : futureContainers.entrySet()) {
 						try {
-							containers.addAll(futureWorkerContainers.get());
+							WorkerManager workerManager = futureWorkerContainers.getKey();
+							List<Container> workerContainers = futureWorkerContainers.getValue().get();
+							workerContainers.forEach(container -> container.setWorkerManager(workerManager));
+							containers.addAll(containersService.addContainers(workerContainers));
 						}
 						catch (InterruptedException | ExecutionException e) {
 							throw new ManagerException("Failed to launch containers on all regions");
