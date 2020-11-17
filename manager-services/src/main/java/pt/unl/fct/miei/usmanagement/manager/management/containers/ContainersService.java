@@ -139,6 +139,11 @@ public class ContainersService {
 		return containers.save(container);
 	}
 
+	public Container updateContainer(Container container) {
+		log.info("Updating container {}", ToStringBuilder.reflectionToString(container));
+		return containers.save(container);
+	}
+
 	public List<Container> getContainers() {
 		return containers.findAll();
 	}
@@ -321,23 +326,9 @@ public class ContainersService {
 
 	public void stopContainer(String id) {
 		Container container = getContainer(id);
-		WorkerManager workerManager = container.getWorkerManager();
 		try {
-			if (workerManager != null) {
-				workerManagersService.stopContainer(workerManager, id);
-				if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
-					try {
-						workerManagersService.deleteWorkerManagerByContainer(container);
-					}
-					catch (EntityNotFoundException e) {
-						log.error("Failed to delete worker-manager associated with container {}", id);
-					}
-				}
-			}
-			else {
-				dockerContainersService.stopContainer(container);
-				deleteContainer(container);
-			}
+			dockerContainersService.stopContainer(container);
+			deleteContainer(container);
 		}
 		catch (ManagerException e) {
 			log.error("Failed to stop container {}: {}", id, e.getMessage());

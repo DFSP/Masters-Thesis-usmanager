@@ -232,12 +232,13 @@ public class DockerSwarmService {
 
 	private Optional<String> leaveSwarm(DockerClient docker) {
 		try {
+			log.info(docker.info().swarm().toString());
 			boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
 			if (isNode) {
 				String nodeId = docker.info().swarm().nodeId();
 				boolean isManager = docker.info().swarm().controlAvailable();
-				/*Integer managers = docker.info().swarm().managers();*/
-				if (isManager/* && managers != null && managers > 1*/) {
+				Integer managers = docker.info().swarm().managers();
+				if (isManager && managers != null && managers > 1) {
 					changeRole(nodeId, NodeRole.WORKER);
 				}
 				docker.leaveSwarm();

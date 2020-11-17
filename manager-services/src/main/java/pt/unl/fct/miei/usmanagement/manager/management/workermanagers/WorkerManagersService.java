@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
@@ -162,6 +163,8 @@ public class WorkerManagersService {
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
 		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).region(container.getRegion()).build();
+		container.setWorkerManager(workerManager);
+		containersService.updateContainer(container);
 		return workerManagers.save(workerManager);
 	}
 
@@ -198,9 +201,13 @@ public class WorkerManagersService {
 		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
 	}
 
-	public void deleteWorkerManager(String workerManagerId) {
+	public void stopWorkerManager(String workerManagerId) {
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
-		containersService.stopContainer(workerManager.getContainer().getContainerId());
+		Container container = workerManager.getContainer();
+		container.setWorkerManager(null);
+		containersService.updateContainer(container);
+		workerManagers.delete(workerManager);
+		containersService.stopContainer(container.getContainerId());
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {
@@ -503,7 +510,6 @@ public class WorkerManagersService {
 	}
 
 	public void init() {
-		HostAddress hostAddress = hostsService.getManagerHostAddress();
 		new Timer("schedule-setup-worker").schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -511,14 +517,19 @@ public class WorkerManagersService {
 				for (int i = 0; i < retries; i++) {
 					try {
 						log.info("Setting up worker manager docker");
-						bashService.executeCommandSync("docker swarm leave --force");
-						dockerSwarmService.initSwarm();
-						return;
+						BashCommandResult result = bashService.executeCommandSync("docker swarm leave --force");
+						if (!result.isSuccessful()) {
+							log.info("Failed to setup worker manager: {}", result.getError());
+						}
+						else {
+							dockerSwarmService.initSwarm();
+							return;
+						}
 					}
 					catch (ManagerException e) {
-						log.error("Failed to setup worker manager {}: {}... Retrying ({}/{})", hostAddress.toSimpleString(), e.getMessage(), i + 1, retries);
-						Timing.sleep(i + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+						log.error("Failed to setup worker manager: {}... Retrying ({}/{})", e.getMessage(), i + 1, retries);
 					}
+					Timing.sleep(i + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
 				}
 			}
 		}, DELAY_BEFORE_SWARM_SETUP);

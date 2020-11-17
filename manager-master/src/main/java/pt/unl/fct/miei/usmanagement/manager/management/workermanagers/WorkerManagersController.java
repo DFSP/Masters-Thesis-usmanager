@@ -77,8 +77,8 @@ public class WorkerManagersController {
 	}
 
 	@DeleteMapping("/{workerManagerId}")
-	public void deleteWorkerManager(@PathVariable String workerManagerId) {
-		workerManagersService.deleteWorkerManager(workerManagerId);
+	public void stopWorkerManager(@PathVariable String workerManagerId) {
+		workerManagersService.stopWorkerManager(workerManagerId);
 	}
 
 	@GetMapping("/{workerManagerId}/assigned-hosts")

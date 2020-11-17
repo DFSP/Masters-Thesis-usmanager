@@ -54,8 +54,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.configurations.Configurat
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
@@ -263,7 +263,9 @@ public class DockerContainersService {
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
 							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress()));
-					} catch (ManagerException ignored) { }
+					}
+					catch (ManagerException ignored) {
+					}
 					if (containers.size() > 0) {
 						DockerContainer container = containers.get(0);
 						log.info("Service {} is already running on container {} on host {}", serviceName, container.getId(), hostAddress);
@@ -349,9 +351,13 @@ public class DockerContainersService {
 					hostAddress, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
 					containerLabels, volumes);
 
+				HostConfig.Bind[] binds = volumes.stream()
+					.map(v -> HostConfig.Bind.from(v.split(":")[0]).to(v.split(":")[1]).readOnly(false).build())
+					.toArray(HostConfig.Bind[]::new);
 				HostConfig hostConfig = HostConfig.builder()
 					.autoRemove(true)
 					.portBindings(Map.of(String.valueOf(internalPort), List.of(PortBinding.of("", String.valueOf(externalPort)))))
+					.appendBinds(binds)
 					.build();
 				ContainerConfig.Builder containerBuilder = ContainerConfig.builder()
 					.image(dockerRepository)
@@ -359,7 +365,6 @@ public class DockerContainersService {
 					.hostConfig(hostConfig)
 					.hostname(serviceName)
 					.env(containerEnvironment)
-					.volumes(volumes)
 					.labels(containerLabels);
 				ContainerConfig containerConfig = launchCommand.isEmpty()
 					? containerBuilder.build()
@@ -572,7 +577,8 @@ public class DockerContainersService {
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
 		ImmutableList<ContainerMount> containerMounts = container.mounts();
 		Set<String> mounts = new HashSet<>();
-		containerMounts.forEach(mount -> mounts.add(mount.source().replace(":", "") + ":" + mount.destination()));
+		log.info(containerMounts.toString());
+		containerMounts.forEach(mount -> mounts.add(mount.source() + ":" + mount.destination()));
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
 		RegionEnum region = RegionEnum.getRegion(container.labels().get(ContainerConstants.Label.REGION));
 		List<ContainerPortMapping> ports = container.ports().stream()
