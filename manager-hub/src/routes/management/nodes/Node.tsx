@@ -187,9 +187,10 @@ class Node extends BaseComponent<Props, State> {
         isNew(this.props.location.search);
 
     private onPostSuccess = (reply: IReply<INode[]>): void => {
-        const nodes = reply.data;
+        let nodes = reply.data;
+        nodes = nodes.map(node => addCoordinates(node));
         if (nodes.length === 1) {
-            const node = nodes[0];
+            let node = nodes[0];
             super.toast(`<span class='green-text'>O host ${node.publicIpAddress} entrou no swarm com o id ${this.mounted ? `<b class='white-text'>${node.nodeId}</b>` : `<a href='/nós/${node.nodeId}'><b>${node.nodeId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateNode(node);
@@ -215,7 +216,8 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onPutSuccess = (reply: IReply<INode>): void => {
-        const node = reply.data;
+        let node = reply.data;
+        node = addCoordinates(node);
         const previousNode = this.getNode();
         const previousAvailability = previousNode?.availability;
         const previousRole = previousNode?.role;
@@ -292,6 +294,7 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onRejoinSwarmSuccess = (node: INode) => {
+        node = addCoordinates(node);
         super.toast(`<span class='green-text'>O host </span> <b>${node?.publicIpAddress}</b> <span class='green-text'>re-entrou no swarm com o id </span> ${this.mounted ? `<b>${node?.nodeId}</b>` : `<a href='/nós/${node?.nodeId}'><b>${node?.nodeId}</b></a>`}`);
         if (this.mounted) {
             this.setState({loading: undefined});
@@ -317,8 +320,9 @@ class Node extends BaseComponent<Props, State> {
     };
 
     private onLeaveSuccess = (nodes: INode[]) => {
-        const node = nodes[0];
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> foi removido com sucesso do swarm</span>`);
+        let node = nodes[0];
+        node = addCoordinates(node);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.nodeId}</b> saiu com sucesso do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -337,7 +341,6 @@ class Node extends BaseComponent<Props, State> {
 
     private updateNode = (node: INode) => {
         node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
-        node = addCoordinates(node);
         const formNode = {...node};
         removeFields(formNode);
         this.setState({node: node, formNode: formNode, loading: undefined});
@@ -384,7 +387,7 @@ class Node extends BaseComponent<Props, State> {
             if (marker.title === '') {
                 marker.title += coordinates.label + '<br/>';
             }
-            marker.title += id + ' - ' + node.publicIpAddress + '/' + node.labels['privateIpAddress'] + '<br/>';
+            marker.title += id + '<br/>' + node.publicIpAddress + '/' + node.labels['privateIpAddress'] + '<br/>';
             marker.label = id;
             marker.latitude = coordinates.latitude;
             marker.longitude = coordinates.longitude;
@@ -501,6 +504,10 @@ class Node extends BaseComponent<Props, State> {
         return node;
     }
 
+    private onPutReply = (node: INode) => {
+        return addCoordinates(node);
+    }
+
     private node = () => {
         const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
         const {currentForm, loading} = this.state;
@@ -509,6 +516,7 @@ class Node extends BaseComponent<Props, State> {
         const formNode = this.getFormNode();
         // @ts-ignore
         const nodeKey: (keyof INode) = formNode && Object.keys(formNode)[0];
+        console.log(node)
         return (
             <>
                 {isLoading && <LoadingSpinner/>}
@@ -534,7 +542,8 @@ class Node extends BaseComponent<Props, State> {
                                   : {
                                       url: `nodes/${(node as INode).nodeId}`,
                                       successCallback: this.onPutSuccess,
-                                      failureCallback: this.onPutFailure
+                                      failureCallback: this.onPutFailure,
+                                      result: this.onPutReply,
                                   }}
                             // delete button is never present on new nodes, so a type cast is safe
                               delete={Object.values(this.props.nodes).filter(node => node.role === 'MANAGER').length === 1 && node.role === 'MANAGER'

@@ -55,7 +55,7 @@ export interface FieldProps<T = string> {
     valueToString?: (v: T) => string;
     dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void, emptyMessage?: string };
     number?: { min: number, max: number };
-    validation?: IValidation;
+    validation?: IValidation | boolean;
     icon?: { include?: boolean, name?: string, linkedTo?: ((v: T) => string | null) | string };
     disabled?: boolean;
     hidden?: boolean;
@@ -93,13 +93,14 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
     }
 
     public render() {
-        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map, checkbox} = this.props;
+        const {id, type, label, dropdown, number, icon, disabled, hidden, valueToString, map, checkbox, validation} = this.props;
         const getError = (errors: IErrors): string => (errors ? errors[id] : '');
+        console.log(validation)
         const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
             const hasErrors = getError(errors);
             if (hasErrors) {
                 return "invalidate-field";
-            } else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value)) {
+            } else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value) && validation !== false) {
                 return "validate-field";
             } else {
                 return "no-validation-field";
@@ -244,6 +245,7 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
 
     private getMapFieldMarkers = (values: any, markers?: IMarker[], valueToMarkers?: (v: T[]) => IMarker[]) => {
         markers = markers || [];
+        console.log(values)
         if (!values) {
             return markers;
         }

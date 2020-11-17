@@ -91,7 +91,7 @@ interface FormProps {
     post?: RestOperation;
     put?: RestOperation;
     delete?: RestOperation;
-    controlsMode?: 'top' | 'modal' | 'modal-fullscreen';
+    controlsMode?: 'top' | 'modal' | 'modal-fullscreen' | 'none';
     modal?: {
         onConfirm?: (values: IValues) => void;
         scrollbar?: RefObject<ScrollBar>;
@@ -512,15 +512,15 @@ class Form extends BaseComponent<Props, State> {
     private isRequired = (id: keyof IValues): boolean => {
         const {fields} = this.props;
         const field: FieldProps | undefined = fields[id];
-        const validation: IValidation | undefined = field?.validation;
-        return validation?.rule.name.includes('required') || false
+        const validation: IValidation | boolean | undefined = field?.validation;
+        return typeof validation === 'object' && validation?.rule.name.includes('required') || false
     }
 
     private validate = (id: keyof IValues): string => {
         const {fields} = this.props;
         const field: FieldProps | undefined = fields[id];
-        const validation: IValidation | undefined = field?.validation;
-        const newError: string = validation ? validation.rule(this.state.values, id, validation.args) : "";
+        const validation: IValidation | boolean | undefined = field?.validation;
+        const newError: string = typeof validation === 'object' && validation ? validation.rule(this.state.values, id, validation.args) : "";
         if (newError !== "") {
             console.log("Validation of field " + field.id + ": " + newError);
         }

@@ -577,7 +577,6 @@ public class DockerContainersService {
 		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
 		ImmutableList<ContainerMount> containerMounts = container.mounts();
 		Set<String> mounts = new HashSet<>();
-		log.info(containerMounts.toString());
 		containerMounts.forEach(mount -> mounts.add(mount.source() + ":" + mount.destination()));
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
 		RegionEnum region = RegionEnum.getRegion(container.labels().get(ContainerConstants.Label.REGION));
