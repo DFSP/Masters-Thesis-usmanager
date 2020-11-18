@@ -1,6 +1,6 @@
 .container {
     background-color: #36393F;
-    margin: 50px 100px 0 100px ;
+    margin: 50px 300px 0 300px ;
     height: calc(100vh - 600px);
     display: flex;
     border: 1px solid black;
@@ -17,6 +17,7 @@
     list-style-type: none;
     line-height: 48px;
     color: white;
+    user-select: none;
 }
 
 .optionSelected {
@@ -25,6 +26,7 @@
     list-style-type: none;
     line-height: 48px;
     color: white;
+    user-select: none;
     background-color: rgba(255, 255, 255, 0.1);
 }
 

@@ -126,7 +126,7 @@ public class NginxLoadBalancerService {
 				}).collect(Collectors.toList())).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to launch load balancers at regions {}: {}", regions, e.getMessage());
+			throw new ManagerException("Unable to launch load balancers at regions %s: %s", regions, e.getMessage());
 		}
 
 	}

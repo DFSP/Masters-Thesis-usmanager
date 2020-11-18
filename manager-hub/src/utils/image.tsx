@@ -46,7 +46,7 @@ import {
     FaMapMarkedAlt,
     FaMapPin,
     FaMinus,
-    FaNetworkWired, FaPaperPlane,
+    FaNetworkWired, FaNewspaper, FaPaperPlane,
     FaPowerOff,
     FaSdCard,
     FaSortAmountDown,
@@ -66,7 +66,10 @@ import {IState} from "../routes/management/hosts/cloud/CloudHost";
 // https://materializecss.com/icons.html
 export const mapLabelToIcon = (label: string, value: any): string | JSX.Element => {
     label = label.toLowerCase().replace(' *', '');
-    if (label === 'mounts') {
+    if (label === 'environment') {
+        return <FaNewspaper/>;
+    }
+    if (label === 'mounts' || label === 'volumes') {
         return <FaFile/>;
     }
     if (label.includes('manager')) {

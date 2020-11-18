@@ -377,7 +377,7 @@ public class WorkerManagersService {
 							containers.addAll(workerContainers);
 						}
 						catch (InterruptedException | ExecutionException e) {
-							throw new ManagerException("Failed to launch containers on worker from region {}", workerManager.getRegion());
+							throw new ManagerException("Failed to launch containers on worker from region %s", workerManager.getRegion());
 						}
 					}
 				}

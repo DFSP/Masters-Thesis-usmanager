@@ -292,7 +292,7 @@ public class ContainersService {
 				return workerManagersService.replicateContainer(managerId, id, toHostAddress).get();
 			}
 			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to replicate container {} at worker manager {}: {}", id, managerId, e.getMessage());
+				throw new ManagerException("Failed to replicate container %s at worker manager %s: %s", id, managerId, e.getMessage());
 			}
 		}
 		else {
@@ -310,7 +310,7 @@ public class ContainersService {
 				return workerManagersService.migrateContainer(managerId, id, hostAddress).get();
 			}
 			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to migrate container {} at worker manager {}: {}", id, managerId, e.getMessage());
+				throw new ManagerException("Failed to migrate container %s at worker manager %s: %s", id, managerId, e.getMessage());
 			}
 		}
 		else {

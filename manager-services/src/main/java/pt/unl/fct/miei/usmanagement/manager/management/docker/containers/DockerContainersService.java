@@ -407,7 +407,7 @@ public class DockerContainersService {
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
 			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, databaseServiceName));
 		if (databaseContainer == null) {
-			throw new ManagerException("Failed to launch database {} on host {}", databaseServiceName, hostAddress);
+			throw new ManagerException("Failed to launch database %s on host %s", databaseServiceName, hostAddress);
 		}
 		String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
 		log.info("Using database {} on host {}", address, hostAddress);
@@ -419,7 +419,7 @@ public class DockerContainersService {
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, memcachedService)))
 			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, memcachedService));
 		if (memcached == null) {
-			throw new ManagerException("Failed to launch memcached {} on host {}", memcachedService, hostAddress);
+			throw new ManagerException("Failed to launch memcached %s on host %s", memcachedService, hostAddress);
 		}
 		String address = memcached.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
 		log.info("Using memcached {} on host {}", address, hostAddress);

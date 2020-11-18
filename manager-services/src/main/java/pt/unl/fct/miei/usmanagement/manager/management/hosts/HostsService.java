@@ -300,7 +300,7 @@ public class HostsService {
 				).collect(Collectors.toList())).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to get closest capable hosts: {}", e.getMessage());
+			throw new ManagerException("Unable to get closest capable hosts: %s", e.getMessage());
 		}
 		return getClosestHost(coordinates, edgeHosts, cloudHosts);
 	}

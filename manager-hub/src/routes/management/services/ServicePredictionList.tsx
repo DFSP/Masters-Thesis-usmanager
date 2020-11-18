@@ -157,17 +157,16 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                             </div>
                         </span>
                     </label>
-                    <div className={`${styles.smallText}`}>
-                        {prediction.startDate === prediction.endDate ?
-                            <div>{prediction.startDate} {prediction.startTime} <span
-                                className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
-                            :
-                            <>
-                                <div>{prediction.startDate} {prediction.startTime}</div>
-                                <div>{prediction.endDate} {prediction.endTime}</div>
-                            </>
-                        }
-                    </div>
+                </div>
+                <div className={`${styles.smallText}`}>
+                    {prediction.startDate === prediction.endDate ?
+                        <div>{prediction.startDate} {prediction.startTime} <span
+                            className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
+                        :
+                        <>
+                            <div>{prediction.startDate} {prediction.startTime}</div>
+                            <div>{prediction.endDate} {prediction.endTime}</div>
+                        </>}
                 </div>
             </ListItem>
         );
