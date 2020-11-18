@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from "react";
+import React from "react";
 import {connect} from "react-redux";
 import {INewSshCommand, ISshCommand} from "../../ssh/SshCommand";
 import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
@@ -32,7 +32,7 @@ import Field from "../../../../components/form/Field";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
 import {IReply} from "../../../../utils/api";
 import {IEdgeHost} from "./EdgeHost";
-import {getEdgeHostAddress, IHostAddress} from "../Hosts";
+import {getEdgeHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): INewSshCommand => ({
     background: false,
@@ -52,10 +52,15 @@ type Props = EdgeHostSshCommandProps & DispatchToProps;
 
 class EdgeHostSshCommand extends BaseComponent<Props, {}> {
 
-    private sshPanel = createRef<any>();
+    private sshPanel: any = null;
 
     private commandFilter = (command: ICommand | IFileTransfer) =>
         command.hostAddress.publicIpAddress === this.props.edgeHost.publicIpAddress
+
+    private onSshPanelRef = (ref: any) => this.sshPanel = ref;
+
+    private scrollToBottom = () =>
+        this.sshPanel.scrollTop = Number.MAX_SAFE_INTEGER;
 
     public render() {
         const command = buildNewSshCommand();
@@ -80,7 +85,9 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
                            id='command'
                            label='command'/>
                 </Form>
-                {this.props.edgeHost && <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
+                {this.props.edgeHost && <SshPanel onRef={this.onSshPanelRef}
+                                                  filter={this.commandFilter}
+                                                  hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
             </>
         );
     }
@@ -88,10 +95,10 @@ class EdgeHostSshCommand extends BaseComponent<Props, {}> {
     private onPostSuccess = (reply: IReply<ISshCommand>): void => {
         const command = reply.data;
         const edgeHost = this.props.edgeHost;
-        const hostAddress =  getEdgeHostAddress(edgeHost);
+        const hostAddress = getEdgeHostAddress(edgeHost);
         const timestampedCommand = {...command, hostAddress: hostAddress, timestamp: Date.now()};
         this.props.addCommand(timestampedCommand);
-        this.sshPanel.current?.scrollToTop();
+        this.scrollToBottom();
     };
 
     private onPostFailure = (reason: string): void =>

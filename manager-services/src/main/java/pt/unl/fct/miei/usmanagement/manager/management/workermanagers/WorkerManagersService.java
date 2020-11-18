@@ -43,8 +43,6 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -53,10 +51,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -70,7 +64,6 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -79,7 +72,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -88,16 +80,12 @@ public class WorkerManagersService {
 	private static final int DELAY_BEFORE_SWARM_SETUP = 2000;
 
 	private final WorkerManagers workerManagers;
-	private final CloudHostsService cloudHostsService;
-	private final EdgeHostsService edgeHostsService;
 	private final ContainersService containersService;
 	private final HostsService hostsService;
 	private final ServicesService servicesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
 	private final NodesService nodesService;
-	private final HostsEventsService hostsEventsService;
-	private final ServicesEventsService servicesEventsService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -105,24 +93,18 @@ public class WorkerManagersService {
 	private final int port;
 	private final int threads;
 
-	public WorkerManagersService(WorkerManagers workerManagers, CloudHostsService cloudHostsService,
-								 EdgeHostsService edgeHostsService, @Lazy ContainersService containersService,
+	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								 Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
-		this.cloudHostsService = cloudHostsService;
-		this.edgeHostsService = edgeHostsService;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
-		this.hostsEventsService = hostsEventsService;
-		this.servicesEventsService = servicesEventsService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -223,7 +205,6 @@ public class WorkerManagersService {
 		WorkerManager workerManager = getWorkerManager(container);
 		workerManagers.delete(workerManager);
 	}
-
 
 	private void checkWorkerManagerExists(String id) {
 		if (!workerManagers.hasWorkerManager(id)) {

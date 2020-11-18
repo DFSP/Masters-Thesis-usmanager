@@ -1870,12 +1870,9 @@ const entities = (state: EntitiesState = {
             });
         case EDGE_HOST_SIMULATED_METRICS_SUCCESS: {
             const edgeHost = entity && state.hosts.edge.data[entity];
-            console.log(edgeHost)
             const simulatedMetrics = {hostSimulatedMetrics: data?.simulatedHostMetrics || []};
-            console.log(simulatedMetrics)
             const edgeHostWithSimulatedMetrics = Object.assign(edgeHost ? edgeHost : [entity], simulatedMetrics);
             const normalizedEdgeHost = normalize(edgeHostWithSimulatedMetrics, Schemas.EDGE_HOST).entities.edgeHosts;
-            console.log(normalizedEdgeHost)
             return {
                 ...state,
                 hosts: {
@@ -3160,7 +3157,6 @@ const entities = (state: EntitiesState = {
             const edgeHosts = {edgeHosts: data?.edgeHosts || []};
             const simulatedHostMetricWithEdgeHosts = Object.assign(simulatedHostMetric ? simulatedHostMetric : [entity], edgeHosts);
             const normalizedSimulatedHostMetric = normalize(simulatedHostMetricWithEdgeHosts, Schemas.SIMULATED_HOST_METRIC).entities;
-            console.log(normalizedSimulatedHostMetric)
             return merge({}, state, {
                 simulatedMetrics: {
                     ...state.simulatedMetrics,

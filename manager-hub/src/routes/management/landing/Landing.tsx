@@ -116,7 +116,7 @@ class Landing extends React.Component<Props, State> {
             if (marker.title === '') {
                 marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + '<br/>';
             }
-            marker.title += container.id.toString().substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+            marker.title += container.id.toString().substr(0, 10) + ' - ' + container.labels['serviceName'] + '<br/>';
             marker.label = publicIpAddress;
             marker.latitude = container.coordinates.latitude;
             marker.longitude = container.coordinates.longitude;

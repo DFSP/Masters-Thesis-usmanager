@@ -599,6 +599,10 @@ function removeFields(service: Partial<IService>) {
     delete service["predictions"];
     delete service["serviceRules"];
     delete service["serviceSimulatedMetrics"];
+    if (service.serviceType === 'SYSTEM') {
+        delete service["minimumReplicas"];
+        delete service["maximumReplicas"];
+    }
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

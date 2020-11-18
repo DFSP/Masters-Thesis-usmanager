@@ -30,6 +30,7 @@ interface SshPanelDispatchToProps {
 interface Props {
     filter?: (command: ICommand | IFileTransfer) => boolean;
     hostAddress?: IHostAddress;
+    onRef?: (ref: any) => void;
 }
 
 export type SshPanelProps = Props & SshPanelStateToProps & SshPanelDispatchToProps;
@@ -40,7 +41,7 @@ interface State {
     panelWidth: string;
 }
 
-class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel {
+class SshPanel extends React.Component<SshPanelProps, State> {
 
     private commandsContainer: any = null;
     private commandsScrollbar: ScrollBar | null = null;
@@ -61,6 +62,7 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
     public componentDidMount() {
         this.updateScrollbars();
         window.addEventListener('resize', this.handleResize);
+        this.props.onRef?.(this.commandsContainer);
     }
 
     public componentDidUpdate(prevProps: Readonly<SshPanelProps>, prevState: Readonly<State>, snapshot?: any) {
@@ -78,9 +80,6 @@ class SshPanel extends React.Component<SshPanelProps, State> implements SshPanel
             panelWidth: this.props.sidenavVisible ? 'calc(100vw - 225px)' : '100vw'
         })
     }
-
-    public scrollToTop = () =>
-        this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
 
     private filteredCommands = () => {
         const {commands, filter} = this.props;

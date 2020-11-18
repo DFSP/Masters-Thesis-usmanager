@@ -44,16 +44,6 @@ public interface WorkerManagers extends JpaRepository<WorkerManager, String> {
 
 	Optional<WorkerManager> getByContainer(@Param("container") Container container);
 
-	@Query("select c "
-		+ "from WorkerManager w join w.assignedCloudHosts c "
-		+ "where w.id = :id")
-	List<CloudHost> getCloudHosts(@Param("id") String id);
-
-	@Query("select e "
-		+ "from WorkerManager w join w.assignedEdgeHosts e "
-		+ "where w.id = :id")
-	List<EdgeHost> getEdgeHosts(@Param("id") String id);
-
 	List<WorkerManager> getByRegion(RegionEnum region);
 
 }

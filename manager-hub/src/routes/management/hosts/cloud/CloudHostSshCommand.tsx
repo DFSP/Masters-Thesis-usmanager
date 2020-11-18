@@ -23,7 +23,7 @@
  */
 
 
-import React, {createRef} from "react";
+import React from "react";
 import {connect} from "react-redux";
 import {INewSshCommand, ISshCommand} from "../../ssh/SshCommand";
 import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
@@ -33,7 +33,7 @@ import Field from "../../../../components/form/Field";
 import Form, {IFields, requiredAndTrimmed} from "../../../../components/form/Form";
 import {IReply} from "../../../../utils/api";
 import {ICloudHost} from "./CloudHost";
-import {getCloudHostAddress, IHostAddress} from "../Hosts";
+import {getCloudHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): INewSshCommand => ({
     background: false,
@@ -53,10 +53,15 @@ type Props = CloudHostSshCommandProps & DispatchToProps;
 
 class CloudHostSshCommand extends BaseComponent<Props, {}> {
 
-    private sshPanel = createRef<any>();
+    private sshPanel: any = null;
 
     private commandFilter = (command: ICommand | IFileTransfer) =>
         command.hostAddress.publicIpAddress === this.props.cloudHost.publicIpAddress
+
+    private onSshPanelRef = (ref: any) => this.sshPanel = ref;
+
+    private scrollToBottom = () =>
+        this.sshPanel.scrollTop = Number.MAX_SAFE_INTEGER;
 
     public render() {
         const command = buildNewSshCommand();
@@ -81,7 +86,10 @@ class CloudHostSshCommand extends BaseComponent<Props, {}> {
                            id='command'
                            label='command'/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getCloudHostAddress(this.props.cloudHost)}/>
+                {this.props.cloudHost && <SshPanel onRef={this.onSshPanelRef}
+                                                   ref={this.sshPanel}
+                                                   filter={this.commandFilter}
+                                                   hostAddress={getCloudHostAddress(this.props.cloudHost)}/>}
             </>
         );
     }
@@ -89,9 +97,13 @@ class CloudHostSshCommand extends BaseComponent<Props, {}> {
     private onPostSuccess = (reply: IReply<ISshCommand>): void => {
         const command = reply.data;
         const cloudHost = this.props.cloudHost;
-        const timestampedCommand: ICommand = {...command, hostAddress: getCloudHostAddress(cloudHost), timestamp: Date.now()};
+        const timestampedCommand: ICommand = {
+            ...command,
+            hostAddress: getCloudHostAddress(cloudHost),
+            timestamp: Date.now()
+        };
         this.props.addCommand(timestampedCommand);
-        this.sshPanel.current?.scrollToTop();
+        this.scrollToBottom();
     };
 
     private onPostFailure = (reason: string): void =>

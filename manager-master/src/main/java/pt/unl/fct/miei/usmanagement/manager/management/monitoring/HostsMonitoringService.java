@@ -201,7 +201,7 @@ public class HostsMonitoringService {
 	private void monitorHostsTask() {
 		List<Node> nodes = nodesService.getReadyNodes(); // TODO only swarm nodes
 		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
-			.map(node -> getHostDecisions(node))
+			.map(this::getHostDecisions)
 			.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureHostDecisions.toArray(new CompletableFuture[0])).join();
@@ -258,7 +258,7 @@ public class HostsMonitoringService {
 
 		// Simulated host metrics
 		Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
-			.stream().filter(metric -> metric.isActive() && (!validStats.containsKey(metric.getName()) || metric.isOverride()))
+			.stream().filter(metric -> metric.isActive() && (!validStats.containsKey(metric.getField().getName()) || metric.isOverride()))
 			.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue));
 		validStats.putAll(hostSimulatedFields);
 
@@ -270,7 +270,8 @@ public class HostsMonitoringService {
 	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {
 		HostAddress hostAddress = node.getHostAddress();
 
-		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent = new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node);
+		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent =
+			new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 
 		getHostMonitoring(hostAddress)
@@ -357,7 +358,7 @@ public class HostsMonitoringService {
 	private void executeUnderworkedHostDecision(HostAddress hostAddress) {
 		// This action is triggered when the asking host is underworked
 		// To resolve that, we migrate all its containers to another close host, and then stop it
-		List<Container> containers =  containersService.migrateHostContainers(hostAddress);
+		List<Container> containers = containersService.migrateHostContainers(hostAddress);
 		List<HostAddress> newHosts = containers.stream().map(Container::getHostAddress).collect(Collectors.toList());
 		hostsService.removeHost(hostAddress);
 		log.info("Resolved underworked host: Stopped {} and migrated containers {} to hosts {}", hostAddress, containers, newHosts);

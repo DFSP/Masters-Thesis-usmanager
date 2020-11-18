@@ -158,7 +158,7 @@ class ServiceCard extends BaseComponent<Props, State> {
             <CardItem key={'serviceType'}
                       label={'Service type'}
                       value={`${service.serviceType}`}/>
-            {replicasMessage &&
+            {service.serviceType !== 'SYSTEM' && replicasMessage &&
             <CardItem key={'replicas'}
                       label={'Replicas'}
                       value={replicasMessage}/>}

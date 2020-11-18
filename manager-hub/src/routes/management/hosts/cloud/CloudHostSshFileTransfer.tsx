@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from "react";
+import React from "react";
 import {ISshFile} from "../../ssh/SshFile";
 import {ICloudHost} from "./CloudHost";
 import BaseComponent from "../../../../components/BaseComponent";
@@ -33,7 +33,7 @@ import {ReduxState} from "../../../../reducers";
 import {addCommand, loadScripts} from "../../../../actions";
 import {connect} from "react-redux";
 import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
-import {getCloudHostAddress, IHostAddress} from "../Hosts";
+import {getCloudHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
     hostAddress: undefined,
@@ -57,7 +57,7 @@ type Props = SshFileProps & StateToProps & DispatchToProps;
 
 class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
 
-    private sshPanel = createRef<any>();
+    private sshPanel: any = null;
 
     public componentDidMount(): void {
         this.props.loadScripts();
@@ -65,6 +65,11 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
 
     private commandFilter = (command: ICommand | IFileTransfer) =>
         command.hostAddress.publicIpAddress === this.props.cloudHost.publicIpAddress
+
+    private onSshPanelRef = (ref: any) => this.sshPanel = ref;
+
+    private scrollToBottom = () =>
+        this.sshPanel.scrollTop = Number.MAX_SAFE_INTEGER;
 
     public render() {
         const command = buildNewSshCommand();
@@ -91,17 +96,19 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
                                values: this.props.scripts,
                            }}/>
                 </Form>
-                <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getCloudHostAddress(this.props.cloudHost)}/>
+                {this.props.cloudHost && <SshPanel onRef={this.onSshPanelRef}
+                                                   filter={this.commandFilter}
+                                                   hostAddress={getCloudHostAddress(this.props.cloudHost)}/>}
             </>
         );
     }
 
     private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
-        super.toast(`<span class="green-text">File uploaded</span>`);
+        super.toast(`<span class='green-text'>File uploaded</span>`);
         const cloudHost = this.props.cloudHost;
         const transfer = {...args, hostAddress: getCloudHostAddress(cloudHost), timestamp: Date.now()};
         this.props.addCommand(transfer);
-        this.sshPanel.current?.scrollToTop();
+        this.scrollToBottom();
     };
 
     private onPostFailure = (reason: string): void =>

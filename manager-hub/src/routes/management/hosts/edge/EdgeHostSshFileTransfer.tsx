@@ -57,7 +57,7 @@ type Props = SshFileProps & StateToProps & DispatchToProps;
 
 class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
 
-    private sshPanel = createRef<any>();
+    private sshPanel: any = null;
 
     private commandFilter = (command: ICommand | IFileTransfer) =>
         command.hostAddress.publicIpAddress === this.props.edgeHost.publicIpAddress
@@ -65,6 +65,11 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
     public componentDidMount(): void {
         this.props.loadScripts();
     };
+
+    private onSshPanelRef = (ref: any) => this.sshPanel = ref;
+
+    private scrollToBottom = () =>
+        this.sshPanel.scrollTop = Number.MAX_SAFE_INTEGER;
 
     public render() {
         const command = buildNewSshCommand();
@@ -91,7 +96,9 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
                                values: this.props.scripts,
                            }}/>
                 </Form>
-                {this.props.edgeHost && <SshPanel ref={this.sshPanel} filter={this.commandFilter} hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
+                {this.props.edgeHost && <SshPanel onRef={this.onSshPanelRef}
+                                                  filter={this.commandFilter}
+                                                  hostAddress={getEdgeHostAddress(this.props.edgeHost)}/>}
             </>
         );
     }
@@ -101,7 +108,7 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
         const edgeHost = this.props.edgeHost;
         const transfer = {...args, hostAddress: getEdgeHostAddress(edgeHost), timestamp: Date.now()};
         this.props.addCommand(transfer);
-        this.sshPanel.current?.scrollToTop();
+        this.scrollToBottom();
     };
 
     private onPostFailure = (reason: string): void =>

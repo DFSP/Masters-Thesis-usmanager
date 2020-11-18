@@ -58,7 +58,7 @@
     flex-grow: 1;
 }
 
-.link:hover > .listItemContent > .linkIcon, .link:hover > .linkedItemContent > .linkIcon {
+.link:hover > .listItemContent > .linkIcon, .link:hover > .linkedItemContent > .linkIcon, a:hover > .linkIcon {
     display: block;
 }
 
