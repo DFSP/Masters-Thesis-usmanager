@@ -64,12 +64,12 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
 
     private rule = (rule: string, index: number): JSX.Element =>
         <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
-            <div className={`${styles.linkedItemContent}`}>
-                <span>{rule}</span>
-            </div>
             <Link to={`/regras/hosts/${rule}`}
                   className={`${styles.link}`}>
-                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                <div className={`${styles.linkedItemContent}`}>
+                    <span>{rule}</span>
+                    <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                </div>
             </Link>
         </ListItem>;
 

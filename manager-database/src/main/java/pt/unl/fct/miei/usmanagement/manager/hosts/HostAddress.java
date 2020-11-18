@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.hosts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;

@@ -6,7 +6,6 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -26,8 +25,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +38,7 @@ public class SyncService {
 	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 45000;
 	private final static int CONTAINERS_DATABASE_SYNC_INTERVAL = 10000;
 	private final static int NODES_DATABASE_SYNC_INTERVAL = 10000;
+	private final static int INVALID_TIMEOUT = 60000;
 
 	private final CloudHostsService cloudHostsService;
 	private final AwsService awsService;
@@ -73,7 +75,9 @@ public class SyncService {
 				try {
 					synchronizeCloudHostsDatabase();
 				}
-				catch (ManagerException ignored) { }
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL);
 	}
@@ -141,7 +145,9 @@ public class SyncService {
 				try {
 					synchronizeContainersDatabase();
 				}
-				catch (ManagerException ignored) { }
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
 	}
@@ -182,9 +188,9 @@ public class SyncService {
 			if (managerId == null) {
 				continue;
 			}
-			Heartbeat heartbeat = heartbeatService.lastHeartbeat(managerId);
-			log.info(heartbeat.toString());
-			if (heartbeat.getHeartbeatTime().isAfter(LocalDateTime.now().plusSeconds(60))) {
+			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
+			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
+			if (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout)) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
@@ -203,7 +209,9 @@ public class SyncService {
 				try {
 					synchronizeNodesDatabase();
 				}
-				catch (ManagerException ignored) { }
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}, NODES_DATABASE_SYNC_INTERVAL, NODES_DATABASE_SYNC_INTERVAL);
 	}
@@ -244,14 +252,23 @@ public class SyncService {
 			if (configurationsService.isConfiguring(nodeId)) {
 				continue;
 			}
-			/*if (!swarmNodesIds.containsKey(nodeId)) {
+			String managerId = node.getManagerId();
+			if (managerId == null) {
+				continue;
+			}
+			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
+			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
+			if (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout)) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);
 			}
-			else {*/
+			else {
 				boolean updated = false;
 				Node swarmNode = swarmNodesIds.get(nodeId);
+				if (swarmNode == null) {
+					continue;
+				}
 				NodeAvailability savedAvailability = node.getAvailability();
 				NodeAvailability currentAvailability = NodeAvailability.getNodeAvailability(swarmNode.spec().availability());
 				if (currentAvailability != savedAvailability) {
@@ -278,7 +295,7 @@ public class SyncService {
 				if (updated) {
 					nodesService.updateNode(node);
 				}
-			/*}*/
+			}
 		}
 
 		log.debug("Finished nodes synchronization");

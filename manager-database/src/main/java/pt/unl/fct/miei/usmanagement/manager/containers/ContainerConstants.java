@@ -62,6 +62,7 @@ public final class ContainerConstants {
 		public static final String COORDINATES = "coordinates";
 		public static final String REGION = "region";
 		public static final String RECOVERY = "recovery";
+		public static final String MASTER_MANAGER = "masterManager";
 	}
 
 }

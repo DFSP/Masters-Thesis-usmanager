@@ -74,7 +74,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         this.props.container || this.state.container;
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class="green-text">O contentor <b class="white-text">${container.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -131,7 +131,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -159,7 +159,7 @@ class ContainerCard extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class="green-text">O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o contentor </span><a href='/contentores/${container.id}'>${container.id}</a>`, 15000);
+        super.toast(`<span class='green-text'>O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o contentor </span><a href='/contentores/${container.id}'>${container.id}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -234,6 +234,10 @@ class ContainerCard extends BaseComponent<Props, State> {
                               loading={loading}
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>
+            {!!container.managerId &&
+            <CardItem key={'managerId'}
+                      label={'Manager'}
+                      value={`${container.managerId}`}/>}
             <CardItem key={'type'}
                       label={'Type'}
                       value={`${container.type}`}/>

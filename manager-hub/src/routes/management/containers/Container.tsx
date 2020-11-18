@@ -92,6 +92,7 @@ export interface IContainer extends IDatabaseData {
     labels: IContainerLabel;
     region: IRegion;
     coordinates: ICoordinates;
+    managerId: string | null;
     logs?: string;
     containerRules?: string[];
     containerSimulatedMetrics?: string[];
@@ -555,16 +556,10 @@ class Container extends BaseComponent<Props, State> {
         return null;
     }
 
-    private workerManagerLink = (workerManagerId: string) => {
-        console.log(workerManagerId)
-        /*const cloudHost = Object.values(this.props.cloudHosts).filter(c => c.publicIpAddress === publicIpAddress)[0];
-        if (cloudHost) {
-            return '/hosts/cloud/' + cloudHost.instanceId;
+    private managerLink = (managerId: string) => {
+        if (!!managerId && managerId !== 'manager-master') {
+            return `/gestores locais/${managerId}`
         }
-        const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
-        if (edgeHost) {
-            return '/hosts/edge/' + edgeHost.publicIpAddress;
-        }*/
         return null;
     }
 
@@ -695,11 +690,11 @@ class Container extends BaseComponent<Props, State> {
                                              id={key}
                                              label={key}
                                              type='multilinetext'/>
-                                    : key === 'workerManager'
+                                    : key === 'managerId'
                                         ? <Field key={index}
                                                  id={key}
                                                  label={key}
-                                                 icon={{linkedTo: this.workerManagerLink}}/>
+                                                 icon={{linkedTo: this.managerLink}}/>
                                         : <Field key={index}
                                                id={key}
                                                label={key}/>
@@ -865,6 +860,9 @@ class Container extends BaseComponent<Props, State> {
 }
 
 function removeFields(container: Partial<IContainer>) {
+    if (container.labels?.['serviceType'] === 'SYSTEM') {
+        delete container["network"];
+    }
     delete container["ports"];
     delete container["labels"];
     delete container["logs"];

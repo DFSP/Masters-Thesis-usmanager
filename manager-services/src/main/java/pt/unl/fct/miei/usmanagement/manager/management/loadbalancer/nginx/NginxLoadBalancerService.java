@@ -40,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -56,6 +57,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -290,7 +292,7 @@ public class NginxLoadBalancerService {
 	public void removeServer(String serviceName, String server, RegionEnum region) {
 		log.info("Removing server {} of service {} from load balancer", server, serviceName);
 		List<Container> loadBalancers = getLoadBalancers(region);
-		loadBalancers.stream().forEach(loadBalancer -> removeServer(loadBalancer, serviceName, server));
+		loadBalancers.forEach(loadBalancer -> removeServer(loadBalancer, serviceName, server));
 		if (!containersService.hasContainers(region)) {
 			initStopLoadBalancerTimer(region);
 		}
@@ -312,7 +314,11 @@ public class NginxLoadBalancerService {
 
 	private String getLoadBalancerApiUrl(Container loadBalancer) {
 		String publicIpAddress = loadBalancer.getHostAddress().getPublicIpAddress();
-		int port = loadBalancer.getPorts().get(0).getPublicPort();
+		Optional<ContainerPortMapping> portMapping = loadBalancer.getPorts().stream().findFirst();
+		if (portMapping.isEmpty()) {
+			throw new ManagerException("Load balancer api url port is unknown");
+		}
+		int port = portMapping.get().getPublicPort();
 		return String.format("http://%s:%s/_/api", publicIpAddress, port);
 	}
 

@@ -64,12 +64,12 @@ class GenericSimulatedServiceMetricList extends BaseComponent<Props, {}> {
 
     private simulatedMetric = (simulatedMetric: string, index: number): JSX.Element =>
         <ListItem key={index} separate={index !== this.props.genericSimulatedServiceMetrics.length - 1}>
-            <div className={`${styles.linkedItemContent}`}>
-                <span>{simulatedMetric}</span>
-            </div>
             <Link to={`/métricas simuladas/serviços/${simulatedMetric}`}
                   className={`${styles.link}`}>
-                <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                <div className={`${styles.linkedItemContent}`}>
+                    <span>{simulatedMetric}</span>
+                    <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                </div>
             </Link>
         </ListItem>;
 

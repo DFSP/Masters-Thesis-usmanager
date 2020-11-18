@@ -42,7 +42,7 @@ public final class DockerContainer {
 	private final String id;
 	private final ContainerTypeEnum type;
 	private final long created;
-	private final List<String> names;
+	private final Set<String> names;
 	private final String image;
 	private final String command;
 	private final String network;
@@ -53,7 +53,7 @@ public final class DockerContainer {
 	private final Set<String> mounts;
 	private final Coordinates coordinates;
 	private final RegionEnum region;
-	private final List<ContainerPortMapping> ports;
+	private final Set<ContainerPortMapping> ports;
 	private final Map<String, String> labels;
 
 	public HostAddress getHostAddress() {

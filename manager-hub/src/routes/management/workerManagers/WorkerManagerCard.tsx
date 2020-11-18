@@ -87,9 +87,14 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                 pathname={`/contentores/${workerManager.container.id}`}
                 state={workerManager}/>,
             <LinkedContextMenuItem
-                option={'Modificar os hosts geridos'}
+                option={'Ver os hosts geridos'}
                 pathname={`/gestores locais/${workerManager.id}`}
-                selected={'assignHosts'}
+                selected={'managedHosts'}
+                state={workerManager}/>,
+            <LinkedContextMenuItem
+                option={'Ver os contentores geridos'}
+                pathname={`/gestores locais/${workerManager.id}`}
+                selected={'managedContainers'}
                 state={workerManager}/>,
         ];
     }

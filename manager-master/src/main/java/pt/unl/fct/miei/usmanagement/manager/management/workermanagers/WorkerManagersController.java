@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -79,26 +80,6 @@ public class WorkerManagersController {
 	@DeleteMapping("/{workerManagerId}")
 	public void stopWorkerManager(@PathVariable String workerManagerId) {
 		workerManagersService.stopWorkerManager(workerManagerId);
-	}
-
-	@GetMapping("/{workerManagerId}/assigned-hosts")
-	public List<String> getHosts(@PathVariable String workerManagerId) {
-		return workerManagersService.getAssignedHosts(workerManagerId);
-	}
-
-	@PostMapping("/{workerManagerId}/assigned-hosts")
-	public void assignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
-		workerManagersService.assignHosts(workerManagerId, Arrays.asList(hosts));
-	}
-
-	@DeleteMapping("/{workerManagerId}/assigned-hosts")
-	public void unassignHosts(@PathVariable String workerManagerId, @RequestBody String[] hosts) {
-		workerManagersService.unassignHosts(workerManagerId, Arrays.asList(hosts));
-	}
-
-	@DeleteMapping("/{workerManagerId}/assigned-hosts/{hostname}")
-	public void removeHost(@PathVariable String workerManagerId, @PathVariable String hostname) {
-		workerManagersService.unassignHost(workerManagerId, hostname);
 	}
 
 }

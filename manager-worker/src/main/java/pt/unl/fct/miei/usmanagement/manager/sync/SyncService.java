@@ -33,100 +33,26 @@ import java.util.stream.Collectors;
 @Service
 public class SyncService {
 
-	private final static int CLOUD_HOSTS_DATABASE_SYNC_INTERVAL = 45000;
 	private final static int CONTAINERS_DATABASE_SYNC_INTERVAL = 10000;
 	private final static int NODES_DATABASE_SYNC_INTERVAL = 10000;
 
-	private final CloudHostsService cloudHostsService;
-	private final AwsService awsService;
 	private final ContainersService containersService;
 	private final DockerContainersService dockerContainersService;
 	private final NodesService nodesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 
-	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
 	private Timer nodesDatabseSyncTimer;
 
-	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
-					   DockerContainersService dockerContainersService, NodesService nodesService,
-					   DockerSwarmService dockerSwarmService, ConfigurationsService configurationsService) {
-		this.cloudHostsService = cloudHostsService;
-		this.awsService = awsService;
+	public SyncService(ContainersService containersService, DockerContainersService dockerContainersService,
+					   NodesService nodesService, DockerSwarmService dockerSwarmService,
+					   ConfigurationsService configurationsService) {
 		this.containersService = containersService;
 		this.dockerContainersService = dockerContainersService;
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
-	}
-
-	public void startCloudHostsDatabaseSynchronization() {
-		cloudHostsDatabaseSyncTimer = new Timer("cloud-hosts-database-synchronization", true);
-		cloudHostsDatabaseSyncTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					synchronizeCloudHostsDatabase();
-				}
-				catch (ManagerException ignored) { }
-			}
-		}, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL, CLOUD_HOSTS_DATABASE_SYNC_INTERVAL);
-	}
-
-	public void stopCloudHostsDatabaseSynchronization() {
-		if (cloudHostsDatabaseSyncTimer != null) {
-			cloudHostsDatabaseSyncTimer.cancel();
-			log.info("Stopped database cloud hosts synchronization");
-		}
-	}
-
-	public List<CloudHost> synchronizeCloudHostsDatabase() {
-		log.debug("Synchronizing cloud hosts data with amazon");
-		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts();
-		List<Instance> awsInstances = awsService.getInstances();
-		Map<String, Instance> awsInstancesIds = awsInstances.stream()
-			.collect(Collectors.toMap(Instance::getInstanceId, instance -> instance));
-		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
-		// Remove invalid and update cloud host entities
-		while (cloudHostsIterator.hasNext()) {
-			CloudHost cloudHost = cloudHostsIterator.next();
-			String instanceId = cloudHost.getInstanceId();
-			if (configurationsService.isConfiguring(instanceId)) {
-				log.info("Instance {} is currently being configured, skipping", instanceId);
-				continue;
-			}
-			if (!awsInstancesIds.containsKey(instanceId)) {
-				cloudHostsService.deleteCloudHost(cloudHost);
-				cloudHostsIterator.remove();
-				log.info("Removing invalid cloud host {}", instanceId);
-			}
-			else {
-				Instance instance = awsInstancesIds.get(instanceId);
-				InstanceState currentState = instance.getState();
-				InstanceState savedState = cloudHost.getState();
-				if (Objects.equals(currentState.getCode(), AwsInstanceState.TERMINATED.getCode())) {
-					cloudHostsService.deleteCloudHost(cloudHost);
-					log.info("Removing terminated cloud host {}", instanceId);
-				}
-				else if (!Objects.equals(currentState, savedState)) {
-					CloudHost newCloudHost = cloudHostsService.saveCloudHostFromInstance(cloudHost.getId(), instance);
-					log.info("Updating state of cloud host {}", newCloudHost.getInstanceId());
-				}
-			}
-		}
-		// Add missing cloud host entities
-		awsInstances.forEach(instance -> {
-			String instanceId = instance.getInstanceId();
-			if (!configurationsService.isConfiguring(instanceId)) {
-				if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode() && !cloudHostsService.hasCloudHost(instanceId)) {
-					CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
-					cloudHosts.add(cloudHost);
-				}
-			}
-		});
-		log.debug("Finished cloud hosts synchronization");
-		return cloudHosts;
 	}
 
 	public void startContainersDatabaseSynchronization() {

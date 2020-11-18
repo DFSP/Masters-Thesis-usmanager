@@ -24,34 +24,25 @@
 
 package pt.unl.fct.miei.usmanagement.manager.workermanagers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
 import lombok.ToString;
-import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Entity
 @Builder(toBuilder = true)
@@ -72,21 +63,6 @@ public class WorkerManager {
 
 	@NotNull
 	private RegionEnum region;
-
-/*	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "workerManager", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Container> managedContainers;*/
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<CloudHost> assignedCloudHosts;
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "managedByWorker", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<EdgeHost> assignedEdgeHosts;
 
 	@PrePersist
 	private void prePersist() {

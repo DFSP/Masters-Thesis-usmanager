@@ -32,9 +32,9 @@ import {
     ADD_CLOUD_HOST_SIMULATED_METRICS,
     ADD_COMMANDS,
     ADD_CONDITION,
-    ADD_CONTAINERS,
     ADD_CONTAINER_RULES,
     ADD_CONTAINER_SIMULATED_METRICS,
+    ADD_CONTAINERS,
     ADD_EDGE_HOST,
     ADD_EDGE_HOST_RULES,
     ADD_EDGE_HOST_SIMULATED_METRICS,
@@ -85,7 +85,6 @@ import {
     APPS_FAILURE,
     APPS_REQUEST,
     APPS_SUCCESS,
-    ASSIGN_WORKER_MANAGER_MACHINES,
     CLEAR_COMMANDS,
     CLOUD_HOST_FAILURE,
     CLOUD_HOST_REQUEST,
@@ -133,8 +132,10 @@ import {
     DELETE_CLOUD_HOST,
     DELETE_CONDITION,
     DELETE_CONTAINER,
-    DELETE_EDGE_HOST, DELETE_LOAD_BALANCER,
+    DELETE_EDGE_HOST,
+    DELETE_LOAD_BALANCER,
     DELETE_NODE,
+    DELETE_REGISTRATION_SERVER,
     DELETE_RULE_APP,
     DELETE_RULE_CONTAINER,
     DELETE_RULE_HOST,
@@ -335,7 +336,6 @@ import {
     SIMULATED_SERVICE_METRICS_FAILURE,
     SIMULATED_SERVICE_METRICS_REQUEST,
     SIMULATED_SERVICE_METRICS_SUCCESS,
-    UNASSIGN_WORKER_MANAGER_MACHINES,
     UPDATE_APP,
     UPDATE_CLOUD_HOST,
     UPDATE_CONDITION,
@@ -354,19 +354,15 @@ import {
     VALUE_MODES_REQUEST,
     VALUE_MODES_SUCCESS,
     WORKER_MANAGER_FAILURE,
-    WORKER_MANAGER_HOSTS_FAILURE,
-    WORKER_MANAGER_HOSTS_REQUEST,
-    WORKER_MANAGER_HOSTS_SUCCESS,
     WORKER_MANAGER_REQUEST,
     WORKER_MANAGER_SUCCESS,
     WORKER_MANAGERS_FAILURE,
     WORKER_MANAGERS_REQUEST,
     WORKER_MANAGERS_SUCCESS,
-    DELETE_REGISTRATION_SERVER,
 } from "../actions";
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
-import {keys, merge, pick, isEqual} from 'lodash';
+import {keys, merge, pick} from 'lodash';
 import {IApp} from "../routes/management/apps/App";
 import {IAddAppService, IAppService} from "../routes/management/apps/AppServicesList";
 import {IService} from "../routes/management/services/Service";
@@ -393,7 +389,7 @@ import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 import {ISshCommand} from "../routes/management/ssh/SshCommand";
 import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
-import { IHostAddress } from "../routes/management/hosts/Hosts";
+import {IHostAddress} from "../routes/management/hosts/Hosts";
 
 export type EntitiesState = {
     apps: {
@@ -3851,49 +3847,6 @@ const entities = (state: EntitiesState = {
                         data: workerManagers,
                     }
                 }
-            }
-            break;
-        case WORKER_MANAGER_HOSTS_REQUEST:
-            return merge({}, state, {workerManagers: {isLoadingAssignedHosts: true, loadAssignedHostsError: null}});
-        case WORKER_MANAGER_HOSTS_SUCCESS:
-            const workerManager = entity && state.workerManagers.data[entity];
-            const assignedHosts = {assignedHosts: data || []};
-            const workerManagerWithAssignedHosts = Object.assign(workerManager ? workerManager : [entity], assignedHosts);
-            const normalizedWorkerManager = normalize(workerManagerWithAssignedHosts, Schemas.WORKER_MANAGER).entities.workerManagers;
-            return merge({}, state, {
-                workerManagers: {
-                    data: normalizedWorkerManager,
-                    isLoadingServices: false,
-                    loadServicesError: null
-                }
-            });
-        case WORKER_MANAGER_HOSTS_FAILURE:
-            return merge({}, state, {workerManagers: {isLoadingAssignedHosts: false, loadAssignedHostsError: error}});
-        case ASSIGN_WORKER_MANAGER_MACHINES:
-            if (entity) {
-                if (data?.assignedHosts?.length) {
-                    const workerManager = state.workerManagers.data[entity];
-                    if (workerManager) {
-                        workerManager.assignedHosts = {...workerManager.assignedHosts, ...data?.assignedHosts};
-                        return merge({}, state, {workerManagers: {data: {[workerManager.id]: {...workerManager}}}});
-                    }
-                }
-            }
-            break;
-        case UNASSIGN_WORKER_MANAGER_MACHINES:
-            if (entity) {
-                const workerManager = state.workerManagers.data[entity];
-                const filteredHosts = (workerManager.assignedHosts &&
-                    Object.values(workerManager.assignedHosts)
-                        .filter(host => !data?.assignedHosts?.includes(host))) || [];
-                const workerManagerWithAssignedHosts = Object.assign(workerManager, !Object.keys(filteredHosts).length ? {assignedHosts: {}} : filteredHosts);
-                const normalizedWorkerManager = normalize(workerManagerWithAssignedHosts, Schemas.WORKER_MANAGER).entities;
-                return merge({}, state, {
-                    workerManagers: {
-                        ...state.workerManagers,
-                        data: normalizedWorkerManager.workerManagers,
-                    }
-                });
             }
             break;
         case LOGS_REQUEST:

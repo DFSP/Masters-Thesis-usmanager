@@ -122,11 +122,11 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		catch (Exception e) {
 			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
 		}
-		hostsEventsService.reset();
+		/*hostsEventsService.reset();
 		servicesEventsService.reset();
 		hostsMonitoringService.reset();
 		servicesMonitoringService.reset();
-		nodesService.reset();
+		nodesService.reset();*/
 	}
 
 }

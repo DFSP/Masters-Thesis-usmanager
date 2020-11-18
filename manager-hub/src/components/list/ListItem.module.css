@@ -58,7 +58,7 @@
     flex-grow: 1;
 }
 
-.link:hover > .linkIcon {
+.link:hover > .listItemContent > .linkIcon, .link:hover > .linkedItemContent > .linkIcon {
     display: block;
 }
 

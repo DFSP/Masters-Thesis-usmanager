@@ -84,7 +84,7 @@ public class Container {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<String> names;
+	private Set<String> names;
 
 	@NotNull
 	private String image;
@@ -106,7 +106,7 @@ public class Container {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<ContainerPortMapping> ports;
+	private Set<ContainerPortMapping> ports;
 
 	@MapKeyColumn(name = "LABEL_KEY", length = 64)
 	@Column(name = "LABEL_VALUE", length = 2048)
@@ -118,12 +118,6 @@ public class Container {
 	private RegionEnum region;
 
 	private String managerId;
-
-/*
-	@ManyToOne
-	@JoinColumn(name = "workerManager_id")
-	private WorkerManager workerManager;
-*/
 
 	@NotNull
 	private Coordinates coordinates;

@@ -127,7 +127,7 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private leaveSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.publicIpAddress}/leave`;
+        const url = `nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
         this.setState({loading: true});
         putData(url, undefined,
             (reply: IReply<INode[]>) => this.onLeaveSuccess(reply.data),
@@ -136,7 +136,7 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private onLeaveSuccess = (nodes: INode[]) => {
         const node = nodes[0];
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.publicIpAddress}</b> saiu do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.id}</b> saiu do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -209,7 +209,7 @@ class NodeCard extends BaseComponent<Props, State> {
                              }}>
             <CardItem key={'hostName'}
                       label={'Hostname'}
-                      value={node.publicIpAddress}/>
+                      value={node.publicIpAddress + '/' + node?.labels['privateIpAddress']}/>
             <CardItem key={'state'}
                       label={'State'}
                       value={node.state}/>
@@ -219,6 +219,10 @@ class NodeCard extends BaseComponent<Props, State> {
             <CardItem key={'role'}
                       label={'Role'}
                       value={node.role}/>
+            {!!node?.managerId &&
+            <CardItem key={'managerId'}
+                      label={'Manager'}
+                      value={`${node.managerId}`}/>}
         </CardNode>
     }
 

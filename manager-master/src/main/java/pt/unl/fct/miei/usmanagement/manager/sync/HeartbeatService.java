@@ -3,6 +3,7 @@ package pt.unl.fct.miei.usmanagement.manager.sync;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HeartbeatService {
@@ -13,8 +14,8 @@ public class HeartbeatService {
 		this.heartbeats = heartbeats;
 	}
 
-	public Heartbeat lastHeartbeat(String nodeId) {
-		return heartbeats.getOne(nodeId);
+	public Optional<Heartbeat> lastHeartbeat(String nodeId) {
+		return heartbeats.getHeartbeatByNodeId(nodeId);
 	}
 
 	public List<Heartbeat> lastHeartbeats() {

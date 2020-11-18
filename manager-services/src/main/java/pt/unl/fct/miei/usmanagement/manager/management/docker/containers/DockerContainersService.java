@@ -131,7 +131,11 @@ public class DockerContainersService {
 			serviceContainers.put(service.getServiceName(), containers);
 			containers.forEach(container -> {
 				String hostname = container.getPublicIpAddress();
-				int publicPort = container.getPorts().get(0).getPublicPort();
+				Optional<ContainerPortMapping> portMapping = container.getPorts().stream().findFirst();
+				if (portMapping.isEmpty()) {
+					throw new ManagerException("Unable to launch app, port of service {} is unknown", service.getServiceName());
+				}
+				int publicPort = portMapping.get().getPublicPort();
 				String address = String.format("%s:%d", hostname, publicPort);
 				dynamicLaunchParams.put(service.getOutputLabel(), address);
 			});
@@ -342,6 +346,9 @@ public class DockerContainersService {
 				containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 				containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 				containerLabels.put(ContainerConstants.Label.REGION, region.name());
+				if (containerType == ContainerTypeEnum.SINGLETON && hostAddress.equals(hostsService.getManagerHostAddress())) {
+					containerLabels.put(ContainerConstants.Label.MASTER_MANAGER, String.valueOf(true));
+				}
 				containerLabels.putAll(labels);
 
 				Set<String> volumes = service.getVolumes();
@@ -561,9 +568,9 @@ public class DockerContainersService {
 		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
-		List<String> names = container.names().stream()
+		Set<String> names = container.names().stream()
 			.map(name -> name.startsWith("/") ? name.substring(1) : name)
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 		String image = container.image();
 		String command = container.command();
 		AttachedNetwork attachedNetwork = container.networkSettings().networks().get(DockerSwarmService.NETWORK_OVERLAY);
@@ -580,9 +587,9 @@ public class DockerContainersService {
 		containerMounts.forEach(mount -> mounts.add(mount.source() + ":" + mount.destination()));
 		Coordinates coordinates = gson.fromJson(container.labels().get(ContainerConstants.Label.COORDINATES), Coordinates.class);
 		RegionEnum region = RegionEnum.getRegion(container.labels().get(ContainerConstants.Label.REGION));
-		List<ContainerPortMapping> ports = container.ports().stream()
+		Set<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 		Map<String, String> labels = container.labels();
 		return new DockerContainer(id, type, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
 			mounts, coordinates, region, ports, labels);

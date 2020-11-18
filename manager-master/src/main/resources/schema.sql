@@ -73,3 +73,12 @@ CREATE TABLE LOGGING_EVENT_EXCEPTION
     PRIMARY KEY (event_id, i),
     FOREIGN KEY (event_id) REFERENCES logging_event (event_id)
 );
+
+SET MODE REGULAR;
+CREATE ALIAS IF NOT EXISTS drop_sym_tables FOR "pt.unl.fct.miei.usmanagement.manager.database.DatabaseFunctions.dropSymTables";
+CALL drop_sym_tables();
+CREATE ALIAS IF NOT EXISTS drop_sym_triggers FOR "pt.unl.fct.miei.usmanagement.manager.database.DatabaseFunctions.dropSymTriggers";
+CALL drop_sym_triggers();
+CREATE ALIAS IF NOT EXISTS drop_sym_functions FOR "pt.unl.fct.miei.usmanagement.manager.database.DatabaseFunctions.dropSymFunctions";
+CALL drop_sym_functions();
+SET MODE MySQL;

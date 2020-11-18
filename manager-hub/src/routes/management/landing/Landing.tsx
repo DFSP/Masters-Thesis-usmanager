@@ -31,11 +31,12 @@ import {connect} from "react-redux";
 import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
-import {IMarker} from "../../../components/map/Marker";
+import Marker, {IMarker} from "../../../components/map/Marker";
 import {Error} from "../../../components/errors/Error";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {isEqual} from 'lodash';
+import {IRegion} from "../regions/Region";
 
 interface StateToProps {
     isLoading: boolean;
@@ -83,19 +84,43 @@ class Landing extends React.Component<Props, State> {
     private handleCenter = () =>
         this.setState({center: !this.state.center})
 
+    private getMarkerColor = (container: IContainer) =>
+        container.labels['masterManager'] === 'true' ? 'Red' : this.mapRegionToColor(container.region);
+
+    private mapRegionToColor = (region: IRegion) => {
+        switch (region.region.toLocaleLowerCase()) {
+            case 'europe':
+                return 'Cyan';
+            case 'north america':
+                return 'Brown';
+            case 'south america':
+                return 'Coral';
+            case 'africa':
+                return 'Violet';
+            case 'middle east':
+                return 'Teal';
+            case 'asia':
+                return 'HotPink';
+            case 'oceania':
+                return 'DarkSlateGray';
+        }
+    }
+
     private getContainersMarkers = (): IMarker[] => {
         const containers: IContainer[] = Object.values(this.props.containers);
         const containerMarkers = new Map<String, IMarker>();
         containers.forEach(container => {
             const publicIpAddress = container.publicIpAddress;
+            const privateIpAddress = container.privateIpAddress;
             const marker = containerMarkers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
             if (marker.title === '') {
-                marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '<br/>';
+                marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + '<br/>';
             }
             marker.title += container.id.toString().substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
             marker.label = publicIpAddress;
             marker.latitude = container.coordinates.latitude;
             marker.longitude = container.coordinates.longitude;
+            marker.color = this.getMarkerColor(container);
             containerMarkers.set(publicIpAddress, marker);
         });
 

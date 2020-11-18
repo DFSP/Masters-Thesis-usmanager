@@ -29,9 +29,12 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -62,16 +65,18 @@ public class NodesService {
 	private final DockerSwarmService dockerSwarmService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
+	private final Environment environment;
 
 	private final Nodes nodes;
 
 	private final int threads;
 
 	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
-						@Lazy ContainersService containersService, Nodes nodes, ParallelismProperties parallelismProperties) {
+						@Lazy ContainersService containersService, Environment environment, Nodes nodes, ParallelismProperties parallelismProperties) {
 		this.dockerSwarmService = dockerSwarmService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
+		this.environment = environment;
 		this.nodes = nodes;
 		this.threads = parallelismProperties.getThreads();
 	}
@@ -260,6 +265,7 @@ public class NodesService {
 			.version(node.version().index())
 			.state(node.status().state())
 			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
+			.managerId(environment.getProperty(EnvironmentConstants.EXTERNAL_ID))
 			.labels(node.spec().labels())
 			.build();
 	}
@@ -288,6 +294,6 @@ public class NodesService {
 		Gson gson = new Gson();
 		Coordinates coordinates = gson.fromJson(node.spec().labels().get(NodeConstants.Label.COORDINATES), Coordinates.class);
 		PlaceEnum place = PlaceEnum.getPlace(node.spec().labels().get(NodeConstants.Label.PLACE));
-		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region);
+		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region, place);
 	}
 }

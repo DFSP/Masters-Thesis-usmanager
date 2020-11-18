@@ -224,49 +224,6 @@ public class WorkerManagersService {
 		workerManagers.delete(workerManager);
 	}
 
-	public List<String> getAssignedHosts(String workerManagerId) {
-		checkWorkerManagerExists(workerManagerId);
-		List<String> cloudHosts = workerManagers.getCloudHosts(workerManagerId).stream()
-			.map(CloudHost::getPublicIpAddress).collect(Collectors.toList());
-		List<String> edgeHosts = workerManagers.getEdgeHosts(workerManagerId).stream()
-			.map(EdgeHost::getPublicIpAddress).collect(Collectors.toList());
-		return Stream.concat(cloudHosts.stream(), edgeHosts.stream()).collect(Collectors.toList());
-	}
-
-	// host is instanceId for cloud hosts, dns/publicIpAddress for edge hosts
-	public void assignHost(String workerManagerId, String hostname) {
-		WorkerManager workerManager = getWorkerManager(workerManagerId);
-		if (!Objects.equals(hostsService.getHostAddress(hostname), workerManager.getContainer().getHostAddress())) {
-			try {
-				cloudHostsService.assignWorkerManager(workerManager, hostname);
-			}
-			catch (EntityNotFoundException ignored) {
-				edgeHostsService.assignWorkerManager(workerManager, hostname);
-			}
-		}
-	}
-
-	public void assignHosts(String workerManagerId, List<String> hosts) {
-		hosts.forEach(host -> assignHost(workerManagerId, host));
-	}
-
-	public void unassignHost(String workerManagerId, String host) {
-		unassignHosts(workerManagerId, List.of(host));
-	}
-
-	public void unassignHosts(String workerManagerId, List<String> hosts) {
-		WorkerManager workerManager = getWorkerManager(workerManagerId);
-		log.info("Removing hosts {}", hosts);
-		hosts.forEach(host -> {
-			try {
-				cloudHostsService.unassignWorkerManager(host);
-			}
-			catch (EntityNotFoundException ignored) {
-				edgeHostsService.unassignWorkerManager(host);
-			}
-		});
-		workerManagers.save(workerManager);
-	}
 
 	private void checkWorkerManagerExists(String id) {
 		if (!workerManagers.hasWorkerManager(id)) {

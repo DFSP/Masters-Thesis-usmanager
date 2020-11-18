@@ -63,6 +63,7 @@ export interface INode extends IDatabaseData {
     coordinates?: ICoordinates
     labels: INodeLabel;
     managerStatus: IManagerStatus;
+    managerId: string | null;
 }
 
 export interface INodeLabel {
@@ -487,10 +488,15 @@ class Node extends BaseComponent<Props, State> {
                                              zoomable: true,
                                              labeled: true
                                          }}/>
-                                : <Field key={index}
-                                         id={key}
-                                         label={key}
-                                         disabled={true}/>)
+                                : key === 'managerId'
+                                    ? <Field key={index}
+                                             id={key}
+                                             label={key}
+                                             icon={{linkedTo: this.managerLink}}/>
+                                    : <Field key={index}
+                                             id={key}
+                                             label={key}
+                                             disabled={true}/>)
         );
     };
 
@@ -507,6 +513,13 @@ class Node extends BaseComponent<Props, State> {
         return addCoordinates(node);
     }
 
+    private managerLink = (managerId: string) => {
+        if (!!managerId && managerId !== 'manager-master') {
+            return `/gestores locais/${managerId}`
+        }
+        return null;
+    }
+
     private node = () => {
         const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
         const {currentForm, loading} = this.state;
@@ -515,7 +528,6 @@ class Node extends BaseComponent<Props, State> {
         const formNode = this.getFormNode();
         // @ts-ignore
         const nodeKey: (keyof INode) = formNode && Object.keys(formNode)[0];
-        console.log(node)
         return (
             <>
                 {isLoading && <LoadingSpinner/>}

@@ -52,6 +52,8 @@ public class Node {
 
 	private ManagerStatus managerStatus;
 
+	private String managerId;
+
 	@MapKeyColumn(name = "LABEL_KEY", length = 64)
 	@Column(name = "LABEL_VALUE", length = 2048)
 	@ElementCollection(fetch = FetchType.EAGER)
