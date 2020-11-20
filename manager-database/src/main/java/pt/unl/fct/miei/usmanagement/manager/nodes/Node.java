@@ -32,7 +32,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "nodes")
 public class Node {
 

@@ -5,6 +5,7 @@ import com.amazonaws.services.ec2.model.InstanceState;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
@@ -117,20 +118,30 @@ public class SyncService {
 					cloudHostsService.deleteCloudHost(cloudHost);
 					log.info("Removing terminated cloud host {}", instanceId);
 				}
-				else if (!Objects.equals(currentState, savedState)) {
-					CloudHost newCloudHost = cloudHostsService.saveCloudHostFromInstance(cloudHost.getId(), instance);
-					log.info("Updating state of cloud host {}", newCloudHost.getInstanceId());
+				else {
+					if (!Objects.equals(currentState, savedState)) {
+						log.info("Updating state of cloud host {}", cloudHost.getInstanceId());
+						cloudHost.setState(currentState);
+						cloudHostsService.saveCloudHost(cloudHost);
+					}
+					String currentPublicIpAddress = instance.getPublicIpAddress();
+					String savedPublicIpAddress = cloudHost.getPublicIpAddress();
+					if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+						log.info("Updating public ip address of cloud host {}", cloudHost.getInstanceId());
+						cloudHostsService.updateAddress(cloudHost, currentPublicIpAddress);
+					}
 				}
+
 			}
 		}
 		// Add missing cloud host entities
 		awsInstances.forEach(instance -> {
 			String instanceId = instance.getInstanceId();
-			if (!configurationsService.isConfiguring(instanceId)) {
-				if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode() && !cloudHostsService.hasCloudHost(instanceId)) {
-					CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
-					cloudHosts.add(cloudHost);
-				}
+			Optional<Configuration> configuration = configurationsService.getConfiguration(instanceId);
+			if (configuration.isEmpty() && instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()
+				&& !cloudHostsService.hasCloudHost(instanceId)) {
+				CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
+				cloudHosts.add(cloudHost);
 			}
 		});
 		log.debug("Finished cloud hosts synchronization");
@@ -179,8 +190,9 @@ public class SyncService {
 			}
 		}
 
-		// Remove invalid containers
+		// Remove invalid containers and update existing ones
 		Iterator<Container> containerIterator = containers.iterator();
+		Map<String, DockerContainer> dockerContainerIds = dockerContainers.stream().distinct().collect(Collectors.toMap(DockerContainer::getId, container -> container));
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
 			String containerId = container.getId();
@@ -194,6 +206,23 @@ public class SyncService {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
+			}
+			else {
+				boolean updated = false;
+				DockerContainer dockerContainer = dockerContainerIds.get(containerId);
+				if (dockerContainer == null) {
+					continue;
+				}
+				String currentPublicIpAddress = dockerContainer.getHostAddress().getPublicIpAddress();
+				String savedPublicIpAddress = container.getHostAddress().getPublicIpAddress();
+				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+					container.setPublicIpAddress(currentPublicIpAddress);
+					log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
+					updated = true;
+				}
+				if (updated) {
+					containersService.updateContainer(container);
+				}
 			}
 		}
 
@@ -257,8 +286,8 @@ public class SyncService {
 				continue;
 			}
 			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
-			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
-			if (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout)) {
+			if (heartbeat.isPresent()
+				&& heartbeat.get().getHeartbeatTime().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);
@@ -290,6 +319,13 @@ public class SyncService {
 				if (!currentState.equalsIgnoreCase(savedState)) {
 					node.setState(currentState);
 					log.info("Synchronized node {} state from {} to {}", nodeId, savedState, currentState);
+					updated = true;
+				}
+				String currentPublicIpAddress = swarmNode.status().addr();
+				String savedPublicIpAddress = node.getPublicIpAddress();
+				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+					node.setPublicIpAddress(currentPublicIpAddress);
+					log.info("Synchronized node {} public ip address from {} to {}", nodeId, savedPublicIpAddress, currentPublicIpAddress);
 					updated = true;
 				}
 				if (updated) {

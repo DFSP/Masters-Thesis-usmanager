@@ -83,40 +83,9 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
         const {registrationServer} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Ver as portas associadas'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'ports'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Ver as labels associadas'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'labels'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Ver as logs'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'logs'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Modificar a lista de regras'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'rules'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Ver a lista de regras genéricas'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'genericContainerRules'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Modificar a lista das métricas simuladas'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'simulatedMetrics'}
-                state={registrationServer}/>,
-            <LinkedContextMenuItem
-                option={'Ver a lista das métricas simuladas genéricas'}
-                pathname={`/contentores/${registrationServer.id}`}
-                selected={'genericSimulatedMetrics'}
-                state={registrationServer}/>
+                option={'Ir para o contentor associado'}
+                pathname={`/contentores/${registrationServer.container.id}`}
+                state={registrationServer.container}/>,
         ];
     }
 

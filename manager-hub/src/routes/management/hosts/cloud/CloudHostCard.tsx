@@ -31,11 +31,11 @@ import LinkedContextMenuItem from "../../../../components/contextmenu/LinkedCont
 import {deleteData, IReply, putData} from "../../../../utils/api";
 import ActionContextMenuItem from "../../../../components/contextmenu/ActionContextMenuItem";
 import {deleteCloudHost, updateCloudHost} from "../../../../actions";
-import {connect} from "react-redux";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../../middleware/api";
 import {RouteComponentProps, withRouter} from "react-router";
 import {isEqual} from "lodash";
+import {connect} from "react-redux";
 
 interface State {
     loading: boolean;
@@ -179,7 +179,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     private bottomContextMenu = (): JSX.Element[] => {
         const cloudHost = this.getCloudHost();
         const id = cloudHost.instanceId;
-        return [
+        const menus = [
             <LinkedContextMenuItem
                 option={'Modificar a lista de regras'}
                 pathname={`/hosts/cloud/${id}`}
@@ -199,18 +199,21 @@ class CloudHostCard extends BaseComponent<Props, State> {
                 option={'Ver a lista das métricas simuladas genéricas'}
                 pathname={`/hosts/cloud/${id}`}
                 selected={'genericSimulatedMetrics'}
-                state={cloudHost}/>,
-            <LinkedContextMenuItem
-                option={'Executar comandos'}
-                pathname={`/hosts/cloud/${id}`}
-                selected={'ssh'}
-                state={cloudHost}/>,
-            <LinkedContextMenuItem
-                option={'Carregar ficheiros'}
-                pathname={`/hosts/cloud/${id}`}
-                selected={'sftp'}
                 state={cloudHost}/>
         ];
+        if (isEqual(cloudHost.state, awsInstanceStates.RUNNING)) {
+            menus.push(<LinkedContextMenuItem
+                    option={'Executar comandos'}
+                    pathname={`/hosts/cloud/${id}`}
+                    selected={'ssh'}
+                    state={cloudHost}/>,
+                <LinkedContextMenuItem
+                    option={'Carregar ficheiros'}
+                    pathname={`/hosts/cloud/${id}`}
+                    selected={'sftp'}
+                    state={cloudHost}/>);
+        }
+        return menus;
     }
 
     public render() {

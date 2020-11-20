@@ -48,7 +48,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @IdClass(LoggingEventExceptionId.class)
 @Table(name = "logging_event_exception")
 public class LoggingEventException {

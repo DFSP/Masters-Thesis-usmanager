@@ -26,7 +26,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "load_balancers")
 public class LoadBalancer {
 

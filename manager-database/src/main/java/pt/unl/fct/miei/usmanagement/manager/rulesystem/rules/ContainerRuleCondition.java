@@ -47,7 +47,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "container_rule_conditions")
 public class ContainerRuleCondition {
 

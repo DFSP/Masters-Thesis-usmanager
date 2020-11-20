@@ -68,7 +68,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "containers")
 public class Container {
 

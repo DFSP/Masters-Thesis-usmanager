@@ -50,5 +50,3 @@ public class HostDecisionResult extends DecisionResult {
 	}
 
 }
-
-

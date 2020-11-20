@@ -47,7 +47,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "service_decision_values")
 public class ServiceDecisionValue {
 

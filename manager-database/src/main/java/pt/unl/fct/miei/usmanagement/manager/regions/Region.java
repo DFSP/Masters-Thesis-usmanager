@@ -46,7 +46,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "regions")
 public class Region {
 

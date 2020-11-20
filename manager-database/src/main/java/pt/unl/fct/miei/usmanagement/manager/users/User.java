@@ -48,7 +48,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "users")
 public class User {
 

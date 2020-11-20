@@ -59,7 +59,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "conditions")
 public class Condition {
 

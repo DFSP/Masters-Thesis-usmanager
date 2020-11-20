@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -58,8 +59,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 public class NodesService {
 
 	private final DockerSwarmService dockerSwarmService;
@@ -272,11 +273,10 @@ public class NodesService {
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> leaveHost(HostAddress hostAddress) {
 		containersService.migrateHostContainers(hostAddress);
-		new ForkJoinPool(threads).execute(() ->
+		new ForkJoinPool(threads).submit(() ->
 			containersService.getSystemContainers(hostAddress).parallelStream()
 				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
-				.forEach(c -> containersService.stopContainer(c.getId()))
-		);
+				.forEach(c -> containersService.stopContainer(c.getId()))).join();
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		dockerSwarmService.leaveSwarm(hostAddress);
 		containersService.stopDockerApiProxy(hostAddress);
@@ -296,4 +296,11 @@ public class NodesService {
 		PlaceEnum place = PlaceEnum.getPlace(node.spec().labels().get(NodeConstants.Label.PLACE));
 		return new HostAddress(username, publicIpAddress, privateIpAddress, coordinates, region, place);
 	}
+
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> updateAddress(HostAddress hostAddress, String publicIpAddress) {
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
+		nodes.forEach(node -> node.setPublicIpAddress(publicIpAddress));
+		return this.nodes.saveAll(nodes);
+	}
+
 }

@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services;
 
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -2,23 +2,30 @@ package pt.unl.fct.miei.usmanagement.manager.management.eips;
 
 import com.amazonaws.services.ec2.model.Address;
 import com.amazonaws.services.ec2.model.AssociateAddressResult;
+import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIps;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,11 +41,18 @@ public class ElasticIpsService {
 	private final ElasticIps elasticIps;
 	private final RegionsService regionsService;
 	private final AwsService awsService;
+	private final CloudHostsService cloudHostsService;
+	private final NodesService nodesService;
+	private final ContainersService containersService;
 
-	public ElasticIpsService(ElasticIps elasticIps, RegionsService regionsService, AwsService awsService) {
+	public ElasticIpsService(ElasticIps elasticIps, RegionsService regionsService, AwsService awsService,
+							 CloudHostsService cloudHostsService, NodesService nodesService, @Lazy ContainersService containersService) {
 		this.elasticIps = elasticIps;
 		this.regionsService = regionsService;
 		this.awsService = awsService;
+		this.cloudHostsService = cloudHostsService;
+		this.nodesService = nodesService;
+		this.containersService = containersService;
 	}
 
 	public List<ElasticIp> getElasticIps() {
@@ -124,13 +138,22 @@ public class ElasticIpsService {
 		});
 	}
 
-	@Async
-	public CompletableFuture<AssociateAddressResult> associateElasticIpAddress(RegionEnum region, String allocationId, String instanceId) {
+	public CloudHost associateElasticIpAddress(RegionEnum region, String allocationId, CloudHost cloudHost) {
 		ElasticIp elasticIp = getElasticIp(allocationId);
+		String instanceId = cloudHost.getInstanceId();
 		AssociateAddressResult associateResult = awsService.associateElasticIpAddress(region, allocationId, instanceId);
 		elasticIp.setAssociationId(associateResult.getAssociationId());
 		elasticIps.save(elasticIp);
-		return CompletableFuture.completedFuture(associateResult);
+		log.info("Associated public ip address {} from elastic ip {} to cloud instance {} with association id {}",
+			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associateResult.getAssociationId());
+		HostAddress previousHostAddress = cloudHost.getAddress();
+		AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+		Instance instance = awsService.getInstance(instanceId, awsRegion);
+		cloudHost = cloudHostsService.saveCloudHostFromInstance(cloudHost.getId(), instance);
+		nodesService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
+		log.info(nodesService.getNodes().stream().map(Node::getPublicIpAddress).collect(Collectors.joining()));
+		containersService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
+		return cloudHost;
 	}
 
 	private Map<RegionEnum, List<Address>> getElasticIpAddresses() {

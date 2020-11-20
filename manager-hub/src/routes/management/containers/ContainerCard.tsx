@@ -224,13 +224,13 @@ class ContainerCard extends BaseComponent<Props, State> {
                               height={'215px'}
                               margin={'10px 0'}
                               hoverable
-                              delete={container.labels['serviceType'] !== 'SYSTEM' ? {
+                              delete={{
                                   textButton: 'Parar',
                                   confirmMessage: `parar contentor ${container.id}`,
                                   url: `containers/${container.id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
-                              } : undefined}
+                              }}
                               loading={loading}
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>

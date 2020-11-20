@@ -2,11 +2,13 @@ package pt.unl.fct.miei.usmanagement.manager.management.configurations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configurations;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class ConfigurationsService {
 	}
 
 	public Configuration addConfiguration(Configuration configuration) {
+		log.info("Saving configuration {}", configuration);
 		return configurations.save(configuration);
 	}
 
@@ -31,8 +34,8 @@ public class ConfigurationsService {
 		return configurations.findAll();
 	}
 
-	public Configuration getConfiguration(String id) {
-		return configurations.findById(id).orElseThrow(() -> new EntityNotFoundException(Configuration.class, "id", id));
+	public Optional<Configuration> getConfiguration(String id) {
+		return configurations.findById(id);
 	}
 
 	public void removeConfiguration(String id) {

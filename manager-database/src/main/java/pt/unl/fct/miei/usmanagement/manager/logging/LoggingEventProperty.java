@@ -47,7 +47,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @IdClass(LoggingEventPropertyId.class)
 @Table(name = "logging_event_property")
 public class LoggingEventProperty {

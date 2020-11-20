@@ -57,7 +57,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "simulated_app_metrics")
 public class AppSimulatedMetric {
 

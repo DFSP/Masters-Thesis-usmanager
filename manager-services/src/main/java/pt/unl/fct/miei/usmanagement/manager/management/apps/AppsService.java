@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.apps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;

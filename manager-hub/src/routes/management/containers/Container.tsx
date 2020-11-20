@@ -741,14 +741,12 @@ class Container extends BaseComponent<Props, State> {
                               failureCallback: this.onPostFailure
                           }}
                         // delete button is never present on new nodes, so a type cast is safe
-                          delete={container && (container as IContainer).labels['serviceType'] !== 'SYSTEM'
-                              ? {
+                          delete={{
                                   textButton: 'Parar',
                                   url: `containers/${(container as IContainer).id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
-                              }
-                              : undefined}
+                              }}
                         // custom buttons are never present on new nodes, so a type cast is safe
                           customButtons={container && (container as IContainer).labels['serviceType'] !== 'SYSTEM'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]

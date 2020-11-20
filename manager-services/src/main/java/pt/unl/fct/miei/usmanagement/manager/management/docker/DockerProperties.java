@@ -23,8 +23,6 @@
  */
 
 package pt.unl.fct.miei.usmanagement.manager.management.docker;
-
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

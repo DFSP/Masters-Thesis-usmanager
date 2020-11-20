@@ -52,7 +52,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "host_monitoring_logs")
 public class HostMonitoringLog {
 

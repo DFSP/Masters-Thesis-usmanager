@@ -26,7 +26,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "registration_servers")
 public class RegistrationServer {
 

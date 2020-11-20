@@ -65,7 +65,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "services")
 public class Service {
 

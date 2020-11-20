@@ -47,7 +47,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "app_rule_conditions")
 public class AppRuleCondition {
 

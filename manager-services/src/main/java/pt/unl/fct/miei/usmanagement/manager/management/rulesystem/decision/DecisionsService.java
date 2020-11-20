@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -52,8 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 public class DecisionsService {
 
 	private final ServiceRulesService serviceRulesService;

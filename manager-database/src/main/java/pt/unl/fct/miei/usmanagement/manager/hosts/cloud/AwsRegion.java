@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.hosts.cloud;
 
+import com.amazonaws.services.ec2.model.Placement;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -119,5 +120,13 @@ public enum AwsRegion {
 
 	public static AwsRegion getDefaultZone() {
 		return EU_WEST_3;
+	}
+
+	public static AwsRegion fromPlacement(Placement placement) {
+		String availabilityZone = placement.getAvailabilityZone();
+		while (!Character.isDigit(availabilityZone.charAt(availabilityZone.length() - 1))) {
+			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
+		}
+		return AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
 	}
 }

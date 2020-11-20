@@ -28,6 +28,7 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -139,8 +140,7 @@ public class HostsService {
 		if (getCloudWorkerNodes().size() < 1) {
 			log.info("No cloud worker hosts found");
 		}
-		new ForkJoinPool(threads).execute(() ->
-			workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER)));
+		new ForkJoinPool(threads).execute(() -> workerHosts.parallelStream().forEach(host -> setupHost(host, NodeRole.WORKER)));
 	}
 
 	private List<CloudHost> getCloudWorkerNodes() {
@@ -207,9 +207,9 @@ public class HostsService {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
-		new ForkJoinPool(threads).execute(() ->
+		new ForkJoinPool(threads).submit(() ->
 			List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
-				.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON)));
+				.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON))).join();
 		executeBackgroundProcess(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
 		return node;
 	}
@@ -231,7 +231,7 @@ public class HostsService {
 		return joinSwarm(hostAddress, NodeRole.WORKER);
 	}
 
-	private pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role) {
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node joinSwarm(HostAddress hostAddress, NodeRole role) {
 		log.info("Host {} is joining swarm as role {}", hostAddress.toSimpleString(), role);
 		try {
 			Node node = dockerSwarmService.getHostNode(hostAddress);
@@ -262,12 +262,12 @@ public class HostsService {
 		return getCapableHost(availableMemory, region, null);
 	}
 
-	public HostAddress getCapableHost(double availableMemory, RegionEnum region, Predicate<HostAddress> nodeFilter) {
+	public HostAddress getCapableHost(double availableMemory, RegionEnum region, Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
 		log.info("Looking for node on region {} with <90% memory available and <90% cpu usage to launch service with {} expected ram usage",
 			region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
 			.filter(node -> node.getRegion() == region && hostMetricsService.hostHasEnoughResources(node.getHostAddress(), availableMemory)
-				&& (nodeFilter == null || nodeFilter.test(node.getHostAddress())))
+				&& (filter == null || filter.test(node)))
 			.map(pt.unl.fct.miei.usmanagement.manager.nodes.Node::getHostAddress)
 			.collect(Collectors.toList());
 		HostAddress hostAddress;
@@ -279,7 +279,6 @@ public class HostsService {
 		else {
 			log.info("No nodes found, joining a new cloud node at {}", region);
 			hostAddress = chooseCloudHost(region, true).getAddress();
-			setupHost(hostAddress, NodeRole.WORKER);
 		}
 		return hostAddress;
 	}
@@ -449,6 +448,9 @@ public class HostsService {
 			if (stateCode == AwsInstanceState.RUNNING.getCode()) {
 				HostAddress hostAddress = cloudHost.getAddress();
 				if (!nodesService.isPartOfSwarm(hostAddress)) {
+					if (addToSwarm) {
+						addHost(cloudHost.getInstanceId(), NodeRole.WORKER);
+					}
 					return cloudHost;
 				}
 			}

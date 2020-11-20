@@ -52,7 +52,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "value_modes")
 public class ValueMode {
 

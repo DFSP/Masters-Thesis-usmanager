@@ -24,9 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.location;
 
-
 import lombok.Data;
-
 import java.util.List;
 
 @Data

@@ -818,7 +818,6 @@ public class DatabaseLoader {
 		return Map.entry(appName, service);
 	}
 
-
 	private Map<String, Service> loadTestingSuite(String dockerHubUsername, AppsService appsService,
 												  ServicesService servicesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(1);

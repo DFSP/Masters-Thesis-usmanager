@@ -56,7 +56,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "apps")
 public class App {
 

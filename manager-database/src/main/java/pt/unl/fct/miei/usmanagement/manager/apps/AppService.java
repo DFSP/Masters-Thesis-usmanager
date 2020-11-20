@@ -48,7 +48,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "app_services")
 public class AppService {
 

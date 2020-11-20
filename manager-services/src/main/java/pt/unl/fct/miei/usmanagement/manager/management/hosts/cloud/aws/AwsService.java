@@ -42,6 +42,7 @@ import com.amazonaws.services.ec2.model.DomainType;
 import com.amazonaws.services.ec2.model.DryRunResult;
 import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
 import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import com.amazonaws.services.ec2.model.Reservation;
@@ -56,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.SSHClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -79,8 +81,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 public class AwsService {
 
 	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(10);
@@ -216,8 +218,8 @@ public class AwsService {
 		try {
 			waitToBoot(instance);
 		}
-		catch (TimeoutException e) {
-			throw new ManagerException("Timeout while waiting for instance %s to boot", instance.getInstanceId());
+		catch (IOException e) {
+			throw new ManagerException("Error while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
 		}
 		return instance;
 	}
@@ -248,8 +250,8 @@ public class AwsService {
 		try {
 			waitToBoot(instance);
 		}
-		catch (TimeoutException e) {
-			throw new ManagerException("Timeout while waiting for instance %s to boot", instance.getInstanceId());
+		catch (IOException e) {
+			throw new ManagerException("Error while waiting for instance %s to boot: %s", instance.getInstanceId(), e.getMessage());
 		}
 		return instance;
 	}
@@ -283,6 +285,7 @@ public class AwsService {
 		amazonEC2.stopInstances(request);
 	}
 
+	@Async
 	public void terminateInstance(String instanceId, AwsRegion region, boolean wait) {
 		log.info("Terminating instance {}", instanceId);
 		setInstanceState(instanceId, AwsInstanceState.TERMINATED, region, wait);
@@ -348,15 +351,10 @@ public class AwsService {
 		return instance[0];
 	}
 
-	public void waitToBoot(Instance instance) throws TimeoutException {
+	public void waitToBoot(Instance instance) throws IOException {
 		HostAddress hostAddress = new HostAddress(awsUsername, instance.getPublicIpAddress(), instance.getPrivateIpAddress());
-		try {
-			SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
-			sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
-		}
-		catch (IOException e) {
-			throw new TimeoutException();
-		}
+		SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
+		sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
 	}
 
 	private boolean isUsManagerInstance(Instance instance) {

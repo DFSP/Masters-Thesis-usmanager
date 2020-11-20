@@ -39,6 +39,4 @@ public class NginxLoadBalancerProperties {
 
 	private int port;
 	private int stopDelay;
-
-
 }

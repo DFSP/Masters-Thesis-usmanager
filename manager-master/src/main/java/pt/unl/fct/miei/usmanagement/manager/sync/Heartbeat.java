@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "sym_node_host")
 public class Heartbeat {
 

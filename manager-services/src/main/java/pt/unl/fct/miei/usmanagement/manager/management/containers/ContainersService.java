@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -67,8 +68,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Service
 @Slf4j
+@org.springframework.stereotype.Service
 public class ContainersService {
 
 	private final DockerContainersService dockerContainersService;
@@ -140,7 +141,7 @@ public class ContainersService {
 		return containers.save(container);
 	}
 
-	public List<Container> addContainers(List<Container> containers) {
+	public List<Container> saveContainers(List<Container> containers) {
 		log.info("Saving containers {}", containers);
 		return this.containers.saveAll(containers);
 	}
@@ -389,9 +390,7 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name()))
 		).stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
 	}
-
-
-	public List<Container> getServiceContainers(HostAddress hostAddress) {
+public List<Container> getServiceContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()),
@@ -556,5 +555,19 @@ public class ContainersService {
 
 	public void reset() {
 		containers.deleteAll();
+	}
+
+	public List<Container> updateAddress(HostAddress hostAddress, String publicIpAddress) {
+		List<Container> containers = getHostContainers(hostAddress);
+		containers.forEach(container -> {
+			container.setPublicIpAddress(publicIpAddress);
+			container.setPrivateIpAddress(hostAddress.getPrivateIpAddress());
+			Map<String, String> labels = container.getLabels();
+			String serviceAddress = container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+			String port = serviceAddress.split(":")[1];
+			labels.put(ContainerConstants.Label.SERVICE_ADDRESS, String.format("%s:%s", publicIpAddress, port));
+			labels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, publicIpAddress);
+		});
+		return saveContainers(containers);
 	}
 }

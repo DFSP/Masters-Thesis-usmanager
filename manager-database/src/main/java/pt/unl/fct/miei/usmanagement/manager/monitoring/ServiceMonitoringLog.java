@@ -49,7 +49,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "service_monitoring_logs")
 public class ServiceMonitoringLog {
 

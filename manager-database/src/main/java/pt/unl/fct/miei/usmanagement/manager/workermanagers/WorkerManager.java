@@ -50,7 +50,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "worker_managers")
 public class WorkerManager {
 

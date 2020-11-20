@@ -77,7 +77,6 @@ public class ServiceSimulatedMetricsController {
 		serviceSimulatedMetricsService.deleteServiceSimulatedMetric(simulatedMetricName);
 	}
 
-
 	@GetMapping("/{simulatedMetricName}/services")
 	public List<Service> getServiceSimulatedMetricServices(@PathVariable String simulatedMetricName) {
 		return serviceSimulatedMetricsService.getServices(simulatedMetricName);

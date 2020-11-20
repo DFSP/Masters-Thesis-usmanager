@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.bash;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 
 import java.io.BufferedReader;

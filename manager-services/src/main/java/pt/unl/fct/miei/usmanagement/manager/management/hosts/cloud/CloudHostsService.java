@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
-import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -41,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHosts;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
@@ -54,7 +55,6 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
@@ -71,6 +71,7 @@ public class CloudHostsService {
 	private final NodesService nodesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
+	private final ContainersService containersService;
 
 	private final CloudHosts cloudHosts;
 
@@ -82,7 +83,9 @@ public class CloudHostsService {
 							 @Lazy HostsService hostsService,
 							 @Lazy NodesService nodesService,
 							 @Lazy DockerSwarmService dockerSwarmService,
-							 ConfigurationsService configurationsService, CloudHosts cloudHosts,
+							 ConfigurationsService configurationsService,
+							 @Lazy ContainersService containersService,
+							 CloudHosts cloudHosts,
 							 ParallelismProperties parallelismProperties) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
@@ -91,6 +94,7 @@ public class CloudHostsService {
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
+		this.containersService = containersService;
 		this.cloudHosts = cloudHosts;
 		this.threads = parallelismProperties.getThreads();
 	}
@@ -130,14 +134,9 @@ public class CloudHostsService {
 			new EntityNotFoundException(CloudHost.class, "address", address.toString()));
 	}
 
-	private CloudHost saveCloudHost(CloudHost cloudHost) {
-		try {
-			log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
-			return cloudHosts.save(cloudHost);
-		} catch (ConstraintViolationException e) {
-			log.error("Trying to add an existing cloud host to the database: {}", e.getMessage());
-			return getCloudHostById(cloudHost.getInstanceId());
-		}
+	public CloudHost saveCloudHost(CloudHost cloudHost) {
+		/*log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));*/
+		return cloudHosts.save(cloudHost);
 	}
 
 	private CloudHost saveCloudHostFromInstance(Instance instance) {
@@ -154,7 +153,7 @@ public class CloudHostsService {
 			.publicDnsName(instance.getPublicDnsName())
 			.publicIpAddress(instance.getPublicIpAddress())
 			.privateIpAddress(instance.getPrivateIpAddress())
-			.awsRegion(this.getPlacementRegion(instance.getPlacement()))
+			.awsRegion(AwsRegion.fromPlacement(instance.getPlacement()))
 			.placement(instance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
@@ -169,7 +168,7 @@ public class CloudHostsService {
 			.publicDnsName(simpleInstance.getPublicDnsName())
 			.publicIpAddress(simpleInstance.getPublicIpAddress())
 			.privateIpAddress(simpleInstance.getPrivateIpAddress())
-			.awsRegion(this.getPlacementRegion(simpleInstance.getPlacement()))
+			.awsRegion(AwsRegion.fromPlacement(simpleInstance.getPlacement()))
 			.placement(simpleInstance.getPlacement())
 			.build();
 		return saveCloudHost(cloudHost);
@@ -253,7 +252,8 @@ public class CloudHostsService {
 		catch (ManagerException e) {
 			log.error("Failed to remove instance {} from the system: {}", id, e.getMessage());
 		}
-		InstanceState state = new InstanceState().withCode(AwsInstanceState.SHUTTING_DOWN.getCode()).withName(AwsInstanceState.SHUTTING_DOWN.getState());
+		InstanceState state = new InstanceState().withCode(AwsInstanceState.SHUTTING_DOWN.getCode())
+			.withName(AwsInstanceState.SHUTTING_DOWN.getState());
 		cloudHost.setState(state);
 		cloudHost = cloudHosts.save(cloudHost);
 		awsService.terminateInstance(cloudHost.getInstanceId(), cloudHost.getAwsRegion(), wait);
@@ -266,10 +266,19 @@ public class CloudHostsService {
 
 	public void terminateInstances() {
 		log.info("Terminating cloud instances");
-		new ForkJoinPool(threads).execute(() ->
+		new ForkJoinPool(threads).submit(() ->
 			awsService.getInstances().parallelStream()
 				.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
-				.forEach(instance -> terminateInstance(instance.getInstanceId(), false)));
+				.forEach(instance -> {
+					String instanceId = instance.getInstanceId();
+					try {
+						terminateInstance(instanceId, false);
+					}
+					catch (EntityNotFoundException ignored) {
+						AwsRegion region = AwsRegion.fromPlacement(instance.getPlacement());
+						awsService.terminateInstance(instanceId, region, false);
+					}
+				})).join();
 	}
 
 	public List<HostRule> getRules(String hostname) {
@@ -359,14 +368,8 @@ public class CloudHostsService {
 		}
 	}
 
-	private AwsRegion getPlacementRegion(Placement placement) {
-		String availabilityZone = placement.getAvailabilityZone();
-		while (!Character.isDigit(availabilityZone.charAt(availabilityZone.length() - 1))) {
-			availabilityZone = availabilityZone.substring(0, availabilityZone.length() - 1);
-		}
-		AwsRegion region = AwsRegion.valueOf(availabilityZone.toUpperCase().replace("-", "_"));
-		return region;
+	public CloudHost updateAddress(CloudHost cloudHost, String publicIpAddress) {
+		cloudHost.setPublicIpAddress(publicIpAddress);
+		return saveCloudHost(cloudHost);
 	}
-
-
 }

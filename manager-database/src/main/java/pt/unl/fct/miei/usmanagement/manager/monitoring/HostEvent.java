@@ -51,7 +51,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "host_events")
 public class HostEvent {
 

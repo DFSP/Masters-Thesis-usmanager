@@ -55,7 +55,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "operators")
 public class Operator {
 

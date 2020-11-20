@@ -40,6 +40,7 @@ import com.spotify.docker.client.shaded.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -61,6 +62,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxL
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
@@ -81,11 +83,13 @@ import java.util.TimerTask;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@org.springframework.stereotype.Service
 @Slf4j
+@org.springframework.stereotype.Service
 public class DockerContainersService {
 
 	private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
@@ -406,6 +410,13 @@ public class DockerContainersService {
 				configurationsService.removeConfiguration(config);
 			}
 		}
+		if (errorMessage.contains("is already in use by container")) {
+			log.info(errorMessage);
+			String containerIdRegex = "is already in use by container \\\\\"(.*)\\\\\"";
+			Matcher containerIdRegexExpression = Pattern.compile(containerIdRegex).matcher(errorMessage);
+			log.info(containerIdRegexExpression.group(0));
+			return findContainer(containerIdRegexExpression.group(0));
+		}
 		throw new ManagerException("Failed to start container: %s", errorMessage);
 	}
 
@@ -535,6 +546,7 @@ public class DockerContainersService {
 	}
 
 	private List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
+		log.info(nodesService.getNodes().stream().map(Node::getPublicIpAddress).collect(Collectors.joining(" ")));
 		return nodesService.getNodes().stream()
 			.map(node -> getContainers(node.getHostAddress(), filter))
 			.flatMap(List::stream)

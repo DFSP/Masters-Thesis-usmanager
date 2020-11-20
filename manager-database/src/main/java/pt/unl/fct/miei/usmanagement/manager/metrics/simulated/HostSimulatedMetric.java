@@ -59,7 +59,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "simulated_host_metrics")
 public class HostSimulatedMetric {
 

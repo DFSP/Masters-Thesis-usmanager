@@ -23,8 +23,6 @@
  */
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
-
-
 import pt.unl.fct.miei.usmanagement.manager.Mode;
 
 public enum EventType {

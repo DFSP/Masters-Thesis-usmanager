@@ -100,5 +100,4 @@ public class SymTriggerRouterEntity {
 			&& routerId != null && routerId.equals(other.getRouterId());
 	}
 
-
 }

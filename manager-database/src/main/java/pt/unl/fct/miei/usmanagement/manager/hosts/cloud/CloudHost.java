@@ -62,7 +62,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "cloud_hosts")
 public class CloudHost {
 

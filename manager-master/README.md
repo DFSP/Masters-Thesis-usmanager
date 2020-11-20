@@ -58,7 +58,6 @@ O [hal explorer](https://mvnrepository.com/artifact/org.springframework.data/spr
 
 http://localhost:8080/api
 
-
 ## Ambiente
 
 > Ubuntu 20.04.1 LTS
@@ -96,7 +95,6 @@ Lançar a aplicação na cloud (aws):
 <!--[<img src="https://i.imgur.com/ei7nKF5.png" alt="" width="48" height="42"> Spring HATEOAS](https://spring.io/projects/spring-hateoas) - Spring HATEOAS provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC-->
 
 [<img src="https://i.imgur.com/qFZtEoa.png" alt="" width="48" height="24"> Maven](http://maven.apache.org/guides/getting-started/) - Maven is essentially a project management and comprehension tool and as such provides a way to help with managing: Builds, Documentation, Reporting, Dependencies, SCMs, Release, Distribution and Documentation
-
 
 ## Troubleshooting
 

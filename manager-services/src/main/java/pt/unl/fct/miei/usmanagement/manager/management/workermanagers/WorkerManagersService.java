@@ -34,6 +34,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
@@ -258,7 +259,6 @@ public class WorkerManagersService {
 		return getContainers(true);
 	}
 
-
 	@Async
 	public CompletableFuture<List<Container>> launchContainer(LaunchContainerRequest launchContainerRequest,
 															  WorkerManager workerManager) {
@@ -322,7 +322,7 @@ public class WorkerManagersService {
 			}
 			catch (InterruptedException | ExecutionException e) {
 				log.error("Failed to launch containers: {}... retrying ({}/{})", e.getMessage(), tries + 1, retries);
-				Timing.sleep(tries + 1, TimeUnit.SECONDS);
+				Timing.sleep(tries * 2, TimeUnit.SECONDS);
 			}
 		} while (containers.isEmpty() && ++tries < retries);
 

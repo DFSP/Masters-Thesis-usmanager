@@ -18,7 +18,6 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "configurations")
 public class Configuration {
 

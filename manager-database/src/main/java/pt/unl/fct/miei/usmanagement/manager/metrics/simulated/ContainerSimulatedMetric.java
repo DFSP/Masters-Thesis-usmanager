@@ -57,7 +57,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "simulated_container_metrics")
 public class ContainerSimulatedMetric {
 

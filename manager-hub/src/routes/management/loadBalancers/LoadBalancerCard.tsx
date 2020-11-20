@@ -83,40 +83,9 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         const {loadBalancer} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Ver as portas associadas'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'ports'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Ver as labels associadas'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'labels'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Ver as logs'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'logs'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Modificar a lista de regras'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'rules'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Ver a lista de regras genéricas'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'genericContainerRules'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Modificar a lista das métricas simuladas'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'simulatedMetrics'}
-                state={loadBalancer}/>,
-            <LinkedContextMenuItem
-                option={'Ver a lista das métricas simuladas genéricas'}
-                pathname={`/contentores/${loadBalancer.id}`}
-                selected={'genericSimulatedMetrics'}
-                state={loadBalancer}/>
+                option={'Ir para o contentor associado'}
+                pathname={`/contentores/${loadBalancer.container.id}`}
+                state={loadBalancer.container}/>,
         ];
     }
 

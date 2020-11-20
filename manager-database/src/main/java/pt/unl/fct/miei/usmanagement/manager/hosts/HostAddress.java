@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.hosts;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 
@@ -35,13 +36,14 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
+@Setter
 public class HostAddress implements Serializable {
 
 	private static final long serialVersionUID = -7952567936761304029L;
 
 	private final String username;
 	private final String publicDnsName;
-	private final String publicIpAddress;
+	private String publicIpAddress;
 	private final String privateIpAddress;
 	private final Coordinates coordinates;
 	private final RegionEnum region;

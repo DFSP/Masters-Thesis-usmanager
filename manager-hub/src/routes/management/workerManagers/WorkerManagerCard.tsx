@@ -83,9 +83,9 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
         const {workerManager} = this.props;
         return [
             <LinkedContextMenuItem
-                option={'Ver os contentores associados'}
+                option={'Ir para o contentor associado'}
                 pathname={`/contentores/${workerManager.container.id}`}
-                state={workerManager}/>,
+                state={workerManager.container}/>,
             <LinkedContextMenuItem
                 option={'Ver os hosts geridos'}
                 pathname={`/gestores locais/${workerManager.id}`}

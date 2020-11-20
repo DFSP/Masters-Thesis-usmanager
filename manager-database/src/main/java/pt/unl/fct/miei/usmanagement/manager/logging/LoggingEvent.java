@@ -46,7 +46,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "logging_event")
 public class LoggingEvent {
 

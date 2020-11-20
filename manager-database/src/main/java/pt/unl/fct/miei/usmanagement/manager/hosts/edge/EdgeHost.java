@@ -62,7 +62,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "edge_hosts")
 public class EdgeHost {
 

@@ -24,30 +24,34 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,86 +60,70 @@ public class RegistrationServerService {
 
 	public static final String REGISTRATION_SERVER = "registration-server";
 
-	private final HostsService hostsService;
-	private final ServicesService servicesService;
 	private final ContainersService containersService;
 	private final ElasticIpsService elasticIpsService;
 	private final CloudHostsService cloudHostsService;
+	private final RegionsService regionsService;
 
 	private final RegistrationServers registrationServers;
 
 	private final int port;
-	private final int threads;
 
-	public RegistrationServerService(HostsService hostsService, ServicesService servicesService,
-									 @Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
-									 CloudHostsService cloudHostsService,
-									 RegistrationServers registrationServers, RegistrationProperties registrationProperties, ParallelismProperties parallelismProperties) {
-		this.hostsService = hostsService;
-		this.servicesService = servicesService;
+	public RegistrationServerService(@Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
+									 CloudHostsService cloudHostsService, RegionsService regionsService,
+									 RegistrationServers registrationServers, RegistrationProperties registrationProperties) {
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
 		this.cloudHostsService = cloudHostsService;
+		this.regionsService = regionsService;
 		this.registrationServers = registrationServers;
 		this.port = registrationProperties.getPort();
-		this.threads = parallelismProperties.getThreads();
 	}
 
 	public RegistrationServer launchRegistrationServer(RegionEnum region) {
 		return launchRegistrationServers(List.of(region)).get(0);
 	}
 
-	public RegistrationServer launchRegistrationServer(HostAddress hostAddress) {
+	@Async
+	public CompletableFuture<RegistrationServer> launchRegistrationServer(HostAddress hostAddress) {
 		String registrationServerAddresses = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
-
 		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER,
 			Collections.emptyList(), Collections.emptyMap(), dynamicLaunchParams);
-
-		RegionEnum region = container.getHostAddress().getRegion();
-		String instanceId = cloudHostsService.getCloudHostByAddress(hostAddress).getInstanceId();
-		String allocationId = elasticIpsService.getElasticIp(region).getAllocationId();
-		try {
-			elasticIpsService.associateElasticIpAddress(region, allocationId, instanceId).get();
-		}
-		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Failed to associate elastic ip address to the registration server: %s", e.getMessage());
-		}
-
+		RegionEnum region = hostAddress.getRegion();
 		RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
-		return registrationServers.save(registrationServer);
+		return CompletableFuture.completedFuture(registrationServers.save(registrationServer));
 	}
 
+	@SneakyThrows
 	public List<RegistrationServer> launchRegistrationServers(List<RegionEnum> regions) {
 		log.info("Launching registration servers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(REGISTRATION_SERVER);
+		List<CompletableFuture<RegistrationServer>> futureRegistrationServers = regions.stream().map(region -> {
+			List<RegistrationServer> regionRegistrationServers = getRegistrationServer(region);
+			if (regionRegistrationServers.size() > 0) {
+				return CompletableFuture.completedFuture(regionRegistrationServers.get(0));
+			}
+			else {
+				AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+				CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
+				ElasticIp elasticIp = elasticIpsService.getElasticIp(region);
+				String allocationId = elasticIp.getAllocationId();
+				cloudHost = elasticIpsService.associateElasticIpAddress(region, allocationId, cloudHost);
+				HostAddress hostAddress = cloudHost.getAddress();
+				return launchRegistrationServer(hostAddress);
+			}
+		}).collect(Collectors.toList());
 
-		List<String> customEnvs = Collections.emptyList();
+		CompletableFuture.allOf(futureRegistrationServers.toArray(new CompletableFuture[0])).join();
 
-		Map<String, String> customLabels = Collections.emptyMap();
-
-		String registrationServerAddresses = getRegistrationServerAddresses();
-		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
-
-		try {
-			return new ForkJoinPool(threads).submit(() ->
-				regions.parallelStream().map(region -> {
-					List<RegistrationServer> regionRegistrationServers = getRegistrationServer(region);
-					if (regionRegistrationServers.size() > 0) {
-						return regionRegistrationServers.get(0);
-					}
-					else {
-						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
-						Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
-						RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
-						return registrationServers.save(registrationServer);
-					}
-				}).collect(Collectors.toList())).get();
+		List<RegistrationServer> registrationServers = new ArrayList<>();
+		for (CompletableFuture<RegistrationServer> futureRegistrationServer : futureRegistrationServers) {
+			RegistrationServer registrationServer = futureRegistrationServer.get();
+			registrationServers.add(registrationServer);
 		}
-		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to launch registration servers at regions %s: %s", regions, e.getMessage());
-		}
+
+		return registrationServers;
 	}
 
 	public List<RegistrationServer> getRegistrationServers() {

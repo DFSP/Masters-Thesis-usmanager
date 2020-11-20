@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.logging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,6 +43,5 @@ public class LoggingEventService {
 	public List<LoggingEvent> getLogs() {
 		return loggingEvents.findAll();
 	}
-
 
 }

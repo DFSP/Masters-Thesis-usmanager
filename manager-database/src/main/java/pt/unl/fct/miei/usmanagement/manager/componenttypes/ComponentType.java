@@ -53,7 +53,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "component_types")
 public class ComponentType {
 
