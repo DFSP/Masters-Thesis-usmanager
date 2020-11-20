@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -229,7 +230,6 @@ public class HostsMonitoringService {
 			HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 			return successfulHostAddresses.contains(hostAddress);
 		}).collect(Collectors.toList());
-
 
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);

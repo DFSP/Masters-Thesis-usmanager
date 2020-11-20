@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-
 -- Logback: the reliable, generic, fast and flexible logging framework.
 -- Copyright (C) 1999-2010, QOS.ch. All rights reserved.
 --

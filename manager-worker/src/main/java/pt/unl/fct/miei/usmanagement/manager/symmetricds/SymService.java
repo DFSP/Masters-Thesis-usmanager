@@ -33,6 +33,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import javax.servlet.ServletContext;
@@ -44,7 +45,6 @@ import java.util.Properties;
 @Slf4j
 @Service
 public class SymService {
-
 
 	private final ServletContext servletContext;
 	private final DataSource dataSource;
