@@ -741,7 +741,7 @@ class Container extends BaseComponent<Props, State> {
                               failureCallback: this.onPostFailure
                           }}
                         // delete button is never present on new nodes, so a type cast is safe
-                          delete={container && (container as IContainer).type !== 'SINGLETON'
+                          delete={container && (container as IContainer).labels['serviceType'] !== 'SYSTEM'
                               ? {
                                   textButton: 'Parar',
                                   url: `containers/${(container as IContainer).id}`,
@@ -750,7 +750,7 @@ class Container extends BaseComponent<Props, State> {
                               }
                               : undefined}
                         // custom buttons are never present on new nodes, so a type cast is safe
-                          customButtons={container && (container as IContainer).type !== 'SINGLETON'
+                          customButtons={container && (container as IContainer).labels['serviceType'] !== 'SYSTEM'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
                           loading={this.state.loading}
@@ -859,7 +859,7 @@ class Container extends BaseComponent<Props, State> {
 
 }
 
-function removeFields(container: Partial<IContainer>) {
+function removeFields(container: IContainer) {
     if (container.labels?.['serviceType'] === 'SYSTEM') {
         delete container["network"];
     }

@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
-
 public enum RuleDecisionEnum {
 
 	NONE,

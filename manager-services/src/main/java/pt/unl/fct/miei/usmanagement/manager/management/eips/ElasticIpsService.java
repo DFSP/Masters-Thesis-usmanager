@@ -125,9 +125,9 @@ public class ElasticIpsService {
 	}
 
 	@Async
-	public CompletableFuture<AssociateAddressResult> associateElasticIpAddress(String allocationId, String instanceId) {
+	public CompletableFuture<AssociateAddressResult> associateElasticIpAddress(RegionEnum region, String allocationId, String instanceId) {
 		ElasticIp elasticIp = getElasticIp(allocationId);
-		AssociateAddressResult associateResult = awsService.associateElasticIpAddress(allocationId, instanceId);
+		AssociateAddressResult associateResult = awsService.associateElasticIpAddress(region, allocationId, instanceId);
 		elasticIp.setAssociationId(associateResult.getAssociationId());
 		elasticIps.save(elasticIp);
 		return CompletableFuture.completedFuture(associateResult);

@@ -114,7 +114,8 @@ public class DatabaseLoader {
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService,
 								   ContainersService containersService, WorkerManagersService workerManagersService,
-								   ConfigurationsService configurationsService) {
+								   ConfigurationsService configurationsService, NginxLoadBalancerService nginxLoadBalancerService,
+								   RegistrationServerService registrationServerService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -157,6 +158,8 @@ public class DatabaseLoader {
 
 			List<CloudHost> cloudHosts = loadCloudHosts(syncService);
 
+			nginxLoadBalancerService.reset();
+			registrationServerService.reset();
 			workerManagersService.reset();
 
 			containersService.reset();

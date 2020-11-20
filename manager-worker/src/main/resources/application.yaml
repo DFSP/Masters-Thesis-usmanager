@@ -69,7 +69,6 @@ edge:
   access:
     key-file-path: src/main/resources/edge
 aws:
-  initial-max-instances: 2
   max-retries: 5
   connection-timeout: 180000
   access:
@@ -82,13 +81,10 @@ aws:
     key-pair: ec2
     type: t2.micro
     tag: us-manager
-container:
-  delay-before-stop: 45000
-  monitor-period: 60000
 docker:
-  install-script: src/main/resources/scripts/dockerfile-docker-install.sh/dockerfile-docker-install.sh
+  install-script: src/main/resources/scripts/docker-install.sh/docker-install.sh
   uninstall-script: src/main/resources/scripts/docker-uninstall.sh/docker-uninstall.sh
-  install-api-script: src/main/resources/scripts/dockerfile-docker-api-install.sh/dockerfile-docker-api-install.sh
+  install-api-script: src/main/resources/scripts/docker-api-install.sh/docker-api-install.sh
   api:
     port: 2376
   api-proxy:
@@ -104,38 +100,39 @@ registration:
 prometheus:
   node-exporter:
     install-script: src/main/resources/scripts/node-exporter-install.sh
-decision:
-  resolve-overworked-host-on-events-count: 3
-  resolve-underworked-host-on-events-count: 3
-  replicate-container-on-event-count: 2
-  migrate-container-on-event-count: 2
-  stop-container-on-event-count: 3
+monitoring:
+  hosts:
+    period: 60000
+    maximum-cpu-percentage: 90
+    maximum-ram-percentage: 90
+    overwork-event-count: 3
+    underwork-event-count: 3
+  services:
+    period: 60000
+    replicate-event-count: 2
+    migrate-event-count: 2
+    stop-event-count: 3
 host:
-  maximum-cpu-percentage: 90
   maximum-hosts: 0
-  maximum-ram-percentage: 90
   minimum-hosts: 1
-  monitor-period: 60000
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
+container:
+  delay-before-stop: 45000
 nginx-load-balancer:
   stop-delay: 300000
 location-request:
   port: 1919
   minimum-request-count-percentage: 15.0
 rules:
-  service-rule-template-file: service-rule-template.drl
-  host-rule-template-file: host-rule-template.drl
+  service-rule-template-file: drools/service-rule-template.drl
+  host-rule-template-file: drools/host-rule-template.drl
 parallelism:
   threads: 8
-#trace: true
+#logging:
 #  level:
 #    org:
 #      hibernate:
-#        sql: DEBUG
-#      type:
-#        descriptor:
-#          sql:
-#            BasicBinder: TRACE
+#        SQL=DEBUG:#trace: debug
 #debug: true
 
 

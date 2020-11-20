@@ -45,7 +45,6 @@ import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import IDatabaseData from "../../../components/IDatabaseData";
-import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {IContainer} from "../containers/Container";
 import {INode} from "../nodes/Node";
 import ManagedHostsList from "./ManagedHostsList";
@@ -235,8 +234,8 @@ class WorkerManager extends BaseComponent<Props, State> {
         region.region;
 
     private getSelectableRegions = (): string[] => {
-       const deployedRegions = Object.values(this.props.workerManagers).map(workerManager => workerManager.region.region);
-       return Object.keys(this.props.regions).filter(region => !deployedRegions.includes(region));
+        const deployedRegions = Object.values(this.props.workerManagers).map(workerManager => workerManager.region.region);
+        return Object.keys(this.props.regions).filter(region => !deployedRegions.includes(region));
     }
 
     private formFields = (isNew: boolean, formWorkerManager?: Partial<IWorkerManager>) => {

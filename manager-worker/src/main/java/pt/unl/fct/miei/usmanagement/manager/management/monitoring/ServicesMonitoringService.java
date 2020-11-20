@@ -30,7 +30,6 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
@@ -42,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.Servic
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
@@ -114,8 +114,8 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 ContainersRecoveryService containersRecoveryService, SyncService syncService, ContainerProperties containerProperties,
-									 WorkerManagerProperties workerManagerProperties) {
+									 ContainersRecoveryService containersRecoveryService, SyncService syncService,
+									 MonitoringProperties monitoringProperties, WorkerManagerProperties workerManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.dockerContainersService = dockerContainersService;
@@ -132,10 +132,10 @@ public class ServicesMonitoringService {
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
 		this.containersRecoveryService = containersRecoveryService;
 		this.syncService = syncService;
-		this.monitorPeriod = containerProperties.getMonitorPeriod();
-		this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
-		this.replicateContainerOnEventCount = containerProperties.getReplicateContainerOnEventCount();
-		this.migrateContainerOnEventCount = containerProperties.getMigrateContainerOnEventCount();
+		this.monitorPeriod = monitoringProperties.getServices().getPeriod();
+		this.stopContainerOnEventCount = monitoringProperties.getServices().getStopEventCount();
+		this.replicateContainerOnEventCount = monitoringProperties.getServices().getReplicateEventCount();
+		this.migrateContainerOnEventCount = monitoringProperties.getServices().getMigrateEventCount();
 		this.isTestEnable = workerManagerProperties.getTests().isEnabled();
 	}
 
@@ -333,7 +333,7 @@ public class ServicesMonitoringService {
 
 	private ServiceDecisionResult runRules(HostAddress hostAddress, String containerId, String serviceName, Map<String, Double> newFields) {
 
-		ContainerEvent containerEvent = new ContainerEvent(containerId, serviceName);
+		ContainerEvent containerEvent = new ContainerEvent(containerId, serviceName, hostAddress);
 		Map<String, Double> containerEventFields = containerEvent.getFields();
 
 		getContainerMonitoring(containerId)
@@ -429,6 +429,7 @@ public class ServicesMonitoringService {
 						String result = String.format("replicated container %s of service %s to container %s on %s",
 							containerId, serviceName, replicatedContainerId, toHostAddress);
 						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+						servicesEventsService.reset(containerId);
 					}
 				}
 				else if (topPriorityDecision == RuleDecisionEnum.STOP) {
@@ -442,6 +443,7 @@ public class ServicesMonitoringService {
 						containersService.stopContainer(containerId);
 						String result = String.format("stopped container %s of service %s on host %s", containerId, serviceName, hostAddress);
 						saveServiceDecision(containerId, serviceName, decision, ruleId, fields, result);
+						servicesEventsService.reset(containerId);
 					}
 				}
 			}

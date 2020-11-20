@@ -65,7 +65,8 @@ class RegistrationServersList extends BaseComponent<Props, {}> {
         <RegistrationServerCard key={registrationServer.id} registrationServer={registrationServer}/>;
 
     private predicate = (registrationServer: IRegistrationServer, search: string): boolean =>
-        registrationServer.publicIpAddress.toLowerCase().includes(search);
+        registrationServer.id.toString().includes(search)
+        || registrationServer.container.publicIpAddress.toLowerCase().includes(search);
 
 }
 

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
+import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
@@ -31,7 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
@@ -39,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMe
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
@@ -47,10 +49,9 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitorings;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -78,7 +79,6 @@ public class HostsMonitoringService {
 	private final HostMonitorings hostsMonitoring;
 	private final HostMonitoringLogs hostMonitoringLogs;
 
-	private final NodesService nodesService;
 	private final ContainersService containersService;
 	private final HostRulesService hostRulesService;
 	private final HostsService hostsService;
@@ -87,6 +87,7 @@ public class HostsMonitoringService {
 	private final HostsEventsService hostsEventsService;
 	private final DecisionsService decisionsService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
+	private final DockerSwarmService dockerSwarmService;
 
 	private final long monitorPeriod;
 	private final int resolveOverworkedHostOnEventsCount;
@@ -97,16 +98,15 @@ public class HostsMonitoringService {
 	private Timer hostMonitoringTimer;
 
 	public HostsMonitoringService(HostMonitorings hostsMonitoring,
-								  HostMonitoringLogs hostMonitoringLogs, NodesService nodesService,
-								  ContainersService containersService, HostRulesService hostRulesService,
-								  HostsService hostsService, HostMetricsService hostMetricsService,
-								  ServicesService servicesService, HostsEventsService hostsEventsService,
-								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
-								  SyncService syncService, HostProperties hostProperties,
-								  MasterManagerProperties masterManagerProperties) {
+								  HostMonitoringLogs hostMonitoringLogs, ContainersService containersService,
+								  HostRulesService hostRulesService, HostsService hostsService,
+								  HostMetricsService hostMetricsService, ServicesService servicesService,
+								  HostsEventsService hostsEventsService, DecisionsService decisionsService,
+								  HostSimulatedMetricsService hostSimulatedMetricsService,
+								  DockerSwarmService dockerSwarmService, MasterManagerProperties masterManagerProperties,
+								  MonitoringProperties monitoringProperties, HostProperties hostProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
-		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.hostRulesService = hostRulesService;
 		this.hostsService = hostsService;
@@ -115,9 +115,10 @@ public class HostsMonitoringService {
 		this.hostsEventsService = hostsEventsService;
 		this.decisionsService = decisionsService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
-		this.monitorPeriod = hostProperties.getMonitorPeriod();
-		this.resolveOverworkedHostOnEventsCount = hostProperties.getResolveOverworkedHostOnEventsCount();
-		this.resolveUnderworkedHostOnEventsCount = hostProperties.getResolveUnderworkedHostOnEventsCount();
+		this.dockerSwarmService = dockerSwarmService;
+		this.monitorPeriod = monitoringProperties.getHosts().getPeriod();
+		this.resolveOverworkedHostOnEventsCount = monitoringProperties.getHosts().getOverworkEventCount();
+		this.resolveUnderworkedHostOnEventsCount = monitoringProperties.getHosts().getUnderworkEventCount();
 		this.maximumHosts = hostProperties.getMaximumHosts();
 		this.minimumHosts = hostProperties.getMinimumHosts();
 		this.isTestEnable = masterManagerProperties.getTests().isEnabled();
@@ -199,7 +200,7 @@ public class HostsMonitoringService {
 	}
 
 	private void monitorHostsTask() {
-		List<Node> nodes = nodesService.getReadyNodes(); // TODO only swarm nodes
+		List<Node> nodes = dockerSwarmService.getReadyNodes();
 		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
 			.map(this::getHostDecisions)
 			.collect(Collectors.toList());
@@ -220,8 +221,10 @@ public class HostsMonitoringService {
 		}
 
 		// filter out unsuccessful hosts
-		nodes = nodes.stream().filter(simpleNode -> successfulHostAddresses.contains(simpleNode.getHostAddress()))
-			.collect(Collectors.toList());
+		nodes = nodes.stream().filter(node -> {
+			HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
+			return successfulHostAddresses.contains(hostAddress);
+		}).collect(Collectors.toList());
 
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);
@@ -233,7 +236,7 @@ public class HostsMonitoringService {
 
 	@Async
 	public CompletableFuture<HostDecisionResult> getHostDecisions(Node node) {
-		HostAddress hostAddress = node.getHostAddress();
+		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		// Metrics from prometheus (node_exporter)
 		Map<String, CompletableFuture<Optional<Double>>> futureStats = hostMetricsService.getHostStats(hostAddress);
@@ -268,10 +271,10 @@ public class HostsMonitoringService {
 	}
 
 	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {
-		HostAddress hostAddress = node.getHostAddress();
+		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent =
-			new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node);
+			new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node, hostAddress);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 
 		getHostMonitoring(hostAddress)
@@ -290,7 +293,7 @@ public class HostsMonitoringService {
 				hostEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 			});
 
-		return hostRulesService.processHostEvent(node, hostEvent);
+		return hostRulesService.processHostEvent(hostEvent);
 	}
 
 	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<Node> nodes) {
@@ -305,8 +308,7 @@ public class HostsMonitoringService {
 			if ((ruleDecision == RuleDecisionEnum.OVERWORK && hostEventCount >= resolveOverworkedHostOnEventsCount)
 				|| (ruleDecision == RuleDecisionEnum.UNDERWORK && hostEventCount >= resolveUnderworkedHostOnEventsCount)) {
 				decisions.add(decision);
-				HostDecision hostDecision = decisionsService.addHostDecision(hostAddress, ruleDecision.name(),
-					decision.getRuleId());
+				HostDecision hostDecision = decisionsService.addHostDecision(hostAddress, ruleDecision.name(), decision.getRuleId());
 				decisionsService.addHostDecisionValueFromFields(hostDecision, decision.getFields());
 				log.info("Host {} had decision {} as event #{}. Triggering action {}", hostAddress, ruleDecision, hostEventCount, ruleDecision);
 			}
@@ -320,6 +322,9 @@ public class HostsMonitoringService {
 	}
 
 	private void executeDecisions(List<HostDecisionResult> decisions, int nodesCount) {
+		log.info("decisions {}", decisions);
+		log.info("nodesCount {}", nodesCount);
+		log.info("maximumHosts {}", maximumHosts);
 		Collections.sort(decisions);
 		HostDecisionResult topPriorityAction = decisions.get(0);
 		RuleDecisionEnum decision = topPriorityAction.getDecision();
@@ -327,6 +332,7 @@ public class HostsMonitoringService {
 		if (decision == RuleDecisionEnum.OVERWORK) {
 			if (maximumHosts <= 0 || nodesCount < maximumHosts) {
 				executeOverworkedHostDecision(hostAddress);
+				hostsEventsService.reset(hostAddress);
 			}
 		}
 		else if (decision == RuleDecisionEnum.UNDERWORK) {
@@ -337,6 +343,7 @@ public class HostsMonitoringService {
 					.findFirst()
 					.ifPresent(d -> resolveUnderworkedHost(d.getHostAddress()));*/
 				executeUnderworkedHostDecision(hostAddress);
+				hostsEventsService.reset(hostAddress);
 			}
 		}
 	}
@@ -344,7 +351,8 @@ public class HostsMonitoringService {
 	private void executeOverworkedHostDecision(HostAddress hostAddress) {
 		// This action is triggered when the asking host is overflowed with work
 		// To resolve that, we migrate one of its containers to another host
-		getRandomContainerToMigrateFrom(hostAddress).ifPresent(container -> {
+
+		getContainerToMigrateFrom(hostAddress).ifPresent(container -> {
 			String containerId = container.getId();
 			String serviceName = container.getServiceName();
 			double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(serviceName);
@@ -364,9 +372,15 @@ public class HostsMonitoringService {
 		log.info("Resolved underworked host: Stopped {} and migrated containers {} to hosts {}", hostAddress, containers, newHosts);
 	}
 
-	private Optional<Container> getRandomContainerToMigrateFrom(HostAddress hostAddress) {
+	private Optional<Container> getContainerToMigrateFrom(HostAddress hostAddress) {
 		List<Container> containers = containersService.getAppContainers(hostAddress);
-		return containers.isEmpty() ? Optional.empty() : Optional.of(containers.get(new Random().nextInt(containers.size())));
+		log.info("{}", containers);
+		if (containers.isEmpty()) {
+			return Optional.empty();
+		}
+		// TODO dont choose randomly
+		Container container = containers.get(new Random().nextInt(containers.size()));
+		return Optional.of(container);
 	}
 
 	public void stopHostMonitoring() {

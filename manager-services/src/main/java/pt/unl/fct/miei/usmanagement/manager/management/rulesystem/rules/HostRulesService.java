@@ -32,18 +32,17 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -264,8 +263,8 @@ public class HostRulesService {
 		}
 	}
 
-	public HostDecisionResult processHostEvent(Node node, HostEvent hostEvent) {
-		HostAddress hostAddress = node.getHostAddress();
+	public HostDecisionResult processHostEvent(HostEvent hostEvent) {
+		HostAddress hostAddress = hostEvent.getHostAddress();
 		if (droolsService.shouldCreateNewHostRuleSession(hostAddress, lastUpdateHostRules.get())) {
 			List<Rule> rules = generateHostRules(hostAddress);
 			Map<Long, String> drools = droolsService.executeDroolsRules(hostEvent, rules, hostRuleTemplateFile);
@@ -275,7 +274,6 @@ public class HostRulesService {
 	}
 
 	private List<Rule> generateHostRules(HostAddress hostAddress) {
-		//FIXME what about cloud hosts?
 		List<HostRule> hostRules = getRules(hostAddress);
 		List<Rule> rules = new ArrayList<>(hostRules.size());
 		log.info("Generating host rules... (count: {})", hostRules.size());
@@ -285,12 +283,13 @@ public class HostRulesService {
 
 	private Rule generateRule(HostRule hostRule) {
 		Long id = hostRule.getId();
-		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(hostRule.getName()).stream().map(condition -> {
-			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName());
-			double value = condition.getValue();
-			OperatorEnum operator = condition.getOperator().getOperator();
-			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
-		}).collect(Collectors.toList());
+		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions =
+			getConditions(hostRule.getName()).stream().map(condition -> {
+				String fieldName = String.format("%s-%s", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
+				double value = condition.getValue();
+				OperatorEnum operator = condition.getOperator().getOperator();
+				return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
+			}).collect(Collectors.toList());
 		RuleDecisionEnum decision = hostRule.getDecision().getRuleDecision();
 		int priority = hostRule.getPriority();
 		return new Rule(id, conditions, decision, priority);

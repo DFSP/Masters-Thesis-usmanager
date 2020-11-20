@@ -30,8 +30,8 @@ import LoadBalancersList from "./LoadBalancersList";
 
 const LoadBalancers: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Adicionar instância'}}
-                   pathname={'/balanceamento de carga/nova instância?new'}/>
+        <AddButton button={{text: 'Iniciar balanceador'}}
+                   pathname={'/balanceamento de carga/iniciar balanceador?new'}/>
         <div className={`${styles.container}`}>
             <LoadBalancersList/>
         </div>

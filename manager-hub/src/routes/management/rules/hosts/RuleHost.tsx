@@ -315,7 +315,9 @@ class RuleHost extends BaseComponent<Props, State> {
                     validation:
                         key === 'priority'
                             ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
-                            : {rule: requiredAndTrimmed}
+                            : key !== 'generic'
+                            ? {rule: requiredAndTrimmed}
+                            : undefined
                 }
             };
         }).reduce((fields, field) => {
@@ -383,9 +385,12 @@ class RuleHost extends BaseComponent<Props, State> {
                                                     }}/>
                                 : key === 'generic'
                                 ? <Field key={index}
-                                        id={key}
-                                        type='checkbox'
-                                        checkbox={{label: 'Aplicar a todos os hosts', checkCallback: this.isGenericSelected}}/>
+                                         id={key}
+                                         type='checkbox'
+                                         checkbox={{
+                                             label: 'Aplicar a todos os hosts',
+                                             checkCallback: this.isGenericSelected
+                                         }}/>
                                 : <Field key={index}
                                          id={key}
                                          label={key}

@@ -1980,13 +1980,13 @@ const fetchLoadBalancers = (id?: string) => ({
         !id
             ? {
                 types: [LOAD_BALANCERS_REQUEST, LOAD_BALANCERS_SUCCESS, LOAD_BALANCERS_FAILURE],
-                endpoint: `containers?serviceName=load-balancer`,
+                endpoint: `load-balancers`,
                 schema: Schemas.LOAD_BALANCER_ARRAY,
                 entity: 'loadBalancers'
             }
             : {
                 types: [LOAD_BALANCER_REQUEST, LOAD_BALANCER_SUCCESS, LOAD_BALANCER_FAILURE],
-                endpoint: `containers/${id}`,
+                endpoint: `load-balancers/${id}`,
                 schema: Schemas.LOAD_BALANCER,
                 entity: 'loadBalancers'
             }
@@ -2023,13 +2023,13 @@ const fetchRegistrationServers = (id?: string) => ({
         !id
             ? {
                 types: [REGISTRATION_SERVERS_REQUEST, REGISTRATION_SERVERS_SUCCESS, REGISTRATION_SERVERS_FAILURE],
-                endpoint: `containers?serviceName=registration-server`,
+                endpoint: `registration-servers`,
                 schema: Schemas.REGISTRATION_SERVER_ARRAY,
                 entity: 'registrationServers'
             }
             : {
                 types: [REGISTRATION_SERVER_REQUEST, REGISTRATION_SERVER_SUCCESS, REGISTRATION_SERVER_FAILURE],
-                endpoint: `containers/${id}`,
+                endpoint: `registration-servers/${id}`,
                 schema: Schemas.REGISTRATION_SERVER,
                 entity: 'registrationServers'
             }

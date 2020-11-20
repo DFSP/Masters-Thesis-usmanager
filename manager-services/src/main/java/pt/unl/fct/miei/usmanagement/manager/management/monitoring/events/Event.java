@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +37,11 @@ import java.util.Map;
 @EqualsAndHashCode
 public class Event {
 
+	private final HostAddress hostAddress;
 	private final Map<String, Double> fields;
 
-	public Event() {
+	public Event(HostAddress hostAddress) {
+		this.hostAddress = hostAddress;
 		this.fields = new HashMap<>();
 	}
 

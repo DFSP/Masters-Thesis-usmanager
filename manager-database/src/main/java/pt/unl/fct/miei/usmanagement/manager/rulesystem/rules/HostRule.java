@@ -58,7 +58,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 @Table(name = "host_rules")
 public class HostRule {
 

@@ -229,8 +229,7 @@ public class AppRulesService {
 	private Rule generateAppRule(AppRule appRule) {
 		Long id = appRule.getId();
 		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(appRule.getName()).stream().map(condition -> {
-			String fieldName = String.format("%s-%S", condition.getField().getName(),
-				condition.getValueMode().getName());
+			String fieldName = String.format("%s-%s", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
 			double value = condition.getValue();
 			OperatorEnum operator = condition.getOperator().getOperator();
 			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);

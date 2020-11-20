@@ -43,35 +43,35 @@ public interface Apps extends JpaRepository<App, Long> {
 
 	@Query("select new pt.unl.fct.miei.usmanagement.manager.services"
 		+ ".ServiceOrder(s.service, s.launchOrder) "
-		+ "from App a join a.appServices s "
+		+ "from App a left join a.appServices s "
 		+ "where lower(a.name) = lower(:appName) order by s.launchOrder")
 	List<ServiceOrder> getServicesOrder(@Param("appName") String appName);
 
 	Optional<App> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select s "
-		+ "from App a join a.appServices s "
+		+ "from App a left join a.appServices s "
 		+ "where lower(a.name) = lower(:appName)")
 	List<AppService> getServices(@Param("appName") String appName);
 
 	@Query("select r "
-		+ "from App c join c.appRules r "
+		+ "from App c left join c.appRules r "
 		+ "where c.name = :appName")
 	List<AppRule> getRules(@Param("appName") String appName);
 
 	@Query("select r "
-		+ "from App c join c.appRules r "
+		+ "from App c left join c.appRules r "
 		+ "where c.name = :appName and lower(r.name) = lower(:ruleName)")
 	List<AppRule> getRule(@Param("appName") String appName,
 						  @Param("ruleName") String ruleName);
 
 	@Query("select m "
-		+ "from App c join c.simulatedAppMetrics m "
+		+ "from App c left join c.simulatedAppMetrics m "
 		+ "where c.name = :appName")
 	List<AppSimulatedMetric> getSimulatedMetrics(@Param("appName") String appName);
 
 	@Query("select m "
-		+ "from App c join c.simulatedAppMetrics m "
+		+ "from App c left join c.simulatedAppMetrics m "
 		+ "where c.name = :appName and lower(m.name) = lower(:simulatedMetricName)")
 	Optional<AppSimulatedMetric> getSimulatedMetric(@Param("appName") String appName,
 													@Param("simulatedMetricName") String simulatedMetricName);

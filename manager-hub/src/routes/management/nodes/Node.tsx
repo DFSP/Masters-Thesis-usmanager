@@ -262,7 +262,8 @@ class Node extends BaseComponent<Props, State> {
             && Object.values(this.props.cloudHosts)
                 .filter(instance => instance.state.name === 'running')
                 .map(instance => instance.publicIpAddress)
-                .includes(node.publicIpAddress)) {
+                .includes(node.publicIpAddress)
+            && !((node as INode).labels?.['masterManager'] === 'true')) {
             if (node.state === 'down') {
                 buttons.push({
                     button:

@@ -30,7 +30,6 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
-@EnableCaching
 public class ManagerMasterApplication {
 
 	public static void main(String[] args) {

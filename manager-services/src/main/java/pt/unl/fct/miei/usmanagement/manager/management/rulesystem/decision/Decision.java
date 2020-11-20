@@ -30,12 +30,12 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 @Data
 public final class Decision {
 
-	private final RuleDecisionEnum decision;
-	private final int priority;
+	private int priority;
+	private RuleDecisionEnum decision;
 
 	public Decision() {
-		this.decision = RuleDecisionEnum.NONE;
 		this.priority = 0;
+		this.decision = RuleDecisionEnum.NONE;
 	}
 
 }

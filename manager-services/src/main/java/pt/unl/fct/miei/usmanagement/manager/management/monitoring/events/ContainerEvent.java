@@ -26,10 +26,9 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
-@RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -38,4 +37,9 @@ public class ContainerEvent extends Event {
 	private final String containerId;
 	private final String serviceName;
 
+	public ContainerEvent(String containerId, String serviceName, HostAddress hostAddress) {
+		super(hostAddress);
+		this.containerId = containerId;
+		this.serviceName = serviceName;
+	}
 }

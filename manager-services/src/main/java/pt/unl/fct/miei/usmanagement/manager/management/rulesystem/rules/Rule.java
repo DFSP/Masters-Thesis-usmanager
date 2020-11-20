@@ -30,7 +30,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.EventType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public final class Rule {
@@ -51,9 +50,41 @@ public final class Rule {
 
 	@Override
 	public String toString() {
-		return conditions.stream().map(c ->
-			"fields[\"" + c.getFieldName() + "\"] " + c.getOperator() + " " + c.getValue())
-			.collect(Collectors.joining(" && "));
+		StringBuilder statementBuilder = new StringBuilder();
+
+		for (Condition condition : getConditions()) {
+			String operator = null;
+
+			switch (condition.getOperator()) {
+				case EQUAL_TO:
+					operator = "==";
+					break;
+				case NOT_EQUAL_TO:
+					operator = "!=";
+					break;
+				case GREATER_THAN:
+					operator = ">";
+					break;
+				case LESS_THAN:
+					operator = "<";
+					break;
+				case GREATER_THAN_OR_EQUAL_TO:
+					operator = ">=";
+					break;
+				case LESS_THAN_OR_EQUAL_TO:
+					operator = "<=";
+					break;
+			}
+			statementBuilder.append("fields[\"");
+			statementBuilder.append(condition.getFieldName()).append("\"] ").append(operator).append(" ");
+			statementBuilder.append(condition.getValue());
+			statementBuilder.append(" && ");
+		}
+
+		String statement = statementBuilder.toString();
+
+		// remove trailing &&
+		return statement.substring(0, statement.length() - 4);
 	}
 
 }

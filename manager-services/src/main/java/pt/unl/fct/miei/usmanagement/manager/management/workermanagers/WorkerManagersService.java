@@ -137,8 +137,7 @@ public class WorkerManagersService {
 
 	public WorkerManager getRegionWorkerManager(RegionEnum region) {
 		List<WorkerManager> workerManagers = getWorkerManagers(region);
-		log.info(region.name());
-		log.info(workerManagers.toString());
+		log.info("Looking for worker managers at region {}, found {}", region.name(), workerManagers.toString());
 		if (workerManagers.isEmpty()) {
 			workerManagers.addAll(launchWorkerManagers(List.of(region)));
 		}
@@ -293,6 +292,7 @@ public class WorkerManagersService {
 					}
 					RegionEnum region = hostAddress.getRegion();
 					WorkerManager workerManager = getRegionWorkerManager(region);
+					// TODO when new workerManager, wait for it to start until requesting the action
 					List<Container> workerContainers = launchContainer(launchContainerRequest, workerManager).get();
 					containers.addAll(workerContainers);
 				}

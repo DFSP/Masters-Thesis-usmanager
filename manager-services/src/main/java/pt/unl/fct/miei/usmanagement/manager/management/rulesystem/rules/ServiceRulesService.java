@@ -228,7 +228,7 @@ public class ServiceRulesService {
 		List<ServiceRule> genericServiceRules = getGenericServiceRules();
 		List<ServiceRule> serviceRules = getServiceRules(serviceName);
 		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size());
-		log.info("Generating service rules... (count: {})", rules.size());
+		log.info("Generating service rules... (count: {})", serviceRules.size());
 		genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
 		serviceRules.forEach(serviceRule -> rules.add(generateServiceRule(serviceRule)));
 		return rules;
@@ -237,8 +237,7 @@ public class ServiceRulesService {
 	private Rule generateServiceRule(ServiceRule serviceRule) {
 		Long id = serviceRule.getId();
 		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(serviceRule.getName()).stream().map(condition -> {
-			String fieldName = String.format("%s-%S", condition.getField().getName(),
-				condition.getValueMode().getName());
+			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
 			double value = condition.getValue();
 			OperatorEnum operator = condition.getOperator().getOperator();
 			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);

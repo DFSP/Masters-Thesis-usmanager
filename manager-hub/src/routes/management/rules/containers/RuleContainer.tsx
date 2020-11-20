@@ -274,7 +274,9 @@ class RuleContainer extends BaseComponent<Props, State> {
                     validation:
                         key === 'priority'
                             ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
-                            : {rule: requiredAndTrimmed}
+                            : key !== 'generic'
+                            ? {rule: requiredAndTrimmed}
+                            : undefined
                 }
             };
         }).reduce((fields, field) => {

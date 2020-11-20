@@ -26,10 +26,9 @@ import React from "react";
 import CardItem from "../../../components/list/CardItem";
 import Card from "../../../components/cards/Card";
 import {ILoadBalancer} from "./LoadBalancer";
-import {IContainer} from "../containers/Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
-import {deleteContainer, deleteLoadBalancer} from "../../../actions";
+import {deleteLoadBalancer} from "../../../actions";
 import {connect} from "react-redux";
 
 interface State {
@@ -70,11 +69,11 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
         if (this.mounted) {
             this.setState({loading: false});
         }
-        this.props.deleteLoadBalancer(loadBalancer) //TODO
+        this.props.deleteLoadBalancer(loadBalancer);
     }
 
     private onStopFailure = (reason: string, loadBalancer: ILoadBalancer): void => {
-        super.toast(`Não foi possível para a instância do balanceamento de carga<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o balanceador de carga <a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -124,7 +123,7 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
     public render() {
         const {loadBalancer} = this.props;
         const {loading} = this.state;
-        const CardLoadBalancer = Card<IContainer>();
+        const CardLoadBalancer = Card<ILoadBalancer>();
         return <CardLoadBalancer id={`load-balancer-${loadBalancer.id}`}
                                  title={loadBalancer.id.toString()}
                                  link={{
@@ -133,23 +132,26 @@ class LoadBalancerCard extends BaseComponent<Props, State> {
                                          state: loadBalancer
                                      }
                                  }}
-                                 height={'85px'}
+                                 height={'175px'}
                                  margin={'10px 0'}
                                  hoverable
                                  delete={{
                                      textButton: 'Parar',
-                                     url: `containers/${loadBalancer.id}`,
+                                     url: `load-balancers/${loadBalancer.id}`,
                                      successCallback: this.onStopSuccess,
                                      failureCallback: this.onStopFailure,
                                  }}
                                  loading={loading}
                                  bottomContextMenuItems={this.contextMenu()}>
+            <CardItem key={'container'}
+                      label={'Container'}
+                      value={loadBalancer.container.id.toString()}/>
             <CardItem key={'host'}
                       label={'Host'}
-                      value={loadBalancer.publicIpAddress}/>
-            <CardItem key={'ports'}
-                      label={'Ports'}
-                      value={`${loadBalancer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+                      value={loadBalancer.container.publicIpAddress}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={loadBalancer.region.region}/>
         </CardLoadBalancer>
     }
 

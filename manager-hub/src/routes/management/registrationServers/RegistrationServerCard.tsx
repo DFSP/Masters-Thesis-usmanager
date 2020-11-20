@@ -26,7 +26,6 @@ import React from "react";
 import CardItem from "../../../components/list/CardItem";
 import Card from "../../../components/cards/Card";
 import {IRegistrationServer} from "./RegistrationServer";
-import {IContainer} from "../containers/Container";
 import BaseComponent from "../../../components/BaseComponent";
 import LinkedContextMenuItem from "../../../components/contextmenu/LinkedContextMenuItem";
 import {deleteRegistrationServer} from "../../../actions";
@@ -124,7 +123,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
     public render() {
         const {registrationServer} = this.props;
         const {loading} = this.state;
-        const CardRegistrationServer = Card<IContainer>();
+        const CardRegistrationServer = Card<IRegistrationServer>();
         return <CardRegistrationServer id={`registrationServer-${registrationServer.id}`}
                                        title={registrationServer.id.toString()}
                                        link={{
@@ -133,23 +132,26 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
                                                state: registrationServer
                                            }
                                        }}
-                                       height={'85px'}
+                                       height={'175px'}
                                        margin={'10px 0'}
                                        hoverable
                                        delete={{
                                            textButton: 'Parar',
-                                           url: `containers/${registrationServer.id}`,
+                                           url: `registration-servers/${registrationServer.id}`,
                                            successCallback: this.onStopSuccess,
                                            failureCallback: this.onStopFailure,
                                        }}
                                        loading={loading}
                                        bottomContextMenuItems={this.contextMenu()}>
+            <CardItem key={'container'}
+                      label={'Container'}
+                      value={registrationServer.container.id.toString()}/>
             <CardItem key={'host'}
                       label={'Host'}
-                      value={registrationServer.publicIpAddress}/>
-            <CardItem key={'ports'}
-                      label={'Ports'}
-                      value={`${registrationServer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+                      value={registrationServer.container.publicIpAddress}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={registrationServer.region.region}/>
         </CardRegistrationServer>
     }
 

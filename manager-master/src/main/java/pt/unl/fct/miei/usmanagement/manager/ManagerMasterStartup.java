@@ -49,7 +49,6 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final HostsService hostsService;
-	private final CloudHostsService cloudHostsService;
 	private final SyncService syncService;
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
@@ -59,14 +58,12 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final Environment environment;
 
 	public ManagerMasterStartup(@Lazy HostsService hostsService,
-								@Lazy CloudHostsService cloudHostsService,
 								@Lazy SyncService syncService,
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
 								SymService symService, Environment environment) {
 		this.hostsService = hostsService;
-		this.cloudHostsService = cloudHostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;

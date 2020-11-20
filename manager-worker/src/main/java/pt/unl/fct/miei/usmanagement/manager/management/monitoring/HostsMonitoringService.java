@@ -40,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMe
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
@@ -49,6 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitorings;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
@@ -103,7 +105,8 @@ public class HostsMonitoringService {
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
 								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
-								  NodesService nodesService, HostProperties hostProperties, WorkerManagerProperties workerManagerProperties) {
+								  NodesService nodesService, HostProperties hostProperties, WorkerManagerProperties workerManagerProperties,
+								  MonitoringProperties monitoringProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
 		this.dockerSwarmService = dockerSwarmService;
@@ -116,9 +119,9 @@ public class HostsMonitoringService {
 		this.decisionsService = decisionsService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.nodesService = nodesService;
-		this.monitorPeriod = hostProperties.getMonitorPeriod();
-		this.resolveOverworkedHostOnEventsCount = hostProperties.getResolveOverworkedHostOnEventsCount();
-		this.resolveUnderworkedHostOnEventsCount = hostProperties.getResolveUnderworkedHostOnEventsCount();
+		this.monitorPeriod = monitoringProperties.getHosts().getPeriod();
+		this.resolveOverworkedHostOnEventsCount = monitoringProperties.getHosts().getOverworkEventCount();
+		this.resolveUnderworkedHostOnEventsCount = monitoringProperties.getHosts().getUnderworkEventCount();
 		this.maximumHosts = hostProperties.getMaximumHosts();
 		this.minimumHosts = hostProperties.getMinimumHosts();
 		this.isTestEnable = workerManagerProperties.getTests().isEnabled();
@@ -201,9 +204,9 @@ public class HostsMonitoringService {
 	}
 
 	private void monitorHostsTask() {
-		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getReadyNodes(); // TODO only swarm nodes
+		List<Node> nodes = dockerSwarmService.getReadyNodes();
 		List<CompletableFuture<HostDecisionResult>> futureHostDecisions = nodes.stream()
-			.map(node -> getHostDecisions(node))
+			.map(this::getHostDecisions)
 			.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureHostDecisions.toArray(new CompletableFuture[0])).join();
@@ -222,8 +225,11 @@ public class HostsMonitoringService {
 		}
 
 		// filter out unsuccessful hosts
-		nodes = nodes.stream().filter(simpleNode -> successfulHostAddresses.contains(simpleNode.getHostAddress()))
-			.collect(Collectors.toList());
+		nodes = nodes.stream().filter(node -> {
+			HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
+			return successfulHostAddresses.contains(hostAddress);
+		}).collect(Collectors.toList());
+
 
 		if (!hostDecisions.isEmpty()) {
 			processHostDecisions(hostDecisions, nodes);
@@ -234,8 +240,8 @@ public class HostsMonitoringService {
 	}
 
 	@Async
-	public CompletableFuture<HostDecisionResult> getHostDecisions(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
-		HostAddress hostAddress = node.getHostAddress();
+	public CompletableFuture<HostDecisionResult> getHostDecisions(Node node) {
+		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		// Metrics from prometheus (node_exporter)
 		Map<String, CompletableFuture<Optional<Double>>> futureStats = hostMetricsService.getHostStats(hostAddress);
@@ -269,10 +275,11 @@ public class HostsMonitoringService {
 		return CompletableFuture.completedFuture(runRules(node, validStats));
 	}
 
-	private HostDecisionResult runRules(pt.unl.fct.miei.usmanagement.manager.nodes.Node node, Map<String, Double> newFields) {
-		HostAddress hostAddress = node.getHostAddress();
+	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {
+		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
-		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent = new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node);
+		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent =
+			new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node, hostAddress);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 
 		getHostMonitoring(hostAddress)
@@ -291,10 +298,10 @@ public class HostsMonitoringService {
 				hostEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
 			});
 
-		return hostRulesService.processHostEvent(node, hostEvent);
+		return hostRulesService.processHostEvent(hostEvent);
 	}
 
-	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+	private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<Node> nodes) {
 		List<HostDecisionResult> decisions = new LinkedList<>();
 		hostDecisions.forEach(futureDecision -> {
 			HostDecisionResult decision;
@@ -328,6 +335,7 @@ public class HostsMonitoringService {
 		if (decision == RuleDecisionEnum.OVERWORK) {
 			if (maximumHosts <= 0 || nodesCount < maximumHosts) {
 				executeOverworkedHostDecision(hostAddress);
+				hostsEventsService.reset(hostAddress);
 			}
 		}
 		else if (decision == RuleDecisionEnum.UNDERWORK) {
@@ -338,6 +346,7 @@ public class HostsMonitoringService {
 					.findFirst()
 					.ifPresent(d -> resolveUnderworkedHost(d.getHostAddress()));*/
 				executeUnderworkedHostDecision(hostAddress);
+				hostsEventsService.reset(hostAddress);
 			}
 		}
 	}

@@ -279,6 +279,7 @@ public class HostsService {
 		else {
 			log.info("No nodes found, joining a new cloud node at {}", region);
 			hostAddress = chooseCloudHost(region, true).getAddress();
+			setupHost(hostAddress, NodeRole.WORKER);
 		}
 		return hostAddress;
 	}

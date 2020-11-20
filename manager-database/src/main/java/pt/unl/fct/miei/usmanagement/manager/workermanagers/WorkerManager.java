@@ -58,7 +58,7 @@ public class WorkerManager {
 	private String id;
 
 	@NotNull
-	@OneToOne(cascade = CascadeType.REMOVE)
+	@OneToOne
 	private Container container;
 
 	@NotNull

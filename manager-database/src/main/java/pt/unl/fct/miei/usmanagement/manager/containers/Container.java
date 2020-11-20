@@ -168,7 +168,7 @@ public class Container {
 
 	@JsonIgnore
 	public HostAddress getHostAddress() {
-		return new HostAddress(publicIpAddress, privateIpAddress, coordinates);
+		return new HostAddress(publicIpAddress, privateIpAddress, coordinates, region);
 	}
 
 	@Override

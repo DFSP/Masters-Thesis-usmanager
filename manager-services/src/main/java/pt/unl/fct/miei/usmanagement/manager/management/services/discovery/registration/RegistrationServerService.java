@@ -24,14 +24,13 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -40,12 +39,13 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServers;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -62,76 +62,74 @@ public class RegistrationServerService {
 	private final ElasticIpsService elasticIpsService;
 	private final CloudHostsService cloudHostsService;
 
+	private final RegistrationServers registrationServers;
+
 	private final int port;
 	private final int threads;
 
 	public RegistrationServerService(HostsService hostsService, ServicesService servicesService,
 									 @Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
 									 CloudHostsService cloudHostsService,
-									 RegistrationProperties registrationProperties, ParallelismProperties parallelismProperties) {
+									 RegistrationServers registrationServers, RegistrationProperties registrationProperties, ParallelismProperties parallelismProperties) {
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
 		this.cloudHostsService = cloudHostsService;
+		this.registrationServers = registrationServers;
 		this.port = registrationProperties.getPort();
 		this.threads = parallelismProperties.getThreads();
 	}
 
-	public Container launchRegistrationServer(RegionEnum region) {
+	public RegistrationServer launchRegistrationServer(RegionEnum region) {
 		return launchRegistrationServers(List.of(region)).get(0);
 	}
 
-	public Container launchRegistrationServer(HostAddress hostAddress) {
-		List<String> customEnvs = Collections.emptyList();
+	public RegistrationServer launchRegistrationServer(HostAddress hostAddress) {
+		String registrationServerAddresses = getRegistrationServerAddresses();
+		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
 
-		Map<String, String> customLabels = Collections.emptyMap();
+		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER,
+			Collections.emptyList(), Collections.emptyMap(), dynamicLaunchParams);
 
-		String registrationServers = getRegistrationServerAddresses();
-		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
-
-		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
-
-		RegionEnum region = hostAddress.getRegion();
+		RegionEnum region = container.getHostAddress().getRegion();
 		String instanceId = cloudHostsService.getCloudHostByAddress(hostAddress).getInstanceId();
 		String allocationId = elasticIpsService.getElasticIp(region).getAllocationId();
 		try {
-			elasticIpsService.associateElasticIpAddress(allocationId, instanceId).get();
+			elasticIpsService.associateElasticIpAddress(region, allocationId, instanceId).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
 			throw new ManagerException("Failed to associate elastic ip address to the registration server: %s", e.getMessage());
 		}
 
-		return container;
+		RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
+		return registrationServers.save(registrationServer);
 	}
 
-	public List<Container> launchRegistrationServers(List<RegionEnum> regions) {
+	public List<RegistrationServer> launchRegistrationServers(List<RegionEnum> regions) {
 		log.info("Launching registration servers at regions {}", regions);
 
 		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(REGISTRATION_SERVER);
-
 
 		List<String> customEnvs = Collections.emptyList();
 
 		Map<String, String> customLabels = Collections.emptyMap();
 
-		String registrationServers = getRegistrationServerAddresses();
-		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServers);
+		String registrationServerAddresses = getRegistrationServerAddresses();
+		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
 
-		Gson gson = new Gson();
 		try {
 			return new ForkJoinPool(threads).submit(() ->
 				regions.parallelStream().map(region -> {
-					List<Container> regionRegistrationServers = containersService.getContainersWithLabels(Set.of(
-						Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-						Pair.of(ContainerConstants.Label.REGION, gson.toJson(region))
-					));
+					List<RegistrationServer> regionRegistrationServers = getRegistrationServer(region);
 					if (regionRegistrationServers.size() > 0) {
 						return regionRegistrationServers.get(0);
 					}
 					else {
 						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
-						return containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
+						Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER, customEnvs, customLabels, dynamicLaunchParams);
+						RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
+						return registrationServers.save(registrationServer);
 					}
 				}).collect(Collectors.toList())).get();
 		}
@@ -140,17 +138,17 @@ public class RegistrationServerService {
 		}
 	}
 
-	private List<HostAddress> getRegistrationServers() {
-		return containersService.getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER))
-		).stream().map(Container::getHostAddress).collect(Collectors.toList());
+	public List<RegistrationServer> getRegistrationServers() {
+		return registrationServers.findAll();
 	}
 
-	private List<HostAddress> getRegistrationServerHosts(RegionEnum region) {
-		return containersService.getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-			Pair.of(ContainerConstants.Label.REGION, region.name()))
-		).stream().map(Container::getHostAddress).collect(Collectors.toList());
+	private List<RegistrationServer> getRegistrationServer(RegionEnum region) {
+		return registrationServers.getByRegion(region);
+	}
+
+	public RegistrationServer getRegistrationServer(String id) {
+		return registrationServers.findById(id).orElseThrow(() ->
+			new EntityNotFoundException(RegistrationServer.class, "id", id));
 	}
 
 	private String getRegistrationServerAddresses() {
@@ -160,12 +158,20 @@ public class RegistrationServerService {
 	}
 
 	public Optional<String> getRegistrationServerAddress(RegionEnum region) {
-		return containersService.getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, REGISTRATION_SERVER),
-			Pair.of(ContainerConstants.Label.REGION, region.name())))
+		return getRegistrationServer(region)
 			.stream()
-			.map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
+			.map(registrationServer -> registrationServer.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
 			.findFirst();
 	}
 
+	public void stopRegistrationServer(String id) {
+		RegistrationServer registrationServer = getRegistrationServer(id);
+		Container container = registrationServer.getContainer();
+		registrationServers.delete(registrationServer);
+		containersService.stopContainer(container.getId());
+	}
+
+	public void reset() {
+		registrationServers.deleteAll();
+	}
 }

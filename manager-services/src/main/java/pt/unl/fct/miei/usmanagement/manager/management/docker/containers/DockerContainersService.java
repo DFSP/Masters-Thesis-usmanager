@@ -298,11 +298,11 @@ public class DockerContainersService {
 				}
 
 				RegionEnum region = hostAddress.getRegion();
-				if (serviceDependenciesService.hasDependents(serviceName)) {
+				if (serviceDependenciesService.hasDependencies(serviceName)) {
 					String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
-						.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+						.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
 					launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 				}
 

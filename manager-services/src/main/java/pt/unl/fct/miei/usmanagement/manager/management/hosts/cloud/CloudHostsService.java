@@ -266,9 +266,10 @@ public class CloudHostsService {
 
 	public void terminateInstances() {
 		log.info("Terminating cloud instances");
-		awsService.getInstances().parallelStream()
-			.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
-			.forEach(instance -> terminateInstance(instance.getInstanceId(), false));
+		new ForkJoinPool(threads).execute(() ->
+			awsService.getInstances().parallelStream()
+				.filter(instance -> !Objects.equals(instance.getState().getCode(), AwsInstanceState.TERMINATED.getCode()))
+				.forEach(instance -> terminateInstance(instance.getInstanceId(), false)));
 	}
 
 	public List<HostRule> getRules(String hostname) {

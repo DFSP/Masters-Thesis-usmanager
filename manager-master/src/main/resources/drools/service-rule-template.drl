@@ -8,9 +8,9 @@ priority
 
 package pt.unl.fct.miei.usmanagement.manager.master.management.management.rulesystem;
 
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
 
-global RuleDecision containerDecision;
+global pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision containerDecision;
 
 template "container"
 

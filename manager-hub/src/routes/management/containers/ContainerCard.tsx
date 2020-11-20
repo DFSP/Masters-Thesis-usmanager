@@ -91,7 +91,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     private topContextMenu = (): JSX.Element[] => {
         const container = this.getContainer();
         const menus = [];
-        if (container?.type !== 'SINGLETON') {
+        if (container?.labels['serviceType'] !== 'SYSTEM') {
             menus.push(
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
                                                        menu={'Replicate'}
@@ -224,13 +224,13 @@ class ContainerCard extends BaseComponent<Props, State> {
                               height={'215px'}
                               margin={'10px 0'}
                               hoverable
-                              delete={{
+                              delete={container.labels['serviceType'] !== 'SYSTEM' ? {
                                   textButton: 'Parar',
                                   confirmMessage: `parar contentor ${container.id}`,
                                   url: `containers/${container.id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
-                              }}
+                              } : undefined}
                               loading={loading}
                               topContextMenuItems={this.topContextMenu()}
                               bottomContextMenuItems={this.bottomContextMenu()}>

@@ -167,8 +167,9 @@ public class AwsService {
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		DescribeInstancesResult result;
 		try {
+			AmazonEC2 client = getEC2Client(region);
 			do {
-				result = getEC2Client(region).describeInstances(request);
+				result = client.describeInstances(request);
 				result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
 					.filter(this::isUsManagerInstance).forEach(instances::add);
 				request.setNextToken(result.getNextToken());
@@ -371,8 +372,9 @@ public class AwsService {
 		return allocateResponse.getAllocationId();
 	}
 
-	public AssociateAddressResult associateElasticIpAddress(String allocationId, String instanceId) {
-		final AmazonEC2 ec2 = getEC2Client();
+	public AssociateAddressResult associateElasticIpAddress(RegionEnum region, String allocationId, String instanceId) {
+		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		AssociateAddressRequest associateRequest = new AssociateAddressRequest()
 			.withInstanceId(instanceId)
 			.withAllocationId(allocationId);

@@ -32,7 +32,7 @@ import java.util.List;
 @Data
 final class LaunchRegistrationServer {
 
-	private HostAddress hostAddress;
+	/*private HostAddress hostAddress;*/
 	private List<String> regions;
 
 }

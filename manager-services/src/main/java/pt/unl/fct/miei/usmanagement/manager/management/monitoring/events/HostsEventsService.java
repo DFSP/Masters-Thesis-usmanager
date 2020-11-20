@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -84,5 +85,13 @@ public class HostsEventsService {
 		List<HostEvent> events = getHostEventsByHostAddress(hostAddress);
 		log.info("Deleting events {} from host {}", events, hostAddress.toSimpleString());
 		hostEvents.deleteAll(events);
+	}
+
+	public void reset(HostAddress hostAddress) {
+		Optional<HostEvent> hostEvent = getHostEventsByHostAddress(hostAddress).stream().findFirst();
+		hostEvent.ifPresent(event -> {
+			event.setCount(0);
+			hostEvents.save(event);
+		});
 	}
 }

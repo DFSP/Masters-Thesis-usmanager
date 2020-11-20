@@ -35,10 +35,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("container")
 public class ContainerProperties {
 
-	private int monitorPeriod;
-	private int replicateContainerOnEventCount;
-	private int migrateContainerOnEventCount;
-	private int stopContainerOnEventCount;
 	private int delayBeforeStop;
 
 }

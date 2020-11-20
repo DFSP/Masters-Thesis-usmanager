@@ -24,21 +24,22 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/registration-server")
+@RequestMapping("/registration-servers")
 public class RegistrationServerController {
 
 	private final RegistrationServerService registrationServerService;
@@ -47,20 +48,35 @@ public class RegistrationServerController {
 		this.registrationServerService = registrationServerService;
 	}
 
+	@GetMapping
+	public List<RegistrationServer> getRegistrationServers() {
+		return registrationServerService.getRegistrationServers();
+	}
+
+	@GetMapping("/{id}")
+	public RegistrationServer getRegistrationServers(@PathVariable String id) {
+		return registrationServerService.getRegistrationServer(id);
+	}
+
 	@PostMapping
-	public List<Container> launchRegistration(@RequestBody LaunchRegistrationServer launchRegistrationServer) {
-		HostAddress hostAddress = launchRegistrationServer.getHostAddress();
-		List<String> regions = launchRegistrationServer.getRegions();
+	public List<RegistrationServer> launchRegistration(@RequestBody LaunchRegistrationServer launchRegistrationServer) {
+		/*HostAddress hostAddress = launchRegistrationServer.getHostAddress();
 		if (hostAddress != null) {
 			return List.of(registrationServerService.launchRegistrationServer(hostAddress));
 		}
-		else if (regions != null) {
-			List<RegionEnum> regionsList = Arrays.stream(regions.toArray(new String[0])).map(RegionEnum::getRegion).collect(Collectors.toList());
-			return registrationServerService.launchRegistrationServers(regionsList);
-		}
+		else if (regions != null) {*/
+		List<String> regions = launchRegistrationServer.getRegions();
+		List<RegionEnum> regionsList = Arrays.stream(regions.toArray(new String[0])).map(RegionEnum::getRegion).collect(Collectors.toList());
+		return registrationServerService.launchRegistrationServers(regionsList);
+		/*}
 		else {
 			throw new BadRequestException("Expected host address or regions to start registration server");
-		}
+		}*/
+	}
+
+	@DeleteMapping("/{id}")
+	public void stopRegistrationServer(@PathVariable String id) {
+		registrationServerService.stopRegistrationServer(id);
 	}
 
 }

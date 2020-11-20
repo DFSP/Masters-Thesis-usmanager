@@ -36,7 +36,7 @@ import java.util.Optional;
 public interface CloudHosts extends JpaRepository<CloudHost, Long> {
 
 	@Query("select h "
-		+ "from CloudHost h join fetch h.managedByWorker "
+		+ "from CloudHost h left join fetch h.managedByWorker "
 		+ "where h.id = :id")
 	Optional<CloudHost> getCloudHostWithWorker(@Param("id") Long id);
 
@@ -57,23 +57,23 @@ public interface CloudHosts extends JpaRepository<CloudHost, Long> {
 									  @Param("privateIpAddress") String privateIpAddress);
 
 	@Query("select r "
-		+ "from CloudHost h join h.hostRules r "
+		+ "from CloudHost h left join h.hostRules r "
 		+ "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname)")
 	List<HostRule> getRules(@Param("hostname") String hostname);
 
 	@Query("select r "
-		+ "from CloudHost h join h.hostRules r "
+		+ "from CloudHost h left join h.hostRules r "
 		+ "where r.generic = false and (h.publicIpAddress = :hostname or h.instanceId = :hostname) "
 		+ "and r.name = :ruleName")
 	Optional<HostRule> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
 
 	@Query("select m "
-		+ "from CloudHost h join h.simulatedHostMetrics m "
+		+ "from CloudHost h left join h.simulatedHostMetrics m "
 		+ "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
 	List<HostSimulatedMetric> getSimulatedMetrics(@Param("hostname") String hostname);
 
 	@Query("select m "
-		+ "from CloudHost h join h.simulatedHostMetrics m "
+		+ "from CloudHost h left join h.simulatedHostMetrics m "
 		+ "where (h.publicIpAddress = :hostname or h.instanceId = :hostname) and m.name = :simulatedMetricName")
 	Optional<HostSimulatedMetric> getSimulatedMetric(@Param("hostname") String hostname,
 													 @Param("simulatedMetricName") String simulatedMetricName);

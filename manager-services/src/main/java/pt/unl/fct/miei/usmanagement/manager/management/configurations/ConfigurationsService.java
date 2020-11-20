@@ -1,7 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.configurations;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configurations;
@@ -46,9 +45,6 @@ public class ConfigurationsService {
 		configurations.delete(configuration);
 	}
 
-	@Query("select case when count(c) > 0 then true else false end "
-		+ "from Configuration c "
-		+ "where c.id = :id")
 	public boolean isConfiguring(String id) {
 		return configurations.isConfiguring(id);
 	}

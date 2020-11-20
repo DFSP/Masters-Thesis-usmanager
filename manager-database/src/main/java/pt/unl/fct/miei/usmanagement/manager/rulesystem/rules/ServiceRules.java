@@ -35,16 +35,11 @@ import java.util.Optional;
 
 public interface ServiceRules extends JpaRepository<ServiceRule, Long> {
 
-	@Query("select r "
-		+ "from ServiceRule r "
-		+ "where r.name = :ruleName")
-	Optional<ServiceRule> findServiceRule(@Param("ruleName") String ruleName);
-
 	Optional<ServiceRule> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
-		+ "from ServiceRule r join r.services s "
-		+ "where r.generic = false and s.serviceName = :serviceName")
+		+ "from ServiceRule r left join r.services s "
+		+ "where r.generic = true or s.serviceName = :serviceName")
 	List<ServiceRule> findByServiceName(@Param("serviceName") String serviceName);
 
 	@Query("select r "
@@ -59,23 +54,23 @@ public interface ServiceRules extends JpaRepository<ServiceRule, Long> {
 
 	@Query("select rc.serviceCondition "
 		+ "from ServiceRule r join r.conditions rc "
-		+ "where r.name = :ruleName")
+		+ "where lower(r.name) = lower(:ruleName)")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
 	@Query("select rc.serviceCondition "
 		+ "from ServiceRule r join r.conditions rc "
-		+ "where r.name = :ruleName and rc.serviceCondition.name = :conditionName")
+		+ "where lower(r.name) = lower(:ruleName) and lower(rc.serviceCondition.name) = lower(:conditionName)")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 
 	@Query("select s "
 		+ "from ServiceRule r join r.services s "
-		+ "where r.name = :ruleName")
+		+ "where lower(r.name) = lower(:ruleName)")
 	List<Service> getServices(@Param("ruleName") String ruleName);
 
 	@Query("select s "
 		+ "from ServiceRule r join r.services s "
-		+ "where r.name = :ruleName and s.serviceName = :serviceName")
+		+ "where lower(r.name) = lower(:ruleName) and lower(s.serviceName) = lower(:serviceName)")
 	Optional<Service> getService(@Param("ruleName") String ruleName, @Param("serviceName") String serviceName);
 
 }

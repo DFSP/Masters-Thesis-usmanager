@@ -24,19 +24,22 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
+import com.spotify.docker.client.messages.swarm.Node;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 
-@RequiredArgsConstructor
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class HostEvent extends Event {
 
 	private final Node node;
+
+	public HostEvent(Node node, HostAddress hostAddress) {
+		super(hostAddress);
+		this.node = node;
+	}
 
 }

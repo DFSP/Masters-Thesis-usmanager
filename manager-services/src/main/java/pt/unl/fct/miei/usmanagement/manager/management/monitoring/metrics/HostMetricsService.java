@@ -25,17 +25,15 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,11 +50,11 @@ public class HostMetricsService {
 	private final double maximumRamPercentage;
 	private final double maximumCpuPercentage;
 
-	public HostMetricsService(PrometheusService prometheusService, FieldsService fieldsService, HostProperties hostProperties) {
+	public HostMetricsService(PrometheusService prometheusService, FieldsService fieldsService, MonitoringProperties monitoringProperties) {
 		this.prometheusService = prometheusService;
 		this.fieldsService = fieldsService;
-		this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
-		this.maximumCpuPercentage = hostProperties.getMaximumCpuPercentage();
+		this.maximumRamPercentage = monitoringProperties.getHosts().getMaximumRamPercentage();
+		this.maximumCpuPercentage = monitoringProperties.getHosts().getMaximumCpuPercentage();
 	}
 
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
@@ -76,7 +74,8 @@ public class HostMetricsService {
 				Optional<Double> metric = futureMetric.get();
 				metrics.add(metric);
 			}
-		} catch (InterruptedException | ExecutionException e) {
+		}
+		catch (InterruptedException | ExecutionException e) {
 			log.error("Unable to get metrics from prometheus for host {}: {}", hostAddress.toSimpleString(), e.getMessage());
 			return false;
 		}
@@ -94,7 +93,7 @@ public class HostMetricsService {
 			double cpuUsageValue = cpuUsage.get();
 			boolean hasEnoughCpu = cpuUsageValue < maximumCpuPercentage;
 			log.info("Node {} {} enough cpu, cpuUsage={} {} maximumCpuPercentage={}",
-				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=",maximumCpuPercentage);
+				hostAddress, hasEnoughCpu ? "has" : "doesn't have", cpuUsageValue, hasEnoughCpu ? "<" : ">=", maximumCpuPercentage);
 			return hasEnoughMemory && hasEnoughCpu;
 		}
 		log.info("Node {} doesn't have enough capacity: failed to fetch metrics", hostAddress);

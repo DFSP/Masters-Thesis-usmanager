@@ -54,7 +54,7 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
             <CardList<ILoadBalancer>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não existem contentores de balanceamento de carga a executar"}
+                emptyMessage={"Não existem balanceadores de carga a executar"}
                 list={this.props.loadBalancers}
                 card={this.loadBalancer}
                 predicate={this.predicate}/>
@@ -65,7 +65,8 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
         <LoadBalancerCard key={loadBalancer.id} loadBalancer={loadBalancer}/>;
 
     private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
-        loadBalancer.publicIpAddress.toLowerCase().includes(search);
+        loadBalancer.id.toString().includes(search)
+        || loadBalancer.container.publicIpAddress.toLowerCase().includes(search);
 
 }
 

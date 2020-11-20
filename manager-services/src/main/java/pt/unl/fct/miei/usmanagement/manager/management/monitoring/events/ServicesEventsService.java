@@ -29,12 +29,15 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvents;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import java.awt.event.ContainerEvent;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -94,4 +97,11 @@ public class ServicesEventsService {
 		serviceEvents.deleteAll();
 	}
 
+	public void reset(String containerId) {
+		Optional<ServiceEvent> containerEvent = getServiceEventsByContainerId(containerId).stream().findFirst();
+		containerEvent.ifPresent(event -> {
+			event.setCount(0);
+			serviceEvents.save(event);
+		});
+	}
 }

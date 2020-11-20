@@ -43,7 +43,7 @@ public interface AppRules extends JpaRepository<AppRule, Long> {
 	Optional<AppRule> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
-		+ "from AppRule r join r.apps s "
+		+ "from AppRule r left join r.apps s "
 		+ "where s.name = :name")
 	List<AppRule> findByAppName(@Param("name") String name);
 
@@ -53,23 +53,23 @@ public interface AppRules extends JpaRepository<AppRule, Long> {
 	boolean hasRule(@Param("ruleName") String ruleName);
 
 	@Query("select rc.appCondition "
-		+ "from AppRule r join r.conditions rc "
+		+ "from AppRule r left join r.conditions rc "
 		+ "where r.name = :ruleName")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
 	@Query("select rc.appCondition "
-		+ "from AppRule r join r.conditions rc "
+		+ "from AppRule r left join r.conditions rc "
 		+ "where r.name = :ruleName and rc.appCondition.name = :conditionName")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 
 	@Query("select s "
-		+ "from AppRule r join r.apps s "
+		+ "from AppRule r left join r.apps s "
 		+ "where r.name = :ruleName")
 	List<App> getApps(@Param("ruleName") String ruleName);
 
 	@Query("select s "
-		+ "from AppRule r join r.apps s "
+		+ "from AppRule r left join r.apps s "
 		+ "where r.name = :ruleName and s.name = :name")
 	Optional<App> getApp(@Param("ruleName") String ruleName, @Param("name") String name);
 

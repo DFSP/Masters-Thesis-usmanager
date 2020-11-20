@@ -42,8 +42,11 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
+import IDatabaseData from "../../../components/IDatabaseData";
 
-export interface IRegistrationServer extends IContainer {
+export interface IRegistrationServer extends IDatabaseData {
+    container: IContainer,
+    region: IRegion,
 }
 
 interface INewRegistrationServerRegion {
@@ -71,10 +74,11 @@ interface StateToProps {
     formRegistrationServer?: Partial<IRegistrationServer>;
     regions: { [key: string]: IRegion };
     nodes: { [key: string]: INode };
+    registrationServers: { [key: string]: IRegistrationServer };
 }
 
 interface DispatchToProps {
-    loadRegistrationServers: (id: string) => void;
+    loadRegistrationServers: (id?: string) => void;
     addRegistrationServers: (registrationServers: IRegistrationServer[]) => void;
     loadRegions: () => void;
     loadNodes: () => void;
@@ -105,7 +109,12 @@ class RegistrationServer extends BaseComponent<Props, State> {
     private mounted = false;
 
     public componentDidMount(): void {
-        this.loadRegistrationServer();
+        if (isNew(this.props.location.search)) {
+            this.props.loadRegistrationServers();
+        } else {
+            const workerManagerId = this.props.match.params.id;
+            this.props.loadRegistrationServers(workerManagerId);
+        }
         this.props.loadRegions();
         this.props.loadNodes();
         this.mounted = true;
@@ -124,13 +133,6 @@ class RegistrationServer extends BaseComponent<Props, State> {
             </MainLayout>
         );
     }
-
-    private loadRegistrationServer = () => {
-        if (!isNew(this.props.location.search)) {
-            const registrationServerId = this.props.match.params.id;
-            this.props.loadRegistrationServers(registrationServerId);
-        }
-    };
 
     private getRegistrationServer = () =>
         this.props.registrationServer || this.state.registrationServer;
@@ -152,7 +154,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
             }
         } else {
             registrationServers = registrationServers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.id} => Host ${registrationServer.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.container.id} => Host ${registrationServer.container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/servidores de registo');
             }
@@ -176,7 +178,6 @@ class RegistrationServer extends BaseComponent<Props, State> {
     private updateRegistrationServer = (registrationServer: IRegistrationServer) => {
         registrationServer = Object.values(normalize(registrationServer, Schemas.REGISTRATION_SERVER).entities.registrationServers || {})[0];
         const formRegistrationServer = {...registrationServer};
-        removeFields(formRegistrationServer);
         this.setState({registrationServer: registrationServer, formRegistrationServer: formRegistrationServer});
     };
 
@@ -215,6 +216,17 @@ class RegistrationServer extends BaseComponent<Props, State> {
     private regionOption = (region: IRegion) =>
         region.region;
 
+    private getSelectableRegions = (): string[] => {
+        const deployedRegions = Object.values(this.props.registrationServers).map(registrationServer => registrationServer.region.region);
+        return Object.keys(this.props.regions).filter(region => !deployedRegions.includes(region));
+    }
+
+    private containerIdField = (container: IContainer) =>
+        container.id.toString();
+
+    private containerPublicIpAddressField = (container: IContainer) =>
+        container.publicIpAddress;
+
     private formFields = (isNew: boolean, formRegistrationServer?: Partial<IRegistrationServer>) => {
         const {currentForm} = this.state;
         return (
@@ -225,7 +237,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
                            id={'regions'}
                            label={'regions'}
                            type={'list'}
-                           value={Object.keys(this.props.regions)}/>
+                           value={this.getSelectableRegions()}/>
                     :
                     <>
                         <Field<Partial<IHostAddress>> key={'hostAddress'}
@@ -240,31 +252,34 @@ class RegistrationServer extends BaseComponent<Props, State> {
                                                       }}/>
                     </>
                 : formRegistrationServer && Object.entries(formRegistrationServer).map((([key, value], index) =>
-                key === 'id'
-                    ? <Field key={index}
-                             id={key}
-                             label={key}
-                             icon={{linkedTo: '/contentores/' + (formRegistrationServer as Partial<IRegistrationServer>).id}}/>
-                    : key === 'created'
-                    ? <Field key={index}
-                             id={key}
-                             label={key}
-                             type={"date"}/>
+                key === 'container'
+                    ? <>
+                        <Field<IContainer> key={index}
+                                           id={key}
+                                           label={key + " id"}
+                                           valueToString={this.containerIdField}
+                                           icon={{linkedTo: '/contentores/' + (formRegistrationServer as Partial<IRegistrationServer>).container?.id}}/>
+                        <Field<IContainer>
+                            key={5000}
+                            id={key}
+                            label={"host"}
+                            valueToString={this.containerPublicIpAddressField}/>
+                    </>
                     : key === 'region'
-                        ? <Field<IRegion> key={index}
-                                          id={key}
-                                          type="dropdown"
-                                          label={key}
-                                          valueToString={this.regionOption}
-                                          dropdown={{
-                                              defaultValue: "Selecionar a região",
-                                              emptyMessage: "Não há regiões disponíveis",
-                                              values: [(formRegistrationServer as IRegistrationServer).region],
-                                              optionToString: this.regionOption
-                                          }}/>
-                        : <Field key={index}
-                                 id={key}
-                                 label={key}/>))
+                    ? <Field<IRegion> key={index}
+                                      id={key}
+                                      type="dropdown"
+                                      label={key}
+                                      valueToString={this.regionOption}
+                                      dropdown={{
+                                          defaultValue: "Selecionar a região",
+                                          emptyMessage: "Não há regiões disponíveis",
+                                          values: [(formRegistrationServer as IRegistrationServer).region],
+                                          optionToString: this.regionOption
+                                      }}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>))
         );
     };
 
@@ -299,21 +314,23 @@ class RegistrationServer extends BaseComponent<Props, State> {
                           showSaveButton={false}
                           post={{
                               textButton: 'Executar',
-                              url: 'registration-server',
+                              url: 'registration-servers',
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure,
                               result: this.onPost,
                           }}
                           delete={{
                               textButton: 'Parar',
-                              url: `containers/${(registrationServer as IRegistrationServer).id}`,
+                              url: `registration-servers/${(registrationServer as IRegistrationServer).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
-                          switchDropdown={isNewRegistrationServer ? {
+                          // registration servers must be launched on cloud hosts and on a specific aws region
+                          // to be able to assign it an elastic ip
+                          /*switchDropdown={isNewRegistrationServer ? {
                               options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
                               onSwitch: this.switchForm
-                          } : undefined}>
+                          } : undefined}*/>
                         {this.formFields(isNewRegistrationServer, formRegistrationServer)}
                     </Form>
                 )}
@@ -332,13 +349,6 @@ class RegistrationServer extends BaseComponent<Props, State> {
 
 }
 
-function removeFields(registrationServer: Partial<IRegistrationServer>) {
-    delete registrationServer["ports"];
-    delete registrationServer["labels"];
-    delete registrationServer["logs"];
-    delete registrationServer["coordinates"];
-}
-
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.registrationServers.isLoadingRegistrationServers;
     const error = state.entities.registrationServers.loadRegistrationServersError;
@@ -350,10 +360,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     let formRegistrationServer;
     if (registrationServer) {
         formRegistrationServer = {...registrationServer};
-        removeFields(formRegistrationServer);
     }
     const regions = state.entities.regions.data;
     const nodes = state.entities.nodes.data;
+    const registrationServers = state.entities.registrationServers.data;
     return {
         isLoading,
         error,
@@ -362,7 +372,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         registrationServer,
         formRegistrationServer,
         regions,
-        nodes
+        nodes,
+        registrationServers
     }
 }
 

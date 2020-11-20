@@ -382,6 +382,23 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name())));
 	}
 
+	public List<Container> getServiceContainers() {
+		return getContainersWithLabels(Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name()))
+		).stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
+	}
+
+
+	public List<Container> getServiceContainers(HostAddress hostAddress) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name()))
+		).stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
+	}
+
 	public List<Container> getSystemContainers() {
 		return getContainersWithLabels(Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()))

@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -39,14 +39,13 @@ import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.Event;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -90,8 +89,8 @@ public class DroolsService {
 
 
 	public boolean shouldCreateNewHostRuleSession(HostAddress hostAddress, long lastUpdate) {
-		final long currVal = lastUpdateHostRules.getOrDefault(hostAddress, -1L);
-		if (currVal < lastUpdate) {
+		long currentTimestamp = lastUpdateHostRules.getOrDefault(hostAddress, -1L);
+		if (currentTimestamp < lastUpdate) {
 			lastUpdateHostRules.put(hostAddress, lastUpdate);
 			return true;
 		}
@@ -121,7 +120,6 @@ public class DroolsService {
 		KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
 		for (Map.Entry<Long, String> drl : drools.entrySet()) {
 			Resource resource = kieServices.getResources().newByteArrayResource(drl.getValue().getBytes());
-			//TODO
 			resource.setTargetPath("rules/rule_host_" + drl.getKey() + ".drl");
 			kieFileSystem.write(resource);
 		}
@@ -148,16 +146,18 @@ public class DroolsService {
 			"ruleId", rule.getId(),
 			"rule", rule,
 			"eventType", event.getClass().getName(),
-			"decision", RuleDecisionEnum.class.getSimpleName() + "." + rule.getDecision().toString(),
+			"decision", RuleDecisionEnum.class.getCanonicalName() + "." + rule.getDecision().toString(),
 			"priority", rule.getPriority());
+		log.info("Generated rule " + data.toString());
 		ByteArrayInputStream ruleTemplate = new ByteArrayInputStream(getRuleTemplate(templateFile).getBytes(StandardCharsets.UTF_8));
 		return new ObjectDataCompiler().compile(List.of(data), ruleTemplate);
 	}
 
 	@Cacheable(cacheNames = "ruleTemplateCache", key = "#templateFile")
 	public String getRuleTemplate(String templateFile) {
-		log.info("Getting rule template...");
+		log.info("Generating rule template...");
 		InputStream ruleTemplate = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFile);
+		assert ruleTemplate != null;
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
 		try {
@@ -185,7 +185,7 @@ public class DroolsService {
 
 	public HostDecisionResult evaluate(HostEvent event) {
 		Decision hostDecision = new Decision();
-		HostAddress hostAddress = event.getNode().getHostAddress();
+		HostAddress hostAddress = event.getHostAddress();
 		StatelessKieSession hostRuleSession = hostRuleSessions.get(hostAddress);
 		hostRuleSession.getGlobals().set("hostDecision", hostDecision);
 		hostRuleSession.execute(event);

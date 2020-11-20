@@ -71,6 +71,10 @@ public class HostAddress implements Serializable {
 		this(username, publicIpAddress, privateIpAddress, coordinates, null, null);
 	}
 
+	public HostAddress(String publicIpAddress, String privateIpAddress, Coordinates coordinates, RegionEnum region) {
+		this(null, publicIpAddress, privateIpAddress, coordinates, region, null);
+	}
+
 	public HostAddress(String username, String publicIpAddress, String privateIpAddress, Coordinates coordinates,
 					   RegionEnum region) {
 		this(username, publicIpAddress, privateIpAddress, coordinates, region, null);

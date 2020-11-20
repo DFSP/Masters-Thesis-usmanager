@@ -219,8 +219,7 @@ public class ContainerRulesService {
   private Rule generateRule(ContainerRuleEntity containerRule) {
     Long id = containerRule.getId();
     List<Condition> conditions = getConditions(containerRule.getName()).stream().map(condition -> {
-      String fieldName = String.format("%s-%S", condition.getField().getName(),
-          condition.getValueMode().getName());
+      String fieldName = String.format("%s-%s", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
       double value = condition.getValue();
       Operator operator = Operator.fromValue(condition.getOperator().getName());
       return new Condition(fieldName, value, operator);
