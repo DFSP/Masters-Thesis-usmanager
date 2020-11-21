@@ -546,8 +546,7 @@ public class DockerContainersService {
 	}
 
 	private List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
-		log.info(nodesService.getNodes().stream().map(Node::getPublicIpAddress).collect(Collectors.joining(" ")));
-		return nodesService.getNodes().stream()
+		return nodesService.getReadyNodes().stream()
 			.map(node -> getContainers(node.getHostAddress(), filter))
 			.flatMap(List::stream)
 			.collect(Collectors.toList());

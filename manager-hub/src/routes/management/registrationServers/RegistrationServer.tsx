@@ -147,7 +147,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O servidor de registo foi iniciado com o id ${this.mounted ? `<b class="white-text">${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.id.toString())

@@ -38,21 +38,23 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticIpsService {
 
-	private final ElasticIps elasticIps;
 	private final RegionsService regionsService;
 	private final AwsService awsService;
 	private final CloudHostsService cloudHostsService;
 	private final NodesService nodesService;
 	private final ContainersService containersService;
 
-	public ElasticIpsService(ElasticIps elasticIps, RegionsService regionsService, AwsService awsService,
-							 CloudHostsService cloudHostsService, NodesService nodesService, @Lazy ContainersService containersService) {
-		this.elasticIps = elasticIps;
+	private final ElasticIps elasticIps;
+
+	public ElasticIpsService(RegionsService regionsService, @Lazy AwsService awsService,
+							 @Lazy CloudHostsService cloudHostsService, NodesService nodesService,
+							 @Lazy ContainersService containersService, ElasticIps elasticIps) {
 		this.regionsService = regionsService;
 		this.awsService = awsService;
 		this.cloudHostsService = cloudHostsService;
 		this.nodesService = nodesService;
 		this.containersService = containersService;
+		this.elasticIps = elasticIps;
 	}
 
 	public List<ElasticIp> getElasticIps() {
@@ -142,16 +144,17 @@ public class ElasticIpsService {
 		ElasticIp elasticIp = getElasticIp(allocationId);
 		String instanceId = cloudHost.getInstanceId();
 		AssociateAddressResult associateResult = awsService.associateElasticIpAddress(region, allocationId, instanceId);
-		elasticIp.setAssociationId(associateResult.getAssociationId());
+		String associationId = associateResult.getAssociationId();
+		elasticIp.setAssociationId(associationId);
+		elasticIp.setInstanceId(instanceId);
 		elasticIps.save(elasticIp);
 		log.info("Associated public ip address {} from elastic ip {} to cloud instance {} with association id {}",
-			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associateResult.getAssociationId());
+			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associationId);
 		HostAddress previousHostAddress = cloudHost.getAddress();
 		AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
 		Instance instance = awsService.getInstance(instanceId, awsRegion);
 		cloudHost = cloudHostsService.saveCloudHostFromInstance(cloudHost.getId(), instance);
 		nodesService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
-		log.info(nodesService.getNodes().stream().map(Node::getPublicIpAddress).collect(Collectors.joining()));
 		containersService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
 		return cloudHost;
 	}
@@ -209,4 +212,11 @@ public class ElasticIpsService {
 		log.info("Clearing all elastic ips");
 	}
 
+	public ElasticIp desassociate(CloudHost cloudHost) {
+		RegionEnum region = cloudHost.getAwsRegion().getRegion();
+		ElasticIp elasticIp = getElasticIp(region);
+		elasticIp.setAssociationId(null);
+		elasticIp.setInstanceId(null);
+		return elasticIps.save(elasticIp);
+	}
 }

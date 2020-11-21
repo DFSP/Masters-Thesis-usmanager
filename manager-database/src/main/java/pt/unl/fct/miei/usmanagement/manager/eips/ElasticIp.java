@@ -41,6 +41,8 @@ public class ElasticIp {
 
 	private String associationId;
 
+	private String instanceId;
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

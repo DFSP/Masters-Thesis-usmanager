@@ -1,24 +1,16 @@
 package pt.unl.fct.miei.usmanagement.manager.sync;
 
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceState;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 
@@ -44,7 +36,7 @@ public class SyncService {
 	private final ConfigurationsService configurationsService;
 
 	private Timer containersDatabaseSyncTimer;
-	private Timer nodesDatabseSyncTimer;
+	private Timer nodesDatabaseSyncTimer;
 
 	public SyncService(ContainersService containersService, DockerContainersService dockerContainersService,
 					   NodesService nodesService, DockerSwarmService dockerSwarmService,
@@ -64,7 +56,8 @@ public class SyncService {
 				try {
 					synchronizeContainersDatabase();
 				}
-				catch (ManagerException ignored) { }
+				catch (ManagerException ignored) {
+				}
 			}
 		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
 	}
@@ -97,7 +90,7 @@ public class SyncService {
 		}
 
 		// Remove invalid containers
-		List<String> dockerContainerIds = dockerContainers.stream().map(DockerContainer::getId).collect(Collectors.toList());
+		Map<String, DockerContainer> dockerContainerIds = dockerContainers.stream().distinct().collect(Collectors.toMap(DockerContainer::getId, container -> container));
 		Iterator<Container> containerIterator = containers.iterator();
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
@@ -105,10 +98,27 @@ public class SyncService {
 			if (configurationsService.isConfiguring(containerId)) {
 				continue;
 			}
-			if (!dockerContainerIds.contains(containerId)) {
+			if (!dockerContainerIds.containsKey(containerId)) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
+			}
+			else {
+				boolean updated = false;
+				DockerContainer dockerContainer = dockerContainerIds.get(containerId);
+				if (dockerContainer == null) {
+					continue;
+				}
+				String currentPublicIpAddress = dockerContainer.getHostAddress().getPublicIpAddress();
+				String savedPublicIpAddress = container.getHostAddress().getPublicIpAddress();
+				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+					container.setPublicIpAddress(currentPublicIpAddress);
+					log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
+					updated = true;
+				}
+				if (updated) {
+					containersService.updateContainer(container);
+				}
 			}
 		}
 
@@ -117,21 +127,22 @@ public class SyncService {
 	}
 
 	public void startNodesDatabaseSynchronization() {
-		nodesDatabseSyncTimer = new Timer("nodes-database-synchronization", true);
-		nodesDatabseSyncTimer.schedule(new TimerTask() {
+		nodesDatabaseSyncTimer = new Timer("nodes-database-synchronization", true);
+		nodesDatabaseSyncTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					synchronizeNodesDatabase();
 				}
-				catch (ManagerException ignored) { }
+				catch (ManagerException ignored) {
+				}
 			}
 		}, NODES_DATABASE_SYNC_INTERVAL, NODES_DATABASE_SYNC_INTERVAL);
 	}
 
 	public void stopNodesDatabaseSynchronization() {
-		if (nodesDatabseSyncTimer != null) {
-			nodesDatabseSyncTimer.cancel();
+		if (nodesDatabaseSyncTimer != null) {
+			nodesDatabaseSyncTimer.cancel();
 			log.info("Stopped nodes database synchronization");
 		}
 	}
@@ -173,6 +184,9 @@ public class SyncService {
 			else {
 				boolean updated = false;
 				Node swarmNode = swarmNodesIds.get(nodeId);
+				if (swarmNode == null) {
+					continue;
+				}
 				NodeAvailability savedAvailability = node.getAvailability();
 				NodeAvailability currentAvailability = NodeAvailability.getNodeAvailability(swarmNode.spec().availability());
 				if (currentAvailability != savedAvailability) {
@@ -194,6 +208,13 @@ public class SyncService {
 				if (!currentState.equalsIgnoreCase(savedState)) {
 					node.setState(currentState);
 					log.info("Synchronized node {} state from {} to {}", nodeId, savedState, currentState);
+					updated = true;
+				}
+				String currentPublicIpAddress = swarmNode.status().addr();
+				String savedPublicIpAddress = node.getPublicIpAddress();
+				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+					node.setPublicIpAddress(currentPublicIpAddress);
+					log.info("Synchronized node {} public ip address from {} to {}", nodeId, savedPublicIpAddress, currentPublicIpAddress);
 					updated = true;
 				}
 				if (updated) {

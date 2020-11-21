@@ -30,7 +30,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -46,9 +45,11 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerC
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
@@ -80,6 +81,8 @@ public class ContainersService {
 	private final ServicesService servicesService;
 	private final HostsService hostsService;
 	private final ConfigurationsService configurationsService;
+	private final RegistrationServerService registrationServerService;
+	private final NginxLoadBalancerService nginxLoadBalancerService;
 	private final Environment environment;
 
 	private final Containers containers;
@@ -90,7 +93,9 @@ public class ContainersService {
 							 ContainerRulesService containerRulesService,
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
-							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService, Environment environment, Containers containers,
+							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
+							 RegistrationServerService registrationServerService, NginxLoadBalancerService nginxLoadBalancerService,
+							 Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -100,6 +105,8 @@ public class ContainersService {
 		this.servicesService = servicesService;
 		this.hostsService = hostsService;
 		this.configurationsService = configurationsService;
+		this.registrationServerService = registrationServerService;
+		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
@@ -333,17 +340,13 @@ public class ContainersService {
 
 	public void stopContainer(String id) {
 		Container container = getContainer(id);
+		deleteContainer(id);
 		try {
 			dockerContainersService.stopContainer(container);
-			deleteContainer(container);
 		}
 		catch (ManagerException e) {
 			log.error("Failed to stop container {}: {}", id, e.getMessage());
 		}
-	}
-
-	public void deleteContainer(Container container) {
-		containers.delete(container);
 	}
 
 	public void deleteContainer(String id) {
@@ -353,7 +356,23 @@ public class ContainersService {
 				workerManagersService.deleteWorkerManagerByContainer(container);
 			}
 			catch (EntityNotFoundException e) {
-				log.error("Failed to delete worker-manager associated with container {}", id);
+				log.error("Failed to delete worker manager associated with container {}: {}", id, e.getMessage());
+			}
+		}
+		else if (container.getNames().stream().anyMatch(name -> name.contains(RegistrationServerService.REGISTRATION_SERVER))) {
+			try {
+				registrationServerService.deleteRegistrationServerByContainer(container);
+			}
+			catch (EntityNotFoundException e) {
+				log.error("Failed to delete registration server associated with container {}: {}", id, e.getMessage());
+			}
+		}
+		else if (container.getNames().stream().anyMatch(name -> name.contains(NginxLoadBalancerService.LOAD_BALANCER))) {
+			try {
+				nginxLoadBalancerService.deleteLoadBalancerByContainer(container);
+			}
+			catch (EntityNotFoundException e) {
+				log.error("Failed to delete load balancer associated with container {}: {}", id, e.getMessage());
 			}
 		}
 		containers.delete(container);

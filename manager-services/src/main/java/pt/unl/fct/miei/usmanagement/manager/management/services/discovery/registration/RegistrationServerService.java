@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -33,7 +32,6 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -51,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -95,7 +92,20 @@ public class RegistrationServerService {
 		return CompletableFuture.completedFuture(registrationServers.save(registrationServer));
 	}
 
-	@SneakyThrows
+	private HostAddress getHost(RegionEnum region) {
+		ElasticIp elasticIp = elasticIpsService.getElasticIp(region);
+		String instanceId = elasticIp.getInstanceId();
+		if (instanceId != null) {
+			return cloudHostsService.getCloudHostById(instanceId).getAddress();
+		}
+		else {
+			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
+			String allocationId = elasticIp.getAllocationId();
+			return elasticIpsService.associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
+		}
+	}
+
 	public List<RegistrationServer> launchRegistrationServers(List<RegionEnum> regions) {
 		log.info("Launching registration servers at regions {}", regions);
 
@@ -105,12 +115,7 @@ public class RegistrationServerService {
 				return CompletableFuture.completedFuture(regionRegistrationServers.get(0));
 			}
 			else {
-				AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
-				CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
-				ElasticIp elasticIp = elasticIpsService.getElasticIp(region);
-				String allocationId = elasticIp.getAllocationId();
-				cloudHost = elasticIpsService.associateElasticIpAddress(region, allocationId, cloudHost);
-				HostAddress hostAddress = cloudHost.getAddress();
+				HostAddress hostAddress = getHost(region);
 				return launchRegistrationServer(hostAddress);
 			}
 		}).collect(Collectors.toList());
@@ -119,7 +124,7 @@ public class RegistrationServerService {
 
 		List<RegistrationServer> registrationServers = new ArrayList<>();
 		for (CompletableFuture<RegistrationServer> futureRegistrationServer : futureRegistrationServers) {
-			RegistrationServer registrationServer = futureRegistrationServer.get();
+			RegistrationServer registrationServer = futureRegistrationServer.join();
 			registrationServers.add(registrationServer);
 		}
 
@@ -137,6 +142,11 @@ public class RegistrationServerService {
 	public RegistrationServer getRegistrationServer(String id) {
 		return registrationServers.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(RegistrationServer.class, "id", id));
+	}
+
+	public RegistrationServer getRegistrationServer(Container container) {
+		return registrationServers.getByContainer(container).orElseThrow(() ->
+			new EntityNotFoundException(RegistrationServer.class, "containerEntity", container.getId()));
 	}
 
 	private String getRegistrationServerAddresses() {
@@ -161,5 +171,10 @@ public class RegistrationServerService {
 
 	public void reset() {
 		registrationServers.deleteAll();
+	}
+
+	public void deleteRegistrationServerByContainer(Container container) {
+		RegistrationServer registrationServer = getRegistrationServer(container);
+		registrationServers.delete(registrationServer);
 	}
 }

@@ -191,8 +191,8 @@ public class SyncService {
 		}
 
 		// Remove invalid containers and update existing ones
-		Iterator<Container> containerIterator = containers.iterator();
 		Map<String, DockerContainer> dockerContainerIds = dockerContainers.stream().distinct().collect(Collectors.toMap(DockerContainer::getId, container -> container));
+		Iterator<Container> containerIterator = containers.iterator();
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
 			String containerId = container.getId();
@@ -266,7 +266,7 @@ public class SyncService {
 				log.debug("Node {} is currently being configured, skipping", nodeId);
 				continue;
 			}
-			if (!nodeIds.contains(nodeId)) {
+			if (!nodeIds.contains(nodeId) && !swarmNode.status().state().equalsIgnoreCase("down")) {
 				nodesService.addNode(swarmNode);
 				log.info("Added missing node {} to the database", nodeId);
 			}

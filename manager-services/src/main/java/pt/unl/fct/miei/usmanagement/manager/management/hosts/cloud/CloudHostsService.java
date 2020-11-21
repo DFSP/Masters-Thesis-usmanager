@@ -26,13 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud;
 
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.Placement;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -44,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.configurations.Configurat
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
@@ -72,6 +70,7 @@ public class CloudHostsService {
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 	private final ContainersService containersService;
+	private final ElasticIpsService elasticIpsService;
 
 	private final CloudHosts cloudHosts;
 
@@ -85,7 +84,7 @@ public class CloudHostsService {
 							 @Lazy DockerSwarmService dockerSwarmService,
 							 ConfigurationsService configurationsService,
 							 @Lazy ContainersService containersService,
-							 CloudHosts cloudHosts,
+							 ElasticIpsService elasticIpsService, CloudHosts cloudHosts,
 							 ParallelismProperties parallelismProperties) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
@@ -95,6 +94,7 @@ public class CloudHostsService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.containersService = containersService;
+		this.elasticIpsService = elasticIpsService;
 		this.cloudHosts = cloudHosts;
 		this.threads = parallelismProperties.getThreads();
 	}
@@ -262,6 +262,7 @@ public class CloudHostsService {
 			dockerSwarmService.leaveSwarm(address);
 		}
 		cloudHosts.delete(cloudHost);
+		elasticIpsService.desassociate(cloudHost);
 	}
 
 	public void terminateInstances() {

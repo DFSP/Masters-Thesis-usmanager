@@ -34,7 +34,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
@@ -197,6 +196,11 @@ public class NginxLoadBalancerService {
 			new EntityNotFoundException(LoadBalancer.class, "id", id));
 	}
 
+	public LoadBalancer getLoadBalancer(Container container) {
+		return loadBalancers.getByContainer(container).orElseThrow(() ->
+			new EntityNotFoundException(LoadBalancer.class, "containerEntity", container.getId()));
+	}
+
 	public List<NginxServiceServers> getServers() {
 		List<CompletableFuture<List<NginxServiceServers>>> futureLoadBalancerServers = new LinkedList<>();
 		List<LoadBalancer> loadBalancers = getLoadBalancers();
@@ -338,5 +342,10 @@ public class NginxLoadBalancerService {
 
 	public void reset() {
 		loadBalancers.deleteAll();
+	}
+
+	public void deleteLoadBalancerByContainer(Container container) {
+		LoadBalancer loadBalancer = getLoadBalancer(container);
+		loadBalancers.delete(loadBalancer);
 	}
 }
