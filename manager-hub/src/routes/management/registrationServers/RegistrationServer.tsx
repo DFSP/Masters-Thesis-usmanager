@@ -147,7 +147,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">O servidor de registo foi iniciado com o id ${this.mounted ? `<b class="white-text">${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.id.toString())
@@ -325,12 +325,12 @@ class RegistrationServer extends BaseComponent<Props, State> {
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
-                          // registration servers must be launched on cloud hosts and on a specific aws region
-                          // to be able to assign it an elastic ip
-                          /*switchDropdown={isNewRegistrationServer ? {
-                              options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
-                              onSwitch: this.switchForm
-                          } : undefined}*/>
+                        // registration servers must be launched on cloud hosts and on a specific aws region
+                        // to be able to assign it an elastic ip
+                        /*switchDropdown={isNewRegistrationServer ? {
+                            options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
+                            onSwitch: this.switchForm
+                        } : undefined}*/>
                         {this.formFields(isNewRegistrationServer, formRegistrationServer)}
                     </Form>
                 )}

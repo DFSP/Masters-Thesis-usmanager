@@ -579,9 +579,14 @@ public class DockerContainersService {
 		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
-		Set<String> names = container.names().stream()
-			.map(name -> name.startsWith("/") ? name.substring(1) : name)
-			.collect(Collectors.toSet());
+		Optional<String> optionalName = container.names().stream().findFirst();
+		String name = "";
+		if (optionalName.isPresent()) {
+			name = optionalName.get();
+			if (name.startsWith("/")) {
+				name = name.substring(1);
+			}
+		}
 		String image = container.image();
 		String command = container.command();
 		AttachedNetwork attachedNetwork = container.networkSettings().networks().get(DockerSwarmService.NETWORK_OVERLAY);
@@ -602,7 +607,7 @@ public class DockerContainersService {
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toSet());
 		Map<String, String> labels = container.labels();
-		return new DockerContainer(id, type, created, names, image, command, network, state, status, publicIpAddress, privateIpAddress,
+		return new DockerContainer(id, type, created, name, image, command, network, state, status, publicIpAddress, privateIpAddress,
 			mounts, coordinates, region, ports, labels);
 	}
 

@@ -170,7 +170,7 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
         const {containers, simulatedMetricContainers, unsavedContainersIds} = this.props;
         return Object.entries(containers).filter(([containerId, _]) => !simulatedMetricContainers.includes(containerId)
             && !unsavedContainersIds.includes(containerId))
-            .map(([_, container]) => container.names[0].replace('/', '') + " - " + container.id);
+            .map(([_, container]) => container.name.replace('/', '') + " - " + container.id);
     };
 
     private invalidate = (data: string): string | undefined =>

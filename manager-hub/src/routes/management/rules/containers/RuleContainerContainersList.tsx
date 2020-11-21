@@ -166,7 +166,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
         const {containers, ruleContainers, unsavedContainersIds} = this.props;
         return Object.entries(containers).filter(([containerId, _]) => !ruleContainers.includes(containerId)
             && !unsavedContainersIds.includes(containerId))
-            .map(([_, container]) => container.names[0].replace('/', '') + " - " + container.id);
+            .map(([_, container]) => container.name.replace('/', '') + " - " + container.id);
     };
 
     private invalidate = (data: string): string | undefined =>

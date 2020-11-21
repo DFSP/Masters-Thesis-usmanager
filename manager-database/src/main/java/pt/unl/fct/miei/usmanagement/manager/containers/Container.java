@@ -81,9 +81,8 @@ public class Container {
 	@NotNull
 	private long created;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private Set<String> names;
+	@NotNull
+	private String name;
 
 	@NotNull
 	private String image;

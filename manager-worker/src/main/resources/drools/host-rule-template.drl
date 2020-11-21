@@ -6,11 +6,11 @@ eventType
 decision
 priority
 
-package pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem;
+package pt.unl.fct.miei.usmanagement.manager.worker.management.management.rulesystem;
 
-import RuleDecision.*;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
 
-global RuleDecision hostDecision;
+global pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision hostDecision;
 
 template "host"
 

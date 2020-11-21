@@ -81,7 +81,7 @@ import ReactTooltip from "react-tooltip";
 export interface IContainer extends IDatabaseData {
     type: ContainerType;
     created: number;
-    names: string[];
+    name: string;
     image: string;
     command: string;
     network: string;

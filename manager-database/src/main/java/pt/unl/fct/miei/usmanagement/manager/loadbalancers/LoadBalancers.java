@@ -16,7 +16,7 @@ public interface LoadBalancers extends JpaRepository<LoadBalancer, String> {
 		+ "where l.id = :id")
 	boolean hasLoadBalancer(@Param("id") String id);
 
-	Optional<LoadBalancer> getByContainer(@Param("container") Container container);
+	Optional<LoadBalancer> getByContainer(Container container);
 
 	List<LoadBalancer> getByRegion(RegionEnum region);
 }

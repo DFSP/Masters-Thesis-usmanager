@@ -34,7 +34,7 @@ spring:
   datasource:
     driverClassName: org.h2.Driver
     #url: jdbc:h2:file:./db/manager-worker-db;DB_CLOSE_ON_EXIT=FALSE
-    url: jdbc:h2:mem:manager-worker-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000
+    url: jdbc:h2:mem:manager-worker-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
     username: sa
     password: admin
     platform: h2

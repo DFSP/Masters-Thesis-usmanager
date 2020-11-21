@@ -144,7 +144,7 @@ public class RegistrationServerService {
 			new EntityNotFoundException(RegistrationServer.class, "id", id));
 	}
 
-	public RegistrationServer getRegistrationServer(Container container) {
+	public RegistrationServer getRegistrationServerByContainer(Container container) {
 		return registrationServers.getByContainer(container).orElseThrow(() ->
 			new EntityNotFoundException(RegistrationServer.class, "containerEntity", container.getId()));
 	}
@@ -164,9 +164,9 @@ public class RegistrationServerService {
 
 	public void stopRegistrationServer(String id) {
 		RegistrationServer registrationServer = getRegistrationServer(id);
-		Container container = registrationServer.getContainer();
+		String containerId = registrationServer.getContainer().getId();
 		registrationServers.delete(registrationServer);
-		containersService.stopContainer(container.getId());
+		containersService.stopContainer(containerId);
 	}
 
 	public void reset() {
@@ -174,7 +174,7 @@ public class RegistrationServerService {
 	}
 
 	public void deleteRegistrationServerByContainer(Container container) {
-		RegistrationServer registrationServer = getRegistrationServer(container);
+		RegistrationServer registrationServer = getRegistrationServerByContainer(container);
 		registrationServers.delete(registrationServer);
 	}
 }

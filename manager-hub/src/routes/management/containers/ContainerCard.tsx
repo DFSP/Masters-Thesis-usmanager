@@ -241,9 +241,9 @@ class ContainerCard extends BaseComponent<Props, State> {
             <CardItem key={'type'}
                       label={'Type'}
                       value={`${container.type}`}/>
-            <CardItem key={'names'}
-                      label={container.names.length == 1 ? 'Name' : 'Names'}
-                      value={container.names.join(', ')}/>
+            <CardItem key={'name'}
+                      label={'Name'}
+                      value={container.name}/>
             <CardItem key={'image'}
                       label={'Image'}
                       value={container.image}/>

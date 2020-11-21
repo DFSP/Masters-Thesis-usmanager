@@ -16,7 +16,7 @@ public interface RegistrationServers extends JpaRepository<RegistrationServer, S
 		+ "where r.id = :id")
 	boolean hasRegistrationServer(@Param("id") String id);
 
-	Optional<RegistrationServer> getByContainer(@Param("container") Container container);
+	Optional<RegistrationServer> getByContainer(Container container);
 
 	List<RegistrationServer> getByRegion(RegionEnum region);
 }

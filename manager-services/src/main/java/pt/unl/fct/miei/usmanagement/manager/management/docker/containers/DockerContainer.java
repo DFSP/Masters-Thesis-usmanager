@@ -42,7 +42,7 @@ public final class DockerContainer {
 	private final String id;
 	private final ContainerTypeEnum type;
 	private final long created;
-	private final Set<String> names;
+	private final String name;
 	private final String image;
 	private final String command;
 	private final String network;

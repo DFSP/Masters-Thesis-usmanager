@@ -6,20 +6,20 @@ eventType
 decision
 priority
 
-package pt.unl.fct.miei.usmanagement.manager.worker.management.rulesystem;
+package pt.unl.fct.miei.usmanagement.manager.worker.management.management.rulesystem;
 
-import pt.unl.fct.miei.usmanagement.manager.database.rulesystem.RuleDecision;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
 
-global RuleDecision serviceDecision;
+global pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision containerDecision;
 
-template "service"
+template "container"
 
-rule "rule_service_@{ruleId}" salience @{priority}
+rule "rule_container_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then
-    serviceDecision.setDecision(@{decision});
-    serviceDecision.setPriority(@{priority});
+    containerDecision.setDecision(@{decision});
+    containerDecision.setPriority(@{priority});
 end
 
 end template

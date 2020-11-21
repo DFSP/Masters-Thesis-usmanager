@@ -170,7 +170,7 @@ public class NginxLoadBalancerService {
 			public void run() {
 				try {
 					containersService.stopContainers((dockerContainer ->
-						dockerContainer.getNames().contains(LOAD_BALANCER) && dockerContainer.getRegion() == region));
+						dockerContainer.getName().contains(LOAD_BALANCER) && dockerContainer.getRegion() == region));
 				}
 				catch (ManagerException e) {
 					log.error("Failed to stop load balancers on region {}: {}. Retrying in {} minutes", region, e.getMessage(),
@@ -196,7 +196,7 @@ public class NginxLoadBalancerService {
 			new EntityNotFoundException(LoadBalancer.class, "id", id));
 	}
 
-	public LoadBalancer getLoadBalancer(Container container) {
+	public LoadBalancer getLoadBalancerByContainer(Container container) {
 		return loadBalancers.getByContainer(container).orElseThrow(() ->
 			new EntityNotFoundException(LoadBalancer.class, "containerEntity", container.getId()));
 	}
@@ -335,9 +335,8 @@ public class NginxLoadBalancerService {
 
 	public void stopLoadBalancer(String id) {
 		LoadBalancer loadBalancer = getLoadBalancer(id);
-		Container container = loadBalancer.getContainer();
 		loadBalancers.delete(loadBalancer);
-		containersService.stopContainer(container.getId());
+		containersService.deleteContainer(loadBalancer.getContainer());
 	}
 
 	public void reset() {
@@ -345,7 +344,7 @@ public class NginxLoadBalancerService {
 	}
 
 	public void deleteLoadBalancerByContainer(Container container) {
-		LoadBalancer loadBalancer = getLoadBalancer(container);
+		LoadBalancer loadBalancer = getLoadBalancerByContainer(container);
 		loadBalancers.delete(loadBalancer);
 	}
 }

@@ -77,7 +77,7 @@ class ManagedHostsList extends BaseComponent<Props, State> {
                       className={`${listItemStyles.link}`}>
                     <div className={`${styles.listItemContent}`}>
                         <i className={`${styles.linkIcon} material-icons right`}>link</i>
-                        <span>{container.id.toString().substr(0, 10)} - {container.names.join(', ')}</span>
+                        <span>{container.id.toString().substr(0, 10)} - {container.name}</span>
                     </div>
                 </Link>
             </ListItem>

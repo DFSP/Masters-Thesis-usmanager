@@ -121,7 +121,7 @@ public class ContainersService {
 				.id(dockerContainer.getId())
 				.type(dockerContainer.getType())
 				.created(dockerContainer.getCreated())
-				.names(dockerContainer.getNames())
+				.name(dockerContainer.getName())
 				.image(dockerContainer.getImage())
 				.command(dockerContainer.getCommand())
 				.network(dockerContainer.getNetwork())
@@ -349,9 +349,13 @@ public class ContainersService {
 		}
 	}
 
+	public void deleteContainer(Container container) {
+		containers.delete(container);
+	}
+
 	public void deleteContainer(String id) {
 		Container container = getContainer(id);
-		if (container.getNames().stream().anyMatch(name -> name.contains(WorkerManagerProperties.WORKER_MANAGER))) {
+		if (container.getName().contains(WorkerManagerProperties.WORKER_MANAGER)) {
 			try {
 				workerManagersService.deleteWorkerManagerByContainer(container);
 			}
@@ -359,7 +363,7 @@ public class ContainersService {
 				log.error("Failed to delete worker manager associated with container {}: {}", id, e.getMessage());
 			}
 		}
-		else if (container.getNames().stream().anyMatch(name -> name.contains(RegistrationServerService.REGISTRATION_SERVER))) {
+		else if (container.getName().contains(RegistrationServerService.REGISTRATION_SERVER)) {
 			try {
 				registrationServerService.deleteRegistrationServerByContainer(container);
 			}
@@ -367,7 +371,7 @@ public class ContainersService {
 				log.error("Failed to delete registration server associated with container {}: {}", id, e.getMessage());
 			}
 		}
-		else if (container.getNames().stream().anyMatch(name -> name.contains(NginxLoadBalancerService.LOAD_BALANCER))) {
+		else if (container.getName().contains(NginxLoadBalancerService.LOAD_BALANCER)) {
 			try {
 				nginxLoadBalancerService.deleteLoadBalancerByContainer(container);
 			}

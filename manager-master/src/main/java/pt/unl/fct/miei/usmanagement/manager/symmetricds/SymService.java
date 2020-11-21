@@ -235,6 +235,9 @@ public class SymService {
 				.triggerId(table)
 				.sourceTableName(table)
 				.channelId("default")
+				.syncOnInsertCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
+				.syncOnUpdateCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
+				.syncOnDeleteCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
 				.lastUpdateTime(LocalDateTime.now())
 				.createTime(LocalDateTime.now())
 				/*.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)*/
