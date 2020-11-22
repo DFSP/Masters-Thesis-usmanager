@@ -60,7 +60,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 @Slf4j
@@ -162,22 +161,22 @@ public class MasterSymService {
 	private void loadTriggerRouters() throws SQLException {
 		getMasterToWorkerTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-				.triggerId(table)
+				.triggerId("master-" + table)
 				.routerId("master-to-worker")
 				.initialLoadOrder(1)
 				.createTime(LocalDateTime.now())
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
 		);
-
-		/*getWorkerToMasterTables().forEach(table ->
+		log.info(getWorkerToMasterTables().toString());
+		getWorkerToMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-				.triggerId(table)
+				.triggerId("worker-" + table)
 				.routerId("worker-to-master")
 				.createTime(LocalDateTime.now())
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
-		);*/
+		);
 	}
 
 	private void loadRouters() {
@@ -213,14 +212,25 @@ public class MasterSymService {
 
 	private void loadTriggers() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
-				log.info("Added synchronize trigger to table {}", table);
+				log.info("Added master synchronize trigger to table {}", table);
 				symTriggersRepository.save(SymTriggerEntity.builder()
-					.triggerId(table)
+					.triggerId("master-" + table)
 					.sourceTableName(table)
 					.channelId("default")
 					.syncOnInsertCondition(syncCondition(table))
 					.syncOnUpdateCondition(syncCondition(table))
 					.syncOnDeleteCondition(syncCondition(table))
+					.lastUpdateTime(LocalDateTime.now())
+					.createTime(LocalDateTime.now())
+					.build());
+			}
+		);
+		getWorkerToMasterTables().forEach(table -> {
+				log.info("Added worker synchronize trigger to table {}", table);
+				symTriggersRepository.save(SymTriggerEntity.builder()
+					.triggerId("worker-" + table)
+					.sourceTableName(table)
+					.channelId("default")
 					.lastUpdateTime(LocalDateTime.now())
 					.createTime(LocalDateTime.now())
 					.build());
@@ -280,9 +290,9 @@ public class MasterSymService {
 		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
 		List<String> tablesNames = new LinkedList<>();
-		List<String> excludingStartsWith = symmetricDSProperties.getTables().getExclude().getStartsWith();
-		List<String> excludingEndsWith = symmetricDSProperties.getTables().getExclude().getEndsWith();
-		List<String> excludingContains = symmetricDSProperties.getTables().getExclude().getContains();
+		List<String> excludingStartsWith = symmetricDSProperties.getMaster().getTables().getExclude().getStartsWith();
+		List<String> excludingEndsWith = symmetricDSProperties.getMaster().getTables().getExclude().getEndsWith();
+		List<String> excludingContains = symmetricDSProperties.getMaster().getTables().getExclude().getContains();
 		while (tables.next()) {
 			String tableName = tables.getString("TABLE_NAME").toLowerCase();
 			if ((excludingStartsWith == null || excludingStartsWith.stream().noneMatch(tableName::startsWith))
@@ -293,5 +303,44 @@ public class MasterSymService {
 		}
 		return tablesNames;
 	}
+
+	private List<String> getWorkerToMasterTables() throws SQLException {
+		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+		List<String> tablesNames = new LinkedList<>();
+		List<String> includingStartsWith = symmetricDSProperties.getWorker().getTables().getInclude().getStartsWith();
+		List<String> includingContains = symmetricDSProperties.getWorker().getTables().getInclude().getContains();
+		List<String> includingEndsWith = symmetricDSProperties.getWorker().getTables().getInclude().getEndsWith();
+		while (tables.next()) {
+			String tableName = tables.getString("TABLE_NAME").toLowerCase();
+			if ((includingStartsWith != null && includingStartsWith.stream().anyMatch(tableName::startsWith))
+				|| (includingContains != null && includingContains.stream().anyMatch(tableName::contains))
+				|| (includingEndsWith != null && includingEndsWith.stream().anyMatch(tableName::endsWith))) {
+				tablesNames.add(tableName);
+			}
+		}
+		return tablesNames;
+	}
+
+	/*	private List<String> getWorkerToMasterTables() throws SQLException {
+		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+		List<String> tablesNames = new LinkedList<>();
+		while (tables.next()) {
+			String tableName = tables.getString("TABLE_NAME").toLowerCase();
+			if (tableName.startsWith("container")
+				|| tableName.startsWith("node")
+				|| tableName.contains("event")
+				|| tableName.equalsIgnoreCase("host_monitoring_logs")
+				|| tableName.equalsIgnoreCase("service_monitoring_logs")
+				|| tableName.equalsIgnoreCase("host_decisions")
+				|| tableName.equalsIgnoreCase("host_decision_values")
+				|| tableName.equalsIgnoreCase("service_decisions")
+				|| tableName.equalsIgnoreCase("service_decision_values")) {
+				tablesNames.add(tableName);
+			}
+		}
+		return tablesNames;
+	}*/
 
 }

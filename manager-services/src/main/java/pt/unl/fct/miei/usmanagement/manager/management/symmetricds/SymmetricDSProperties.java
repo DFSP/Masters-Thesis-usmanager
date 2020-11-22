@@ -37,44 +37,105 @@ import java.util.List;
 @ConfigurationProperties("symmetricds")
 public class SymmetricDSProperties {
 
-	private final Tables tables;
+	private final Master master;
+	private final Worker worker;
 
 	public SymmetricDSProperties() {
-		this.tables = new Tables();
+		this.master = new Master();
+		this.worker = new Worker();
 	}
 
 	@Getter
 	@Setter
-	public static final class Tables {
+	public static final class Master {
 
-		private final Exclude exclude;
-		private final Include include;
+		private final Tables tables;
 
-		private Tables() {
-			this.exclude = new Exclude();
-			this.include = new Include();
+		private Master() {
+			this.tables = new Tables();
 		}
 
 		@Getter
 		@Setter
-		public static final class Exclude {
+		public static final class Tables {
 
-			private List<String> startsWith;
-			private List<String> endsWith;
-			private List<String> contains;
+			private final Exclude exclude;
+			private final Include include;
 
-		}
+			private Tables() {
+				this.exclude = new Exclude();
+				this.include = new Include();
+			}
 
-		@Getter
-		@Setter
-		public static final class Include {
+			@Getter
+			@Setter
+			public static final class Exclude {
 
-			private List<String> startsWith;
-			private List<String> endsWith;
-			private List<String> contains;
+				private List<String> startsWith;
+				private List<String> endsWith;
+				private List<String> contains;
+
+			}
+
+			@Getter
+			@Setter
+			public static final class Include {
+
+				private List<String> startsWith;
+				private List<String> endsWith;
+				private List<String> contains;
+
+			}
 
 		}
 
 	}
+
+	@Getter
+	@Setter
+	public static final class Worker {
+
+		private final Tables tables;
+
+		private Worker() {
+			this.tables = new Tables();
+		}
+
+		@Getter
+		@Setter
+		public static final class Tables {
+
+			private final Exclude exclude;
+			private final Include include;
+
+			private Tables() {
+				this.exclude = new Exclude();
+				this.include = new Include();
+			}
+
+			@Getter
+			@Setter
+			public static final class Exclude {
+
+				private List<String> startsWith;
+				private List<String> endsWith;
+				private List<String> contains;
+
+			}
+
+			@Getter
+			@Setter
+			public static final class Include {
+
+				private List<String> startsWith;
+				private List<String> endsWith;
+				private List<String> contains;
+
+			}
+
+		}
+
+	}
+
 
 }

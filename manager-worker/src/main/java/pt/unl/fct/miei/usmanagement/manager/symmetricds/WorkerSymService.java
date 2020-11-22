@@ -109,16 +109,16 @@ public class WorkerSymService {
 		engineHolder.setAutoStart(false);
 		servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, engineHolder);
 		serverSymmetricEngine.setup();
-		this.loadSymmetricDs();
+/*		this.loadSymmetricDs();*/
 		serverSymmetricEngine.start();
 	}
 
-	private void loadSymmetricDs() throws SQLException {
+/*	private void loadSymmetricDs() throws SQLException {
 		this.loadTriggers();
 		this.loadTriggerRouters();
-	}
+	}*/
 
-	private void loadTriggers() throws SQLException {
+/*	private void loadTriggers() throws SQLException {
 		getWorkerToMasterTables().forEach(table -> {
 			log.info("Added synchronize trigger to table {}", table);
 			symTriggersRepository.save(SymTriggerEntity.builder()
@@ -130,9 +130,9 @@ public class WorkerSymService {
 				.build());
 			}
 		);
-	}
+	}*/
 
-	private void loadTriggerRouters() throws SQLException {
+	/*private void loadTriggerRouters() throws SQLException {
 		getWorkerToMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId(table)
@@ -141,9 +141,9 @@ public class WorkerSymService {
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
 		);
-	}
+	}*/
 
-	private List<String> getWorkerToMasterTables() throws SQLException {
+	/*private List<String> getWorkerToMasterTables() throws SQLException {
 		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
 		List<String> tablesNames = new LinkedList<>();
@@ -159,7 +159,7 @@ public class WorkerSymService {
 			}
 		}
 		return tablesNames;
-	}
+	}*/
 
 /*	private List<String> getWorkerToMasterTables() throws SQLException {
 		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
