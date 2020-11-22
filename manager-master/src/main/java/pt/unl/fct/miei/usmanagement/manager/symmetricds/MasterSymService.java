@@ -158,14 +158,24 @@ public class MasterSymService {
 		this.loadTriggerRouters();
 	}
 
+	private String initialLoadCondition(String table) {
+		String initialLoadCondition = table.equalsIgnoreCase("containers") ? "(NAME like 'registration-server%' or NAME like 'load-balancer%')" : null;
+		if (table.equalsIgnoreCase("containers")) {
+			return "(NAME like 'registration-server%' or NAME like 'load-balancer%')";
+		}
+		if (List.of("container_labels", "container_mounts", "container_ports", "container_rule", "container_simulated_metric").contains(table)) {
+			return "1 = 0"; // will be updated dynamically with container ids
+		}
+		return initialLoadCondition;
+	}
+
 	private void loadTriggerRouters() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
-			String initialLoadCondition = table.equalsIgnoreCase("containers") ? "(NAME like 'registration-server%' or NAME like 'load-balancer%')" : null;
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-				.triggerId(table)
+				.triggerId("master-" + table)
 				.routerId("master-to-worker")
 				.initialLoadOrder(1)
-				.initialLoadSelect(initialLoadCondition)
+				.initialLoadSelect(initialLoadCondition(table))
 				.createTime(LocalDateTime.now())
 				.lastUpdateTime(LocalDateTime.now())
 				.build());
@@ -215,9 +225,11 @@ public class MasterSymService {
 	private void loadTriggers() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
 				log.info("Added master synchronize trigger to table {}", table);
-				String syncCondition = table.equalsIgnoreCase("containers") ? "(NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')" : null;
+				String syncCondition = table.equalsIgnoreCase("containers")
+					? "(OLD_NAME like 'registration-server%' or OLD_NAME like 'load-balancer%' or NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')"
+					: null;
 				symTriggersRepository.save(SymTriggerEntity.builder()
-					.triggerId(table)
+					.triggerId("master-" + table)
 					.sourceTableName(table)
 					.channelId("default")
 					.syncOnInsertCondition(syncCondition)

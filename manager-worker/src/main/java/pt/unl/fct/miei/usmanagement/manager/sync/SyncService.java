@@ -60,7 +60,8 @@ public class SyncService {
 				try {
 					synchronizeContainersDatabase();
 				}
-				catch (ManagerException ignored) {
+				catch (Exception e) {
+					log.error("Error while synchronizing containers database: {}", e.getMessage());
 				}
 			}
 		}, CONTAINERS_DATABASE_SYNC_INTERVAL, CONTAINERS_DATABASE_SYNC_INTERVAL);
@@ -142,7 +143,8 @@ public class SyncService {
 				try {
 					synchronizeNodesDatabase();
 				}
-				catch (ManagerException ignored) {
+				catch (Exception e) {
+					log.error("Error while synchronizing nodes database: {}", e.getMessage());
 				}
 			}
 		}, NODES_DATABASE_SYNC_INTERVAL, NODES_DATABASE_SYNC_INTERVAL);

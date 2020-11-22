@@ -35,21 +35,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.symmetricds.SymmetricDSProperties;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.SymTriggerEntity;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.SymTriggersRepository;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router.SymTriggerRouterEntity;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router.SymTriggerRoutersRepository;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 @Slf4j
@@ -109,7 +102,7 @@ public class WorkerSymService {
 		engineHolder.setAutoStart(false);
 		servletContext.setAttribute(WebConstants.ATTR_ENGINE_HOLDER, engineHolder);
 		serverSymmetricEngine.setup();
-/*		this.loadSymmetricDs();*/
+		/*		this.loadSymmetricDs();*/
 		serverSymmetricEngine.start();
 	}
 
