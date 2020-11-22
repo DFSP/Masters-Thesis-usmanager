@@ -37,7 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.symmetricds.WorkerSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
@@ -45,13 +45,13 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final HostsService hostsService;
-	private final SymService symService;
+	private final WorkerSymService symService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final SyncService syncService;
 	private final Environment environment;
 
-	public ManagerWorkerStartup(SymService symService, HostsService hostsService,
+	public ManagerWorkerStartup(WorkerSymService symService, HostsService hostsService,
 								ServicesMonitoringService servicesMonitoringService,
 								HostsMonitoringService hostsMonitoringService, SyncService syncService,
 								Environment environment) {

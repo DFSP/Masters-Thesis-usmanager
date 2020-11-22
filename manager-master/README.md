@@ -35,7 +35,7 @@ sh src/main/resources/scripts/node-exporter-install.sh
 
 #### Local
 ```shell script
-EXPORT EXTERNAL_ID=manager-master
+export EXTERNAL_ID=manager-master
 mvn spring-boot:run
 ```
 

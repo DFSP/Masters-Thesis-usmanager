@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIps;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -23,7 +22,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.HashMap;
@@ -212,9 +210,10 @@ public class ElasticIpsService {
 		log.info("Clearing all elastic ips");
 	}
 
-	public ElasticIp desassociate(CloudHost cloudHost) {
+	public ElasticIp dissociate(CloudHost cloudHost) {
 		RegionEnum region = cloudHost.getAwsRegion().getRegion();
 		ElasticIp elasticIp = getElasticIp(region);
+		awsService.dissociateElasticIpAddress(region, elasticIp.getAssociationId());
 		elasticIp.setAssociationId(null);
 		elasticIp.setInstanceId(null);
 		return elasticIps.save(elasticIp);

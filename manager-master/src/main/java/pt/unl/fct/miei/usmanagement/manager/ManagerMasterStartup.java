@@ -33,15 +33,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.symmetricds.MasterSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
@@ -53,7 +51,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
-	private final SymService symService;
+	private final MasterSymService symService;
 
 	private final Environment environment;
 
@@ -62,7 +60,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								SymService symService, Environment environment) {
+								MasterSymService symService, Environment environment) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;

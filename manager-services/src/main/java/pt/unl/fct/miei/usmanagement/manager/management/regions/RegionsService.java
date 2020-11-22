@@ -103,6 +103,7 @@ public class RegionsService {
 
 	public AwsRegion mapToAwsRegion(RegionEnum region) {
 		for (AwsRegion awsRegion : AwsRegion.getAwsRegions()) {
+
 			if (region == awsRegion.getRegion()) {
 				return awsRegion;
 			}

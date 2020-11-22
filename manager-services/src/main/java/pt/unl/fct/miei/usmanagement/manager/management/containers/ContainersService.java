@@ -50,6 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.management.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
@@ -83,6 +84,7 @@ public class ContainersService {
 	private final ConfigurationsService configurationsService;
 	private final RegistrationServerService registrationServerService;
 	private final NginxLoadBalancerService nginxLoadBalancerService;
+	private final SymService symService;
 	private final Environment environment;
 
 	private final Containers containers;
@@ -95,7 +97,7 @@ public class ContainersService {
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
 							 RegistrationServerService registrationServerService, NginxLoadBalancerService nginxLoadBalancerService,
-							 Environment environment, Containers containers,
+							 SymService symService, Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -107,6 +109,7 @@ public class ContainersService {
 		this.configurationsService = configurationsService;
 		this.registrationServerService = registrationServerService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
+		this.symService = symService;
 		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
@@ -145,6 +148,7 @@ public class ContainersService {
 	public Container addContainer(Container container) {
 		checkContainerDoesntExist(container);
 		log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
+		symService.handleContainerTriggers(container);
 		return containers.save(container);
 	}
 
@@ -154,7 +158,7 @@ public class ContainersService {
 	}
 
 	public Container updateContainer(Container container) {
-		log.info("Updating container {}", ToStringBuilder.reflectionToString(container));
+		/*log.info("Updating container {}", ToStringBuilder.reflectionToString(container));*/
 		return containers.save(container);
 	}
 

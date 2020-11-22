@@ -40,7 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitorin
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.SymService;
+import pt.unl.fct.miei.usmanagement.manager.symmetricds.MasterSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.Objects;
@@ -54,7 +54,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final DockerSwarmService dockerSwarmService;
 	private final CloudHostsService cloudHostsService;
 	private final ElasticIpsService elasticIpsService;
-	private final SymService symService;
+	private final MasterSymService symService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsEventsService hostsEventsService;
@@ -63,7 +63,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final SyncService syncService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 ElasticIpsService elasticIpsService, SymService symService, CloudHostsService cloudHostsService,
+								 ElasticIpsService elasticIpsService, MasterSymService symService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								 NodesService nodesService, SyncService syncService) {

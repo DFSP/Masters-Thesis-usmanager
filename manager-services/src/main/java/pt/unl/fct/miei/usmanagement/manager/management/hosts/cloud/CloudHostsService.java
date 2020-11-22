@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -50,6 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
@@ -176,6 +178,16 @@ public class CloudHostsService {
 
 	public void deleteCloudHost(CloudHost cloudHost) {
 		cloudHosts.delete(cloudHost);
+		try {
+			RegionEnum region = cloudHost.getAwsRegion().getRegion();
+			ElasticIp elasticIp = elasticIpsService.getElasticIp(region);
+			String instanceId = cloudHost.getInstanceId();
+			if (Objects.equals(elasticIp.getInstanceId(), instanceId)) {
+				elasticIpsService.dissociate(cloudHost);
+			}
+		} catch (EntityNotFoundException ignored) {
+
+		}
 	}
 
 	public CloudHost launchInstance(Coordinates coordinates) {
@@ -262,7 +274,7 @@ public class CloudHostsService {
 			dockerSwarmService.leaveSwarm(address);
 		}
 		cloudHosts.delete(cloudHost);
-		elasticIpsService.desassociate(cloudHost);
+		elasticIpsService.dissociate(cloudHost);
 	}
 
 	public void terminateInstances() {

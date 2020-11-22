@@ -33,8 +33,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.symmetricds.SymmetricDSProperties;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.node.SymNodesRepository;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.node.group.SymNodeGroupEntity;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.node.group.SymNodeGroupsRepository;
@@ -60,11 +60,12 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 @Slf4j
 @Service
-public class SymService {
+public class MasterSymService {
 
 	private final SymTriggerRoutersRepository symTriggerRoutersRepository;
 	private final SymTriggersRepository symTriggersRepository;
@@ -85,17 +86,17 @@ public class SymService {
 
 	private ServerSymmetricEngine serverSymmetricEngine;
 
-	public SymService(SymTriggerRoutersRepository symTriggerRoutersRepository,
-					  SymTriggersRepository symTriggersRepository,
-					  SymRoutersRepository symRoutersRepository,
-					  SymNodeGroupLinksRepository symNodeGroupLinksRepository,
-					  SymNodeGroupsRepository symNodeGroupsRepository,
-					  SymNodeHostsRepository symNodeHostsRepository,
-					  SymNodeIdentitiesRepository symNodeIdentitiesRepository,
-					  SymNodesSecurityRepository symNodesSecurityRepository,
-					  SymNodesRepository symNodesRepository, Environment environment, ServletContext servletContext, DataSource dataSource,
-					  ApplicationContext applicationContext, DataSourceProperties dataSourceProperties,
-					  SymmetricDSProperties symmetricDSProperties) {
+	public MasterSymService(SymTriggerRoutersRepository symTriggerRoutersRepository,
+							SymTriggersRepository symTriggersRepository,
+							SymRoutersRepository symRoutersRepository,
+							SymNodeGroupLinksRepository symNodeGroupLinksRepository,
+							SymNodeGroupsRepository symNodeGroupsRepository,
+							SymNodeHostsRepository symNodeHostsRepository,
+							SymNodeIdentitiesRepository symNodeIdentitiesRepository,
+							SymNodesSecurityRepository symNodesSecurityRepository,
+							SymNodesRepository symNodesRepository, Environment environment, ServletContext servletContext, DataSource dataSource,
+							ApplicationContext applicationContext, DataSourceProperties dataSourceProperties,
+							SymmetricDSProperties symmetricDSProperties) {
 		this.symTriggerRoutersRepository = symTriggerRoutersRepository;
 		this.symTriggersRepository = symTriggersRepository;
 		this.symRoutersRepository = symRoutersRepository;
@@ -156,25 +157,6 @@ public class SymService {
 		this.loadTriggers();
 		this.loadRouters();
 		this.loadTriggerRouters();
-
-		/*CONFLICT_ID
-		SOURCE_NODE_GROUP_ID
-		TARGET_NODE_GROUP_ID
-		TARGET_CHANNEL_ID
-		TARGET_CATALOG_NAME
-		TARGET_SCHEMA_NAME
-		TARGET_TABLE_NAME
-		DETECT_TYPE
-		DETECT_EXPRESSION
-		RESOLVE_TYPE
-		PING_BACK
-		RESOLVE_CHANGES_ONLY
-		RESOLVE_ROW_ONLY
-		CREATE_TIME
-		LAST_UPDATE_BY
-		LAST_UPDATE_TIME
-*/
-
 	}
 
 	private void loadTriggerRouters() throws SQLException {
@@ -188,14 +170,14 @@ public class SymService {
 				.build())
 		);
 
-		getWorkerToMasterTables().forEach(table ->
+		/*getWorkerToMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId(table)
 				.routerId("worker-to-master")
 				.createTime(LocalDateTime.now())
 				.lastUpdateTime(LocalDateTime.now())
 				.build())
-		);
+		);*/
 	}
 
 	private void loadRouters() {
@@ -218,7 +200,7 @@ public class SymService {
 			.createTime(LocalDateTime.now())
 			.lastUpdateTime(LocalDateTime.now())
 			.build());
-		// Default router sends all data from workers to manager
+		// Default router sends all data from workers to master
 		symRoutersRepository.save(SymRouterEntity.builder()
 			.routerId("worker-to-master")
 			.sourceNodeGroupId("manager-worker")
@@ -230,29 +212,30 @@ public class SymService {
 	}
 
 	private void loadTriggers() throws SQLException {
-		this.getMasterToWorkerTables().forEach(table ->
-			symTriggersRepository.save(SymTriggerEntity.builder()
-				.triggerId(table)
-				.sourceTableName(table)
-				.channelId("default")
-				.syncOnInsertCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
-				.syncOnUpdateCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
-				.syncOnDeleteCondition(table.equalsIgnoreCase("containers") ? "name like registration-server% or name like load-balancer%" : null)
-				.lastUpdateTime(LocalDateTime.now())
-				.createTime(LocalDateTime.now())
-				/*.excludedColumnNames(table.equalsIgnoreCase("containers") ? "WORKER_MANAGER_ID" : null)*/
-				.build())
+		getMasterToWorkerTables().forEach(table -> {
+				log.info("Added synchronize trigger to table {}", table);
+				symTriggersRepository.save(SymTriggerEntity.builder()
+					.triggerId(table)
+					.sourceTableName(table)
+					.channelId("default")
+					.syncOnInsertCondition(syncCondition(table))
+					.syncOnUpdateCondition(syncCondition(table))
+					.syncOnDeleteCondition(syncCondition(table))
+					.lastUpdateTime(LocalDateTime.now())
+					.createTime(LocalDateTime.now())
+					.build());
+			}
 		);
+	}
 
-		this.getWorkerToMasterTables().forEach(table ->
-			symTriggersRepository.save(SymTriggerEntity.builder()
-				.triggerId(table)
-				.sourceTableName(table)
-				.channelId("default")
-				.lastUpdateTime(LocalDateTime.now())
-				.createTime(LocalDateTime.now())
-				.build())
-		);
+	private String syncCondition(String table) {
+		if (!table.startsWith("container")) {
+			return null;
+		}
+		if (table.equalsIgnoreCase("containers")) {
+			return "(NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')";
+		}
+		return null;
 	}
 
 	private void loadNodeGroupLinks() {
@@ -309,37 +292,6 @@ public class SymService {
 			}
 		}
 		return tablesNames;
-	}
-
-	private List<String> getWorkerToMasterTables() throws SQLException {
-		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-		ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
-		List<String> tablesNames = new LinkedList<>();
-		while (tables.next()) {
-			String tableName = tables.getString("TABLE_NAME").toLowerCase();
-			if (tableName.startsWith("container")
-				|| tableName.startsWith("node")
-				|| tableName.contains("event")
-				|| tableName.equalsIgnoreCase("host_monitoring_logs")
-				|| tableName.equalsIgnoreCase("service_monitoring_logs")
-				|| tableName.equalsIgnoreCase("host_decisions")
-				|| tableName.equalsIgnoreCase("host_decision_values")
-				|| tableName.equalsIgnoreCase("service_decisions")
-				|| tableName.equalsIgnoreCase("service_decision_values")) {
-				tablesNames.add(tableName);
-			}
-		}
-		return tablesNames;
-	}
-
-	private int countRepetitions(String string, char c) {
-		int count = 0;
-		for (int i = 0; i < string.length(); i++) {
-			if (string.charAt(i) == c) {
-				count++;
-			}
-		}
-		return count;
 	}
 
 }

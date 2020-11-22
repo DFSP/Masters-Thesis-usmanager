@@ -40,7 +40,6 @@ import com.spotify.docker.client.shaded.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -62,7 +61,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxL
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
@@ -93,6 +91,8 @@ import java.util.stream.IntStream;
 public class DockerContainersService {
 
 	private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
+
+	private final static Pattern CONTAINER_ID_PATTERN = Pattern.compile("is already in use by container \\\\\"(.*)\\\\\"");
 
 	private final ContainersService containersService;
 	private final DockerCoreService dockerCoreService;
@@ -412,10 +412,12 @@ public class DockerContainersService {
 		}
 		if (errorMessage.contains("is already in use by container")) {
 			log.info(errorMessage);
-			String containerIdRegex = "is already in use by container \\\\\"(.*)\\\\\"";
-			Matcher containerIdRegexExpression = Pattern.compile(containerIdRegex).matcher(errorMessage);
-			log.info(containerIdRegexExpression.group(0));
-			return findContainer(containerIdRegexExpression.group(0));
+			Matcher containerIdRegexExpression = CONTAINER_ID_PATTERN.matcher(errorMessage);
+			boolean found = containerIdRegexExpression.find();
+			if (found) {
+				log.info(containerIdRegexExpression.group(1));
+				return findContainer(containerIdRegexExpression.group(1));
+			}
 		}
 		throw new ManagerException("Failed to start container: %s", errorMessage);
 	}

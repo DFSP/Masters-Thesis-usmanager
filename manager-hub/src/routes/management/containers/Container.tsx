@@ -747,8 +747,7 @@ class Container extends BaseComponent<Props, State> {
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }}
-                        // custom buttons are never present on new nodes, so a type cast is safe
-                          customButtons={container && (container as IContainer).labels['serviceType'] !== 'SYSTEM'
+                          customButtons={!isNewContainer && container && (container as IContainer).labels?.['serviceType'] !== 'SYSTEM'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
                           loading={this.state.loading}

@@ -287,7 +287,8 @@ public class SyncService {
 			}
 			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
 			if (heartbeat.isPresent()
-				&& heartbeat.get().getHeartbeatTime().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
+				&& heartbeat.get().getHeartbeatTime().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+				&& !managerId.equalsIgnoreCase("manager-master")) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);

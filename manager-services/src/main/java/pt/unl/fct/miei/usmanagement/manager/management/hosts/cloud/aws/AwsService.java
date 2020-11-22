@@ -38,6 +38,8 @@ import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeAddressesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
+import com.amazonaws.services.ec2.model.DisassociateAddressResult;
 import com.amazonaws.services.ec2.model.DomainType;
 import com.amazonaws.services.ec2.model.DryRunResult;
 import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
@@ -377,6 +379,14 @@ public class AwsService {
 			.withInstanceId(instanceId)
 			.withAllocationId(allocationId);
 		return ec2.associateAddress(associateRequest);
+	}
+
+	public DisassociateAddressResult dissociateElasticIpAddress(RegionEnum region, String associationId) {
+		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AmazonEC2 ec2 = getEC2Client(awsRegion);
+		DisassociateAddressRequest disassociateAddressRequest = new DisassociateAddressRequest()
+			.withAssociationId(associationId);
+		return ec2.disassociateAddress(disassociateAddressRequest);
 	}
 
 	@Async

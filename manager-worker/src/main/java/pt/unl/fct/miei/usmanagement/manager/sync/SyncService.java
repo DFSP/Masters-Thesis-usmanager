@@ -2,8 +2,10 @@ package pt.unl.fct.miei.usmanagement.manager.sync;
 
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -37,15 +39,17 @@ public class SyncService {
 
 	private Timer containersDatabaseSyncTimer;
 	private Timer nodesDatabaseSyncTimer;
+	private String externalId;
 
 	public SyncService(ContainersService containersService, DockerContainersService dockerContainersService,
 					   NodesService nodesService, DockerSwarmService dockerSwarmService,
-					   ConfigurationsService configurationsService) {
+					   ConfigurationsService configurationsService, Environment environment) {
 		this.containersService = containersService;
 		this.dockerContainersService = dockerContainersService;
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
+		this.externalId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
 	}
 
 	public void startContainersDatabaseSynchronization() {
@@ -96,6 +100,10 @@ public class SyncService {
 			Container container = containerIterator.next();
 			String containerId = container.getId();
 			if (configurationsService.isConfiguring(containerId)) {
+				continue;
+			}
+			String managerId = container.getManagerId();
+			if (!Objects.equals(managerId, externalId)) {
 				continue;
 			}
 			if (!dockerContainerIds.containsKey(containerId)) {

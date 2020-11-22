@@ -126,6 +126,11 @@ location-request:
 rules:
   service-rule-template-file: drools/service-rule-template.drl
   host-rule-template-file: drools/host-rule-template.drl
+symmetricds:
+  tables:
+    include:
+      startsWith: container, node
+      contains: event, host_monitoring_logs, service_monitoring_logs, host_decisions, host_decision_values, service_decisions, service_decision_values
 parallelism:
   threads: 8
 #logging:
@@ -133,4 +138,4 @@ parallelism:
 #    org:
 #      hibernate:
 #        SQL=DEBUG:#trace: debug
-#debug: true
+debug: true

@@ -71,6 +71,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -173,7 +174,8 @@ public class WorkerManagersService {
 						return regionWorkerManagers.get(0);
 					}
 					else {
-						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region);
+						Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress());
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();
