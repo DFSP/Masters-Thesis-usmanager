@@ -159,14 +159,15 @@ public class MasterSymService {
 	}
 
 	private String initialLoadCondition(String table) {
-		String initialLoadCondition = table.equalsIgnoreCase("containers") ? "(NAME like 'registration-server%' or NAME like 'load-balancer%')" : null;
+		return null;
+		/*String initialLoadCondition = table.equalsIgnoreCase("containers") ? "(NAME like 'registration-server%' or NAME like 'load-balancer%')" : null;
 		if (table.equalsIgnoreCase("containers")) {
 			return "(NAME like 'registration-server%' or NAME like 'load-balancer%')";
 		}
 		if (List.of("container_labels", "container_mounts", "container_ports", "container_rule", "container_simulated_metric").contains(table)) {
-			return "1 = 0"; // will be updated dynamically with container ids
+			return "(OLD_CONTAINER_ID = '' or NEW_CONTAINER_ID = '')"; // will be updated dynamically with container ids
 		}
-		return initialLoadCondition;
+		return initialLoadCondition;*/
 	}
 
 	private void loadTriggerRouters() throws SQLException {
@@ -225,9 +226,9 @@ public class MasterSymService {
 	private void loadTriggers() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
 				log.info("Added master synchronize trigger to table {}", table);
-				String syncCondition = table.equalsIgnoreCase("containers")
+				String syncCondition = /*table.equalsIgnoreCase("containers")
 					? "(OLD_NAME like 'registration-server%' or OLD_NAME like 'load-balancer%' or NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')"
-					: null;
+					: */null;
 				symTriggersRepository.save(SymTriggerEntity.builder()
 					.triggerId("master-" + table)
 					.sourceTableName(table)

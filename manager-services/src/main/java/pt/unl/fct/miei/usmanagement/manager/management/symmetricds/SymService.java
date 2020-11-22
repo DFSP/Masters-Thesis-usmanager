@@ -28,7 +28,7 @@ public class SymService {
 	}
 
 	public void handleContainerTriggers(Container container) {
-		String name = container.getName();
+		/*String name = container.getName();
 		if (!name.startsWith(RegistrationServerService.REGISTRATION_SERVER) && !name.startsWith(NginxLoadBalancerService.LOAD_BALANCER)) {
 			return;
 		}
@@ -36,7 +36,7 @@ public class SymService {
 		List.of("container_labels", "container_mounts", "container_ports", "container_rule", "container_simulated_metric").forEach(table -> {
 			updateSymTrigger(containerId, table);
 			updateSymTriggerRouter(containerId, table);
-		});
+		});*/
 	}
 
 	private void updateSymTriggerRouter(String containerId, String table) {

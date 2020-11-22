@@ -186,6 +186,10 @@ public class SyncService {
 			if (configurationsService.isConfiguring(nodeId)) {
 				continue;
 			}
+			String managerId = node.getManagerId();
+			if (!Objects.equals(managerId, externalId)) {
+				continue;
+			}
 			if (!swarmNodesIds.containsKey(nodeId)) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
