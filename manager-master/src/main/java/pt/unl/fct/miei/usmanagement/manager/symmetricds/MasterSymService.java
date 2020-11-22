@@ -159,16 +159,18 @@ public class MasterSymService {
 	}
 
 	private void loadTriggerRouters() throws SQLException {
-		getMasterToWorkerTables().forEach(table ->
+		getMasterToWorkerTables().forEach(table -> {
+			String initialLoadCondition = table.equalsIgnoreCase("containers") ? "(NAME like 'registration-server%' or NAME like 'load-balancer%')" : null;
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-				.triggerId("master-" + table)
+				.triggerId(table)
 				.routerId("master-to-worker")
 				.initialLoadOrder(1)
+				.initialLoadSelect(initialLoadCondition)
 				.createTime(LocalDateTime.now())
 				.lastUpdateTime(LocalDateTime.now())
-				.build())
+				.build());
+			}
 		);
-		log.info(getWorkerToMasterTables().toString());
 		getWorkerToMasterTables().forEach(table ->
 			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
 				.triggerId("worker-" + table)
@@ -213,13 +215,14 @@ public class MasterSymService {
 	private void loadTriggers() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
 				log.info("Added master synchronize trigger to table {}", table);
+				String syncCondition = table.equalsIgnoreCase("containers") ? "(NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')" : null;
 				symTriggersRepository.save(SymTriggerEntity.builder()
-					.triggerId("master-" + table)
+					.triggerId(table)
 					.sourceTableName(table)
 					.channelId("default")
-					.syncOnInsertCondition(syncCondition(table))
-					.syncOnUpdateCondition(syncCondition(table))
-					.syncOnDeleteCondition(syncCondition(table))
+					.syncOnInsertCondition(syncCondition)
+					.syncOnUpdateCondition(syncCondition)
+					.syncOnDeleteCondition(syncCondition)
 					.lastUpdateTime(LocalDateTime.now())
 					.createTime(LocalDateTime.now())
 					.build());
@@ -227,25 +230,20 @@ public class MasterSymService {
 		);
 		getWorkerToMasterTables().forEach(table -> {
 				log.info("Added worker synchronize trigger to table {}", table);
+				String syncCondition = table.equalsIgnoreCase("containers")
+					|| table.equalsIgnoreCase("nodes") ? "(MANAGER_ID = '$(externalId)')" : null;
 				symTriggersRepository.save(SymTriggerEntity.builder()
 					.triggerId("worker-" + table)
 					.sourceTableName(table)
 					.channelId("default")
+					.syncOnInsertCondition(syncCondition)
+					.syncOnUpdateCondition(syncCondition)
+					.syncOnDeleteCondition(syncCondition)
 					.lastUpdateTime(LocalDateTime.now())
 					.createTime(LocalDateTime.now())
 					.build());
 			}
 		);
-	}
-
-	private String syncCondition(String table) {
-		if (!table.startsWith("container")) {
-			return null;
-		}
-		if (table.equalsIgnoreCase("containers")) {
-			return "(NEW_NAME like 'registration-server%' or NEW_NAME like 'load-balancer%')";
-		}
-		return null;
 	}
 
 	private void loadNodeGroupLinks() {
