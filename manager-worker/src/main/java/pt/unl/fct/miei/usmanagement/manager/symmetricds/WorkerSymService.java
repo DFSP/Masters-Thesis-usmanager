@@ -152,9 +152,9 @@ public class WorkerSymService {
 		List<String> includingEndsWith = symmetricDSProperties.getTables().getInclude().getEndsWith();
 		while (tables.next()) {
 			String tableName = tables.getString("TABLE_NAME").toLowerCase();
-			if ((includingStartsWith == null || includingStartsWith.stream().anyMatch(tableName::startsWith))
-				&& (includingContains == null || includingContains.stream().anyMatch(tableName::contains))
-				&& (includingEndsWith == null || includingEndsWith.stream().anyMatch(tableName::endsWith))) {
+			if ((includingStartsWith != null && includingStartsWith.stream().anyMatch(tableName::startsWith))
+				|| (includingContains != null && includingContains.stream().anyMatch(tableName::contains))
+				|| (includingEndsWith != null && includingEndsWith.stream().anyMatch(tableName::endsWith))) {
 				tablesNames.add(tableName);
 			}
 		}

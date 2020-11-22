@@ -29,7 +29,7 @@ public class SymService {
 		}
 		String containerId = container.getId();
 		List.of("container_labels", "container_mounts", "container_ports").forEach(table -> {
-			Optional<SymTriggerEntity> currentTrigger = symTriggersRepository.findById(table);
+			Optional<SymTriggerEntity> currentTrigger = symTriggersRepository.findById("master-" + table);
 			if (currentTrigger.isPresent()) {
 				SymTriggerEntity symTrigger = currentTrigger.get();
 				String syncCondition = symTrigger.getSyncOnInsertCondition();

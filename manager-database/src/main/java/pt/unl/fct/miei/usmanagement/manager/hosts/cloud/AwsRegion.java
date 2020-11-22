@@ -47,7 +47,7 @@ public enum AwsRegion {
 
 	GOV_CLOUD_WEST_1("us-gov-west-1", "AWS GovCloud (US-West)", RegionEnum.NORTH_AMERICA, null, new Coordinates("AWS GovCloud (US-West)", 46.412832, -117.046891), false),
 	GOV_CLOUD_EAST_1("us-gov-east-1", "AWS GovCloud (US-East)", RegionEnum.NORTH_AMERICA, null, new Coordinates("AWS GovCloud (US-East)", 40.058766, -83.175497), false),
-	US_EAST_1("us-east-1", "US East (N. Virginia)", RegionEnum.NORTH_AMERICA, "ami-016cd039ca0300805", new Coordinates("US East (N. Virginia)", 38.946728, -77.443386)),
+	US_EAST_1("us-east-1", "US East (N. Virginia)", RegionEnum.NORTH_AMERICA, "ami-0c674068fe23667c7", new Coordinates("US East (N. Virginia)", 38.946728, -77.443386)),
 	US_EAST_2("us-east-2", "US East (Ohio)", RegionEnum.NORTH_AMERICA, "ami-065559657711caa53", new Coordinates("US East (Ohio)", 39.958587, -82.997058)),
 	US_WEST_1("us-west-1", "US West (N. California)", RegionEnum.NORTH_AMERICA, "ami-0df861b1e282905a0", new Coordinates("US West (N. California)", 37.758891, -122.443318)),
 	US_WEST_2("us-west-2", "US West (Oregon)", RegionEnum.NORTH_AMERICA, "ami-04934a32a6f126606", new Coordinates("US West (Oregon)", 45.841904, -119.296774)),

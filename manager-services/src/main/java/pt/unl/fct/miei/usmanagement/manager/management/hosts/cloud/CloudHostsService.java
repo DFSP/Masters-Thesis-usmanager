@@ -185,9 +185,7 @@ public class CloudHostsService {
 			if (Objects.equals(elasticIp.getInstanceId(), instanceId)) {
 				elasticIpsService.dissociate(cloudHost);
 			}
-		} catch (EntityNotFoundException ignored) {
-
-		}
+		} catch (EntityNotFoundException ignored) { }
 	}
 
 	public CloudHost launchInstance(Coordinates coordinates) {
@@ -273,8 +271,7 @@ public class CloudHostsService {
 		if (nodesService.isPartOfSwarm(address)) {
 			dockerSwarmService.leaveSwarm(address);
 		}
-		cloudHosts.delete(cloudHost);
-		elasticIpsService.dissociate(cloudHost);
+		deleteCloudHost(cloudHost);
 	}
 
 	public void terminateInstances() {

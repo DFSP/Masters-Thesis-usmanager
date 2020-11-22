@@ -87,7 +87,7 @@ import java.util.stream.Collectors;
 @Service
 public class AwsService {
 
-	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(10);
+	private static final int BOOT_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(2);
 
 	private final SshService sshService;
 	private final Map<AwsRegion, AmazonEC2> ec2Clients;
@@ -355,8 +355,20 @@ public class AwsService {
 
 	public void waitToBoot(Instance instance) throws IOException {
 		HostAddress hostAddress = new HostAddress(awsUsername, instance.getPublicIpAddress(), instance.getPrivateIpAddress());
-		SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
-		sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
+		String error = null;
+		final int retries = 5;
+		for (int i = 0; i < retries; i++) {
+			try {
+				SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
+				sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
+				return;
+			} catch (IOException e) {
+				error = e.getMessage();
+				log.info("Error while waiting for instance {} to boot: {}... retrying ({}/{})", instance.getInstanceId(), e.getMessage(), i + 1, retries);
+				Timing.sleep(i + 1, TimeUnit.SECONDS);
+			}
+		}
+		throw new IOException(error);
 	}
 
 	private boolean isUsManagerInstance(Instance instance) {
