@@ -52,7 +52,7 @@ public enum AwsRegion {
 	US_WEST_1("us-west-1", "US West (N. California)", RegionEnum.NORTH_AMERICA, "ami-0df861b1e282905a0", new Coordinates("US West (N. California)", 37.758891, -122.443318)),
 	US_WEST_2("us-west-2", "US West (Oregon)", RegionEnum.NORTH_AMERICA, "ami-04934a32a6f126606", new Coordinates("US West (Oregon)", 45.841904, -119.296774)),
 	AF_SOUTH_1("af-south-1", "Africa (Cape Town)", RegionEnum.AFRICA, "ami-0d3f351838a464138", new Coordinates("Africa (Cape Town)", -33.953923, 18.566379)),
-	AP_EAST_1("ap-east-1", "Asia Pacific (Hong Kong)", RegionEnum.ASIA, "ami-05a10535c9e6811bd", new Coordinates("Asia Pacific (Hong Kong)", 22.321326, 114.172109)),
+	AP_EAST_1("ap-east-1", "Asia Pacific (Hong Kong)", RegionEnum.ASIA, "ami-05a10535c9e6811bd", new Coordinates("Asia Pacific (Hong Kong)", 22.321326, 114.172109), false),
 	AP_SOUTH_1("ap-south-1", "Asia Pacific (Mumbai)", RegionEnum.ASIA, "ami-060b4856be6b88671", new Coordinates("Asia Pacific (Mumbai)", 19.085863, 72.873766)),
 	AP_NORTHEAST_2("ap-northeast-2", "Asia Pacific (Seoul)", RegionEnum.ASIA, "ami-051233a90353e8845", new Coordinates("Asia Pacific (Seoul)", 37.562049, 127.007511)),
 	AP_SOUTHEAST_1("ap-southeast-1", "Asia Pacific (Singapore)", RegionEnum.ASIA, "ami-0d5e118c0540b5489", new Coordinates("Asia Pacific (Singapore)", 1.353010, 103.869377)),
@@ -66,7 +66,7 @@ public enum AwsRegion {
 	EU_SOUTH_1("eu-south-1", "Europe (Milan)", RegionEnum.EUROPE, "ami-03b570cd52f568c7c", new Coordinates("Europe (Milan)", 45.469902, 9.179905)),
 	EU_WEST_3("eu-west-3", "Europe (Paris)", RegionEnum.EUROPE, "ami-070848040dcf61cb6", new Coordinates("Europe (Paris)", 48.879382, 2.341615)),
 	EU_NORTH_1("eu-north-1", "Europe (Stockholm)", RegionEnum.EUROPE, "ami-033eae7360852e3c3", new Coordinates("Europe (Stockholm)", 59.329544, 18.066653)),
-	ME_SOUTH_1("me-south-1", "Middle East (Bahrain)", RegionEnum.MIDDLE_EAST, "ami-0a227f8b7f1926094", new Coordinates("Middle East (Bahrain)", 26.233356, 50.585524)),
+	ME_SOUTH_1("me-south-1", "Middle East (Bahrain)", RegionEnum.MIDDLE_EAST, "ami-0a227f8b7f1926094", new Coordinates("Middle East (Bahrain)", 26.233356, 50.585524), false),
 	SA_EAST_1("sa-east-1", "South America (São Paulo)", RegionEnum.SOUTH_AMERICA, "ami-0351ba0be52c674ef", new Coordinates("South America (São Paulo)", -23.576129, -46.614103));
 
 	private final String zone;

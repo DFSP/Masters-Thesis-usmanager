@@ -92,7 +92,7 @@ class Landing extends React.Component<Props, State> {
             case 'europe':
                 return 'Cyan';
             case 'north america':
-                return 'Brown';
+                return 'Yellow';
             case 'south america':
                 return 'Coral';
             case 'africa':
