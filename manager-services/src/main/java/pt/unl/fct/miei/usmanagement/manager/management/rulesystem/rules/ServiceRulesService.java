@@ -69,7 +69,7 @@ public class ServiceRulesService {
 	private final AtomicLong lastUpdateServiceRules;
 
 	public ServiceRulesService(ConditionsService conditionsService, DroolsService droolsService,
-							   @Lazy ServicesService servicesService, ContainersService containersService,
+							   @Lazy ServicesService servicesService, @Lazy ContainersService containersService,
 							   ServiceRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.droolsService = droolsService;

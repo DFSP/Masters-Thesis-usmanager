@@ -243,8 +243,8 @@ public class MasterSymService {
 		);
 		getWorkerToMasterTables().forEach(table -> {
 				log.info("Added worker synchronize trigger to table {}", table);
-				String syncCondition = table.equalsIgnoreCase("containers")
-					|| table.equalsIgnoreCase("nodes") ? "(OLD_MANAGER_ID = '$(externalId)' or NEW_MANAGER_ID = '$(externalId)')" : null;
+				String syncCondition = List.of("containers", "container_labels", "container_mounts", "container_ports", "nodes", "node_labels").contains(table)
+					? "(OLD_MANAGER_ID = '$(externalId)' or NEW_MANAGER_ID = '$(externalId)')" : null;
 				symTriggersRepository.save(SymTriggerEntity.builder()
 					.triggerId("worker-" + table)
 					.sourceTableName(table)

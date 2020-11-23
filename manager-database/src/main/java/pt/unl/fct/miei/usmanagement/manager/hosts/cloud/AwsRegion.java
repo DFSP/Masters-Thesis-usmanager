@@ -66,7 +66,7 @@ public enum AwsRegion {
 	EU_SOUTH_1("eu-south-1", "Europe (Milan)", RegionEnum.EUROPE, "ami-03b570cd52f568c7c", new Coordinates("Europe (Milan)", 45.469902, 9.179905)),
 	EU_WEST_3("eu-west-3", "Europe (Paris)", RegionEnum.EUROPE, "ami-070848040dcf61cb6", new Coordinates("Europe (Paris)", 48.879382, 2.341615)),
 	EU_NORTH_1("eu-north-1", "Europe (Stockholm)", RegionEnum.EUROPE, "ami-033eae7360852e3c3", new Coordinates("Europe (Stockholm)", 59.329544, 18.066653)),
-	//ME_SOUTH_1("me-south-1", "Middle East (Bahrain)", RegionEnum.MIDDLE_EAST, "ami-0a227f8b7f1926094", new Coordinates("Middle East (Bahrain)", 26.233356, 50.585524), false),
+	ME_SOUTH_1("me-south-1", "Middle East (Bahrain)", RegionEnum.MIDDLE_EAST, "ami-0a227f8b7f1926094", new Coordinates("Middle East (Bahrain)", 26.233356, 50.585524), false),
 	SA_EAST_1("sa-east-1", "South America (São Paulo)", RegionEnum.SOUTH_AMERICA, "ami-0351ba0be52c674ef", new Coordinates("South America (São Paulo)", -23.576129, -46.614103));
 
 	private final String zone;
