@@ -8,18 +8,17 @@ através da recolha de várias métricas, como utilização de cpu e ram dos dis
 dependências entre microserviços, e dispositivos cloud e edge disponíveis.  
 Este projeto está enquadrado no contexto de várias dissertações para obtenção do grau mestre em Engenharia Informática na [FCT-UNL](https://www.fct.unl.pt/).
 
-### Organização do projeto (módulos)
-
-
-- [manager-master](manager-master)
-
-- [manager-worker](manager-worker)
+### Organização do projeto
 
 - [manager-database](manager-database)
 
+- [manager-hub](manager-hub)
+
+- [manager-master](manager-master)
+
 - [manager-services](manager-services)
 
-- [manager-hub](manager-hub)
+- [manager-worker](manager-worker)
 
 - [nginx-basic-auth-proxy](nginx-basic-auth-proxy)
 
@@ -29,19 +28,19 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 
 - [prometheus](prometheus)
 
-- [request-location-monitor](request-location-monitor)
+- [registration-client](registration-client)
 
 - [registration-server](registration-server)
 
-- [registration-client](registration-client)
+- [request-location-monitor](request-location-monitor)
 
-- [registration-client-java](registration-client-java)
+- [registration-client-java](/registration-client-java)
 
-- [registration-client-go](registration-client-go)
+- [registration-client-go](/registration-client-go)
 
-- [registration-client-cpp](registration-client-cpp)
+- [registration-client-cpp](/registration-client-cpp)
 
-- [registration-client-csharp](registration-client-csharp)
+- [registration-client-csharp](/registration-client-csharp)
 
 - Microserviços
   - Sock shop
@@ -52,22 +51,67 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
     - [queue-master](../microservices/sock-shop/queue-master)
     - [shipping](../microservices/sock-shop/shipping)
   - Online boutique
-    - TODO 
-  - Death-star-bench
-    - TODO
+    - [adservice](../microservices/online-boutique/src/adservice)
+    - [cartservice](../microservices/online-boutique/src/cartservice)
+    - [checkoutservice](../microservices/online-boutique/src/checkoutservice)
+    - [currencyservice](../microservices/online-boutique/src/currencyservice)
+    - [emailservice](../microservices/online-boutique/src/emailservice)
+    - [frontend](../microservices/online-boutique/src/frontend)
+    - [loadgenerator](../microservices/online-boutique/src/loadgenerator)
+    - [paymentservice](../microservices/online-boutique/src/paymentservice)
+    - [productcatalogservice](../microservices/online-boutique/src/productcatalogservice)
+    - [recommendationservice](../microservices/online-boutique/src/recommendationservice)
+    - [shippingservice](../microservices/online-boutique/src/shippingservice)
+  - Hotel Reservation
+    - [frontend](../microservices/death-star-bench/hotelReservation/services/frontend)
+    - [geo](../microservices/death-star-bench/hotelReservation/services/geo)
+    - [profile](../microservices/death-star-bench/hotelReservation/services/profile)
+    - [rate](../microservices/death-star-bench/hotelReservation/services/rate)
+    - [recommendation](../microservices/death-star-bench/hotelReservation/services/recommendation)
+    - [reservation](../microservices/death-star-bench/hotelReservation/services/reservation)
+    - [search](../microservices/death-star-bench/hotelReservation/services/search)
+    - [user](../microservices/death-star-bench/hotelReservation/services/user)
+  - Media
+    - [CastInfoService](../microservices/death-star-bench/mediaMicroservices/src/CastInfoService)
+    - [ComposeReviewService](../microservices/death-star-bench/mediaMicroservices/src/ComposeReviewService)
+    - [MovieIdService](../microservices/death-star-bench/mediaMicroservices/src/MovieIdService)
+    - [MovieReviewService](../microservices/death-star-bench/mediaMicroservices/src/MovieReviewService)
+    - [MovieInfoService](../microservices/death-star-bench/mediaMicroservices/src/MovieInfoService)
+    - [PageService](../microservices/death-star-bench/mediaMicroservices/src/PageService)
+    - [PlotService](../microservices/death-star-bench/mediaMicroservices/src/PlotService)
+    - [RatingService](../microservices/death-star-bench/mediaMicroservices/src/RatingService)
+    - [ReviewStorageService](../microservices/death-star-bench/mediaMicroservices/src/ReviewStorageService)
+    - [UniqueIdService](../microservices/death-star-bench/mediaMicroservices/src/UniqueIdService)
+    - [TextService](../microservices/death-star-bench/mediaMicroservices/src/TextService)
+    - [UserReviewService](../microservices/death-star-bench/mediaMicroservices/src/UserReviewService)
+    - [UserService](../microservices/death-star-bench/mediaMicroservices/src/UserService)
+  - Social Network
+    - [UserService](../microservices/death-star-bench/socialNetwork/src/UserService)
+    - [TextService](../microservices/death-star-bench/socialNetwork/src/TextService)
+    - [UniqueIdService](../microservices/death-star-bench/socialNetwork/src/UniqueIdService)
+    - [ComposePostService](../microservices/death-star-bench/socialNetwork/src/ComposePostService)
+    - [HomeTimelineService](../microservices/death-star-bench/socialNetwork/src/HomeTimelineService)
+    - [PostStorageSerivce](../microservices/death-star-bench/socialNetwork/src/PostStorageSerivce)
+    - [SocialGraphService](../microservices/death-star-bench/socialNetwork/src/SocialGraphService)
+    - [MediaService](../microservices/death-star-bench/socialNetwork/src/MediaService)
+    - [UserMentionService](../microservices/death-star-bench/socialNetwork/src/UrlShortenService)
+    - [UserMentionService](../microservices/death-star-bench/socialNetwork/src/UserMentionService)
+    - [UserTimelineService](../microservices/death-star-bench/socialNetwork/src/UserTimelineService)
+    - [WriteHomeTimelineService](../microservices/death-star-bench/socialNetwork/src/WriteHomeTimelineService)
   - Mixal
-    - TODO
+    - [movie](../microservices/mixal/movie)
+    - [prime](../microservices/mixal/prime)
+    - [serve](../microservices/mixal/serve)
+    - [webac](../microservices/mixal/webac)
   - Test suite
-    - Crash-testing
+    - [crash-testing](../microservices/test-suite/crash-testing)
     
-  
-
 
 ### Ferramentas usadas
 
 [<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://www.jetbrains.com/idea/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
 
-[<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> CLion](https://www.jetbrains.com/clion/) - A cross-platform IDE for C and C++
+[<img src="https://i.imgur.com/LxlB6ty.png" alt="" width="48" height="48"> CLion](https://www.jetbrains.com/clion/) - A cross-platform IDE for C and C++
 
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
