@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -28,23 +28,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRules;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -57,6 +61,7 @@ public class ServiceRulesService {
 	private final ConditionsService conditionsService;
 	private final DroolsService droolsService;
 	private final ServicesService servicesService;
+	private final ContainersService containersService;
 
 	private final ServiceRules rules;
 
@@ -64,11 +69,12 @@ public class ServiceRulesService {
 	private final AtomicLong lastUpdateServiceRules;
 
 	public ServiceRulesService(ConditionsService conditionsService, DroolsService droolsService,
-							   @Lazy ServicesService servicesService, ServiceRules rules,
-							   RulesProperties rulesProperties) {
+							   @Lazy ServicesService servicesService, ContainersService containersService,
+							   ServiceRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.droolsService = droolsService;
 		this.servicesService = servicesService;
+		this.containersService = containersService;
 		this.rules = rules;
 		this.serviceRuleTemplateFile = rulesProperties.getServiceRuleTemplateFile();
 		this.lastUpdateServiceRules = new AtomicLong(0);
@@ -217,34 +223,55 @@ public class ServiceRulesService {
 
 	public ServiceDecisionResult processServiceEvent(HostAddress hostAddress, ContainerEvent containerEvent) {
 		String serviceName = containerEvent.getServiceName();
+		String containerId = containerEvent.getContainerId();
 		if (droolsService.shouldCreateNewServiceRuleSession(serviceName, lastUpdateServiceRules.get())) {
-			List<Rule> rules = generateServiceRules(serviceName);
+			List<Rule> rules = generateServiceRules(serviceName, containerId);
 			Map<Long, String> drools = droolsService.executeDroolsRules(containerEvent, rules, serviceRuleTemplateFile);
 			droolsService.createNewServiceRuleSession(serviceName, drools);
 		}
 		return droolsService.evaluate(hostAddress, containerEvent);
 	}
 
-	private List<Rule> generateServiceRules(String serviceName) {
+	private List<Rule> generateServiceRules(String serviceName, String containerId) {
 		List<ServiceRule> genericServiceRules = getGenericServiceRules();
+		List<AppRule> appRules = new LinkedList<>();
+		for (App app : servicesService.getApps(serviceName)) {
+			appRules.addAll(app.getAppRules());
+		}
 		List<ServiceRule> serviceRules = getServiceRules(serviceName);
-		List<Rule> rules = new ArrayList<>(genericServiceRules.size() + serviceRules.size());
-		log.info("Generating service rules... (count: {})", serviceRules.size());
+		List<ContainerRule> containerRules = new ArrayList<>(containersService.getRules(containerId));
+		int count = genericServiceRules.size() + appRules.size() + serviceRules.size() + containerRules.size();
+		List<Rule> rules = new ArrayList<>(count);
+		log.info("Generating service rules... (count: {})", count);
 		genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
+		appRules.forEach(appRule -> rules.add(generateServiceRule(appRule)));
 		serviceRules.forEach(serviceRule -> rules.add(generateServiceRule(serviceRule)));
+		containerRules.forEach(containerRule -> rules.add(generateServiceRule(containerRule)));
 		return rules;
 	}
 
 	private Rule generateServiceRule(ServiceRule serviceRule) {
-		Long id = serviceRule.getId();
-		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(serviceRule.getName()).stream().map(condition -> {
+		return generateRule(serviceRule.getId(), serviceRule.getName(), serviceRule.getDecision().getRuleDecision(),
+			serviceRule.getPriority());
+	}
+
+	private Rule generateServiceRule(AppRule appRule) {
+		return generateRule(appRule.getId(), appRule.getName(), appRule.getDecision().getRuleDecision(),
+			appRule.getPriority());
+	}
+
+	private Rule generateServiceRule(ContainerRule containerRule) {
+		return generateRule(containerRule.getId(), containerRule.getName(), containerRule.getDecision().getRuleDecision(),
+			containerRule.getPriority());
+	}
+
+	private Rule generateRule(Long id, String ruleName, RuleDecisionEnum decision, int priority) {
+		List<pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition> conditions = getConditions(ruleName).stream().map(condition -> {
 			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
 			double value = condition.getValue();
 			OperatorEnum operator = condition.getOperator().getOperator();
 			return new pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition(fieldName, value, operator);
 		}).collect(Collectors.toList());
-		RuleDecisionEnum decision = serviceRule.getDecision().getRuleDecision();
-		int priority = serviceRule.getPriority();
 		return new Rule(id, conditions, decision, priority);
 	}
 

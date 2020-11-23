@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -275,10 +274,13 @@ public class HostRulesService {
 	}
 
 	private List<Rule> generateHostRules(HostAddress hostAddress) {
+		List<HostRule> genericHostRules = getGenericHostRules();
 		List<HostRule> hostRules = getRules(hostAddress);
-		List<Rule> rules = new ArrayList<>(hostRules.size());
-		log.info("Generating host rules... (count: {})", hostRules.size());
+		int count = genericHostRules.size() + hostRules.size();
+		List<Rule> rules = new ArrayList<>(count);
+		log.info("Generating host rules... (count: {})", count);
 		hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
+		genericHostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
 		return rules;
 	}
 

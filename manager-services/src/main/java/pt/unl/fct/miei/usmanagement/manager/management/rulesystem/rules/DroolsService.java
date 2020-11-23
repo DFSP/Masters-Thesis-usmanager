@@ -38,7 +38,6 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.Event;
@@ -87,7 +86,8 @@ public class DroolsService {
 		}
 		return false;
 	}
-public boolean shouldCreateNewHostRuleSession(HostAddress hostAddress, long lastUpdate) {
+
+	public boolean shouldCreateNewHostRuleSession(HostAddress hostAddress, long lastUpdate) {
 		long currentTimestamp = lastUpdateHostRules.getOrDefault(hostAddress, -1L);
 		if (currentTimestamp < lastUpdate) {
 			lastUpdateHostRules.put(hostAddress, lastUpdate);

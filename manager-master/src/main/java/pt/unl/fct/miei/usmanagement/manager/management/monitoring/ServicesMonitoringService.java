@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -40,12 +39,11 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.Servic
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ContainerFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceFieldAverage;
@@ -287,19 +285,17 @@ public class ServicesMonitoringService {
 
 			stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, stat, value));
 
-			if (!serviceName.equals(MasterManagerProperties.MASTER_MANAGER)
-				&& !serviceName.equals(WorkerManagerProperties.WORKER_MANAGER)) {
-				ServiceDecisionResult containerDecisionResult = runRules(hostAddress, containerId, serviceName, stats);
-				List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);
-				if (containerDecisions != null) {
-					containerDecisions.add(containerDecisionResult);
-				}
-				else {
-					containerDecisions = new LinkedList<>();
-					containerDecisions.add(containerDecisionResult);
-					containersDecisions.put(serviceName, containerDecisions);
-				}
+			ServiceDecisionResult containerDecisionResult = runRules(hostAddress, serviceName, containerId, stats);
+			List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);
+			if (containerDecisions != null) {
+				containerDecisions.add(containerDecisionResult);
 			}
+			else {
+				containerDecisions = new LinkedList<>();
+				containerDecisions.add(containerDecisionResult);
+				containersDecisions.put(serviceName, containerDecisions);
+			}
+
 		});
 
 		if (!containersDecisions.isEmpty()) {
@@ -310,7 +306,7 @@ public class ServicesMonitoringService {
 		}
 	}
 
-	private ServiceDecisionResult runRules(HostAddress hostAddress, String containerId, String serviceName, Map<String, Double> newFields) {
+	private ServiceDecisionResult runRules(HostAddress hostAddress, String serviceName, String containerId, Map<String, Double> newFields) {
 
 		ContainerEvent containerEvent = new ContainerEvent(containerId, serviceName, hostAddress);
 		Map<String, Double> containerEventFields = containerEvent.getFields();

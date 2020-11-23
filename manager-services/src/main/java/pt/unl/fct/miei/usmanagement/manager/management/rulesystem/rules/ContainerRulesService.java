@@ -29,7 +29,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
@@ -48,28 +47,17 @@ public class ContainerRulesService {
 
 	private final ConditionsService conditionsService;
 	private final ContainersService containersService;
-	private final DroolsService droolsService;
+	private final ServiceRulesService serviceRulesService;
 
 	private final ContainerRules rules;
 
-	//private final String containerRuleTemplateFile;
-	//private final AtomicLong lastUpdateContainerRules;
-
 	public ContainerRulesService(ConditionsService conditionsService, @Lazy ContainersService containersService,
-								 DroolsService droolsService, ContainerRules rules,
-								 RulesProperties rulesProperties) {
+								 ContainerRules rules, ServiceRulesService serviceRulesService) {
 		this.conditionsService = conditionsService;
 		this.containersService = containersService;
-		this.droolsService = droolsService;
 		this.rules = rules;
-		//this.containerRuleTemplateFile = rulesProperties.getContainerRuleTemplateFile();
-		//this.lastUpdateContainerRules = new AtomicLong(0);
+		this.serviceRulesService = serviceRulesService;
 	}
-
-  /*public void setLastUpdateContainerRules() {
-    long currentTime = System.currentTimeMillis();
-    lastUpdateContainerRules.getAndSet(currentTime);
-  }*/
 
 	public List<ContainerRule> getRules() {
 		return rules.findAll();
@@ -88,7 +76,7 @@ public class ContainerRulesService {
 	public ContainerRule addRule(ContainerRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 		return rules.save(rule);
 	}
 
@@ -97,7 +85,7 @@ public class ContainerRulesService {
 		ContainerRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
 		rule = rules.save(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 		return rule;
 	}
 
@@ -106,7 +94,7 @@ public class ContainerRulesService {
 		ContainerRule rule = getRule(ruleName);
 		rule.removeAssociations();
 		rules.delete(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 	}
 
 	public Condition getCondition(String ruleName, String conditionName) {
@@ -128,7 +116,7 @@ public class ContainerRulesService {
 			ContainerRuleCondition.builder().containerCondition(condition).containerRule(rule).build();
 		rule = rule.toBuilder().condition(containerRuleCondition).build();
 		rules.save(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 	}
 
 	public void addConditions(String ruleName, List<String> conditions) {
@@ -145,7 +133,7 @@ public class ContainerRulesService {
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
 		rules.save(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 	}
 
 	public Container getContainer(String ruleName, String containerId) {
@@ -171,7 +159,7 @@ public class ContainerRulesService {
 			container.addRule(rule);
 		});
 		rules.save(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 	}
 
 	public void removeContainer(String ruleName, String containerId) {
@@ -183,7 +171,7 @@ public class ContainerRulesService {
 		ContainerRule rule = getRule(ruleName);
 		containerIds.forEach(containerId -> containersService.getContainer(containerId).removeRule(rule));
 		rules.save(rule);
-		//setLastUpdateContainerRules();
+		serviceRulesService.setLastUpdateServiceRules();
 	}
 
 	private void checkRuleExists(String ruleName) {
@@ -198,36 +186,5 @@ public class ContainerRulesService {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}
 	}
-
-  /* public HostDecisionResult processHostEvent(String hostname, HostEvent hostEvent) {
-    if (droolsService.shouldCreateNewRuleSession(hostname, lastUpdateContainerRules.get())) {
-      List<Rule> rules = generateContainerRules(hostname);
-      Map<Long, String> drools = droolsService.executeDroolsRules(hostEvent, rules, containerRuleTemplateFile);
-      droolsService.createNewContainerRuleSession(hostname, drools);
-    }
-    return droolsService.evaluate(hostEvent);
-  }
-
-  private List<Rule> generateContainerRules(String hostname) {
-    //FIXME what about containers?
-    List<ContainerRuleEntity> containerRules = getRules(hostname);
-    var rules = new ArrayList<Rule>(containerRules.size());
-    log.info("Generating Container rules... (count: {})", rules.size());
-    containerRules.forEach(containerRule -> rules.add(generateRule(containerRule)));
-    return rules;
-  }
-
-  private Rule generateRule(ContainerRuleEntity containerRule) {
-    Long id = containerRule.getId();
-    List<Condition> conditions = getConditions(containerRule.getName()).stream().map(condition -> {
-      String fieldName = String.format("%s-%s", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
-      double value = condition.getValue();
-      Operator operator = Operator.fromValue(condition.getOperator().getName());
-      return new Condition(fieldName, value, operator);
-    }).collect(Collectors.toList());
-    RuleDecision decision = RuleDecision.fromValue(containerRule.getDecision().getName());
-    int priority = containerRule.getPriority();
-    return new Rule(id, conditions, decision, priority);
-  }*/
 
 }
