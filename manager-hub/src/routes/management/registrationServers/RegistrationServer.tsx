@@ -173,7 +173,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, registrationServer: IRegistrationServer): void =>
-        super.toast(`Não foi possível para o servidor de registo ${this.mounted ? `<b>${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível parar o servidor de registo ${this.mounted ? `<b>${registrationServer.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`}`, 10000, reason, true);
 
     private updateRegistrationServer = (registrationServer: IRegistrationServer) => {
         registrationServer = Object.values(normalize(registrationServer, Schemas.REGISTRATION_SERVER).entities.registrationServers || {})[0];

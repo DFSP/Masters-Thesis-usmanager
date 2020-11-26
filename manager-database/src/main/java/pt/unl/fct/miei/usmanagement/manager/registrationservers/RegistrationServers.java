@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface RegistrationServers extends JpaRepository<RegistrationServer, String> {
 
 	@Query("select case when count(r) > 0 then true else false end "
-		+ "from RegistrationServer r "
+		+ "from Zookeeper r "
 		+ "where r.id = :id")
 	boolean hasRegistrationServer(@Param("id") String id);
 

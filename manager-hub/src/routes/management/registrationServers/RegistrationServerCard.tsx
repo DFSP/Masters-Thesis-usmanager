@@ -73,7 +73,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, registrationServer: IRegistrationServer): void => {
-        super.toast(`Não foi possível para o servidor de registo <a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o servidor de registo <a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

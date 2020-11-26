@@ -84,6 +84,8 @@ import SimulatedAppMetrics from "../routes/management/metrics/apps/SimulatedAppM
 import SimulatedAppMetric from "../routes/management/metrics/apps/SimulatedAppMetric";
 import Sidenav from "../views/sidenav/Sidenav";
 import ReactTooltip from "react-tooltip";
+import KafkaBrokers from "../routes/management/kafka/KafkaBrokers";
+import KafkaBroker from "../routes/management/kafka/KafkaBroker";
 
 interface RootContainerProps {
     store: any;
@@ -139,6 +141,8 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/servidores de registo/:id": {component: RegistrationServer},
     "/gestores locais": {component: WorkerManagers, search: true},
     "/gestores locais/:id": {component: WorkerManager},
+    "/kafka": {component: KafkaBrokers, search: true},
+    "/kafka/:id": {component: KafkaBroker},
     "/secure shell": {component: Ssh},
     "/configurações": {component: Settings},
     "/logs": {component: ManagementLogs, search: true},

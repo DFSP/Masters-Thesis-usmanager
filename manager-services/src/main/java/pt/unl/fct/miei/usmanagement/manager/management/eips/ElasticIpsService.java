@@ -218,4 +218,19 @@ public class ElasticIpsService {
 		elasticIp.setInstanceId(null);
 		return elasticIps.save(elasticIp);
 	}
+
+	public HostAddress getHost(RegionEnum region) {
+		ElasticIp elasticIp = getElasticIp(region);
+		String instanceId = elasticIp.getInstanceId();
+		if (instanceId != null) {
+			return cloudHostsService.getCloudHostById(instanceId).getAddress();
+		}
+		else {
+			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
+			String allocationId = elasticIp.getAllocationId();
+			return associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
+		}
+	}
+
 }

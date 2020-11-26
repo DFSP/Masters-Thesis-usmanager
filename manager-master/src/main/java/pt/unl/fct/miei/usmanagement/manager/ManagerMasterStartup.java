@@ -73,7 +73,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		String hostAddressJson = environment.getProperty(EnvironmentConstants.HOST_ADDRESS);
+		/*String hostAddressJson = environment.getProperty(EnvironmentConstants.HOST_ADDRESS);
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
 			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
@@ -86,7 +86,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startCloudHostsDatabaseSynchronization();
 		syncService.startContainersDatabaseSynchronization();
-		syncService.startNodesDatabaseSynchronization();
+		syncService.startNodesDatabaseSynchronization();*/
 	}
 
 }

@@ -51,12 +51,12 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.Containe
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.symmetricds.SymService;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
@@ -359,7 +359,7 @@ public class ContainersService {
 
 	public void deleteContainer(String id) {
 		Container container = getContainer(id);
-		if (container.getName().contains(WorkerManagerProperties.WORKER_MANAGER)) {
+		if (container.getName().contains(ServiceConstants.Name.WORKER_MANAGER)) {
 			try {
 				workerManagersService.deleteWorkerManagerByContainer(container);
 			}
@@ -367,7 +367,7 @@ public class ContainersService {
 				log.error("Failed to delete worker manager associated with container {}: {}", id, e.getMessage());
 			}
 		}
-		else if (container.getName().contains(RegistrationServerService.REGISTRATION_SERVER)) {
+		else if (container.getName().contains(ServiceConstants.Name.REGISTRATION_SERVER)) {
 			try {
 				registrationServerService.deleteRegistrationServerByContainer(container);
 			}
@@ -375,7 +375,7 @@ public class ContainersService {
 				log.error("Failed to delete registration server associated with container {}: {}", id, e.getMessage());
 			}
 		}
-		else if (container.getName().contains(NginxLoadBalancerService.LOAD_BALANCER)) {
+		else if (container.getName().contains(ServiceConstants.Name.LOAD_BALANCER)) {
 			try {
 				nginxLoadBalancerService.deleteLoadBalancerByContainer(container);
 			}
@@ -417,7 +417,8 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.DATABASE.name()))
 		).stream().filter(container -> !configurationsService.isConfiguring(container.getId())).collect(Collectors.toList());
 	}
-public List<Container> getServiceContainers(HostAddress hostAddress) {
+
+	public List<Container> getServiceContainers(HostAddress hostAddress) {
 		return getHostContainersWithLabels(hostAddress, Set.of(
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.FRONTEND.name()),
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.BACKEND.name()),

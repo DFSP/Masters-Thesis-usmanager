@@ -47,10 +47,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PrometheusService {
 
-	public static final String PROMETHEUS = "prometheus";
-	private static final int DEFAULT_PORT = 9090;
-	private static final String URL = "http://%s:%d/api/v1/query";
-
 	private final RestTemplate restTemplate;
 
 	public PrometheusService() {
@@ -61,7 +57,7 @@ public class PrometheusService {
 	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
 		URI uri = UriComponentsBuilder
-			.fromHttpUrl(String.format(URL, hostAddress.getPublicIpAddress(), DEFAULT_PORT))
+			.fromHttpUrl(String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), PrometheusProperties.PORT))
 			.queryParam("query", URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8))
 			.queryParam("time", Double.toString((System.currentTimeMillis() * 1.0) / 1000.0))
 			.build(true).toUri();

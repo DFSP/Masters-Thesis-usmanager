@@ -38,6 +38,7 @@ import {
     ADD_EDGE_HOST,
     ADD_EDGE_HOST_RULES,
     ADD_EDGE_HOST_SIMULATED_METRICS,
+    ADD_KAFKA_BROKERS,
     ADD_LOAD_BALANCERS,
     ADD_NODES,
     ADD_REGISTRATION_SERVERS,
@@ -133,6 +134,7 @@ import {
     DELETE_CONDITION,
     DELETE_CONTAINER,
     DELETE_EDGE_HOST,
+    DELETE_KAFKA_BROKER,
     DELETE_LOAD_BALANCER,
     DELETE_NODE,
     DELETE_REGISTRATION_SERVER,
@@ -161,6 +163,12 @@ import {
     FIELDS_FAILURE,
     FIELDS_REQUEST,
     FIELDS_SUCCESS,
+    KAFKA_BROKER_FAILURE,
+    KAFKA_BROKER_REQUEST,
+    KAFKA_BROKER_SUCCESS,
+    KAFKA_BROKERS_FAILURE,
+    KAFKA_BROKERS_REQUEST,
+    KAFKA_BROKERS_SUCCESS,
     LOAD_BALANCER_FAILURE,
     LOAD_BALANCER_REQUEST,
     LOAD_BALANCER_SUCCESS,
@@ -390,6 +398,7 @@ import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAp
 import {ISshCommand} from "../routes/management/ssh/SshCommand";
 import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
 import {IHostAddress} from "../routes/management/hosts/Hosts";
+import {IKafkaBroker} from "../routes/management/kafka/KafkaBroker";
 
 export type EntitiesState = {
     apps: {
@@ -563,6 +572,13 @@ export type EntitiesState = {
         isLoadingRegions: boolean,
         loadRegionsError: string | null,
     },
+    workerManagers: {
+        data: { [key: string]: IWorkerManager },
+        isLoadingWorkerManagers: boolean,
+        loadWorkerManagersError: string | null,
+        isLoadingAssignedHosts: boolean,
+        loadAssignedHostsError: string | null,
+    },
     loadBalancers: {
         data: { [key: string]: ILoadBalancer },
         isLoadingLoadBalancers: boolean,
@@ -573,12 +589,10 @@ export type EntitiesState = {
         isLoadingRegistrationServers: boolean,
         loadRegistrationServersError: string | null,
     },
-    workerManagers: {
-        data: { [key: string]: IWorkerManager },
-        isLoadingWorkerManagers: boolean,
-        loadWorkerManagersError: string | null,
-        isLoadingAssignedHosts: boolean,
-        loadAssignedHostsError: string | null,
+    kafkaBrokers: {
+        data: { [key: string]: IKafkaBroker },
+        isLoadingKafkaBrokers: boolean,
+        loadKafkaBrokersError: string | null,
     },
     logs: {
         data: { [key: number]: ILogs },
@@ -634,9 +648,10 @@ export type EntitiesAction = {
         simulatedServiceMetrics?: ISimulatedServiceMetric[],
         simulatedContainerMetrics?: ISimulatedContainerMetric[],
         simulatedMetricNames?: string[],
+        workerManagers?: IWorkerManager[],
         loadBalancers?: ILoadBalancer[],
         registrationServers?: ILoadBalancer[],
-        workerManagers?: IWorkerManager[],
+        kafkaBrokers?: IKafkaBroker[],
         assignedHosts?: string[],
         logs?: ILogs[],
         commands?: ISshCommand[],
@@ -816,6 +831,13 @@ const entities = (state: EntitiesState = {
                           isLoadingRegions: false,
                           loadRegionsError: null
                       },
+                      workerManagers: {
+                          data: {},
+                          isLoadingWorkerManagers: false,
+                          loadWorkerManagersError: null,
+                          isLoadingAssignedHosts: false,
+                          loadAssignedHostsError: null,
+                      },
                       loadBalancers: {
                           data: {},
                           isLoadingLoadBalancers: false,
@@ -826,12 +848,10 @@ const entities = (state: EntitiesState = {
                           isLoadingRegistrationServers: false,
                           loadRegistrationServersError: null
                       },
-                      workerManagers: {
+                      kafkaBrokers: {
                           data: {},
-                          isLoadingWorkerManagers: false,
-                          loadWorkerManagersError: null,
-                          isLoadingAssignedHosts: false,
-                          loadAssignedHostsError: null,
+                          isLoadingKafkaBrokers: false,
+                          loadKafkaBrokersError: null
                       },
                       logs: {
                           data: {},
@@ -3681,6 +3701,59 @@ const entities = (state: EntitiesState = {
                 });
             }
             return state;
+
+        case WORKER_MANAGERS_REQUEST:
+        case WORKER_MANAGER_REQUEST:
+            return merge({}, state, {workerManagers: {isLoadingWorkerManagers: true, loadWorkerManagersError: null}});
+        case WORKER_MANAGERS_FAILURE:
+        case WORKER_MANAGER_FAILURE:
+            return merge({}, state, {workerManagers: {isLoadingWorkerManagers: false, loadWorkerManagersError: error}});
+        case WORKER_MANAGERS_SUCCESS:
+            return {
+                ...state,
+                workerManagers: {
+                    ...state.workerManagers,
+                    data: merge({}, pick(state.workerManagers.data, keys(data?.workerManagers)), data?.workerManagers),
+                    isLoadingWorkerManagers: false,
+                    loadWorkerManagersError: null,
+                }
+            };
+        case WORKER_MANAGER_SUCCESS:
+            return {
+                ...state,
+                workerManagers: {
+                    ...state.workerManagers,
+                    data: merge({}, state.workerManagers.data, data?.workerManagers),
+                    isLoadingWorkerManagers: false,
+                    loadWorkerManagersError: null,
+                }
+            };
+        case ADD_WORKER_MANAGERS:
+            if (data?.workerManagers?.length) {
+                const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers;
+                return merge({}, state, {
+                    workerManagers: {
+                        data: workerManager,
+                        isLoadingWorkerManagers: false,
+                        loadWorkerManagersError: null
+                    }
+                });
+            }
+            break;
+        case DELETE_WORKER_MANAGER:
+            if (data?.workerManagers?.length) {
+                const workerManagerToDelete = data.workerManagers[0];
+                const filteredApps = Object.values(state.workerManagers.data).filter(workerManager => workerManager.id !== workerManagerToDelete.id);
+                const workerManagers = normalize(filteredApps, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers || {};
+                return {
+                    ...state,
+                    workerManagers: {
+                        ...state.workerManagers,
+                        data: workerManagers,
+                    }
+                }
+            }
+            break;
         case LOAD_BALANCERS_REQUEST:
         case LOAD_BALANCER_REQUEST:
             return merge({}, state, {loadBalancers: {isLoadingLoadBalancers: true, loadLoadBalancersError: null}});
@@ -3793,54 +3866,63 @@ const entities = (state: EntitiesState = {
                 }
             }
             break;
-        case WORKER_MANAGERS_REQUEST:
-        case WORKER_MANAGER_REQUEST:
-            return merge({}, state, {workerManagers: {isLoadingWorkerManagers: true, loadWorkerManagersError: null}});
-        case WORKER_MANAGERS_FAILURE:
-        case WORKER_MANAGER_FAILURE:
-            return merge({}, state, {workerManagers: {isLoadingWorkerManagers: false, loadWorkerManagersError: error}});
-        case WORKER_MANAGERS_SUCCESS:
+        case KAFKA_BROKERS_REQUEST:
+        case KAFKA_BROKER_REQUEST:
+            return merge({}, state, {
+                kafkaBrokers: {
+                    isLoadingKafkaBrokers: true,
+                    loadKafkaBrokersError: null
+                }
+            });
+        case KAFKA_BROKERS_FAILURE:
+        case KAFKA_BROKER_FAILURE:
+            return merge({}, state, {
+                kafkaBrokers: {
+                    isLoadingKafkaBrokers: false,
+                    loadKafkaBrokersError: error
+                }
+            });
+        case KAFKA_BROKERS_SUCCESS:
             return {
                 ...state,
-                workerManagers: {
-                    ...state.workerManagers,
-                    data: merge({}, pick(state.workerManagers.data, keys(data?.workerManagers)), data?.workerManagers),
-                    isLoadingWorkerManagers: false,
-                    loadWorkerManagersError: null,
+                kafkaBrokers: {
+                    ...state.kafkaBrokers,
+                    data: merge({}, pick(state.kafkaBrokers.data, keys(data?.kafkaBrokers)), data?.kafkaBrokers),
+                    isLoadingKafkaBrokers: false,
+                    loadKafkaBrokersError: null,
                 }
             };
-        case WORKER_MANAGER_SUCCESS:
+        case KAFKA_BROKER_SUCCESS:
             return {
                 ...state,
-                workerManagers: {
-                    ...state.workerManagers,
-                    data: merge({}, state.workerManagers.data, data?.workerManagers),
-                    isLoadingWorkerManagers: false,
-                    loadWorkerManagersError: null,
+                kafkaBrokers: {
+                    data: merge({}, state.kafkaBrokers.data, data?.kafkaBrokers),
+                    isLoadingKafkaBrokers: false,
+                    loadKafkaBrokersError: null,
                 }
             };
-        case ADD_WORKER_MANAGERS:
-            if (data?.workerManagers?.length) {
-                const workerManager = normalize(data?.workerManagers, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers;
+        case ADD_KAFKA_BROKERS:
+            if (data?.kafkaBrokers?.length) {
+                const kafkaBrokers = normalize(data?.kafkaBrokers, Schemas.KAFKA_BROKER_ARRAY).entities.kafkaBrokers;
                 return merge({}, state, {
-                    workerManagers: {
-                        data: workerManager,
-                        isLoadingWorkerManagers: false,
-                        loadWorkerManagersError: null
+                    kafkaBrokers: {
+                        data: kafkaBrokers,
+                        isLoadingKafkaBrokers: false,
+                        loadKafkaBrokersError: null
                     }
                 });
             }
             break;
-        case DELETE_WORKER_MANAGER:
-            if (data?.workerManagers?.length) {
-                const workerManagerToDelete = data.workerManagers[0];
-                const filteredApps = Object.values(state.workerManagers.data).filter(workerManager => workerManager.id !== workerManagerToDelete.id);
-                const workerManagers = normalize(filteredApps, Schemas.WORKER_MANAGER_ARRAY).entities.workerManagers || {};
+        case DELETE_KAFKA_BROKER:
+            if (data?.kafkaBrokers?.length) {
+                const kafkaBrokersToDelete = data.kafkaBrokers[0];
+                const filteredKafkaBrokers = Object.values(state.kafkaBrokers.data).filter(kafkaBroker => kafkaBroker.id !== kafkaBrokersToDelete.id);
+                const kafkaBrokers = normalize(filteredKafkaBrokers, Schemas.KAFKA_BROKER_ARRAY).entities.kafkaBrokers || {};
                 return {
                     ...state,
-                    workerManagers: {
-                        ...state.workerManagers,
-                        data: workerManagers,
+                    kafkaBrokers: {
+                        ...state.kafkaBrokers,
+                        data: kafkaBrokers,
                     }
                 }
             }

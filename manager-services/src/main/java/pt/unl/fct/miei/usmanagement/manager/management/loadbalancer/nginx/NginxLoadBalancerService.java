@@ -51,6 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,8 +72,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class NginxLoadBalancerService {
-
-	public static final String LOAD_BALANCER = "load-balancer";
 
 	private final ContainersService containersService;
 	private final HostsService hostsService;
@@ -111,7 +110,7 @@ public class NginxLoadBalancerService {
 	public List<LoadBalancer> launchLoadBalancers(List<RegionEnum> regions) {
 		log.info("Launching load balancers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(LOAD_BALANCER);
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(ServiceConstants.Name.LOAD_BALANCER);
 
 		try {
 			return new ForkJoinPool(threads).submit(() ->
@@ -143,7 +142,7 @@ public class NginxLoadBalancerService {
 		if (nginxServers != null) {
 			environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.SERVER, new Gson().toJson(nginxServers)));
 		}
-		Container container = containersService.launchContainer(hostAddress, LOAD_BALANCER, environment);
+		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.LOAD_BALANCER, environment);
 
 		RegionEnum region = container.getHostAddress().getRegion();
 		LoadBalancer loadBalancer = LoadBalancer.builder().container(container).region(region).build();
@@ -151,7 +150,7 @@ public class NginxLoadBalancerService {
 	}
 
 	private LoadBalancer launchLoadBalancer(RegionEnum region, NginxServer[] nginxServers) {
-		double availableMemory = servicesService.getExpectedMemoryConsumption(LOAD_BALANCER);
+		double availableMemory = servicesService.getExpectedMemoryConsumption(ServiceConstants.Name.LOAD_BALANCER);
 		HostAddress hostAddress = hostsService.getCapableHost(availableMemory, region);
 		return launchLoadBalancer(hostAddress, nginxServers);
 	}
@@ -170,7 +169,7 @@ public class NginxLoadBalancerService {
 			public void run() {
 				try {
 					containersService.stopContainers((dockerContainer ->
-						dockerContainer.getName().contains(LOAD_BALANCER) && dockerContainer.getRegion() == region));
+						dockerContainer.getName().contains(ServiceConstants.Name.LOAD_BALANCER) && dockerContainer.getRegion() == region));
 				}
 				catch (ManagerException e) {
 					log.error("Failed to stop load balancers on region {}: {}. Retrying in {} minutes", region, e.getMessage(),

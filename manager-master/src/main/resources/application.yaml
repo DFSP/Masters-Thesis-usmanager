@@ -29,6 +29,11 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
+  kafka:
+    consumer:
+      group-id: manager-master
+      auto-offset-reset: earliest
+    bootstrap-servers: 192.168.1.83:9092
 management:
   endpoints:
     web:

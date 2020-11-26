@@ -25,7 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
-import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -107,7 +107,7 @@ public class ServicesMonitoringService {
 									 AppSimulatedMetricsService appSimulatedMetricsService,
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
-									 MasterManagerProperties masterManagerProperties, MonitoringProperties monitoringProperties) {
+									 ManagerMasterProperties masterManagerProperties, MonitoringProperties monitoringProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.containersService = containersService;

@@ -1,5 +1,4 @@
-/*
- * MIT License
+/* MIT License
  *
  * Copyright (c) 2020 manager
  *
@@ -22,13 +21,13 @@
  * SOFTWARE.
  */
 
+
 package pt.unl.fct.miei.usmanagement.manager.database;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import pt.unl.fct.miei.usmanagement.manager.MasterManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
@@ -55,7 +54,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitorin
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
@@ -65,7 +63,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenc
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
@@ -81,6 +78,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.users.User;
@@ -104,7 +102,8 @@ public class DatabaseLoader {
 	@Bean
 	CommandLineRunner initDatabase(UsersService usersService, ServicesService servicesService, AppsService appsService,
 								   AppServices appServices, ServiceDependenciesService serviceDependenciesService,
-		/*RegionsService regionsService,*/EdgeHostsService edgeHostsService, ComponentTypesService componentTypesService,
+		/*RegionsService regionsService,*/
+								   EdgeHostsService edgeHostsService, ComponentTypesService componentTypesService,
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
@@ -121,7 +120,7 @@ public class DatabaseLoader {
 			Map<String, User> users = loadUsers(usersService);
 
 			String dockerHubUsername = dockerProperties.getHub().getUsername();
-			Map<String, Service> services = new HashMap<>(loadSystemComponents(dockerHubUsername, servicesService, dockerProperties));
+			Map<String, Service> services = new HashMap<>(loadSystemComponents(dockerHubUsername, servicesService, serviceDependenciesService, dockerProperties));
 			services.putAll(loadSockShop(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadMixal(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadOnlineBoutique(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
@@ -131,6 +130,7 @@ public class DatabaseLoader {
 			services.putAll(loadTestingSuite(dockerHubUsername, appsService, servicesService, appServices));
 
 			/*Map<RegionEnum, Region> regions = loadRegions(regionsService);*/
+
 
 			Map<ComponentTypeEnum, ComponentType> componentTypes = loadComponentTypes(componentTypesService);
 
@@ -789,6 +789,7 @@ public class DatabaseLoader {
 		return regionsMap;
 	}*/
 
+
 	private Map.Entry<String, Service> associateServiceToApp(String appName, String serviceName, Integer defaultExternalPort,
 															 Integer defaultInternalPort, ServiceTypeEnum type,
 															 Set<String> environment, ServicesService servicesService,
@@ -917,11 +918,12 @@ public class DatabaseLoader {
 		Map.Entry<String, Service> movieReviewRedis = associateServiceToApp(appName, "movie-review-redis", 6380, 6379, ServiceTypeEnum.DATABASE,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(movieReviewRedis.getKey(), movieReviewRedis.getValue());
-		/* Volumes
-		- ./nginx-web-server/lua-scripts:/usr/local/openresty/nginx/lua-scripts
-		- ./nginx-web-server/conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
-		- ./nginx-web-server/jaeger-config.json:/usr/local/openresty/nginx/jaeger-config.json
-		- ./gen-lua:/gen-lua*/
+		/*Volumes
+			- ./nginx-web-server/lua-scripts:/usr/local/openresty/nginx/lua-scripts
+			- ./nginx-web-server/conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+			- ./nginx-web-server/jaeger-config.json:/usr/local/openresty/nginx/jaeger-config.json
+			- ./gen-lua:/gen-lua*/
+
 		Map.Entry<String, Service> nginxWebServer = associateServiceToApp(appName, "nginx-web-server", 18080, 8080, ServiceTypeEnum.FRONTEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(nginxWebServer.getKey(), nginxWebServer.getValue());
@@ -957,6 +959,7 @@ public class DatabaseLoader {
 		servicesMap.put(movieInfoMemcached.getKey(), movieInfoMemcached.getValue());
 
 		/*- 5775:5775/udp, 6831:6831/udp, 6832:6832/udp, 5778:5778, 16686:16686, 14268:14268, 9411:9411*/
+
 		Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 16686, 16686, ServiceTypeEnum.BACKEND,
 			Set.of("COLLECTOR_ZIPKIN_HTTP_PORT=9411"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(jaeger.getKey(), jaeger.getValue());
@@ -1556,16 +1559,18 @@ public class DatabaseLoader {
 		return usersMap;
 	}
 
-	private Map<String, Service> loadSystemComponents(String dockerHubUsername, ServicesService servicesService, DockerProperties dockerProperties) {
+	private Map<String, Service> loadSystemComponents(String dockerHubUsername, ServicesService servicesService,
+													  ServiceDependenciesService serviceDependenciesService,
+													  DockerProperties dockerProperties) {
 		Map<String, Service> servicesMap = new HashMap<>(7);
 
 		Service masterManager;
 		try {
-			masterManager = servicesService.getService(MasterManagerProperties.MASTER_MANAGER);
+			masterManager = servicesService.getService(ServiceConstants.Name.MASTER_MANAGER);
 		}
 		catch (EntityNotFoundException ignored) {
 			masterManager = Service.builder()
-				.serviceName(MasterManagerProperties.MASTER_MANAGER)
+				.serviceName(ServiceConstants.Name.MASTER_MANAGER)
 				.dockerRepository(dockerHubUsername + "/manager-master")
 				.defaultExternalPort(8080)
 				.defaultInternalPort(8080)
@@ -1575,15 +1580,15 @@ public class DatabaseLoader {
 				.build();
 			masterManager = servicesService.addService(masterManager);
 		}
-		servicesMap.put(MasterManagerProperties.MASTER_MANAGER, masterManager);
+		servicesMap.put(ServiceConstants.Name.MASTER_MANAGER, masterManager);
 
 		Service workerManager;
 		try {
-			workerManager = servicesService.getService(WorkerManagerProperties.WORKER_MANAGER);
+			workerManager = servicesService.getService(ServiceConstants.Name.WORKER_MANAGER);
 		}
 		catch (EntityNotFoundException ignored) {
 			workerManager = Service.builder()
-				.serviceName(WorkerManagerProperties.WORKER_MANAGER)
+				.serviceName(ServiceConstants.Name.WORKER_MANAGER)
 				.dockerRepository(dockerHubUsername + "/manager-worker")
 				.defaultExternalPort(8081)
 				.defaultInternalPort(8081)
@@ -1594,7 +1599,7 @@ public class DatabaseLoader {
 				.build();
 			workerManager = servicesService.addService(workerManager);
 		}
-		servicesMap.put(WorkerManagerProperties.WORKER_MANAGER, workerManager);
+		servicesMap.put(ServiceConstants.Name.WORKER_MANAGER, workerManager);
 
 		Service dockerApiProxy;
 		try {
@@ -1616,11 +1621,11 @@ public class DatabaseLoader {
 
 		Service loadBalancer;
 		try {
-			loadBalancer = servicesService.getService(NginxLoadBalancerService.LOAD_BALANCER);
+			loadBalancer = servicesService.getService(ServiceConstants.Name.LOAD_BALANCER);
 		}
 		catch (EntityNotFoundException ignored) {
 			loadBalancer = Service.builder()
-				.serviceName(NginxLoadBalancerService.LOAD_BALANCER)
+				.serviceName(ServiceConstants.Name.LOAD_BALANCER)
 				.dockerRepository(dockerHubUsername + "/nginx-load-balancer")
 				.defaultExternalPort(1906)
 				.defaultInternalPort(80)
@@ -1630,7 +1635,7 @@ public class DatabaseLoader {
 				.build();
 			loadBalancer = servicesService.addService(loadBalancer);
 		}
-		servicesMap.put(NginxLoadBalancerService.LOAD_BALANCER, loadBalancer);
+		servicesMap.put(ServiceConstants.Name.LOAD_BALANCER, loadBalancer);
 
 		Service requestLocationMonitor;
 		try {
@@ -1652,11 +1657,11 @@ public class DatabaseLoader {
 
 		Service registrationServer;
 		try {
-			registrationServer = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER);
+			registrationServer = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER);
 		}
 		catch (EntityNotFoundException ignored) {
 			registrationServer = Service.builder()
-				.serviceName(RegistrationServerService.REGISTRATION_SERVER)
+				.serviceName(ServiceConstants.Name.REGISTRATION_SERVER)
 				.dockerRepository(dockerHubUsername + "/registration-server")
 				.defaultExternalPort(8761)
 				.defaultInternalPort(8761)
@@ -1667,15 +1672,15 @@ public class DatabaseLoader {
 				.build();
 			registrationServer = servicesService.addService(registrationServer);
 		}
-		servicesMap.put(RegistrationServerService.REGISTRATION_SERVER, registrationServer);
+		servicesMap.put(ServiceConstants.Name.REGISTRATION_SERVER, registrationServer);
 
 		Service prometheus;
 		try {
-			prometheus = servicesService.getService(PrometheusService.PROMETHEUS);
+			prometheus = servicesService.getService(ServiceConstants.Name.PROMETHEUS);
 		}
 		catch (EntityNotFoundException ignored) {
 			prometheus = Service.builder()
-				.serviceName(PrometheusService.PROMETHEUS)
+				.serviceName(ServiceConstants.Name.PROMETHEUS)
 				.dockerRepository(dockerHubUsername + "/prometheus")
 				.defaultExternalPort(9090)
 				.defaultInternalPort(9090)
@@ -1685,7 +1690,45 @@ public class DatabaseLoader {
 				.build();
 			prometheus = servicesService.addService(prometheus);
 		}
-		servicesMap.put(PrometheusService.PROMETHEUS, prometheus);
+		servicesMap.put(ServiceConstants.Name.PROMETHEUS, prometheus);
+
+		Service kafka;
+		try {
+			kafka = servicesService.getService(ServiceConstants.Name.KAFKA);
+		}
+		catch (EntityNotFoundException ignored) {
+			kafka = Service.builder()
+				.serviceName(ServiceConstants.Name.KAFKA)
+				.dockerRepository("wurstmeister/kafka:2.12-2.5.0")
+				.defaultExternalPort(9092)
+				.defaultInternalPort(9092)
+				.outputLabel("${kafkaHost}")
+				.serviceType(ServiceTypeEnum.SYSTEM)
+				.build();
+			kafka = servicesService.addService(kafka);
+		}
+		servicesMap.put(ServiceConstants.Name.KAFKA, kafka);
+
+		Service zookeeper;
+		try {
+			zookeeper = servicesService.getService(ServiceConstants.Name.ZOOKEEPER);
+		}
+		catch (EntityNotFoundException ignored) {
+			zookeeper = Service.builder()
+				.serviceName(ServiceConstants.Name.ZOOKEEPER)
+				.dockerRepository("wurstmeister/zookeeper")
+				.defaultExternalPort(2181)
+				.defaultInternalPort(2181)
+				.outputLabel("${zookeeperHost}")
+				.serviceType(ServiceTypeEnum.SYSTEM)
+				.build();
+			zookeeper = servicesService.addService(zookeeper);
+		}
+		servicesMap.put(ServiceConstants.Name.ZOOKEEPER, zookeeper);
+
+		if (!serviceDependenciesService.hasDependency(ServiceConstants.Name.KAFKA, ServiceConstants.Name.ZOOKEEPER)) {
+			serviceDependenciesService.addDependency(kafka, zookeeper);
+		}
 
 		return servicesMap;
 	}

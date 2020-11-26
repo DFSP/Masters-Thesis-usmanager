@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("worker-manager")
 public class WorkerManagerProperties {
 
-	public static final String WORKER_MANAGER = "worker-manager";
 	private String id;
 	private String masterHostname;
 	private int monitorPeriod;

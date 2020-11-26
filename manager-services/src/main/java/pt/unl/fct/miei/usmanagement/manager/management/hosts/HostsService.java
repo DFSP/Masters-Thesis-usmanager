@@ -56,6 +56,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResu
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;
@@ -208,9 +209,9 @@ public class HostsService {
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
 		new ForkJoinPool(threads).submit(() ->
-			List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, PrometheusService.PROMETHEUS).parallelStream()
+			List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, ServiceConstants.Name.PROMETHEUS).parallelStream()
 				.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON))).join();
-		executeBackgroundProcess(PrometheusProperties.NODE_EXPORTER, hostAddress, PrometheusProperties.NODE_EXPORTER);
+		executeBackgroundProcess(ServiceConstants.Name.NODE_EXPORTER, hostAddress, ServiceConstants.Name.NODE_EXPORTER);
 		return node;
 	}
 

@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -54,6 +55,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
@@ -87,6 +89,7 @@ public class WorkerManagersService {
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
 	private final NodesService nodesService;
+	private final KafkaService kafkaService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -97,7 +100,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 Environment environment, WorkerManagerProperties workerManagerProperties,
+								 KafkaService kafkaService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
@@ -106,6 +109,7 @@ public class WorkerManagersService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
+		this.kafkaService = kafkaService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -153,6 +157,7 @@ public class WorkerManagersService {
 		if (!hostAddress.isComplete()) {
 			hostAddress = hostsService.completeHostAddress(hostAddress);
 		}
+
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
@@ -164,7 +169,7 @@ public class WorkerManagersService {
 	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {
 		log.info("Launching worker managers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(WorkerManagerProperties.WORKER_MANAGER);
+		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(ServiceConstants.Name.WORKER_MANAGER);
 
 		try {
 			return new ForkJoinPool(threads).submit(() ->
@@ -192,7 +197,7 @@ public class WorkerManagersService {
 			ContainerConstants.Environment.Manager.SYNC_URL + "=" + getSyncUrl(),
 			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress)
 		));
-		return containersService.launchContainer(hostAddress, WorkerManagerProperties.WORKER_MANAGER, environment);
+		return containersService.launchContainer(hostAddress, ServiceConstants.Name.WORKER_MANAGER, environment);
 	}
 
 	public void stopWorkerManager(String workerManagerId) {

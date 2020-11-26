@@ -24,10 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.containers;
 
-import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
-
 public final class ContainerConstants {
 
 	private ContainerConstants() {
@@ -44,10 +40,18 @@ public final class ContainerConstants {
 		}
 
 		public static final class Manager {
-			public static final String EXTERNAL_ID = "EXTERNAL_ID";
-			public static final String REGISTRATION_URL = "REGISTRATION_URL";
-			public static final String SYNC_URL = "SYNC_URL";
-			public static final String HOST_ADDRESS = "HOST_ADDRESS";
+			public static final String EXTERNAL_ID = "manager.worker.external-id";
+			public static final String REGISTRATION_URL = "manager.worker.registration-url";
+			public static final String SYNC_URL = "manager.worker.sync-url";
+			public static final String HOST_ADDRESS = "manager.worker.host-address";
+			public static final String KAFKA_BOOTSTRAP_SERVERS = "spring.kafka.bootstrap-servers";
+		}
+
+		public static final class Kafka {
+			public static final String KAFKA_BROKER_ID = "KAFKA_BROKER_ID";
+			public static final String KAFKA_ADVERTISED_HOST_NAME = "KAFKA_ADVERTISED_HOST_NAME";
+			public static final String KAFKA_CREATE_TOPICS = "KAFKA_CREATE_TOPICS";
+			public static final String KAFKA_ZOOKEEPER_CONNECT = "KAFKA_ZOOKEEPER_CONNECT";
 		}
 	}
 

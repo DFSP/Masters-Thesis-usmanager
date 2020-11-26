@@ -63,6 +63,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
@@ -303,7 +304,7 @@ public class DockerContainersService {
 
 				RegionEnum region = hostAddress.getRegion();
 				if (serviceDependenciesService.hasDependencies(serviceName)) {
-					String outputLabel = servicesService.getService(RegistrationServerService.REGISTRATION_SERVER).getOutputLabel();
+					String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
 						.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));

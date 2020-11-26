@@ -47,6 +47,7 @@ import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
 import {ICommand, IFileTransfer} from "../routes/management/ssh/SshPanel";
 import {IHostAddress} from "../routes/management/hosts/Hosts";
+import {IKafkaBroker} from "../routes/management/kafka/KafkaBroker";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -1966,6 +1967,83 @@ export function deleteRegion(region: IRegion): EntitiesAction {
     }
 }*/
 
+export const WORKER_MANAGERS_REQUEST = 'WORKER_MANAGERS_REQUEST';
+export const WORKER_MANAGER_REQUEST = 'WORKER_MANAGER_REQUEST';
+export const WORKER_MANAGERS_SUCCESS = 'WORKER_MANAGERS_SUCCESS';
+export const WORKER_MANAGER_SUCCESS = 'WORKER_MANAGER_SUCCESS';
+export const WORKER_MANAGERS_FAILURE = 'WORKER_MANAGERS_FAILURE';
+export const WORKER_MANAGER_FAILURE = 'WORKER_MANAGER_FAILURE';
+export const loadWorkerManagers = () => (dispatch: any) => {
+    return dispatch(fetchWorkerManagers());
+};
+const fetchWorkerManagers = (id?: string) => ({
+    [CALL_API]:
+        !id
+            ? {
+                types: [WORKER_MANAGERS_REQUEST, WORKER_MANAGERS_SUCCESS, WORKER_MANAGERS_FAILURE],
+                endpoint: `worker-managers`,
+                schema: Schemas.WORKER_MANAGER_ARRAY,
+                entity: 'workerManagers'
+            }
+            : {
+                types: [WORKER_MANAGER_REQUEST, WORKER_MANAGER_SUCCESS, WORKER_MANAGER_FAILURE],
+                endpoint: `worker-managers/${id}`,
+                schema: Schemas.WORKER_MANAGER,
+                entity: 'workerManagers'
+            }
+});
+export const ADD_WORKER_MANAGERS = 'ADD_WORKER_MANAGERS';
+
+export function addWorkerManagers(workerManagers: IWorkerManager[]): EntitiesAction {
+    return {
+        type: ADD_WORKER_MANAGERS,
+        data: {workerManagers}
+    }
+}
+
+export const DELETE_WORKER_MANAGER = 'DELETE_WORKER_MANAGER';
+
+export function deleteWorkerManager(workerManager: IWorkerManager): EntitiesAction {
+    return {
+        type: DELETE_WORKER_MANAGER,
+        data: {workerManagers: [workerManager]}
+    }
+}
+
+export const WORKER_MANAGER_HOSTS_REQUEST = 'WORKER_MANAGER_HOSTS_REQUEST';
+export const WORKER_MANAGER_HOSTS_SUCCESS = 'WORKER_MANAGER_HOSTS_SUCCESS';
+export const WORKER_MANAGER_HOSTS_FAILURE = 'WORKER_MANAGER_HOSTS_FAILURE';
+export const loadWorkerManagerHosts = (id: string) => (dispatch: any) => {
+    return dispatch(fetchWorkerManagerHosts(id));
+};
+const fetchWorkerManagerHosts = (id: string) => ({
+    [CALL_API]: {
+        types: [WORKER_MANAGER_HOSTS_REQUEST, WORKER_MANAGER_HOSTS_SUCCESS, WORKER_MANAGER_HOSTS_FAILURE],
+        endpoint: `worker-managers/${id}/assigned-hosts`,
+        entity: id
+    }
+});
+
+export const ASSIGN_WORKER_MANAGER_MACHINES = 'ASSIGN_WORKER_MANAGER_MACHINES';
+
+export function assignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
+    return {
+        type: ASSIGN_WORKER_MANAGER_MACHINES,
+        entity: id,
+        data: {assignedHosts: hosts}
+    }
+}
+
+export const UNASSIGN_WORKER_MANAGER_MACHINES = 'UNASSIGN_WORKER_MANAGER_MACHINES';
+
+export function unassignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
+    return {
+        type: UNASSIGN_WORKER_MANAGER_MACHINES,
+        entity: id,
+        data: {assignedHosts: hosts}
+    }
+}
+
 export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
 export const LOAD_BALANCER_REQUEST = 'LOAD_BALANCER_REQUEST';
 export const LOAD_BALANCERS_SUCCESS = 'LOAD_BALANCERS_SUCCESS';
@@ -2052,80 +2130,46 @@ export function deleteRegistrationServer(registrationServer: IRegistrationServer
     }
 }
 
-export const WORKER_MANAGERS_REQUEST = 'WORKER_MANAGERS_REQUEST';
-export const WORKER_MANAGER_REQUEST = 'WORKER_MANAGER_REQUEST';
-export const WORKER_MANAGERS_SUCCESS = 'WORKER_MANAGERS_SUCCESS';
-export const WORKER_MANAGER_SUCCESS = 'WORKER_MANAGER_SUCCESS';
-export const WORKER_MANAGERS_FAILURE = 'WORKER_MANAGERS_FAILURE';
-export const WORKER_MANAGER_FAILURE = 'WORKER_MANAGER_FAILURE';
-export const loadWorkerManagers = () => (dispatch: any) => {
-    return dispatch(fetchWorkerManagers());
+export const KAFKA_BROKERS_REQUEST = 'KAFKA_BROKERS_REQUEST';
+export const KAFKA_BROKER_REQUEST = 'KAFKA_BROKER_REQUEST';
+export const KAFKA_BROKERS_SUCCESS = 'KAFKA_BROKERS_SUCCESS';
+export const KAFKA_BROKER_SUCCESS = 'KAFKA_BROKER_SUCCESS';
+export const KAFKA_BROKERS_FAILURE = 'KAFKA_BROKERS_FAILURE';
+export const KAFKA_BROKER_FAILURE = 'KAFKA_BROKER_FAILURE';
+export const loadKafkaBrokers = () => (dispatch: any) => {
+    return dispatch(fetchKafkaBrokers());
 };
-const fetchWorkerManagers = (id?: string) => ({
+const fetchKafkaBrokers = (id?: string) => ({
     [CALL_API]:
         !id
             ? {
-                types: [WORKER_MANAGERS_REQUEST, WORKER_MANAGERS_SUCCESS, WORKER_MANAGERS_FAILURE],
-                endpoint: `worker-managers`,
-                schema: Schemas.WORKER_MANAGER_ARRAY,
-                entity: 'workerManagers'
+                types: [KAFKA_BROKERS_REQUEST, KAFKA_BROKERS_SUCCESS, KAFKA_BROKERS_FAILURE],
+                endpoint: `kafka`,
+                schema: Schemas.KAFKA_BROKER_ARRAY,
+                entity: 'kafkaBrokers'
             }
             : {
-                types: [WORKER_MANAGER_REQUEST, WORKER_MANAGER_SUCCESS, WORKER_MANAGER_FAILURE],
-                endpoint: `worker-managers/${id}`,
-                schema: Schemas.WORKER_MANAGER,
-                entity: 'workerManagers'
+                types: [KAFKA_BROKER_REQUEST, KAFKA_BROKER_SUCCESS, KAFKA_BROKER_FAILURE],
+                endpoint: `kafka/${id}`,
+                schema: Schemas.KAFKA_BROKER,
+                entity: 'kafkaBrokers'
             }
 });
-export const ADD_WORKER_MANAGERS = 'ADD_WORKER_MANAGERS';
+export const ADD_KAFKA_BROKERS = 'ADD_KAFKA_BROKERS';
 
-export function addWorkerManagers(workerManagers: IWorkerManager[]): EntitiesAction {
+export function addKafkaBrokers(kafkaBrokers: IKafkaBroker[]): EntitiesAction {
     return {
-        type: ADD_WORKER_MANAGERS,
-        data: {workerManagers}
+        type: ADD_KAFKA_BROKERS,
+        data: {kafkaBrokers}
     }
 }
 
-export const DELETE_WORKER_MANAGER = 'DELETE_WORKER_MANAGER';
+export const DELETE_KAFKA_BROKER = 'DELETE_KAFKA_BROKER';
 
-export function deleteWorkerManager(workerManager: IWorkerManager): EntitiesAction {
+export function deleteKafkaBroker(kafkaBroker: IKafkaBroker): EntitiesAction {
     return {
-        type: DELETE_WORKER_MANAGER,
-        data: {workerManagers: [workerManager]}
-    }
-}
-
-export const WORKER_MANAGER_HOSTS_REQUEST = 'WORKER_MANAGER_HOSTS_REQUEST';
-export const WORKER_MANAGER_HOSTS_SUCCESS = 'WORKER_MANAGER_HOSTS_SUCCESS';
-export const WORKER_MANAGER_HOSTS_FAILURE = 'WORKER_MANAGER_HOSTS_FAILURE';
-export const loadWorkerManagerHosts = (id: string) => (dispatch: any) => {
-    return dispatch(fetchWorkerManagerHosts(id));
-};
-const fetchWorkerManagerHosts = (id: string) => ({
-    [CALL_API]: {
-        types: [WORKER_MANAGER_HOSTS_REQUEST, WORKER_MANAGER_HOSTS_SUCCESS, WORKER_MANAGER_HOSTS_FAILURE],
-        endpoint: `worker-managers/${id}/assigned-hosts`,
-        entity: id
-    }
-});
-
-export const ASSIGN_WORKER_MANAGER_MACHINES = 'ASSIGN_WORKER_MANAGER_MACHINES';
-
-export function assignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
-    return {
-        type: ASSIGN_WORKER_MANAGER_MACHINES,
-        entity: id,
-        data: {assignedHosts: hosts}
-    }
-}
-
-export const UNASSIGN_WORKER_MANAGER_MACHINES = 'UNASSIGN_WORKER_MANAGER_MACHINES';
-
-export function unassignWorkerManagerHosts(id: string, hosts: string[]): EntitiesAction {
-    return {
-        type: UNASSIGN_WORKER_MANAGER_MACHINES,
-        entity: id,
-        data: {assignedHosts: hosts}
+        type: DELETE_KAFKA_BROKER,
+        data: {kafkaBrokers: [kafkaBroker]}
     }
 }
 

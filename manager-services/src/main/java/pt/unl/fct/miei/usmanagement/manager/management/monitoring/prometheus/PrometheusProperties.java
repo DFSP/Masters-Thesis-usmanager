@@ -37,7 +37,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("prometheus")
 public class PrometheusProperties {
 
-	public static final String NODE_EXPORTER = "node_exporter";
+	public static final int PORT = 9090;
+	public static final String URL = "http://%s:%d/api/v1/query";
 
 	private final NodeExporter nodeExporter;
 

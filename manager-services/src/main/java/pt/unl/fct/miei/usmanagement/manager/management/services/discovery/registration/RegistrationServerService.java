@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServers;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,24 +56,17 @@ import java.util.stream.Collectors;
 @Service
 public class RegistrationServerService {
 
-	public static final String REGISTRATION_SERVER = "registration-server";
-
 	private final ContainersService containersService;
 	private final ElasticIpsService elasticIpsService;
-	private final CloudHostsService cloudHostsService;
-	private final RegionsService regionsService;
 
 	private final RegistrationServers registrationServers;
 
 	private final int port;
 
 	public RegistrationServerService(@Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
-									 CloudHostsService cloudHostsService, RegionsService regionsService,
 									 RegistrationServers registrationServers, RegistrationProperties registrationProperties) {
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
-		this.cloudHostsService = cloudHostsService;
-		this.regionsService = regionsService;
 		this.registrationServers = registrationServers;
 		this.port = registrationProperties.getPort();
 	}
@@ -85,25 +79,11 @@ public class RegistrationServerService {
 	public CompletableFuture<RegistrationServer> launchRegistrationServer(HostAddress hostAddress) {
 		String registrationServerAddresses = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
-		Container container = containersService.launchContainer(hostAddress, REGISTRATION_SERVER,
+		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.REGISTRATION_SERVER,
 			Collections.emptyList(), Collections.emptyMap(), dynamicLaunchParams);
 		RegionEnum region = hostAddress.getRegion();
 		RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
 		return CompletableFuture.completedFuture(registrationServers.save(registrationServer));
-	}
-
-	private HostAddress getHost(RegionEnum region) {
-		ElasticIp elasticIp = elasticIpsService.getElasticIp(region);
-		String instanceId = elasticIp.getInstanceId();
-		if (instanceId != null) {
-			return cloudHostsService.getCloudHostById(instanceId).getAddress();
-		}
-		else {
-			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
-			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
-			String allocationId = elasticIp.getAllocationId();
-			return elasticIpsService.associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
-		}
 	}
 
 	public List<RegistrationServer> launchRegistrationServers(List<RegionEnum> regions) {
@@ -115,7 +95,7 @@ public class RegistrationServerService {
 				return CompletableFuture.completedFuture(regionRegistrationServers.get(0));
 			}
 			else {
-				HostAddress hostAddress = getHost(region);
+				HostAddress hostAddress = elasticIpsService.getHost(region);
 				return launchRegistrationServer(hostAddress);
 			}
 		}).collect(Collectors.toList());

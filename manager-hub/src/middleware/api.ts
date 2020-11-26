@@ -51,6 +51,7 @@ import {ISimulatedContainerMetric} from "../routes/management/metrics/containers
 import {IWorkerManager} from "../routes/management/workerManagers/WorkerManager";
 import {IRuleApp} from "../routes/management/rules/apps/RuleApp";
 import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAppMetric";
+import {IKafkaBroker} from "../routes/management/kafka/KafkaBroker";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -141,12 +142,14 @@ interface ISchemas {
     SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
     SIMULATED_CONTAINER_METRIC: schema.Entity<ISimulatedContainerMetric>;
     SIMULATED_CONTAINER_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
+    WORKER_MANAGER: schema.Entity<IWorkerManager>;
+    WORKER_MANAGER_ARRAY: schema.Entity<IWorkerManager>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
     LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
     REGISTRATION_SERVER: schema.Entity<IRegistrationServer>;
     REGISTRATION_SERVER_ARRAY: schema.Entity<IRegistrationServer>[];
-    WORKER_MANAGER: schema.Entity<IWorkerManager>;
-    WORKER_MANAGER_ARRAY: schema.Entity<IWorkerManager>[];
+    KAFKA_BROKER: schema.Entity<IKafkaBroker>;
+    KAFKA_BROKER_ARRAY: schema.Entity<IKafkaBroker>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -266,6 +269,10 @@ const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new s
 });
 const containerSimulatedMetrics = new schema.Array(simulatedContainerMetric);
 
+const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerManagers', undefined, {
+    idAttribute: (workerManager: IWorkerManager) => workerManager.id.toString()
+});
+
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
     idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.id.toString()
 });
@@ -274,8 +281,8 @@ const registrationServer: schema.Entity<IRegistrationServer> = new schema.Entity
     idAttribute: (registrationServer: IRegistrationServer) => registrationServer.id.toString()
 });
 
-const workerManager: schema.Entity<IWorkerManager> = new schema.Entity('workerManagers', undefined, {
-    idAttribute: (workerManager: IWorkerManager) => workerManager.id.toString()
+const kafkaBroker: schema.Entity<IKafkaBroker> = new schema.Entity('kafkaBrokers', undefined, {
+    idAttribute: (kafkaBroker: IKafkaBroker) => kafkaBroker.id.toString()
 });
 
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
@@ -365,12 +372,14 @@ export const Schemas: ISchemas = {
     SIMULATED_SERVICE_METRIC_ARRAY: [simulatedServiceMetric],
     SIMULATED_CONTAINER_METRIC: simulatedContainerMetric,
     SIMULATED_CONTAINER_METRIC_ARRAY: [simulatedContainerMetric],
+    WORKER_MANAGER: workerManager,
+    WORKER_MANAGER_ARRAY: [workerManager],
     LOAD_BALANCER: loadBalancer,
     LOAD_BALANCER_ARRAY: [loadBalancer],
     REGISTRATION_SERVER: registrationServer,
     REGISTRATION_SERVER_ARRAY: [registrationServer],
-    WORKER_MANAGER: workerManager,
-    WORKER_MANAGER_ARRAY: [workerManager],
+    KAFKA_BROKER: kafkaBroker,
+    KAFKA_BROKER_ARRAY: [kafkaBroker],
     LOGS_ARRAY: [logs],
 };
 
