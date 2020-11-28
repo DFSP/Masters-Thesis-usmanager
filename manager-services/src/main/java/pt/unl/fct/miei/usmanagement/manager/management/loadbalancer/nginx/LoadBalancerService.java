@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class NginxLoadBalancerService {
+public class LoadBalancerService {
 
 	private final ContainersService containersService;
 	private final HostsService hostsService;
@@ -87,10 +87,10 @@ public class NginxLoadBalancerService {
 	private final int threads;
 	private final Map<RegionEnum, Timer> stopLoadBalancerTimers;
 
-	public NginxLoadBalancerService(@Lazy ContainersService containersService, HostsService hostsService,
-									ServicesService servicesService,
-									LoadBalancers loadBalancers, NginxLoadBalancerProperties nginxLoadBalancerProperties,
-									DockerProperties dockerProperties, ParallelismProperties parallelismProperties) {
+	public LoadBalancerService(@Lazy ContainersService containersService, HostsService hostsService,
+							   ServicesService servicesService,
+							   LoadBalancers loadBalancers, NginxLoadBalancerProperties nginxLoadBalancerProperties,
+							   DockerProperties dockerProperties, ParallelismProperties parallelismProperties) {
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
@@ -143,9 +143,11 @@ public class NginxLoadBalancerService {
 			environment.add(String.format("%s=%s", ContainerConstants.Environment.LoadBalancer.SERVER, new Gson().toJson(nginxServers)));
 		}
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.LOAD_BALANCER, environment);
+		return saveLoadBalancer(container);
+	}
 
-		RegionEnum region = container.getHostAddress().getRegion();
-		LoadBalancer loadBalancer = LoadBalancer.builder().container(container).region(region).build();
+	public LoadBalancer saveLoadBalancer(Container container) {
+		LoadBalancer loadBalancer = LoadBalancer.builder().container(container).region(container.getRegion()).build();
 		return loadBalancers.save(loadBalancer);
 	}
 
@@ -345,5 +347,9 @@ public class NginxLoadBalancerService {
 	public void deleteLoadBalancerByContainer(Container container) {
 		LoadBalancer loadBalancer = getLoadBalancerByContainer(container);
 		loadBalancers.delete(loadBalancer);
+	}
+
+	public boolean hasLoadBalancer(Container container) {
+		return loadBalancers.hasLoadBalancerByContainer(container.getId());
 	}
 }

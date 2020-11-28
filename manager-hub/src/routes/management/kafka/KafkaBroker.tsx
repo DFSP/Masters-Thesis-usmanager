@@ -43,8 +43,10 @@ import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
 import IDatabaseData from "../../../components/IDatabaseData";
+import {IRuleCondition} from "../rules/conditions/RuleCondition";
 
 export interface IKafkaBroker extends IDatabaseData {
+    brokerId: number,
     container: IContainer,
     region: IRegion,
 }
@@ -147,14 +149,14 @@ class KafkaBroker extends BaseComponent<Props, State> {
         let kafkaBrokers = reply.data;
         if (kafkaBrokers.length === 1) {
             const kafkaBroker = kafkaBrokers[0];
-            super.toast(`<span class="green-text">A instância kafka foi iniciada no contentor ${this.mounted ? `<b class="white-text">${kafkaBroker.id}</b>` : `<a href='/kafka/${kafkaBroker.id}'><b>${kafkaBroker.id}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O kafka broker foi iniciado no contentor ${this.mounted ? `<b class="white-text">${kafkaBroker.container.id}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.container.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateKafkaBroker(kafkaBroker);
-                this.props.history.replace(kafkaBroker.id.toString())
+                this.props.history.replace(kafkaBroker.brokerId.toString())
             }
         } else {
             kafkaBrokers = kafkaBrokers.reverse();
-            super.toast(`<span class="green-text">Foram iniciadas ${kafkaBrokers.length} instâncias kafka:<br/><b class="white-text">${kafkaBrokers.map(kafkaBroker => `Contentor ${kafkaBroker.container.id} => Host ${kafkaBroker.container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${kafkaBrokers.length} kafka brokers:<br/><b class="white-text">${kafkaBrokers.map(kafkaBroker => `Contentor ${kafkaBroker.container.id} => Host ${kafkaBroker.container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/kafka');
             }
@@ -163,21 +165,22 @@ class KafkaBroker extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Não foi possível lançar a instância kafka`, 10000, reason, true);
+        super.toast(`Não foi possível lançar o kafka broker`, 10000, reason, true);
 
     private onDeleteSuccess = (kafkaBroker: IKafkaBroker): void => {
-        super.toast(`<span class="green-text">A instância kafka <b class="white-text">${kafkaBroker.id}</b> foi parada com sucesso</span>`);
+        super.toast(`<span class="green-text">O kafka broker <b class="white-text">${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push('/kafka');
         }
     };
 
     private onDeleteFailure = (reason: string, kafkaBroker: IKafkaBroker): void =>
-        super.toast(`Não foi possível para a instância kafka ${this.mounted ? `<b>${kafkaBroker.id}</b>` : `<a href='/kafka/${kafkaBroker.id}'><b>${kafkaBroker.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível parar o kafka broker ${this.mounted ? `<b>${kafkaBroker.brokerId}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.brokerId}</b></a>`}`, 10000, reason, true);
 
     private updateKafkaBroker = (kafkaBroker: IKafkaBroker) => {
         kafkaBroker = Object.values(normalize(kafkaBroker, Schemas.KAFKA_BROKER).entities.kafkaBrokers || {})[0];
         const formKafkaBroker = {...kafkaBroker};
+        removeFields(formKafkaBroker);
         this.setState({kafkaBroker: kafkaBroker, formKafkaBroker: formKafkaBroker});
     };
 
@@ -321,7 +324,7 @@ class KafkaBroker extends BaseComponent<Props, State> {
                           }}
                           delete={{
                               textButton: 'Parar',
-                              url: `kafka/${(kafkaBroker as IKafkaBroker).id}`,
+                              url: `kafka/${(kafkaBroker as IKafkaBroker).brokerId}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}
@@ -340,13 +343,17 @@ class KafkaBroker extends BaseComponent<Props, State> {
 
     private tabs = (): Tab[] => [
         {
-            title: 'Instância Kafka',
+            title: 'Kafka broker',
             id: 'kafkaBroker',
             content: () => this.kafkaBroker(),
             active: this.props.location.state?.selected === 'kafka-broker'
         },
     ];
 
+}
+
+function removeFields(kafkaBroker: Partial<IKafkaBroker>) {
+    delete kafkaBroker["id"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -360,6 +367,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     let formKafkaBroker;
     if (kafkaBroker) {
         formKafkaBroker = {...kafkaBroker};
+        removeFields(formKafkaBroker);
     }
     const regions = state.entities.regions.data;
     const nodes = state.entities.nodes.data;

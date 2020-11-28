@@ -39,6 +39,8 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -48,7 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiPro
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.LoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
@@ -113,8 +115,9 @@ public class DatabaseLoader {
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								   NodesService nodesService, ElasticIpsService elasticIpsService, SyncService syncService,
 								   ContainersService containersService, WorkerManagersService workerManagersService,
-								   ConfigurationsService configurationsService, NginxLoadBalancerService nginxLoadBalancerService,
-								   RegistrationServerService registrationServerService) {
+								   ConfigurationsService configurationsService, LoadBalancerService nginxLoadBalancerService,
+								   RegistrationServerService registrationServerService, ZookeeperService zookeeperService,
+								   KafkaService kafkaService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -130,7 +133,6 @@ public class DatabaseLoader {
 			services.putAll(loadTestingSuite(dockerHubUsername, appsService, servicesService, appServices));
 
 			/*Map<RegionEnum, Region> regions = loadRegions(regionsService);*/
-
 
 			Map<ComponentTypeEnum, ComponentType> componentTypes = loadComponentTypes(componentTypesService);
 
@@ -161,6 +163,8 @@ public class DatabaseLoader {
 			nginxLoadBalancerService.reset();
 			registrationServerService.reset();
 			workerManagersService.reset();
+			zookeeperService.reset();
+			kafkaService.reset();
 
 			containersService.reset();
 
@@ -1704,6 +1708,7 @@ public class DatabaseLoader {
 				.defaultInternalPort(9092)
 				.outputLabel("${kafkaHost}")
 				.serviceType(ServiceTypeEnum.SYSTEM)
+				.volumes(Set.of("/var/run/docker.sock:/var/run/docker.socks"))
 				.build();
 			kafka = servicesService.addService(kafka);
 		}

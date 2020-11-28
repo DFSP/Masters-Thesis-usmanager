@@ -45,6 +45,7 @@ import com.amazonaws.services.ec2.model.DryRunResult;
 import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import com.amazonaws.services.ec2.model.Reservation;
@@ -204,11 +205,11 @@ public class AwsService {
 		return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
 	}
 
-	public Instance createInstance(AwsRegion region) {
-		log.info("Launching new instance at region {} {}", region.getZone(), region.getName());
+	public Instance createInstance(AwsRegion region, InstanceType type) {
+		log.info("Launching new instance of type {} at region {} {}", type, region.getZone(), region.getName());
 		String instanceId;
 		try {
-			instanceId = launchInstance(region).get();
+			instanceId = launchInstance(region, type).get();
 			configurationsService.addConfiguration(instanceId);
 		}
 		catch (InterruptedException | ExecutionException e) {
@@ -227,10 +228,10 @@ public class AwsService {
 	}
 
 	@Async
-	public CompletableFuture<String> launchInstance(AwsRegion region) {
+	public CompletableFuture<String> launchInstance(AwsRegion region, InstanceType type) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
 			.withImageId(region.getAmi())
-			.withInstanceType(awsInstanceType)
+			.withInstanceType(type)
 			.withMinCount(1)
 			.withMaxCount(1)
 			.withSecurityGroups(awsInstanceSecurityGroup)

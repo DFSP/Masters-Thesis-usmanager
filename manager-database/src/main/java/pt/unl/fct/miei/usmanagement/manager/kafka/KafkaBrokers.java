@@ -9,12 +9,17 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import java.util.List;
 import java.util.Optional;
 
-public interface KafkaBrokers extends JpaRepository<KafkaBroker, String> {
+public interface KafkaBrokers extends JpaRepository<KafkaBroker, Long> {
 
-	@Query("select case when count(r) > 0 then true else false end "
-		+ "from Zookeeper r "
-		+ "where r.id = :id")
+	@Query("select case when count(k) > 0 then true else false end "
+		+ "from KafkaBroker k "
+		+ "where k.id = :id")
 	boolean hasKafkaBroker(@Param("id") String id);
+
+	@Query("select case when count(k) > 0 then true else false end "
+		+ "from KafkaBroker k "
+		+ "where k.container.id = :id")
+	boolean hasKafkaBrokerByContainer(@Param("id") String id);
 
 	Optional<KafkaBroker> getByContainer(Container container);
 

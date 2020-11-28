@@ -3,8 +3,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.symmetricds;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.SymTriggerEntity;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.SymTriggersRepository;
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router.SymTriggerRouterEntity;
@@ -12,7 +10,6 @@ import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router.SymTrigge
 import pt.unl.fct.miei.usmanagement.manager.symmetricds.trigger.router.SymTriggerRoutersRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j

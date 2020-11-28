@@ -40,12 +40,14 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.LoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
@@ -83,8 +85,10 @@ public class ContainersService {
 	private final HostsService hostsService;
 	private final ConfigurationsService configurationsService;
 	private final RegistrationServerService registrationServerService;
-	private final NginxLoadBalancerService nginxLoadBalancerService;
+	private final LoadBalancerService nginxLoadBalancerService;
 	private final SymService symService;
+	private final KafkaService kafkaService;
+	private final ZookeeperService zookeeperService;
 	private final Environment environment;
 
 	private final Containers containers;
@@ -96,8 +100,8 @@ public class ContainersService {
 							 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
-							 RegistrationServerService registrationServerService, NginxLoadBalancerService nginxLoadBalancerService,
-							 SymService symService, Environment environment, Containers containers,
+							 RegistrationServerService registrationServerService, LoadBalancerService nginxLoadBalancerService,
+							 SymService symService, KafkaService kafkaService, ZookeeperService zookeeperService, Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -110,6 +114,8 @@ public class ContainersService {
 		this.registrationServerService = registrationServerService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.symService = symService;
+		this.kafkaService = kafkaService;
+		this.zookeeperService = zookeeperService;
 		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
@@ -381,6 +387,22 @@ public class ContainersService {
 			}
 			catch (EntityNotFoundException e) {
 				log.error("Failed to delete load balancer associated with container {}: {}", id, e.getMessage());
+			}
+		}
+		else if (container.getName().contains(ServiceConstants.Name.KAFKA)) {
+			try {
+				kafkaService.deleteKafkaBrokerByContainer(container);
+			}
+			catch (EntityNotFoundException e) {
+				log.error("Failed to delete kafka broker associated with container {}: {}", id, e.getMessage());
+			}
+		}
+		else if (container.getName().contains(ServiceConstants.Name.ZOOKEEPER)) {
+			try {
+				zookeeperService.deleteZookeeperByContainer(container);
+			}
+			catch (EntityNotFoundException e) {
+				log.error("Failed to delete zookeeper associated with container {}: {}", id, e.getMessage());
 			}
 		}
 		containers.delete(container);

@@ -42,6 +42,11 @@ public interface WorkerManagers extends JpaRepository<WorkerManager, String> {
 		+ "where w.id = :id")
 	boolean hasWorkerManager(@Param("id") String id);
 
+	@Query("select case when count(w) > 0 then true else false end "
+		+ "from WorkerManager w "
+		+ "where w.container.id = :id")
+	boolean hasWorkerManagerByContainer(@Param("id") String id);
+
 	Optional<WorkerManager> getByContainer(@Param("container") Container container);
 
 	List<WorkerManager> getByRegion(RegionEnum region);

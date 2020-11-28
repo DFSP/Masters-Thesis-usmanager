@@ -1,3 +1,4 @@
+/*
 package pt.unl.fct.miei.usmanagement.manager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
+	private final KafkaTemplate<String, String> template;
+	private final CountDownLatch latch = new CountDownLatch(3);
+
 	public Application(KafkaTemplate<String, String> template) {
 		this.template = template;
 	}
@@ -24,10 +28,6 @@ public class Application implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args).close();
 	}
-
-	private final KafkaTemplate<String, String> template;
-
-	private final CountDownLatch latch = new CountDownLatch(3);
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -45,3 +45,4 @@ public class Application implements CommandLineRunner {
 	}
 
 }
+*/

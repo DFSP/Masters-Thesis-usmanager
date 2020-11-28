@@ -6,10 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -28,7 +30,11 @@ import java.util.UUID;
 public class KafkaBroker {
 
 	@Id
-	private String id;
+	@GeneratedValue
+	private Long id;
+
+	@NaturalId
+	private Long brokerId;
 
 	@NotNull
 	@OneToOne
@@ -36,13 +42,6 @@ public class KafkaBroker {
 
 	@NotNull
 	private RegionEnum region;
-
-	@PrePersist
-	private void prePersist() {
-		if (this.getId() == null) {
-			this.setId(UUID.randomUUID().toString());
-		}
-	}
 
 	@Override
 	public int hashCode() {

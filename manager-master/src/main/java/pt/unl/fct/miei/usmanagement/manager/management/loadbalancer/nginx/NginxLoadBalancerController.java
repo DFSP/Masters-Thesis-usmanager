@@ -44,9 +44,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/load-balancers")
 public class NginxLoadBalancerController {
 
-	private final NginxLoadBalancerService nginxLoadBalancerService;
+	private final LoadBalancerService nginxLoadBalancerService;
 
-	public NginxLoadBalancerController(NginxLoadBalancerService nginxLoadBalancerService) {
+	public NginxLoadBalancerController(LoadBalancerService nginxLoadBalancerService) {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 	}
 

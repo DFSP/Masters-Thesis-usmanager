@@ -56,7 +56,7 @@ public class KafkaController {
 	}
 
 	@GetMapping("/{id}")
-	public KafkaBroker getKafkaBroker(@PathVariable String id) {
+	public KafkaBroker getKafkaBroker(@PathVariable Long id) {
 		return kafkaService.getKafkaBroker(id);
 	}
 
@@ -77,8 +77,8 @@ public class KafkaController {
 	}
 
 	@DeleteMapping("/{id}")
-	public void stopKafkaBrokers(@PathVariable String id) {
-		kafkaService.stopRegistrationServer(id);
+	public void stopKafkaBrokers(@PathVariable Long id) {
+		kafkaService.stopKafkaBroker(id);
 	}
 
 }

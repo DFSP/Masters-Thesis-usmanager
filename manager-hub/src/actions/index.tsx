@@ -1973,8 +1973,8 @@ export const WORKER_MANAGERS_SUCCESS = 'WORKER_MANAGERS_SUCCESS';
 export const WORKER_MANAGER_SUCCESS = 'WORKER_MANAGER_SUCCESS';
 export const WORKER_MANAGERS_FAILURE = 'WORKER_MANAGERS_FAILURE';
 export const WORKER_MANAGER_FAILURE = 'WORKER_MANAGER_FAILURE';
-export const loadWorkerManagers = () => (dispatch: any) => {
-    return dispatch(fetchWorkerManagers());
+export const loadWorkerManagers = (id?: string) => (dispatch: any) => {
+    return dispatch(fetchWorkerManagers(id));
 };
 const fetchWorkerManagers = (id?: string) => ({
     [CALL_API]:
@@ -2093,8 +2093,8 @@ export const REGISTRATION_SERVERS_SUCCESS = 'REGISTRATION_SERVERS_SUCCESS';
 export const REGISTRATION_SERVER_SUCCESS = 'REGISTRATION_SERVER_SUCCESS';
 export const REGISTRATION_SERVERS_FAILURE = 'REGISTRATION_SERVERS_FAILURE';
 export const REGISTRATION_SERVER_FAILURE = 'REGISTRATION_SERVER_FAILURE';
-export const loadRegistrationServers = () => (dispatch: any) => {
-    return dispatch(fetchRegistrationServers());
+export const loadRegistrationServers = (id?: string) => (dispatch: any) => {
+    return dispatch(fetchRegistrationServers(id));
 };
 const fetchRegistrationServers = (id?: string) => ({
     [CALL_API]:
@@ -2136,8 +2136,8 @@ export const KAFKA_BROKERS_SUCCESS = 'KAFKA_BROKERS_SUCCESS';
 export const KAFKA_BROKER_SUCCESS = 'KAFKA_BROKER_SUCCESS';
 export const KAFKA_BROKERS_FAILURE = 'KAFKA_BROKERS_FAILURE';
 export const KAFKA_BROKER_FAILURE = 'KAFKA_BROKER_FAILURE';
-export const loadKafkaBrokers = () => (dispatch: any) => {
-    return dispatch(fetchKafkaBrokers());
+export const loadKafkaBrokers = (id?: string) => (dispatch: any) => {
+    return dispatch(fetchKafkaBrokers(id));
 };
 const fetchKafkaBrokers = (id?: string) => ({
     [CALL_API]:

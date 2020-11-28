@@ -33,7 +33,6 @@ spring:
     consumer:
       group-id: manager-master
       auto-offset-reset: earliest
-    bootstrap-servers: 192.168.1.83:9092
 management:
   endpoints:
     web:

@@ -57,7 +57,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.LoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
@@ -100,7 +100,7 @@ public class DockerContainersService {
 	private final NodesService nodesService;
 	private final ServicesService servicesService;
 	private final ServiceDependenciesService serviceDependenciesService;
-	private final NginxLoadBalancerService nginxLoadBalancerService;
+	private final LoadBalancerService nginxLoadBalancerService;
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
 
@@ -111,7 +111,7 @@ public class DockerContainersService {
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService, ServicesService servicesService,
-								   ServiceDependenciesService serviceDependenciesService, NginxLoadBalancerService nginxLoadBalancerService,
+								   ServiceDependenciesService serviceDependenciesService, LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
 								   ContainerProperties containerProperties, ConfigurationsService configurationsService,
 								   ParallelismProperties parallelismProperties) {
@@ -303,7 +303,8 @@ public class DockerContainersService {
 				}
 
 				RegionEnum region = hostAddress.getRegion();
-				if (serviceDependenciesService.hasDependencies(serviceName)) {
+				if (service.getServiceType() != ServiceTypeEnum.SYSTEM
+					&& serviceDependenciesService.hasDependencies(serviceName)) {
 					String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
@@ -18,8 +20,13 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsSer
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsSimpleInstance;
+import pt.unl.fct.miei.usmanagement.manager.management.loadbalancer.nginx.LoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -49,6 +56,10 @@ public class SyncService {
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 	private final HeartbeatService heartbeatService;
+	private final LoadBalancerService loadBalancerService;
+	private final RegistrationServerService registrationServerService;
+	private final WorkerManagersService workerManagersService;
+	private final KafkaService kafkaService;
 
 	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
@@ -57,7 +68,9 @@ public class SyncService {
 	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
 					   DockerContainersService dockerContainersService, NodesService nodesService,
 					   DockerSwarmService dockerSwarmService, ConfigurationsService configurationsService,
-					   HeartbeatService heartbeatService) {
+					   HeartbeatService heartbeatService, LoadBalancerService loadBalancerService,
+					   LoadBalancerService loadBalancerService1, RegistrationServerService registrationServerService,
+					   WorkerManagersService workerManagersService, KafkaService kafkaService) {
 		this.cloudHostsService = cloudHostsService;
 		this.awsService = awsService;
 		this.containersService = containersService;
@@ -66,6 +79,10 @@ public class SyncService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.heartbeatService = heartbeatService;
+		this.loadBalancerService = loadBalancerService1;
+		this.registrationServerService = registrationServerService;
+		this.workerManagersService = workerManagersService;
+		this.kafkaService = kafkaService;
 	}
 
 	public void startCloudHostsDatabaseSynchronization() {
@@ -185,24 +202,24 @@ public class SyncService {
 				continue;
 			}
 			if (!containerIds.contains(containerId)) {
-				containersService.addContainerFromDockerContainer(dockerContainer);
-				log.info("Added missing container {} to the database", containerId);
+				Container container = containersService.addContainerFromDockerContainer(dockerContainer);
+				containers.add(container);
+				log.info("Added missing {} container {} to the database", container.getName(), containerId);
 			}
 		}
 
 		// Remove invalid containers and update existing ones
-		Map<String, DockerContainer> dockerContainerIds = dockerContainers.stream().distinct().collect(Collectors.toMap(DockerContainer::getId, container -> container));
+		Map<String, DockerContainer> dockerContainerIds = dockerContainers.stream().distinct()
+			.collect(Collectors.toMap(DockerContainer::getId, container -> container));
 		Iterator<Container> containerIterator = containers.iterator();
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
 			String containerId = container.getId();
 			String managerId = container.getManagerId();
-			if (managerId == null) {
-				continue;
-			}
-			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
+			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
 			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
-			if (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout)) {
+			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !dockerContainerIds.containsKey(containerId))
+				|| (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout))) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
@@ -223,6 +240,20 @@ public class SyncService {
 				if (updated) {
 					containersService.updateContainer(container);
 				}
+			}
+
+			String containerName = container.getName();
+			if (containerName.contains(ServiceConstants.Name.LOAD_BALANCER) && !loadBalancerService.hasLoadBalancer(container)) {
+				loadBalancerService.saveLoadBalancer(container);
+			}
+			else if (containerName.contains(ServiceConstants.Name.REGISTRATION_SERVER) && !registrationServerService.hasRegistrationServer(container)) {
+				registrationServerService.saveRegistrationServer(container);
+			}
+			else if (containerName.contains(ServiceConstants.Name.WORKER_MANAGER) && !workerManagersService.hasWorkerManager(container)) {
+				workerManagersService.saveWorkerManager(container);
+			}
+			else if (containerName.contains(ServiceConstants.Name.KAFKA) && !kafkaService.hasKafkaBroker(container)) {
+				kafkaService.saveKafkaBroker(container);
 			}
 		}
 
@@ -282,13 +313,10 @@ public class SyncService {
 				continue;
 			}
 			String managerId = node.getManagerId();
-			if (managerId == null) {
-				continue;
-			}
-			Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
-			if (heartbeat.isPresent()
-				&& heartbeat.get().getHeartbeatTime().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
-				&& !managerId.equalsIgnoreCase("manager-master")) {
+			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
+			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
+			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId))
+				|| (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout))) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);

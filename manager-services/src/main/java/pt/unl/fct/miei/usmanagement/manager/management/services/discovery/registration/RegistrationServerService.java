@@ -30,19 +30,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServers;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,8 +78,7 @@ public class RegistrationServerService {
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.REGISTRATION_SERVER,
 			Collections.emptyList(), Collections.emptyMap(), dynamicLaunchParams);
 		RegionEnum region = hostAddress.getRegion();
-		RegistrationServer registrationServer = RegistrationServer.builder().container(container).region(region).build();
-		return CompletableFuture.completedFuture(registrationServers.save(registrationServer));
+		return CompletableFuture.completedFuture(saveRegistrationServer(container));
 	}
 
 	public List<RegistrationServer> launchRegistrationServers(List<RegionEnum> regions) {
@@ -131,7 +126,7 @@ public class RegistrationServerService {
 
 	private String getRegistrationServerAddresses() {
 		return elasticIpsService.getElasticIps().stream()
-			.map(address -> String.format("http://%s:%s/eureka/", address.getPublicIp(), port))
+			.map(address -> String.format("http://%s:%s/eureka", address.getPublicIp(), port))
 			.collect(Collectors.joining(","));
 	}
 
@@ -156,5 +151,13 @@ public class RegistrationServerService {
 	public void deleteRegistrationServerByContainer(Container container) {
 		RegistrationServer registrationServer = getRegistrationServerByContainer(container);
 		registrationServers.delete(registrationServer);
+	}
+
+	public RegistrationServer saveRegistrationServer(Container container) {
+		return registrationServers.save(RegistrationServer.builder().container(container).region(container.getRegion()).build());
+	}
+
+	public boolean hasRegistrationServer(Container container) {
+		return registrationServers.hasRegistrationServerByContainer(container.getId());
 	}
 }

@@ -16,6 +16,11 @@ public interface LoadBalancers extends JpaRepository<LoadBalancer, String> {
 		+ "where l.id = :id")
 	boolean hasLoadBalancer(@Param("id") String id);
 
+	@Query("select case when count(l) > 0 then true else false end "
+		+ "from LoadBalancer l "
+		+ "where l.container.id = :id")
+	boolean hasLoadBalancerByContainer(@Param("id") String id);
+
 	Optional<LoadBalancer> getByContainer(Container container);
 
 	List<LoadBalancer> getByRegion(RegionEnum region);

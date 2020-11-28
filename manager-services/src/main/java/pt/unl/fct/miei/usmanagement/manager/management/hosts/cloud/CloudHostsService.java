@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud;
 
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.InstanceType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -203,9 +204,13 @@ public class CloudHostsService {
 	}
 
 	public CloudHost launchInstance(AwsRegion region) {
+		return launchInstance(region, InstanceType.T2Micro);
+	}
+
+	public CloudHost launchInstance(AwsRegion region, InstanceType type) {
 		String instanceId = null;
 		try {
-			Instance instance = awsService.createInstance(region);
+			Instance instance = awsService.createInstance(region, type);
 			instanceId = instance.getInstanceId();
 			CloudHost cloudHost = saveCloudHostFromInstance(instance);
 			hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);

@@ -1,6 +1,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.zookeeper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -21,7 +22,7 @@ public class ZookeeperService {
 
 	private final Zookeepers zookeepers;
 
-	public ZookeeperService(ContainersService containersService, Zookeepers zookeepers) {
+	public ZookeeperService(@Lazy ContainersService containersService, Zookeepers zookeepers) {
 		this.containersService = containersService;
 		this.zookeepers = zookeepers;
 	}
@@ -58,4 +59,12 @@ public class ZookeeperService {
 		containersService.stopContainer(containerId);
 	}
 
+	public void deleteZookeeperByContainer(Container container) {
+		Zookeeper zookeeper = getZookeeperByContainer(container);
+		zookeepers.delete(zookeeper);
+	}
+
+	public void reset() {
+		zookeepers.deleteAll();
+	}
 }

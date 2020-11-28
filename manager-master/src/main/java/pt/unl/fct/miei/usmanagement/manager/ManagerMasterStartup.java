@@ -31,6 +31,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -51,7 +52,6 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
-	private final MasterSymService symService;
 
 	private final Environment environment;
 
@@ -60,25 +60,24 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								MasterSymService symService, Environment environment) {
+								Environment environment) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
-		this.symService = symService;
 		this.environment = environment;
 	}
 
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		/*String hostAddressJson = environment.getProperty(EnvironmentConstants.HOST_ADDRESS);
+		String hostAddressJson = environment.getProperty(EnvironmentConstants.HOST_ADDRESS);
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
 			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
 		log.info(new Gson().toJson(hostAddress));
-		symService.startSymmetricDsService(hostAddress);
+		/*symService.startSymmetricDsService(hostAddress);*/
 		elasticIpsService.allocateElasticIpAddresses();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		hostsService.clusterHosts();
@@ -86,7 +85,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startCloudHostsDatabaseSynchronization();
 		syncService.startContainersDatabaseSynchronization();
-		syncService.startNodesDatabaseSynchronization();*/
+		syncService.startNodesDatabaseSynchronization();
 	}
 
 }

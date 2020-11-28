@@ -1,8 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.management.eips;
 
 import com.amazonaws.services.ec2.model.Address;
+import com.amazonaws.services.ec2.model.AmazonEC2Exception;
 import com.amazonaws.services.ec2.model.AssociateAddressResult;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -213,7 +215,11 @@ public class ElasticIpsService {
 	public ElasticIp dissociate(CloudHost cloudHost) {
 		RegionEnum region = cloudHost.getAwsRegion().getRegion();
 		ElasticIp elasticIp = getElasticIp(region);
-		awsService.dissociateElasticIpAddress(region, elasticIp.getAssociationId());
+		try {
+			awsService.dissociateElasticIpAddress(region, elasticIp.getAssociationId());
+		} catch (AmazonEC2Exception e) {
+			log.error("Error while dissociating elastic ip {}: {}", elasticIp.getAllocationId(), e.getMessage());
+		}
 		elasticIp.setAssociationId(null);
 		elasticIp.setInstanceId(null);
 		return elasticIps.save(elasticIp);
@@ -227,7 +233,7 @@ public class ElasticIpsService {
 		}
 		else {
 			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
-			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion);
+			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium);
 			String allocationId = elasticIp.getAllocationId();
 			return associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
 		}

@@ -1,5 +1,4 @@
-/*
- * MIT License
+/* * MIT License
  *
  * Copyright (c) 2020 manager
  *
@@ -21,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 
 package pt.unl.fct.miei.usmanagement.manager;
 
@@ -82,7 +82,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) {
-		/*symService.stopSymmetricDSServer();
+		symService.stopSymmetricDSServer();
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
 		syncService.stopCloudHostsDatabaseSynchronization();
@@ -121,12 +121,12 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		}
 		catch (Exception e) {
 			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
-		}*/
+		}
 		/*hostsEventsService.reset();
 		servicesEventsService.reset();
 		hostsMonitoringService.reset();
-		servicesMonitoringService.reset();
-		nodesService.reset();*/
+		servicesMonitoringService.reset();*/
+		nodesService.reset();
 	}
 
 }
