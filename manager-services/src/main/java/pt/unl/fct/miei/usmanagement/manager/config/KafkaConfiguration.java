@@ -39,8 +39,6 @@ public class KafkaConfiguration {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-		props.put(ProducerConfig.METADATA_MAX_IDLE_CONFIG, 30000);
-		props.put(ProducerConfig.METADATA_MAX_AGE_CONFIG, 30000);
 		return props;
 	}
 

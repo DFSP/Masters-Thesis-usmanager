@@ -75,7 +75,6 @@ import java.util.stream.Collectors;
 public class KafkaService {
 
 	private static final int PORT = 9092;
-	private static final int DELAY_BEFORE_STARTUP = 45000;
 	private static final int MIN_POPULATE_SLEEP = 5000;
 	private static final int MAX_POPULATE_SLEEP = 15000;
 
@@ -197,12 +196,7 @@ public class KafkaService {
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
-			new Timer("populate-kafka", true).schedule(new TimerTask() {
-				@Override
-				public void run() {
-					populateTopics();
-				}
-			}, DELAY_BEFORE_STARTUP);
+			populateTopics();
 		}
 
 		return kafkaBrokers;
@@ -244,6 +238,7 @@ public class KafkaService {
 
 	public String getKafkaBrokersHosts() {
 		return elasticIpsService.getElasticIps().stream()
+			.filter(elasticIp -> elasticIp.getAssociationId() != null)
 			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT))
 			.collect(Collectors.joining(","));
 	}
@@ -315,11 +310,8 @@ public class KafkaService {
 			}
 			catch (KafkaException e) {
 				String message = e.getMessage();
-				/*if (message != null && message.contains("not present in metadata after")) {
-					producerFactory.reset();
-				}*/
 				int randomSleep = random.nextInt(MAX_POPULATE_SLEEP - MIN_POPULATE_SLEEP) + MIN_POPULATE_SLEEP;
-				log.error("Failed to populate kafka: {}. Retrying in {} ms", message, randomSleep);
+				log.error("Failed to populate kafka: {}... Retrying in {} ms", message, randomSleep);
 				Timing.sleep(randomSleep, TimeUnit.MILLISECONDS);
 			}
 		} while (!populated);
@@ -362,32 +354,45 @@ public class KafkaService {
 
 	@Async
 	public void sendApp(App app) {
-		if (hasKafkaBrokers() && populated) {
+		boolean hasKafkaBrokers = hasKafkaBrokers();
+		if (hasKafkaBrokers && populated) {
 			AppMessage appMessage = new AppMessage(app);
-			log.info("Sending app message to kafka: {}", appMessage.toString());
+			log.info("Sending {} to kafka", appMessage.toString());
 			kafkaTemplate.send("apps", appMessage);
 		}
 		else {
-			log.warn("Not sending app {} to kafka: hasKafkaBrokers={} populated={}", app.getName(), hasKafkaBrokers(), populated);
+			log.warn("Not sending app {} to kafka because hasKafkaBrokers={} and populated={}", app.getName(), hasKafkaBrokers, populated);
 		}
 	}
 
 	@Async
 	public void deleteApp(App app) {
-		if (hasKafkaBrokers() && populated) {
+		boolean hasKafkaBrokers = hasKafkaBrokers();
+		if (hasKafkaBrokers && populated) {
+			log.info("Sending DELETE app id={} request to kafka", app.getId());
 			kafkaTemplate.send("apps", "DELETE", app.getId());
+		}
+		else {
+			log.warn("Not sending DELETE app id={} request to kafka because hasKafkaBrokers={} and populated={}", app.getId(), hasKafkaBrokers, populated);
 		}
 	}
 
+	/*"apps:1:1,cloud-hosts:1:1,component-types:1:1,conditions:1:1,containers:1:1,decisions:1:1,"
+		+ "edge-hosts:1:1,eips:1:1,fields:1:1,nodes:1:1,operators:1:1,services:1:1,simulated-host-metrics:1:1,"
+		+ "simulated-app-metrics:1:1,simulated-service-metrics:1:1,simulated-container-metrics:1:1,host-rules:1:1,"
+		+ "app-rules:1:1,service-rules:1:1,container-rules:1:1,value-modes:1:1";*/
+
+
 	@Async
 	public void sendService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		if (hasKafkaBrokers() && populated) {
+		boolean hasKafkaBrokers = hasKafkaBrokers();
+		if (hasKafkaBrokers && populated) {
 			ServiceMessage serviceMessage = new ServiceMessage(service);
-			log.info("Sending service message to kafka: {}", serviceMessage.toString());
+			log.info("Sending {} to kafka", serviceMessage.toString());
 			kafkaTemplate.send("services", serviceMessage);
 		}
 		else {
-			log.warn("Not sending service {} to kafka: hasKafkaBrokers={} populated={}", service.getServiceName(), hasKafkaBrokers(), populated);
+			log.warn("Not sending service {} to kafka because hasKafkaBrokers={} and populated={}", service.getServiceName(), hasKafkaBrokers, populated);
 		}
 	}
 
@@ -395,76 +400,6 @@ public class KafkaService {
 	public void deleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
 		if (hasKafkaBrokers() && populated) {
 			kafkaTemplate.send("services", "DELETE", service.getId());
-		}
-	}
-
-	@Async
-	public void sendContainer(Container container) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("containers", container);
-		}
-	}
-
-	@Async
-	public void deleteContainer(Container container) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("containers", "DELETE", container.getId());
-		}
-	}
-
-	@Async
-	public void sendNode(Node node) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("nodes", node);
-		}
-	}
-
-	@Async
-	public void deleteNode(Node node) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("nodes", "DELETE", node.getId());
-		}
-	}
-
-	@Async
-	public void sendHostEvent(HostEvent hostEvent) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("host-events", hostEvent);
-		}
-	}
-
-	@Async
-	public void sendServiceEvent(ServiceEvent serviceEvent) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("service-events", serviceEvent);
-		}
-	}
-
-	@Async
-	public void sendHostMonitoringLogs(HostMonitoringLogs hostMonitoringLogs) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("host-monitoring-logs", hostMonitoringLogs);
-		}
-	}
-
-	@Async
-	public void sendServiceMonitoringLogs(ServiceMonitoringLogs serviceMonitoringLogs) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("service-monitoring-logs", serviceMonitoringLogs);
-		}
-	}
-
-	@Async
-	public void sendHostDecision(HostDecision hostDecision) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("host-decision", hostDecision);
-		}
-	}
-
-	@Async
-	public void sendServiceDecision(ServiceDecision serviceDecision) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("service-decision", serviceDecision);
 		}
 	}
 
