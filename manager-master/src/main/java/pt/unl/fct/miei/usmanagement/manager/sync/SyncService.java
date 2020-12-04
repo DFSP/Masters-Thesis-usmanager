@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
@@ -25,7 +24,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.regist
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 
 import java.time.LocalDateTime;
@@ -69,7 +67,7 @@ public class SyncService {
 					   DockerContainersService dockerContainersService, NodesService nodesService,
 					   DockerSwarmService dockerSwarmService, ConfigurationsService configurationsService,
 					   HeartbeatService heartbeatService, LoadBalancerService loadBalancerService,
-					   LoadBalancerService loadBalancerService1, RegistrationServerService registrationServerService,
+					   RegistrationServerService registrationServerService,
 					   WorkerManagersService workerManagersService, KafkaService kafkaService) {
 		this.cloudHostsService = cloudHostsService;
 		this.awsService = awsService;
@@ -79,7 +77,7 @@ public class SyncService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.heartbeatService = heartbeatService;
-		this.loadBalancerService = loadBalancerService1;
+		this.loadBalancerService = loadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.workerManagersService = workerManagersService;
 		this.kafkaService = kafkaService;
@@ -240,20 +238,20 @@ public class SyncService {
 				if (updated) {
 					containersService.updateContainer(container);
 				}
-			}
 
-			String containerName = container.getName();
-			if (containerName.contains(ServiceConstants.Name.LOAD_BALANCER) && !loadBalancerService.hasLoadBalancer(container)) {
-				loadBalancerService.saveLoadBalancer(container);
-			}
-			else if (containerName.contains(ServiceConstants.Name.REGISTRATION_SERVER) && !registrationServerService.hasRegistrationServer(container)) {
-				registrationServerService.saveRegistrationServer(container);
-			}
-			else if (containerName.contains(ServiceConstants.Name.WORKER_MANAGER) && !workerManagersService.hasWorkerManager(container)) {
-				workerManagersService.saveWorkerManager(container);
-			}
-			else if (containerName.contains(ServiceConstants.Name.KAFKA) && !kafkaService.hasKafkaBroker(container)) {
-				kafkaService.saveKafkaBroker(container);
+				String containerName = container.getName();
+				if (containerName.contains(ServiceConstants.Name.LOAD_BALANCER) && !loadBalancerService.hasLoadBalancer(container)) {
+					loadBalancerService.saveLoadBalancer(container);
+				}
+				else if (containerName.contains(ServiceConstants.Name.REGISTRATION_SERVER) && !registrationServerService.hasRegistrationServer(container)) {
+					registrationServerService.saveRegistrationServer(container);
+				}
+				else if (containerName.contains(ServiceConstants.Name.WORKER_MANAGER) && !workerManagersService.hasWorkerManager(container)) {
+					workerManagersService.saveWorkerManager(container);
+				}
+				else if (containerName.contains(ServiceConstants.Name.KAFKA) && !kafkaService.hasKafkaBroker(container)) {
+					kafkaService.saveKafkaBroker(container);
+				}
 			}
 		}
 

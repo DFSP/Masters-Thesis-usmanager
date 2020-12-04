@@ -402,7 +402,6 @@ public class AwsService {
 		return ec2.disassociateAddress(disassociateAddressRequest);
 	}
 
-	@Async
 	public CompletableFuture<List<Address>> getElasticIpAddresses(AwsRegion region) {
 		final AmazonEC2 ec2 = getEC2Client(region);
 		DescribeAddressesResult result = ec2.describeAddresses();

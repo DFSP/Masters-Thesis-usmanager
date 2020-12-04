@@ -31,7 +31,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -40,7 +39,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.MasterSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
@@ -76,8 +74,6 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
 			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
-		log.info(new Gson().toJson(hostAddress));
-		/*symService.startSymmetricDsService(hostAddress);*/
 		elasticIpsService.allocateElasticIpAddresses();
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		hostsService.clusterHosts();

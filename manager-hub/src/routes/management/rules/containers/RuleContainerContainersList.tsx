@@ -160,7 +160,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Não foi possível remove o contentor`, 10000, reason, true);
+        super.toast(`Não foi possível remover o contentor`, 10000, reason, true);
 
     private getSelectableContainers = () => {
         const {containers, ruleContainers, unsavedContainersIds} = this.props;

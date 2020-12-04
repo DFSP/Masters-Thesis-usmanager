@@ -128,7 +128,8 @@ public class EdgeHostsService {
 		EdgeHost edgeHostEntity = edgeHosts.save(edgeHost);
 
 		boolean setup = false;
-		for (int i = 0; i < 5; i++) {
+		final int retries = 5;
+		for (int i = 0; i < retries; i++) {
 			char[] password = System.console().readPassword("%s", "> Enter edge host password: ");
 			try {
 				setupEdgeHost(edgeHost, password);
@@ -137,7 +138,7 @@ public class EdgeHostsService {
 			}
 			catch (Exception e) {
 				log.error("Unable to setup new edge host");
-				log.info("Password is most likely wrong, try again");
+				log.info("Password is most likely wrong, try again. {}/{}", i + 1, retries);
 			}
 			java.util.Arrays.fill(password, ' ');
 		}

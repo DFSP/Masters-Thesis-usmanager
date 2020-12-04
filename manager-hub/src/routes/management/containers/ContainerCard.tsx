@@ -82,7 +82,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteFailure = (reason: string, container: IContainer): void => {
-        super.toast(`Não foi possível parar o contentor <a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 10000, reason, true);
+        super.toast(`Erro ao parar o contentor <a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -139,7 +139,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -167,7 +167,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

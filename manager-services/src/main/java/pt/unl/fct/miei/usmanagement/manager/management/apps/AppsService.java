@@ -27,13 +27,13 @@ package pt.unl.fct.miei.usmanagement.manager.management.apps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
@@ -57,21 +57,29 @@ public class AppsService {
 	private final AppRulesService appRulesService;
 	private final AppSimulatedMetricsService appSimulatedMetricsService;
 	private final ContainersService containersService;
+	private final KafkaService kafkaService;
 
 	private final Apps apps;
 
 	public AppsService(ServicesService servicesService, AppRulesService appRulesService,
 					   AppSimulatedMetricsService appSimulatedMetricsService, ContainersService containersService,
-					   Apps apps) {
+					   KafkaService kafkaService, Apps apps) {
 		this.servicesService = servicesService;
 		this.appRulesService = appRulesService;
 		this.appSimulatedMetricsService = appSimulatedMetricsService;
 		this.containersService = containersService;
+		this.kafkaService = kafkaService;
 		this.apps = apps;
 	}
 
 	public List<App> getApps() {
 		return apps.findAll();
+	}
+
+	private App saveApp(App app) {
+		app = apps.save(app);
+		kafkaService.sendApp(app);
+		return app;
 	}
 
 	public App getApp(Long id) {
@@ -87,7 +95,7 @@ public class AppsService {
 	public App addApp(App app) {
 		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
-		return apps.save(app);
+		return saveApp(app);
 	}
 
 	public App updateApp(String appName, App newApp) {
@@ -99,12 +107,13 @@ public class AppsService {
 		ObjectUtils.copyValidProperties(newApp, app);
 		log.info("App after copying properties: {}",
 			ToStringBuilder.reflectionToString(app));
-		return apps.save(app);
+		return saveApp(app);
 	}
 
 	public void deleteApp(String name) {
 		App app = getApp(name);
 		apps.delete(app);
+		kafkaService.deleteApp(app);
 	}
 
 	public List<AppService> getServices(String appName) {
@@ -207,8 +216,8 @@ public class AppsService {
 			appSimulatedMetricsService.removeApp(simulatedMetric, appId));
 	}
 
-	public boolean hasApp(String appname) {
-		return apps.hasApp(appname);
+	public boolean hasApp(String name) {
+		return apps.hasApp(name);
 	}
 
 	private void checkAppExists(String appName) {

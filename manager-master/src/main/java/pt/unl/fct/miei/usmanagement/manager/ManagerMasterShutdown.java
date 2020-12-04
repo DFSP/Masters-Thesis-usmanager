@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
@@ -61,12 +62,13 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final ServicesEventsService servicesEventsService;
 	private final NodesService nodesService;
 	private final SyncService syncService;
+	private final KafkaService kafkaService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
 								 ElasticIpsService elasticIpsService, MasterSymService symService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
-								 NodesService nodesService, SyncService syncService) {
+								 NodesService nodesService, SyncService syncService, KafkaService kafkaService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.elasticIpsService = elasticIpsService;
@@ -78,16 +80,18 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		this.servicesEventsService = servicesEventsService;
 		this.nodesService = nodesService;
 		this.syncService = syncService;
+		this.kafkaService = kafkaService;
 	}
 
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) {
-		symService.stopSymmetricDSServer();
+		/*symService.stopSymmetricDSServer();*/
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
 		syncService.stopCloudHostsDatabaseSynchronization();
 		syncService.stopContainersDatabaseSynchronization();
 		syncService.stopNodesDatabaseSynchronization();
+		kafkaService.stop();
 		try {
 			Predicate<DockerContainer> containersPredicate = (dockerContainer) -> {
 				String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");

@@ -157,7 +157,7 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Não foi possível remover condition`, 10000, reason, true);
+        super.toast(`Não foi possível remover a condição`, 10000, reason, true);
 
     private getSelectableConditionNames = () => {
         const {conditions, ruleConditions, unsavedConditions} = this.props;

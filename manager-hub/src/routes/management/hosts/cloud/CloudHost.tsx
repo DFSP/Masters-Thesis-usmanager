@@ -213,7 +213,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string): void =>
-        super.toast(`Não foi possível configurar uma instância nova`, 10000, reason, true);
+        super.toast(`Erro ao configurar uma instância nova`, 10000, reason, true);
 
     private shouldShowSaveButton = () =>
         !!this.state.unsavedRules.length
@@ -348,7 +348,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Não foi possível começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -375,7 +375,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStopFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Não foi possível parar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao parar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -398,7 +398,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onTerminateFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Não foi possível terminar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao terminar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }

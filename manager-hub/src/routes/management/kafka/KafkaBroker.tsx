@@ -359,7 +359,7 @@ function removeFields(kafkaBroker: Partial<IKafkaBroker>) {
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.kafkaBrokers.isLoadingKafkaBrokers;
     const error = state.entities.kafkaBrokers.loadKafkaBrokersError;
-    const id = props.match.params.id;
+    const id = props.match.params.id.toString();
     const newKafkaBroker = isNew(props.location.search);
     const newKafkaBrokerRegion = newKafkaBroker ? buildNewKafkaBrokerRegion() : undefined;
     const newKafkaBrokerHost = newKafkaBroker ? buildNewKafkaBrokerHost() : undefined;

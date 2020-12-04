@@ -161,7 +161,7 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string): void =>
-        super.toast(`Não foi possível remover simulated metric`, 10000, reason, true);
+        super.toast(`Não foi possível remover a métrica simulada`, 10000, reason, true);
 
     private getSelectableSimulatedMetrics = () => {
         const {simulatedMetrics, simulatedMetricsName, unsavedSimulatedMetrics} = this.props;

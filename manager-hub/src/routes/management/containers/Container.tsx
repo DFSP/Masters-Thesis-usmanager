@@ -41,8 +41,8 @@ import {ReduxState} from "../../../reducers";
 import {
     addContainerRules,
     addContainers,
-    addContainerSimulatedMetrics,
-    loadContainers,
+    addContainerSimulatedMetrics, loadCloudHosts,
+    loadContainers, loadEdgeHosts,
     loadNodes,
     loadServices
 } from "../../../actions";
@@ -157,6 +157,8 @@ interface DispatchToProps {
     loadContainers: (containerId?: string) => void;
     loadNodes: () => void;
     loadServices: () => void;
+    loadCloudHosts: () => void;
+    loadEdgeHosts: () => void;
     addContainers: (containers: IContainer[]) => void;
     addContainerRules: (containerId: string, rules: string[]) => void;
     addContainerSimulatedMetrics: (containerId: string, simulatedMetrics: string[]) => void;
@@ -202,6 +204,8 @@ class Container extends BaseComponent<Props, State> {
         this.loadContainer();
         this.props.loadNodes();
         this.props.loadServices();
+        this.props.loadCloudHosts();
+        this.props.loadEdgeHosts();
         this.mounted = true;
     };
 
@@ -271,7 +275,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onPostFailure = (reason: string, request: INewContainerHost | INewContainerLocation): void => {
-        super.toast(`Não foi possível iniciar o contentor</b>`, 10000, reason, true);
+        super.toast(`Erro ao iniciar o contentor</b>`, 10000, reason, true);
     }
 
     private onDeleteSuccess = (container: IContainer): void => {
@@ -282,7 +286,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onDeleteFailure = (reason: string, container: IContainer): void =>
-        super.toast(`Não foi possível parar o contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao parar o contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`}`, 10000, reason, true);
 
     private replicateButton = () =>
         <>
@@ -348,7 +352,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao replicar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -375,7 +379,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onMigrateFailure = (reason: string, container?: IContainer) => {
-        super.toast(`Não foi possível migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao migrar o contentor ${this.mounted ? `<b>${container?.id}</b>` : `<a href='/contentores/${container?.id}'><b>${container?.id}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -551,7 +555,7 @@ class Container extends BaseComponent<Props, State> {
         }
         const edgeHost = Object.values(this.props.edgeHosts).filter(e => e.publicIpAddress === publicIpAddress)[0];
         if (edgeHost) {
-            return '/hosts/edge/' + edgeHost.publicIpAddress;
+            return '/hosts/edge/' + edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress;
         }
         return null;
     }
@@ -696,8 +700,8 @@ class Container extends BaseComponent<Props, State> {
                                                  label={key}
                                                  icon={{linkedTo: this.managerLink}}/>
                                         : <Field key={index}
-                                               id={key}
-                                               label={key}/>
+                                                 id={key}
+                                                 label={key}/>
                 )}
             </>;
     }
@@ -742,11 +746,11 @@ class Container extends BaseComponent<Props, State> {
                           }}
                         // delete button is never present on new nodes, so a type cast is safe
                           delete={{
-                                  textButton: 'Parar',
-                                  url: `containers/${(container as IContainer).id}`,
-                                  successCallback: this.onDeleteSuccess,
-                                  failureCallback: this.onDeleteFailure
-                              }}
+                              textButton: 'Parar',
+                              url: `containers/${(container as IContainer).id}`,
+                              successCallback: this.onDeleteSuccess,
+                              failureCallback: this.onDeleteFailure
+                          }}
                           customButtons={!isNewContainer && container && (container as IContainer).labels?.['serviceType'] !== 'SYSTEM'
                               ? [{button: this.replicateButton()}, {button: this.migrateButton()}]
                               : undefined}
@@ -904,6 +908,8 @@ const mapDispatchToProps: DispatchToProps = {
     addContainers,
     loadNodes,
     loadServices,
+    loadCloudHosts,
+    loadEdgeHosts,
     addContainerRules,
     addContainerSimulatedMetrics,
 };

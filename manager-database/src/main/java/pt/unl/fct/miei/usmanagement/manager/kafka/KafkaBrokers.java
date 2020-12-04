@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface KafkaBrokers extends JpaRepository<KafkaBroker, Long> {
 
+	Optional<KafkaBroker> findByBrokerId(Long id);
+
 	@Query("select case when count(k) > 0 then true else false end "
 		+ "from KafkaBroker k "
 		+ "where k.id = :id")
@@ -24,4 +26,9 @@ public interface KafkaBrokers extends JpaRepository<KafkaBroker, Long> {
 	Optional<KafkaBroker> getByContainer(Container container);
 
 	List<KafkaBroker> getByRegion(RegionEnum region);
+
+	@Query("select case when count(k) > 0 then true else false end "
+		+ "from KafkaBroker k ")
+	boolean hasKafkaBrokers();
+
 }

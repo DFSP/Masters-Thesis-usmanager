@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -60,15 +60,18 @@ public class ServicesService {
 	private final ServiceRulesService serviceRulesService;
 	private final ServiceSimulatedMetricsService serviceSimulatedMetricsService;
 	private final AppsService appsService;
+	private final KafkaService kafkaService;
 
 	public ServicesService(Services services, ServiceEventPredictions serviceEventPredictions,
 						   ServiceRulesService serviceRulesService,
-						   ServiceSimulatedMetricsService serviceSimulatedMetricsService, @Lazy AppsService appsService) {
+						   ServiceSimulatedMetricsService serviceSimulatedMetricsService, @Lazy AppsService appsService,
+						   KafkaService kafkaService) {
 		this.services = services;
 		this.serviceEventPredictions = serviceEventPredictions;
 		this.serviceRulesService = serviceRulesService;
 		this.serviceSimulatedMetricsService = serviceSimulatedMetricsService;
 		this.appsService = appsService;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<Service> getServices() {
@@ -89,10 +92,16 @@ public class ServicesService {
 		return services.findByDockerRepositoryIgnoreCase(dockerRepository);
 	}
 
+	private Service saveService(Service service) {
+		service = services.save(service);
+		kafkaService.sendService(service);
+		return service;
+	}
+
 	public Service addService(Service service) {
 		checkServiceDoesntExist(service);
 		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
-		return services.save(service);
+		return saveService(service);
 	}
 
 	public Service updateService(String serviceName, Service newService) {
@@ -104,7 +113,7 @@ public class ServicesService {
 		ObjectUtils.copyValidProperties(newService, service);
 		log.info("Service after copying properties: {}",
 			ToStringBuilder.reflectionToString(service));
-		return services.save(service);
+		return saveService(service);
 	}
 
 	public void deleteService(String serviceName) {

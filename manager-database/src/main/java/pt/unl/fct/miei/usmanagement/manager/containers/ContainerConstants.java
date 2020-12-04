@@ -49,9 +49,10 @@ public final class ContainerConstants {
 
 		public static final class Kafka {
 			public static final String KAFKA_BROKER_ID = "KAFKA_BROKER_ID";
-			public static final String KAFKA_ADVERTISED_HOST_NAME = "KAFKA_ADVERTISED_HOST_NAME";
-			public static final String KAFKA_CREATE_TOPICS = "KAFKA_CREATE_TOPICS";
+			public static final String KAFKA_LISTENERS = "KAFKA_LISTENERS";
+			public static final String KAFKA_ADVERTISED_LISTENERS = "KAFKA_ADVERTISED_LISTENERS";
 			public static final String KAFKA_ZOOKEEPER_CONNECT = "KAFKA_ZOOKEEPER_CONNECT";
+			public static final String KAFKA_CREATE_TOPICS = "KAFKA_CREATE_TOPICS";
 		}
 	}
 
@@ -67,7 +68,7 @@ public final class ContainerConstants {
 		public static final String REGION = "region";
 		public static final String RECOVERY = "recovery";
 		public static final String MASTER_MANAGER = "masterManager";
-		public static final String KAFKA_BROKER_ID = "KAFKA_BROKER_ID";
+		public static final String KAFKA_BROKER_ID = "kafkaBrokerId";
 	}
 
 }

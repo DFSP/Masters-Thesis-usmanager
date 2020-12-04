@@ -96,7 +96,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-        super.toast(`Não foi possível começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
+        super.toast(`Erro ao começar a instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`}`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }

@@ -1708,7 +1708,7 @@ public class DatabaseLoader {
 				.defaultInternalPort(9092)
 				.outputLabel("${kafkaHost}")
 				.serviceType(ServiceTypeEnum.SYSTEM)
-				.volumes(Set.of("/var/run/docker.sock:/var/run/docker.socks"))
+				.volumes(Set.of("/var/run/docker.sock:/var/run/docker.sock"))
 				.build();
 			kafka = servicesService.addService(kafka);
 		}

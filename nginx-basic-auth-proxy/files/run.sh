@@ -25,6 +25,6 @@ sed \
   -e "s/##SERVER_NAME##/$SERVER_NAME/g" \
   -e "s/##PORT##/$PORT/g" \
   -e "s|##PROXY_PASS##|$PROXY_PASS|g" \
-  nginx.conf.tmpl > /etc/nginx/nginx.conf
+  nginx.conf.tmpl >/etc/nginx/nginx.conf
 
 exec nginx -g "daemon off;"

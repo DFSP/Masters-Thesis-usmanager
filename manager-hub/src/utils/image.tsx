@@ -98,7 +98,7 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
     if (label === 'defaultdb') {
         return <FaDatabase/>;
     }
-    if (label === 'id' || label === 'instanceid') {
+    if (label === 'id' || label === 'instanceid' || label === 'brokerid') {
         return "fingerprint";
     }
     if (label === 'state') {

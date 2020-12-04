@@ -84,7 +84,7 @@ public class ServiceSimulatedMetric {
 
 	@NotNull
 	private boolean override;
-	
+
 	@NotNull
 	private boolean active;
 

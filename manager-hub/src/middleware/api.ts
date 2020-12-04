@@ -282,7 +282,7 @@ const registrationServer: schema.Entity<IRegistrationServer> = new schema.Entity
 });
 
 const kafkaBroker: schema.Entity<IKafkaBroker> = new schema.Entity('kafkaBrokers', undefined, {
-    idAttribute: (kafkaBroker: IKafkaBroker) => kafkaBroker.id.toString()
+    idAttribute: (kafkaBroker: IKafkaBroker) => kafkaBroker.brokerId.toString()
 });
 
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {

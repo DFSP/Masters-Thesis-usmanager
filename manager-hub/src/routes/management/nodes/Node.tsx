@@ -206,11 +206,11 @@ class Node extends BaseComponent<Props, State> {
     private onPostFailure = (reason: string, node: INewNodeHost | INewNodeLocation): void => {
         let message;
         if ("host" in node && node.host) {
-            message = `Não foi possível começar o nó no host ${node.host}`;
+            message = `Erro ao iniciar o nó no host ${node.host}`;
         } else if ("coordinates" in node) {
-            message = `Não foi possível começar um nó na localização ${node.coordinates}`;
+            message = `Erro ao iniciar um nó na localização ${node.coordinates}`;
         } else {
-            message = `Não foi possível começar o nó`;
+            message = `Erro ao iniciar o nó`;
         }
         super.toast(message, 10000, reason, true);
     };
