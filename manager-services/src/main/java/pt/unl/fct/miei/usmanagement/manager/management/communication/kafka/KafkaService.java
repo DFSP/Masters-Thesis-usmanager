@@ -15,10 +15,15 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.kafka.KafkaBroker;
 import pt.unl.fct.miei.usmanagement.manager.kafka.KafkaBrokers;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
@@ -30,6 +35,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
@@ -43,18 +50,25 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRule
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLogs;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLogs;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
 
 import java.util.ArrayList;
@@ -62,8 +76,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -131,7 +143,7 @@ public class KafkaService {
 						@Lazy AppRulesService appRulesService,
 						@Lazy ContainerRulesService containerRulesService,
 						@Lazy ValueModesService valueModesService,
-						ZookeeperService zookeeperService,
+						HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService, ZookeeperService zookeeperService,
 						@Lazy ProducerFactory<String, Object> producerFactory,
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
@@ -303,8 +315,7 @@ public class KafkaService {
 				for (Map.Entry<String, Supplier<?>> topicKeyValue : topicsValues().entrySet()) {
 					String topic = topicKeyValue.getKey();
 					List<?> values = (List<?>) topicKeyValue.getValue().get();
-					kafkaTemplate.send(topic, values.get(0));
-					/*values.forEach(value -> kafkaTemplate.send(topic, value));*/
+					values.forEach(value -> kafkaTemplate.send(topic, value));
 				}
 				populated = true;
 			}
@@ -320,143 +331,419 @@ public class KafkaService {
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
 
-		topicsValues.put("apps", appsService::getApps);
-		/*topicsValues.put("cloud-hosts", cloudHostsService::getCloudHosts);
-		topicsValues.put("component-types", componentTypesService::getComponentTypes);
-		topicsValues.put("conditions", conditionsService::getConditions);
-		topicsValues.put("containers", containersService::getContainers);
-		topicsValues.put("decisions", decisionsService::getDecisions);
-		topicsValues.put("edge-hosts", edgeHostsService::getEdgeHosts);
-		topicsValues.put("eips", elasticIpsService::getElasticIps);
-		topicsValues.put("fields", fieldsService::getFields);
-		topicsValues.put("nodes", nodesService::getNodes);
-		topicsValues.put("operators", operatorsService::getOperators);
-		topicsValues.put("services", servicesService::getServices);
-		topicsValues.put("simulated-host-metrics", hostSimulatedMetricsService::getHostSimulatedMetrics);
-		topicsValues.put("simulated-app-metrics", appSimulatedMetricsService::getAppSimulatedMetrics);
-		topicsValues.put("simulated-service-metrics", serviceSimulatedMetricsService::getServiceSimulatedMetrics);
-		topicsValues.put("simulated-container-metrics", containerSimulatedMetricsService::getContainerSimulatedMetrics);
-		topicsValues.put("host-rules", hostRulesService::getRules);
-		topicsValues.put("app-rules", appRulesService::getRules);
-		topicsValues.put("service-rules", serviceRulesService::getRules);
-		topicsValues.put("container-rules", containerRulesService::getRules);
-		topicsValues.put("value-modes", servicesService::getServices);*/
-
+		topicsValues.put("apps", () -> appsService.getApps().stream().map(AppMessage::new).collect(Collectors.toList()));
+		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHosts().stream().map(CloudHostMessage::new).collect(Collectors.toList()));
+		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeMessage::new).collect(Collectors.toList()));
+		topicsValues.put("conditions", () -> conditionsService.getConditions().stream().map(ConditionMessage::new).collect(Collectors.toList()));
+		topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerMessage::new).collect(Collectors.toList()));
+		topicsValues.put("decisions", () -> decisionsService.getDecisions().stream().map(DecisionMessage::new).collect(Collectors.toList()));
+		topicsValues.put("edge-hosts", () -> edgeHostsService.getEdgeHosts().stream().map(EdgeHostMessage::new).collect(Collectors.toList()));
+		topicsValues.put("eips", () -> elasticIpsService.getElasticIps().stream().map(ElasticIpMessage::new).collect(Collectors.toList()));
+		topicsValues.put("fields", () -> fieldsService.getFields().stream().map(FieldMessage::new).collect(Collectors.toList()));
+		topicsValues.put("nodes", () -> nodesService.getNodes().stream().map(NodeMessage::new).collect(Collectors.toList()));
+		topicsValues.put("operators", () -> operatorsService.getOperators().stream().map(OperatorMessage::new).collect(Collectors.toList()));
+		topicsValues.put("services", () -> servicesService.getServices().stream().map(ServiceMessage::new).collect(Collectors.toList()));
+		topicsValues.put("simulated-host-metrics", () -> hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(HostSimulatedMetricMessage::new).collect(Collectors.toList()));
+		topicsValues.put("simulated-app-metrics", () -> appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(AppSimulatedMetricMessage::new).collect(Collectors.toList()));
+		topicsValues.put("simulated-service-metrics", () -> serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(ServiceSimulatedMetricMessage::new).collect(Collectors.toList()));
+		topicsValues.put("simulated-container-metrics", () -> containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(ContainerSimulatedMetricMessage::new).collect(Collectors.toList()));
+		topicsValues.put("host-rules", () -> hostRulesService.getRules().stream().map(HostRuleMessage::new).collect(Collectors.toList()));
+		topicsValues.put("app-rules", () -> appRulesService.getRules().stream().map(AppRuleMessage::new).collect(Collectors.toList()));
+		topicsValues.put("service-rules", () -> serviceRulesService.getRules().stream().map(ServiceRuleMessage::new).collect(Collectors.toList()));
+		topicsValues.put("container-rules", () -> containerRulesService.getRules().stream().map(ContainerRuleMessage::new).collect(Collectors.toList()));
+		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeMessage::new).collect(Collectors.toList()));
 		return topicsValues;
 	}
 
 	private String topics() {
-		return "apps:1:1,cloud-hosts:1:1,component-types:1:1,conditions:1:1,containers:1:1,decisions:1:1,"
+		String masterManagerTopics = "apps:1:1,cloud-hosts:1:1,component-types:1:1,conditions:1:1,containers:1:1,decisions:1:1,"
 			+ "edge-hosts:1:1,eips:1:1,fields:1:1,nodes:1:1,operators:1:1,services:1:1,simulated-host-metrics:1:1,"
 			+ "simulated-app-metrics:1:1,simulated-service-metrics:1:1,simulated-container-metrics:1:1,host-rules:1:1,"
 			+ "app-rules:1:1,service-rules:1:1,container-rules:1:1,value-modes:1:1";
+		String workerManagerTopics = "host-events:1:1,service-events:1:1,host-monitoring-logs:1:1,service-monitoring-logs:1:1,"
+			+ "host-decisions:1:1,service-decisions:1:1";
+		return masterManagerTopics + "," + workerManagerTopics;
 	}
 
 	@Async
 	public void sendApp(App app) {
-		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && populated) {
-			AppMessage appMessage = new AppMessage(app);
-			log.info("Sending {} to kafka", appMessage.toString());
-			kafkaTemplate.send("apps", appMessage);
-		}
-		else {
-			log.warn("Not sending app {} to kafka because hasKafkaBrokers={} and populated={}", app.getName(), hasKafkaBrokers, populated);
-		}
+		send("apps", new AppMessage(app), app.getId());
 	}
 
 	@Async
 	public void deleteApp(App app) {
-		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && populated) {
-			log.info("Sending DELETE app id={} request to kafka", app.getId());
-			kafkaTemplate.send("apps", "DELETE", app.getId());
-		}
-		else {
-			log.warn("Not sending DELETE app id={} request to kafka because hasKafkaBrokers={} and populated={}", app.getId(), hasKafkaBrokers, populated);
-		}
+		sendDelete("apps", app.getId());
 	}
 
-	/*"apps:1:1,cloud-hosts:1:1,component-types:1:1,conditions:1:1,containers:1:1,decisions:1:1,"
-		+ "edge-hosts:1:1,eips:1:1,fields:1:1,nodes:1:1,operators:1:1,services:1:1,simulated-host-metrics:1:1,"
-		+ "simulated-app-metrics:1:1,simulated-service-metrics:1:1,simulated-container-metrics:1:1,host-rules:1:1,"
-		+ "app-rules:1:1,service-rules:1:1,container-rules:1:1,value-modes:1:1";*/
+	@Async
+	public void sendCloudHost(CloudHost cloudHost) {
+		send("cloud-hosts", new CloudHostMessage(cloudHost), cloudHost.getId());
+	}
 
+	@Async
+	public void deleteCloudHost(CloudHost cloudHost) {
+		sendDelete("cloud-hosts", cloudHost.getId());
+	}
+
+	@Async
+	public void sendComponentType(ComponentType componentType) {
+		send("component-types", new ComponentTypeMessage(componentType), componentType.getId());
+	}
+
+	@Async
+	public void deleteComponentType(ComponentType componentType) {
+		sendDelete("component-types", componentType.getId());
+	}
+
+	@Async
+	public void sendCondition(Condition condition) {
+		send("conditions", new ConditionMessage(condition), condition.getId());
+	}
+
+	@Async
+	public void deleteCondition(Condition condition) {
+		sendDelete("conditions", condition.getId());
+	}
+
+	@Async
+	public void sendContainer(Container container) {
+		send("containers", new ContainerMessage(container), container.getId());
+	}
+
+	@Async
+	public void deleteContainer(Container container) {
+		sendDelete("containers", container.getId());
+	}
+
+	@Async
+	public void sendDecision(Decision decision) {
+		send("decisions", new DecisionMessage(decision), decision.getId());
+	}
+
+	@Async
+	public void deleteDecision(Decision decision) {
+		sendDelete("decisions", decision.getId());
+	}
+
+	@Async
+	public void sendEdgeHost(EdgeHost edgeHost) {
+		send("edge-hosts", new EdgeHostMessage(edgeHost), edgeHost.getId());
+	}
+
+	@Async
+	public void deleteEdgeHost(EdgeHost edgeHost) {
+		sendDelete("edge-hosts", edgeHost.getId());
+	}
+
+	@Async
+	public void sendElasticIp(ElasticIp elasticIp) {
+		send("eips", new ElasticIpMessage(elasticIp), elasticIp.getId());
+	}
+
+	@Async
+	public void deleteElasticIp(ElasticIp elasticIp) {
+		sendDelete("eips", elasticIp.getId());
+	}
+
+	@Async
+	public void sendField(Field field) {
+		send("fields", new FieldMessage(field), field.getId());
+	}
+
+	@Async
+	public void deleteField(Field field) {
+		sendDelete("fields", field.getId());
+	}
+
+	@Async
+	public void sendNode(Node node) {
+		send("nodes", new NodeMessage(node), node.getId());
+	}
+
+	@Async
+	public void deleteNode(Node node) {
+		sendDelete("nodes", node.getId());
+	}
+
+	@Async
+	public void sendOperator(Operator operator) {
+		send("operators", new OperatorMessage(operator), operator.getId());
+	}
+
+	@Async
+	public void deleteOperator(Operator operator) {
+		sendDelete("operators", operator.getId());
+	}
 
 	@Async
 	public void sendService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && populated) {
-			ServiceMessage serviceMessage = new ServiceMessage(service);
-			log.info("Sending {} to kafka", serviceMessage.toString());
-			kafkaTemplate.send("services", serviceMessage);
-		}
-		else {
-			log.warn("Not sending service {} to kafka because hasKafkaBrokers={} and populated={}", service.getServiceName(), hasKafkaBrokers, populated);
-		}
+		send("services", new ServiceMessage(service), service.getId());
 	}
 
 	@Async
 	public void deleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		if (hasKafkaBrokers() && populated) {
-			kafkaTemplate.send("services", "DELETE", service.getId());
+		sendDelete("services", service.getId());
+	}
+
+	@Async
+	public void sendHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		send("simulated-host-metrics", new HostSimulatedMetricMessage(hostSimulatedMetric), hostSimulatedMetric.getId());
+	}
+
+	@Async
+	public void deleteHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		sendDelete("simulated-host-metrics", hostSimulatedMetric.getId());
+	}
+
+	@Async
+	public void sendAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
+		send("simulated-app-metrics", new AppSimulatedMetricMessage(appSimulatedMetric), appSimulatedMetric.getId());
+	}
+
+	@Async
+	public void deleteAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
+		sendDelete("simulated-app-metrics", appSimulatedMetric.getId());
+	}
+
+	@Async
+	public void sendServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
+		send("simulated-service-metrics", new ServiceSimulatedMetricMessage(serviceSimulatedMetric), serviceSimulatedMetric.getId());
+	}
+
+	@Async
+	public void deleteServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
+		sendDelete("simulated-service-metrics", serviceSimulatedMetric.getId());
+	}
+
+	@Async
+	public void sendContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
+		send("simulated-container-metrics", new ContainerSimulatedMetricMessage(containerSimulatedMetric), containerSimulatedMetric.getId());
+	}
+
+	@Async
+	public void deleteContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
+		sendDelete("simulated-container-metrics", containerSimulatedMetric.getId());
+	}
+
+	@Async
+	public void sendHostRule(HostRule hostRule) {
+		send("host-rules", new HostRuleMessage(hostRule), hostRule.getId());
+	}
+
+	@Async
+	public void deleteHostRule(HostRule hostRule) {
+		sendDelete("host-rules", hostRule.getId());
+	}
+
+	@Async
+	public void sendAppRule(AppRule appRule) {
+		send("app-rules", new AppRuleMessage(appRule), appRule.getId());
+	}
+
+	@Async
+	public void deleteAppRule(AppRule appRule) {
+		sendDelete("app-rules", appRule.getId());
+	}
+
+	@Async
+	public void sendServiceRule(ServiceRule serviceRule) {
+		send("service-rules", new ServiceRuleMessage(serviceRule), serviceRule.getId());
+	}
+
+	@Async
+	public void deleteServiceRule(ServiceRule serviceRule) {
+		sendDelete("service-rules", serviceRule.getId());
+	}
+
+	@Async
+	public void sendContainerRule(ContainerRule containerRule) {
+		send("container-rules", new ContainerRuleMessage(containerRule), containerRule.getId());
+	}
+
+	@Async
+	public void deleteContainerRule(ContainerRule containerRule) {
+		sendDelete("container-rules", containerRule.getId());
+	}
+
+	@Async
+	public void sendValueMode(ValueMode valueMode) {
+		send("value-modes", new ValueModeMessage(valueMode), valueMode.getId());
+	}
+
+	@Async
+	public void deleteValueMode(ValueMode valueMode) {
+		sendDelete("value-modes", valueMode.getId());
+	}
+
+	@Async
+	public void send(String topic, Object message, Object id) {
+		boolean hasKafkaBrokers = hasKafkaBrokers();
+		if (hasKafkaBrokers && populated) {
+			log.info("Sending {} to kafka", message.toString());
+			kafkaTemplate.send(topic, message);
+		}
+		else {
+			log.warn("Not sending message id={} to kafka topic {} because hasKafkaBrokers={} and populated={}",
+				id, topic, hasKafkaBrokers, populated);
+		}
+	}
+
+	@Async
+	public void sendDelete(String topic, Object id) {
+		boolean hasKafkaBrokers = hasKafkaBrokers();
+		if (hasKafkaBrokers && populated) {
+			log.info("Sending DELETE id={} request to kafka topic {}", id, topic);
+			kafkaTemplate.send(topic, "DELETE", id);
+		}
+		else {
+			log.warn("Not sending DELETE id={} request to kafka topic {} because hasKafkaBrokers={} and populated={}",
+				id, topic, hasKafkaBrokers, populated);
 		}
 	}
 
 	@KafkaListener(groupId = "manager", topics = "apps", autoStartup = "false")
-	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
 		log.info("key={} message={}", key, appMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "services", autoStartup = "false")
-	public void listenServices(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-							   @Payload ServiceMessage serviceMessage) {
-		log.info("key={} value={}", key, serviceMessage.toString());
+	@KafkaListener(groupId = "manager", topics = "cloud-hosts", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostMessage cloudHostMessage) {
+		log.info("key={} message={}", key, cloudHostMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "component-types", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeMessage componentTypeMessage) {
+		log.info("key={} message={}", key, componentTypeMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "conditions", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
+		log.info("key={} message={}", key, conditionMessage.toString());
 	}
 
 	@KafkaListener(groupId = "manager", topics = "containers", autoStartup = "false")
-	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload Container container) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(container));
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerMessage containerMessage) {
+		log.info("key={} message={}", key, containerMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "decisions", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionMessage decisionMessage) {
+		log.info("key={} message={}", key, decisionMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "edge-hosts", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostMessage edgeHostMessage) {
+		log.info("key={} message={}", key, edgeHostMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "eips", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpMessage elasticIpMessage) {
+		log.info("key={} message={}", key, elasticIpMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "fields", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldMessage fieldMessage) {
+		log.info("key={} message={}", key, fieldMessage.toString());
 	}
 
 	@KafkaListener(groupId = "manager", topics = "nodes", autoStartup = "false")
-	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload Node node) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(node));
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeMessage nodeMessage) {
+		log.info("key={} message={}", key, nodeMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "host-events", autoStartup = "false")
-	public void listenHostEvents(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEvent hostEvent) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(hostEvent));
+	@KafkaListener(groupId = "manager", topics = "operators", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorMessage operatorMessage) {
+		log.info("key={} message={}", key, operatorMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "service-events", autoStartup = "false")
-	public void listenServiceEvents(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-									@Payload ServiceEvent serviceEvent) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(serviceEvent));
+	@KafkaListener(groupId = "manager", topics = "services", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMessage serviceMessage) {
+		log.info("key={} message={}", key, serviceMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "host-monitoring-logs", autoStartup = "false")
-	public void listenHostMonitoringLogs(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-										 @Payload HostMonitoringLog hostMonitoringLog) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(hostMonitoringLog));
+	@KafkaListener(groupId = "manager", topics = "simulated-host-metrics", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricMessage hostSimulatedMetricMessage) {
+		log.info("key={} message={}", key, hostSimulatedMetricMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "service-monitoring-logs", autoStartup = "false")
-	public void listenServiceMonitoringLogs(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-											@Payload ServiceMonitoringLog serviceMonitoringLog) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(serviceMonitoringLog));
+	@KafkaListener(groupId = "manager", topics = "simulated-app-metrics", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricMessage appSimulatedMetricMessage) {
+		log.info("key={} message={}", key, appSimulatedMetricMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "host-decisions", autoStartup = "false")
-	public void listenHostDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-									@Payload HostDecision hostDecision) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(hostDecision));
+	@KafkaListener(groupId = "manager", topics = "simulated-service-metrics", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricMessage serviceSimulatedMetricMessage) {
+		log.info("key={} message={}", key, serviceSimulatedMetricMessage.toString());
 	}
 
-	@KafkaListener(groupId = "manager", topics = "service-decisions", autoStartup = "false")
-	public void listenServiceDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-									   @Payload ServiceDecision serviceDecision) {
-		log.info("key={} value={}", key, ToStringBuilder.reflectionToString(serviceDecision));
+	@KafkaListener(groupId = "manager", topics = "simulated-container-metrics", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricMessage containerSimulatedMetricMessage) {
+		log.info("key={} message={}", key, containerSimulatedMetricMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "host-rules", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleMessage hostRuleMessage) {
+		log.info("key={} message={}", key, hostRuleMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "app-rules", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleMessage appRuleMessage) {
+		log.info("key={} message={}", key, appRuleMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "service-rules", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleMessage serviceRuleMessage) {
+		log.info("key={} message={}", key, serviceRuleMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "container-rules", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleMessage containerRuleMessage) {
+		log.info("key={} message={}", key, containerRuleMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager", topics = "value-modes", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeMessage valueModeMessage) {
+		log.info("key={} message={}", key, valueModeMessage.toString());
+	}
+
+
+
+
+
+	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventMessage hostEventMessage) {
+		log.info("key={} value={}", key, hostEventMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventMessage serviceEventMessage) {
+		log.info("key={} value={}", key, serviceEventMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogMessage hostMonitoringLog) {
+		log.info("key={} value={}", key, hostMonitoringLog.toString());
+	}
+
+	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogMessage serviceMonitoringLogMessage) {
+		log.info("key={} value={}", key, serviceMonitoringLogMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionMessage hostDecisionMessage) {
+		log.info("key={} value={}", key, hostDecisionMessage.toString());
+	}
+
+	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionMessage serviceDecisionMessage) {
+		log.info("key={} value={}", key, serviceDecisionMessage.toString());
+	}
+
+	public void restart() {
+		producerFactory.reset();
+		kafkaListenerEndpointRegistry.stop();
+		kafkaListenerEndpointRegistry.start();
 	}
 
 	public void stop() {

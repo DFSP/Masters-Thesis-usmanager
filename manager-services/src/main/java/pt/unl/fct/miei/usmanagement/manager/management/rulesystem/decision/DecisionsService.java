@@ -49,6 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceR
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -191,6 +192,11 @@ public class DecisionsService {
 		);
 	}
 
+
+	public List<ServiceDecision> getServiceDecisions() {
+		return serviceDecisions.findAll();
+	}
+
 	public List<ServiceDecision> getServiceDecisions(String serviceName) {
 		return serviceDecisions.findByServiceName(serviceName);
 	}
@@ -199,9 +205,12 @@ public class DecisionsService {
 		return serviceDecisions.findByContainerIdStartingWith(containerId);
 	}
 
+	public List<HostDecision> getHostDecisions() {
+		return hostDecisions.findAll();
+	}
+
 	public List<HostDecision> getHostDecisions(HostAddress hostAddress) {
 		return hostDecisions.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
 			hostAddress.getPrivateIpAddress());
 	}
-
 }

@@ -138,7 +138,6 @@ public class Container {
 	)
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
 
-
 	@JsonIgnore
 	public String getServiceName() {
 		return getLabels().get(ContainerConstants.Label.SERVICE_NAME);

@@ -87,7 +87,7 @@ public class Condition {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostRuleCondition> hostRuleConditions;
+	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore

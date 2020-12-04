@@ -35,12 +35,12 @@ public class ServiceMessage {
 	private Set<String> environment;
 	private Set<String> volumes;
 	private Double expectedMemoryConsumption;
-	private Set<Long> appServices;
-	private Set<Long> dependencies;
-	private Set<Long> dependents;
-	private Set<Long> eventPredictions;
-	private Set<Long> serviceRules;
-	private Set<Long> simulatedServiceMetrics;
+	private Set<AppService> appServices;
+	private Set<ServiceDependency> dependencies;
+	private Set<ServiceDependency> dependents;
+	private Set<ServiceEventPrediction> eventPredictions;
+	private Set<ServiceRule> serviceRules;
+	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
 	public ServiceMessage(Service service) {
 		this.id = service.getId();
@@ -57,35 +57,10 @@ public class ServiceMessage {
 		this.environment = service.getEnvironment();
 		this.volumes = service.getVolumes();
 		this.expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-		Set<AppService> appServices = service.getAppServices();
-		if (appServices != null) {
-			this.appServices = new HashSet<>(appServices.size());
-			appServices.forEach(appService -> this.appServices.add(appService.getId()));
-		}
-		Set<ServiceDependency> dependencies = service.getDependencies();
-		if (dependencies != null) {
-			this.dependencies = new HashSet<>(dependencies.size());
-			dependencies.forEach(dependency -> this.dependencies.add(dependency.getDependency().getId()));
-		}
-		Set<ServiceDependency> dependents = service.getDependents();
-		if (dependents != null) {
-			this.dependents = new HashSet<>(dependents.size());
-			dependents.forEach(dependent -> this.dependents.add(dependent.getDependency().getId()));
-		}
-		Set<ServiceEventPrediction> eventPredictions = service.getEventPredictions();
-		if (eventPredictions != null) {
-			this.eventPredictions = new HashSet<>(eventPredictions.size());
-			eventPredictions.forEach(eventPrediction -> this.eventPredictions.add(eventPrediction.getId()));
-		}
-		Set<ServiceRule> serviceRules = service.getServiceRules();
-		if (serviceRules != null) {
-			this.serviceRules = new HashSet<>(serviceRules.size());
-			serviceRules.forEach(serviceRule -> this.serviceRules.add(serviceRule.getId()));
-		}
-		Set<ServiceSimulatedMetric> simulatedServiceMetrics = service.getSimulatedServiceMetrics();
-		if (simulatedServiceMetrics != null) {
-			this.simulatedServiceMetrics = new HashSet<>(simulatedServiceMetrics.size());
-			simulatedServiceMetrics.forEach(simulatedServiceMetric -> this.simulatedServiceMetrics.add(simulatedServiceMetric.getId()));
-		}
+		this.dependencies = service.getDependencies();
+		this.dependents = service.getDependents();
+		this.eventPredictions = service.getEventPredictions();
+		this.serviceRules = service.getServiceRules();
+		this.simulatedServiceMetrics = service.getSimulatedServiceMetrics();
 	}
 }

@@ -70,14 +70,14 @@ public class AppRule {
 
 	private int priority;
 
+	@ManyToOne
+	@JoinColumn(name = "decision_id")
+	private Decision decision;
+
 	@Singular
 	@JsonIgnore
 	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<App> apps;
-
-	@ManyToOne
-	@JoinColumn(name = "decision_id")
-	private Decision decision;
 
 	@Singular
 	@JsonIgnore
