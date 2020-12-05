@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class/*, KafkaAutoConfiguration.class*/})

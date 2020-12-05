@@ -137,7 +137,7 @@ public class SyncService {
 					if (!Objects.equals(currentState, savedState)) {
 						log.info("Updating state of cloud host {}", cloudHost.getInstanceId());
 						cloudHost.setState(currentState);
-						cloudHostsService.saveCloudHost(cloudHost);
+						cloudHostsService.updateCloudHost(cloudHost);
 					}
 					String currentPublicIpAddress = instance.getPublicIpAddress();
 					String savedPublicIpAddress = cloudHost.getPublicIpAddress();

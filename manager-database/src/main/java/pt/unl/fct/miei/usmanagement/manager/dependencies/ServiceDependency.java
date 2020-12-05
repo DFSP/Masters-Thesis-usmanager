@@ -30,7 +30,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.Entity;

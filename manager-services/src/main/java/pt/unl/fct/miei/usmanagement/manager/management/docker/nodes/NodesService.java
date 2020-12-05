@@ -32,13 +32,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
@@ -66,6 +65,7 @@ public class NodesService {
 	private final DockerSwarmService dockerSwarmService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
+	private final KafkaService kafkaService;
 	private final Environment environment;
 
 	private final Nodes nodes;
@@ -73,10 +73,11 @@ public class NodesService {
 	private final int threads;
 
 	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
-						@Lazy ContainersService containersService, Environment environment, Nodes nodes, ParallelismProperties parallelismProperties) {
+						@Lazy ContainersService containersService, KafkaService kafkaService, Environment environment, Nodes nodes, ParallelismProperties parallelismProperties) {
 		this.dockerSwarmService = dockerSwarmService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
+		this.kafkaService = kafkaService;
 		this.environment = environment;
 		this.nodes = nodes;
 		this.threads = parallelismProperties.getThreads();
@@ -127,7 +128,9 @@ public class NodesService {
 		checkNodeDoesntExist(swarmNode);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
 		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
-		return nodes.save(node);
+		node = saveNode(node);
+		kafkaService.sendNode(node);
+		return node;
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> addNodes(NodeRole role, String host, List<Coordinates> coordinates) {
@@ -137,7 +140,9 @@ public class NodesService {
 			nodes.add(node);
 			/*Node n = hostsService.addHost(host, role);
 			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(n);
-			nodes.add(this.nodes.save(node));*/
+			node = saveNode(node);
+			kafkaService.sendNode(node);
+			nodes.add(node);*/
 		}
 		else if (coordinates != null) {
 			for (Coordinates coordinate : coordinates) {
@@ -146,6 +151,10 @@ public class NodesService {
 			}
 		}
 		return nodes;
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node saveNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
+		return nodes.save(node);
 	}
 
 	public void removeHost(HostAddress hostAddress) {
@@ -178,7 +187,8 @@ public class NodesService {
 		dockerSwarmService.changeAvailability(nodeId, newAvailability);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
 		node.setAvailability(newAvailability);
-		nodes.save(node);
+		node = saveNode(node);
+		kafkaService.sendNode(node);
 		return node;
 	}
 
@@ -186,8 +196,7 @@ public class NodesService {
 		dockerSwarmService.changeRole(nodeId, newRole);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
 		node.setRole(newRole);
-		nodes.save(node);
-		return node;
+		return updateNode(node);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addLabel(String nodeId, String label, String value) {
@@ -200,8 +209,7 @@ public class NodesService {
 		Map<String, String> labels = node.getLabels();
 		labels.putAll(newLabels);
 		node.setLabels(labels);
-		nodes.save(node);
-		return node;
+		return updateNode(node);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node removeLabel(String nodeId, String label) {
@@ -210,21 +218,22 @@ public class NodesService {
 		Map<String, String> labels = node.getLabels();
 		labels.remove(label);
 		node.setLabels(labels);
-		nodes.save(node);
-		return node;
+		return updateNode(node);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
-		return nodes.save(node);
+		node = saveNode(node);
+		kafkaService.sendNode(node);
+		return node;
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNodeSpecs(String nodeId,
-																		   pt.unl.fct.miei.usmanagement.manager.nodes.Node newNode) {
-		Node swarmNode = dockerSwarmService.updateNode(nodeId, newNode.getAvailability().name(), newNode.getRole().name(),
-			newNode.getLabels());
-		newNode = fromSwarmNode(swarmNode);
-		log.info("Saving node {}", ToStringBuilder.reflectionToString(newNode));
-		return nodes.save(newNode);
+																		   pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
+		Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
+			node.getLabels());
+		node = fromSwarmNode(swarmNode);
+		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
+		return updateNode(node);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node rejoinSwarm(String nodeId) {
@@ -236,8 +245,10 @@ public class NodesService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNodeFromSwarmNode(Node swarmNode) {
-		pt.unl.fct.miei.usmanagement.manager.nodes.Node newNode = fromSwarmNode(swarmNode);
-		return nodes.save(newNode);
+		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
+		node = saveNode(node);
+		kafkaService.sendNode(node);
+		return node;
 	}
 
 	public boolean hasNode(String nodeId) {
@@ -283,6 +294,7 @@ public class NodesService {
 		hostsService.stopBackgroundProcesses(hostAddress);
 		nodes.forEach(node -> node.setState("down"));
 		this.nodes.saveAll(nodes);
+		nodes.forEach(kafkaService::sendNode);
 		return nodes;
 	}
 
@@ -300,7 +312,8 @@ public class NodesService {
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> updateAddress(HostAddress hostAddress, String publicIpAddress) {
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		nodes.forEach(node -> node.setPublicIpAddress(publicIpAddress));
-		return this.nodes.saveAll(nodes);
+		nodes = this.nodes.saveAll(nodes);
+		nodes.forEach(kafkaService::sendNode);
+		return nodes;
 	}
-
 }

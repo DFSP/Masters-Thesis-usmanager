@@ -38,7 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServers;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

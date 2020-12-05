@@ -47,7 +47,7 @@ func distanceBetween(oneInstance *Instance, anotherInstance *Instance) float64 {
 	deltaY := (anotherLongitude - oneLongitude) * math.Pi / 180
 	r := 6371e3
 
-	return math.Acos(math.Sin(ph1) * math.Sin(ph2) + math.Cos(ph1) * math.Cos(ph2) * math.Cos(deltaY)) * r
+	return math.Acos(math.Sin(ph1)*math.Sin(ph2)+math.Cos(ph1)*math.Cos(ph2)*math.Cos(deltaY)) * r
 }
 
 func GetBestInstance(thisInstance *Instance, instances []*Instance) data.InstanceEndpoint {

@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModes;
@@ -41,9 +41,11 @@ import java.util.List;
 public class ValueModesService {
 
 	private final ValueModes valueModes;
+	private final KafkaService kafkaService;
 
-	public ValueModesService(ValueModes valueModes) {
+	public ValueModesService(ValueModes valueModes, KafkaService kafkaService) {
 		this.valueModes = valueModes;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<ValueMode> getValueModes() {
@@ -63,15 +65,22 @@ public class ValueModesService {
 	public ValueMode addValueMode(ValueMode valueMode) {
 		checkValueModeDoesntExist(valueMode);
 		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
-		return valueModes.save(valueMode);
+		valueMode = saveValueMode(valueMode);
+		kafkaService.sendValueMode(valueMode);
+		return valueMode;
 	}
 
 	public ValueMode updateValueMode(String valueModeName, ValueMode newValueMode) {
 		ValueMode valueMode = getValueMode(valueModeName);
 		log.info("Updating valueMode {} with {}", ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
 		ObjectUtils.copyValidProperties(newValueMode, valueMode);
-		valueMode = valueModes.save(valueMode);
+		valueMode = saveValueMode(valueMode);
+		kafkaService.sendValueMode(valueMode);
 		return valueMode;
+	}
+
+	public ValueMode saveValueMode(ValueMode valueMode) {
+		return valueModes.save(valueMode);
 	}
 
 	public void deleteValueMode(String valueModeName) {

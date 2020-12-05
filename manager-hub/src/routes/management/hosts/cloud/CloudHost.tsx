@@ -57,7 +57,7 @@ import {ICoordinates} from "../../../../components/map/LocationMap";
 import {IMarker} from "../../../../components/map/Marker";
 import CloudHostSshCommand from "./CloudHostSshCommand";
 import CloudHostSshFileTransfer from "./CloudHostSshFileTransfer";
-import { isEqual } from "lodash";
+import {isEqual} from "lodash";
 import {IRegion} from "../../regions/Region";
 
 export interface ICloudHost extends IDatabaseData {

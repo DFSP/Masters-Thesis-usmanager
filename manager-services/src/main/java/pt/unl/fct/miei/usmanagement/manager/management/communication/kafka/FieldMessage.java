@@ -1,10 +1,8 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
@@ -13,12 +11,6 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMe
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -43,5 +35,17 @@ public class FieldMessage {
 		this.simulatedHostMetrics = field.getSimulatedHostMetrics();
 		this.simulatedServiceMetrics = field.getSimulatedServiceMetrics();
 		this.componentDecisionValueLogs = field.getComponentDecisionValueLogs();
+	}
+
+	public Field get() {
+		return Field.builder()
+			.id(id)
+			.name(name)
+			.prometheusQuery(prometheusQuery)
+			.conditions(conditions)
+			.simulatedHostMetrics(simulatedHostMetrics)
+			.simulatedServiceMetrics(simulatedServiceMetrics)
+			.componentDecisionValueLogs(componentDecisionValueLogs)
+			.build();
 	}
 }

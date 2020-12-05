@@ -28,15 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -48,13 +48,15 @@ public class HostSimulatedMetricsService {
 
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
+	private final KafkaService kafkaService;
 
 	private final HostSimulatedMetrics hostSimulatedMetrics;
 
 	public HostSimulatedMetricsService(CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService,
-									   HostSimulatedMetrics hostSimulatedMetrics) {
+									   KafkaService kafkaService, HostSimulatedMetrics hostSimulatedMetrics) {
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
+		this.kafkaService = kafkaService;
 		this.hostSimulatedMetrics = hostSimulatedMetrics;
 	}
 
@@ -65,7 +67,7 @@ public class HostSimulatedMetricsService {
 	public List<HostSimulatedMetric> getHostSimulatedMetricByHost(HostAddress hostAddress) {
 		return hostSimulatedMetrics.findByHost(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
-	
+
 	public HostSimulatedMetric getHostSimulatedMetric(Long id) {
 		return hostSimulatedMetrics.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(HostSimulatedMetric.class, "id", id.toString()));
@@ -76,19 +78,27 @@ public class HostSimulatedMetricsService {
 			new EntityNotFoundException(HostSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
 
-	public HostSimulatedMetric addHostSimulatedMetric(HostSimulatedMetric simulatedHostMetric) {
-		checkHostSimulatedMetricDoesntExist(simulatedHostMetric);
-		log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(simulatedHostMetric));
-		return hostSimulatedMetrics.save(simulatedHostMetric);
+	public HostSimulatedMetric addHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		checkHostSimulatedMetricDoesntExist(hostSimulatedMetric);
+		log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(hostSimulatedMetric));
+		hostSimulatedMetric = saveHostSimulatedMetric(hostSimulatedMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetric);
+		return hostSimulatedMetric;
 	}
 
 	public HostSimulatedMetric updateHostSimulatedMetric(String simulatedMetricName,
 														 HostSimulatedMetric newHostSimulatedMetric) {
 		log.info("Updating simulated host metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newHostSimulatedMetric));
-		HostSimulatedMetric simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
-		ObjectUtils.copyValidProperties(newHostSimulatedMetric, simulatedHostMetric);
-		return hostSimulatedMetrics.save(simulatedHostMetric);
+		HostSimulatedMetric hostSimulatedMetric = getHostSimulatedMetric(simulatedMetricName);
+		ObjectUtils.copyValidProperties(newHostSimulatedMetric, hostSimulatedMetric);
+		hostSimulatedMetric = saveHostSimulatedMetric(hostSimulatedMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetric);
+		return hostSimulatedMetric;
+	}
+
+	public HostSimulatedMetric saveHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		return hostSimulatedMetrics.save(hostSimulatedMetric);
 	}
 
 	public void deleteHostSimulatedMetric(String simulatedMetricName) {
@@ -185,7 +195,7 @@ public class HostSimulatedMetricsService {
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();
 	}
-	
+
 	private void checkHostSimulatedMetricExists(String simulatedMetricName) {
 		if (!hostSimulatedMetrics.hasHostSimulatedMetric(simulatedMetricName)) {
 			throw new EntityNotFoundException(HostSimulatedMetric.class, "simulatedMetricName", simulatedMetricName);
@@ -198,5 +208,4 @@ public class HostSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated host metric '" + name + "' already exists");
 		}
 	}
-	
 }

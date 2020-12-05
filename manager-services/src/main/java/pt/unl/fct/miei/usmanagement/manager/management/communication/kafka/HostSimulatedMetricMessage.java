@@ -40,4 +40,19 @@ public class HostSimulatedMetricMessage {
 		this.cloudHosts = hostSimulatedMetric.getCloudHosts();
 		this.edgeHosts = hostSimulatedMetric.getEdgeHosts();
 	}
+
+	public HostSimulatedMetric get() {
+		return HostSimulatedMetric.builder()
+			.id(id)
+			.name(name)
+			.field(field)
+			.minimumValue(minimumValue)
+			.maximumValue(maximumValue)
+			.generic(generic)
+			.override(override)
+			.active(active)
+			.cloudHosts(cloudHosts)
+			.edgeHosts(edgeHosts)
+			.build();
+	}
 }

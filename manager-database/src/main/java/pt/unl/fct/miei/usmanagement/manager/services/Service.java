@@ -32,7 +32,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -55,7 +54,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -108,11 +106,11 @@ public class Service {
 
 	private Double expectedMemoryConsumption;
 
-    /*private Double dockerImageSize;*/
+	/*private Double dockerImageSize;*/
 
-  	/*private Double expectedStorageConsumption;*/
+	/*private Double expectedStorageConsumption;*/
 
-  	/*private Double expectedBandwidthConsumption;*/
+	/*private Double expectedBandwidthConsumption;*/
 
   	/*// Stateful services shouldn't migrate until all database replication/migration components are incorporated
   	@NotNull

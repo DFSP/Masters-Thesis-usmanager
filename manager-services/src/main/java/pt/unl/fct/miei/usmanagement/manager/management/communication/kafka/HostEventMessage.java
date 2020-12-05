@@ -1,7 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class HostEventMessage {
 	}
 
 	@JsonIgnore
-	public HostEvent toHostEvent() {
+	public HostEvent get() {
 		return HostEvent.builder()
 			.id(id)
 			.publicIpAddress(publicIpAddress)

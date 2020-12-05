@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -31,40 +31,36 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRules;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class AppRulesService {
 
 	private final ConditionsService conditionsService;
-	private final DroolsService droolsService;
 	private final AppsService appsService;
 	private final ServiceRulesService serviceRulesService;
+	private final KafkaService kafkaService;
 
 	private final AppRules rules;
 
-	public AppRulesService(ConditionsService conditionsService, DroolsService droolsService,
-						   @Lazy AppsService appsService, AppRules rules, ServiceRulesService serviceRulesService) {
+	public AppRulesService(ConditionsService conditionsService,
+						   @Lazy AppsService appsService, AppRules rules, ServiceRulesService serviceRulesService,
+						   KafkaService kafkaService) {
 		this.conditionsService = conditionsService;
-		this.droolsService = droolsService;
 		this.appsService = appsService;
 		this.rules = rules;
 		this.serviceRulesService = serviceRulesService;
+		this.kafkaService = kafkaService;
 	}
 
 
@@ -85,15 +81,22 @@ public class AppRulesService {
 	public AppRule addRule(AppRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-		serviceRulesService.setLastUpdateServiceRules();
-		return rules.save(rule);
+		rule = saveRule(rule);
+		kafkaService.sendAppRule(rule);
+		return rule;
 	}
 
 	public AppRule updateRule(String ruleName, AppRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		AppRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
-		rule = rules.save(rule);
+		rule = saveRule(rule);
+		kafkaService.sendAppRule(rule);
+		return rule;
+	}
+
+	public AppRule saveRule(AppRule appRule) {
+		AppRule rule = rules.save(appRule);
 		serviceRulesService.setLastUpdateServiceRules();
 		return rule;
 	}
@@ -125,11 +128,10 @@ public class AppRulesService {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
 		AppRule rule = getRule(ruleName);
-		AppRuleCondition appRuleCondition =
-			AppRuleCondition.builder().appCondition(condition).appRule(rule).build();
+		AppRuleCondition appRuleCondition = AppRuleCondition.builder().appCondition(condition).appRule(rule).build();
 		rule = rule.toBuilder().condition(appRuleCondition).build();
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendAppRule(rule);
 	}
 
 	public void addConditions(String ruleName, List<String> conditions) {
@@ -145,8 +147,8 @@ public class AppRulesService {
 		AppRule rule = getRule(ruleName);
 		rule.getConditions()
 			.removeIf(condition -> conditionNames.contains(condition.getAppCondition().getName()));
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendAppRule(rule);
 	}
 
 	public App getApp(String ruleName, String appName) {
@@ -171,8 +173,8 @@ public class AppRulesService {
 			App app = appsService.getApp(appName);
 			app.addRule(rule);
 		});
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		AppRule appRule = saveRule(rule);
+		kafkaService.sendAppRule(appRule);
 	}
 
 	public void removeApp(String ruleName, String appName) {
@@ -183,8 +185,8 @@ public class AppRulesService {
 		log.info("Removing apps {} from rule {}", appNames, ruleName);
 		AppRule rule = getRule(ruleName);
 		appNames.forEach(appName -> appsService.getApp(appName).removeRule(rule));
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		AppRule appRule = saveRule(rule);
+		kafkaService.sendAppRule(appRule);
 	}
 
 	private void checkRuleExists(String ruleName) {
@@ -199,5 +201,4 @@ public class AppRulesService {
 			throw new DataIntegrityViolationException("App rule '" + name + "' already exists");
 		}
 	}
-
 }

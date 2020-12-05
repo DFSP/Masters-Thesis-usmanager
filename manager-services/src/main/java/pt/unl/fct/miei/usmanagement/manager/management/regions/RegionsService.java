@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.regions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 

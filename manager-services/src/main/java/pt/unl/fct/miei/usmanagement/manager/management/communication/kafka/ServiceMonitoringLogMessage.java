@@ -30,7 +30,7 @@ public class ServiceMonitoringLogMessage {
 		this.timestamp = serviceMonitoringLog.getTimestamp();
 	}
 
-	public ServiceMonitoringLog toServiceMonitoringLog() {
+	public ServiceMonitoringLog get() {
 		return ServiceMonitoringLog.builder()
 			.id(id)
 			.containerId(containerId)

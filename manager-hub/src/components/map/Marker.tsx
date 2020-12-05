@@ -25,7 +25,6 @@
 import {Point} from "react-simple-maps";
 import React from "react";
 import {ICoordinates} from "./LocationMap";
-import styles from "./Marker.module.css";
 
 export interface IMarker extends ICoordinates {
     title: string,

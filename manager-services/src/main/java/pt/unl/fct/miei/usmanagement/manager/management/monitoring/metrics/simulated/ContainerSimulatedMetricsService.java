@@ -29,9 +29,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
@@ -45,12 +45,14 @@ import java.util.Random;
 public class ContainerSimulatedMetricsService {
 
 	private final ContainersService containersService;
+	private final KafkaService kafkaService;
 
 	private final ContainerSimulatedMetrics containerSimulatedMetrics;
 
 	public ContainerSimulatedMetricsService(@Lazy ContainersService containersService,
-											ContainerSimulatedMetrics containerSimulatedMetrics) {
+											KafkaService kafkaService, ContainerSimulatedMetrics containerSimulatedMetrics) {
 		this.containersService = containersService;
+		this.kafkaService = kafkaService;
 		this.containerSimulatedMetrics = containerSimulatedMetrics;
 	}
 
@@ -75,7 +77,9 @@ public class ContainerSimulatedMetricsService {
 	public ContainerSimulatedMetric addContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
 		checkContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
 		log.info("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
-		return containerSimulatedMetrics.save(containerSimulatedMetric);
+		containerSimulatedMetric = saveContainerSimulatedMetric(containerSimulatedMetric);
+		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
+		return containerSimulatedMetric;
 	}
 
 	public ContainerSimulatedMetric updateContainerSimulatedMetric(String simulatedMetricName,
@@ -84,6 +88,12 @@ public class ContainerSimulatedMetricsService {
 			ToStringBuilder.reflectionToString(newContainerSimulatedMetric));
 		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newContainerSimulatedMetric, containerSimulatedMetric);
+		containerSimulatedMetric = saveContainerSimulatedMetric(containerSimulatedMetric);
+		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
+		return containerSimulatedMetric;
+	}
+
+	public ContainerSimulatedMetric saveContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
 
@@ -116,7 +126,8 @@ public class ContainerSimulatedMetricsService {
 			Container container = containersService.getContainer(containerId);
 			container.addContainerSimulatedMetric(containerMetric);
 		});
-		containerSimulatedMetrics.save(containerMetric);
+		ContainerSimulatedMetric containerSimulatedMetric = saveContainerSimulatedMetric(containerMetric);
+		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
 	}
 
 	public void removeContainer(String simulatedMetricName, String containerId) {
@@ -128,7 +139,8 @@ public class ContainerSimulatedMetricsService {
 		ContainerSimulatedMetric containerMetric = getContainerSimulatedMetric(simulatedMetricName);
 		containerIds.forEach(containerId ->
 			containersService.getContainer(containerId).removeContainerSimulatedMetric(containerMetric));
-		containerSimulatedMetrics.save(containerMetric);
+		ContainerSimulatedMetric containerSimulatedMetric = saveContainerSimulatedMetric(containerMetric);
+		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
 	}
 
 	private void checkContainerSimulatedMetricExists(String name) {
@@ -150,5 +162,4 @@ public class ContainerSimulatedMetricsService {
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();
 	}
-
 }

@@ -36,9 +36,8 @@ import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
 import {Method} from "axios";
 import {ReduxState} from "../../reducers";
-import {connect, Provider} from "react-redux";
+import {connect} from "react-redux";
 import BaseComponent from "../BaseComponent";
-import Navbar from "../../views/navbar/Navbar";
 import ReactTooltip from "react-tooltip";
 
 export interface IFormModal {
@@ -324,7 +323,8 @@ class Form extends BaseComponent<Props, State> {
                                     <>
                                         <button
                                             className={`dropdown-trigger btn-floating btn-flat btn-small right`}
-                                            data-for='dark-tooltip' data-tip={switchDropdown.title || 'Alterar formulário'} data-place='bottom'
+                                            data-for='dark-tooltip'
+                                            data-tip={switchDropdown.title || 'Alterar formulário'} data-place='bottom'
                                             data-target={`switch-dropdown`}
                                             type={'button'}
                                             ref={this.dropdown}>
@@ -503,10 +503,10 @@ class Form extends BaseComponent<Props, State> {
 
     private saveRequired = () => {
         return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
-                ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
-                    || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
-                    || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)
-                    || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
+            ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
+                || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
+                || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)
+                || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
     };
 
     private isRequired = (id: keyof IValues): boolean => {
@@ -595,7 +595,11 @@ class Form extends BaseComponent<Props, State> {
                             post.successCallback(reply, requestBody);
                             if (this.mounted) {
                                 const data = post.result?.(reply.data) || reply.data;
-                                this.setState({values: data as IValues, savedValues: data as IValues, loading: undefined});
+                                this.setState({
+                                    values: data as IValues,
+                                    savedValues: data as IValues,
+                                    loading: undefined
+                                });
                             }
                         },
                         (reply) => {
@@ -616,7 +620,11 @@ class Form extends BaseComponent<Props, State> {
                             put.successCallback(reply, requestBody);
                             if (this.mounted) {
                                 const data = put.result?.(reply.data) || reply.data;
-                                this.setState({values: data as IValues, savedValues: data as IValues, loading: undefined});
+                                this.setState({
+                                    values: data as IValues,
+                                    savedValues: data as IValues,
+                                    loading: undefined
+                                });
                             }
                         },
                         (reason) => {

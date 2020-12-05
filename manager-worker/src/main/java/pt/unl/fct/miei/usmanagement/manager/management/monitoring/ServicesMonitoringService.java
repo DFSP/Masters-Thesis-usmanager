@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -42,8 +41,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.Servic
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;

@@ -30,6 +30,6 @@ type InstanceEndpoint struct {
 }
 
 type LocationRequest struct {
-	Service   string `json:"service,omitempty"`
-	Count     int    `json:"count,omitempty"`
+	Service string `json:"service,omitempty"`
+	Count   int    `json:"count,omitempty"`
 }

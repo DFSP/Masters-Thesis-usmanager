@@ -308,10 +308,10 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                                  }}/>
                                 : key === 'override'
                                 ? <Field key={index}
-                                       id={key}
-                                       label={key}
-                                       type='checkbox'
-                                       checkbox={{label: 'Sobrepor às métricas obtidas'}}/>
+                                         id={key}
+                                         label={key}
+                                         type='checkbox'
+                                         checkbox={{label: 'Sobrepor às métricas obtidas'}}/>
                                 : key === 'active'
                                     ? <Field key={index}
                                              id={key}

@@ -31,6 +31,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
@@ -62,6 +63,7 @@ public class ServiceRulesService {
 	private final DroolsService droolsService;
 	private final ServicesService servicesService;
 	private final ContainersService containersService;
+	private final KafkaService kafkaService;
 
 	private final ServiceRules rules;
 
@@ -70,11 +72,12 @@ public class ServiceRulesService {
 
 	public ServiceRulesService(ConditionsService conditionsService, DroolsService droolsService,
 							   @Lazy ServicesService servicesService, @Lazy ContainersService containersService,
-							   ServiceRules rules, RulesProperties rulesProperties) {
+							   KafkaService kafkaService, ServiceRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.droolsService = droolsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
+		this.kafkaService = kafkaService;
 		this.rules = rules;
 		this.serviceRuleTemplateFile = rulesProperties.getServiceRuleTemplateFile();
 		this.lastUpdateServiceRules = new AtomicLong(0);
@@ -102,17 +105,24 @@ public class ServiceRulesService {
 	public ServiceRule addRule(ServiceRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-		setLastUpdateServiceRules();
-		return rules.save(rule);
+		rule = saveRule(rule);
+		kafkaService.sendServiceRule(rule);
+		return rule;
 	}
 
 	public ServiceRule updateRule(String ruleName, ServiceRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		ServiceRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
-		rule = rules.save(rule);
-		setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendServiceRule(rule);
 		return rule;
+	}
+
+	public ServiceRule saveRule(ServiceRule serviceRule) {
+		serviceRule = rules.save(serviceRule);
+		setLastUpdateServiceRules();
+		return serviceRule;
 	}
 
 	public void deleteRule(String ruleName) {
@@ -149,8 +159,8 @@ public class ServiceRulesService {
 		ServiceRuleCondition serviceRuleCondition =
 			ServiceRuleCondition.builder().serviceCondition(condition).serviceRule(rule).build();
 		rule = rule.toBuilder().condition(serviceRuleCondition).build();
-		rules.save(rule);
-		setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendServiceRule(rule);
 	}
 
 	public void addConditions(String ruleName, List<String> conditions) {
@@ -164,10 +174,9 @@ public class ServiceRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		ServiceRule rule = getRule(ruleName);
-		rule.getConditions()
-			.removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
-		rules.save(rule);
-		setLastUpdateServiceRules();
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
+		rule = saveRule(rule);
+		kafkaService.sendServiceRule(rule);
 	}
 
 	public Service getService(String ruleName, String serviceName) {
@@ -192,8 +201,8 @@ public class ServiceRulesService {
 			Service service = servicesService.getService(serviceName);
 			service.addRule(rule);
 		});
-		rules.save(rule);
-		setLastUpdateServiceRules();
+		ServiceRule serviceRule = saveRule(rule);
+		kafkaService.sendServiceRule(serviceRule);
 	}
 
 	public void removeService(String ruleName, String serviceName) {
@@ -204,8 +213,8 @@ public class ServiceRulesService {
 		log.info("Removing services {} from rule {}", serviceNames, ruleName);
 		ServiceRule rule = getRule(ruleName);
 		serviceNames.forEach(serviceName -> servicesService.getService(serviceName).removeRule(rule));
-		rules.save(rule);
-		setLastUpdateServiceRules();
+		ServiceRule serviceRule = saveRule(rule);
+		kafkaService.sendServiceRule(serviceRule);
 	}
 
 	private void checkRuleExists(String ruleName) {

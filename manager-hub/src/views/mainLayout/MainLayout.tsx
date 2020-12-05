@@ -31,7 +31,6 @@ import M from "materialize-css";
 import {RouteComponentProps, withRouter} from "react-router";
 import {bindActionCreators} from "redux";
 import {updateSearch} from "../../actions";
-import ReactTooltip from "react-tooltip";
 
 interface StateToProps {
     sidenavVisible: boolean;

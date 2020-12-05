@@ -12,7 +12,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -62,5 +61,29 @@ public class ServiceMessage {
 		this.eventPredictions = service.getEventPredictions();
 		this.serviceRules = service.getServiceRules();
 		this.simulatedServiceMetrics = service.getSimulatedServiceMetrics();
+	}
+
+	public Service get() {
+		return Service.builder()
+			.id(id)
+			.serviceName(serviceName)
+			.dockerRepository(dockerRepository)
+			.defaultExternalPort(defaultExternalPort)
+			.defaultInternalPort(defaultInternalPort)
+			.defaultDb(defaultDb)
+			.launchCommand(launchCommand)
+			.minimumReplicas(minimumReplicas)
+			.maximumReplicas(maximumReplicas)
+			.outputLabel(outputLabel)
+			.serviceType(serviceType)
+			.environment(environment)
+			.volumes(volumes)
+			.expectedMemoryConsumption(expectedMemoryConsumption)
+			.dependencies(dependencies)
+			.dependents(dependents)
+			.eventPredictions(eventPredictions)
+			.serviceRules(serviceRules)
+			.simulatedServiceMetrics(simulatedServiceMetrics)
+			.build();
 	}
 }

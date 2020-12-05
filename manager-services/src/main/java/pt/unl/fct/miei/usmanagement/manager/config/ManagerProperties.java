@@ -28,9 +28,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter

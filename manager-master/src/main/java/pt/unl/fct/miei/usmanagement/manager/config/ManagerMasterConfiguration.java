@@ -32,20 +32,18 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pt.unl.fct.miei.usmanagement.manager.util.json.JsonPathArgumentResolver;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @Configuration
 @EnableAsync
 @EnableCaching
-public class ManagerMasterConfiguration extends CachingConfigurerSupport implements WebMvcConfigurer  {
+public class ManagerMasterConfiguration extends CachingConfigurerSupport implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {

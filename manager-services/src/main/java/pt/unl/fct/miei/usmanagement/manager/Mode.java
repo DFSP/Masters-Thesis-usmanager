@@ -24,8 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager;
 
-import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
-
 public enum Mode {
 
 	LOCAL,

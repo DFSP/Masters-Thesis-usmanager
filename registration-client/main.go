@@ -47,7 +47,7 @@ var register bool
 var interval int
 var registerPort int
 
-func init()  {
+func init() {
 	flag.BoolVar(&register, "register", true, "True: registration-client will register service on Eureka; False: service will manually trigger the register")
 	flag.IntVar(&interval, "interval", 5000, "Interval time (in ms) to send location data")
 	flag.IntVar(&registerPort, "register-port", 1906, "Port to start the http server")

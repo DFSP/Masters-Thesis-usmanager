@@ -32,7 +32,7 @@ import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IHostAddress} from "../hosts/Hosts";
-import { isEqual } from "lodash";
+import {isEqual} from "lodash";
 
 export interface ISshCommand {
     hostAddress: IHostAddress;

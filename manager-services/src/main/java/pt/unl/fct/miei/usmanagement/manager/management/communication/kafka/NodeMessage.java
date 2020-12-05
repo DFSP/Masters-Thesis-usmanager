@@ -4,19 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.MapKeyColumn;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -45,6 +37,19 @@ public class NodeMessage {
 		this.managerStatus = node.getManagerStatus();
 		this.managerId = node.getManagerId();
 		this.labels = node.getLabels();
+	}
+
+	public Node get() {
+		return Node.builder()
+			.id(id)
+			.publicIpAddress(publicIpAddress)
+			.availability(availability)
+			.role(role)
+			.version(version)
+			.state(state)
+			.managerStatus(managerStatus)
+			.managerId(managerId)
+			.build();
 	}
 
 }

@@ -42,7 +42,10 @@ const SimulatedMetrics = () =>
                            {text: 'aplicada a hosts', pathname: '/métricas simuladas/hosts/nova métrica?new'},
                            {text: 'aplicada a aplicações', pathname: '/métricas simuladas/aplicações/nova métrica?new'},
                            {text: 'aplicada a serviços', pathname: '/métricas simuladas/serviços/nova métrica?new'},
-                           {text: 'aplicada a contentores', pathname: '/métricas simuladas/contentores/nova métrica?new'},
+                           {
+                               text: 'aplicada a contentores',
+                               pathname: '/métricas simuladas/contentores/nova métrica?new'
+                           },
                        ],
                    }}/>
         <div className={`${styles.container}`}>

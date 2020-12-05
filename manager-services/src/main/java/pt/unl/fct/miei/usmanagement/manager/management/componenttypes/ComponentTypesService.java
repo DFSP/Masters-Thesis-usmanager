@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypes;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -42,9 +42,11 @@ import java.util.List;
 public class ComponentTypesService {
 
 	private final ComponentTypes componentTypes;
+	private final KafkaService kafkaService;
 
-	public ComponentTypesService(ComponentTypes componentTypes) {
+	public ComponentTypesService(ComponentTypes componentTypes, KafkaService kafkaService) {
 		this.componentTypes = componentTypes;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<ComponentType> getComponentTypes() {
@@ -69,7 +71,9 @@ public class ComponentTypesService {
 	public ComponentType addComponentType(ComponentType componentType) {
 		checkComponentTypeDoesntExist(componentType);
 		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
-		return componentTypes.save(componentType);
+		componentType = componentTypes.save(componentType);
+		kafkaService.sendComponentType(componentType);
+		return componentType;
 	}
 
 	public ComponentType updateComponentType(String componentTypeName, ComponentType newComponentType) {
@@ -77,7 +81,12 @@ public class ComponentTypesService {
 		log.info("Updating componentType {} with {}", ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
 		ObjectUtils.copyValidProperties(newComponentType, componentType);
 		componentType = componentTypes.save(componentType);
+		kafkaService.sendComponentType(componentType);
 		return componentType;
+	}
+	
+	public ComponentType saveComponentType(ComponentType componentType) {
+		return componentTypes.save(componentType);
 	}
 
 	public void deleteComponentType(String componentTypeName) {

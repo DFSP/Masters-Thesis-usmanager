@@ -30,7 +30,7 @@ public class HostMonitoringLogMessage {
 		this.timestamp = hostMonitoringLog.getTimestamp();
 	}
 
-	public HostMonitoringLog toHostMonitoringLog() {
+	public HostMonitoringLog get() {
 		return HostMonitoringLog.builder()
 			.id(id)
 			.publicIpAddress(publicIpAddress)

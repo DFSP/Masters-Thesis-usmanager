@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import javax.persistence.Entity;

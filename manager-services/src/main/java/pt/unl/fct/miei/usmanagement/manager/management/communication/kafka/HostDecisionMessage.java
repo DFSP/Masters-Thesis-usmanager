@@ -36,7 +36,7 @@ public class HostDecisionMessage {
 		this.hostDecisions = hostDecision.getHostDecisions();
 	}
 
-	public HostDecision toHostDecision() {
+	public HostDecision get() {
 		return HostDecision.builder()
 			.id(id)
 			.decision(decision)

@@ -6,7 +6,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
@@ -39,7 +38,7 @@ public class SyncService {
 
 	private Timer containersDatabaseSyncTimer;
 	private Timer nodesDatabaseSyncTimer;
-	private String externalId;
+	private final String externalId;
 
 	public SyncService(ContainersService containersService, DockerContainersService dockerContainersService,
 					   NodesService nodesService, DockerSwarmService dockerSwarmService,

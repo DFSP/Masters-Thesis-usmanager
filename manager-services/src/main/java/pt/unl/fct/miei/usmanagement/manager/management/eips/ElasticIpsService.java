@@ -20,6 +20,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
@@ -46,17 +47,19 @@ public class ElasticIpsService {
 	private final CloudHostsService cloudHostsService;
 	private final NodesService nodesService;
 	private final ContainersService containersService;
+	private final KafkaService kafkaService;
 
 	private final ElasticIps elasticIps;
 
 	public ElasticIpsService(RegionsService regionsService, @Lazy AwsService awsService,
 							 @Lazy CloudHostsService cloudHostsService, NodesService nodesService,
-							 @Lazy ContainersService containersService, ElasticIps elasticIps) {
+							 @Lazy ContainersService containersService, KafkaService kafkaService, ElasticIps elasticIps) {
 		this.regionsService = regionsService;
 		this.awsService = awsService;
 		this.cloudHostsService = cloudHostsService;
 		this.nodesService = nodesService;
 		this.containersService = containersService;
+		this.kafkaService = kafkaService;
 		this.elasticIps = elasticIps;
 	}
 
@@ -82,6 +85,12 @@ public class ElasticIpsService {
 	public ElasticIp addElasticIp(ElasticIp elasticIp) {
 		checkElasticIpDoesntExist(elasticIp);
 		log.info("Saving elasticIp {}", ToStringBuilder.reflectionToString(elasticIp));
+		elasticIp = saveElasticIp(elasticIp);
+		kafkaService.sendElasticIp(elasticIp);
+		return elasticIp;
+	}
+
+	public ElasticIp saveElasticIp(ElasticIp elasticIp) {
 		return elasticIps.save(elasticIp);
 	}
 
@@ -146,7 +155,8 @@ public class ElasticIpsService {
 				});
 				return elasticIpAddresses;
 
-			} catch (SdkClientException | ManagerException e) {
+			}
+			catch (SdkClientException | ManagerException e) {
 				errorMessage = e.getMessage();
 				log.error("Failed to allocate elastic ip addresses: {}. Retrying {}/{}", errorMessage, i + 1, retries);
 			}
@@ -161,7 +171,8 @@ public class ElasticIpsService {
 		String associationId = associateResult.getAssociationId();
 		elasticIp.setAssociationId(associationId);
 		elasticIp.setInstanceId(instanceId);
-		elasticIps.save(elasticIp);
+		elasticIp = saveElasticIp(elasticIp);
+		kafkaService.sendElasticIp(elasticIp);
 		log.info("Associated public ip address {} from elastic ip {} to cloud instance {} with association id {}",
 			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associationId);
 		HostAddress previousHostAddress = cloudHost.getAddress();
@@ -182,8 +193,9 @@ public class ElasticIpsService {
 				try {
 					futureElasticIpAddresses.put(region, awsService.getElasticIpAddresses(awsRegion));
 					break;
-				} catch (SdkClientException e) {
-					log.error("Failed to get elastic ips from region {}. Retrying {}/{}", awsRegion.getZone(), i + 1 , retries);
+				}
+				catch (SdkClientException e) {
+					log.error("Failed to get elastic ips from region {}. Retrying {}/{}", awsRegion.getZone(), i + 1, retries);
 					Timing.sleep(i * 2, TimeUnit.SECONDS);
 				}
 			}
@@ -240,12 +252,15 @@ public class ElasticIpsService {
 		ElasticIp elasticIp = getElasticIp(region);
 		try {
 			awsService.dissociateElasticIpAddress(region, elasticIp.getAssociationId());
-		} catch (AmazonEC2Exception e) {
+		}
+		catch (AmazonEC2Exception e) {
 			log.error("Error while dissociating elastic ip {}: {}", elasticIp.getAllocationId(), e.getMessage());
 		}
 		elasticIp.setAssociationId(null);
 		elasticIp.setInstanceId(null);
-		return elasticIps.save(elasticIp);
+		elasticIp = saveElasticIp(elasticIp);
+		kafkaService.sendElasticIp(elasticIp);
+		return elasticIp;
 	}
 
 	public HostAddress getHost(RegionEnum region) {
@@ -261,5 +276,4 @@ public class ElasticIpsService {
 			return associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
 		}
 	}
-
 }

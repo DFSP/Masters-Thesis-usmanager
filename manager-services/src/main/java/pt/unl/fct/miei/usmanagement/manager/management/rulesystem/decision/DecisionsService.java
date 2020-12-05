@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -25,31 +25,32 @@
 package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValue;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValues;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValues;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,13 +67,14 @@ public class DecisionsService {
 	private final ServiceDecisionValues serviceDecisionValues;
 	private final HostDecisionValues hostDecisionValues;
 	private final FieldsService fieldsService;
+	private final KafkaService kafkaService;
 
 	public DecisionsService(ServiceRulesService serviceRulesService, HostRulesService hostRulesService,
 							Decisions decisions, ServiceDecisions serviceDecisions,
 							HostDecisions hostDecisions,
 							ServiceDecisionValues serviceDecisionValues,
 							HostDecisionValues hostDecisionValues,
-							FieldsService fieldsService) {
+							FieldsService fieldsService, KafkaService kafkaService) {
 		this.serviceRulesService = serviceRulesService;
 		this.hostRulesService = hostRulesService;
 		this.decisions = decisions;
@@ -81,6 +83,7 @@ public class DecisionsService {
 		this.serviceDecisionValues = serviceDecisionValues;
 		this.hostDecisionValues = hostDecisionValues;
 		this.fieldsService = fieldsService;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getDecisions() {
@@ -103,6 +106,14 @@ public class DecisionsService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addDecision(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision) {
+		checkDecisionDoesntExist(decision);
+		log.info("Saving decision {}", ToStringBuilder.reflectionToString(decision));
+		decision = saveDecision(decision);
+		kafkaService.sendDecision(decision);
+		return decision;
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision saveDecision(Decision decision) {
 		return decisions.save(decision);
 	}
 
@@ -220,4 +231,12 @@ public class DecisionsService {
 		return hostDecisions.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(),
 			hostAddress.getPrivateIpAddress());
 	}
+
+	private void checkDecisionDoesntExist(Decision decision) {
+		Long id = decision.getId();
+		if (decisions.hasDecision(id)) {
+			throw new DataIntegrityViolationException("Decision '" + id + "' already exists");
+		}
+	}
+
 }

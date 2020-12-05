@@ -23,12 +23,9 @@
  */
 
 import {ComposableMap, Geographies, Geography, Marker, Point, ZoomableGroup} from "react-simple-maps";
-import React, {createRef, memo} from "react";
+import React, {createRef} from "react";
 import * as d3Geo from "d3-geo";
 import {IMarker} from "./Marker";
-import {bindActionCreators} from "redux";
-import {updateSearch} from "../../actions";
-import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {ReduxState} from "../../reducers";
 
@@ -47,7 +44,7 @@ type Props = StateToProps & {
     zoomable?: boolean;
     position?: { coordinates: Point, zoom: number },
     center?: boolean;
-    onZoom?: (zoom: number ) => void;
+    onZoom?: (zoom: number) => void;
     keepRatio?: boolean;
 }
 
@@ -107,7 +104,10 @@ class MapChart extends React.Component<Props, State> {
     }
 
     private handleResize = () => {
-        this.setState(_ => ({maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225), maxHeight: window.innerHeight - 125}))
+        this.setState(_ => ({
+            maxWidth: window.innerWidth + (this.props.sidenavVisible ? 0 : 225),
+            maxHeight: window.innerHeight - 125
+        }))
         this.calculateScale();
     }
 

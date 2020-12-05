@@ -34,7 +34,9 @@ public class MasterKafkaService {
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final DecisionsService decisionsService;
 
-	public MasterKafkaService(HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService, HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService, DecisionsService decisionsService) {
+	public MasterKafkaService(HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
+							  HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
+							  DecisionsService decisionsService) {
 		this.hostsEventsService = hostsEventsService;
 		this.servicesEventsService = servicesEventsService;
 		this.hostsMonitoringService = hostsMonitoringService;
@@ -45,42 +47,43 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventMessage hostEventMessage) {
 		log.info("Received key={} value={}", key, hostEventMessage.toString());
-		HostEvent hostEvent = hostEventMessage.toHostEvent();
+		HostEvent hostEvent = hostEventMessage.get();
 		hostsEventsService.addHostEvent(hostEvent);
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventMessage serviceEventMessage) {
 		log.info("Received key={} value={}", key, serviceEventMessage.toString());
-		ServiceEvent serviceEvent = serviceEventMessage.toServiceEvent();
+		ServiceEvent serviceEvent = serviceEventMessage.get();
 		servicesEventsService.addServiceEvent(serviceEvent);
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogMessage hostMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, hostMonitoringLogMessage.toString());
-		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.toHostMonitoringLog();
+		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.get();
 		hostsMonitoringService.addHostMonitoringLog(hostMonitoringLog);
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogMessage serviceMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, serviceMonitoringLogMessage.toString());
-		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.toServiceMonitoringLog();
+		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.get();
 		servicesMonitoringService.addServiceMonitoringLog(serviceMonitoringLog);
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionMessage hostDecisionMessage) {
 		log.info("Received key={} value={}", key, hostDecisionMessage.toString());
-		HostDecision hostDecision = hostDecisionMessage.toHostDecision();
+		HostDecision hostDecision = hostDecisionMessage.get();
 		decisionsService.saveHostDecision(hostDecision);
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionMessage serviceDecisionMessage) {
 		log.info("Received key={} value={}", key, serviceDecisionMessage.toString());
-		ServiceDecision serviceDecision = serviceDecisionMessage.toServiceDecision();
+		ServiceDecision serviceDecision = serviceDecisionMessage.get();
+		decisionsService.saveServiceDecision(serviceDecision);
 	}
 
 }

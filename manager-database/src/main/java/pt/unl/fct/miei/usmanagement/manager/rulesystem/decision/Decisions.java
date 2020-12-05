@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.decision;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
@@ -41,4 +42,8 @@ public interface Decisions extends JpaRepository<Decision, Long> {
 	Optional<Decision> findByRuleDecisionAndComponentTypeType(@Param("decision") RuleDecisionEnum decision,
 															  @Param("componentType") ComponentTypeEnum componentType);
 
+	@Query("select case when count(d) > 0 then true else false end "
+		+ "from Decision d "
+		+ "where lower(d.id) = lower(:id)")
+	boolean hasDecision(Long id);
 }

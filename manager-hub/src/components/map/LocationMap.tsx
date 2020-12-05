@@ -28,7 +28,6 @@ import ReactTooltip from "react-tooltip";
 import {Point} from "react-simple-maps";
 import Marker, {IMarker} from "./Marker";
 import Dialog from "../dialogs/Dialog";
-import Sidenav from "../../views/sidenav/Sidenav";
 
 export interface ICoordinates {
     label?: string,
@@ -128,7 +127,8 @@ export default class LocationMap extends React.Component<Props, State> {
         }));
         const map = <>
             <MapChart setTooltipContent={this.setTooltip} onClick={onSelect} markers={markers} hover={hover}
-                      clickHighlight={clickHighlight} zoomable={zoomable} keepRatio={keepRatio} position={position} center={this.center()}
+                      clickHighlight={clickHighlight} zoomable={zoomable} keepRatio={keepRatio} position={position}
+                      center={this.center()}
                       onZoom={this.resizeMarkers}/>
             <ReactTooltip html multiline>
                 {tooltip}

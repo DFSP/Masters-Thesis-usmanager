@@ -32,6 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
@@ -59,6 +60,7 @@ public class HostRulesService {
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
 	private final DroolsService droolsService;
+	private final KafkaService kafkaService;
 
 	private final HostRules rules;
 
@@ -66,12 +68,13 @@ public class HostRulesService {
 	private final AtomicLong lastUpdateHostRules;
 
 	public HostRulesService(ConditionsService conditionsService, CloudHostsService cloudHostsService,
-							EdgeHostsService edgeHostsService, DroolsService droolsService, HostRules rules,
-							RulesProperties rulesProperties) {
+							EdgeHostsService edgeHostsService, DroolsService droolsService, KafkaService kafkaService,
+							HostRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.droolsService = droolsService;
+		this.kafkaService = kafkaService;
 		this.rules = rules;
 		this.hostRuleTemplateFile = rulesProperties.getHostRuleTemplateFile();
 		this.lastUpdateHostRules = new AtomicLong(0);
@@ -105,17 +108,24 @@ public class HostRulesService {
 	public HostRule addRule(HostRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-		setLastUpdateHostRules();
-		return rules.save(rule);
+		rule = saveRule(rule);
+		kafkaService.sendHostRule(rule);
+		return rule;
 	}
 
 	public HostRule updateRule(String ruleName, HostRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		HostRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
-		rule = rules.save(rule);
-		setLastUpdateHostRules();
+		rule = saveRule(rule);
+		kafkaService.sendHostRule(rule);
 		return rule;
+	}
+
+	public HostRule saveRule(HostRule hostRule) {
+		hostRule = rules.save(hostRule);
+		setLastUpdateHostRules();
+		return hostRule;
 	}
 
 	public void deleteRule(String ruleName) {
@@ -153,8 +163,8 @@ public class HostRulesService {
 		HostRuleCondition hostRuleCondition =
 			HostRuleCondition.builder().hostCondition(condition).hostRule(rule).build();
 		rule = rule.toBuilder().condition(hostRuleCondition).build();
-		rules.save(rule);
-		setLastUpdateHostRules();
+		rule = saveRule(rule);
+		kafkaService.sendHostRule(rule);
 	}
 
 	public void addConditions(String ruleName, List<String> conditions) {
@@ -168,10 +178,9 @@ public class HostRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		HostRule rule = getRule(ruleName);
-		rule.getConditions()
-			.removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
-		rules.save(rule);
-		setLastUpdateHostRules();
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
+		rule = saveRule(rule);
+		kafkaService.sendHostRule(rule);
 	}
 
 	public CloudHost getCloudHost(String ruleName, String instanceId) {
@@ -196,8 +205,8 @@ public class HostRulesService {
 			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
 			cloudHost.addRule(rule);
 		});
-		rules.save(rule);
-		setLastUpdateHostRules();
+		HostRule hostRule = saveRule(rule);
+		kafkaService.sendHostRule(hostRule);
 	}
 
 	public void removeCloudHost(String ruleName, String instanceId) {
@@ -208,8 +217,8 @@ public class HostRulesService {
 		log.info("Removing cloud hosts {} from rule {}", instanceIds, ruleName);
 		HostRule rule = getRule(ruleName);
 		instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeRule(rule));
-		rules.save(rule);
-		setLastUpdateHostRules();
+		HostRule hostRule = saveRule(rule);
+		kafkaService.sendHostRule(hostRule);
 	}
 
 	public EdgeHost getEdgeHost(String ruleName, String hostname) {
@@ -234,8 +243,8 @@ public class HostRulesService {
 			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			edgeHost.addRule(rule);
 		});
-		rules.save(rule);
-		setLastUpdateHostRules();
+		HostRule hostRule = saveRule(rule);
+		kafkaService.sendHostRule(hostRule);
 	}
 
 	public void removeEdgeHost(String ruleName, HostAddress hostAddress) {
@@ -246,8 +255,8 @@ public class HostRulesService {
 		log.info("Removing edge hosts {} from rule {}", hostAddresses, ruleName);
 		HostRule rule = getRule(ruleName);
 		hostAddresses.forEach(hostAddress -> edgeHostsService.getEdgeHostByAddress(hostAddress).removeRule(rule));
-		rules.save(rule);
-		setLastUpdateHostRules();
+		HostRule hostRule = saveRule(rule);
+		kafkaService.sendHostRule(hostRule);
 	}
 
 	private void checkRuleExists(String ruleName) {

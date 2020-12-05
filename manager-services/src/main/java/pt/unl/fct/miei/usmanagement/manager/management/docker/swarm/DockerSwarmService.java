@@ -35,7 +35,6 @@ import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -139,7 +138,8 @@ public class DockerSwarmService {
 			createNetworkOverlay(hostAddress);
 			Node swarmNode = getNode(nodeId);
 			return nodesService.addNode(swarmNode);
-		} finally {
+		}
+		finally {
 			configurationsService.removeConfiguration(nodeId);
 		}
 	}
@@ -205,7 +205,8 @@ public class DockerSwarmService {
 				setNodeLabels(nodeId, privateIpAddress, username, hostAddress.getCoordinates(), hostAddress.getRegion(), hostAddress.getPlace());
 				Node node = getNode(nodeId);
 				return nodesService.addNode(node);
-			} finally {
+			}
+			finally {
 				if (config != null) {
 					configurationsService.removeConfiguration(config);
 				}

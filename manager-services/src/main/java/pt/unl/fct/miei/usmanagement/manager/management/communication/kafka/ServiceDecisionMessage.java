@@ -38,7 +38,7 @@ public class ServiceDecisionMessage {
 		this.serviceDecisions = serviceDecision.getServiceDecisions();
 	}
 
-	public ServiceDecision toServiceDecision() {
+	public ServiceDecision get() {
 		return ServiceDecision.builder()
 			.id(id)
 			.containerId(containerId)

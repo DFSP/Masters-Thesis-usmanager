@@ -35,8 +35,6 @@ import styles from './Services.module.css'
 import BaseComponent from "../../../components/BaseComponent";
 import {Dropdown} from "../../../components/form/Dropdown";
 import {IApp} from "../apps/App";
-import { isEqual } from 'lodash';
-import {Link} from "react-router-dom";
 
 interface StateToProps {
     isLoading: boolean
@@ -123,7 +121,7 @@ class Services extends BaseComponent<Props, State> {
                     <CardList<IService>
                         isLoading={this.props.isLoading}
                         error={this.props.error}
-                        emptyMessage={selectedApp? `A aplicação ${selectedApp} não tem nenhum serviço associado` : "Sem serviços para mostrar"}
+                        emptyMessage={selectedApp ? `A aplicação ${selectedApp} não tem nenhum serviço associado` : "Sem serviços para mostrar"}
                         list={this.filteredServices()}
                         card={this.service}
                         predicate={this.predicate}/>

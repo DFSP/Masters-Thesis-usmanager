@@ -29,7 +29,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -37,6 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHosts;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshCommandResult;
@@ -60,6 +60,7 @@ public class EdgeHostsService {
 	private final SshService sshService;
 	private final BashService bashService;
 	private final NodesService nodesService;
+	private final KafkaService kafkaService;
 
 	private final EdgeHosts edgeHosts;
 
@@ -69,12 +70,13 @@ public class EdgeHostsService {
 							@Lazy HostSimulatedMetricsService hostSimulatedMetricsService,
 							@Lazy SshService sshService, BashService bashService,
 							@Lazy NodesService nodesService,
-							EdgeHosts edgeHosts, EdgeHostsProperties edgeHostsProperties) {
+							KafkaService kafkaService, EdgeHosts edgeHosts, EdgeHostsProperties edgeHostsProperties) {
 		this.hostRulesService = hostRulesService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.sshService = sshService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
+		this.kafkaService = kafkaService;
 		this.edgeHosts = edgeHosts;
 		this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
 	}
@@ -119,13 +121,9 @@ public class EdgeHostsService {
 	}
 
 	public EdgeHost addEdgeHost(EdgeHost edgeHost) {
-		return addEdgeHost(edgeHost, null);
-	}
-
-	public EdgeHost addManualEdgeHost(EdgeHost edgeHost) {
 		checkHostDoesntExist(edgeHost);
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-		EdgeHost edgeHostEntity = edgeHosts.save(edgeHost);
+		edgeHost = saveEdgeHost(edgeHost);
 
 		boolean setup = false;
 		final int retries = 5;
@@ -143,30 +141,32 @@ public class EdgeHostsService {
 			java.util.Arrays.fill(password, ' ');
 		}
 		if (!setup) {
-			edgeHosts.delete(edgeHostEntity);
+			edgeHosts.delete(edgeHost);
 			throw new ManagerException("Unable to setup new edge host");
 		}
 
-		return edgeHostEntity;
+		kafkaService.sendEdgeHost(edgeHost);
+		return edgeHost;
 	}
 
 	public EdgeHost addEdgeHost(EdgeHost edgeHost, char[] password) {
 		checkHostDoesntExist(edgeHost);
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
-		EdgeHost edgeHostEntity = edgeHosts.save(edgeHost);
+		edgeHost = saveEdgeHost(edgeHost);
 		if (password != null) {
 			try {
 				setupEdgeHost(edgeHost, password);
 			}
 			catch (Exception e) {
-				edgeHosts.delete(edgeHostEntity);
+				edgeHosts.delete(edgeHost);
 				throw new ManagerException("Unable to setup new edge host: %s", e.getMessage());
 			}
 			finally {
 				java.util.Arrays.fill(password, ' ');
 			}
 		}
-		return edgeHostEntity;
+		kafkaService.sendEdgeHost(edgeHost);
+		return edgeHost;
 	}
 
 	private void setupEdgeHost(EdgeHost edgeHost, char[] password) {
@@ -202,12 +202,19 @@ public class EdgeHostsService {
 			ToStringBuilder.reflectionToString(edgeHost),
 			ToStringBuilder.reflectionToString(newEdgeHost));
 		ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
+		edgeHost = saveEdgeHost(edgeHost);
+		kafkaService.sendEdgeHost(edgeHost);
+		return edgeHost;
+	}
+
+	public EdgeHost saveEdgeHost(EdgeHost edgeHost) {
 		return edgeHosts.save(edgeHost);
 	}
 
 	public void deleteEdgeHost(HostAddress hostAddress) {
 		EdgeHost edgeHost = getEdgeHostByAddress(hostAddress);
 		edgeHosts.delete(edgeHost);
+		kafkaService.sendDeleteEdgeHost(edgeHost);
 		deleteEdgeHostConfig(edgeHost);
 	}
 
@@ -278,14 +285,16 @@ public class EdgeHostsService {
 		EdgeHost edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
 			.managedByWorker(workerManager)
 			.build();
-		edgeHosts.save(edgeHostEntity);
+		saveEdgeHost(edgeHostEntity);
+		kafkaService.sendEdgeHost(edgeHostEntity);
 	}
 
 	public void unassignWorkerManager(String edgeHost) {
 		EdgeHost edgeHostEntity = getEdgeHostByHostname(edgeHost).toBuilder()
 			.managedByWorker(null)
 			.build();
-		edgeHosts.save(edgeHostEntity);
+		saveEdgeHost(edgeHostEntity);
+		kafkaService.sendEdgeHost(edgeHostEntity);
 	}
 
 	public boolean hasEdgeHost(HostAddress hostAddress) {

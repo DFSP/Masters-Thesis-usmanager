@@ -1,18 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,7 +30,7 @@ public class ServiceEventMessage {
 		this.count = serviceEvent.getCount();
 	}
 
-	public ServiceEvent toServiceEvent() {
+	public ServiceEvent get() {
 		return ServiceEvent.builder()
 			.id(id)
 			.serviceName(serviceName)

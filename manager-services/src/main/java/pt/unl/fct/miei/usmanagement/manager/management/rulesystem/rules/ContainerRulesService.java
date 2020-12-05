@@ -31,12 +31,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -48,15 +49,17 @@ public class ContainerRulesService {
 	private final ConditionsService conditionsService;
 	private final ContainersService containersService;
 	private final ServiceRulesService serviceRulesService;
+	private final KafkaService kafkaService;
 
 	private final ContainerRules rules;
 
 	public ContainerRulesService(ConditionsService conditionsService, @Lazy ContainersService containersService,
-								 ContainerRules rules, ServiceRulesService serviceRulesService) {
+								 ContainerRules rules, ServiceRulesService serviceRulesService, KafkaService kafkaService) {
 		this.conditionsService = conditionsService;
 		this.containersService = containersService;
 		this.rules = rules;
 		this.serviceRulesService = serviceRulesService;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<ContainerRule> getRules() {
@@ -76,17 +79,24 @@ public class ContainerRulesService {
 	public ContainerRule addRule(ContainerRule rule) {
 		checkRuleDoesntExist(rule);
 		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-		serviceRulesService.setLastUpdateServiceRules();
-		return rules.save(rule);
+		rule = saveRule(rule);
+		kafkaService.sendContainerRule(rule);
+		return rule;
 	}
 
 	public ContainerRule updateRule(String ruleName, ContainerRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		ContainerRule rule = getRule(ruleName);
 		ObjectUtils.copyValidProperties(newRule, rule);
-		rule = rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendContainerRule(rule);
 		return rule;
+	}
+
+	public ContainerRule saveRule(ContainerRule containerRule) {
+		containerRule = rules.save(containerRule);
+		serviceRulesService.setLastUpdateServiceRules();
+		return containerRule;
 	}
 
 	public void deleteRule(String ruleName) {
@@ -115,8 +125,8 @@ public class ContainerRulesService {
 		ContainerRuleCondition containerRuleCondition =
 			ContainerRuleCondition.builder().containerCondition(condition).containerRule(rule).build();
 		rule = rule.toBuilder().condition(containerRuleCondition).build();
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		rule = saveRule(rule);
+		kafkaService.sendContainerRule(rule);
 	}
 
 	public void addConditions(String ruleName, List<String> conditions) {
@@ -130,10 +140,9 @@ public class ContainerRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		ContainerRule rule = getRule(ruleName);
-		rule.getConditions()
-			.removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
+		rule = saveRule(rule);
+		kafkaService.sendContainerRule(rule);
 	}
 
 	public Container getContainer(String ruleName, String containerId) {
@@ -158,8 +167,8 @@ public class ContainerRulesService {
 			Container container = containersService.getContainer(containerId);
 			container.addRule(rule);
 		});
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		ContainerRule containerRule = saveRule(rule);
+		kafkaService.sendContainerRule(containerRule);
 	}
 
 	public void removeContainer(String ruleName, String containerId) {
@@ -170,8 +179,8 @@ public class ContainerRulesService {
 		log.info("Removing containers {} from rule {}", containerIds, ruleName);
 		ContainerRule rule = getRule(ruleName);
 		containerIds.forEach(containerId -> containersService.getContainer(containerId).removeRule(rule));
-		rules.save(rule);
-		serviceRulesService.setLastUpdateServiceRules();
+		ContainerRule containerRule = saveRule(rule);
+		kafkaService.sendContainerRule(containerRule);
 	}
 
 	private void checkRuleExists(String ruleName) {
@@ -186,5 +195,4 @@ public class ContainerRulesService {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}
 	}
-
 }

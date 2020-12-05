@@ -172,14 +172,14 @@ public class MasterSymService {
 
 	private void loadTriggerRouters() throws SQLException {
 		getMasterToWorkerTables().forEach(table -> {
-			symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
-				.triggerId("master-" + table)
-				.routerId("master-to-worker")
-				.initialLoadOrder(1)
-				.initialLoadSelect(initialLoadCondition(table))
-				.createTime(LocalDateTime.now())
-				.lastUpdateTime(LocalDateTime.now())
-				.build());
+				symTriggerRoutersRepository.save(SymTriggerRouterEntity.builder()
+					.triggerId("master-" + table)
+					.routerId("master-to-worker")
+					.initialLoadOrder(1)
+					.initialLoadSelect(initialLoadCondition(table))
+					.createTime(LocalDateTime.now())
+					.lastUpdateTime(LocalDateTime.now())
+					.build());
 			}
 		);
 		getWorkerToMasterTables().forEach(table ->

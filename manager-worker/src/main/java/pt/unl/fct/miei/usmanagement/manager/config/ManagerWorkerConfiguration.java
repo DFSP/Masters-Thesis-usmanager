@@ -43,7 +43,7 @@ import java.util.List;
 @Configuration
 @EnableAsync
 @EnableCaching
-public class ManagerWorkerConfiguration extends CachingConfigurerSupport implements WebMvcConfigurer  {
+public class ManagerWorkerConfiguration extends CachingConfigurerSupport implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {

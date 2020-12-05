@@ -44,7 +44,6 @@ import com.amazonaws.services.ec2.model.DomainType;
 import com.amazonaws.services.ec2.model.DryRunResult;
 import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
 import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceNetworkInterfaceSpecification;
 import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
@@ -60,7 +59,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.SSHClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -363,7 +361,8 @@ public class AwsService {
 				SSHClient client = sshService.waitAvailability(hostAddress, BOOT_TIMEOUT);
 				sshService.executeCommand("whoami", hostAddress, client, BOOT_TIMEOUT);
 				return;
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				error = e.getMessage();
 				log.info("Error while waiting for instance {} to boot: {}... retrying ({}/{})", instance.getInstanceId(), e.getMessage(), i + 1, retries);
 				Timing.sleep(i + 1, TimeUnit.SECONDS);

@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 import java.util.List;
 

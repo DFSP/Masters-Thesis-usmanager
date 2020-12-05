@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
@@ -42,9 +42,11 @@ import java.util.List;
 public class OperatorsService {
 
 	private final Operators operators;
+	private final KafkaService kafkaService;
 
-	public OperatorsService(Operators operators) {
+	public OperatorsService(Operators operators, KafkaService kafkaService) {
 		this.operators = operators;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<Operator> getOperators() {
@@ -69,6 +71,12 @@ public class OperatorsService {
 	public Operator addOperator(Operator operator) {
 		checkOperatorDoesntExist(operator);
 		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
+		operator = saveOperator(operator);
+		kafkaService.sendOperator(operator);
+		return operator;
+	}
+
+	public Operator saveOperator(Operator operator) {
 		return operators.save(operator);
 	}
 
@@ -76,7 +84,8 @@ public class OperatorsService {
 		Operator operator = getOperator(operatorName);
 		log.info("Updating operator {} with {}", ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
 		ObjectUtils.copyValidProperties(newOperator, operator);
-		operator = operators.save(operator);
+		operator = saveOperator(operator);
+		kafkaService.sendOperator(operator);
 		return operator;
 	}
 
@@ -91,5 +100,4 @@ public class OperatorsService {
 			throw new DataIntegrityViolationException("Operator '" + op.getSymbol() + "' already exists");
 		}
 	}
-
 }

@@ -1,10 +1,8 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
@@ -12,14 +10,6 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
-import javax.persistence.CascadeType;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -40,6 +30,16 @@ public class DecisionMessage {
 		this.componentType = decision.getComponentType();
 		this.serviceEvents = decision.getServiceEvents();
 		this.hostEvents = decision.getHostEvents();
+	}
+
+	public Decision get() {
+		return Decision.builder()
+			.id(id)
+			.ruleDecision(ruleDecision)
+			.componentType(componentType)
+			.serviceEvents(serviceEvents)
+			.hostEvents(hostEvents)
+			.build();
 	}
 
 }

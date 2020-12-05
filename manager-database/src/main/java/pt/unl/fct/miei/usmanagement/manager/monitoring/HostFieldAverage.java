@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
 import lombok.Data;
-import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 
 @Data
 public class HostFieldAverage {

@@ -58,4 +58,26 @@ public class ContainerMessage {
 		this.containerRules = container.getContainerRules();
 		this.simulatedContainerMetrics = container.getSimulatedContainerMetrics();
 	}
+
+	public Container get() {
+		return Container.builder()
+			.id(id)
+			.type(type)
+			.created(created)
+			.name(name)
+			.image(image)
+			.command(command)
+			.network(network)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.mounts(mounts)
+			.ports(ports)
+			.labels(labels)
+			.region(region)
+			.managerId(managerId)
+			.coordinates(coordinates)
+			.containerRules(containerRules)
+			.simulatedContainerMetrics(simulatedContainerMetrics)
+			.build();
+	}
 }

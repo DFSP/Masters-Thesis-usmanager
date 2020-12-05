@@ -55,7 +55,7 @@ export class Checkbox extends React.Component<Props, State> {
         const {checked} = this.state;
         return (
             <div className={styles.checkbox}>
-                <label >
+                <label>
                     <input id={id}
                            type="checkbox"
                            disabled={disabled}

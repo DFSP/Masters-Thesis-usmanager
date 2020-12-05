@@ -38,7 +38,7 @@ import {IService} from "../services/Service";
 import Field from "../../../components/form/Field";
 import {IFields, IValues, requiredAndNumberAndMinAndMax} from "../../../components/form/Form";
 import IDatabaseData from "../../../components/IDatabaseData";
-import { isEqual } from "lodash";
+import {isEqual} from "lodash";
 import ScrollBar from "react-perfect-scrollbar";
 
 export interface IAppService extends IDatabaseData {

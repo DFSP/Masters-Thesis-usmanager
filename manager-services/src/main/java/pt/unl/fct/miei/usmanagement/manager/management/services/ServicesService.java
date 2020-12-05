@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -32,6 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
@@ -42,7 +43,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Services;
-import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.sql.Timestamp;
@@ -92,23 +92,25 @@ public class ServicesService {
 		return services.findByDockerRepositoryIgnoreCase(dockerRepository);
 	}
 
-	private Service saveService(Service service) {
-		service = services.save(service);
-		kafkaService.sendService(service);
-		return service;
-	}
-
 	public Service addService(Service service) {
 		checkServiceDoesntExist(service);
 		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
-		return saveService(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
+		return service;
 	}
 
 	public Service updateService(String serviceName, Service newService) {
 		Service service = getService(serviceName);
 		log.info("Updating service {} with {}", ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
 		ObjectUtils.copyValidProperties(newService, service);
-		return saveService(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
+		return service;
+	}
+
+	public Service saveService(Service service) {
+		return services.save(service);
 	}
 
 	public void deleteService(String serviceName) {
@@ -132,13 +134,10 @@ public class ServicesService {
 		String appName = addServiceApp.getName();
 		int launchOrder = addServiceApp.getLaunchOrder();
 		App app = appsService.getApp(appName);
-		AppService appService = AppService.builder()
-			.app(app)
-			.service(service)
-			.launchOrder(launchOrder)
-			.build();
+		AppService appService = AppService.builder().app(app).service(service).launchOrder(launchOrder).build();
 		service = service.toBuilder().appService(appService).build();
-		services.save(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
 	}
 
 	public void addApps(String serviceName, List<AddServiceApp> addServiceApps) {
@@ -152,9 +151,9 @@ public class ServicesService {
 	public void removeApps(String serviceName, List<String> apps) {
 		Service service = getService(serviceName);
 		log.info("Removing apps {}", apps);
-		service.getAppServices()
-			.removeIf(app -> apps.contains(app.getApp().getName()));
-		services.save(service);
+		service.getAppServices().removeIf(app -> apps.contains(app.getApp().getName()));
+		service = saveService(service);
+		kafkaService.sendService(service);
 	}
 
 	public List<Service> getDependencies(String serviceName) {
@@ -178,7 +177,8 @@ public class ServicesService {
 		Service dependency = getService(dependencyName);
 		ServiceDependency serviceDependency = ServiceDependency.builder().service(service).dependency(dependency).build();
 		service = service.toBuilder().dependency(serviceDependency).build();
-		services.save(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
 	}
 
 	public void addDependencies(String serviceName, List<String> dependenciesNames) {
@@ -192,9 +192,9 @@ public class ServicesService {
 	public void removeDependencies(String serviceName, List<String> dependencies) {
 		Service service = getService(serviceName);
 		log.info("Removing dependencies {}", dependencies);
-		service.getDependencies().removeIf(dependency ->
-			dependencies.contains(dependency.getDependency().getServiceName()));
-		services.save(service);
+		service.getDependencies().removeIf(dependency -> dependencies.contains(dependency.getDependency().getServiceName()));
+		service = saveService(service);
+		kafkaService.sendService(service);
 	}
 
 	public List<Service> getDependents(String serviceName) {
@@ -212,7 +212,8 @@ public class ServicesService {
 		ServiceEventPrediction servicePrediction = prediction.toBuilder()
 			.service(service).lastUpdate(Timestamp.from(Instant.now())).build();
 		service = service.toBuilder().eventPrediction(servicePrediction).build();
-		services.save(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
 		return getEventPrediction(serviceName, prediction.getName());
 	}
 
@@ -231,7 +232,8 @@ public class ServicesService {
 		Service service = getService(serviceName);
 		service.getEventPredictions()
 			.removeIf(prediction -> predictionsName.contains(prediction.getName()));
-		services.save(service);
+		service = saveService(service);
+		kafkaService.sendService(service);
 	}
 
 	public ServiceEventPrediction getEventPrediction(String serviceName,

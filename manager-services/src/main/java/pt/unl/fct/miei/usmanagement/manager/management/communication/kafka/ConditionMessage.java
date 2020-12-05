@@ -7,13 +7,11 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -42,5 +40,19 @@ public class ConditionMessage {
 		this.hostConditions = condition.getHostConditions();
 		this.serviceConditions = condition.getServiceConditions();
 		this.containerConditions = condition.getContainerConditions();
+	}
+
+	public Condition get() {
+		return Condition.builder()
+			.id(id)
+			.name(name)
+			.valueMode(valueMode)
+			.field(field)
+			.operator(operator)
+			.value(value)
+			.hostConditions(hostConditions)
+			.serviceConditions(serviceConditions)
+			.containerConditions(containerConditions)
+			.build();
 	}
 }

@@ -33,4 +33,15 @@ public class AppRuleMessage {
 		this.conditions = rule.getConditions();
 	}
 
+	public AppRule get() {
+		return AppRule.builder()
+			.id(id)
+			.name(name)
+			.priority(priority)
+			.decision(decision)
+			.apps(apps)
+			.conditions(conditions)
+			.build();
+	}
+
 }

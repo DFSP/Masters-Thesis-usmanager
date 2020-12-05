@@ -1,15 +1,15 @@
 /*
  * MIT License
- *  
+ *
  * Copyright (c) 2020 manager
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -28,12 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -44,12 +45,14 @@ import java.util.Random;
 public class ServiceSimulatedMetricsService {
 
 	private final ServicesService servicesService;
+	private final KafkaService kafkaService;
 
 	private final ServiceSimulatedMetrics serviceSimulatedMetrics;
 
 	public ServiceSimulatedMetricsService(@Lazy ServicesService servicesService,
-										  ServiceSimulatedMetrics serviceSimulatedMetrics) {
+										  KafkaService kafkaService, ServiceSimulatedMetrics serviceSimulatedMetrics) {
 		this.servicesService = servicesService;
+		this.kafkaService = kafkaService;
 		this.serviceSimulatedMetrics = serviceSimulatedMetrics;
 	}
 
@@ -74,7 +77,9 @@ public class ServiceSimulatedMetricsService {
 	public ServiceSimulatedMetric addServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
 		checkServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
 		log.info("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
-		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
+		serviceSimulatedMetric = saveServiceSimulatedMetric(serviceSimulatedMetric);
+		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
+		return serviceSimulatedMetric;
 	}
 
 	public ServiceSimulatedMetric updateServiceSimulatedMetric(String simulatedMetricName,
@@ -83,6 +88,12 @@ public class ServiceSimulatedMetricsService {
 			ToStringBuilder.reflectionToString(newServiceSimulatedMetric));
 		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newServiceSimulatedMetric, serviceSimulatedMetric);
+		serviceSimulatedMetric = saveServiceSimulatedMetric(serviceSimulatedMetric);
+		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
+		return serviceSimulatedMetric;
+	}
+
+	public ServiceSimulatedMetric saveServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
 
@@ -101,7 +112,7 @@ public class ServiceSimulatedMetricsService {
 		return serviceSimulatedMetrics.findGenericServiceSimulatedMetric(simulatedMetricName).orElseThrow(() ->
 			new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName));
 	}
-	
+
 	public List<Service> getServices(String simulatedMetricName) {
 		checkServiceSimulatedMetricExists(simulatedMetricName);
 		return serviceSimulatedMetrics.getServices(simulatedMetricName);
@@ -124,7 +135,8 @@ public class ServiceSimulatedMetricsService {
 			Service service = servicesService.getService(serviceName);
 			service.addServiceSimulatedMetric(serviceMetric);
 		});
-		serviceSimulatedMetrics.save(serviceMetric);
+		ServiceSimulatedMetric serviceSimulatedMetric = saveServiceSimulatedMetric(serviceMetric);
+		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
 	}
 
 	public void removeService(String simulatedMetricName, String serviceName) {
@@ -136,7 +148,8 @@ public class ServiceSimulatedMetricsService {
 		ServiceSimulatedMetric serviceMetric = getServiceSimulatedMetric(simulatedMetricName);
 		serviceNames.forEach(serviceName ->
 			servicesService.getService(serviceName).removeServiceSimulatedMetric(serviceMetric));
-		serviceSimulatedMetrics.save(serviceMetric);
+		ServiceSimulatedMetric serviceSimulatedMetric = saveServiceSimulatedMetric(serviceMetric);
+		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
 	}
 
 	public Double randomizeFieldValue(ServiceSimulatedMetric serviceSimulatedMetric) {
@@ -145,7 +158,7 @@ public class ServiceSimulatedMetricsService {
 		double maxValue = serviceSimulatedMetric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();
 	}
-	
+
 	private void checkServiceSimulatedMetricExists(String simulatedMetricName) {
 		if (!serviceSimulatedMetrics.hasServiceSimulatedMetric(simulatedMetricName)) {
 			throw new EntityNotFoundException(ServiceSimulatedMetric.class, "simulatedMetricName", simulatedMetricName);
@@ -158,5 +171,4 @@ public class ServiceSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated service metric '" + name + "' already exists");
 		}
 	}
-	
 }

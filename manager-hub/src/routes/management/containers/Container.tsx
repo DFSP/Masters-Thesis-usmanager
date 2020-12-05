@@ -41,8 +41,10 @@ import {ReduxState} from "../../../reducers";
 import {
     addContainerRules,
     addContainers,
-    addContainerSimulatedMetrics, loadCloudHosts,
-    loadContainers, loadEdgeHosts,
+    addContainerSimulatedMetrics,
+    loadCloudHosts,
+    loadContainers,
+    loadEdgeHosts,
     loadNodes,
     loadServices
 } from "../../../actions";
@@ -76,7 +78,6 @@ import GenericServiceRuleList from "../services/GenericServiceRuleList";
 import {IRegion} from "../regions/Region";
 import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
-import ReactTooltip from "react-tooltip";
 
 export interface IContainer extends IDatabaseData {
     type: ContainerType;

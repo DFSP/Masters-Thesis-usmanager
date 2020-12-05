@@ -31,8 +31,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
@@ -381,8 +379,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteApp(App app) {
-		sendDelete("apps", app.getId());
+	public void sendDeleteApp(App app) {
+		delete("apps", app.getId());
 	}
 
 	@Async
@@ -391,8 +389,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteCloudHost(CloudHost cloudHost) {
-		sendDelete("cloud-hosts", cloudHost.getId());
+	public void sendDeleteCloudHost(CloudHost cloudHost) {
+		delete("cloud-hosts", cloudHost.getId());
 	}
 
 	@Async
@@ -401,8 +399,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteComponentType(ComponentType componentType) {
-		sendDelete("component-types", componentType.getId());
+	public void sendDeleteComponentType(ComponentType componentType) {
+		delete("component-types", componentType.getId());
 	}
 
 	@Async
@@ -411,8 +409,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteCondition(Condition condition) {
-		sendDelete("conditions", condition.getId());
+	public void sendDeleteCondition(Condition condition) {
+		delete("conditions", condition.getId());
 	}
 
 	@Async
@@ -421,8 +419,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteContainer(Container container) {
-		sendDelete("containers", container.getId());
+	public void sendDeleteContainer(Container container) {
+		delete("containers", container.getId());
 	}
 
 	@Async
@@ -431,8 +429,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteDecision(Decision decision) {
-		sendDelete("decisions", decision.getId());
+	public void sendDeleteDecision(Decision decision) {
+		delete("decisions", decision.getId());
 	}
 
 	@Async
@@ -441,8 +439,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteEdgeHost(EdgeHost edgeHost) {
-		sendDelete("edge-hosts", edgeHost.getId());
+	public void sendDeleteEdgeHost(EdgeHost edgeHost) {
+		delete("edge-hosts", edgeHost.getId());
 	}
 
 	@Async
@@ -451,8 +449,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteElasticIp(ElasticIp elasticIp) {
-		sendDelete("eips", elasticIp.getId());
+	public void sendDeleteElasticIp(ElasticIp elasticIp) {
+		delete("eips", elasticIp.getId());
 	}
 
 	@Async
@@ -461,8 +459,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteField(Field field) {
-		sendDelete("fields", field.getId());
+	public void sendDeleteField(Field field) {
+		delete("fields", field.getId());
 	}
 
 	@Async
@@ -471,8 +469,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteNode(Node node) {
-		sendDelete("nodes", node.getId());
+	public void sendDeleteNode(Node node) {
+		delete("nodes", node.getId());
 	}
 
 	@Async
@@ -481,8 +479,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteOperator(Operator operator) {
-		sendDelete("operators", operator.getId());
+	public void sendDeleteOperator(Operator operator) {
+		delete("operators", operator.getId());
 	}
 
 	@Async
@@ -491,8 +489,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		sendDelete("services", service.getId());
+	public void sendDeleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
+		delete("services", service.getId());
 	}
 
 	@Async
@@ -501,8 +499,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
-		sendDelete("simulated-host-metrics", hostSimulatedMetric.getId());
+	public void sendDeleteHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		delete("simulated-host-metrics", hostSimulatedMetric.getId());
 	}
 
 	@Async
@@ -511,8 +509,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
-		sendDelete("simulated-app-metrics", appSimulatedMetric.getId());
+	public void sendDeleteAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
+		delete("simulated-app-metrics", appSimulatedMetric.getId());
 	}
 
 	@Async
@@ -521,8 +519,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
-		sendDelete("simulated-service-metrics", serviceSimulatedMetric.getId());
+	public void sendDeleteServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
+		delete("simulated-service-metrics", serviceSimulatedMetric.getId());
 	}
 
 	@Async
@@ -531,8 +529,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
-		sendDelete("simulated-container-metrics", containerSimulatedMetric.getId());
+	public void sendDeleteContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
+		delete("simulated-container-metrics", containerSimulatedMetric.getId());
 	}
 
 	@Async
@@ -541,8 +539,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteHostRule(HostRule hostRule) {
-		sendDelete("host-rules", hostRule.getId());
+	public void sendDeleteHostRule(HostRule hostRule) {
+		delete("host-rules", hostRule.getId());
 	}
 
 	@Async
@@ -551,8 +549,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteAppRule(AppRule appRule) {
-		sendDelete("app-rules", appRule.getId());
+	public void sendDeleteAppRule(AppRule appRule) {
+		delete("app-rules", appRule.getId());
 	}
 
 	@Async
@@ -561,8 +559,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteServiceRule(ServiceRule serviceRule) {
-		sendDelete("service-rules", serviceRule.getId());
+	public void sendDeleteServiceRule(ServiceRule serviceRule) {
+		delete("service-rules", serviceRule.getId());
 	}
 
 	@Async
@@ -571,8 +569,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteContainerRule(ContainerRule containerRule) {
-		sendDelete("container-rules", containerRule.getId());
+	public void sendDeleteContainerRule(ContainerRule containerRule) {
+		delete("container-rules", containerRule.getId());
 	}
 
 	@Async
@@ -581,8 +579,8 @@ public class KafkaService {
 	}
 
 	@Async
-	public void deleteValueMode(ValueMode valueMode) {
-		sendDelete("value-modes", valueMode.getId());
+	public void sendDeleteValueMode(ValueMode valueMode) {
+		delete("value-modes", valueMode.getId());
 	}
 
 	@Async
@@ -629,7 +627,7 @@ public class KafkaService {
 	}
 
 	@Async
-	public void sendDelete(String topic, Object id) {
+	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
 		if (hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to kafka topic {}", id, topic);

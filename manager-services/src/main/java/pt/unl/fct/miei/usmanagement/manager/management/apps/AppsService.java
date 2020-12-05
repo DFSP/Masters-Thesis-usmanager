@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
-import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -76,10 +76,8 @@ public class AppsService {
 		return apps.findAll();
 	}
 
-	private App saveApp(App app) {
-		app = apps.save(app);
-		kafkaService.sendApp(app);
-		return app;
+	public App saveApp(App app) {
+		return apps.save(app);
 	}
 
 	public App getApp(Long id) {
@@ -95,20 +93,25 @@ public class AppsService {
 	public App addApp(App app) {
 		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
-		return saveApp(app);
+		kafkaService.sendApp(app);
+		app = saveApp(app);
+		kafkaService.sendApp(app);
+		return app;
 	}
 
 	public App updateApp(String appName, App newApp) {
 		App app = getApp(appName);
 		log.info("Updating app {} with {}", ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
 		ObjectUtils.copyValidProperties(newApp, app);
-		return saveApp(app);
+		app = saveApp(app);
+		kafkaService.sendApp(app);
+		return app;
 	}
 
 	public void deleteApp(String name) {
 		App app = getApp(name);
 		apps.delete(app);
-		kafkaService.deleteApp(app);
+		kafkaService.sendDeleteApp(app);
 	}
 
 	public List<AppService> getServices(String appName) {

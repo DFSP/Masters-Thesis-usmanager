@@ -7,10 +7,6 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -31,5 +27,16 @@ public class ElasticIpMessage {
 		this.publicIp = elasticIp.getPublicIp();
 		this.associationId = elasticIp.getAssociationId();
 		this.instanceId = elasticIp.getInstanceId();
+	}
+
+	public ElasticIp get() {
+		return ElasticIp.builder()
+			.id(id)
+			.region(region)
+			.allocationId(allocationId)
+			.publicIp(publicIp)
+			.associationId(associationId)
+			.instanceId(instanceId)
+			.build();
 	}
 }

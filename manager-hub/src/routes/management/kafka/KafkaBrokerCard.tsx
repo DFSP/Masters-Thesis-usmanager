@@ -94,24 +94,24 @@ class KafkaBrokerCard extends BaseComponent<Props, State> {
         const {loading} = this.state;
         const CardKafkaBroker = Card<IKafkaBroker>();
         return <CardKafkaBroker id={`kafkaBroker-${kafkaBroker.id}`}
-                                       title={kafkaBroker.brokerId.toString()}
-                                       link={{
-                                           to: {
-                                               pathname: `/kafka/${kafkaBroker.brokerId}`,
-                                               state: kafkaBroker
-                                           }
-                                       }}
-                                       height={'175px'}
-                                       margin={'10px 0'}
-                                       hoverable
-                                       delete={{
-                                           textButton: 'Parar',
-                                           url: `kafka/${kafkaBroker.brokerId}`,
-                                           successCallback: this.onStopSuccess,
-                                           failureCallback: this.onStopFailure,
-                                       }}
-                                       loading={loading}
-                                       bottomContextMenuItems={this.contextMenu()}>
+                                title={kafkaBroker.brokerId.toString()}
+                                link={{
+                                    to: {
+                                        pathname: `/kafka/${kafkaBroker.brokerId}`,
+                                        state: kafkaBroker
+                                    }
+                                }}
+                                height={'175px'}
+                                margin={'10px 0'}
+                                hoverable
+                                delete={{
+                                    textButton: 'Parar',
+                                    url: `kafka/${kafkaBroker.brokerId}`,
+                                    successCallback: this.onStopSuccess,
+                                    failureCallback: this.onStopFailure,
+                                }}
+                                loading={loading}
+                                bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'container'}
                       label={'Container'}
                       value={kafkaBroker.container.id.toString()}/>

@@ -23,7 +23,7 @@
  */
 
 import React, {createRef} from "react";
-import M, {DatepickerOptions, TimepickerOptions} from "materialize-css";
+import M, {TimepickerOptions} from "materialize-css";
 import {zeroPad} from "../../utils/text";
 
 interface Props {

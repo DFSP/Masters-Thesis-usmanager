@@ -26,4 +26,12 @@ public class ComponentTypeMessage {
 		this.decisions = componentType.getDecisions();
 	}
 
+	public ComponentType get() {
+		return ComponentType.builder()
+			.id(id)
+			.type(type)
+			.decisions(decisions)
+			.build();
+	}
+
 }

@@ -27,12 +27,12 @@ package pt.unl.fct.miei.usmanagement.manager.management.docker;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.remote.ssh.SshService;
 
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
+
 @Service
 public class DockerCoreService {
 

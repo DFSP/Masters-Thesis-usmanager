@@ -27,7 +27,7 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import styles from './Settings.module.css'
 import PerfectScrollbar from "react-perfect-scrollbar";
 import Field from "../../../components/form/Field";
-import Form, {required} from "../../../components/form/Form";
+import Form from "../../../components/form/Form";
 import BaseComponent from "../../../components/BaseComponent";
 
 type FormOption = 'initialization' | 'monitoring' | 'timeouts' | 'parallelism'
@@ -56,17 +56,11 @@ class Settings extends BaseComponent<{}, State> {
         }
     })
 
-    private monitoringFields = () => ({
+    private monitoringFields = () => ({})
 
-    })
+    private timeoutsFields = () => ({})
 
-    private timeoutsFields = () => ({
-
-    })
-
-    private parallelismFields = () => ({
-
-    })
+    private parallelismFields = () => ({})
 
     private getSelectedForm = (): JSX.Element | undefined => {
         switch (this.state.selectedForm) {

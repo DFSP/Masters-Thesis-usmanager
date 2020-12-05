@@ -124,7 +124,8 @@ export default class Field<T> extends React.Component<FieldProps<T>, {}> {
                                     </i>}
                                     <label className="active" htmlFor={id}>
                                         {camelCaseToSentenceCase(label)}
-                                        {type?.toLowerCase() !== 'checkbox' && formContext.isRequired(id) && <label className={`red-text ${styles.requiredLabel}`}>*</label>}
+                                        {type?.toLowerCase() !== 'checkbox' && formContext.isRequired(id) &&
+                                        <label className={`red-text ${styles.requiredLabel}`}>*</label>}
                                     </label>
                                 </>
                             )}

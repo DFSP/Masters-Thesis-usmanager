@@ -349,7 +349,10 @@ class RuleService extends BaseComponent<Props, State> {
                                 ? <Field key={index}
                                          id={key}
                                          type='checkbox'
-                                         checkbox={{label: 'Aplicar a todos os serviços', checkCallback: this.isGenericSelected}}/>
+                                         checkbox={{
+                                             label: 'Aplicar a todos os serviços',
+                                             checkCallback: this.isGenericSelected
+                                         }}/>
                                 : <Field key={index}
                                          id={key}
                                          label={key}

@@ -2,7 +2,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -45,7 +44,8 @@ public class ContainersRecoveryService {
 			.filter(container -> {
 				try {
 					return servicesService.getService(container.getServiceName()).getMinimumReplicas() > 0;
-				} catch (EntityNotFoundException ignored) {
+				}
+				catch (EntityNotFoundException ignored) {
 					return false;
 				}
 			})
@@ -65,11 +65,13 @@ public class ContainersRecoveryService {
 				if (recovery.getTimestamp() + STOP_CONTAINER_RECOVERY_TIME_FRAME > currentTimestamp) {
 					log.info("Adding previous recovery: {}", recovery);
 					recoveries.add(recovery);
-				} else {
+				}
+				else {
 					log.info("Ignoring previous recovery {} because it has expired", recovery);
 				}
 			}
-		} else {
+		}
+		else {
 			log.info("This is the first known recovery on container {}", containerId);
 		}
 		return recoveries;

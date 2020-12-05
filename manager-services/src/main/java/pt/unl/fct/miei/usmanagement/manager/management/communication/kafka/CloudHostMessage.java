@@ -9,11 +9,9 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -50,6 +48,24 @@ public class CloudHostMessage {
 		this.managedByWorker = cloudHost.getManagedByWorker();
 		this.hostRules = cloudHost.getHostRules();
 		this.simulatedHostMetrics = cloudHost.getSimulatedHostMetrics();
+	}
+
+	public CloudHost get() {
+		return CloudHost.builder()
+			.id(id)
+			.instanceId(instanceId)
+			.instanceType(instanceType)
+			.state(state)
+			.imageId(imageId)
+			.publicDnsName(publicDnsName)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.placement(placement)
+			.awsRegion(awsRegion)
+			.managedByWorker(managedByWorker)
+			.hostRules(hostRules)
+			.simulatedHostMetrics(simulatedHostMetrics)
+			.build();
 	}
 
 }

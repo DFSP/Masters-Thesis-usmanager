@@ -34,4 +34,16 @@ public class ServiceRuleMessage {
 		this.decision = serviceRule.getDecision();
 		this.conditions = serviceRule.getConditions();
 	}
+
+	public ServiceRule get() {
+		return ServiceRule.builder()
+			.id(id)
+			.name(name)
+			.priority(priority)
+			.generic(generic)
+			.services(services)
+			.decision(decision)
+			.conditions(conditions)
+			.build();
+	}
 }

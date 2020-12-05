@@ -30,8 +30,7 @@ import SshFile, {ISshFile} from "./SshFile";
 import styles from "./Ssh.module.css";
 import {connect} from "react-redux";
 import {addCommand, loadCloudHosts, loadEdgeHosts} from "../../../actions";
-import {ICommand, IFileTransfer} from "./SshPanel";
-import SshPanel from "./SshPanel";
+import SshPanel, {ICommand, IFileTransfer} from "./SshPanel";
 
 interface DispatchToProps {
     loadCloudHosts: () => void;

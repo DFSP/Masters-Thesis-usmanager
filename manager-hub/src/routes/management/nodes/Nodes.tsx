@@ -58,7 +58,10 @@ class Nodes extends BaseComponent<Props, {}> {
         return (
             <MainLayout>
                 <ActionButton icon={'sync'}
-                              tooltip={{text: 'Sincronizar os nós na base de dados com o docker swarm', position: 'bottom'}}
+                              tooltip={{
+                                  text: 'Sincronizar os nós na base de dados com o docker swarm',
+                                  position: 'bottom'
+                              }}
                               clickCallback={this.syncNodes}/>
                 <AddButton button={{text: 'Adicionar nó'}}
                            pathname={'/nós/novo nó?new'}/>

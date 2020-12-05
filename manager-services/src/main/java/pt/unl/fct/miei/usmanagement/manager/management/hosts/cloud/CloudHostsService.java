@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHosts;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
@@ -74,6 +75,7 @@ public class CloudHostsService {
 	private final ConfigurationsService configurationsService;
 	private final ContainersService containersService;
 	private final ElasticIpsService elasticIpsService;
+	private final KafkaService kafkaService;
 
 	private final CloudHosts cloudHosts;
 
@@ -87,7 +89,7 @@ public class CloudHostsService {
 							 @Lazy DockerSwarmService dockerSwarmService,
 							 ConfigurationsService configurationsService,
 							 @Lazy ContainersService containersService,
-							 ElasticIpsService elasticIpsService, CloudHosts cloudHosts,
+							 ElasticIpsService elasticIpsService, KafkaService kafkaService, CloudHosts cloudHosts,
 							 ParallelismProperties parallelismProperties) {
 		this.awsService = awsService;
 		this.hostRulesService = hostRulesService;
@@ -98,6 +100,7 @@ public class CloudHostsService {
 		this.configurationsService = configurationsService;
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
+		this.kafkaService = kafkaService;
 		this.cloudHosts = cloudHosts;
 		this.threads = parallelismProperties.getThreads();
 	}
@@ -138,8 +141,14 @@ public class CloudHostsService {
 	}
 
 	public CloudHost saveCloudHost(CloudHost cloudHost) {
-		/*log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));*/
 		return cloudHosts.save(cloudHost);
+	}
+
+	public CloudHost updateCloudHost(CloudHost cloudHost) {
+		checkCloudHostExists(cloudHost.getInstanceId());
+		cloudHost = cloudHosts.save(cloudHost);
+		kafkaService.sendCloudHost(cloudHost);
+		return cloudHost;
 	}
 
 	private CloudHost saveCloudHostFromInstance(Instance instance) {
@@ -159,7 +168,9 @@ public class CloudHostsService {
 			.awsRegion(AwsRegion.fromPlacement(instance.getPlacement()))
 			.placement(instance.getPlacement())
 			.build();
-		return saveCloudHost(cloudHost);
+		cloudHost = saveCloudHost(cloudHost);
+		kafkaService.sendCloudHost(cloudHost);
+		return cloudHost;
 	}
 
 	public CloudHost addCloudHostFromSimpleInstance(AwsSimpleInstance simpleInstance) {
@@ -174,7 +185,9 @@ public class CloudHostsService {
 			.awsRegion(AwsRegion.fromPlacement(simpleInstance.getPlacement()))
 			.placement(simpleInstance.getPlacement())
 			.build();
-		return saveCloudHost(cloudHost);
+		cloudHost = saveCloudHost(cloudHost);
+		kafkaService.sendCloudHost(cloudHost);
+		return cloudHost;
 	}
 
 	public void deleteCloudHost(CloudHost cloudHost) {
@@ -186,7 +199,9 @@ public class CloudHostsService {
 			if (Objects.equals(elasticIp.getInstanceId(), instanceId)) {
 				elasticIpsService.dissociate(cloudHost);
 			}
-		} catch (EntityNotFoundException ignored) { }
+		}
+		catch (EntityNotFoundException ignored) {
+		}
 	}
 
 	public CloudHost launchInstance(Coordinates coordinates) {
@@ -373,6 +388,11 @@ public class CloudHostsService {
 		cloudHosts.save(cloudHost);
 	}
 
+	public CloudHost updateAddress(CloudHost cloudHost, String publicIpAddress) {
+		cloudHost.setPublicIpAddress(publicIpAddress);
+		return updateCloudHost(cloudHost);
+	}
+
 	public boolean hasCloudHost(String hostname) {
 		return cloudHosts.hasCloudHost(hostname);
 	}
@@ -381,10 +401,5 @@ public class CloudHostsService {
 		if (!hasCloudHost(hostname)) {
 			throw new EntityNotFoundException(CloudHost.class, "hostname", hostname);
 		}
-	}
-
-	public CloudHost updateAddress(CloudHost cloudHost, String publicIpAddress) {
-		cloudHost.setPublicIpAddress(publicIpAddress);
-		return saveCloudHost(cloudHost);
 	}
 }

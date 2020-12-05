@@ -29,10 +29,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
@@ -45,11 +45,14 @@ import java.util.Random;
 public class AppSimulatedMetricsService {
 
 	private final AppsService appsService;
+	private final KafkaService kafkaService;
 
 	private final AppSimulatedMetrics appSimulatedMetrics;
 
-	public AppSimulatedMetricsService(@Lazy AppsService appsService, AppSimulatedMetrics appSimulatedMetrics) {
+	public AppSimulatedMetricsService(@Lazy AppsService appsService, KafkaService kafkaService,
+									  AppSimulatedMetrics appSimulatedMetrics) {
 		this.appsService = appsService;
+		this.kafkaService = kafkaService;
 		this.appSimulatedMetrics = appSimulatedMetrics;
 	}
 
@@ -74,7 +77,9 @@ public class AppSimulatedMetricsService {
 	public AppSimulatedMetric addAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
 		checkAppSimulatedMetricDoesntExist(appSimulatedMetric);
 		log.info("Saving simulated app metric {}", ToStringBuilder.reflectionToString(appSimulatedMetric));
-		return appSimulatedMetrics.save(appSimulatedMetric);
+		appSimulatedMetric = saveAppSimulatedMetric(appSimulatedMetric);
+		kafkaService.sendAppSimulatedMetric(appSimulatedMetric);
+		return appSimulatedMetric;
 	}
 
 	public AppSimulatedMetric updateAppSimulatedMetric(String simulatedMetricName,
@@ -83,6 +88,12 @@ public class AppSimulatedMetricsService {
 			ToStringBuilder.reflectionToString(newAppSimulatedMetric));
 		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
 		ObjectUtils.copyValidProperties(newAppSimulatedMetric, appSimulatedMetric);
+		appSimulatedMetric = saveAppSimulatedMetric(appSimulatedMetric);
+		kafkaService.sendAppSimulatedMetric(appSimulatedMetric);
+		return appSimulatedMetric;
+	}
+
+	public AppSimulatedMetric saveAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
 		return appSimulatedMetrics.save(appSimulatedMetric);
 	}
 
@@ -149,5 +160,4 @@ public class AppSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated app metric '" + name + "' already exists");
 		}
 	}
-
 }

@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.symmetricds.node.group.link;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
 public interface SymNodeGroupLinksRepository extends JpaRepository<SymNodeGroupLinkEntity, SymNodeGroupLinkId> {
 
 }

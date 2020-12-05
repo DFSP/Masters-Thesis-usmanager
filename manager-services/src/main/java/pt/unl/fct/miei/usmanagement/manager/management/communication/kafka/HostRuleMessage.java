@@ -38,4 +38,17 @@ public class HostRuleMessage {
 		this.conditions = hostRule.getConditions();
 	}
 
+	public HostRule get() {
+		return HostRule.builder()
+			.id(id)
+			.name(name)
+			.priority(priority)
+			.decision(decision)
+			.generic(generic)
+			.cloudHosts(cloudHosts)
+			.edgeHosts(edgeHosts)
+			.conditions(conditions)
+			.build();
+	}
+
 }

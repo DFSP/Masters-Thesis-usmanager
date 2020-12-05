@@ -111,7 +111,7 @@ func Deregister() {
 	if !registered {
 		return
 	}
- 	reglog.Logger.Infof("Deregistering instance %+v", &Instance)
+	reglog.Logger.Infof("Deregistering instance %+v", &Instance)
 	err := EurekaServer.UpdateInstanceStatus(&Instance, eureka.DOWN)
 	if err != nil {
 		reglog.Logger.Errorf("Update instance status error: %s", err.Error())

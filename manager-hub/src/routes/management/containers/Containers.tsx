@@ -66,7 +66,10 @@ class Containers extends BaseComponent<Props, {}> {
                 <AddButton button={{text: 'Lançar contentor'}}
                            pathname={'/contentores/lançar contentor?new'}/>
                 <ActionButton icon={'sync'}
-                              tooltip={{text: 'Sincronizar os contentores na base de dados com o docker swarm', position: 'bottom'}}
+                              tooltip={{
+                                  text: 'Sincronizar os contentores na base de dados com o docker swarm',
+                                  position: 'bottom'
+                              }}
                               clickCallback={this.reloadContainers}/>
                 <div className={`${styles.container}`}>
                     <CardList<IContainer>

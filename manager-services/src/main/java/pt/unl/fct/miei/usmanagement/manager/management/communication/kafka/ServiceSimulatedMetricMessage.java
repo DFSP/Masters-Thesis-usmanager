@@ -37,4 +37,19 @@ public class ServiceSimulatedMetricMessage {
 		this.active = serviceSimulatedMetric.isActive();
 		this.services = serviceSimulatedMetric.getServices();
 	}
+
+	public ServiceSimulatedMetric get() {
+		return ServiceSimulatedMetric.builder()
+			.id(id)
+			.name(name)
+			.field(field)
+			.minimumValue(minimumValue)
+			.maximumValue(maximumValue)
+			.generic(generic)
+			.override(override)
+			.active(active)
+			.services(services)
+			.build();
+	}
+
 }

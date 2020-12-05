@@ -758,7 +758,7 @@ public class DatabaseLoader {
 		catch (EntityNotFoundException ignored) {
 			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
 			RegionEnum region = RegionEnum.getClosestRegion(coordinates);
-			danielHost = edgeHostsService.addManualEdgeHost(EdgeHost.builder()
+			danielHost = edgeHostsService.addEdgeHost(EdgeHost.builder()
 				.username("daniel")
 				.publicIpAddress("2.82.208.89")
 				.privateIpAddress("192.168.1.83")

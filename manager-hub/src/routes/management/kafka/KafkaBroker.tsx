@@ -32,7 +32,7 @@ import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addKafkaBrokers, loadNodes, loadRegions, loadKafkaBrokers,} from "../../../actions";
+import {addKafkaBrokers, loadKafkaBrokers, loadNodes, loadRegions,} from "../../../actions";
 import {connect} from "react-redux";
 import {IRegion} from "../regions/Region";
 import {IReply} from "../../../utils/api";
@@ -43,7 +43,6 @@ import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
 import IDatabaseData from "../../../components/IDatabaseData";
-import {IRuleCondition} from "../rules/conditions/RuleCondition";
 
 export interface IKafkaBroker extends IDatabaseData {
     brokerId: number,

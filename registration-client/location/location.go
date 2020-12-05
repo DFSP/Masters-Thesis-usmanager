@@ -39,7 +39,6 @@ import (
 var lock sync.Mutex
 var locationRequests *ConcurrentMap
 
-
 func init() {
 	locationRequests = NewConcurrentMap()
 }
@@ -47,7 +46,7 @@ func init() {
 func RegisterRequest(service string) {
 	locationRequest := data.LocationRequest{
 		Service: service,
-		Count: 1,
+		Count:   1,
 	}
 	AddRequest(locationRequest)
 }
@@ -61,8 +60,8 @@ func AddRequest(locationRequest data.LocationRequest) {
 		count += serviceRequests.(data.LocationRequest).Count
 	}
 	newServiceRequests := data.LocationRequest{
-		Service:   locationRequest.Service,
-		Count:     count,
+		Service: locationRequest.Service,
+		Count:   count,
 	}
 	locationRequests.Set(locationRequest.Service, newServiceRequests)
 }

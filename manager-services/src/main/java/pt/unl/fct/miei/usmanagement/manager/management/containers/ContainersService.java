@@ -86,7 +86,6 @@ public class ContainersService {
 	private final ConfigurationsService configurationsService;
 	private final RegistrationServerService registrationServerService;
 	private final LoadBalancerService nginxLoadBalancerService;
-	private final SymService symService;
 	private final KafkaService kafkaService;
 	private final ZookeeperService zookeeperService;
 	private final Environment environment;
@@ -101,7 +100,8 @@ public class ContainersService {
 							 DockerApiProxyService dockerApiProxyService, WorkerManagersService workerManagersService,
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
 							 RegistrationServerService registrationServerService, LoadBalancerService nginxLoadBalancerService,
-							 SymService symService, KafkaService kafkaService, ZookeeperService zookeeperService, Environment environment, Containers containers,
+							 KafkaService kafkaService, ZookeeperService zookeeperService,
+							 Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -113,7 +113,6 @@ public class ContainersService {
 		this.configurationsService = configurationsService;
 		this.registrationServerService = registrationServerService;
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
-		this.symService = symService;
 		this.kafkaService = kafkaService;
 		this.zookeeperService = zookeeperService;
 		this.environment = environment;
@@ -154,18 +153,27 @@ public class ContainersService {
 	public Container addContainer(Container container) {
 		checkContainerDoesntExist(container);
 		log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
-		symService.handleContainerTriggers(container);
-		return containers.save(container);
+		container = saveContainer(container);
+		kafkaService.sendContainer(container);
+		return container;
 	}
 
 	public List<Container> saveContainers(List<Container> containers) {
 		log.info("Saving containers {}", containers);
-		return this.containers.saveAll(containers);
+		containers = this.containers.saveAll(containers);
+		containers.forEach(kafkaService::sendContainer);
+		return containers;
+	}
+
+	public Container saveContainer(Container container) {
+		return containers.save(container);
 	}
 
 	public Container updateContainer(Container container) {
 		/*log.info("Updating container {}", ToStringBuilder.reflectionToString(container));*/
-		return containers.save(container);
+		container = saveContainer(container);
+		kafkaService.sendContainer(container);
+		return container;
 	}
 
 	public List<Container> getContainers() {

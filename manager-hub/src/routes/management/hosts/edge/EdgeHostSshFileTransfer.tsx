@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from "react";
+import React from "react";
 import {ISshFile} from "../../ssh/SshFile";
 import {IEdgeHost} from "./EdgeHost";
 import BaseComponent from "../../../../components/BaseComponent";
@@ -33,7 +33,7 @@ import {ReduxState} from "../../../../reducers";
 import {addCommand, loadScripts} from "../../../../actions";
 import {connect} from "react-redux";
 import SshPanel, {ICommand, IFileTransfer} from "../../ssh/SshPanel";
-import {getEdgeHostAddress, IHostAddress} from "../Hosts";
+import {getEdgeHostAddress} from "../Hosts";
 
 const buildNewSshCommand = (): Partial<ISshFile> => ({
     hostAddress: undefined,

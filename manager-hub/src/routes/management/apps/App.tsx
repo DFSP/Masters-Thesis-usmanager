@@ -328,7 +328,8 @@ class App extends BaseComponent<Props, State> {
                     <>
                         <button
                             className={`modal-trigger btn-flat btn-small blue-text ${formStyles.formButton}`}
-                            data-for='dark-tooltip' data-tip="Lançar todos os microserviços desta aplicação" data-place={'bottom'}
+                            data-for='dark-tooltip' data-tip="Lançar todos os microserviços desta aplicação"
+                            data-place={'bottom'}
                             data-target={'launch-app-modal'}>
                             Iniciar
                         </button>

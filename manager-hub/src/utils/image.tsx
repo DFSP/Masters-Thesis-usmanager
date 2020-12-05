@@ -30,7 +30,8 @@ import {
     FaDatabase,
     FaDocker,
     FaDoorClosed,
-    FaDoorOpen, FaFile,
+    FaDoorOpen,
+    FaFile,
     FaGlobe,
     FaGlobeAfrica,
     FaGlobeAmericas,
@@ -46,7 +47,8 @@ import {
     FaMapMarkedAlt,
     FaMapPin,
     FaMinus,
-    FaNetworkWired, FaNewspaper, FaPaperPlane,
+    FaNetworkWired,
+    FaNewspaper,
     FaPowerOff,
     FaSdCard,
     FaSortAmountDown,
@@ -56,7 +58,8 @@ import {
     FaThList,
     FaThumbsDown,
     FaThumbsUp,
-    FaToolbox, FaVolumeDown, FaVolumeOff
+    FaToolbox,
+    FaVolumeOff
 } from "react-icons/all";
 import React from "react";
 import {IRegion} from "../routes/management/regions/Region";
@@ -76,12 +79,12 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
         return 'group_work';
     }
     if (label === 'type') {
-       if (value === 'BY_REQUEST') {
-           return <FaVolumeOff/>;
-       }
-       if (value === 'SINGLETON') {
-           return 'filter_1';
-       }
+        if (value === 'BY_REQUEST') {
+            return <FaVolumeOff/>;
+        }
+        if (value === 'SINGLETON') {
+            return 'filter_1';
+        }
     }
     if (label === 'network') {
         return <FaNetworkWired/>;

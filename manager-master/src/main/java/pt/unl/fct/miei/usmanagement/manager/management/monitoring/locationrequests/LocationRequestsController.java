@@ -27,7 +27,7 @@ public class LocationRequestsController {
 	}
 
 	@GetMapping("/locations/weight")
-	public Map<String, List<LocationWeight>>  getLocationsWeight() {
+	public Map<String, List<LocationWeight>> getLocationsWeight() {
 		return locationRequestsService.getLocationsWeight();
 	}
 

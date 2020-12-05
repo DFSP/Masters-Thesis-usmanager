@@ -54,7 +54,8 @@ public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedE
 		syncService.stopNodesDatabaseSynchronization();
 		try {
 			dockerSwarmService.destroySwarm();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Failed to destroy the swarm: {}", e.getMessage());
 		}
 	}

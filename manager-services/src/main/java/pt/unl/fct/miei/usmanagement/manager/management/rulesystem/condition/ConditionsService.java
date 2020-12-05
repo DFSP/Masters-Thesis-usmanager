@@ -28,21 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
+
 @Slf4j
 @Service
 public class ConditionsService {
 
 	private final Conditions conditions;
+	private final KafkaService kafkaService;
 
-	public ConditionsService(Conditions conditions) {
+	public ConditionsService(Conditions conditions, KafkaService kafkaService) {
 		this.conditions = conditions;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<Condition> getConditions() {
@@ -62,14 +65,21 @@ public class ConditionsService {
 	public Condition addCondition(Condition condition) {
 		checkConditionDoesntExist(condition);
 		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
-		return conditions.save(condition);
+		condition = saveCondition(condition);
+		kafkaService.sendCondition(condition);
+		return condition;
 	}
 
 	public Condition updateCondition(String conditionName, Condition newCondition) {
 		Condition condition = getCondition(conditionName);
 		ObjectUtils.copyValidProperties(newCondition, condition);
 		condition = conditions.save(condition);
+		kafkaService.sendCondition(condition);
 		return condition;
+	}
+
+	public Condition saveCondition(Condition condition) {
+		return conditions.save(condition);
 	}
 
 	public void deleteCondition(String conditionName) {

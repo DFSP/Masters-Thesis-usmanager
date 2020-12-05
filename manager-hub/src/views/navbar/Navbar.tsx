@@ -133,7 +133,8 @@ class Navbar extends React.Component<Props, State> {
                             <ul className='right'>
                                 {<button className={`btn-floating btn-flat btn-small brightnessButton`}
                                          key={this.state.darkMode ? 'dark-mode' : 'light-mode'}
-                                         data-for='tooltip' data-tip={this.state.darkMode ? 'Modo claro' : 'Modo escuro'}
+                                         data-for='tooltip'
+                                         data-tip={this.state.darkMode ? 'Modo claro' : 'Modo escuro'}
                                          data-place='bottom' onClick={this.toggleBrightness}>
                                     <i className='material-icons'>{this.state.darkMode ? 'brightness_4' : 'brightness_7'}</i>
                                 </button>}

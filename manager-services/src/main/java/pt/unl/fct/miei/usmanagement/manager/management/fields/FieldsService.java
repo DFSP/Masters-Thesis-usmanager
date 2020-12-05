@@ -28,10 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
 
 import java.util.List;
@@ -41,9 +41,11 @@ import java.util.List;
 public class FieldsService {
 
 	private final Fields fields;
+	private final KafkaService kafkaService;
 
-	public FieldsService(Fields fields) {
+	public FieldsService(Fields fields, KafkaService kafkaService) {
 		this.fields = fields;
+		this.kafkaService = kafkaService;
 	}
 
 	public List<Field> getFields() {
@@ -63,15 +65,22 @@ public class FieldsService {
 	public Field addField(Field field) {
 		checkFieldDoesntExist(field);
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
-		return fields.save(field);
+		field = fields.save(field);
+		kafkaService.sendField(field);
+		return field;
 	}
 
 	public Field updateField(String fieldName, Field newField) {
 		Field field = getField(fieldName);
 		log.info("Updating field {} with {}", ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
 		ObjectUtils.copyValidProperties(newField, field);
-		field = fields.save(field);
+		field = saveField(field);
+		kafkaService.sendField(field);
 		return field;
+	}
+
+	public Field saveField(Field field) {
+		return fields.save(field);
 	}
 
 	public void deleteField(String fieldName) {
@@ -89,5 +98,4 @@ public class FieldsService {
 			throw new DataIntegrityViolationException("Field " + fieldName + " already exists");
 		}
 	}
-
 }

@@ -1,6 +1,6 @@
 .container {
     background-color: #36393F;
-    margin: 50px 300px 0 300px ;
+    margin: 50px 300px 0 300px;
     height: calc(100vh - 600px);
     display: flex;
     border: 1px solid black;

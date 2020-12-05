@@ -82,7 +82,6 @@ import RuleApp from "../routes/management/rules/apps/RuleApp";
 import RulesApp from "../routes/management/rules/apps/RulesApp";
 import SimulatedAppMetrics from "../routes/management/metrics/apps/SimulatedAppMetrics";
 import SimulatedAppMetric from "../routes/management/metrics/apps/SimulatedAppMetric";
-import Sidenav from "../views/sidenav/Sidenav";
 import ReactTooltip from "react-tooltip";
 import KafkaBrokers from "../routes/management/kafka/KafkaBrokers";
 import KafkaBroker from "../routes/management/kafka/KafkaBroker";

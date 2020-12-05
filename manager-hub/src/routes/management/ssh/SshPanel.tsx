@@ -143,7 +143,8 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                                     <div>
                                         <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
                                         {!this.props.filter &&
-                                        <span className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>}
+                                        <span
+                                            className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>}
                                         <span className={styles.command}>{command.command}</span>
                                         {command.exitStatus !== 0 && command.error !== null && command.output !== null &&
                                         <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
@@ -160,7 +161,8 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                                     <div>
                                         <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
                                         O ficheiro {command.filename} foi transferido
-                                        para o host {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''} com sucesso`}
+                                        para o
+                                        host {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''} com sucesso`}
                                     </div>
                                 </>
                             }
@@ -173,7 +175,8 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                     this.rightControlsScrollbar = ref;
                 }}>
                     <button className={`btn-floating btn-flat btn-small`}
-                            data-for='tooltip' data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Esconder'}
+                            data-for='tooltip'
+                            data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Esconder'}
                             data-place='left'
                             onClick={this.toggleCommands}>
                         <i className='material-icons'>{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>

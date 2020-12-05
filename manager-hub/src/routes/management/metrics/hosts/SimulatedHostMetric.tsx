@@ -360,7 +360,10 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                         ? <Field key={index}
                                                  id={key}
                                                  type='checkbox'
-                                                 checkbox={{label: 'Aplicar a todos os hosts', checkCallback: this.isGenericSelected}}/>
+                                                 checkbox={{
+                                                     label: 'Aplicar a todos os hosts',
+                                                     checkCallback: this.isGenericSelected
+                                                 }}/>
                                         : key === 'active'
                                             ? <Field key={index}
                                                      id={key}

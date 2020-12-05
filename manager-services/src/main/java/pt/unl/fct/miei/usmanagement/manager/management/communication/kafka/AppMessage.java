@@ -9,7 +9,6 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -32,6 +31,17 @@ public class AppMessage {
 		this.appServices = app.getAppServices();
 		this.appRules = app.getAppRules();
 		this.simulatedAppMetrics = app.getSimulatedAppMetrics();
+	}
+
+	public App get() {
+		return App.builder()
+			.id(id)
+			.name(name)
+			.description(description)
+			.appServices(appServices)
+			.appRules(appRules)
+			.simulatedAppMetrics(simulatedAppMetrics)
+			.build();
 	}
 
 }

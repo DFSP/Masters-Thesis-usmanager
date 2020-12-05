@@ -29,14 +29,13 @@ import com.spotify.docker.client.messages.CpuStats;
 import com.spotify.docker.client.messages.MemoryStats;
 import com.spotify.docker.client.messages.NetworkStats;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 @Service
 public class ServiceMetricsService {
 
@@ -83,7 +82,8 @@ public class ServiceMetricsService {
 		}
 		return cpuPercent;
 	}
-private double getContainerRamPercent(MemoryStats memStats) {
+
+	private double getContainerRamPercent(MemoryStats memStats) {
 		return memStats.limit() < 1 ? 0.0 : (memStats.usage().doubleValue() / memStats.limit().doubleValue()) * 100.0;
 	}
 

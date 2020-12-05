@@ -31,7 +31,7 @@ import {connect} from "react-redux";
 import {ReduxState} from "../../../reducers";
 import Dialog from "../../../components/dialogs/Dialog";
 import {IContainer} from "../containers/Container";
-import Marker, {IMarker} from "../../../components/map/Marker";
+import {IMarker} from "../../../components/map/Marker";
 import {Error} from "../../../components/errors/Error";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
