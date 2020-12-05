@@ -29,4 +29,15 @@ public class ServiceMonitoringLogMessage {
 		this.value = serviceMonitoringLog.getValue();
 		this.timestamp = serviceMonitoringLog.getTimestamp();
 	}
+
+	public ServiceMonitoringLog toServiceMonitoringLog() {
+		return ServiceMonitoringLog.builder()
+			.id(id)
+			.containerId(containerId)
+			.serviceName(serviceName)
+			.field(field)
+			.value(value)
+			.timestamp(timestamp)
+			.build();
+	}
 }

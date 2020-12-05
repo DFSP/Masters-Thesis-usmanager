@@ -106,13 +106,8 @@ public class ServicesService {
 
 	public Service updateService(String serviceName, Service newService) {
 		Service service = getService(serviceName);
-		log.info("Updating service {} with {}",
-			ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
-		log.info("Service before copying properties: {}",
-			ToStringBuilder.reflectionToString(service));
+		log.info("Updating service {} with {}", ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
 		ObjectUtils.copyValidProperties(newService, service);
-		log.info("Service after copying properties: {}",
-			ToStringBuilder.reflectionToString(service));
 		return saveService(service);
 	}
 

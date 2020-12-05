@@ -68,13 +68,8 @@ public class ValueModesService {
 
 	public ValueMode updateValueMode(String valueModeName, ValueMode newValueMode) {
 		ValueMode valueMode = getValueMode(valueModeName);
-		log.info("Updating valueMode {} with {}",
-			ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
-		log.info("valueMode before copying properties: {}",
-			ToStringBuilder.reflectionToString(valueMode));
+		log.info("Updating valueMode {} with {}", ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
 		ObjectUtils.copyValidProperties(newValueMode, valueMode);
-		log.info("valueMode after copying properties: {}",
-			ToStringBuilder.reflectionToString(valueMode));
 		valueMode = valueModes.save(valueMode);
 		return valueMode;
 	}

@@ -74,13 +74,8 @@ public class OperatorsService {
 
 	public Operator updateOperator(String operatorName, Operator newOperator) {
 		Operator operator = getOperator(operatorName);
-		log.info("Updating operator {} with {}",
-			ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
-		log.info("operator before copying properties: {}",
-			ToStringBuilder.reflectionToString(operator));
+		log.info("Updating operator {} with {}", ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
 		ObjectUtils.copyValidProperties(newOperator, operator);
-		log.info("operator after copying properties: {}",
-			ToStringBuilder.reflectionToString(operator));
 		operator = operators.save(operator);
 		return operator;
 	}

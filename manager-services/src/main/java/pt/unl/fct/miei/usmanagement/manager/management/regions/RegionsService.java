@@ -76,13 +76,8 @@ public class RegionsService {
 
 	public Region updateRegion(String name, Region newRegion) {
 		Region region = getRegion(name);
-		log.info("Updating region {} with {}",
-			ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
-		log.info("Region before copying properties: {}",
-			ToStringBuilder.reflectionToString(region));
+		log.info("Updating region {} with {}", ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
 		ObjectUtils.copyValidProperties(newRegion, region);
-		log.info("Region after copying properties: {}",
-			ToStringBuilder.reflectionToString(region));
 		return regions.save(region);
 	}
 

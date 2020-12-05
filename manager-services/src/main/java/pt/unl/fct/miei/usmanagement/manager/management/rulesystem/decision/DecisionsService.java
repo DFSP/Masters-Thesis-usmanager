@@ -152,6 +152,10 @@ public class DecisionsService {
 			.rule(rule)
 			.decision(decision)
 			.timestamp(timestamp).build();
+		return saveServiceDecision(serviceDecision);
+	}
+
+	public ServiceDecision saveServiceDecision(ServiceDecision serviceDecision) {
 		return serviceDecisions.save(serviceDecision);
 	}
 
@@ -160,6 +164,10 @@ public class DecisionsService {
 		pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision = getHostPossibleDecision(decisionName);
 		HostDecision hostDecision = HostDecision.builder().publicIpAddress(hostAddress.getPublicIpAddress())
 			.privateIpAddress(hostAddress.getPrivateIpAddress()).rule(rule).decision(decision).build();
+		return saveHostDecision(hostDecision);
+	}
+
+	public HostDecision saveHostDecision(HostDecision hostDecision) {
 		return hostDecisions.save(hostDecision);
 	}
 
@@ -191,7 +199,6 @@ public class DecisionsService {
 				.collect(Collectors.toList())
 		);
 	}
-
 
 	public List<ServiceDecision> getServiceDecisions() {
 		return serviceDecisions.findAll();

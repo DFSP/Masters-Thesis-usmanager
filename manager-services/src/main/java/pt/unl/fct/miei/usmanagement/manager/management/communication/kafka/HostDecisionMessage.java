@@ -36,4 +36,15 @@ public class HostDecisionMessage {
 		this.hostDecisions = hostDecision.getHostDecisions();
 	}
 
+	public HostDecision toHostDecision() {
+		return HostDecision.builder()
+			.id(id)
+			.decision(decision)
+			.rule(rule)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.timestamp(timestamp)
+			.hostDecisions(hostDecisions)
+			.build();
+	}
 }

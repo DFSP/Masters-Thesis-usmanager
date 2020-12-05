@@ -30,4 +30,14 @@ public class HostMonitoringLogMessage {
 		this.timestamp = hostMonitoringLog.getTimestamp();
 	}
 
+	public HostMonitoringLog toHostMonitoringLog() {
+		return HostMonitoringLog.builder()
+			.id(id)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.field(field)
+			.value(value)
+			.timestamp(timestamp)
+			.build();
+	}
 }

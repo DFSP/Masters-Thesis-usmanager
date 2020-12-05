@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,5 +31,18 @@ public class HostEventMessage {
 		this.managerPrivateIpAddress = hostEvent.getManagerPrivateIpAddress();
 		this.decision = hostEvent.getDecision();
 		this.count = hostEvent.getCount();
+	}
+
+	@JsonIgnore
+	public HostEvent toHostEvent() {
+		return HostEvent.builder()
+			.id(id)
+			.publicIpAddress(publicIpAddress)
+			.privateIpAddress(privateIpAddress)
+			.managerPublicIpAddress(managerPublicIpAddress)
+			.managerPrivateIpAddress(managerPrivateIpAddress)
+			.decision(decision)
+			.count(count)
+			.build();
 	}
 }

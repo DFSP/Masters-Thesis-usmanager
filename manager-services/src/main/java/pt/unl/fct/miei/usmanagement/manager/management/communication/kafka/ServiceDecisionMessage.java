@@ -1,23 +1,14 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -34,7 +25,7 @@ public class ServiceDecisionMessage {
 	private Decision decision;
 	private ServiceRule rule;
 	private Timestamp timestamp;
-	private Set<ServiceDecisionValue> serviceDecisionValues;
+	private Set<ServiceDecisionValue> serviceDecisions;
 
 	public ServiceDecisionMessage(ServiceDecision serviceDecision) {
 		this.id = serviceDecision.getId();
@@ -44,7 +35,19 @@ public class ServiceDecisionMessage {
 		this.decision = serviceDecision.getDecision();
 		this.rule = serviceDecision.getRule();
 		this.timestamp = serviceDecision.getTimestamp();
-		this.serviceDecisionValues = serviceDecision.getServiceDecisionValues();
+		this.serviceDecisions = serviceDecision.getServiceDecisions();
 	}
 
+	public ServiceDecision toServiceDecision() {
+		return ServiceDecision.builder()
+			.id(id)
+			.containerId(containerId)
+			.serviceName(serviceName)
+			.result(result)
+			.decision(decision)
+			.rule(rule)
+			.timestamp(timestamp)
+			.serviceDecisions(serviceDecisions)
+			.build();
+	}
 }

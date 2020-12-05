@@ -68,13 +68,8 @@ public class FieldsService {
 
 	public Field updateField(String fieldName, Field newField) {
 		Field field = getField(fieldName);
-		log.info("Updating field {} with {}",
-			ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
-		log.info("Field before copying properties: {}",
-			ToStringBuilder.reflectionToString(field));
+		log.info("Updating field {} with {}", ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
 		ObjectUtils.copyValidProperties(newField, field);
-		log.info("Field after copying properties: {}",
-			ToStringBuilder.reflectionToString(field));
 		field = fields.save(field);
 		return field;
 	}

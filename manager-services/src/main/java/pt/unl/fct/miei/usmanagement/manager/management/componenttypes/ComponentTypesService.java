@@ -74,13 +74,8 @@ public class ComponentTypesService {
 
 	public ComponentType updateComponentType(String componentTypeName, ComponentType newComponentType) {
 		ComponentType componentType = getComponentType(componentTypeName);
-		log.info("Updating componentType {} with {}",
-			ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
-		log.info("ComponentType before copying properties: {}",
-			ToStringBuilder.reflectionToString(componentType));
+		log.info("Updating componentType {} with {}", ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
 		ObjectUtils.copyValidProperties(newComponentType, componentType);
-		log.info("ComponentType after copying properties: {}",
-			ToStringBuilder.reflectionToString(componentType));
 		componentType = componentTypes.save(componentType);
 		return componentType;
 	}

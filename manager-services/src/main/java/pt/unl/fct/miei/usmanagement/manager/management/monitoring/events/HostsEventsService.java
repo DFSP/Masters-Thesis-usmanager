@@ -60,6 +60,10 @@ public class HostsEventsService {
 		return hostEvents.findByPublicIpAddressAndPrivateIpAddress(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
 	}
 
+	public HostEvent addHostEvent(HostEvent hostEvent) {
+		return hostEvents.save(hostEvent);
+	}
+
 	public HostEvent saveHostEvent(HostAddress hostAddress, String decisionName) {
 		HostAddress managerHostAddress = hostsService.getManagerHostAddress();
 		Decision decision = decisionsService.getHostPossibleDecision(decisionName);
@@ -74,7 +78,7 @@ public class HostsEventsService {
 		else {
 			hostEvent.setCount(hostEvent.getCount() + 1);
 		}
-		return this.hostEvents.save(hostEvent);
+		return addHostEvent(hostEvent);
 	}
 
 	public void reset() {

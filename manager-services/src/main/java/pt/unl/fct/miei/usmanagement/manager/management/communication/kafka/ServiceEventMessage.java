@@ -36,4 +36,16 @@ public class ServiceEventMessage {
 		this.decision = serviceEvent.getDecision();
 		this.count = serviceEvent.getCount();
 	}
+
+	public ServiceEvent toServiceEvent() {
+		return ServiceEvent.builder()
+			.id(id)
+			.serviceName(serviceName)
+			.containerId(containerId)
+			.managerPublicIpAddress(managerPublicIpAddress)
+			.managerPrivateIpAddress(managerPrivateIpAddress)
+			.decision(decision)
+			.count(count)
+			.build();
+	}
 }

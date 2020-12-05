@@ -66,6 +66,10 @@ public class ServicesEventsService {
 		return serviceEvents.findByContainerIdStartingWith(containerId);
 	}
 
+	public ServiceEvent addServiceEvent(ServiceEvent serviceEvent) {
+		return serviceEvents.save(serviceEvent);
+	}
+
 	public ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
 		HostAddress managerHostAddress = hostsService.getManagerHostAddress();
 		Decision decision = decisionsService.getServicePossibleDecision(decisionName);
@@ -80,8 +84,7 @@ public class ServicesEventsService {
 		else {
 			event.setCount(event.getCount() + 1);
 		}
-		event = serviceEvents.save(event);
-		return event;
+		return addServiceEvent(event);
 	}
 
 	public void resetServiceEvent(String serviceName) {

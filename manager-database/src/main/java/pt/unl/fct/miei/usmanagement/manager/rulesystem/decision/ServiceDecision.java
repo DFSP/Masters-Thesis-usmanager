@@ -83,7 +83,7 @@ public class ServiceDecision {
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceDecisionValue> serviceDecisionValues;
+	private Set<ServiceDecisionValue> serviceDecisions;
 
 	@PrePersist
 	public void prePersist() {

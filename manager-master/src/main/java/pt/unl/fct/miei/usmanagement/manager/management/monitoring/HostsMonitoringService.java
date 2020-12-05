@@ -163,7 +163,7 @@ public class HostsMonitoringService {
 		return hostsMonitoring.getHostMonitoringFieldAverage(hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), field);
 	}
 
-	public void saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
+	public HostMonitoringLog saveHostMonitoringLog(HostAddress hostAddress, String field, double effectiveValue) {
 		HostMonitoringLog hostMonitoringLog = HostMonitoringLog.builder()
 			.publicIpAddress(hostAddress.getPublicIpAddress())
 			.privateIpAddress(hostAddress.getPrivateIpAddress())
@@ -171,6 +171,10 @@ public class HostsMonitoringService {
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
 			.build();
+		return addHostMonitoringLog(hostMonitoringLog);
+	}
+
+	public HostMonitoringLog addHostMonitoringLog(HostMonitoringLog hostMonitoringLog) {
 		hostMonitoringLogs.save(hostMonitoringLog);
 	}
 

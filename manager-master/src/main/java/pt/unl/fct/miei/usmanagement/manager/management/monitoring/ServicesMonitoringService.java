@@ -186,7 +186,7 @@ public class ServicesMonitoringService {
 		return servicesMonitoring.getTopContainersByField(containerIds, field);
 	}
 
-	public void saveServiceMonitoringLog(String containerId, String serviceName, String field, double effectiveValue) {
+	public ServiceMonitoringLog saveServiceMonitoringLog(String containerId, String serviceName, String field, double effectiveValue) {
 		ServiceMonitoringLog serviceMonitoringLog = ServiceMonitoringLog.builder()
 			.containerId(containerId)
 			.serviceName(serviceName)
@@ -194,7 +194,11 @@ public class ServicesMonitoringService {
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
 			.build();
-		serviceMonitoringLogs.save(serviceMonitoringLog);
+		return addServiceMonitoringLog(serviceMonitoringLog);
+	}
+
+	public ServiceMonitoringLog addServiceMonitoringLog(ServiceMonitoringLog serviceMonitoringLog) {
+		return serviceMonitoringLogs.save(serviceMonitoringLog);
 	}
 
 	public List<ServiceMonitoringLog> getServiceMonitoringLogs() {

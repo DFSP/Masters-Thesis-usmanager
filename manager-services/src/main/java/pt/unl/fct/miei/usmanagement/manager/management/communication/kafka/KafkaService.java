@@ -2,16 +2,12 @@ package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.KafkaException;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
@@ -54,6 +50,9 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
@@ -111,14 +110,12 @@ public class KafkaService {
 	private final ServiceRulesService serviceRulesService;
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
-
 	private final ZookeeperService zookeeperService;
 	private final ProducerFactory<String, Object> producerFactory;
 	private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
-
 	private final KafkaBrokers kafkaBrokers;
-
 	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final String managerId;
 	private final AtomicLong increment;
 	private boolean populated;
 
@@ -143,11 +140,12 @@ public class KafkaService {
 						@Lazy AppRulesService appRulesService,
 						@Lazy ContainerRulesService containerRulesService,
 						@Lazy ValueModesService valueModesService,
-						HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService, ZookeeperService zookeeperService,
+						@Lazy ZookeeperService zookeeperService,
 						@Lazy ProducerFactory<String, Object> producerFactory,
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
-						@Lazy KafkaTemplate<String, Object> kafkaTemplate) {
+						@Lazy KafkaTemplate<String, Object> kafkaTemplate,
+						Environment environment) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -174,6 +172,7 @@ public class KafkaService {
 		this.kafkaBrokers = kafkaBrokers;
 		this.kafkaTemplate = kafkaTemplate;
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
 		this.increment = new AtomicLong();
 		this.populated = false;
 	}
@@ -363,6 +362,17 @@ public class KafkaService {
 		String workerManagerTopics = "host-events:1:1,service-events:1:1,host-monitoring-logs:1:1,service-monitoring-logs:1:1,"
 			+ "host-decisions:1:1,service-decisions:1:1";
 		return masterManagerTopics + "," + workerManagerTopics;
+	}
+
+	public void restart() {
+		producerFactory.reset();
+		kafkaListenerEndpointRegistry.stop();
+		kafkaListenerEndpointRegistry.start();
+	}
+
+	public void stop() {
+		producerFactory.reset();
+		kafkaListenerEndpointRegistry.stop();
 	}
 
 	@Async
@@ -576,6 +586,36 @@ public class KafkaService {
 	}
 
 	@Async
+	public void sendHostEvent(HostEvent hostEvent) {
+		send("host-events", new HostEventMessage(hostEvent), hostEvent.getId());
+	}
+
+	@Async
+	public void sendServiceEvent(ServiceEvent serviceEvent) {
+		send("service-events", new ServiceEventMessage(serviceEvent), serviceEvent.getId());
+	}
+
+	@Async
+	public void sendHostMonitoringLog(HostMonitoringLog hostMonitoringLog) {
+		send("host-monitoring-logs", new HostMonitoringLogMessage(hostMonitoringLog), hostMonitoringLog.getId());
+	}
+
+	@Async
+	public void sendServiceMonitoringLog(ServiceMonitoringLog serviceMonitoringLog) {
+		send("service-monitoring-logs", new ServiceMonitoringLogMessage(serviceMonitoringLog), serviceMonitoringLog.getId());
+	}
+
+	@Async
+	public void sendHostDecision(HostDecision hostDecision) {
+		send("host-decisions", new HostDecisionMessage(hostDecision), hostDecision.getId());
+	}
+
+	@Async
+	public void sendServiceDecision(ServiceDecision serviceDecision) {
+		send("service-decisions", new ServiceDecisionMessage(serviceDecision), serviceDecision.getId());
+	}
+
+	@Async
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
 		if (hasKafkaBrokers && populated) {
@@ -599,156 +639,6 @@ public class KafkaService {
 			log.warn("Not sending DELETE id={} request to kafka topic {} because hasKafkaBrokers={} and populated={}",
 				id, topic, hasKafkaBrokers, populated);
 		}
-	}
-
-	@KafkaListener(groupId = "manager", topics = "apps", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
-		log.info("key={} message={}", key, appMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "cloud-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostMessage cloudHostMessage) {
-		log.info("key={} message={}", key, cloudHostMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "component-types", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeMessage componentTypeMessage) {
-		log.info("key={} message={}", key, componentTypeMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "conditions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
-		log.info("key={} message={}", key, conditionMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "containers", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerMessage containerMessage) {
-		log.info("key={} message={}", key, containerMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionMessage decisionMessage) {
-		log.info("key={} message={}", key, decisionMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "edge-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostMessage edgeHostMessage) {
-		log.info("key={} message={}", key, edgeHostMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "eips", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpMessage elasticIpMessage) {
-		log.info("key={} message={}", key, elasticIpMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "fields", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldMessage fieldMessage) {
-		log.info("key={} message={}", key, fieldMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "nodes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeMessage nodeMessage) {
-		log.info("key={} message={}", key, nodeMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "operators", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorMessage operatorMessage) {
-		log.info("key={} message={}", key, operatorMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "services", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMessage serviceMessage) {
-		log.info("key={} message={}", key, serviceMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "simulated-host-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricMessage hostSimulatedMetricMessage) {
-		log.info("key={} message={}", key, hostSimulatedMetricMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "simulated-app-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricMessage appSimulatedMetricMessage) {
-		log.info("key={} message={}", key, appSimulatedMetricMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "simulated-service-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricMessage serviceSimulatedMetricMessage) {
-		log.info("key={} message={}", key, serviceSimulatedMetricMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "simulated-container-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricMessage containerSimulatedMetricMessage) {
-		log.info("key={} message={}", key, containerSimulatedMetricMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "host-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleMessage hostRuleMessage) {
-		log.info("key={} message={}", key, hostRuleMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "app-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleMessage appRuleMessage) {
-		log.info("key={} message={}", key, appRuleMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "service-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleMessage serviceRuleMessage) {
-		log.info("key={} message={}", key, serviceRuleMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "container-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleMessage containerRuleMessage) {
-		log.info("key={} message={}", key, containerRuleMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager", topics = "value-modes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeMessage valueModeMessage) {
-		log.info("key={} message={}", key, valueModeMessage.toString());
-	}
-
-
-
-
-
-	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventMessage hostEventMessage) {
-		log.info("key={} value={}", key, hostEventMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventMessage serviceEventMessage) {
-		log.info("key={} value={}", key, serviceEventMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogMessage hostMonitoringLog) {
-		log.info("key={} value={}", key, hostMonitoringLog.toString());
-	}
-
-	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogMessage serviceMonitoringLogMessage) {
-		log.info("key={} value={}", key, serviceMonitoringLogMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionMessage hostDecisionMessage) {
-		log.info("key={} value={}", key, hostDecisionMessage.toString());
-	}
-
-	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionMessage serviceDecisionMessage) {
-		log.info("key={} value={}", key, serviceDecisionMessage.toString());
-	}
-
-	public void restart() {
-		producerFactory.reset();
-		kafkaListenerEndpointRegistry.stop();
-		kafkaListenerEndpointRegistry.start();
-	}
-
-	public void stop() {
-		producerFactory.reset();
-		kafkaListenerEndpointRegistry.stop();
 	}
 
 }
