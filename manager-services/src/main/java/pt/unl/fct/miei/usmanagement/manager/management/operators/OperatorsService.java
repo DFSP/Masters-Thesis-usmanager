@@ -33,7 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.Kafka
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class OperatorsService {
 	public Operator updateOperator(String operatorName, Operator newOperator) {
 		Operator operator = getOperator(operatorName);
 		log.info("Updating operator {} with {}", ToStringBuilder.reflectionToString(operator), ToStringBuilder.reflectionToString(newOperator));
-		ObjectUtils.copyValidProperties(newOperator, operator);
+		EntityUtils.copyValidProperties(newOperator, operator);
 		operator = saveOperator(operator);
 		kafkaService.sendOperator(operator);
 		return operator;

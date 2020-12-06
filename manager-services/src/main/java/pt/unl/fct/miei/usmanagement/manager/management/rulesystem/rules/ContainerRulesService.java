@@ -38,7 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class ContainerRulesService {
 	public ContainerRule updateRule(String ruleName, ContainerRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		ContainerRule rule = getRule(ruleName);
-		ObjectUtils.copyValidProperties(newRule, rule);
+		EntityUtils.copyValidProperties(newRule, rule);
 		rule = saveRule(rule);
 		kafkaService.sendContainerRule(rule);
 		return rule;

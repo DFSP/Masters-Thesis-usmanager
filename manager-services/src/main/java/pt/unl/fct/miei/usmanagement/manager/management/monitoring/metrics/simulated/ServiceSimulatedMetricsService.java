@@ -31,11 +31,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -87,7 +86,7 @@ public class ServiceSimulatedMetricsService {
 		log.info("Updating simulated service metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newServiceSimulatedMetric));
 		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
-		ObjectUtils.copyValidProperties(newServiceSimulatedMetric, serviceSimulatedMetric);
+		EntityUtils.copyValidProperties(newServiceSimulatedMetric, serviceSimulatedMetric);
 		serviceSimulatedMetric = saveServiceSimulatedMetric(serviceSimulatedMetric);
 		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
 		return serviceSimulatedMetric;

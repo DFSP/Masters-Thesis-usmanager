@@ -35,7 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.Kafka
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -87,7 +87,7 @@ public class ContainerSimulatedMetricsService {
 		log.info("Updating simulated container metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newContainerSimulatedMetric));
 		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
-		ObjectUtils.copyValidProperties(newContainerSimulatedMetric, containerSimulatedMetric);
+		EntityUtils.copyValidProperties(newContainerSimulatedMetric, containerSimulatedMetric);
 		containerSimulatedMetric = saveContainerSimulatedMetric(containerSimulatedMetric);
 		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
 		return containerSimulatedMetric;

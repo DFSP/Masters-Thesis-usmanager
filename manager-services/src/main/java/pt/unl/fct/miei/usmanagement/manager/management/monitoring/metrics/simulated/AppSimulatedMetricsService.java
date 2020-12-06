@@ -35,7 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetrics;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -87,7 +87,7 @@ public class AppSimulatedMetricsService {
 		log.info("Updating simulated app metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newAppSimulatedMetric));
 		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
-		ObjectUtils.copyValidProperties(newAppSimulatedMetric, appSimulatedMetric);
+		EntityUtils.copyValidProperties(newAppSimulatedMetric, appSimulatedMetric);
 		appSimulatedMetric = saveAppSimulatedMetric(appSimulatedMetric);
 		kafkaService.sendAppSimulatedMetric(appSimulatedMetric);
 		return appSimulatedMetric;

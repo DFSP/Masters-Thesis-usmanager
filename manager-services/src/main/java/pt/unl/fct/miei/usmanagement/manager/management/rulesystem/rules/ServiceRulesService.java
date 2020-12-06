@@ -46,7 +46,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRules;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -113,7 +113,7 @@ public class ServiceRulesService {
 	public ServiceRule updateRule(String ruleName, ServiceRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		ServiceRule rule = getRule(ruleName);
-		ObjectUtils.copyValidProperties(newRule, rule);
+		EntityUtils.copyValidProperties(newRule, rule);
 		rule = saveRule(rule);
 		kafkaService.sendServiceRule(rule);
 		return rule;

@@ -43,7 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Services;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -103,7 +103,7 @@ public class ServicesService {
 	public Service updateService(String serviceName, Service newService) {
 		Service service = getService(serviceName);
 		log.info("Updating service {} with {}", ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
-		ObjectUtils.copyValidProperties(newService, service);
+		EntityUtils.copyValidProperties(newService, service);
 		service = saveService(service);
 		kafkaService.sendService(service);
 		return service;

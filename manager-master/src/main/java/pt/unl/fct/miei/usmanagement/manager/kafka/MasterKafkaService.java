@@ -1,6 +1,7 @@
 package pt.unl.fct.miei.usmanagement.manager.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -48,42 +49,66 @@ public class MasterKafkaService {
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventMessage hostEventMessage) {
 		log.info("Received key={} value={}", key, hostEventMessage.toString());
 		HostEvent hostEvent = hostEventMessage.get();
-		hostsEventsService.addHostEvent(hostEvent);
+		try {
+			hostsEventsService.addHostEvent(hostEvent);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostEvent), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventMessage serviceEventMessage) {
 		log.info("Received key={} value={}", key, serviceEventMessage.toString());
 		ServiceEvent serviceEvent = serviceEventMessage.get();
-		servicesEventsService.addServiceEvent(serviceEvent);
+		try {
+			servicesEventsService.addServiceEvent(serviceEvent);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceEvent), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogMessage hostMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, hostMonitoringLogMessage.toString());
 		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.get();
-		hostsMonitoringService.addHostMonitoringLog(hostMonitoringLog);
+		try {
+			hostsMonitoringService.addHostMonitoringLog(hostMonitoringLog);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostMonitoringLog), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogMessage serviceMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, serviceMonitoringLogMessage.toString());
 		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.get();
-		servicesMonitoringService.addServiceMonitoringLog(serviceMonitoringLog);
+		try {
+			servicesMonitoringService.addServiceMonitoringLog(serviceMonitoringLog);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceMonitoringLog), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionMessage hostDecisionMessage) {
 		log.info("Received key={} value={}", key, hostDecisionMessage.toString());
 		HostDecision hostDecision = hostDecisionMessage.get();
-		decisionsService.saveHostDecision(hostDecision);
+		try {
+			decisionsService.saveHostDecision(hostDecision);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostDecision), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionMessage serviceDecisionMessage) {
 		log.info("Received key={} value={}", key, serviceDecisionMessage.toString());
 		ServiceDecision serviceDecision = serviceDecisionMessage.get();
-		decisionsService.saveServiceDecision(serviceDecision);
+		try {
+			decisionsService.saveServiceDecision(serviceDecision);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceDecision), e.getMessage());
+		}
 	}
 
 }

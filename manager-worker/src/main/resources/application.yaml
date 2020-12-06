@@ -133,4 +133,4 @@ parallelism:
 #    org:
 #      hibernate:
 #        SQL=DEBUG:#trace: debug
-debug: true
+#debug: true

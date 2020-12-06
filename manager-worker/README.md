@@ -18,18 +18,17 @@ Gere um conjunto de nós e containers na edge.
 ## Executar
 
 ##### Argumentos
-- EXTERNAL_ID - id do gestor, deve ser único, para que seja diferenciado dos outros gestores locais.
+- ID - id do gestor, deve ser único, para que seja diferenciado dos outros gestores locais.
 - HOST_ADDRESS - endereço associado ao gestor, em formato json, [ver estrutura](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/hosts/HostAddress.java).
-- REGISTRATION_URL - url de registo no gestor principal, especificado no seu [sym-node.properties](../manager-master/src/main/resources/sym/sym-node.properties).
+- HOST_ADDRESS - endereço associado ao gestor, em formato json, [ver estrutura](../manager-database/src/main/java/pt/unl/fct/miei/usmanagement/manager/hosts/HostAddress.java).
 
 <sup>Alterar os valores dos argumentos, conforme necessário:</sup>
 
 #### Local
 
 ```shell script
-export EXTERNAL_ID=001 
+export ID=001 
 export HOST_ADDRESS='{"username":"...","publicDnsName":"...","publicIpAddress":"...","privateIpAddress":"...","coordinates":{"label":"Portugal","latitude":...,"longitude":...},"region":"EUROPE","place":"..."}'
-export REGISTRATION_URL=http://...:8080/api/sync
 mvn spring-boot:run
 ```
 

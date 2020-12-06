@@ -33,7 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypes;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 
@@ -79,7 +79,7 @@ public class ComponentTypesService {
 	public ComponentType updateComponentType(String componentTypeName, ComponentType newComponentType) {
 		ComponentType componentType = getComponentType(componentTypeName);
 		log.info("Updating componentType {} with {}", ToStringBuilder.reflectionToString(componentType), ToStringBuilder.reflectionToString(newComponentType));
-		ObjectUtils.copyValidProperties(newComponentType, componentType);
+		EntityUtils.copyValidProperties(newComponentType, componentType);
 		componentType = componentTypes.save(componentType);
 		kafkaService.sendComponentType(componentType);
 		return componentType;

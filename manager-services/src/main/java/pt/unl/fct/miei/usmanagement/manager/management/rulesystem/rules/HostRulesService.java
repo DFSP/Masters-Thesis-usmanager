@@ -44,7 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +116,7 @@ public class HostRulesService {
 	public HostRule updateRule(String ruleName, HostRule newRule) {
 		log.info("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
 		HostRule rule = getRule(ruleName);
-		ObjectUtils.copyValidProperties(newRule, rule);
+		EntityUtils.copyValidProperties(newRule, rule);
 		rule = saveRule(rule);
 		kafkaService.sendHostRule(rule);
 		return rule;

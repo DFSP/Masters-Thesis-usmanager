@@ -32,7 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 
@@ -72,7 +72,8 @@ public class ConditionsService {
 
 	public Condition updateCondition(String conditionName, Condition newCondition) {
 		Condition condition = getCondition(conditionName);
-		ObjectUtils.copyValidProperties(newCondition, condition);
+		log.info("Updating condition {} with {}", ToStringBuilder.reflectionToString(condition), ToStringBuilder.reflectionToString(newCondition));
+		EntityUtils.copyValidProperties(newCondition, condition);
 		condition = conditions.save(condition);
 		kafkaService.sendCondition(condition);
 		return condition;

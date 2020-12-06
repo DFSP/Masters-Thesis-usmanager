@@ -1,6 +1,8 @@
 package pt.unl.fct.miei.usmanagement.manager.kafka;
 
+import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -132,15 +134,25 @@ public class WorkerKafkaService {
 	@KafkaListener(groupId = "manager-worker", topics = "apps", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
 		log.info("Received key={} message={}", key, appMessage.toString());
-		App app = appMessage.get();
-		appsService.addApp(app);
+		if (Objects.equal(key, "DELETE")) {
+			/*appsService.deleteApp();*/
+		}
+		else {
+			App app = appMessage.get();
+			appsService.addApp(app);
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "cloud-hosts", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostMessage cloudHostMessage) {
 		log.info("Received key={} message={}", key, cloudHostMessage.toString());
 		CloudHost cloudHost = cloudHostMessage.get();
-		cloudHostsService.saveCloudHost(cloudHost);
+		try {
+			cloudHostsService.saveCloudHost(cloudHost);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(cloudHost), e.getMessage());
+		}
+
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "component-types", autoStartup = "false")
@@ -154,126 +166,198 @@ public class WorkerKafkaService {
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
 		log.info("Received key={} message={}", key, conditionMessage.toString());
 		Condition condition = conditionMessage.get();
-		conditionsService.saveCondition(condition);
+		try {
+			conditionsService.saveCondition(condition);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "containers", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerMessage containerMessage) {
 		log.info("Received key={} message={}", key, containerMessage.toString());
 		Container container = containerMessage.get();
-		containersService.saveContainer(container);
+		try {
+			containersService.saveContainer(container);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(container), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionMessage decisionMessage) {
 		log.info("Received key={} message={}", key, decisionMessage.toString());
 		Decision decision = decisionMessage.get();
-		decisionsService.saveDecision(decision);
+		try {
+			decisionsService.saveDecision(decision);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(decision), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "edge-hosts", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostMessage edgeHostMessage) {
 		log.info("Received key={} message={}", key, edgeHostMessage.toString());
 		EdgeHost edgeHost = edgeHostMessage.get();
-		edgeHostsService.saveEdgeHost(edgeHost);
+		try {
+			edgeHostsService.saveEdgeHost(edgeHost);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(edgeHost), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "eips", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpMessage elasticIpMessage) {
 		log.info("Received key={} message={}", key, elasticIpMessage.toString());
 		ElasticIp elasticIp = elasticIpMessage.get();
-		elasticIpsService.saveElasticIp(elasticIp);
+		try {
+			elasticIpsService.saveElasticIp(elasticIp);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(elasticIp), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "fields", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldMessage fieldMessage) {
 		log.info("Received key={} message={}", key, fieldMessage.toString());
 		Field field = fieldMessage.get();
-		fieldsService.saveField(field);
+		try {
+			fieldsService.saveField(field);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(field), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "nodes", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeMessage nodeMessage) {
 		log.info("Received key={} message={}", key, nodeMessage.toString());
 		Node node = nodeMessage.get();
-		nodesService.saveNode(node);
+		try {
+			nodesService.saveNode(node);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(node), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "operators", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorMessage operatorMessage) {
 		log.info("Received key={} message={}", key, operatorMessage.toString());
 		Operator operator = operatorMessage.get();
-		operatorsService.saveOperator(operator);
+		try {
+			operatorsService.saveOperator(operator);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(operator), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "services", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMessage serviceMessage) {
 		log.info("Received key={} message={}", key, serviceMessage.toString());
 		pt.unl.fct.miei.usmanagement.manager.services.Service service = serviceMessage.get();
-		servicesService.saveService(service);
+		try {
+			servicesService.saveService(service);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(service), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-host-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricMessage hostSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, hostSimulatedMetricMessage.toString());
 		HostSimulatedMetric hostSimulatedMetric = hostSimulatedMetricMessage.get();
-		hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
+		try {
+			hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetric), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-app-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricMessage appSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, appSimulatedMetricMessage.toString());
 		AppSimulatedMetric appSimulatedMetric = appSimulatedMetricMessage.get();
-		appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
+		try {
+			appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetric), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-service-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricMessage serviceSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, serviceSimulatedMetricMessage.toString());
 		ServiceSimulatedMetric serviceSimulatedMetric = serviceSimulatedMetricMessage.get();
-		serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
+		try {
+			serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-container-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricMessage containerSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, containerSimulatedMetricMessage.toString());
 		ContainerSimulatedMetric containerSimulatedMetric = containerSimulatedMetricMessage.get();
-		containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
+		try {
+			containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetric), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "host-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleMessage hostRuleMessage) {
 		log.info("Received key={} message={}", key, hostRuleMessage.toString());
 		HostRule hostRule = hostRuleMessage.get();
-		hostRulesService.saveRule(hostRule);
+		try {
+			hostRulesService.saveRule(hostRule);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostRule), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "app-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleMessage appRuleMessage) {
 		log.info("Received key={} message={}", key, appRuleMessage.toString());
 		AppRule appRule = appRuleMessage.get();
-		appRulesService.saveRule(appRule);
+		try {
+			appRulesService.saveRule(appRule);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appRule), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "service-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleMessage serviceRuleMessage) {
 		log.info("Received key={} message={}", key, serviceRuleMessage.toString());
 		ServiceRule serviceRule = serviceRuleMessage.get();
-		serviceRulesService.saveRule(serviceRule);
+		try {
+			serviceRulesService.saveRule(serviceRule);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceRule), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "container-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleMessage containerRuleMessage) {
 		log.info("Received key={} message={}", key, containerRuleMessage.toString());
 		ContainerRule containerRule = containerRuleMessage.get();
-		containerRulesService.saveRule(containerRule);
+		try {
+			containerRulesService.saveRule(containerRule);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerRule), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "value-modes", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeMessage valueModeMessage) {
 		log.info("Received key={} message={}", key, valueModeMessage.toString());
 		ValueMode valueMode = valueModeMessage.get();
-		valueModesService.saveValueMode(valueMode);
+		try {
+			valueModesService.saveValueMode(valueMode);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(valueMode), e.getMessage());
+		}
 	}
 
 }

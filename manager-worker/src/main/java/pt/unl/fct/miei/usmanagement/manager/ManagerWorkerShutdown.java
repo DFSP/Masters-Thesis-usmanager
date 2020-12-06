@@ -37,27 +37,24 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
-	private final WorkerSymService symService;
 	private final SyncService syncService;
 	private final DockerSwarmService dockerSwarmService;
 
-	public ManagerWorkerShutdown(WorkerSymService symService, SyncService syncService, DockerSwarmService dockerSwarmService) {
-		this.symService = symService;
+	public ManagerWorkerShutdown(SyncService syncService, DockerSwarmService dockerSwarmService) {
 		this.syncService = syncService;
 		this.dockerSwarmService = dockerSwarmService;
 	}
 
 	@Override
 	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
-		symService.stopSymmetricDSServer();
 		syncService.stopContainersDatabaseSynchronization();
 		syncService.stopNodesDatabaseSynchronization();
-		try {
+		/*try {
 			dockerSwarmService.destroySwarm();
 		}
 		catch (Exception e) {
 			log.error("Failed to destroy the swarm: {}", e.getMessage());
-		}
+		}*/
 	}
 
 }

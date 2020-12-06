@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.management.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.management.docker.DockerProperties;
@@ -88,6 +89,7 @@ public class WorkerManagersService {
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
 	private final NodesService nodesService;
+	private final KafkaService kafkaService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -98,7 +100,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 Environment environment, WorkerManagerProperties workerManagerProperties,
+								 KafkaService kafkaService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
@@ -107,6 +109,7 @@ public class WorkerManagersService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
+		this.kafkaService = kafkaService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -189,10 +192,9 @@ public class WorkerManagersService {
 
 	private Container launchWorkerManager(HostAddress hostAddress, String id) {
 		List<String> environment = new LinkedList<>(List.of(
-			ContainerConstants.Environment.Manager.EXTERNAL_ID + "=" + id,
-			ContainerConstants.Environment.Manager.REGISTRATION_URL + "=" + getRegistrationUrl(),
-			ContainerConstants.Environment.Manager.SYNC_URL + "=" + getSyncUrl(),
-			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress)
+			ContainerConstants.Environment.Manager.ID + "=" + id,
+			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress),
+			ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS + "=" + kafkaService.getKafkaBrokersHosts()
 		));
 		return containersService.launchContainer(hostAddress, ServiceConstants.Name.WORKER_MANAGER, environment);
 	}

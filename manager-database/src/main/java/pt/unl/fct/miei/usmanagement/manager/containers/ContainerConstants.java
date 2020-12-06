@@ -40,11 +40,9 @@ public final class ContainerConstants {
 		}
 
 		public static final class Manager {
-			public static final String EXTERNAL_ID = "manager.worker.external-id";
-			public static final String REGISTRATION_URL = "manager.worker.registration-url";
-			public static final String SYNC_URL = "manager.worker.sync-url";
-			public static final String HOST_ADDRESS = "manager.worker.host-address";
-			public static final String KAFKA_BOOTSTRAP_SERVERS = "spring.kafka.bootstrap-servers";
+			public static final String ID = "ID";
+			public static final String HOST_ADDRESS = "HOST_ADDRESS";
+			public static final String KAFKA_BOOTSTRAP_SERVERS = "KAFKA_BOOTSTRAP_SERVERS";
 		}
 
 		public static final class Kafka {

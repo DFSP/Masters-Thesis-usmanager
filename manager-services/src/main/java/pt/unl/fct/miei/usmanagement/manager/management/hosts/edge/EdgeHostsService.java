@@ -45,7 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRule
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
@@ -201,7 +201,7 @@ public class EdgeHostsService {
 		log.info("Updating edgeHost {} with {}",
 			ToStringBuilder.reflectionToString(edgeHost),
 			ToStringBuilder.reflectionToString(newEdgeHost));
-		ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
+		EntityUtils.copyValidProperties(newEdgeHost, edgeHost);
 		edgeHost = saveEdgeHost(edgeHost);
 		kafkaService.sendEdgeHost(edgeHost);
 		return edgeHost;

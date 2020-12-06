@@ -32,6 +32,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.springframework.data.domain.Persistable;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
@@ -59,7 +61,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "conditions")
-public class Condition {
+public class Condition extends AbstractEntity<Long> {
 
 	@Id
 	@GeneratedValue
@@ -69,15 +71,15 @@ public class Condition {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "value_mode_id")
 	private ValueMode valueMode;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "field_id")
 	private Field field;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "operator_id")
 	private Operator operator;
 

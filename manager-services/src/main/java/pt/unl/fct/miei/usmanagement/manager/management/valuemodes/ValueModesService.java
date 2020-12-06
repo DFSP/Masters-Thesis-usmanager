@@ -30,7 +30,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModes;
 
@@ -73,7 +73,7 @@ public class ValueModesService {
 	public ValueMode updateValueMode(String valueModeName, ValueMode newValueMode) {
 		ValueMode valueMode = getValueMode(valueModeName);
 		log.info("Updating valueMode {} with {}", ToStringBuilder.reflectionToString(valueMode), ToStringBuilder.reflectionToString(newValueMode));
-		ObjectUtils.copyValidProperties(newValueMode, valueMode);
+		EntityUtils.copyValidProperties(newValueMode, valueMode);
 		valueMode = saveValueMode(valueMode);
 		kafkaService.sendValueMode(valueMode);
 		return valueMode;

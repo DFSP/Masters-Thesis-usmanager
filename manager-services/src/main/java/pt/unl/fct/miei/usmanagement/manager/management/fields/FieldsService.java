@@ -32,7 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class FieldsService {
 	public Field updateField(String fieldName, Field newField) {
 		Field field = getField(fieldName);
 		log.info("Updating field {} with {}", ToStringBuilder.reflectionToString(field), ToStringBuilder.reflectionToString(newField));
-		ObjectUtils.copyValidProperties(newField, field);
+		EntityUtils.copyValidProperties(newField, field);
 		field = saveField(field);
 		kafkaService.sendField(field);
 		return field;

@@ -48,7 +48,7 @@ public class SyncService {
 		this.nodesService = nodesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
-		this.externalId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
+		this.externalId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 	}
 
 	public void startContainersDatabaseSynchronization() {

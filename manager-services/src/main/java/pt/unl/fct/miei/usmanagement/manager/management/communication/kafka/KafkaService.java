@@ -2,6 +2,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.KafkaException;
@@ -114,6 +115,7 @@ public class KafkaService {
 	private final KafkaBrokers kafkaBrokers;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 	private final String managerId;
+	private final String kafkaBootstrapServers;
 	private final AtomicLong increment;
 	private boolean populated;
 
@@ -170,7 +172,8 @@ public class KafkaService {
 		this.kafkaBrokers = kafkaBrokers;
 		this.kafkaTemplate = kafkaTemplate;
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
-		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+		this.kafkaBootstrapServers = environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS);
 		this.increment = new AtomicLong();
 		this.populated = false;
 	}
@@ -246,7 +249,9 @@ public class KafkaService {
 	}
 
 	public String getKafkaBrokersHosts() {
-		return elasticIpsService.getElasticIps().stream()
+		return kafkaBootstrapServers != null
+			? kafkaBootstrapServers
+			: elasticIpsService.getElasticIps().stream()
 			.filter(elasticIp -> elasticIp.getAssociationId() != null)
 			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT))
 			.collect(Collectors.joining(","));
@@ -328,11 +333,11 @@ public class KafkaService {
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
 
-		topicsValues.put("apps", () -> appsService.getApps().stream().map(AppMessage::new).collect(Collectors.toList()));
+		/*topicsValues.put("apps", () -> appsService.getApps().stream().map(AppMessage::new).collect(Collectors.toList()));
 		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHosts().stream().map(CloudHostMessage::new).collect(Collectors.toList()));
-		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeMessage::new).collect(Collectors.toList()));
+		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeMessage::new).collect(Collectors.toList()));*/
 		topicsValues.put("conditions", () -> conditionsService.getConditions().stream().map(ConditionMessage::new).collect(Collectors.toList()));
-		topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerMessage::new).collect(Collectors.toList()));
+		/*topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerMessage::new).collect(Collectors.toList()));
 		topicsValues.put("decisions", () -> decisionsService.getDecisions().stream().map(DecisionMessage::new).collect(Collectors.toList()));
 		topicsValues.put("edge-hosts", () -> edgeHostsService.getEdgeHosts().stream().map(EdgeHostMessage::new).collect(Collectors.toList()));
 		topicsValues.put("eips", () -> elasticIpsService.getElasticIps().stream().map(ElasticIpMessage::new).collect(Collectors.toList()));
@@ -348,7 +353,7 @@ public class KafkaService {
 		topicsValues.put("app-rules", () -> appRulesService.getRules().stream().map(AppRuleMessage::new).collect(Collectors.toList()));
 		topicsValues.put("service-rules", () -> serviceRulesService.getRules().stream().map(ServiceRuleMessage::new).collect(Collectors.toList()));
 		topicsValues.put("container-rules", () -> containerRulesService.getRules().stream().map(ContainerRuleMessage::new).collect(Collectors.toList()));
-		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeMessage::new).collect(Collectors.toList()));
+		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeMessage::new).collect(Collectors.toList()));*/
 		return topicsValues;
 	}
 
@@ -360,6 +365,10 @@ public class KafkaService {
 		String workerManagerTopics = "host-events:1:1,service-events:1:1,host-monitoring-logs:1:1,service-monitoring-logs:1:1,"
 			+ "host-decisions:1:1,service-decisions:1:1";
 		return masterManagerTopics + "," + workerManagerTopics;
+	}
+
+	public void start() {
+		kafkaListenerEndpointRegistry.start();
 	}
 
 	public void restart() {
@@ -617,11 +626,11 @@ public class KafkaService {
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
 		if (hasKafkaBrokers && populated) {
-			log.info("Sending {} to kafka", message.toString());
+			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, message);
 		}
 		else {
-			log.warn("Not sending message id={} to kafka topic {} because hasKafkaBrokers={} and populated={}",
+			log.warn("Not sending message id={} to topic={} because hasKafkaBrokers={} and populated={}",
 				id, topic, hasKafkaBrokers, populated);
 		}
 	}
@@ -630,11 +639,11 @@ public class KafkaService {
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
 		if (hasKafkaBrokers && populated) {
-			log.info("Sending DELETE id={} request to kafka topic {}", id, topic);
+			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, "DELETE", id);
 		}
 		else {
-			log.warn("Not sending DELETE id={} request to kafka topic {} because hasKafkaBrokers={} and populated={}",
+			log.warn("Not sending DELETE id={} request to topic={} because hasKafkaBrokers={} and populated={}",
 				id, topic, hasKafkaBrokers, populated);
 		}
 	}

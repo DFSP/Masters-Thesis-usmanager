@@ -37,7 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsSer
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -91,7 +91,7 @@ public class HostSimulatedMetricsService {
 		log.info("Updating simulated host metric {} with {}", simulatedMetricName,
 			ToStringBuilder.reflectionToString(newHostSimulatedMetric));
 		HostSimulatedMetric hostSimulatedMetric = getHostSimulatedMetric(simulatedMetricName);
-		ObjectUtils.copyValidProperties(newHostSimulatedMetric, hostSimulatedMetric);
+		EntityUtils.copyValidProperties(newHostSimulatedMetric, hostSimulatedMetric);
 		hostSimulatedMetric = saveHostSimulatedMetric(hostSimulatedMetric);
 		kafkaService.sendHostSimulatedMetric(hostSimulatedMetric);
 		return hostSimulatedMetric;

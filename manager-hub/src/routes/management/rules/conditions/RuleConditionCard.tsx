@@ -89,7 +89,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
                                   margin={'10px 0'}
                                   hoverable
                                   delete={{
-                                      url: `simulated-metrics/services/${condition.name}`,
+                                      url: `rules/conditions/${condition.name}`,
                                       successCallback: this.onDeleteSuccess,
                                       failureCallback: this.onDeleteFailure,
                                   }}

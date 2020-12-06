@@ -34,54 +34,66 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.WorkerSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class ManagerWorkerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final HostsService hostsService;
-	private final WorkerSymService symService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final SyncService syncService;
+	private final KafkaService kafkaService;
 	private final Environment environment;
 
-	public ManagerWorkerStartup(WorkerSymService symService, HostsService hostsService,
-								ServicesMonitoringService servicesMonitoringService,
+	public ManagerWorkerStartup(HostsService hostsService, ServicesMonitoringService servicesMonitoringService,
 								HostsMonitoringService hostsMonitoringService, SyncService syncService,
-								Environment environment) {
-		this.symService = symService;
+								KafkaService kafkaService, Environment environment) {
 		this.hostsService = hostsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.syncService = syncService;
+		this.kafkaService = kafkaService;
 		this.environment = environment;
 	}
 
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-		if (environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS) == null
-			/*|| environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID) == null
-			|| environment.getProperty(ContainerConstants.Environment.Manager.REGISTRATION_URL) == null*/) {
-			System.out.printf("usage: %s is required\n", ContainerConstants.Environment.Manager.HOST_ADDRESS);
-			System.exit(1);
-		}
+		requireEnvVars();
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
-		/*String externalId = environment.getProperty(ContainerConstants.Environment.Manager.EXTERNAL_ID);
-		String registrationUrl = environment.getProperty(ContainerConstants.Environment.Manager.REGISTRATION_URL);
-		symService.startSymmetricDsService(externalId, registrationUrl, hostAddress);*/
-		servicesMonitoringService.initServiceMonitorTimer();
+		kafkaService.start();
+		/*servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startContainersDatabaseSynchronization();
-		syncService.startNodesDatabaseSynchronization();
+		syncService.startNodesDatabaseSynchronization();*/
+	}
+
+	private void requireEnvVars() {
+		Map<String, String> vars = new HashMap<>(3);
+		vars.put(ContainerConstants.Environment.Manager.HOST_ADDRESS,
+			environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS));
+		vars.put(ContainerConstants.Environment.Manager.ID,
+			environment.getProperty(ContainerConstants.Environment.Manager.ID));
+		vars.put(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS,
+			environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS));
+		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
+		if (!requiredVars.isEmpty()) {
+			log.error("Usage: {} is required and {} is missing", vars.keySet(), requiredVars);
+			System.exit(1);
+		}
 	}
 
 }

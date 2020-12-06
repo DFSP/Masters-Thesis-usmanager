@@ -43,7 +43,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
-import pt.unl.fct.miei.usmanagement.manager.util.ObjectUtils;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -93,7 +93,6 @@ public class AppsService {
 	public App addApp(App app) {
 		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
-		kafkaService.sendApp(app);
 		app = saveApp(app);
 		kafkaService.sendApp(app);
 		return app;
@@ -102,7 +101,7 @@ public class AppsService {
 	public App updateApp(String appName, App newApp) {
 		App app = getApp(appName);
 		log.info("Updating app {} with {}", ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
-		ObjectUtils.copyValidProperties(newApp, app);
+		EntityUtils.copyValidProperties(newApp, app);
 		app = saveApp(app);
 		kafkaService.sendApp(app);
 		return app;

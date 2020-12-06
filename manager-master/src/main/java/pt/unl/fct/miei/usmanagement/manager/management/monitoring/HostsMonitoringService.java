@@ -175,7 +175,7 @@ public class HostsMonitoringService {
 	}
 
 	public HostMonitoringLog addHostMonitoringLog(HostMonitoringLog hostMonitoringLog) {
-		hostMonitoringLogs.save(hostMonitoringLog);
+		return hostMonitoringLogs.save(hostMonitoringLog);
 	}
 
 	public List<HostMonitoringLog> getHostMonitoringLogs() {
