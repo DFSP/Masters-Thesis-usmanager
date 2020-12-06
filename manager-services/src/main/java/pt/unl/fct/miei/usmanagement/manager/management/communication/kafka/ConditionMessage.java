@@ -12,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
+import java.util.LinkedList;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -50,9 +51,9 @@ public class ConditionMessage {
 			.field(field)
 			.operator(operator)
 			.value(value)
-			.hostConditions(hostConditions)
-			.serviceConditions(serviceConditions)
-			.containerConditions(containerConditions)
+			.hostConditions(hostConditions != null ? hostConditions : new LinkedList<>())
+			.serviceConditions(serviceConditions != null ? serviceConditions : new LinkedList<>())
+			.containerConditions(containerConditions != null ? containerConditions : new LinkedList<>())
 			.build();
 	}
 }

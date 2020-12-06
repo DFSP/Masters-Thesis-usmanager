@@ -32,8 +32,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import org.springframework.data.domain.Persistable;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
@@ -45,6 +43,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -61,10 +60,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "conditions")
-public class Condition extends AbstractEntity<Long> {
+public class Condition {
 
 	@Id
-	@GeneratedValue
 	private Long id;
 
 	@NotNull

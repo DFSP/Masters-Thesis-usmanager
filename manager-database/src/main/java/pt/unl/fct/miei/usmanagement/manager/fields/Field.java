@@ -70,7 +70,7 @@ public class Field {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<Condition> conditions;
 
 	@Singular

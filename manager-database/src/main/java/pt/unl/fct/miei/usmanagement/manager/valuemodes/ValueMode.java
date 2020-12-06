@@ -64,7 +64,7 @@ public class ValueMode {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "valueMode")
 	private Set<Condition> conditions;
 
 	@Override

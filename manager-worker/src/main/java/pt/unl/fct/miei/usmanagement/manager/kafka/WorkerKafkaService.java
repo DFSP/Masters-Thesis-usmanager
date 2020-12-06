@@ -134,12 +134,16 @@ public class WorkerKafkaService {
 	@KafkaListener(groupId = "manager-worker", topics = "apps", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
 		log.info("Received key={} message={}", key, appMessage.toString());
-		if (Objects.equal(key, "DELETE")) {
-			/*appsService.deleteApp();*/
-		}
-		else {
-			App app = appMessage.get();
-			appsService.addApp(app);
+		try {
+			if (Objects.equal(key, "DELETE")) {
+				/*appsService.deleteApp();*/
+			}
+			else {
+				App app = appMessage.get();
+				appsService.saveApp(app);
+			}
+		} catch (Exception e) {
+			log.error("Error while processing {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());
 		}
 	}
 
@@ -157,16 +161,25 @@ public class WorkerKafkaService {
 
 	@KafkaListener(groupId = "manager-worker", topics = "component-types", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeMessage componentTypeMessage) {
-		log.info("Received key={} message={}", key, componentTypeMessage.toString());
+		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(componentTypeMessage));
 		ComponentType componentType = componentTypeMessage.get();
-		componentTypesService.saveComponentType(componentType);
+		try {
+			componentTypesService.saveComponentType(componentType);
+		} catch (Exception e) {
+			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(componentType), e.getMessage());
+		}
 	}
 
 	@KafkaListener(groupId = "manager-worker", topics = "conditions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
-		log.info("Received key={} message={}", key, conditionMessage.toString());
+		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionMessage));
 		Condition condition = conditionMessage.get();
 		try {
+			condition.setField(null);
+			condition.setOperator(null);
+			condition.setValueMode(null);
+			log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(condition));
+			/*valueModesService.saveValueMode(condition.getValueMode());*/
 			conditionsService.saveCondition(condition);
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());
