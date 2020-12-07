@@ -88,6 +88,10 @@ public class ConditionsService {
 		return conditions.save(condition);
 	}
 
+	public void deleteCondition(Long id) {
+		conditions.deleteById(id);
+	}
+
 	public void deleteCondition(String conditionName) {
 		Condition condition = getCondition(conditionName);
 		conditions.delete(condition);

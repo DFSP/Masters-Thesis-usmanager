@@ -65,11 +65,11 @@ public class HostDecision {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "rule_id")
 	private HostRule rule;
 

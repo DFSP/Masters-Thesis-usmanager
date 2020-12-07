@@ -53,7 +53,7 @@ import java.util.Objects;
 @Table(name = "host_events")
 public class HostEvent {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -70,7 +70,6 @@ public class HostEvent {
 	@NotNull
 	private String managerPrivateIpAddress;
 
-	@JsonIgnoreProperties({"componentType"})
 	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;

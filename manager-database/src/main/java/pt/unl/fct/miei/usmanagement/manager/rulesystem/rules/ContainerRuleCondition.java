@@ -56,11 +56,11 @@ public class ContainerRuleCondition {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "container_rule_id")
 	private ContainerRule containerRule;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "condition_id")
 	private Condition containerCondition;
 

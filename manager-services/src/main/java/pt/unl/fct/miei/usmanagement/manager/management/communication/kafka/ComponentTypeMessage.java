@@ -20,6 +20,10 @@ public class ComponentTypeMessage {
 	private ComponentTypeEnum type;
 	private Set<Decision> decisions;
 
+	public ComponentTypeMessage(Long id) {
+		this.id = id;
+	}
+
 	public ComponentTypeMessage(ComponentType componentType) {
 		this.id = componentType.getId();
 		this.type = componentType.getType();

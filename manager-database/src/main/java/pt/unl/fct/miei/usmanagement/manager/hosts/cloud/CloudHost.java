@@ -94,7 +94,7 @@ public class CloudHost {
 	private AwsRegion awsRegion;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private WorkerManager managedByWorker;
 
 	@Singular

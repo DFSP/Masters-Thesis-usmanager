@@ -117,6 +117,10 @@ public class DecisionsService {
 		return decisions.save(decision);
 	}
 
+	public void deleteDecision(Long id) {
+		decisions.deleteById(id);
+	}
+
 	public List<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> getServicesPossibleDecisions() {
 		return decisions.findByComponentTypeType(ComponentTypeEnum.SERVICE);
 	}

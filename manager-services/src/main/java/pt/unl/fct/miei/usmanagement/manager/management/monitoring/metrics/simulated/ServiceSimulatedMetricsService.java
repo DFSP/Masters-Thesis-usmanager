@@ -96,11 +96,21 @@ public class ServiceSimulatedMetricsService {
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
 
+	public void deleteServiceSimulatedMetric(Long id) {
+		log.info("Deleting simulated service metric {}", id);
+		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(id);
+		deleteServiceSimulatedMetric(serviceSimulatedMetric);
+	}
+
 	public void deleteServiceSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated service metric {}", simulatedMetricName);
 		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
-		serviceSimulatedMetric.removeAssociations();
-		serviceSimulatedMetrics.delete(serviceSimulatedMetric);
+		deleteServiceSimulatedMetric(serviceSimulatedMetric);
+	}
+
+	public void deleteServiceSimulatedMetric(ServiceSimulatedMetric simulatedMetric) {
+		simulatedMetric.removeAssociations();
+		serviceSimulatedMetrics.delete(simulatedMetric);
 	}
 
 	public List<ServiceSimulatedMetric> getGenericServiceSimulatedMetrics() {

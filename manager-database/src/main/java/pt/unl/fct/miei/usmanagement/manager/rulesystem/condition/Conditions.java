@@ -37,9 +37,6 @@ public interface Conditions extends JpaRepository<Condition, Long> {
 		+ "where lower(c.name) = lower(:name)")
 	boolean hasCondition(@Param("name") String name);
 
-	@Query("select c "
-		+ "from Condition c left join fetch c.hostConditions left join fetch c.appConditions left join fetch c.serviceConditions left join fetch c.containerConditions "
-		+ "where lower(c.name) = lower(:name)")
 	Optional<Condition> findByNameIgnoreCase(@Param("name") String name);
 
 }

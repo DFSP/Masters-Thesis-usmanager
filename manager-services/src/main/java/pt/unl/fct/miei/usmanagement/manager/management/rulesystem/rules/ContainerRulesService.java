@@ -99,9 +99,19 @@ public class ContainerRulesService {
 		return containerRule;
 	}
 
+	public void deleteRule(Long id) {
+		log.info("Deleting rule {}", id);
+		ContainerRule rule = getRule(id);
+		deleteRule(rule);
+	}
+
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		ContainerRule rule = getRule(ruleName);
+		deleteRule(rule);
+	}
+
+	public void deleteRule(ContainerRule rule) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		serviceRulesService.setLastUpdateServiceRules();

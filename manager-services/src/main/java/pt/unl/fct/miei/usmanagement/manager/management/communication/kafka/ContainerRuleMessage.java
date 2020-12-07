@@ -24,6 +24,10 @@ public class ContainerRuleMessage {
 	private Set<Container> containers;
 	private Set<ContainerRuleCondition> conditions;
 
+	public ContainerRuleMessage(Long id) {
+		this.id = id;
+	}
+
 	public ContainerRuleMessage(ContainerRule containerRule) {
 		this.id = containerRule.getId();
 		this.name = containerRule.getName();

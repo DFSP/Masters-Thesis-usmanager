@@ -211,6 +211,10 @@ public class EdgeHostsService {
 		return edgeHosts.save(edgeHost);
 	}
 
+	public void deleteEdgeHost(Long id) {
+		edgeHosts.deleteById(id);
+	}
+
 	public void deleteEdgeHost(HostAddress hostAddress) {
 		EdgeHost edgeHost = getEdgeHostByAddress(hostAddress);
 		edgeHosts.delete(edgeHost);

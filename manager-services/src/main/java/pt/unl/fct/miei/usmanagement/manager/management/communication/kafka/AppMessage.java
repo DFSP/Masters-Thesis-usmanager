@@ -9,6 +9,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -24,6 +25,10 @@ public class AppMessage {
 	private Set<AppRule> appRules;
 	private Set<AppSimulatedMetric> simulatedAppMetrics;
 
+	public AppMessage(Long id) {
+		this.id = id;
+	}
+
 	public AppMessage(App app) {
 		this.id = app.getId();
 		this.name = app.getName();
@@ -38,9 +43,9 @@ public class AppMessage {
 			.id(id)
 			.name(name)
 			.description(description)
-			.appServices(appServices)
-			.appRules(appRules)
-			.simulatedAppMetrics(simulatedAppMetrics)
+			.appServices(appServices == null ? new HashSet<>() : appServices)
+			.appRules(appRules == null ? new HashSet<>() : appRules)
+			.simulatedAppMetrics(simulatedAppMetrics == null ? new HashSet<>() : simulatedAppMetrics)
 			.build();
 	}
 

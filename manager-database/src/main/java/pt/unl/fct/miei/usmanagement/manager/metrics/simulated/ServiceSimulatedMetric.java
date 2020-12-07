@@ -69,7 +69,7 @@ public class ServiceSimulatedMetric {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "field_id")
 	private Field field;
 

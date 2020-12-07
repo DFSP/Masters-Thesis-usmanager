@@ -128,9 +128,19 @@ public class HostRulesService {
 		return hostRule;
 	}
 
+	public void deleteRule(Long id) {
+		log.info("Deleting rule {}", id);
+		HostRule rule = getRule(id);
+		deleteRule(rule);
+	}
+
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		HostRule rule = getRule(ruleName);
+		deleteRule(rule);
+	}
+
+	public void deleteRule(HostRule rule) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateHostRules();

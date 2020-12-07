@@ -28,6 +28,10 @@ public class HostSimulatedMetricMessage {
 	private Set<CloudHost> cloudHosts;
 	private Set<EdgeHost> edgeHosts;
 
+	public HostSimulatedMetricMessage(Long id) {
+		this.id = id;
+	}
+
 	public HostSimulatedMetricMessage(HostSimulatedMetric hostSimulatedMetric) {
 		this.id = hostSimulatedMetric.getId();
 		this.name = hostSimulatedMetric.getName();

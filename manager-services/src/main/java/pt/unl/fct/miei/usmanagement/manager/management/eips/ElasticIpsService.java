@@ -276,4 +276,8 @@ public class ElasticIpsService {
 			return associateElasticIpAddress(region, allocationId, cloudHost).getAddress();
 		}
 	}
+
+	public void deleteElasticIp(Long id) {
+		elasticIps.deleteById(id);
+	}
 }

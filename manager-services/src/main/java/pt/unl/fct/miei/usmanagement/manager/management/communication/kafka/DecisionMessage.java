@@ -24,6 +24,10 @@ public class DecisionMessage {
 	private Set<ServiceEvent> serviceEvents;
 	private Set<HostEvent> hostEvents;
 
+	public DecisionMessage(Long id) {
+		this.id = id;
+	}
+
 	public DecisionMessage(Decision decision) {
 		this.id = decision.getId();
 		this.ruleDecision = decision.getRuleDecision();

@@ -30,6 +30,10 @@ public class EdgeHostMessage {
 	private Set<HostRule> hostRules;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
+	public EdgeHostMessage(Long id) {
+		this.id = id;
+	}
+
 	public EdgeHostMessage(EdgeHost edgeHost) {
 		this.id = edgeHost.getId();
 		this.username = edgeHost.getUsername();

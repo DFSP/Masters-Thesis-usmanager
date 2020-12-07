@@ -61,7 +61,7 @@ import java.util.Set;
 @Table(name = "host_rules")
 public class HostRule {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -72,7 +72,7 @@ public class HostRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

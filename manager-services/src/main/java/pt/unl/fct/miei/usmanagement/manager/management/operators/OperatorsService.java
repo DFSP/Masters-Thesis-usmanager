@@ -84,6 +84,10 @@ public class OperatorsService {
 		return operator;
 	}
 
+	public void deleteOperator(Long id) {
+		operators.deleteById(id);
+	}
+
 	public void deleteOperator(String operatorName) {
 		Operator operator = getOperator(operatorName);
 		operators.delete(operator);

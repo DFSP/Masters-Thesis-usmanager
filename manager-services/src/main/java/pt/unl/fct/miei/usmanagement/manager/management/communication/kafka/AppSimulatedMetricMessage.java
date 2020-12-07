@@ -25,6 +25,10 @@ public class AppSimulatedMetricMessage {
 	private boolean active;
 	private Set<App> apps;
 
+	public AppSimulatedMetricMessage(Long id) {
+		this.id = id;
+	}
+
 	public AppSimulatedMetricMessage(AppSimulatedMetric appSimulatedMetric) {
 		this.id = appSimulatedMetric.getId();
 		this.name = appSimulatedMetric.getName();

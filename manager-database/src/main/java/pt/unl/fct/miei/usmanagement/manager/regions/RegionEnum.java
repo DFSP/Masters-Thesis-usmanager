@@ -42,9 +42,9 @@ import java.util.Objects;
 @ToString
 public enum RegionEnum {
 
+	EUROPE("Europe", new Coordinates("Europe", 49.540486, 9.881931)),
 	NORTH_AMERICA("North America", new Coordinates("North America", 39.787092, -99.754244)),
 	SOUTH_AMERICA("South America", new Coordinates("South America", -14.864205, -55.902655)),
-	EUROPE("Europe", new Coordinates("Europe", 49.540486, 9.881931)),
 	AFRICA("Africa", new Coordinates("Africa", 4.256283, 23.308534)),
 	MIDDLE_EAST("Middle East", new Coordinates("Middle East", 31.971059, 46.572714)),
 	ASIA("Asia", new Coordinates("Asia", 35.360601, 95.728129)),

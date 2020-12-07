@@ -389,7 +389,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteApp(App app) {
-		delete("apps", app.getId());
+		delete("apps", new AppMessage(app.getId()));
 	}
 
 	@Async
@@ -399,7 +399,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteCloudHost(CloudHost cloudHost) {
-		delete("cloud-hosts", cloudHost.getId());
+		delete("cloud-hosts", new CloudHostMessage(cloudHost.getId()));
 	}
 
 	@Async
@@ -409,7 +409,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteComponentType(ComponentType componentType) {
-		delete("component-types", componentType.getId());
+		delete("component-types", new ComponentTypeMessage(componentType.getId()));
 	}
 
 	@Async
@@ -419,7 +419,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteCondition(Condition condition) {
-		delete("conditions", condition.getId());
+		delete("conditions", new ConditionMessage(condition.getId()));
 	}
 
 	@Async
@@ -429,7 +429,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteContainer(Container container) {
-		delete("containers", container.getId());
+		delete("containers", new ContainerMessage(container.getId()));
 	}
 
 	@Async
@@ -439,7 +439,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteDecision(Decision decision) {
-		delete("decisions", decision.getId());
+		delete("decisions", new DecisionMessage(decision.getId()));
 	}
 
 	@Async
@@ -449,7 +449,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteEdgeHost(EdgeHost edgeHost) {
-		delete("edge-hosts", edgeHost.getId());
+		delete("edge-hosts", new EdgeHostMessage(edgeHost.getId()));
 	}
 
 	@Async
@@ -459,7 +459,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteElasticIp(ElasticIp elasticIp) {
-		delete("eips", elasticIp.getId());
+		delete("eips", new ElasticIpMessage(elasticIp.getId()));
 	}
 
 	@Async
@@ -469,7 +469,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteField(Field field) {
-		delete("fields", field.getId());
+		delete("fields", new FieldMessage(field.getId()));
 	}
 
 	@Async
@@ -479,7 +479,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteNode(Node node) {
-		delete("nodes", node.getId());
+		delete("nodes", new NodeMessage(node.getId()));
 	}
 
 	@Async
@@ -489,7 +489,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteOperator(Operator operator) {
-		delete("operators", operator.getId());
+		delete("operators", new OperatorMessage(operator.getId()));
 	}
 
 	@Async
@@ -499,7 +499,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		delete("services", service.getId());
+		delete("services", new ServiceMessage(service.getId()));
 	}
 
 	@Async
@@ -509,7 +509,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
-		delete("simulated-host-metrics", hostSimulatedMetric.getId());
+		delete("simulated-host-metrics", new HostSimulatedMetricMessage(hostSimulatedMetric.getId()));
 	}
 
 	@Async
@@ -519,7 +519,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
-		delete("simulated-app-metrics", appSimulatedMetric.getId());
+		delete("simulated-app-metrics", new AppSimulatedMetricMessage(appSimulatedMetric.getId()));
 	}
 
 	@Async
@@ -529,7 +529,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
-		delete("simulated-service-metrics", serviceSimulatedMetric.getId());
+		delete("simulated-service-metrics", new ServiceSimulatedMetricMessage(serviceSimulatedMetric.getId()));
 	}
 
 	@Async
@@ -539,7 +539,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
-		delete("simulated-container-metrics", containerSimulatedMetric.getId());
+		delete("simulated-container-metrics", new ContainerSimulatedMetricMessage(containerSimulatedMetric.getId()));
 	}
 
 	@Async
@@ -549,7 +549,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteHostRule(HostRule hostRule) {
-		delete("host-rules", hostRule.getId());
+		delete("host-rules", new HostRuleMessage(hostRule.getId()));
 	}
 
 	@Async
@@ -559,7 +559,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteAppRule(AppRule appRule) {
-		delete("app-rules", appRule.getId());
+		delete("app-rules", new AppRuleMessage(appRule.getId()));
 	}
 
 	@Async
@@ -569,7 +569,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteServiceRule(ServiceRule serviceRule) {
-		delete("service-rules", serviceRule.getId());
+		delete("service-rules", new ServiceRuleMessage(serviceRule.getId()));
 	}
 
 	@Async
@@ -579,7 +579,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteContainerRule(ContainerRule containerRule) {
-		delete("container-rules", containerRule.getId());
+		delete("container-rules", new ContainerRuleMessage(containerRule.getId()));
 	}
 
 	@Async
@@ -589,7 +589,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDeleteValueMode(ValueMode valueMode) {
-		delete("value-modes", valueMode.getId());
+		delete("value-modes", new ValueModeMessage(valueMode.getId()));
 	}
 
 	@Async

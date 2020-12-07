@@ -101,9 +101,18 @@ public class AppRulesService {
 		return rule;
 	}
 
+	public void deleteRule(Long id) {
+		log.info("Deleting rule {}", id);
+		AppRule rule = getRule(id);
+
+	}
+
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		AppRule rule = getRule(ruleName);
+	}
+
+	public void deleteRule(AppRule rule) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		serviceRulesService.setLastUpdateServiceRules();

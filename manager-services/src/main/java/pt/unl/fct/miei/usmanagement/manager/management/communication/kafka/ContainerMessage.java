@@ -39,6 +39,10 @@ public class ContainerMessage {
 	private Set<ContainerRule> containerRules;
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
 
+	public ContainerMessage(String id) {
+		this.id = id;
+	}
+
 	public ContainerMessage(Container container) {
 		this.id = container.getId();
 		this.type = container.getType();

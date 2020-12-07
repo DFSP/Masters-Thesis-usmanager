@@ -135,11 +135,12 @@ public class WorkerKafkaService {
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
 		log.info("Received key={} message={}", key, appMessage.toString());
 		try {
+			App app = appMessage.get();
 			if (Objects.equal(key, "DELETE")) {
-				/*appsService.deleteApp();*/
+				Long id = app.getId();
+				appsService.deleteApp(id);
 			}
 			else {
-				App app = appMessage.get();
 				appsService.saveApp(app);
 			}
 		} catch (Exception e) {
@@ -152,7 +153,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, cloudHostMessage.toString());
 		CloudHost cloudHost = cloudHostMessage.get();
 		try {
-			cloudHostsService.saveCloudHost(cloudHost);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = cloudHost.getId();
+				cloudHostsService.deleteCloudHost(id);
+			}
+			else {
+				cloudHostsService.saveCloudHost(cloudHost);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(cloudHost), e.getMessage());
 		}
@@ -164,7 +171,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(componentTypeMessage));
 		ComponentType componentType = componentTypeMessage.get();
 		try {
-			componentTypesService.saveComponentType(componentType);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = componentType.getId();
+				componentTypesService.deleteComponentType(id);
+			}
+			else {
+				componentTypesService.saveComponentType(componentType);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(componentType), e.getMessage());
 		}
@@ -175,14 +188,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionMessage));
 		Condition condition = conditionMessage.get();
 		try {
-			/*condition.getField().setId(null);
-			condition.getValueMode().setId(null);
-			condition.getOperator().setId(null);*/
-			log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(condition));
-			log.info("{}", ToStringBuilder.reflectionToString(condition.getField()));
-			log.info("{}", ToStringBuilder.reflectionToString(condition.getOperator()));
-			log.info("{}", ToStringBuilder.reflectionToString(condition.getValueMode()));
-			conditionsService.saveCondition(condition);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = condition.getId();
+				conditionsService.deleteCondition(id);
+			}
+			else {
+				conditionsService.saveCondition(condition);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());
 		}
@@ -193,7 +205,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, containerMessage.toString());
 		Container container = containerMessage.get();
 		try {
-			containersService.saveContainer(container);
+			if (Objects.equal(key, "DELETE")) {
+				String id = container.getId();
+				containersService.deleteContainer(id);
+			}
+			else {
+				containersService.saveContainer(container);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(container), e.getMessage());
 		}
@@ -204,7 +222,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, decisionMessage.toString());
 		Decision decision = decisionMessage.get();
 		try {
-			decisionsService.saveDecision(decision);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = decision.getId();
+				decisionsService.deleteDecision(id);
+			}
+			else {
+				decisionsService.saveDecision(decision);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(decision), e.getMessage());
 		}
@@ -215,7 +239,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, edgeHostMessage.toString());
 		EdgeHost edgeHost = edgeHostMessage.get();
 		try {
-			edgeHostsService.saveEdgeHost(edgeHost);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = edgeHost.getId();
+				edgeHostsService.deleteEdgeHost(id);
+			}
+			else {
+				edgeHostsService.saveEdgeHost(edgeHost);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(edgeHost), e.getMessage());
 		}
@@ -226,7 +256,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, elasticIpMessage.toString());
 		ElasticIp elasticIp = elasticIpMessage.get();
 		try {
-			elasticIpsService.saveElasticIp(elasticIp);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = elasticIp.getId();
+				elasticIpsService.deleteElasticIp(id);
+			}
+			else {
+				elasticIpsService.saveElasticIp(elasticIp);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(elasticIp), e.getMessage());
 		}
@@ -237,7 +273,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, fieldMessage.toString());
 		Field field = fieldMessage.get();
 		try {
-			fieldsService.saveField(field);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = field.getId();
+				fieldsService.deleteField(id);
+			}
+			else {
+				fieldsService.saveField(field);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(field), e.getMessage());
 		}
@@ -248,7 +290,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, nodeMessage.toString());
 		Node node = nodeMessage.get();
 		try {
-			nodesService.saveNode(node);
+			if (Objects.equal(key, "DELETE")) {
+				String id = node.getId();
+				nodesService.deleteNode(id);
+			}
+			else {
+				nodesService.saveNode(node);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(node), e.getMessage());
 		}
@@ -259,7 +307,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, operatorMessage.toString());
 		Operator operator = operatorMessage.get();
 		try {
-			operatorsService.saveOperator(operator);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = operator.getId();
+				operatorsService.deleteOperator(id);
+			}
+			else {
+				operatorsService.saveOperator(operator);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(operator), e.getMessage());
 		}
@@ -270,7 +324,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, serviceMessage.toString());
 		pt.unl.fct.miei.usmanagement.manager.services.Service service = serviceMessage.get();
 		try {
-			servicesService.saveService(service);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = service.getId();
+				servicesService.deleteService(id);
+			}
+			else {
+				servicesService.saveService(service);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(service), e.getMessage());
 		}
@@ -281,7 +341,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, hostSimulatedMetricMessage.toString());
 		HostSimulatedMetric hostSimulatedMetric = hostSimulatedMetricMessage.get();
 		try {
-			hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = hostSimulatedMetric.getId();
+				hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
+			}
+			else {
+				hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetric), e.getMessage());
 		}
@@ -292,7 +358,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, appSimulatedMetricMessage.toString());
 		AppSimulatedMetric appSimulatedMetric = appSimulatedMetricMessage.get();
 		try {
-			appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = appSimulatedMetric.getId();
+				appSimulatedMetricsService.deleteAppSimulatedMetric(id);
+			}
+			else {
+				appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetric), e.getMessage());
 		}
@@ -303,7 +375,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, serviceSimulatedMetricMessage.toString());
 		ServiceSimulatedMetric serviceSimulatedMetric = serviceSimulatedMetricMessage.get();
 		try {
-			serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = serviceSimulatedMetric.getId();
+				serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
+			}
+			else {
+				serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric), e.getMessage());
 		}
@@ -314,7 +392,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, containerSimulatedMetricMessage.toString());
 		ContainerSimulatedMetric containerSimulatedMetric = containerSimulatedMetricMessage.get();
 		try {
-			containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = containerSimulatedMetric.getId();
+				containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
+			}
+			else {
+				containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetric), e.getMessage());
 		}
@@ -325,7 +409,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, hostRuleMessage.toString());
 		HostRule hostRule = hostRuleMessage.get();
 		try {
-			hostRulesService.saveRule(hostRule);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = hostRule.getId();
+				hostRulesService.deleteRule(id);
+			}
+			else {
+				hostRulesService.saveRule(hostRule);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostRule), e.getMessage());
 		}
@@ -336,7 +426,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, appRuleMessage.toString());
 		AppRule appRule = appRuleMessage.get();
 		try {
-			appRulesService.saveRule(appRule);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = appRule.getId();
+				appRulesService.deleteRule(id);
+			}
+			else {
+				appRulesService.saveRule(appRule);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appRule), e.getMessage());
 		}
@@ -347,7 +443,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, serviceRuleMessage.toString());
 		ServiceRule serviceRule = serviceRuleMessage.get();
 		try {
-			serviceRulesService.saveRule(serviceRule);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = serviceRule.getId();
+				serviceRulesService.deleteRule(id);
+			}
+			else {
+				serviceRulesService.saveRule(serviceRule);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceRule), e.getMessage());
 		}
@@ -358,7 +460,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, containerRuleMessage.toString());
 		ContainerRule containerRule = containerRuleMessage.get();
 		try {
-			containerRulesService.saveRule(containerRule);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = containerRule.getId();
+				containerRulesService.deleteRule(id);
+			}
+			else {
+				containerRulesService.saveRule(containerRule);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerRule), e.getMessage());
 		}
@@ -369,7 +477,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, valueModeMessage.toString());
 		ValueMode valueMode = valueModeMessage.get();
 		try {
-			valueModesService.saveValueMode(valueMode);
+			if (Objects.equal(key, "DELETE")) {
+				Long id = valueMode.getId();
+				valueModesService.deleteValueMode(id);
+			}
+			else {
+				valueModesService.saveValueMode(valueMode);
+			}
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(valueMode), e.getMessage());
 		}

@@ -24,18 +24,22 @@
 
 package pt.unl.fct.miei.usmanagement.manager.containers;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public final class ContainerPortMapping implements Serializable {
 
 	private static final long serialVersionUID = 2141637578615092539L;
 
-	private final int privatePort;
-	private final int publicPort;
-	private final String type;
-	private final String ip;
+	private int privatePort;
+	private int publicPort;
+	private String type;
+	private String ip;
 
 }

@@ -58,11 +58,11 @@ public class AppService {
 	private Long id;
 
 	@JsonIgnore
-@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "app_id")
 	private App app;
 
-@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "service_id")
 	private Service service;
 

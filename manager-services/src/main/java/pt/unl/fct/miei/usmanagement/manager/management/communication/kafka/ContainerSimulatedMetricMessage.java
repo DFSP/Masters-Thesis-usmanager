@@ -25,6 +25,10 @@ public class ContainerSimulatedMetricMessage {
 	private boolean active;
 	private Set<Container> containers;
 
+	public ContainerSimulatedMetricMessage(Long id) {
+		this.id = id;
+	}
+
 	public ContainerSimulatedMetricMessage(ContainerSimulatedMetric containerSimulatedMetric) {
 		this.id = containerSimulatedMetric.getId();
 		this.name = containerSimulatedMetric.getName();

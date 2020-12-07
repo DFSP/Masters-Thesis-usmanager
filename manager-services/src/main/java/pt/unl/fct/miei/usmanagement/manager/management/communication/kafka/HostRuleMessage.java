@@ -18,6 +18,7 @@ import java.util.Set;
 @Getter
 public class HostRuleMessage {
 
+	private Long id;
 	private String name;
 	private int priority;
 	private Decision decision;
@@ -26,7 +27,12 @@ public class HostRuleMessage {
 	private Set<EdgeHost> edgeHosts;
 	private Set<HostRuleCondition> conditions;
 
+	public HostRuleMessage(Long id) {
+		this.id = id;
+	}
+
 	public HostRuleMessage(HostRule hostRule) {
+		this.id = hostRule.getId();
 		this.name = hostRule.getName();
 		this.priority = hostRule.getPriority();
 		this.decision = hostRule.getDecision();
@@ -38,6 +44,7 @@ public class HostRuleMessage {
 
 	public HostRule get() {
 		return HostRule.builder()
+			.id(id)
 			.name(name)
 			.priority(priority)
 			.decision(decision)

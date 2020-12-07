@@ -26,6 +26,10 @@ public class ServiceSimulatedMetricMessage {
 	private boolean active;
 	private Set<Service> services;
 
+	public ServiceSimulatedMetricMessage(Long id) {
+		this.id = id;
+	}
+
 	public ServiceSimulatedMetricMessage(ServiceSimulatedMetric serviceSimulatedMetric) {
 		this.id = serviceSimulatedMetric.getId();
 		this.name = serviceSimulatedMetric.getName();

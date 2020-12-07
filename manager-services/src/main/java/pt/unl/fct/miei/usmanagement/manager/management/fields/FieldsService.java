@@ -84,6 +84,10 @@ public class FieldsService {
 		return fields.save(field);
 	}
 
+	public void deleteField(Long id) {
+		fields.deleteById(id);
+	}
+
 	public void deleteField(String fieldName) {
 		Field field = getField(fieldName);
 		fields.delete(field);

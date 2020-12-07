@@ -34,6 +34,10 @@ public class ConditionMessage {
 	private Set<ServiceRuleCondition> serviceConditions;
 	private Set<ContainerRuleCondition> containerConditions;
 
+	public ConditionMessage(Long id) {
+		this.id = id;
+	}
+
 	public ConditionMessage(Condition condition) {
 		this.id = condition.getId();
 		this.name = condition.getName();

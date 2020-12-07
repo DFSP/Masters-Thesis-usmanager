@@ -125,9 +125,19 @@ public class ServiceRulesService {
 		return serviceRule;
 	}
 
+	public void deleteRule(Long id) {
+		log.info("Deleting rule {}", id);
+		ServiceRule rule = getRule(id);
+		deleteRule(rule);
+	}
+
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		ServiceRule rule = getRule(ruleName);
+		deleteRule(rule);
+	}
+
+	public void deleteRule(ServiceRule rule) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateServiceRules();

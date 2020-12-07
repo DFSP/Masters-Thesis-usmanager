@@ -169,6 +169,7 @@ public class NodesService {
 	public void deleteNode(String nodeId) {
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
 		nodes.delete(node);
+		kafkaService.sendDeleteNode(node);
 	}
 
 	public boolean isPartOfSwarm(HostAddress hostAddress) {

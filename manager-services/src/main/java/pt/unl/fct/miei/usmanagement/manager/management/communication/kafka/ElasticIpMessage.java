@@ -20,6 +20,10 @@ public class ElasticIpMessage {
 	private String associationId;
 	private String instanceId;
 
+	public ElasticIpMessage(Long id) {
+		this.id = id;
+	}
+
 	public ElasticIpMessage(ElasticIp elasticIp) {
 		this.id = elasticIp.getId();
 		this.region = elasticIp.getRegion();

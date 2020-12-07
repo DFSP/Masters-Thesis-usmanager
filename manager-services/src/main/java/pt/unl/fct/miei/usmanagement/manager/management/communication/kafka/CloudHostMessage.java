@@ -34,6 +34,10 @@ public class CloudHostMessage {
 	private Set<HostRule> hostRules;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
+	public CloudHostMessage(Long id) {
+		this.id = id;
+	}
+
 	public CloudHostMessage(CloudHost cloudHost) {
 		this.id = cloudHost.getId();
 		this.instanceId = cloudHost.getInstanceId();

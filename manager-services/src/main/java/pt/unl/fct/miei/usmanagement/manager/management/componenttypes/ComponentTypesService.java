@@ -89,6 +89,10 @@ public class ComponentTypesService {
 		return componentTypes.save(componentType);
 	}
 
+	public void deleteComponentType(Long id) {
+		componentTypes.deleteById(id);
+	}
+
 	public void deleteComponentType(String componentTypeName) {
 		ComponentType componentType = getComponentType(componentTypeName);
 		componentTypes.delete(componentType);

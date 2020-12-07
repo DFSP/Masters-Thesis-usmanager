@@ -27,6 +27,10 @@ public class NodeMessage {
 	private String managerId;
 	private Map<String, String> labels;
 
+	public NodeMessage(String id) {
+		this.id = id;
+	}
+
 	public NodeMessage(Node node) {
 		this.id = node.getId();
 		this.publicIpAddress = node.getPublicIpAddress();

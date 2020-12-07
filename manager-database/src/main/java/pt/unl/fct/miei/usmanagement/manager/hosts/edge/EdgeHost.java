@@ -89,7 +89,7 @@ public class EdgeHost {
 	private Coordinates coordinates;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "managedByWorker_id")
 	private WorkerManager managedByWorker;
 

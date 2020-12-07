@@ -25,6 +25,10 @@ public class ServiceRuleMessage {
 	private Decision decision;
 	private Set<ServiceRuleCondition> conditions;
 
+	public ServiceRuleMessage(Long id) {
+		this.id = id;
+	}
+
 	public ServiceRuleMessage(ServiceRule serviceRule) {
 		this.id = serviceRule.getId();
 		this.name = serviceRule.getName();

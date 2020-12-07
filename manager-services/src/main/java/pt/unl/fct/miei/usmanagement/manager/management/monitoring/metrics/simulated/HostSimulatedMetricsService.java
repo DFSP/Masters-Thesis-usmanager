@@ -101,11 +101,21 @@ public class HostSimulatedMetricsService {
 		return hostSimulatedMetrics.save(hostSimulatedMetric);
 	}
 
+	public void deleteHostSimulatedMetric(Long id) {
+		log.info("Deleting simulated host metric {}", id);
+		HostSimulatedMetric simulatedHostMetric = getHostSimulatedMetric(id);
+		deleteHostSimulatedMetric(simulatedHostMetric);
+	}
+
 	public void deleteHostSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated host metric {}", simulatedMetricName);
 		HostSimulatedMetric simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
-		simulatedHostMetric.removeAssociations();
-		hostSimulatedMetrics.delete(simulatedHostMetric);
+		deleteHostSimulatedMetric(simulatedHostMetric);
+	}
+
+	public void deleteHostSimulatedMetric(HostSimulatedMetric simulatedMetric) {
+		simulatedMetric.removeAssociations();
+		hostSimulatedMetrics.delete(simulatedMetric);
 	}
 
 	public List<HostSimulatedMetric> getGenericHostSimulatedMetrics() {

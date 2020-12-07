@@ -113,6 +113,10 @@ public class ServicesService {
 		return services.save(service);
 	}
 
+	public void deleteService(Long id) {
+		services.deleteById(id);
+	}
+
 	public void deleteService(String serviceName) {
 		Service service = getService(serviceName);
 		services.delete(service);

@@ -190,8 +190,12 @@ public class CloudHostsService {
 		return cloudHost;
 	}
 
+	public void deleteCloudHost(Long id) {
+		cloudHosts.deleteById(id);
+	}
+
 	public void deleteCloudHost(CloudHost cloudHost) {
-		cloudHosts.delete(cloudHost);
+		deleteCloudHost(cloudHost.getId());
 		try {
 			RegionEnum region = cloudHost.getAwsRegion().getRegion();
 			ElasticIp elasticIp = elasticIpsService.getElasticIp(region);

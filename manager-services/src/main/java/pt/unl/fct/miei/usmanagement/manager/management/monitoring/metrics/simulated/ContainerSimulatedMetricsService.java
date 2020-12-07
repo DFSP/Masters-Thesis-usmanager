@@ -97,11 +97,21 @@ public class ContainerSimulatedMetricsService {
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
 
+	public void deleteContainerSimulatedMetric(Long id) {
+		log.info("Deleting simulated container metric {}", id);
+		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(id);
+		deleteContainerSimulatedMetric(containerSimulatedMetric);
+	}
+
 	public void deleteContainerSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated container metric {}", simulatedMetricName);
 		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
-		containerSimulatedMetric.removeAssociations();
-		containerSimulatedMetrics.delete(containerSimulatedMetric);
+		deleteContainerSimulatedMetric(containerSimulatedMetric);
+	}
+
+	public void deleteContainerSimulatedMetric(ContainerSimulatedMetric simulatedMetric) {
+		simulatedMetric.removeAssociations();
+		containerSimulatedMetrics.delete(simulatedMetric);
 	}
 
 	public List<Container> getContainers(String simulatedMetricName) {

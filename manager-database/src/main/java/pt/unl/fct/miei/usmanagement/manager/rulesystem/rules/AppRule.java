@@ -71,7 +71,7 @@ public class AppRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

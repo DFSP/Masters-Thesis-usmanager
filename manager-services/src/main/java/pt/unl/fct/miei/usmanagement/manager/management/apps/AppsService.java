@@ -107,6 +107,10 @@ public class AppsService {
 		return app;
 	}
 
+	public void deleteApp(Long id) {
+		apps.deleteById(id);
+	}
+
 	public void deleteApp(String name) {
 		App app = getApp(name);
 		apps.delete(app);

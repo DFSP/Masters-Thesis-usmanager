@@ -24,6 +24,10 @@ public class AppRuleMessage {
 	private Set<App> apps;
 	private Set<AppRuleCondition> conditions;
 
+	public AppRuleMessage(Long id) {
+		this.id = id;
+	}
+
 	public AppRuleMessage(AppRule rule) {
 		this.id = rule.getId();
 		this.name = rule.getName();

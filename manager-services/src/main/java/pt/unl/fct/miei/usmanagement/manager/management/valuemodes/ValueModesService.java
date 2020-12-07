@@ -84,6 +84,10 @@ public class ValueModesService {
 		return valueModes.save(valueMode);
 	}
 
+	public void deleteValueMode(Long id) {
+		valueModes.deleteById(id);
+	}
+
 	public void deleteValueMode(String valueModeName) {
 		ValueMode valueMode = getValueMode(valueModeName);
 		valueModes.delete(valueMode);

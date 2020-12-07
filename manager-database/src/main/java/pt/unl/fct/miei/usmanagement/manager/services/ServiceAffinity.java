@@ -56,11 +56,11 @@ public class ServiceAffinity {
 	private Long id;
 
 	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "service_id")
 	private Service service;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "other_service_id")
 	private Service otherService;
 

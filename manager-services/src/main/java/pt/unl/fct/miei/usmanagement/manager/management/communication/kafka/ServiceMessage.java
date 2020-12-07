@@ -41,6 +41,10 @@ public class ServiceMessage {
 	private Set<ServiceRule> serviceRules;
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
+	public ServiceMessage(Long id) {
+		this.id = id;
+	}
+
 	public ServiceMessage(Service service) {
 		this.id = service.getId();
 		this.serviceName = service.getServiceName();

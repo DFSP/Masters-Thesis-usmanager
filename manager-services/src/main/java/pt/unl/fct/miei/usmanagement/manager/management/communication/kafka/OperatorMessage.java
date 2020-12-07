@@ -16,9 +16,14 @@ import java.util.Set;
 @Getter
 public class OperatorMessage {
 
+	private Long id;
 	private OperatorEnum operator;
 	private String symbol;
 	private Set<Condition> conditions;
+
+	public OperatorMessage(Long id) {
+		this.id = id;
+	}
 
 	public OperatorMessage(Operator operator) {
 		this.operator = operator.getOperator();

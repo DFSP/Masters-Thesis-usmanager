@@ -97,11 +97,21 @@ public class AppSimulatedMetricsService {
 		return appSimulatedMetrics.save(appSimulatedMetric);
 	}
 
+	public void deleteAppSimulatedMetric(Long id) {
+		log.info("Deleting simulated app metric {}", id);
+		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(id);
+		deleteAppSimulatedMetric(appSimulatedMetric);
+	}
+
 	public void deleteAppSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated app metric {}", simulatedMetricName);
 		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
-		appSimulatedMetric.removeAssociations();
-		appSimulatedMetrics.delete(appSimulatedMetric);
+		deleteAppSimulatedMetric(appSimulatedMetric);
+	}
+
+	public void deleteAppSimulatedMetric(AppSimulatedMetric simulatedMetric) {
+		simulatedMetric.removeAssociations();
+		appSimulatedMetrics.delete(simulatedMetric);
 	}
 
 	public List<App> getApps(String simulatedMetricName) {

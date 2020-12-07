@@ -19,13 +19,19 @@ import java.util.Set;
 @Getter
 public class FieldMessage {
 
+	private Long id;
 	private String name;
 	private PrometheusQueryEnum prometheusQuery;
 	private Set<Condition> conditions;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
+	public FieldMessage(Long id) {
+		this.id = id;
+	}
+
 	public FieldMessage(Field field) {
+		this.id = id;
 		this.name = field.getName();
 		this.prometheusQuery = field.getPrometheusQuery();
 		this.conditions = field.getConditions();
@@ -35,6 +41,7 @@ public class FieldMessage {
 
 	public Field get() {
 		return Field.builder()
+			.id(id)
 			.name(name)
 			.prometheusQuery(prometheusQuery)
 			.conditions(conditions)
