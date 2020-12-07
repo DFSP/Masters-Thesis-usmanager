@@ -130,22 +130,22 @@ public class Service {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service")
 	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service")
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "dependency")
 	private Set<ServiceDependency> dependents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service")
 	private Set<ServiceEventPrediction> eventPredictions;
 
 	@Singular

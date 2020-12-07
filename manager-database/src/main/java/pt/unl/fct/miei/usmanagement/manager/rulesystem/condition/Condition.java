@@ -88,22 +88,22 @@ public class Condition {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "hostCondition")
 	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "appCondition")
 	private Set<AppRuleCondition> appConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "serviceCondition")
 	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "containerCondition")
 	private Set<ContainerRuleCondition> containerConditions;
 
 	public void addHostCondition(HostRuleCondition condition) {

@@ -82,7 +82,7 @@ public class AppRule {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "appRule")
 	private Set<AppRuleCondition> conditions;
 
 	public void removeAssociations() {

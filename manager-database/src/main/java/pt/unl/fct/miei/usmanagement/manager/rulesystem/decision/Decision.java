@@ -74,17 +74,17 @@ public class Decision {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "decision")
 	private Set<ServiceEvent> serviceEvents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "decision")
 	private Set<HostEvent> hostEvents;
 
   /*@Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "decision")
   private Set<ServiceDecisionEntity> componentDecisionLogs;*/
 
 	@Override

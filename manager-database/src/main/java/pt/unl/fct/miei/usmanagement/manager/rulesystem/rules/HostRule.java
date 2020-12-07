@@ -90,7 +90,7 @@ public class HostRule {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "hostRule")
 	private Set<HostRuleCondition> conditions;
 
 	public void removeAssociations() {

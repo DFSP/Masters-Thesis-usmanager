@@ -84,7 +84,7 @@ public class ServiceRule {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "serviceRule")
 	private Set<ServiceRuleCondition> conditions;
 
 	public void removeAssociations() {

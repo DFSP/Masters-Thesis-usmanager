@@ -84,7 +84,7 @@ public class HostDecision {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "hostDecision")
 	private Set<HostDecisionValue> hostDecisions;
 
 	@PrePersist

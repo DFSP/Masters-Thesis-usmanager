@@ -82,7 +82,7 @@ public class ContainerRule {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "containerRule")
 	private Set<ContainerRuleCondition> conditions;
 
 	public void removeAssociations() {
