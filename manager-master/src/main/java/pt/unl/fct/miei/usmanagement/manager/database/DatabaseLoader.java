@@ -146,7 +146,7 @@ public class DatabaseLoader {
 
 			Map<String, Condition> conditions = loadConditions(conditionsService, valueModes, fields, operators);
 
-			Map<String, HostRule> hostRules = loadRules(hostRulesService, hostRuleConditions, decisions, conditions);
+			Map<String, HostRule> hostRules = loadRules(hostRulesService, hostRuleConditions, decisions, conditionsService);
 
 			Map<String, ServiceRule> serviceRules = loadServiceRules(serviceRulesService, serviceRuleConditions, decisions, conditions);
 
@@ -208,7 +208,7 @@ public class DatabaseLoader {
 	}
 
 	private Map<String, HostRule> loadRules(HostRulesService hostRulesService, HostRuleConditions hostRuleConditions,
-											Map<RuleDecisionEnum, Decision> decisions, Map<String, Condition> conditions) {
+											Map<RuleDecisionEnum, Decision> decisions, ConditionsService conditionsService) {
 		Map<String, HostRule> hostRuleMap = new HashMap<>();
 
 		HostRule cpuAndRamOver90GenericHostRule;
@@ -224,19 +224,22 @@ public class DatabaseLoader {
 				.generic(true)
 				.build();
 			cpuAndRamOver90GenericHostRule = hostRulesService.addRule(cpuAndRamOver90GenericHostRule);
-
-			Condition cpuPercentageOver90 = conditions.get("CpuPercentageOver90");
+			log.info("{}", conditionsService.getConditions());
+			Condition cpuPercentageOver90 = conditionsService.getCondition("CpuPercentageOver90");
 			HostRuleCondition cpuOver90Condition = HostRuleCondition.builder()
 				.hostRule(cpuAndRamOver90GenericHostRule)
 				.hostCondition(cpuPercentageOver90)
 				.build();
-			Condition ramPercentageOver90 = conditions.get("RamPercentageOver90");
-			hostRuleConditions.save(cpuOver90Condition);
+			cpuPercentageOver90.addHostCondition(cpuOver90Condition);
+			conditionsService.saveCondition(cpuPercentageOver90);
+
+			Condition ramPercentageOver90 = conditionsService.getCondition("RamPercentageOver90");
 			HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
 				.hostRule(cpuAndRamOver90GenericHostRule)
 				.hostCondition(ramPercentageOver90)
 				.build();
-			hostRuleConditions.save(ramOver90Condition);
+			ramPercentageOver90.addHostCondition(ramOver90Condition);
+			conditionsService.saveCondition(ramPercentageOver90);
 		}
 		hostRuleMap.put("CpuAndRamOver90", cpuAndRamOver90GenericHostRule);
 

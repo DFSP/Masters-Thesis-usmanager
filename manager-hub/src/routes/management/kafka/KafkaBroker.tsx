@@ -148,7 +148,7 @@ class KafkaBroker extends BaseComponent<Props, State> {
         let kafkaBrokers = reply.data;
         if (kafkaBrokers.length === 1) {
             const kafkaBroker = kafkaBrokers[0];
-            super.toast(`<span class="green-text">O kafka broker foi iniciado no contentor ${this.mounted ? `<b class="white-text">${kafkaBroker.container.id}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.container.id}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O kafka broker foi iniciado com o id ${this.mounted ? `<b class="white-text">${kafkaBroker.brokerId}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.brokerId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateKafkaBroker(kafkaBroker);
                 this.props.history.replace(kafkaBroker.brokerId.toString())

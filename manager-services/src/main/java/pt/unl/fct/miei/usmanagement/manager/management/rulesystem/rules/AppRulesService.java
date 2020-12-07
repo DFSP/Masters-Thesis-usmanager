@@ -145,8 +145,7 @@ public class AppRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		AppRule rule = getRule(ruleName);
-		rule.getConditions()
-			.removeIf(condition -> conditionNames.contains(condition.getAppCondition().getName()));
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getAppCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendAppRule(rule);
 	}

@@ -169,7 +169,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, condition: IRuleCondition): void =>
-        super.toast(`Não foi possível apagar a condição ${this.mounted ? `<b>${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível guardar a condição ${this.mounted ? `<b>${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (condition: IRuleCondition): void => {
         super.toast(`<span class="green-text">A condição <b class="white-text">${condition.name}</b> foi apagada com sucesso</span>`);

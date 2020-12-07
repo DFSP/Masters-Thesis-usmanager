@@ -19,33 +19,27 @@ import java.util.Set;
 @Getter
 public class FieldMessage {
 
-	private Long id;
 	private String name;
 	private PrometheusQueryEnum prometheusQuery;
 	private Set<Condition> conditions;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
-	private Set<ServiceDecisionValue> componentDecisionValueLogs;
 
 	public FieldMessage(Field field) {
-		this.id = field.getId();
 		this.name = field.getName();
 		this.prometheusQuery = field.getPrometheusQuery();
 		this.conditions = field.getConditions();
 		this.simulatedHostMetrics = field.getSimulatedHostMetrics();
 		this.simulatedServiceMetrics = field.getSimulatedServiceMetrics();
-		this.componentDecisionValueLogs = field.getComponentDecisionValueLogs();
 	}
 
 	public Field get() {
 		return Field.builder()
-			.id(id)
 			.name(name)
 			.prometheusQuery(prometheusQuery)
 			.conditions(conditions)
 			.simulatedHostMetrics(simulatedHostMetrics)
 			.simulatedServiceMetrics(simulatedServiceMetrics)
-			.componentDecisionValueLogs(componentDecisionValueLogs)
 			.build();
 	}
 }

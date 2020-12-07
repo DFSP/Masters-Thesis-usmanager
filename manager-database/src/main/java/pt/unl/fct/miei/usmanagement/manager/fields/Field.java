@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -59,7 +60,8 @@ import java.util.Set;
 public class Field {
 
 	@Id
-	@GeneratedValue
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -75,18 +77,13 @@ public class Field {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceDecisionValue> componentDecisionValueLogs;
 
 	@Override
 	public int hashCode() {

@@ -32,10 +32,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
@@ -63,6 +66,8 @@ import java.util.Set;
 public class Condition {
 
 	@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -90,6 +95,11 @@ public class Condition {
 
 	@Singular
 	@JsonIgnore
+	@OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AppRuleCondition> appConditions;
+
+	@Singular
+	@JsonIgnore
 	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceRuleCondition> serviceConditions;
 
@@ -97,6 +107,16 @@ public class Condition {
 	@JsonIgnore
 	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ContainerRuleCondition> containerConditions;
+
+	public void addHostCondition(HostRuleCondition condition) {
+		hostConditions.add(condition);
+		condition.setHostCondition(this);
+	}
+
+	public void removeHostCondition(HostRuleCondition condition) {
+		hostConditions.add(condition);
+		condition.setHostCondition(null);
+	}
 
 	@Override
 	public int hashCode() {

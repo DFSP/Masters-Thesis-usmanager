@@ -15,19 +15,16 @@ import java.util.Set;
 @Getter
 public class ValueModeMessage {
 
-	private Long id;
 	private String name;
 	private Set<Condition> conditions;
 
 	public ValueModeMessage(ValueMode valueMode) {
-		this.id = valueMode.getId();
 		this.name = valueMode.getName();
 		this.conditions = valueMode.getConditions();
 	}
 
 	public ValueMode get() {
 		return ValueMode.builder()
-			.id(id)
 			.name(name)
 			.conditions(conditions)
 			.build();

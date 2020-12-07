@@ -30,6 +30,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
@@ -40,10 +41,13 @@ import java.util.List;
 @Service
 public class ConditionsService {
 
-	private final Conditions conditions;
+	private final FieldsService fieldsService;
 	private final KafkaService kafkaService;
 
-	public ConditionsService(Conditions conditions, KafkaService kafkaService) {
+	private final Conditions conditions;
+
+	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService) {
+		this.fieldsService = fieldsService;
 		this.conditions = conditions;
 		this.kafkaService = kafkaService;
 	}
@@ -74,6 +78,7 @@ public class ConditionsService {
 		Condition condition = getCondition(conditionName);
 		log.info("Updating condition {} with {}", ToStringBuilder.reflectionToString(condition), ToStringBuilder.reflectionToString(newCondition));
 		EntityUtils.copyValidProperties(newCondition, condition);
+		condition.setField(fieldsService.getField(condition.getField().getName()));
 		condition = conditions.save(condition);
 		kafkaService.sendCondition(condition);
 		return condition;

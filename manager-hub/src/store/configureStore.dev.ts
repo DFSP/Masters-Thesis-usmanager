@@ -44,7 +44,7 @@ const configureStore = (persistedState = loadState()) =>
                 loadingBarMiddleware({
                     promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
                 }),
-                createLogger(),
+                /*createLogger(),*/
             ),
             DevTools.instrument(),
         ),

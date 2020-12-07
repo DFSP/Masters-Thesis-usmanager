@@ -16,13 +16,11 @@ import java.util.Set;
 @Getter
 public class OperatorMessage {
 
-	private Long id;
 	private OperatorEnum operator;
 	private String symbol;
 	private Set<Condition> conditions;
 
 	public OperatorMessage(Operator operator) {
-		this.id = operator.getId();
 		this.operator = operator.getOperator();
 		this.symbol = operator.getSymbol();
 		this.conditions = operator.getConditions();
@@ -30,7 +28,6 @@ public class OperatorMessage {
 
 	public Operator get() {
 		return Operator.builder()
-			.id(id)
 			.operator(operator)
 			.symbol(symbol)
 			.conditions(conditions)

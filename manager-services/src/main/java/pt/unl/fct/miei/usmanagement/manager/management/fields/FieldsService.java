@@ -57,6 +57,7 @@ public class FieldsService {
 			new EntityNotFoundException(Field.class, "id", id.toString()));
 	}
 
+
 	public Field getField(String name) {
 		return fields.findByNameIgnoreCase(name).orElseThrow(() ->
 			new EntityNotFoundException(Field.class, "name", name));

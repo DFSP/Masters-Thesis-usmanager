@@ -175,11 +175,13 @@ public class WorkerKafkaService {
 		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionMessage));
 		Condition condition = conditionMessage.get();
 		try {
-			condition.setField(null);
-			condition.setOperator(null);
-			condition.setValueMode(null);
+			/*condition.getField().setId(null);
+			condition.getValueMode().setId(null);
+			condition.getOperator().setId(null);*/
 			log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(condition));
-			/*valueModesService.saveValueMode(condition.getValueMode());*/
+			log.info("{}", ToStringBuilder.reflectionToString(condition.getField()));
+			log.info("{}", ToStringBuilder.reflectionToString(condition.getOperator()));
+			log.info("{}", ToStringBuilder.reflectionToString(condition.getValueMode()));
 			conditionsService.saveCondition(condition);
 		} catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());

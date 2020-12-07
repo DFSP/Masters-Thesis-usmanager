@@ -8,8 +8,8 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:file:./db/manager-master-db;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
-    #url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
+    #url: jdbc:h2:file:./db/manager-master-db;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
+    url: jdbc:h2:mem:manager-master-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
     username: sa
     password: admin
     platform: h2

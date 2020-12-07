@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -53,12 +54,12 @@ public class HostRuleCondition {
 	@GeneratedValue
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "host_rule_id")
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "host_rule")
 	private HostRule hostRule;
 
-	@ManyToOne
-	@JoinColumn(name = "condition_id")
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "condition")
 	private Condition hostCondition;
 
 	@Override

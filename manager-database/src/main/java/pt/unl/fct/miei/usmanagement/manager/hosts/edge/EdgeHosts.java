@@ -36,7 +36,7 @@ import java.util.Optional;
 public interface EdgeHosts extends JpaRepository<EdgeHost, Long> {
 
 	@Query("select h "
-		+ "from EdgeHost h join fetch h.managedByWorker "
+		+ "from EdgeHost h left join fetch h.managedByWorker "
 		+ "where h.id = :id")
 	Optional<EdgeHost> getEdgeHostWithWorker(@Param("id") Long id);
 

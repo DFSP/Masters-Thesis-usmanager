@@ -57,6 +57,7 @@ public class ValueModesService {
 			new EntityNotFoundException(ValueMode.class, "id", id.toString()));
 	}
 
+
 	public ValueMode getValueMode(String valueModeName) {
 		return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
 			new EntityNotFoundException(ValueMode.class, "name", valueModeName));

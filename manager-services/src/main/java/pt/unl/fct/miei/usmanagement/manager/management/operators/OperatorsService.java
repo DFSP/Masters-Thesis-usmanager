@@ -53,11 +53,6 @@ public class OperatorsService {
 		return operators.findAll();
 	}
 
-	public Operator getOperator(Long id) {
-		return operators.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(Operator.class, "id", id.toString()));
-	}
-
 	public Operator getOperator(String operatorName) {
 		OperatorEnum operator = OperatorEnum.valueOf(operatorName.toUpperCase());
 		return getOperator(operator);

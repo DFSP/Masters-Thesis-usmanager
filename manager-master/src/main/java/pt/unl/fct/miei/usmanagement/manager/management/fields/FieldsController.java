@@ -59,13 +59,11 @@ public class FieldsController {
 
 	@PostMapping
 	public Field addField(@RequestBody Field field) {
-		Validation.validatePostRequest(field.getId());
 		return fieldsService.addField(field);
 	}
 
 	@PutMapping("/{fieldName}")
 	public Field updateField(@PathVariable String fieldName, @RequestBody Field field) {
-		Validation.validatePutRequest(field.getId());
 		return fieldsService.updateField(fieldName, field);
 	}
 
