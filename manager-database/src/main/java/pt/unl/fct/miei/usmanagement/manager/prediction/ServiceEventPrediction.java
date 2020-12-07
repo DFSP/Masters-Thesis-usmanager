@@ -36,6 +36,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -58,7 +59,7 @@ import java.util.Objects;
 @Table(name = "service_event_predictions")
 public class ServiceEventPrediction {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

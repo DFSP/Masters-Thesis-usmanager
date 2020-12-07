@@ -25,12 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.EventType;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.util.List;
 
+@Slf4j
 @Data
 public final class Rule {
 

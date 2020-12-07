@@ -34,6 +34,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
