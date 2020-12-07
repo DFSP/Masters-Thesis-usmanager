@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -59,15 +60,16 @@ import java.util.Set;
 @Table(name = "simulated_service_metrics")
 public class ServiceSimulatedMetric {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "field_id")
 	private Field field;
 

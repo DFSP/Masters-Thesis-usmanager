@@ -30,8 +30,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -49,15 +51,16 @@ import java.util.Objects;
 @Table(name = "app_rule_conditions")
 public class AppRuleCondition {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "app_rule_id")
 	private AppRule appRule;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "condition_id")
 	private Condition appCondition;
 

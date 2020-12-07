@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
@@ -52,7 +53,8 @@ import java.util.Objects;
 public class ServiceEvent {
 
 	@Id
-	@GeneratedValue
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -69,7 +71,7 @@ public class ServiceEvent {
 
 
 	@JsonIgnoreProperties({"componentType"})
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

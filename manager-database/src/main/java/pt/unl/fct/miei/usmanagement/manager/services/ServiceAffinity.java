@@ -50,16 +50,17 @@ import java.util.Objects;
 @Table(name = "service_affinity")
 public class ServiceAffinity {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@JsonIgnore
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "service_id")
 	private Service service;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "other_service_id")
 	private Service otherService;
 

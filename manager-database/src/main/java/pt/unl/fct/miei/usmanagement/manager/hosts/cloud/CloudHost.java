@@ -35,6 +35,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
@@ -64,8 +65,9 @@ import java.util.Set;
 @Table(name = "cloud_hosts")
 public class CloudHost {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NaturalId
@@ -92,7 +94,7 @@ public class CloudHost {
 	private AwsRegion awsRegion;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	private WorkerManager managedByWorker;
 
 	@Singular

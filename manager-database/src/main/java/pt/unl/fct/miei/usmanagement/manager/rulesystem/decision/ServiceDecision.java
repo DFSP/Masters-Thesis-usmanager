@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import javax.persistence.Basic;
@@ -58,8 +59,9 @@ import java.util.Set;
 @Table(name = "service_decisions")
 public class ServiceDecision {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	private String containerId;
@@ -68,11 +70,11 @@ public class ServiceDecision {
 
 	private String result;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "rule_id")
 	private ServiceRule rule;
 

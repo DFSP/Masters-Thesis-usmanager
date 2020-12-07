@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -64,8 +65,9 @@ import java.util.Set;
 @Table(name = "edge_hosts")
 public class EdgeHost {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -87,7 +89,7 @@ public class EdgeHost {
 	private Coordinates coordinates;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "managedByWorker_id")
 	private WorkerManager managedByWorker;
 

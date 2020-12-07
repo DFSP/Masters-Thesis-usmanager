@@ -333,11 +333,11 @@ public class KafkaService {
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
 
-		/*topicsValues.put("apps", () -> appsService.getApps().stream().map(AppMessage::new).collect(Collectors.toList()));
+		topicsValues.put("apps", () -> appsService.getApps().stream().map(AppMessage::new).collect(Collectors.toList()));
 		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHosts().stream().map(CloudHostMessage::new).collect(Collectors.toList()));
-		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeMessage::new).collect(Collectors.toList()));*/
+		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeMessage::new).collect(Collectors.toList()));
 		topicsValues.put("conditions", () -> conditionsService.getConditions().stream().map(ConditionMessage::new).collect(Collectors.toList()));
-		/*topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerMessage::new).collect(Collectors.toList()));
+		topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerMessage::new).collect(Collectors.toList()));
 		topicsValues.put("decisions", () -> decisionsService.getDecisions().stream().map(DecisionMessage::new).collect(Collectors.toList()));
 		topicsValues.put("edge-hosts", () -> edgeHostsService.getEdgeHosts().stream().map(EdgeHostMessage::new).collect(Collectors.toList()));
 		topicsValues.put("eips", () -> elasticIpsService.getElasticIps().stream().map(ElasticIpMessage::new).collect(Collectors.toList()));
@@ -353,7 +353,7 @@ public class KafkaService {
 		topicsValues.put("app-rules", () -> appRulesService.getRules().stream().map(AppRuleMessage::new).collect(Collectors.toList()));
 		topicsValues.put("service-rules", () -> serviceRulesService.getRules().stream().map(ServiceRuleMessage::new).collect(Collectors.toList()));
 		topicsValues.put("container-rules", () -> containerRulesService.getRules().stream().map(ContainerRuleMessage::new).collect(Collectors.toList()));
-		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeMessage::new).collect(Collectors.toList()));*/
+		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeMessage::new).collect(Collectors.toList()));
 		return topicsValues;
 	}
 

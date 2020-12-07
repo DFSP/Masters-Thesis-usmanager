@@ -38,7 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
@@ -46,7 +45,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;

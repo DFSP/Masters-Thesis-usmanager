@@ -32,6 +32,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -57,8 +58,9 @@ import java.util.Objects;
 @Table(name = "service_event_predictions")
 public class ServiceEventPrediction {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -87,7 +89,7 @@ public class ServiceEventPrediction {
 
 	@JsonIgnore
 	@JoinColumn(name = "service_id")
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	private Service service;
 
 	@JsonIgnore

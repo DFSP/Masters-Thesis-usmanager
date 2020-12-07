@@ -31,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.Entity;
@@ -51,8 +52,9 @@ import java.util.Objects;
 @Table(name = "host_events")
 public class HostEvent {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@NotNull
@@ -68,7 +70,7 @@ public class HostEvent {
 	private String managerPrivateIpAddress;
 
 	@JsonIgnoreProperties({"componentType"})
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

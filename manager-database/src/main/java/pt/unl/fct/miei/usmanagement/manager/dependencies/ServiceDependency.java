@@ -30,8 +30,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -50,15 +52,16 @@ import java.util.Objects;
 public class ServiceDependency {
 
 	@Id
-	@GeneratedValue
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
 	@JoinColumn(name = "service_id")
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	private Service service;
 
 	@JoinColumn(name = "dependency_id")
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	private Service dependency;
 
 	@Override

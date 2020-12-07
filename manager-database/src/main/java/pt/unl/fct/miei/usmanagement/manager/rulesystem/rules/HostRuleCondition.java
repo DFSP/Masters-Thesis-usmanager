@@ -30,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import javax.persistence.CascadeType;
@@ -50,15 +51,16 @@ import java.util.Objects;
 @Table(name = "host_rule_conditions")
 public class HostRuleCondition {
 
-	@Id
-	@GeneratedValue
+		@Id
+	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
+	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "host_rule")
 	private HostRule hostRule;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "condition")
 	private Condition hostCondition;
 
