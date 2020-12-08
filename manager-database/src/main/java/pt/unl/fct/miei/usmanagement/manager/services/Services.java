@@ -137,4 +137,15 @@ public interface Services extends JpaRepository<Service, Long> {
 	Optional<ServiceSimulatedMetric> getSimulatedMetric(@Param("serviceName") String serviceName,
 														@Param("simulatedMetricName") String simulatedMetricName);
 
+	@Query("select s "
+		+ "from Service s "
+		+ "left join fetch s.appServices "
+		+ "left join fetch s.dependencies "
+		+ "left join fetch s.dependents "
+		+ "left join fetch s.eventPredictions "
+		+ "left join fetch s.serviceRules "
+		+ "left join fetch s.simulatedServiceMetrics "
+		+ "where lower(s.serviceName) = lower(:serviceName)")
+	Optional<Service> findByServiceNameIgnoreCaseWithEntities(String serviceName);
+
 }

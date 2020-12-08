@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
@@ -70,6 +71,9 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -141,7 +145,11 @@ public class WorkerKafkaService {
 				appsService.deleteApp(id);
 			}
 			else {
-				appsService.saveApp(app);
+				app = appsService.saveApp(app);
+				Set<AppService> services = appMessage.getAppServices();
+				if (services != null) {
+					appsService.addServices(app.getName(), services);
+				}
 			}
 		} catch (Exception e) {
 			log.error("Error while processing {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());

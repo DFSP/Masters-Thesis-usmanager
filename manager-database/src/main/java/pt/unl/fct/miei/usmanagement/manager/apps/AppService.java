@@ -38,8 +38,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 import java.util.Objects;
 
@@ -49,6 +51,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
+/*@IdClass(AppServiceKey.class)*/
 @Table(name = "app_services")
 public class AppService {
 
@@ -57,16 +60,33 @@ public class AppService {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "app_id")
 	private App app;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "service_id")
 	private Service service;
 
 	private int launchOrder;
+
+	/*@Id
+	private String appId;
+
+	@Id
+	private String serviceId;
+
+	@ManyToOne
+	@MapsId("appId")
+	@JoinColumn(name = "app_id")
+	private App app;
+
+	@ManyToOne
+	@MapsId("serviceId")
+	@JoinColumn(name = "service_id")
+	private Service service;
+
+	private int launchOrder;*/
 
 	@Override
 	public int hashCode() {
@@ -84,5 +104,24 @@ public class AppService {
 		AppService other = (AppService) o;
 		return id != null && id.equals(other.getId());
 	}
+
+	/*@Override
+	public int hashCode() {
+		return Objects.hash(getAppId(), getServiceId());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof AppService)) {
+			return false;
+		}
+		AppService other = (AppService) o;
+		return appId != null && appId.equals(other.getAppId())
+			&& serviceId != null && serviceId.equals(other.getServiceId());
+	}*/
+
 
 }

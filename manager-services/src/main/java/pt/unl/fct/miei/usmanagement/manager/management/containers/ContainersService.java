@@ -52,7 +52,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.management.symmetricds.SymService;
 import pt.unl.fct.miei.usmanagement.manager.management.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;

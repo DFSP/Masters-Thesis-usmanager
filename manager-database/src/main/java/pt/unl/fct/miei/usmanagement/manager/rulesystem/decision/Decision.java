@@ -68,7 +68,7 @@ public class Decision {
 	@Enumerated(EnumType.STRING)
 	private RuleDecisionEnum ruleDecision;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "component_type_id")
 	private ComponentType componentType;
 

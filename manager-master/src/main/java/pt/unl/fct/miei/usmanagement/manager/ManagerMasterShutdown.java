@@ -41,7 +41,6 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitorin
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.symmetricds.MasterSymService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.Objects;
@@ -55,7 +54,6 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final DockerSwarmService dockerSwarmService;
 	private final CloudHostsService cloudHostsService;
 	private final ElasticIpsService elasticIpsService;
-	private final MasterSymService symService;
 	private final HostsMonitoringService hostsMonitoringService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsEventsService hostsEventsService;
@@ -65,14 +63,13 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final KafkaService kafkaService;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
-								 ElasticIpsService elasticIpsService, MasterSymService symService, CloudHostsService cloudHostsService,
+								 ElasticIpsService elasticIpsService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								 NodesService nodesService, SyncService syncService, KafkaService kafkaService) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.elasticIpsService = elasticIpsService;
-		this.symService = symService;
 		this.cloudHostsService = cloudHostsService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.servicesMonitoringService = servicesMonitoringService;
@@ -85,7 +82,6 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) {
-		/*symService.stopSymmetricDSServer();*/
 		hostsMonitoringService.stopHostMonitoring();
 		servicesMonitoringService.stopServiceMonitoring();
 		syncService.stopCloudHostsDatabaseSynchronization();

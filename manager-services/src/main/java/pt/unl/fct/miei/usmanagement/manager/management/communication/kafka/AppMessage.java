@@ -43,9 +43,9 @@ public class AppMessage {
 			.id(id)
 			.name(name)
 			.description(description)
-			.appServices(appServices == null ? new HashSet<>() : appServices)
-			.appRules(appRules == null ? new HashSet<>() : appRules)
-			.simulatedAppMetrics(simulatedAppMetrics == null ? new HashSet<>() : simulatedAppMetrics)
+			.appServices(new HashSet<>())
+			.appRules(new HashSet<>())
+			.simulatedAppMetrics(new HashSet<>())
 			.build();
 	}
 

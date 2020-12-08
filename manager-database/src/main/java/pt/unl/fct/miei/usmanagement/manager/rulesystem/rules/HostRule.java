@@ -72,7 +72,7 @@ public class HostRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
@@ -80,12 +80,12 @@ public class HostRule {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.MERGE})
 	private Set<CloudHost> cloudHosts;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.MERGE})
 	private Set<EdgeHost> edgeHosts;
 
 	@Singular

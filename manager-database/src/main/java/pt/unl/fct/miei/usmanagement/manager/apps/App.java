@@ -73,7 +73,7 @@ public class App {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "app", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppService> appServices;
 
 	@Singular

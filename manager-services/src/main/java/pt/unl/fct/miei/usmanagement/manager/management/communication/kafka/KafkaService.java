@@ -12,6 +12,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -74,6 +75,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -387,6 +389,10 @@ public class KafkaService {
 		send("apps", new AppMessage(app), app.getId());
 	}
 
+	public void sendAppServices(Set<AppService> appServices) {
+		send("apps", appServices);
+	}
+
 	@Async
 	public void sendDeleteApp(App app) {
 		delete("apps", new AppMessage(app.getId()));
@@ -620,6 +626,11 @@ public class KafkaService {
 	@Async
 	public void sendServiceDecision(ServiceDecision serviceDecision) {
 		send("service-decisions", new ServiceDecisionMessage(serviceDecision), serviceDecision.getId());
+	}
+
+	@Async
+	public void send(String topic, Object message) {
+		send(topic, message, null);
 	}
 
 	@Async

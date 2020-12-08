@@ -67,7 +67,7 @@ import java.util.Set;
 @Table(name = "services")
 public class Service {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -130,22 +130,22 @@ public class Service {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service")
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service")
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "dependency")
+	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service")
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceEventPrediction> eventPredictions;
 
 	@Singular

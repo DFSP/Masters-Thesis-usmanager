@@ -47,6 +47,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -122,6 +123,12 @@ public class AppsService {
 		return apps.getServices(appName);
 	}
 
+	public void addService(String appName, AppService appService) {
+		App app = getApp(appName);
+		app = app.toBuilder().appService(appService).build();
+		apps.save(app);
+	}
+
 	public void addService(String appName, String serviceName, int order) {
 		App app = getApp(appName);
 		Service service = servicesService.getService(serviceName);
@@ -131,11 +138,16 @@ public class AppsService {
 			.launchOrder(order)
 			.build();
 		app = app.toBuilder().appService(appService).build();
-		apps.save(app);
+		app = apps.save(app);
+		kafkaService.sendAppServices(app.getAppServices());
 	}
 
 	public void addServices(String appName, Map<String, Integer> services) {
 		services.forEach((service, launchOrder) -> addService(appName, service, launchOrder));
+	}
+
+	public void addServices(String appName, Set<AppService> appServices) {
+		appServices.forEach(appService -> addService(appName, appService));
 	}
 
 	public void removeService(String appName, String service) {

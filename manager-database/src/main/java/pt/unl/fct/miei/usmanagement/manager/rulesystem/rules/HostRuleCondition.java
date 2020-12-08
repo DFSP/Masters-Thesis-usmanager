@@ -56,11 +56,11 @@ public class HostRuleCondition {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "host_rule")
 	private HostRule hostRule;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "condition")
 	private Condition hostCondition;
 

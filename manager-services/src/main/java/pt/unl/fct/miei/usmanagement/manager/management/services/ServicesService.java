@@ -88,6 +88,11 @@ public class ServicesService {
 			new EntityNotFoundException(Service.class, "serviceName", serviceName));
 	}
 
+	public Service getServiceAndEntities(String serviceName) {
+		return services.findByServiceNameIgnoreCaseWithEntities(serviceName).orElseThrow(() ->
+			new EntityNotFoundException(Service.class, "serviceName", serviceName));
+	}
+
 	public List<Service> getServicesByDockerRepository(String dockerRepository) {
 		return services.findByDockerRepositoryIgnoreCase(dockerRepository);
 	}
@@ -120,6 +125,7 @@ public class ServicesService {
 	public void deleteService(String serviceName) {
 		Service service = getService(serviceName);
 		services.delete(service);
+		kafkaService.sendDeleteService(service);
 	}
 
 	public App getApp(String serviceName, String appName) {
@@ -134,12 +140,12 @@ public class ServicesService {
 	}
 
 	public void addApp(String serviceName, AddServiceApp addServiceApp) {
-		Service service = getService(serviceName);
+		Service service = getServiceAndEntities(serviceName);
 		String appName = addServiceApp.getName();
 		int launchOrder = addServiceApp.getLaunchOrder();
 		App app = appsService.getApp(appName);
 		AppService appService = AppService.builder().app(app).service(service).launchOrder(launchOrder).build();
-		service = service.toBuilder().appService(appService).build();
+		service.getAppServices().add(appService);
 		service = saveService(service);
 		kafkaService.sendService(service);
 	}

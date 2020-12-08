@@ -72,15 +72,15 @@ public class Condition {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "value_mode_id")
 	private ValueMode valueMode;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "field_id")
 	private Field field;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "operator_id")
 	private Operator operator;
 
@@ -105,16 +105,6 @@ public class Condition {
 	@JsonIgnore
 	@OneToMany(mappedBy = "containerCondition")
 	private Set<ContainerRuleCondition> containerConditions;
-
-	public void addHostCondition(HostRuleCondition condition) {
-		hostConditions.add(condition);
-		condition.setHostCondition(this);
-	}
-
-	public void removeHostCondition(HostRuleCondition condition) {
-		hostConditions.add(condition);
-		condition.setHostCondition(null);
-	}
 
 	@Override
 	public int hashCode() {

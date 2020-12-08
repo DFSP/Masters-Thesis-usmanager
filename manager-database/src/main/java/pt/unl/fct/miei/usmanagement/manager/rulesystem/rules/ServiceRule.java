@@ -78,7 +78,7 @@ public class ServiceRule {
 	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Service> services;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
