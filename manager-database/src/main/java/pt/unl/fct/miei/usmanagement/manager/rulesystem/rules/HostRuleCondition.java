@@ -51,16 +51,16 @@ import java.util.Objects;
 @Table(name = "host_rule_conditions")
 public class HostRuleCondition {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "host_rule")
 	private HostRule hostRule;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "condition")
 	private Condition hostCondition;
 

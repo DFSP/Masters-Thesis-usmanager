@@ -12,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetri
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -67,8 +68,8 @@ public class CloudHostMessage {
 			.placement(placement)
 			.awsRegion(awsRegion)
 			.managedByWorker(managedByWorker)
-			.hostRules(hostRules)
-			.simulatedHostMetrics(simulatedHostMetrics)
+			.hostRules(hostRules != null ? hostRules : new HashSet<>())
+			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics : new HashSet<>())
 			.build();
 	}
 

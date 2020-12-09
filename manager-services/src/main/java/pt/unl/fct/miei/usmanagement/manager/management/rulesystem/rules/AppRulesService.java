@@ -34,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
@@ -47,6 +48,7 @@ import java.util.List;
 public class AppRulesService {
 
 	private final ConditionsService conditionsService;
+	private final RuleConditionsService ruleConditionsService;
 	private final AppsService appsService;
 	private final ServiceRulesService serviceRulesService;
 	private final KafkaService kafkaService;
@@ -54,9 +56,11 @@ public class AppRulesService {
 	private final AppRules rules;
 
 	public AppRulesService(ConditionsService conditionsService,
-						   @Lazy AppsService appsService, AppRules rules, ServiceRulesService serviceRulesService,
+						   RuleConditionsService ruleConditionsService, @Lazy AppsService appsService, AppRules rules,
+						   ServiceRulesService serviceRulesService,
 						   KafkaService kafkaService) {
 		this.conditionsService = conditionsService;
+		this.ruleConditionsService = ruleConditionsService;
 		this.appsService = appsService;
 		this.rules = rules;
 		this.serviceRulesService = serviceRulesService;
@@ -138,8 +142,8 @@ public class AppRulesService {
 		Condition condition = conditionsService.getCondition(conditionName);
 		AppRule rule = getRule(ruleName);
 		AppRuleCondition appRuleCondition = AppRuleCondition.builder().appCondition(condition).appRule(rule).build();
+		ruleConditionsService.saveAppRuleCondition(appRuleCondition);
 		rule = rule.toBuilder().condition(appRuleCondition).build();
-		rule = saveRule(rule);
 		kafkaService.sendAppRule(rule);
 	}
 

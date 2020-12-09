@@ -70,11 +70,11 @@ public class ServiceDecision {
 
 	private String result;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "rule_id")
 	private ServiceRule rule;
 
@@ -83,7 +83,7 @@ public class ServiceDecision {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceDecision")
+	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDecisionValue> serviceDecisions;
 
 	@PrePersist

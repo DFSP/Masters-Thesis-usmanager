@@ -90,7 +90,7 @@ public class ServiceEventPrediction {
 
 	@JsonIgnore
 	@JoinColumn(name = "service_id")
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	private Service service;
 
 	@JsonIgnore

@@ -71,7 +71,7 @@ public class ContainerRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
@@ -82,7 +82,7 @@ public class ContainerRule {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule")
+	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ContainerRuleCondition> conditions;
 
 	public void removeAssociations() {

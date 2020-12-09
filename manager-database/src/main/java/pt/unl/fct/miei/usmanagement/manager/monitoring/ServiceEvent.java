@@ -70,7 +70,7 @@ public class ServiceEvent {
 	@NotNull
 	private String managerPrivateIpAddress;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

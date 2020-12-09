@@ -57,11 +57,11 @@ public class ServiceDependency {
 	private Long id;
 
 	@JoinColumn(name = "service_id")
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	private Service service;
 
 	@JoinColumn(name = "dependency_id")
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	private Service dependency;
 
 	@Override

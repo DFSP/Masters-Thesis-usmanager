@@ -295,7 +295,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 button:
                     <button className={`btn-flat btn-small green-text ${formStyles.formButton}`}
                             onClick={this.startCloudHost}>
-                        Ligar
+                        Iniciar
                     </button>
             });
         }

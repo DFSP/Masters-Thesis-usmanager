@@ -72,11 +72,16 @@ public class HostRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
 	private boolean generic;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HostRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
@@ -87,11 +92,6 @@ public class HostRule {
 	@JsonIgnore
 	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.MERGE})
 	private Set<EdgeHost> edgeHosts;
-
-	@Singular
-	@JsonIgnore
-	@OneToMany(mappedBy = "hostRule")
-	private Set<HostRuleCondition> conditions;
 
 	public void removeAssociations() {
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();

@@ -65,11 +65,11 @@ public class HostDecision {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "rule_id")
 	private HostRule rule;
 
@@ -84,7 +84,7 @@ public class HostDecision {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostDecision")
+	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostDecisionValue> hostDecisions;
 
 	@PrePersist

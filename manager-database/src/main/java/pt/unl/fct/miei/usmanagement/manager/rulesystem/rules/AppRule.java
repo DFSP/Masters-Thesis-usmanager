@@ -71,19 +71,19 @@ public class AppRule {
 
 	private int priority;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<App> apps;
+	@OneToMany(mappedBy = "appRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AppRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appRule")
-	private Set<AppRuleCondition> conditions;
+	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<App> apps;
 
 	public void removeAssociations() {
 		Iterator<App> appsIterator = apps.iterator();

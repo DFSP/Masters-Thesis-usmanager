@@ -12,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulated
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,8 +81,8 @@ public class ContainerMessage {
 			.region(region)
 			.managerId(managerId)
 			.coordinates(coordinates)
-			.containerRules(containerRules)
-			.simulatedContainerMetrics(simulatedContainerMetrics)
+			.containerRules(containerRules != null ? containerRules : new HashSet<>())
+			.simulatedContainerMetrics(simulatedContainerMetrics != null ? simulatedContainerMetrics : new HashSet<>())
 			.build();
 	}
 }

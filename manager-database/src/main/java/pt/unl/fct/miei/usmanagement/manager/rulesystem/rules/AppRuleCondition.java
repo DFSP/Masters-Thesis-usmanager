@@ -56,11 +56,11 @@ public class AppRuleCondition {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "app_rule_id")
 	private AppRule appRule;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "condition_id")
 	private Condition appCondition;
 

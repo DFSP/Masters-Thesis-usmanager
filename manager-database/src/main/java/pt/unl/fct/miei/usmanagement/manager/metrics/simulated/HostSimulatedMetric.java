@@ -62,7 +62,7 @@ import java.util.Set;
 @Table(name = "simulated_host_metrics")
 public class HostSimulatedMetric {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -71,7 +71,7 @@ public class HostSimulatedMetric {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "field_id")
 	private Field field;
 

@@ -9,6 +9,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -55,8 +56,8 @@ public class HostSimulatedMetricMessage {
 			.generic(generic)
 			.override(override)
 			.active(active)
-			.cloudHosts(cloudHosts)
-			.edgeHosts(edgeHosts)
+			.cloudHosts(cloudHosts != null ? cloudHosts : new HashSet<>())
+			.edgeHosts(edgeHosts != null ? edgeHosts : new HashSet<>())
 			.build();
 	}
 }

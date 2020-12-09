@@ -72,15 +72,15 @@ public class Condition {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "value_mode_id")
 	private ValueMode valueMode;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "field_id")
 	private Field field;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "operator_id")
 	private Operator operator;
 
@@ -88,22 +88,22 @@ public class Condition {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostCondition")
+	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appCondition")
+	@OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppRuleCondition> appConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceCondition")
+	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerCondition")
+	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ContainerRuleCondition> containerConditions;
 
 	@Override

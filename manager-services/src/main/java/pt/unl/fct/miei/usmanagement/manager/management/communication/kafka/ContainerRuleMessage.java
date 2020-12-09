@@ -9,6 +9,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -43,8 +44,8 @@ public class ContainerRuleMessage {
 			.name(name)
 			.priority(priority)
 			.decision(decision)
-			.containers(containers)
-			.conditions(conditions)
+			.containers(containers != null ? containers : new HashSet<>())
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 

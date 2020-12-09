@@ -38,14 +38,14 @@ public class AppMessage {
 		this.simulatedAppMetrics = app.getSimulatedAppMetrics();
 	}
 
-	public App get() {
+	public App getEntity() {
 		return App.builder()
 			.id(id)
 			.name(name)
 			.description(description)
-			.appServices(new HashSet<>())
-			.appRules(new HashSet<>())
-			.simulatedAppMetrics(new HashSet<>())
+			.appServices(appServices != null ? appServices : new HashSet<>())
+			.appRules(appRules != null ? appRules : new HashSet<>())
+			.simulatedAppMetrics(simulatedAppMetrics != null ? simulatedAppMetrics : new HashSet<>())
 			.build();
 	}
 

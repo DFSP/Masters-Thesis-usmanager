@@ -9,6 +9,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -43,8 +44,8 @@ public class AppRuleMessage {
 			.name(name)
 			.priority(priority)
 			.decision(decision)
-			.apps(apps)
-			.conditions(conditions)
+			.apps(apps != null ? apps : new HashSet<>())
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 

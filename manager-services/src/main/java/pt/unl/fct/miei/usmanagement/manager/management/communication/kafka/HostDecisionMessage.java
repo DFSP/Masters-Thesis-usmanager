@@ -10,6 +10,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecisionValu
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -44,7 +45,7 @@ public class HostDecisionMessage {
 			.publicIpAddress(publicIpAddress)
 			.privateIpAddress(privateIpAddress)
 			.timestamp(timestamp)
-			.hostDecisions(hostDecisions)
+			.hostDecisions(hostDecisions != null ? hostDecisions : new HashSet<>())
 			.build();
 	}
 }

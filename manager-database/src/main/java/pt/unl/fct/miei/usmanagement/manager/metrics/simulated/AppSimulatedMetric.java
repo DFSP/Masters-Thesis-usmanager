@@ -69,7 +69,7 @@ public class AppSimulatedMetric {
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "field_id")
 	private Field field;
 

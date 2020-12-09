@@ -206,7 +206,7 @@ class RuleApp extends BaseComponent<Props, State> {
     private saveRuleConditions = (rule: IRuleApp): void => {
         const {unsavedConditions} = this.state;
         if (unsavedConditions.length) {
-            postData(`rules/aplicações/${rule.name}/conditions`, unsavedConditions,
+            postData(`rules/apps/${rule.name}/conditions`, unsavedConditions,
                 () => this.onSaveConditionsSuccess(rule),
                 (reason) => this.onSaveConditionsFailure(rule, reason));
         }

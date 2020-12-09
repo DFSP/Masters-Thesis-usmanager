@@ -68,23 +68,23 @@ public class Decision {
 	@Enumerated(EnumType.STRING)
 	private RuleDecisionEnum ruleDecision;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "component_type_id")
 	private ComponentType componentType;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision")
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceEvent> serviceEvents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision")
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostEvent> hostEvents;
 
   /*@Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision")
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceDecisionEntity> componentDecisionLogs;*/
 
 	@Override

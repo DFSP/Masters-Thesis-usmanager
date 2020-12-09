@@ -369,7 +369,7 @@ class Node extends BaseComponent<Props, State> {
         const nodesHostname = Object.values(this.props.nodes).map(node => node.publicIpAddress);
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
-            .filter(instance => instance.state.name === 'running' || instance.state.name === 'stopped')
+            .filter(instance => instance.state.name === 'running')
             .map(instance => instance.publicIpAddress || instance.instanceId);
         const edgeHosts = Object.entries(this.props.edgeHosts)
             .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.publicIpAddress))

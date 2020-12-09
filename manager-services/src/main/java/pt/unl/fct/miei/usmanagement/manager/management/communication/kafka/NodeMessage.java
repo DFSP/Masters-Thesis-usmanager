@@ -53,6 +53,7 @@ public class NodeMessage {
 			.state(state)
 			.managerStatus(managerStatus)
 			.managerId(managerId)
+			.labels(labels)
 			.build();
 	}
 

@@ -7,6 +7,7 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -33,7 +34,7 @@ public class ValueModeMessage {
 		return ValueMode.builder()
 			.id(id)
 			.name(name)
-			.conditions(conditions)
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 }

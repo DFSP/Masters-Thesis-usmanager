@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.Kafka
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
@@ -60,6 +61,7 @@ import java.util.stream.Collectors;
 public class ServiceRulesService {
 
 	private final ConditionsService conditionsService;
+	private final RuleConditionsService ruleConditionsService;
 	private final DroolsService droolsService;
 	private final ServicesService servicesService;
 	private final ContainersService containersService;
@@ -70,10 +72,11 @@ public class ServiceRulesService {
 	private final String serviceRuleTemplateFile;
 	private final AtomicLong lastUpdateServiceRules;
 
-	public ServiceRulesService(ConditionsService conditionsService, DroolsService droolsService,
+	public ServiceRulesService(ConditionsService conditionsService, RuleConditionsService ruleConditionsService, DroolsService droolsService,
 							   @Lazy ServicesService servicesService, @Lazy ContainersService containersService,
 							   KafkaService kafkaService, ServiceRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
+		this.ruleConditionsService = ruleConditionsService;
 		this.droolsService = droolsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
@@ -166,10 +169,9 @@ public class ServiceRulesService {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
 		ServiceRule rule = getRule(ruleName);
-		ServiceRuleCondition serviceRuleCondition =
-			ServiceRuleCondition.builder().serviceCondition(condition).serviceRule(rule).build();
+		ServiceRuleCondition serviceRuleCondition = ServiceRuleCondition.builder().serviceCondition(condition).serviceRule(rule).build();
+		ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition);
 		rule = rule.toBuilder().condition(serviceRuleCondition).build();
-		rule = saveRule(rule);
 		kafkaService.sendServiceRule(rule);
 	}
 

@@ -36,6 +36,11 @@ import java.util.Optional;
 
 public interface Apps extends JpaRepository<App, Long> {
 
+	@Query("select a "
+		+ "from App a left join fetch a.appServices left join fetch a.appRules left join fetch a.simulatedAppMetrics "
+		+ "where lower(a.name) = lower(:appName)")
+	Optional<App> findByNameWithEntities(String appName);
+
 	@Query("select case when count(a) > 0 then true else false end "
 		+ "from App a "
 		+ "where lower(a.name) = lower(:appName)")

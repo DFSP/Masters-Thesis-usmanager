@@ -10,6 +10,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionV
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -47,7 +48,7 @@ public class ServiceDecisionMessage {
 			.decision(decision)
 			.rule(rule)
 			.timestamp(timestamp)
-			.serviceDecisions(serviceDecisions)
+			.serviceDecisions(serviceDecisions != null ? serviceDecisions : new HashSet<>())
 			.build();
 	}
 }

@@ -8,6 +8,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -49,7 +50,7 @@ public class ContainerSimulatedMetricMessage {
 			.maximumValue(maximumValue)
 			.override(override)
 			.active(active)
-			.containers(containers)
+			.containers(containers != null ? containers : new HashSet<>())
 			.build();
 	}
 }

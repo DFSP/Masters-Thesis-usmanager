@@ -8,6 +8,7 @@ import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -52,7 +53,7 @@ public class ServiceSimulatedMetricMessage {
 			.generic(generic)
 			.override(override)
 			.active(active)
-			.services(services)
+			.services(services != null ? services : new HashSet<>())
 			.build();
 	}
 

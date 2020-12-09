@@ -9,6 +9,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -21,8 +22,8 @@ public class ServiceRuleMessage {
 	private String name;
 	private int priority;
 	private boolean generic;
-	private Set<Service> services;
 	private Decision decision;
+	private Set<Service> services;
 	private Set<ServiceRuleCondition> conditions;
 
 	public ServiceRuleMessage(Long id) {
@@ -34,8 +35,8 @@ public class ServiceRuleMessage {
 		this.name = serviceRule.getName();
 		this.priority = serviceRule.getPriority();
 		this.generic = serviceRule.isGeneric();
-		this.services = serviceRule.getServices();
 		this.decision = serviceRule.getDecision();
+		this.services = serviceRule.getServices();
 		this.conditions = serviceRule.getConditions();
 	}
 
@@ -45,9 +46,9 @@ public class ServiceRuleMessage {
 			.name(name)
 			.priority(priority)
 			.generic(generic)
-			.services(services)
 			.decision(decision)
-			.conditions(conditions)
+			.services(services != null ? services : new HashSet<>())
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 }

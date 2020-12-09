@@ -56,11 +56,11 @@ public class ServiceRuleCondition {
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "service_rule_id")
 	private ServiceRule serviceRule;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "condition_id")
 	private Condition serviceCondition;
 

@@ -11,6 +11,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMe
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -45,8 +46,8 @@ public class FieldMessage {
 			.name(name)
 			.prometheusQuery(prometheusQuery)
 			.conditions(conditions)
-			.simulatedHostMetrics(simulatedHostMetrics)
-			.simulatedServiceMetrics(simulatedServiceMetrics)
+			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics : new HashSet<>())
+			.simulatedServiceMetrics(simulatedServiceMetrics != null ? simulatedServiceMetrics : new HashSet<>())
 			.build();
 	}
 }

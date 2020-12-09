@@ -12,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -83,11 +84,11 @@ public class ServiceMessage {
 			.environment(environment)
 			.volumes(volumes)
 			.expectedMemoryConsumption(expectedMemoryConsumption)
-			.dependencies(dependencies)
-			.dependents(dependents)
-			.eventPredictions(eventPredictions)
-			.serviceRules(serviceRules)
-			.simulatedServiceMetrics(simulatedServiceMetrics)
+			.dependencies(dependencies != null ? dependencies : new HashSet<>())
+			.dependents(dependents != null ? dependents : new HashSet<>())
+			.eventPredictions(eventPredictions != null ? eventPredictions : new HashSet<>())
+			.serviceRules(serviceRules  != null ? serviceRules : new HashSet<>())
+			.simulatedServiceMetrics(simulatedServiceMetrics  != null ? simulatedServiceMetrics : new HashSet<>())
 			.build();
 	}
 }

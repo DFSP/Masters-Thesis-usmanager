@@ -73,18 +73,18 @@ public class ServiceRule {
 
 	private boolean generic;
 
-	@Singular
-	@JsonIgnore
-	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Service> services;
-
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceRule")
+	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<Service> services;
+
+	@Singular
+	@JsonIgnore
+	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceRuleCondition> conditions;
 
 	public void removeAssociations() {

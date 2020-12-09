@@ -8,6 +8,7 @@ import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class ComponentTypeMessage {
 		return ComponentType.builder()
 			.id(id)
 			.type(type)
-			.decisions(decisions)
+			.decisions(decisions != null ? decisions : new HashSet<>())
 			.build();
 	}
 

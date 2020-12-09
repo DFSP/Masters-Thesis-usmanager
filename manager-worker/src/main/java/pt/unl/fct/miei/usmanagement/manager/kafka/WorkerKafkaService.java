@@ -51,6 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
@@ -67,11 +68,16 @@ import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
+import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -100,6 +106,7 @@ public class WorkerKafkaService {
 	private final ServiceRulesService serviceRulesService;
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
+	private final RuleConditionsService ruleConditionsService;
 
 	public WorkerKafkaService(AppsService appsService, CloudHostsService cloudHostsService,
 							  ComponentTypesService componentTypesService, ConditionsService conditionsService,
@@ -111,7 +118,7 @@ public class WorkerKafkaService {
 							  ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 							  ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							  HostRulesService hostRulesService, AppRulesService appRulesService, ServiceRulesService serviceRulesService,
-							  ContainerRulesService containerRulesService, ValueModesService valueModesService) {
+							  ContainerRulesService containerRulesService, ValueModesService valueModesService, RuleConditionsService ruleConditionsService) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -133,29 +140,39 @@ public class WorkerKafkaService {
 		this.serviceRulesService = serviceRulesService;
 		this.containerRulesService = containerRulesService;
 		this.valueModesService = valueModesService;
+		this.ruleConditionsService = ruleConditionsService;
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "apps", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
 		log.info("Received key={} message={}", key, appMessage.toString());
 		try {
-			App app = appMessage.get();
+			App app = appMessage.getEntity();
 			if (Objects.equal(key, "DELETE")) {
 				Long id = app.getId();
 				appsService.deleteApp(id);
 			}
 			else {
-				app = appsService.saveApp(app);
-				Set<AppService> services = appMessage.getAppServices();
-				if (services != null) {
-					appsService.addServices(app.getName(), services);
-				}
+				Set<AppService> appServices = app.getAppServices();
+				appServices.forEach(appService -> {
+					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService();
+					try {
+						servicesService.saveService(service);
+					}
+					catch (ConstraintViolationException e) {
+						log.warn("Not adding service {}: {}", service.getServiceName(), e.getMessage());
+					}
+				});
+				appsService.saveApp(app);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while processing {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "cloud-hosts", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostMessage cloudHostMessage) {
 		log.info("Received key={} message={}", key, cloudHostMessage.toString());
@@ -168,12 +185,14 @@ public class WorkerKafkaService {
 			else {
 				cloudHostsService.saveCloudHost(cloudHost);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(cloudHost), e.getMessage());
 		}
 
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "component-types", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeMessage componentTypeMessage) {
 		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(componentTypeMessage));
@@ -184,13 +203,18 @@ public class WorkerKafkaService {
 				componentTypesService.deleteComponentType(id);
 			}
 			else {
+				Set<Decision> decisions = componentType.getDecisions();
+				componentType.setDecisions(new HashSet<>());
 				componentTypesService.saveComponentType(componentType);
+				decisions.forEach(decisionsService::saveDecision);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(componentType), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "conditions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
 		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionMessage));
@@ -201,13 +225,28 @@ public class WorkerKafkaService {
 				conditionsService.deleteCondition(id);
 			}
 			else {
+				Set<HostRuleCondition> hostRuleConditions = condition.getHostConditions();
+				hostRuleConditions.forEach(hostRuleCondition -> hostRulesService.saveRule(hostRuleCondition.getHostRule()));
+				condition.setHostConditions(new HashSet<>());
+				Set<AppRuleCondition> appRuleConditions = condition.getAppConditions();
+				appRuleConditions.forEach(appRuleCondition -> appRulesService.saveRule(appRuleCondition.getAppRule()));
+				condition.setAppConditions(new HashSet<>());
+				Set<ServiceRuleCondition> serviceRuleConditions = condition.getServiceConditions();
+				serviceRuleConditions.forEach(serviceRuleCondition -> serviceRulesService.saveRule(serviceRuleCondition.getServiceRule()));
+				condition.setServiceConditions(new HashSet<>());
+				Set<ContainerRuleCondition> containerRuleConditions = condition.getContainerConditions();
+				containerRuleConditions.forEach(containerRuleCondition -> containerRulesService.saveRule(containerRuleCondition.getContainerRule()));
+				condition.setContainerConditions(new HashSet<>());
+
 				conditionsService.saveCondition(condition);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "containers", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerMessage containerMessage) {
 		log.info("Received key={} message={}", key, containerMessage.toString());
@@ -220,11 +259,13 @@ public class WorkerKafkaService {
 			else {
 				containersService.saveContainer(container);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(container), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionMessage decisionMessage) {
 		log.info("Received key={} message={}", key, decisionMessage.toString());
@@ -237,11 +278,13 @@ public class WorkerKafkaService {
 			else {
 				decisionsService.saveDecision(decision);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(decision), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "edge-hosts", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostMessage edgeHostMessage) {
 		log.info("Received key={} message={}", key, edgeHostMessage.toString());
@@ -254,11 +297,13 @@ public class WorkerKafkaService {
 			else {
 				edgeHostsService.saveEdgeHost(edgeHost);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(edgeHost), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "eips", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpMessage elasticIpMessage) {
 		log.info("Received key={} message={}", key, elasticIpMessage.toString());
@@ -271,11 +316,13 @@ public class WorkerKafkaService {
 			else {
 				elasticIpsService.saveElasticIp(elasticIp);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(elasticIp), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "fields", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldMessage fieldMessage) {
 		log.info("Received key={} message={}", key, fieldMessage.toString());
@@ -288,11 +335,13 @@ public class WorkerKafkaService {
 			else {
 				fieldsService.saveField(field);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(field), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "nodes", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeMessage nodeMessage) {
 		log.info("Received key={} message={}", key, nodeMessage.toString());
@@ -305,11 +354,13 @@ public class WorkerKafkaService {
 			else {
 				nodesService.saveNode(node);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(node), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "operators", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorMessage operatorMessage) {
 		log.info("Received key={} message={}", key, operatorMessage.toString());
@@ -322,11 +373,13 @@ public class WorkerKafkaService {
 			else {
 				operatorsService.saveOperator(operator);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(operator), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "services", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMessage serviceMessage) {
 		log.info("Received key={} message={}", key, serviceMessage.toString());
@@ -339,11 +392,13 @@ public class WorkerKafkaService {
 			else {
 				servicesService.saveService(service);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(service), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-host-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricMessage hostSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, hostSimulatedMetricMessage.toString());
@@ -356,11 +411,13 @@ public class WorkerKafkaService {
 			else {
 				hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetric), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-app-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricMessage appSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, appSimulatedMetricMessage.toString());
@@ -373,11 +430,13 @@ public class WorkerKafkaService {
 			else {
 				appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetric), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-service-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricMessage serviceSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, serviceSimulatedMetricMessage.toString());
@@ -390,11 +449,13 @@ public class WorkerKafkaService {
 			else {
 				serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-container-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricMessage containerSimulatedMetricMessage) {
 		log.info("Received key={} message={}", key, containerSimulatedMetricMessage.toString());
@@ -407,11 +468,13 @@ public class WorkerKafkaService {
 			else {
 				containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetric), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "host-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleMessage hostRuleMessage) {
 		log.info("Received key={} message={}", key, hostRuleMessage.toString());
@@ -422,13 +485,24 @@ public class WorkerKafkaService {
 				hostRulesService.deleteRule(id);
 			}
 			else {
+				Set<HostRuleCondition> hostRuleConditions = hostRule.getConditions();
+				hostRuleConditions.forEach(hostRuleCondition -> {
+					hostRulesService.saveRule(hostRuleCondition.getHostRule());
+					conditionsService.saveCondition(hostRuleCondition.getHostCondition());
+				});
+				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
+				cloudHosts.forEach(cloudHostsService::saveCloudHost);
+				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
+				edgeHosts.forEach(edgeHostsService::saveEdgeHost);
 				hostRulesService.saveRule(hostRule);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostRule), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "app-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleMessage appRuleMessage) {
 		log.info("Received key={} message={}", key, appRuleMessage.toString());
@@ -439,13 +513,22 @@ public class WorkerKafkaService {
 				appRulesService.deleteRule(id);
 			}
 			else {
+				Set<AppRuleCondition> appRuleConditions = appRule.getConditions();
+				appRuleConditions.forEach(appRuleCondition -> {
+					appRulesService.saveRule(appRuleCondition.getAppRule());
+					conditionsService.saveCondition(appRuleCondition.getAppCondition());
+				});
+				Set<App> apps = appRule.getApps();
+				apps.forEach(appsService::saveApp);
 				appRulesService.saveRule(appRule);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appRule), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "service-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleMessage serviceRuleMessage) {
 		log.info("Received key={} message={}", key, serviceRuleMessage.toString());
@@ -456,13 +539,22 @@ public class WorkerKafkaService {
 				serviceRulesService.deleteRule(id);
 			}
 			else {
+				Set<ServiceRuleCondition> serviceRuleConditions = serviceRule.getConditions();
+				serviceRuleConditions.forEach(serviceRuleCondition -> {
+					serviceRulesService.saveRule(serviceRuleCondition.getServiceRule());
+					conditionsService.saveCondition(serviceRuleCondition.getServiceCondition());
+				});
+				Set<pt.unl.fct.miei.usmanagement.manager.services.Service> services = serviceRule.getServices();
+				services.forEach(servicesService::saveService);
 				serviceRulesService.saveRule(serviceRule);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceRule), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "container-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleMessage containerRuleMessage) {
 		log.info("Received key={} message={}", key, containerRuleMessage.toString());
@@ -473,13 +565,22 @@ public class WorkerKafkaService {
 				containerRulesService.deleteRule(id);
 			}
 			else {
+				Set<ContainerRuleCondition> containerRuleConditions = containerRule.getConditions();
+				containerRuleConditions.forEach(containerRuleCondition -> {
+					containerRulesService.saveRule(containerRuleCondition.getContainerRule());
+					conditionsService.saveCondition(containerRuleCondition.getContainerCondition());
+				});
+				Set<pt.unl.fct.miei.usmanagement.manager.containers.Container> containers = containerRule.getContainers();
+				containers.forEach(containersService::saveContainer);
 				containerRulesService.saveRule(containerRule);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerRule), e.getMessage());
 		}
 	}
 
+	//@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "value-modes", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeMessage valueModeMessage) {
 		log.info("Received key={} message={}", key, valueModeMessage.toString());
@@ -490,9 +591,12 @@ public class WorkerKafkaService {
 				valueModesService.deleteValueMode(id);
 			}
 			else {
+				Set<Condition> conditions = valueMode.getConditions();
+				conditions.forEach(conditionsService::saveCondition);
 				valueModesService.saveValueMode(valueMode);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(valueMode), e.getMessage());
 		}
 	}

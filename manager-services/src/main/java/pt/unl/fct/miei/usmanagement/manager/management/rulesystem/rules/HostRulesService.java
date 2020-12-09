@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsSer
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 public class HostRulesService {
 
 	private final ConditionsService conditionsService;
+	private final RuleConditionsService ruleConditionsService;
 	private final CloudHostsService cloudHostsService;
 	private final EdgeHostsService edgeHostsService;
 	private final DroolsService droolsService;
@@ -67,10 +69,11 @@ public class HostRulesService {
 	private final String hostRuleTemplateFile;
 	private final AtomicLong lastUpdateHostRules;
 
-	public HostRulesService(ConditionsService conditionsService, CloudHostsService cloudHostsService,
+	public HostRulesService(ConditionsService conditionsService, RuleConditionsService ruleConditionsService, CloudHostsService cloudHostsService,
 							EdgeHostsService edgeHostsService, DroolsService droolsService, KafkaService kafkaService,
 							HostRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
+		this.ruleConditionsService = ruleConditionsService;
 		this.cloudHostsService = cloudHostsService;
 		this.edgeHostsService = edgeHostsService;
 		this.droolsService = droolsService;
@@ -102,6 +105,11 @@ public class HostRulesService {
 
 	public HostRule getRule(String name) {
 		return rules.findByNameIgnoreCase(name).orElseThrow(() ->
+			new EntityNotFoundException(HostRule.class, "name", name));
+	}
+
+	public HostRule getRuleAndEntities(String name) {
+		return rules.findByNameWithEntities(name).orElseThrow(() ->
 			new EntityNotFoundException(HostRule.class, "name", name));
 	}
 
@@ -169,11 +177,10 @@ public class HostRulesService {
 	public void addCondition(String ruleName, String conditionName) {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
-		HostRule rule = getRule(ruleName);
-		HostRuleCondition hostRuleCondition =
-			HostRuleCondition.builder().hostCondition(condition).hostRule(rule).build();
+		HostRule rule = getRuleAndEntities(ruleName);
+		HostRuleCondition hostRuleCondition = HostRuleCondition.builder().hostCondition(condition).hostRule(rule).build();
+		ruleConditionsService.saveHostRuleCondition(hostRuleCondition);
 		rule = rule.toBuilder().condition(hostRuleCondition).build();
-		rule = saveRule(rule);
 		kafkaService.sendHostRule(rule);
 	}
 
@@ -187,7 +194,7 @@ public class HostRulesService {
 
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
-		HostRule rule = getRule(ruleName);
+		HostRule rule = getRuleAndEntities(ruleName);
 		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendHostRule(rule);
@@ -210,7 +217,7 @@ public class HostRulesService {
 
 	public void addCloudHosts(String ruleName, List<String> instanceIds) {
 		log.info("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
-		HostRule rule = getRule(ruleName);
+		HostRule rule = getRuleAndEntities(ruleName);
 		instanceIds.forEach(instanceId -> {
 			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
 			cloudHost.addRule(rule);
@@ -225,7 +232,7 @@ public class HostRulesService {
 
 	public void removeCloudHosts(String ruleName, List<String> instanceIds) {
 		log.info("Removing cloud hosts {} from rule {}", instanceIds, ruleName);
-		HostRule rule = getRule(ruleName);
+		HostRule rule = getRuleAndEntities(ruleName);
 		instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeRule(rule));
 		HostRule hostRule = saveRule(rule);
 		kafkaService.sendHostRule(hostRule);
@@ -248,7 +255,7 @@ public class HostRulesService {
 
 	public void addEdgeHosts(String ruleName, List<HostAddress> hostAddresses) {
 		log.info("Adding edge hosts {} to rule {}", hostAddresses, ruleName);
-		HostRule rule = getRule(ruleName);
+		HostRule rule = getRuleAndEntities(ruleName);
 		hostAddresses.forEach(hostAddress -> {
 			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			edgeHost.addRule(rule);
@@ -263,23 +270,27 @@ public class HostRulesService {
 
 	public void removeEdgeHosts(String ruleName, List<HostAddress> hostAddresses) {
 		log.info("Removing edge hosts {} from rule {}", hostAddresses, ruleName);
-		HostRule rule = getRule(ruleName);
+		HostRule rule = getRuleAndEntities(ruleName);
 		hostAddresses.forEach(hostAddress -> edgeHostsService.getEdgeHostByAddress(hostAddress).removeRule(rule));
 		HostRule hostRule = saveRule(rule);
 		kafkaService.sendHostRule(hostRule);
 	}
 
 	private void checkRuleExists(String ruleName) {
-		if (!rules.hasRule(ruleName)) {
+		if (!hasRule(ruleName)) {
 			throw new EntityNotFoundException(HostRule.class, "ruleName", ruleName);
 		}
 	}
 
 	private void checkRuleDoesntExist(HostRule hostRule) {
 		String name = hostRule.getName();
-		if (rules.hasRule(name)) {
+		if (hasRule(name)) {
 			throw new DataIntegrityViolationException("Host rule '" + name + "' already exists");
 		}
+	}
+
+	public boolean hasRule(String name) {
+		return rules.hasRule(name);
 	}
 
 	public HostDecisionResult processHostEvent(HostEvent hostEvent) {

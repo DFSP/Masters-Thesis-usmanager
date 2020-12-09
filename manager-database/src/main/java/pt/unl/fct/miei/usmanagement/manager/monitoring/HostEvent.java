@@ -70,7 +70,7 @@ public class HostEvent {
 	@NotNull
 	private String managerPrivateIpAddress;
 
-	@ManyToOne(cascade = {CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 

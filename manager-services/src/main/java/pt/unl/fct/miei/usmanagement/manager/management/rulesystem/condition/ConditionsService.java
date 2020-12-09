@@ -33,6 +33,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.Kafka
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
@@ -46,10 +54,16 @@ public class ConditionsService {
 
 	private final Conditions conditions;
 
-	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService) {
+	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService,
+							 HostRuleConditions hostRuleConditions, AppRuleConditions appRuleConditions,
+							 ServiceRuleConditions serviceRuleConditions, ContainerRuleConditions containerRuleConditions) {
 		this.fieldsService = fieldsService;
 		this.conditions = conditions;
 		this.kafkaService = kafkaService;
+		this.hostRuleConditions = hostRuleConditions;
+		this.appRuleConditions = appRuleConditions;
+		this.serviceRuleConditions = serviceRuleConditions;
+		this.containerRuleConditions = containerRuleConditions;
 	}
 
 	public List<Condition> getConditions() {

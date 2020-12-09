@@ -10,6 +10,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -49,9 +50,9 @@ public class HostRuleMessage {
 			.priority(priority)
 			.decision(decision)
 			.generic(generic)
-			.cloudHosts(cloudHosts)
-			.edgeHosts(edgeHosts)
-			.conditions(conditions)
+			.cloudHosts(cloudHosts != null ? cloudHosts : new HashSet<>())
+			.edgeHosts(edgeHosts != null ? edgeHosts : new HashSet<>())
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 

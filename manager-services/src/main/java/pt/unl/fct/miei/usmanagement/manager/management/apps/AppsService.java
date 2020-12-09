@@ -78,6 +78,7 @@ public class AppsService {
 	}
 
 	public App saveApp(App app) {
+		log.info("Saving app {}", app.getName());
 		return apps.save(app);
 	}
 
@@ -91,6 +92,11 @@ public class AppsService {
 			new EntityNotFoundException(App.class, "name", appName));
 	}
 
+	public App getAppAndEntities(String appName) {
+		return apps.findByNameWithEntities(appName).orElseThrow(() ->
+			new EntityNotFoundException(App.class, "name", appName));
+	}
+
 	public App addApp(App app) {
 		checkAppDoesntExist(app);
 		log.info("Saving app {}", ToStringBuilder.reflectionToString(app));
@@ -100,7 +106,7 @@ public class AppsService {
 	}
 
 	public App updateApp(String appName, App newApp) {
-		App app = getApp(appName);
+		App app = getAppAndEntities(appName);
 		log.info("Updating app {} with {}", ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
 		EntityUtils.copyValidProperties(newApp, app);
 		app = saveApp(app);
@@ -109,6 +115,7 @@ public class AppsService {
 	}
 
 	public void deleteApp(Long id) {
+		log.info("Deleting app {}", id);
 		apps.deleteById(id);
 	}
 
@@ -125,12 +132,17 @@ public class AppsService {
 
 	public void addService(String appName, AppService appService) {
 		App app = getApp(appName);
+		addService(app, appService);
+	}
+
+	public void addService(App app, AppService appService) {
 		app = app.toBuilder().appService(appService).build();
+		servicesService.saveService(appService.getService());
 		apps.save(app);
 	}
 
 	public void addService(String appName, String serviceName, int order) {
-		App app = getApp(appName);
+		App app = getAppAndEntities(appName);
 		Service service = servicesService.getService(serviceName);
 		AppService appService = AppService.builder()
 			.app(app)
@@ -139,15 +151,15 @@ public class AppsService {
 			.build();
 		app = app.toBuilder().appService(appService).build();
 		app = apps.save(app);
-		kafkaService.sendAppServices(app.getAppServices());
+		kafkaService.sendApp(app);
 	}
 
 	public void addServices(String appName, Map<String, Integer> services) {
 		services.forEach((service, launchOrder) -> addService(appName, service, launchOrder));
 	}
 
-	public void addServices(String appName, Set<AppService> appServices) {
-		appServices.forEach(appService -> addService(appName, appService));
+	public void addServices(App app, Set<AppService> appServices) {
+		appServices.forEach(appService -> addService(app, appService));
 	}
 
 	public void removeService(String appName, String service) {
@@ -155,10 +167,11 @@ public class AppsService {
 	}
 
 	public void removeServices(String appName, List<String> services) {
-		App app = getApp(appName);
+		App app = getAppAndEntities(appName);
 		log.info("Removing services {}", services);
 		app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
-		apps.save(app);
+		app = apps.save(app);
+		kafkaService.sendApp(app);
 	}
 
 	public Map<String, List<Container>> launch(String appName, Coordinates coordinates) {

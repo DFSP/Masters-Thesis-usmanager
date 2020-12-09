@@ -73,7 +73,7 @@ public class Operator {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "operator")
+	@OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Condition> conditions;
 
 	@Override

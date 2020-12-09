@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
@@ -109,7 +110,7 @@ public class DatabaseLoader {
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
-								   HostRuleConditions hostRuleConditions, ServiceRulesService serviceRulesService,
+								   ServiceRulesService serviceRulesService,
 								   ServiceRuleConditions serviceRuleConditions, DockerProperties dockerProperties,
 								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
 								   HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
@@ -146,7 +147,7 @@ public class DatabaseLoader {
 
 			Map<String, Condition> conditions = loadConditions(conditionsService, valueModes, fields, operators);
 
-			Map<String, HostRule> hostRules = loadRules(hostRulesService, hostRuleConditions, decisions, conditions);
+			Map<String, HostRule> hostRules = loadRules(hostRulesService, conditionsService, decisions, conditions);
 
 			Map<String, ServiceRule> serviceRules = loadServiceRules(serviceRulesService, serviceRuleConditions, decisions, conditions);
 
@@ -176,10 +177,11 @@ public class DatabaseLoader {
 		};
 	}
 
-	private Map<String, ServiceRule> loadServiceRules(ServiceRulesService serviceRulesService,
-													  ServiceRuleConditions serviceRuleConditions,
-													  Map<RuleDecisionEnum, Decision> decisions,
-													  Map<String, Condition> conditions) {
+	@Transactional
+	Map<String, ServiceRule> loadServiceRules(ServiceRulesService serviceRulesService,
+											  ServiceRuleConditions serviceRuleConditions,
+											  Map<RuleDecisionEnum, Decision> decisions,
+											  Map<String, Condition> conditions) {
 		Map<String, ServiceRule> serviceRuleMap = new HashMap<>();
 
 		ServiceRule rxOver500000GenericServiceRule;
@@ -207,8 +209,9 @@ public class DatabaseLoader {
 		return serviceRuleMap;
 	}
 
-	private Map<String, HostRule> loadRules(HostRulesService hostRulesService, HostRuleConditions hostRuleConditions,
-											Map<RuleDecisionEnum, Decision> decisions, Map<String, Condition> conditions) {
+	@Transactional
+	Map<String, HostRule> loadRules(HostRulesService hostRulesService, ConditionsService conditionsService,
+									Map<RuleDecisionEnum, Decision> decisions, Map<String, Condition> conditions) {
 		Map<String, HostRule> hostRuleMap = new HashMap<>();
 
 		HostRule cpuAndRamOver90GenericHostRule;
@@ -231,20 +234,21 @@ public class DatabaseLoader {
 				.hostCondition(cpuPercentageOver90)
 				.build();
 			Condition ramPercentageOver90 = conditions.get("RamPercentageOver90");
-			hostRuleConditions.save(cpuOver90Condition);
+			conditionsService.saveHostCondition(cpuOver90Condition);
 			HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
 				.hostRule(cpuAndRamOver90GenericHostRule)
 				.hostCondition(ramPercentageOver90)
 				.build();
-			hostRuleConditions.save(ramOver90Condition);
+			conditionsService.saveHostCondition(ramOver90Condition);
 		}
 		hostRuleMap.put("CpuAndRamOver90", cpuAndRamOver90GenericHostRule);
 
 		return hostRuleMap;
 	}
 
-	private Map<String, Condition> loadConditions(ConditionsService conditionsService, Map<String, ValueMode> valueModes,
-												  Map<String, Field> fields, Map<OperatorEnum, Operator> operators) {
+	@Transactional
+	Map<String, Condition> loadConditions(ConditionsService conditionsService, Map<String, ValueMode> valueModes,
+										  Map<String, Field> fields, Map<OperatorEnum, Operator> operators) {
 		Map<String, Condition> conditionsMap = new HashMap<>();
 
 		ValueMode effectiveValue = valueModes.get("effective-val");
@@ -321,7 +325,8 @@ public class DatabaseLoader {
 		return conditionsMap;
 	}
 
-	private Map<String, ValueMode> loadValueModes(ValueModesService valueModesService) {
+	@Transactional
+	Map<String, ValueMode> loadValueModes(ValueModesService valueModesService) {
 		Map<String, ValueMode> valueModes = new HashMap<>();
 
 		ValueMode effectiveValue;
@@ -375,7 +380,8 @@ public class DatabaseLoader {
 		return valueModes;
 	}
 
-	private Map<String, Field> loadFields(FieldsService fieldsService) {
+	@Transactional
+	Map<String, Field> loadFields(FieldsService fieldsService) {
 		Map<String, Field> fieldsMap = new HashMap<>();
 
 		Field cpu;
@@ -517,7 +523,8 @@ public class DatabaseLoader {
 		return fieldsMap;
 	}
 
-	private Map<RuleDecisionEnum, Decision> loadDecisions(DecisionsService decisionsService, Map<ComponentTypeEnum, ComponentType> componentTypes) {
+	@Transactional
+	Map<RuleDecisionEnum, Decision> loadDecisions(DecisionsService decisionsService, Map<ComponentTypeEnum, ComponentType> componentTypes) {
 		Map<RuleDecisionEnum, Decision> decisionsMap = new HashMap<>();
 
 		ComponentType serviceComponentType = componentTypes.get(ComponentTypeEnum.SERVICE);
@@ -618,7 +625,8 @@ public class DatabaseLoader {
 		return decisionsMap;
 	}
 
-	private Map<OperatorEnum, Operator> loadOperators(OperatorsService operatorsService) {
+	@Transactional
+	Map<OperatorEnum, Operator> loadOperators(OperatorsService operatorsService) {
 		Map<OperatorEnum, Operator> operatorsMap = new HashMap<>();
 
 		Operator notEqualTo;
@@ -702,7 +710,8 @@ public class DatabaseLoader {
 		return operatorsMap;
 	}
 
-	private Map<ComponentTypeEnum, ComponentType> loadComponentTypes(ComponentTypesService componentTypesService) {
+	@Transactional
+	Map<ComponentTypeEnum, ComponentType> loadComponentTypes(ComponentTypesService componentTypesService) {
 		Map<ComponentTypeEnum, ComponentType> componentTypesMap = new HashMap<>();
 
 		ComponentType hostComponentType;
@@ -744,11 +753,13 @@ public class DatabaseLoader {
 		return componentTypesMap;
 	}
 
-	private List<CloudHost> loadCloudHosts(SyncService syncService) {
+	@Transactional
+	List<CloudHost> loadCloudHosts(SyncService syncService) {
 		return syncService.synchronizeCloudHostsDatabase();
 	}
 
-	private List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
+	@Transactional
+	List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
 		List<EdgeHost> egeHosts = new ArrayList<>(1);
 
 		EdgeHost danielHost;
@@ -772,7 +783,9 @@ public class DatabaseLoader {
 		return egeHosts;
 	}
 
-	/*private Map<RegionEnum, Region> loadRegions(RegionsService regionsService) {
+
+	/*@Transactional
+    Map<RegionEnum, Region> loadRegions(RegionsService regionsService) {
 		Map<RegionEnum, Region> regionsMap = new HashMap<>();
 
 		for (RegionEnum regionEnum : RegionEnum.values()) {
@@ -793,12 +806,12 @@ public class DatabaseLoader {
 		return regionsMap;
 	}*/
 
-
-	private Map.Entry<String, Service> associateServiceToApp(String appName, String serviceName, Integer defaultExternalPort,
-															 Integer defaultInternalPort, ServiceTypeEnum type,
-															 Set<String> environment, ServicesService servicesService,
-															 String dockerHubUsername, List<String> launch,
-															 Double expectedMemoryConsumption) {
+	@Transactional
+	Map.Entry<String, Service> associateServiceToApp(String appName, String serviceName, Integer defaultExternalPort,
+													 Integer defaultInternalPort, ServiceTypeEnum type,
+													 Set<String> environment, ServicesService servicesService,
+													 String dockerHubUsername, List<String> launch,
+													 Double expectedMemoryConsumption) {
 		appName = appName.toLowerCase().replace(" ", "-") + "-" + serviceName;
 		Service service;
 		try {
@@ -823,8 +836,9 @@ public class DatabaseLoader {
 		return Map.entry(appName, service);
 	}
 
-	private Map<String, Service> loadTestingSuite(String dockerHubUsername, AppsService appsService,
-												  ServicesService servicesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadTestingSuite(String dockerHubUsername, AppsService appsService,
+										  ServicesService servicesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(1);
 
 		String appName = "Test Suite";
@@ -846,15 +860,17 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadSocialNetwork(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-												   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadSocialNetwork(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+										   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>();
 
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadMediaMicroservices(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-														ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadMediaMicroservices(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+												ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(32);
 
 		String appName = "Media";
@@ -1113,8 +1129,9 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadHotelReservation(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-													  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadHotelReservation(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+											  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(18);
 
 		String appName = "Hotel Reservation";
@@ -1243,8 +1260,9 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadOnlineBoutique(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-													ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadOnlineBoutique(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+											ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(11);
 
 		String appName = "Online Boutique";
@@ -1360,8 +1378,9 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadMixal(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-										   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadMixal(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+								   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(5);
 
 		String appName = "Mixal";
@@ -1411,8 +1430,9 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, Service> loadSockShop(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
-											  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
+	@Transactional
+	Map<String, Service> loadSockShop(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
+									  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(14);
 
 		String appName = "Sock Shop";
@@ -1523,7 +1543,8 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	private Map<String, User> loadUsers(UsersService usersService) {
+	@Transactional
+	Map<String, User> loadUsers(UsersService usersService) {
 		Map<String, User> usersMap = new HashMap<>(2);
 
 		User admin;
@@ -1563,9 +1584,10 @@ public class DatabaseLoader {
 		return usersMap;
 	}
 
-	private Map<String, Service> loadSystemComponents(String dockerHubUsername, ServicesService servicesService,
-													  ServiceDependenciesService serviceDependenciesService,
-													  DockerProperties dockerProperties) {
+	@Transactional
+	Map<String, Service> loadSystemComponents(String dockerHubUsername, ServicesService servicesService,
+											  ServiceDependenciesService serviceDependenciesService,
+											  DockerProperties dockerProperties) {
 		Map<String, Service> servicesMap = new HashMap<>(7);
 
 		Service masterManager;

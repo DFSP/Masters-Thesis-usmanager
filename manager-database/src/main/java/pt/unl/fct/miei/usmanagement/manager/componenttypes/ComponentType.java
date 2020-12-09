@@ -56,7 +56,7 @@ import java.util.Set;
 @Table(name = "component_types")
 public class ComponentType {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -67,7 +67,7 @@ public class ComponentType {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "componentType")
+	@OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Decision> decisions;
 
 	@Override

@@ -389,10 +389,6 @@ public class KafkaService {
 		send("apps", new AppMessage(app), app.getId());
 	}
 
-	public void sendAppServices(Set<AppService> appServices) {
-		send("apps", appServices);
-	}
-
 	@Async
 	public void sendDeleteApp(App app) {
 		delete("apps", new AppMessage(app.getId()));

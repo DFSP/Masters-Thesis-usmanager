@@ -8,6 +8,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -49,7 +50,7 @@ public class AppSimulatedMetricMessage {
 			.maximumValue(maximumValue)
 			.override(override)
 			.active(active)
-			.apps(apps)
+			.apps(apps != null ? apps : new HashSet<>())
 			.build();
 	}
 }

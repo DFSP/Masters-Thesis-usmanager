@@ -39,6 +39,11 @@ public interface HostRules extends JpaRepository<HostRule, Long> {
 	Optional<HostRule> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select r "
+		+ "from HostRule r left join fetch r.conditions left join fetch r.cloudHosts left join fetch r.edgeHosts "
+		+ "where lower(r.name) = lower(:name)")
+	Optional<HostRule> findByNameWithEntities(String name);
+
+	@Query("select r "
 		+ "from HostRule r left join r.cloudHosts c left join r.edgeHosts e "
 		+ "where r.generic = true or "
 		+ "(c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "

@@ -8,6 +8,7 @@ import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -35,7 +36,7 @@ public class OperatorMessage {
 		return Operator.builder()
 			.operator(operator)
 			.symbol(symbol)
-			.conditions(conditions)
+			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
 	}
 }

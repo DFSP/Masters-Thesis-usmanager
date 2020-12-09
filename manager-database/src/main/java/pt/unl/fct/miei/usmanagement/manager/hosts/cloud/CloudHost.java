@@ -65,7 +65,7 @@ import java.util.Set;
 @Table(name = "cloud_hosts")
 public class CloudHost {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -94,7 +94,7 @@ public class CloudHost {
 	private AwsRegion awsRegion;
 
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	private WorkerManager managedByWorker;
 
 	@Singular
@@ -140,7 +140,6 @@ public class CloudHost {
 		return new HostAddress("ubuntu", publicDnsName, publicIpAddress, privateIpAddress,
 			awsRegion.getCoordinates(), awsRegion.getRegion(), PlaceEnum.CLOUD);
 	}
-
 
 	@Override
 	public int hashCode() {
