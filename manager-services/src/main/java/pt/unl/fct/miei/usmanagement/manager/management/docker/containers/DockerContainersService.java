@@ -610,7 +610,7 @@ public class DockerContainersService {
 		Set<ContainerPortMapping> ports = container.ports().stream()
 			.map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
 			.collect(Collectors.toSet());
-		Map<String, String> labels = container.labels();
+		Map<String, String> labels = new HashMap<>(container.labels());
 		return new DockerContainer(id, type, created, name, image, command, network, state, status, publicIpAddress, privateIpAddress,
 			mounts, coordinates, region, ports, labels);
 	}

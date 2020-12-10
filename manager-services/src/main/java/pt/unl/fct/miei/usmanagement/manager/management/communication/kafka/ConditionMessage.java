@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,6 @@ import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,6 +33,8 @@ public class ConditionMessage {
 	private Set<AppRuleCondition> appConditions;
 	private Set<ServiceRuleCondition> serviceConditions;
 	private Set<ContainerRuleCondition> containerConditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ConditionMessage(Long id) {
 		this.id = id;
@@ -49,10 +51,11 @@ public class ConditionMessage {
 		this.appConditions = condition.getAppConditions();
 		this.serviceConditions = condition.getServiceConditions();
 		this.containerConditions = condition.getContainerConditions();
+		/*this.isNew = condition.isNew();*/
 	}
 
 	public Condition get() {
-		return Condition.builder()
+		Condition condition = Condition.builder()
 			.id(id)
 			.name(name)
 			.valueMode(valueMode)
@@ -64,5 +67,7 @@ public class ConditionMessage {
 			.serviceConditions(serviceConditions != null ? serviceConditions : new HashSet<>())
 			.containerConditions(containerConditions != null ? containerConditions : new HashSet<>())
 			.build();
+		/*condition.setNew(condition.isNew());*/
+		return condition;
 	}
 }

@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,6 +42,8 @@ public class ServiceMessage {
 	private Set<ServiceEventPrediction> eventPredictions;
 	private Set<ServiceRule> serviceRules;
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ServiceMessage(Long id) {
 		this.id = id;
@@ -66,10 +69,11 @@ public class ServiceMessage {
 		this.eventPredictions = service.getEventPredictions();
 		this.serviceRules = service.getServiceRules();
 		this.simulatedServiceMetrics = service.getSimulatedServiceMetrics();
+		/*this.isNew = service.isNew();*/
 	}
 
 	public Service get() {
-		return Service.builder()
+		Service service = Service.builder()
 			.id(id)
 			.serviceName(serviceName)
 			.dockerRepository(dockerRepository)
@@ -87,8 +91,10 @@ public class ServiceMessage {
 			.dependencies(dependencies != null ? dependencies : new HashSet<>())
 			.dependents(dependents != null ? dependents : new HashSet<>())
 			.eventPredictions(eventPredictions != null ? eventPredictions : new HashSet<>())
-			.serviceRules(serviceRules  != null ? serviceRules : new HashSet<>())
-			.simulatedServiceMetrics(simulatedServiceMetrics  != null ? simulatedServiceMetrics : new HashSet<>())
+			.serviceRules(serviceRules != null ? serviceRules : new HashSet<>())
+			.simulatedServiceMetrics(simulatedServiceMetrics != null ? simulatedServiceMetrics : new HashSet<>())
 			.build();
+		/*service.setNew(isNew);*/
+		return service;
 	}
 }

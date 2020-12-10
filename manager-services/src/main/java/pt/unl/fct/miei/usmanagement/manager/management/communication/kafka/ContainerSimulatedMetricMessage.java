@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ public class ContainerSimulatedMetricMessage {
 	private boolean override;
 	private boolean active;
 	private Set<Container> containers;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ContainerSimulatedMetricMessage(Long id) {
 		this.id = id;
@@ -39,10 +42,11 @@ public class ContainerSimulatedMetricMessage {
 		this.override = containerSimulatedMetric.isOverride();
 		this.active = containerSimulatedMetric.isActive();
 		this.containers = containerSimulatedMetric.getContainers();
+		/*this.isNew = containerSimulatedMetric.isNew();*/
 	}
 
 	public ContainerSimulatedMetric get() {
-		return ContainerSimulatedMetric.builder()
+		ContainerSimulatedMetric containerSimulatedMetric = ContainerSimulatedMetric.builder()
 			.id(id)
 			.name(name)
 			.field(field)
@@ -52,5 +56,7 @@ public class ContainerSimulatedMetricMessage {
 			.active(active)
 			.containers(containers != null ? containers : new HashSet<>())
 			.build();
+		/*containerSimulatedMetric.setNew(isNew);*/
+		return containerSimulatedMetric;
 	}
 }

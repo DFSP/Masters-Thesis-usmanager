@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,8 @@ public class HostDecisionMessage {
 	private String privateIpAddress;
 	private Timestamp timestamp;
 	private Set<HostDecisionValue> hostDecisions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public HostDecisionMessage(HostDecision hostDecision) {
 		this.id = hostDecision.getId();
@@ -35,10 +38,11 @@ public class HostDecisionMessage {
 		this.privateIpAddress = hostDecision.getPrivateIpAddress();
 		this.timestamp = hostDecision.getTimestamp();
 		this.hostDecisions = hostDecision.getHostDecisions();
+		/*this.isNew = hostDecision.isNew();*/
 	}
 
 	public HostDecision get() {
-		return HostDecision.builder()
+		HostDecision hostDecision = HostDecision.builder()
 			.id(id)
 			.decision(decision)
 			.rule(rule)
@@ -47,5 +51,7 @@ public class HostDecisionMessage {
 			.timestamp(timestamp)
 			.hostDecisions(hostDecisions != null ? hostDecisions : new HashSet<>())
 			.build();
+		/*hostDecision.setNew(hostDecision.isNew());*/
+		return hostDecision;
 	}
 }

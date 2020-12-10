@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +26,8 @@ public class FieldMessage {
 	private Set<Condition> conditions;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public FieldMessage(Long id) {
 		this.id = id;
@@ -38,10 +40,11 @@ public class FieldMessage {
 		this.conditions = field.getConditions();
 		this.simulatedHostMetrics = field.getSimulatedHostMetrics();
 		this.simulatedServiceMetrics = field.getSimulatedServiceMetrics();
+		/*this.isNew = field.isNew();*/
 	}
 
 	public Field get() {
-		return Field.builder()
+		Field field = Field.builder()
 			.id(id)
 			.name(name)
 			.prometheusQuery(prometheusQuery)
@@ -49,5 +52,7 @@ public class FieldMessage {
 			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics : new HashSet<>())
 			.simulatedServiceMetrics(simulatedServiceMetrics != null ? simulatedServiceMetrics : new HashSet<>())
 			.build();
+		/*field.setNew(isNew);*/
+		return field;
 	}
 }

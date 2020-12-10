@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
@@ -80,8 +81,10 @@ public class HostSimulatedMetricsService {
 
 	public HostSimulatedMetric addHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
 		checkHostSimulatedMetricDoesntExist(hostSimulatedMetric);
-		log.info("Saving simulated host metric {}", ToStringBuilder.reflectionToString(hostSimulatedMetric));
 		hostSimulatedMetric = saveHostSimulatedMetric(hostSimulatedMetric);
+		/*HostSimulatedMetric kafkaHostSimulatedMetric = hostSimulatedMetric;
+		kafkaHostSimulatedMetric.setNew(true);
+		kafkaService.sendHostSimulatedMetric(kafkaHostSimulatedMetric);*/
 		kafkaService.sendHostSimulatedMetric(hostSimulatedMetric);
 		return hostSimulatedMetric;
 	}
@@ -98,6 +101,7 @@ public class HostSimulatedMetricsService {
 	}
 
 	public HostSimulatedMetric saveHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
+		log.info("Saving hostSimulatedMetric {}", ToStringBuilder.reflectionToString(hostSimulatedMetric));
 		return hostSimulatedMetrics.save(hostSimulatedMetric);
 	}
 

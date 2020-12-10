@@ -76,8 +76,10 @@ public class AppSimulatedMetricsService {
 
 	public AppSimulatedMetric addAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
 		checkAppSimulatedMetricDoesntExist(appSimulatedMetric);
-		log.info("Saving simulated app metric {}", ToStringBuilder.reflectionToString(appSimulatedMetric));
 		appSimulatedMetric = saveAppSimulatedMetric(appSimulatedMetric);
+		/*AppSimulatedMetric kafkaAppSimulatedMetric = appSimulatedMetric;
+		kafkaAppSimulatedMetric.setNew(true);
+		kafkaService.sendAppSimulatedMetric(kafkaAppSimulatedMetric);*/
 		kafkaService.sendAppSimulatedMetric(appSimulatedMetric);
 		return appSimulatedMetric;
 	}
@@ -94,6 +96,7 @@ public class AppSimulatedMetricsService {
 	}
 
 	public AppSimulatedMetric saveAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
+		log.info("Saving appSimulatedMetric {}", ToStringBuilder.reflectionToString(appSimulatedMetric));
 		return appSimulatedMetrics.save(appSimulatedMetric);
 	}
 

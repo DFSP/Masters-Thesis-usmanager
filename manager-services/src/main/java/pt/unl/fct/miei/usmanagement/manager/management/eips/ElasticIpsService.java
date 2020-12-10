@@ -84,13 +84,16 @@ public class ElasticIpsService {
 
 	public ElasticIp addElasticIp(ElasticIp elasticIp) {
 		checkElasticIpDoesntExist(elasticIp);
-		log.info("Saving elasticIp {}", ToStringBuilder.reflectionToString(elasticIp));
 		elasticIp = saveElasticIp(elasticIp);
+		/*ElasticIp kafkaElasticIp = elasticIp;
+		kafkaElasticIp.setNew(true);
+		kafkaService.sendElasticIp(kafkaElasticIp);*/
 		kafkaService.sendElasticIp(elasticIp);
 		return elasticIp;
 	}
 
 	public ElasticIp saveElasticIp(ElasticIp elasticIp) {
+		log.info("Saving elasticIp {}", ToStringBuilder.reflectionToString(elasticIp));
 		return elasticIps.save(elasticIp);
 	}
 
@@ -178,7 +181,8 @@ public class ElasticIpsService {
 		HostAddress previousHostAddress = cloudHost.getAddress();
 		AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
 		Instance instance = awsService.getInstance(instanceId, awsRegion);
-		cloudHost = cloudHostsService.saveCloudHostFromInstance(cloudHost.getId(), instance);
+		cloudHost.setPublicIpAddress(instance.getPublicIpAddress());
+		cloudHost = cloudHostsService.updateCloudHost(cloudHost);
 		nodesService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
 		containersService.updateAddress(previousHostAddress, elasticIp.getPublicIp());
 		return cloudHost;

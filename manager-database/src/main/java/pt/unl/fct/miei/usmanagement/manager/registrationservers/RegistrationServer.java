@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -25,7 +26,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Table(name = "registration_servers")
-public class RegistrationServer {
+public class RegistrationServer /*extends AbstractEntity<String> */{
 
 	@Id
 	private String id;

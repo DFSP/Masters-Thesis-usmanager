@@ -36,9 +36,12 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 @Slf4j
@@ -50,6 +53,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
+	private final RegionsService regionsService;
 
 	private final Environment environment;
 
@@ -58,12 +62,13 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								Environment environment) {
+								RegionsService regionsService, Environment environment) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
+		this.regionsService = regionsService;
 		this.environment = environment;
 	}
 

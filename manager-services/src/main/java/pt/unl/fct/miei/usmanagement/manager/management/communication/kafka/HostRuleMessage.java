@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,8 @@ public class HostRuleMessage {
 	private Set<CloudHost> cloudHosts;
 	private Set<EdgeHost> edgeHosts;
 	private Set<HostRuleCondition> conditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public HostRuleMessage(Long id) {
 		this.id = id;
@@ -41,10 +44,11 @@ public class HostRuleMessage {
 		this.cloudHosts = hostRule.getCloudHosts();
 		this.edgeHosts = hostRule.getEdgeHosts();
 		this.conditions = hostRule.getConditions();
+		/*this.isNew = hostRule.isNew();*/
 	}
 
 	public HostRule get() {
-		return HostRule.builder()
+		HostRule hostRule = HostRule.builder()
 			.id(id)
 			.name(name)
 			.priority(priority)
@@ -54,6 +58,8 @@ public class HostRuleMessage {
 			.edgeHosts(edgeHosts != null ? edgeHosts : new HashSet<>())
 			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
+		/*hostRule.setNew(isNew);*/
+		return hostRule;
 	}
 
 }

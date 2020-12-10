@@ -32,6 +32,9 @@ import java.util.Optional;
 
 public interface ComponentTypes extends JpaRepository<ComponentType, Long> {
 
+	@Query("select t "
+		+ "from ComponentType t left join fetch t.decisions "
+		+ "where t.type = :type")
 	Optional<ComponentType> findByType(@Param("type") ComponentTypeEnum type);
 
 	@Query("select case when count(t) > 0 then true else false end "

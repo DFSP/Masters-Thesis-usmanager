@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ public class ServiceRuleMessage {
 	private Decision decision;
 	private Set<Service> services;
 	private Set<ServiceRuleCondition> conditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ServiceRuleMessage(Long id) {
 		this.id = id;
@@ -38,10 +41,11 @@ public class ServiceRuleMessage {
 		this.decision = serviceRule.getDecision();
 		this.services = serviceRule.getServices();
 		this.conditions = serviceRule.getConditions();
+		/*this.isNew = serviceRule.isNew();*/
 	}
 
 	public ServiceRule get() {
-		return ServiceRule.builder()
+		ServiceRule serviceRule = ServiceRule.builder()
 			.id(id)
 			.name(name)
 			.priority(priority)
@@ -50,5 +54,7 @@ public class ServiceRuleMessage {
 			.services(services != null ? services : new HashSet<>())
 			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
+		/*serviceRule.setNew(serviceRule.isNew());*/
+		return serviceRule;
 	}
 }

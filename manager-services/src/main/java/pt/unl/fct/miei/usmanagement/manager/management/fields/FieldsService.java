@@ -67,6 +67,9 @@ public class FieldsService {
 		checkFieldDoesntExist(field);
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		field = fields.save(field);
+		/*Field kafkaField = field;
+		kafkaField.setNew(true);
+		kafkaService.sendField(kafkaField);*/
 		kafkaService.sendField(field);
 		return field;
 	}
@@ -81,6 +84,7 @@ public class FieldsService {
 	}
 
 	public Field saveField(Field field) {
+		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		return fields.save(field);
 	}
 

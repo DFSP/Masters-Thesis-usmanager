@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,8 @@ public class HostSimulatedMetricMessage {
 	private boolean active;
 	private Set<CloudHost> cloudHosts;
 	private Set<EdgeHost> edgeHosts;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public HostSimulatedMetricMessage(Long id) {
 		this.id = id;
@@ -44,10 +47,11 @@ public class HostSimulatedMetricMessage {
 		this.active = hostSimulatedMetric.isActive();
 		this.cloudHosts = hostSimulatedMetric.getCloudHosts();
 		this.edgeHosts = hostSimulatedMetric.getEdgeHosts();
+		/*this.isNew = hostSimulatedMetric.isNew();*/
 	}
 
 	public HostSimulatedMetric get() {
-		return HostSimulatedMetric.builder()
+		HostSimulatedMetric hostSimulatedMetric = HostSimulatedMetric.builder()
 			.id(id)
 			.name(name)
 			.field(field)
@@ -59,5 +63,7 @@ public class HostSimulatedMetricMessage {
 			.cloudHosts(cloudHosts != null ? cloudHosts : new HashSet<>())
 			.edgeHosts(edgeHosts != null ? edgeHosts : new HashSet<>())
 			.build();
+		/*hostSimulatedMetric.setNew(isNew);*/
+		return hostSimulatedMetric;
 	}
 }

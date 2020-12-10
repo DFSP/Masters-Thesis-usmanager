@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,7 +19,7 @@ import javax.persistence.Table;
 @Setter
 @Getter
 @Table(name = "configurations")
-public class Configuration {
+public class Configuration /*extends AbstractEntity<String> */{
 
 	@Id
 	private String id;

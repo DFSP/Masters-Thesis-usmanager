@@ -37,19 +37,22 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsSer
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRules;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -115,8 +118,10 @@ public class HostRulesService {
 
 	public HostRule addRule(HostRule rule) {
 		checkRuleDoesntExist(rule);
-		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		rule = saveRule(rule);
+		/*HostRule kafkaRule = rule;
+		kafkaRule.setNew(true);
+		kafkaService.sendHostRule(kafkaRule);*/
 		kafkaService.sendHostRule(rule);
 		return rule;
 	}
@@ -130,7 +135,22 @@ public class HostRulesService {
 		return rule;
 	}
 
+	public HostRule addOrUpdateRule(HostRule hostRule) {
+		Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
+		if (optionalRule.isPresent()) {
+			HostRule rule = optionalRule.get();
+			EntityUtils.copyValidProperties(hostRule, rule);
+			rule.getConditions().clear();
+			rule.getConditions().addAll(hostRule.getConditions());
+			return rules.save(rule);
+		}
+		else {
+			return rules.save(hostRule);
+		}
+	}
+
 	public HostRule saveRule(HostRule hostRule) {
+		log.info("Saving hostRule {}", ToStringBuilder.reflectionToString(hostRule));
 		hostRule = rules.save(hostRule);
 		setLastUpdateHostRules();
 		return hostRule;
@@ -178,7 +198,9 @@ public class HostRulesService {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
 		HostRule rule = getRuleAndEntities(ruleName);
-		HostRuleCondition hostRuleCondition = HostRuleCondition.builder().hostCondition(condition).hostRule(rule).build();
+		HostRuleCondition hostRuleCondition = HostRuleCondition.builder()
+			.id(new RuleConditionKey(rule.getId(), condition.getId()))
+			.hostRule(rule).hostCondition(condition).build();
 		ruleConditionsService.saveHostRuleCondition(hostRuleCondition);
 		rule = rule.toBuilder().condition(hostRuleCondition).build();
 		kafkaService.sendHostRule(rule);

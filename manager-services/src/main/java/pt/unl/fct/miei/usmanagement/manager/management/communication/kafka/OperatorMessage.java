@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class OperatorMessage {
 	private OperatorEnum operator;
 	private String symbol;
 	private Set<Condition> conditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public OperatorMessage(Long id) {
 		this.id = id;
@@ -30,13 +33,16 @@ public class OperatorMessage {
 		this.operator = operator.getOperator();
 		this.symbol = operator.getSymbol();
 		this.conditions = operator.getConditions();
+		/*this.isNew = operator.isNew();*/
 	}
 
 	public Operator get() {
-		return Operator.builder()
-			.operator(operator)
+		Operator operator = Operator.builder()
+			.operator(this.operator)
 			.symbol(symbol)
 			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
+		/*operator.setNew(isNew);*/
+		return operator;
 	}
 }

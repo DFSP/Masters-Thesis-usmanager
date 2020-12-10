@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
@@ -58,7 +59,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_app_metrics")
-public class AppSimulatedMetric {
+public class AppSimulatedMetric /*extends AbstractEntity<Long> */{
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -88,7 +89,7 @@ public class AppSimulatedMetric {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "simulatedAppMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(mappedBy = "simulatedAppMetrics")
 	private Set<App> apps;
 
 	public void removeAssociations() {

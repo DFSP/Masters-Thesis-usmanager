@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -57,8 +58,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "service_rules")
-public class ServiceRule {
+@Table(name = "rules_service")
+public class ServiceRule /*extends AbstractEntity<Long> */{
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -79,13 +80,13 @@ public class ServiceRule {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "serviceRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Service> services;
+	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ServiceRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceRuleCondition> conditions;
+	@ManyToMany(mappedBy = "serviceRules")
+	private Set<Service> services;
 
 	public void removeAssociations() {
 		Iterator<Service> servicesIterator = services.iterator();

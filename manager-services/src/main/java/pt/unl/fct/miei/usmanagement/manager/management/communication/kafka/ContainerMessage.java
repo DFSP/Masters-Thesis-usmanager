@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,8 @@ public class ContainerMessage {
 	private Coordinates coordinates;
 	private Set<ContainerRule> containerRules;
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ContainerMessage(String id) {
 		this.id = id;
@@ -62,10 +65,11 @@ public class ContainerMessage {
 		this.coordinates = container.getCoordinates();
 		this.containerRules = container.getContainerRules();
 		this.simulatedContainerMetrics = container.getSimulatedContainerMetrics();
+		/*this.isNew = container.isNew();*/
 	}
 
 	public Container get() {
-		return Container.builder()
+		Container container = Container.builder()
 			.id(id)
 			.type(type)
 			.created(created)
@@ -84,5 +88,7 @@ public class ContainerMessage {
 			.containerRules(containerRules != null ? containerRules : new HashSet<>())
 			.simulatedContainerMetrics(simulatedContainerMetrics != null ? simulatedContainerMetrics : new HashSet<>())
 			.build();
+		/*container.setNew(isNew);*/
+		return container;
 	}
 }

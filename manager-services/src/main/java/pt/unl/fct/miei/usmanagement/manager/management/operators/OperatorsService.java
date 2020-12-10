@@ -28,14 +28,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -65,13 +69,34 @@ public class OperatorsService {
 
 	public Operator addOperator(Operator operator) {
 		checkOperatorDoesntExist(operator);
-		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
 		operator = saveOperator(operator);
+		/*Operator kafkaOperator = operator;
+		operator.setNew(true);
+		kafkaService.sendOperator(kafkaOperator);*/
 		kafkaService.sendOperator(operator);
 		return operator;
 	}
 
+	@Transactional
+	public Operator addOrUpdateOperator(Operator operator) {
+		Optional<Operator> optionalOptional = operators.findById(operator.getId());
+		if (optionalOptional.isPresent()) {
+			Operator op = optionalOptional.get();
+			Set<Condition> conditions = operator.getConditions();
+			if (conditions != null) {
+				op.getConditions().retainAll(conditions);
+				op.getConditions().addAll(conditions);
+			}
+			EntityUtils.copyValidProperties(operator, op);
+			return saveOperator(op);
+		}
+		else {
+			return saveOperator(operator);
+		}
+	}
+
 	public Operator saveOperator(Operator operator) {
+		log.info("Saving operator {}", ToStringBuilder.reflectionToString(operator));
 		return operators.save(operator);
 	}
 

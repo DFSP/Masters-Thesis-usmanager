@@ -25,12 +25,14 @@
 package pt.unl.fct.miei.usmanagement.manager.database;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServices;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
@@ -58,6 +60,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonito
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
@@ -76,6 +79,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
@@ -110,6 +114,7 @@ public class DatabaseLoader {
 								   OperatorsService operatorsService, DecisionsService decisionsService,
 								   FieldsService fieldsService, ValueModesService valueModesService,
 								   ConditionsService conditionsService, HostRulesService hostRulesService,
+								   RuleConditionsService ruleConditionsService,
 								   ServiceRulesService serviceRulesService,
 								   ServiceRuleConditions serviceRuleConditions, DockerProperties dockerProperties,
 								   HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
@@ -147,7 +152,7 @@ public class DatabaseLoader {
 
 			Map<String, Condition> conditions = loadConditions(conditionsService, valueModes, fields, operators);
 
-			Map<String, HostRule> hostRules = loadRules(hostRulesService, conditionsService, decisions, conditions);
+			Map<String, HostRule> hostRules = loadRules(hostRulesService, ruleConditionsService, decisions, conditions);
 
 			Map<String, ServiceRule> serviceRules = loadServiceRules(serviceRulesService, serviceRuleConditions, decisions, conditions);
 
@@ -199,6 +204,7 @@ public class DatabaseLoader {
 				.build();
 			rxOver500000GenericServiceRule = serviceRulesService.addRule(rxOver500000GenericServiceRule);
 			ServiceRuleCondition rxOver500000Condition = ServiceRuleCondition.builder()
+				.id(new RuleConditionKey(rxOver500000GenericServiceRule.getId(), rxBytesPerSecOver500000.getId()))
 				.serviceRule(rxOver500000GenericServiceRule)
 				.serviceCondition(rxBytesPerSecOver500000)
 				.build();
@@ -210,7 +216,7 @@ public class DatabaseLoader {
 	}
 
 	@Transactional
-	Map<String, HostRule> loadRules(HostRulesService hostRulesService, ConditionsService conditionsService,
+	Map<String, HostRule> loadRules(HostRulesService hostRulesService, RuleConditionsService ruleConditionsService,
 									Map<RuleDecisionEnum, Decision> decisions, Map<String, Condition> conditions) {
 		Map<String, HostRule> hostRuleMap = new HashMap<>();
 
@@ -230,16 +236,18 @@ public class DatabaseLoader {
 
 			Condition cpuPercentageOver90 = conditions.get("CpuPercentageOver90");
 			HostRuleCondition cpuOver90Condition = HostRuleCondition.builder()
+				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), cpuPercentageOver90.getId()))
 				.hostRule(cpuAndRamOver90GenericHostRule)
 				.hostCondition(cpuPercentageOver90)
 				.build();
 			Condition ramPercentageOver90 = conditions.get("RamPercentageOver90");
-			conditionsService.saveHostCondition(cpuOver90Condition);
+			ruleConditionsService.saveHostRuleCondition(cpuOver90Condition);
 			HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
+				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), ramPercentageOver90.getId()))
 				.hostRule(cpuAndRamOver90GenericHostRule)
 				.hostCondition(ramPercentageOver90)
 				.build();
-			conditionsService.saveHostCondition(ramOver90Condition);
+			ruleConditionsService.saveHostRuleCondition(ramOver90Condition);
 		}
 		hostRuleMap.put("CpuAndRamOver90", cpuAndRamOver90GenericHostRule);
 
@@ -853,7 +861,7 @@ public class DatabaseLoader {
 				.build();
 			testing = appsService.addApp(testing);
 			appServices.saveAll(List.of(
-				AppService.builder().app(testing).service(crashTesting.getValue()).build())
+				AppService.builder().id(new AppServiceKey(testing.getId(), crashTesting.getValue().getId())).app(testing).service(crashTesting.getValue()).build())
 			);
 		}
 
@@ -990,39 +998,39 @@ public class DatabaseLoader {
 				.build();
 			media = appsService.addApp(media);
 			appServices.saveAll(List.of(
-				AppService.builder().app(media).service(uniqueId.getValue()).launchOrder(1).build(),
-				AppService.builder().app(media).service(movieIdDb.getValue()).launchOrder(2).build(),
-				AppService.builder().app(media).service(movieIdMemcached.getValue()).launchOrder(3).build(),
-				AppService.builder().app(media).service(movieId.getValue()).launchOrder(4).build(),
-				AppService.builder().app(media).service(text.getValue()).launchOrder(5).build(),
-				AppService.builder().app(media).service(ratingRedis.getValue()).launchOrder(6).build(),
-				AppService.builder().app(media).service(rating.getValue()).launchOrder(7).build(),
-				AppService.builder().app(media).service(userDb.getValue()).launchOrder(8).build(),
-				AppService.builder().app(media).service(userMemcached.getValue()).launchOrder(9).build(),
-				AppService.builder().app(media).service(user.getValue()).launchOrder(10).build(),
-				AppService.builder().app(media).service(composeReviewMemcached.getValue()).launchOrder(11).build(),
-				AppService.builder().app(media).service(composeReview.getValue()).launchOrder(12).build(),
-				AppService.builder().app(media).service(reviewStorageDb.getValue()).launchOrder(13).build(),
-				AppService.builder().app(media).service(reviewStorageMemcached.getValue()).launchOrder(14).build(),
-				AppService.builder().app(media).service(reviewStorage.getValue()).launchOrder(15).build(),
-				AppService.builder().app(media).service(userReviewDb.getValue()).launchOrder(16).build(),
-				AppService.builder().app(media).service(userReviewRedis.getValue()).launchOrder(17).build(),
-				AppService.builder().app(media).service(userReview.getValue()).launchOrder(18).build(),
-				AppService.builder().app(media).service(movieReviewDb.getValue()).launchOrder(19).build(),
-				AppService.builder().app(media).service(movieReviewRedis.getValue()).launchOrder(20).build(),
-				AppService.builder().app(media).service(movieReview.getValue()).launchOrder(21).build(),
-				AppService.builder().app(media).service(nginxWebServer.getValue()).launchOrder(21).build(),
-				AppService.builder().app(media).service(castInfoDb.getValue()).launchOrder(22).build(),
-				AppService.builder().app(media).service(castInfoMemcached.getValue()).launchOrder(23).build(),
-				AppService.builder().app(media).service(castInfo.getValue()).launchOrder(24).build(),
-				AppService.builder().app(media).service(plotDb.getValue()).launchOrder(25).build(),
-				AppService.builder().app(media).service(plotMemcached.getValue()).launchOrder(26).build(),
-				AppService.builder().app(media).service(plot.getValue()).launchOrder(27).build(),
-				AppService.builder().app(media).service(movieInfoDb.getValue()).launchOrder(28).build(),
-				AppService.builder().app(media).service(movieInfoMemcached.getValue()).launchOrder(29).build(),
-				AppService.builder().app(media).service(movieInfo.getValue()).launchOrder(30).build(),
-				AppService.builder().app(media).service(page.getValue()).launchOrder(31).build(),
-				AppService.builder().app(media).service(jaeger.getValue()).launchOrder(32).build())
+				AppService.builder().id(new AppServiceKey(media.getId(), uniqueId.getValue().getId())).app(media).service(uniqueId.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieIdDb.getValue().getId())).app(media).service(movieIdDb.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieIdMemcached.getValue().getId())).app(media).service(movieIdMemcached.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieId.getValue().getId())).app(media).service(movieId.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), text.getValue().getId())).app(media).service(text.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), ratingRedis.getValue().getId())).app(media).service(ratingRedis.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), rating.getValue().getId())).app(media).service(rating.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userDb.getValue().getId())).app(media).service(userDb.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userMemcached.getValue().getId())).app(media).service(userMemcached.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), user.getValue().getId())).app(media).service(user.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), composeReviewMemcached.getValue().getId())).app(media).service(composeReviewMemcached.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), composeReview.getValue().getId())).app(media).service(composeReview.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageDb.getValue().getId())).app(media).service(reviewStorageDb.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageMemcached.getValue().getId())).app(media).service(reviewStorageMemcached.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorage.getValue().getId())).app(media).service(reviewStorage.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReviewDb.getValue().getId())).app(media).service(userReviewDb.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReviewRedis.getValue().getId())).app(media).service(userReviewRedis.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReview.getValue().getId())).app(media).service(userReview.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewDb.getValue().getId())).app(media).service(movieReviewDb.getValue()).launchOrder(19).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewRedis.getValue().getId())).app(media).service(movieReviewRedis.getValue()).launchOrder(20).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReview.getValue().getId())).app(media).service(movieReview.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), nginxWebServer.getValue().getId())).app(media).service(nginxWebServer.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfoDb.getValue().getId())).app(media).service(castInfoDb.getValue()).launchOrder(22).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfoMemcached.getValue().getId())).app(media).service(castInfoMemcached.getValue()).launchOrder(23).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfo.getValue().getId())).app(media).service(castInfo.getValue()).launchOrder(24).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plotDb.getValue().getId())).app(media).service(plotDb.getValue()).launchOrder(25).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plotMemcached.getValue().getId())).app(media).service(plotMemcached.getValue()).launchOrder(26).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plot.getValue().getId())).app(media).service(plot.getValue()).launchOrder(27).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoDb.getValue().getId())).app(media).service(movieInfoDb.getValue()).launchOrder(28).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoMemcached.getValue().getId())).app(media).service(movieInfoMemcached.getValue()).launchOrder(29).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfo.getValue().getId())).app(media).service(movieInfo.getValue()).launchOrder(30).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), page.getValue().getId())).app(media).service(page.getValue()).launchOrder(31).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), jaeger.getValue().getId())).app(media).service(jaeger.getValue()).launchOrder(32).build())
 			);
 		}
 
@@ -1208,24 +1216,24 @@ public class DatabaseLoader {
 				.build();
 			hotelReservation = appsService.addApp(hotelReservation);
 			appServices.saveAll(List.of(
-				AppService.builder().app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
-				AppService.builder().app(hotelReservation).service(memcachedProfile.getValue()).launchOrder(2).build(),
-				AppService.builder().app(hotelReservation).service(profileDb.getValue()).launchOrder(3).build(),
-				AppService.builder().app(hotelReservation).service(profile.getValue()).launchOrder(4).build(),
-				AppService.builder().app(hotelReservation).service(search.getValue()).launchOrder(5).build(),
-				AppService.builder().app(hotelReservation).service(geoDb.getValue()).launchOrder(6).build(),
-				AppService.builder().app(hotelReservation).service(geo.getValue()).launchOrder(7).build(),
-				AppService.builder().app(hotelReservation).service(rateDb.getValue()).launchOrder(8).build(),
-				AppService.builder().app(hotelReservation).service(memcachedRate.getValue()).launchOrder(9).build(),
-				AppService.builder().app(hotelReservation).service(rate.getValue()).launchOrder(10).build(),
-				AppService.builder().app(hotelReservation).service(recommendationDb.getValue()).launchOrder(12).build(),
-				AppService.builder().app(hotelReservation).service(recommendation.getValue()).launchOrder(13).build(),
-				AppService.builder().app(hotelReservation).service(userDb.getValue()).launchOrder(14).build(),
-				AppService.builder().app(hotelReservation).service(user.getValue()).launchOrder(15).build(),
-				AppService.builder().app(hotelReservation).service(reservationDb.getValue()).launchOrder(16).build(),
-				AppService.builder().app(hotelReservation).service(memcachedReserve.getValue()).launchOrder(17).build(),
-				AppService.builder().app(hotelReservation).service(reservation.getValue()).launchOrder(18).build(),
-				AppService.builder().app(hotelReservation).service(frontend.getValue()).launchOrder(19).build())
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), jaeger.getValue().getId())).app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedProfile.getValue().getId())).app(hotelReservation).service(memcachedProfile.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profileDb.getValue().getId())).app(hotelReservation).service(profileDb.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profile.getValue().getId())).app(hotelReservation).service(profile.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), search.getValue().getId())).app(hotelReservation).service(search.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geoDb.getValue().getId())).app(hotelReservation).service(geoDb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geo.getValue().getId())).app(hotelReservation).service(geo.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rateDb.getValue().getId())).app(hotelReservation).service(rateDb.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedRate.getValue().getId())).app(hotelReservation).service(memcachedRate.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rate.getValue().getId())).launchOrder(10).app(hotelReservation).service(rate.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendationDb.getValue().getId())).launchOrder(12).app(hotelReservation).service(recommendationDb.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendation.getValue().getId())).launchOrder(13).app(hotelReservation).service(recommendation.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), userDb.getValue().getId())).launchOrder(14).app(hotelReservation).service(userDb.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), user.getValue().getId())).launchOrder(15).app(hotelReservation).service(user.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservationDb.getValue().getId())).launchOrder(16).app(hotelReservation).service(reservationDb.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedReserve.getValue().getId())).launchOrder(17).app(hotelReservation).service(memcachedReserve.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservation.getValue().getId())).launchOrder(18).app(hotelReservation).service(reservation.getValue()).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), frontend.getValue().getId())).launchOrder(19).app(hotelReservation).service(frontend.getValue()).build())
 			);
 		}
 
@@ -1313,17 +1321,17 @@ public class DatabaseLoader {
 				.build();
 			onlineBoutique = appsService.addApp(onlineBoutique);
 			appServices.saveAll(List.of(
-				AppService.builder().app(onlineBoutique).service(payment.getValue()).launchOrder(1).build(),
-				AppService.builder().app(onlineBoutique).service(email.getValue()).launchOrder(2).build(),
-				AppService.builder().app(onlineBoutique).service(carts.getValue()).launchOrder(3).build(),
-				AppService.builder().app(onlineBoutique).service(recommendation.getValue()).launchOrder(4).build(),
-				AppService.builder().app(onlineBoutique).service(catalogue.getValue()).launchOrder(5).build(),
-				AppService.builder().app(onlineBoutique).service(currency.getValue()).launchOrder(6).build(),
-				AppService.builder().app(onlineBoutique).service(shipping.getValue()).launchOrder(7).build(),
-				AppService.builder().app(onlineBoutique).service(checkout.getValue()).launchOrder(8).build(),
-				AppService.builder().app(onlineBoutique).service(ads.getValue()).launchOrder(9).build(),
-				AppService.builder().app(onlineBoutique).service(frontend.getValue()).launchOrder(10).build(),
-				AppService.builder().app(onlineBoutique).service(loadGenerator.getValue()).launchOrder(11).build()));
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), payment.getValue().getId())).app(onlineBoutique).service(payment.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), email.getValue().getId())).app(onlineBoutique).service(email.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), carts.getValue().getId())).app(onlineBoutique).service(carts.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), recommendation.getValue().getId())).app(onlineBoutique).service(recommendation.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), catalogue.getValue().getId())).app(onlineBoutique).service(catalogue.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), currency.getValue().getId())).app(onlineBoutique).service(currency.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), shipping.getValue().getId())).app(onlineBoutique).service(shipping.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), checkout.getValue().getId())).app(onlineBoutique).service(checkout.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), ads.getValue().getId())).app(onlineBoutique).service(ads.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), frontend.getValue().getId())).app(onlineBoutique).service(frontend.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), loadGenerator.getValue().getId())).app(onlineBoutique).service(loadGenerator.getValue()).launchOrder(11).build()));
 		}
 
 		if (!serviceDependenciesService.hasDependency(carts.getKey(), redis.getKey())) {
@@ -1408,11 +1416,11 @@ public class DatabaseLoader {
 				.build();
 			mixal = appsService.addApp(mixal);
 			appServices.saveAll(List.of(
-				AppService.builder().app(mixal).service(movieDb.getValue()).launchOrder(1).build(),
-				AppService.builder().app(mixal).service(movie.getValue()).launchOrder(2).build(),
-				AppService.builder().app(mixal).service(prime.getValue()).launchOrder(3).build(),
-				AppService.builder().app(mixal).service(serve.getValue()).launchOrder(4).build(),
-				AppService.builder().app(mixal).service(webac.getValue()).launchOrder(5).build()));
+				AppService.builder().id(new AppServiceKey(mixal.getId(), movieDb.getValue().getId())).app(mixal).service(movieDb.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), movie.getValue().getId())).app(mixal).service(movie.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), prime.getValue().getId())).app(mixal).service(prime.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), serve.getValue().getId())).app(mixal).service(serve.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), webac.getValue().getId())).app(mixal).service(webac.getValue()).launchOrder(5).build()));
 		}
 		if (!serviceDependenciesService.hasDependency(serve.getKey(), movie.getKey())) {
 			serviceDependenciesService.addDependency(serve.getValue(), movie.getValue());
@@ -1484,20 +1492,21 @@ public class DatabaseLoader {
 					"It is intended to aid the demonstration and testing of microservice and cloud native technologies.")
 				.build();
 			sockShop = appsService.addApp(sockShop);
+			log.info("{}", sockShop.getId());
 			appServices.saveAll(List.of(
-				AppService.builder().app(sockShop).service(rabbitmq.getValue()).launchOrder(1).build(),
-				AppService.builder().app(sockShop).service(queueMaster.getValue()).launchOrder(2).build(),
-				AppService.builder().app(sockShop).service(shipping.getValue()).launchOrder(3).build(),
-				AppService.builder().app(sockShop).service(ordersDb.getValue()).launchOrder(4).build(),
-				AppService.builder().app(sockShop).service(orders.getValue()).launchOrder(5).build(),
-				AppService.builder().app(sockShop).service(cartsDb.getValue()).launchOrder(6).build(),
-				AppService.builder().app(sockShop).service(carts.getValue()).launchOrder(7).build(),
-				AppService.builder().app(sockShop).service(payment.getValue()).launchOrder(8).build(),
-				AppService.builder().app(sockShop).service(catalogueDb.getValue()).launchOrder(9).build(),
-				AppService.builder().app(sockShop).service(catalogue.getValue()).launchOrder(10).build(),
-				AppService.builder().app(sockShop).service(userDb.getValue()).launchOrder(11).build(),
-				AppService.builder().app(sockShop).service(user.getValue()).launchOrder(12).build(),
-				AppService.builder().app(sockShop).service(frontend.getValue()).launchOrder(13).build()));
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), rabbitmq.getValue().getId())).app(sockShop).service(rabbitmq.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), queueMaster.getValue().getId())).app(sockShop).service(queueMaster.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), shipping.getValue().getId())).app(sockShop).service(shipping.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), ordersDb.getValue().getId())).app(sockShop).service(ordersDb.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), orders.getValue().getId())).app(sockShop).service(orders.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), cartsDb.getValue().getId())).app(sockShop).service(cartsDb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), carts.getValue().getId())).app(sockShop).service(carts.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), payment.getValue().getId())).app(sockShop).service(payment.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogueDb.getValue().getId())).app(sockShop).service(catalogueDb.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogue.getValue().getId())).app(sockShop).service(catalogue.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), userDb.getValue().getId())).app(sockShop).service(userDb.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), user.getValue().getId())).app(sockShop).service(user.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), frontend.getValue().getId())).app(sockShop).service(frontend.getValue()).launchOrder(13).build()));
 		}
 
 		if (!serviceDependenciesService.hasDependency(frontend.getKey(), user.getKey())) {

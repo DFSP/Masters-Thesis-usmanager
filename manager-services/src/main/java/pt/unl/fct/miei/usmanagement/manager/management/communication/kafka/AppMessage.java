@@ -24,6 +24,8 @@ public class AppMessage {
 	private Set<AppService> appServices;
 	private Set<AppRule> appRules;
 	private Set<AppSimulatedMetric> simulatedAppMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew;*/
 
 	public AppMessage(Long id) {
 		this.id = id;
@@ -36,10 +38,11 @@ public class AppMessage {
 		this.appServices = app.getAppServices();
 		this.appRules = app.getAppRules();
 		this.simulatedAppMetrics = app.getSimulatedAppMetrics();
+		/*this.isNew = app.isNew();*/
 	}
 
 	public App getEntity() {
-		return App.builder()
+		App app = App.builder()
 			.id(id)
 			.name(name)
 			.description(description)
@@ -47,6 +50,8 @@ public class AppMessage {
 			.appRules(appRules != null ? appRules : new HashSet<>())
 			.simulatedAppMetrics(simulatedAppMetrics != null ? simulatedAppMetrics : new HashSet<>())
 			.build();
+		/*app.setNew(isNew);*/
+		return app;
 	}
 
 }

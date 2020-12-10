@@ -28,6 +28,7 @@ import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.InstanceType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
@@ -141,6 +142,7 @@ public class CloudHostsService {
 	}
 
 	public CloudHost saveCloudHost(CloudHost cloudHost) {
+		log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
 		return cloudHosts.save(cloudHost);
 	}
 
@@ -152,7 +154,7 @@ public class CloudHostsService {
 	}
 
 	private CloudHost saveCloudHostFromInstance(Instance instance) {
-		return saveCloudHostFromInstance(0L, instance);
+		return saveCloudHostFromInstance(null, instance);
 	}
 
 	public CloudHost saveCloudHostFromInstance(Long id, Instance instance) {
@@ -168,7 +170,11 @@ public class CloudHostsService {
 			.awsRegion(AwsRegion.fromPlacement(instance.getPlacement()))
 			.placement(instance.getPlacement())
 			.build();
+		/*cloudHost.setNew(id == null);*/
 		cloudHost = saveCloudHost(cloudHost);
+		/*CloudHost kafkaCloudHost = cloudHost;
+		kafkaCloudHost.setNew(id == null);
+		kafkaService.sendCloudHost(kafkaCloudHost);*/
 		kafkaService.sendCloudHost(cloudHost);
 		return cloudHost;
 	}
@@ -186,6 +192,9 @@ public class CloudHostsService {
 			.placement(simpleInstance.getPlacement())
 			.build();
 		cloudHost = saveCloudHost(cloudHost);
+		/*CloudHost kafkaCloudHost = cloudHost;
+		kafkaCloudHost.setNew(true);
+		kafkaService.sendCloudHost(kafkaCloudHost);*/
 		kafkaService.sendCloudHost(cloudHost);
 		return cloudHost;
 	}

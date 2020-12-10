@@ -1,6 +1,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class HostEventMessage {
 	private String managerPrivateIpAddress;
 	private Decision decision;
 	private int count;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public HostEventMessage(HostEvent hostEvent) {
 		this.id = hostEvent.getId();
@@ -30,11 +33,12 @@ public class HostEventMessage {
 		this.managerPrivateIpAddress = hostEvent.getManagerPrivateIpAddress();
 		this.decision = hostEvent.getDecision();
 		this.count = hostEvent.getCount();
+		/*this.isNew = hostEvent.isNew();*/
 	}
 
 	@JsonIgnore
 	public HostEvent get() {
-		return HostEvent.builder()
+		HostEvent hostEvent = HostEvent.builder()
 			.id(id)
 			.publicIpAddress(publicIpAddress)
 			.privateIpAddress(privateIpAddress)
@@ -43,5 +47,7 @@ public class HostEventMessage {
 			.decision(decision)
 			.count(count)
 			.build();
+		/*hostEvent.setNew(isNew);*/
+		return hostEvent;
 	}
 }

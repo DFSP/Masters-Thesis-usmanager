@@ -2,6 +2,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,8 @@ public class CloudHostMessage {
 	private WorkerManager managedByWorker;
 	private Set<HostRule> hostRules;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew;*/
 
 	public CloudHostMessage(Long id) {
 		this.id = id;
@@ -53,10 +56,11 @@ public class CloudHostMessage {
 		this.managedByWorker = cloudHost.getManagedByWorker();
 		this.hostRules = cloudHost.getHostRules();
 		this.simulatedHostMetrics = cloudHost.getSimulatedHostMetrics();
+		/*this.isNew = cloudHost.isNew();*/
 	}
 
 	public CloudHost get() {
-		return CloudHost.builder()
+		CloudHost cloudHost = CloudHost.builder()
 			.id(id)
 			.instanceId(instanceId)
 			.instanceType(instanceType)
@@ -71,6 +75,8 @@ public class CloudHostMessage {
 			.hostRules(hostRules != null ? hostRules : new HashSet<>())
 			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics : new HashSet<>())
 			.build();
+		/*cloudHost.setNew(isNew);*/
+		return cloudHost;
 	}
 
 }

@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.apps;
+package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,16 +18,15 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 @Embeddable
-public
-class AppServiceKey implements Serializable {
+public class RuleConditionKey implements Serializable {
 
-	private static final long serialVersionUID = -3602299693295159087L;
+	private static final long serialVersionUID = -7826161915660858243L;
 
-	@Column(name = "app_id")
-	private Long appId;
+	@Column(name = "rule_id")
+	private Long ruleId;
 
-	@Column(name = "service_id")
-	private Long serviceId;
+	@Column(name = "condition_id")
+	private Long conditionId;
 
 }
 

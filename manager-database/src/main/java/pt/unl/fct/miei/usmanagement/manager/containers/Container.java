@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
@@ -63,8 +64,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString(exclude = {"containerRules", "simulatedContainerMetrics"})
 @Table(name = "containers")
-public class Container {
+public class Container /*extends AbstractEntity<String> */ {
 
 	@Id
 	@NaturalId
@@ -117,8 +119,8 @@ public class Container {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "container_rule",
+	@ManyToMany
+	@JoinTable(name = "container_rules",
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
@@ -126,8 +128,8 @@ public class Container {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "container_simulated_metric",
+	@ManyToMany
+	@JoinTable(name = "container_simulated_metrics",
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)

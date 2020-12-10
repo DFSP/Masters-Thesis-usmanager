@@ -34,11 +34,13 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
@@ -81,8 +83,10 @@ public class ContainerRulesService {
 
 	public ContainerRule addRule(ContainerRule rule) {
 		checkRuleDoesntExist(rule);
-		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		rule = saveRule(rule);
+		/*ContainerRule kafkaRule = rule;
+		kafkaRule.setNew(true);
+		kafkaService.sendContainerRule(kafkaRule);*/
 		kafkaService.sendContainerRule(rule);
 		return rule;
 	}
@@ -97,6 +101,7 @@ public class ContainerRulesService {
 	}
 
 	public ContainerRule saveRule(ContainerRule containerRule) {
+		log.info("Saving containerRule {}", ToStringBuilder.reflectionToString(containerRule));
 		containerRule = rules.save(containerRule);
 		serviceRulesService.setLastUpdateServiceRules();
 		return containerRule;
@@ -135,7 +140,9 @@ public class ContainerRulesService {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
 		ContainerRule rule = getRule(ruleName);
-		ContainerRuleCondition containerRuleCondition = ContainerRuleCondition.builder().containerCondition(condition).containerRule(rule).build();
+		ContainerRuleCondition containerRuleCondition = ContainerRuleCondition.builder()
+			.id(new RuleConditionKey(rule.getId(), condition.getId()))
+			.containerRule(rule).containerCondition(condition).build();
 		ruleConditionsService.saveContainerRuleCondition(containerRuleCondition);
 		rule = rule.toBuilder().condition(containerRuleCondition).build();
 		kafkaService.sendContainerRule(rule);

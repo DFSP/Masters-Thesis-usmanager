@@ -31,6 +31,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
@@ -75,8 +76,10 @@ public class ServiceSimulatedMetricsService {
 
 	public ServiceSimulatedMetric addServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
 		checkServiceSimulatedMetricDoesntExist(serviceSimulatedMetric);
-		log.info("Saving simulated service metric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
 		serviceSimulatedMetric = saveServiceSimulatedMetric(serviceSimulatedMetric);
+		/*ServiceSimulatedMetric kafkaServiceSimulatedMetric = serviceSimulatedMetric;
+		kafkaServiceSimulatedMetric.setNew(true);
+		kafkaService.sendServiceSimulatedMetric(kafkaServiceSimulatedMetric);*/
 		kafkaService.sendServiceSimulatedMetric(serviceSimulatedMetric);
 		return serviceSimulatedMetric;
 	}
@@ -93,6 +96,7 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	public ServiceSimulatedMetric saveServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
+		log.info("Saving serviceSimulatedMetric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
 	}
 

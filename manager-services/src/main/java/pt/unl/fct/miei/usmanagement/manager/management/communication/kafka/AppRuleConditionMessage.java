@@ -14,16 +14,21 @@ public class AppRuleConditionMessage {
 
 	private AppRuleMessage appRuleMessage;
 	private ConditionMessage conditionMessage;
+	/*@JsonProperty("isNew")
+	private boolean isNew;*/
 
 	public AppRuleConditionMessage(AppRuleCondition appRuleCondition) {
 		this.appRuleMessage = new AppRuleMessage(appRuleCondition.getAppRule());
 		this.conditionMessage = new ConditionMessage(appRuleCondition.getAppCondition());
+		/*this.isNew = appRuleCondition.isNew();*/
 	}
 
 	public AppRuleCondition get() {
-		return AppRuleCondition.builder()
+		AppRuleCondition appRuleCondition = AppRuleCondition.builder()
 			.appRule(appRuleMessage.get())
 			.appCondition(conditionMessage.get())
 			.build();
+		/*appRuleCondition.setNew(isNew);*/
+		return appRuleCondition;
 	}
 }

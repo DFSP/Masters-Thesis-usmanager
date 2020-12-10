@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,8 @@ public class ServiceDecisionMessage {
 	private ServiceRule rule;
 	private Timestamp timestamp;
 	private Set<ServiceDecisionValue> serviceDecisions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ServiceDecisionMessage(ServiceDecision serviceDecision) {
 		this.id = serviceDecision.getId();
@@ -37,10 +40,11 @@ public class ServiceDecisionMessage {
 		this.rule = serviceDecision.getRule();
 		this.timestamp = serviceDecision.getTimestamp();
 		this.serviceDecisions = serviceDecision.getServiceDecisions();
+		/*this.isNew = serviceDecision.isNew();*/
 	}
 
 	public ServiceDecision get() {
-		return ServiceDecision.builder()
+		ServiceDecision serviceDecision = ServiceDecision.builder()
 			.id(id)
 			.containerId(containerId)
 			.serviceName(serviceName)
@@ -50,5 +54,7 @@ public class ServiceDecisionMessage {
 			.timestamp(timestamp)
 			.serviceDecisions(serviceDecisions != null ? serviceDecisions : new HashSet<>())
 			.build();
+		/*serviceDecision.setNew(isNew);*/
+		return serviceDecision;
 	}
 }

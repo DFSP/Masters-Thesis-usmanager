@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,8 @@ public class NodeMessage {
 	private ManagerStatus managerStatus;
 	private String managerId;
 	private Map<String, String> labels;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public NodeMessage(String id) {
 		this.id = id;
@@ -41,10 +44,11 @@ public class NodeMessage {
 		this.managerStatus = node.getManagerStatus();
 		this.managerId = node.getManagerId();
 		this.labels = node.getLabels();
+		/*this.isNew = node.isNew();*/
 	}
 
 	public Node get() {
-		return Node.builder()
+		Node node = Node.builder()
 			.id(id)
 			.publicIpAddress(publicIpAddress)
 			.availability(availability)
@@ -55,6 +59,8 @@ public class NodeMessage {
 			.managerId(managerId)
 			.labels(labels)
 			.build();
+		/*node.setNew(isNew);*/
+		return node;
 	}
 
 }

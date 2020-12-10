@@ -70,8 +70,10 @@ public class ComponentTypesService {
 
 	public ComponentType addComponentType(ComponentType componentType) {
 		checkComponentTypeDoesntExist(componentType);
-		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
 		componentType = componentTypes.save(componentType);
+		/*ComponentType kafkaComponentType = componentType;
+		kafkaComponentType.setNew(true);
+		kafkaService.sendComponentType(kafkaComponentType);*/
 		kafkaService.sendComponentType(componentType);
 		return componentType;
 	}
@@ -86,6 +88,7 @@ public class ComponentTypesService {
 	}
 	
 	public ComponentType saveComponentType(ComponentType componentType) {
+		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
 		return componentTypes.save(componentType);
 	}
 

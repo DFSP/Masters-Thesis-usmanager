@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -58,8 +59,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "host_rules")
-public class HostRule {
+@Table(name = "rules_host")
+public class HostRule /*extends AbstractEntity<Long> */{
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -85,12 +86,12 @@ public class HostRule {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.MERGE})
+	@ManyToMany(mappedBy = "hostRules")
 	private Set<CloudHost> cloudHosts;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules", cascade = {CascadeType.MERGE})
+	@ManyToMany(mappedBy = "hostRules")
 	private Set<EdgeHost> edgeHosts;
 
 	public void removeAssociations() {

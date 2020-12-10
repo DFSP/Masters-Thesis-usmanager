@@ -51,6 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,8 +128,10 @@ public class NodesService {
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNode(Node swarmNode) {
 		checkNodeDoesntExist(swarmNode);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
-		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
 		node = saveNode(node);
+		/*pt.unl.fct.miei.usmanagement.manager.nodes.Node kafkaNode = node;
+		kafkaNode.setNew(true);
+		kafkaService.sendNode(kafkaNode);*/
 		kafkaService.sendNode(node);
 		return node;
 	}
@@ -154,6 +157,7 @@ public class NodesService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node saveNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
+		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
 		return nodes.save(node);
 	}
 
@@ -233,7 +237,6 @@ public class NodesService {
 		Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
 			node.getLabels());
 		node = fromSwarmNode(swarmNode);
-		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
 		return updateNode(node);
 	}
 
@@ -248,6 +251,9 @@ public class NodesService {
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addNodeFromSwarmNode(Node swarmNode) {
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(swarmNode);
 		node = saveNode(node);
+		/*pt.unl.fct.miei.usmanagement.manager.nodes.Node kafkaNode = node;
+		kafkaNode.setNew(true);
+		kafkaService.sendNode(kafkaNode);*/
 		kafkaService.sendNode(node);
 		return node;
 	}
@@ -279,7 +285,7 @@ public class NodesService {
 			.state(node.status().state())
 			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
 			.managerId(environment.getProperty(EnvironmentConstants.EXTERNAL_ID))
-			.labels(node.spec().labels())
+			.labels(new HashMap<>(node.spec().labels()))
 			.build();
 	}
 

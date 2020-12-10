@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import javax.persistence.CascadeType;
@@ -53,7 +54,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "value_modes")
-public class ValueMode {
+public class ValueMode /*extends AbstractEntity<Long> */{
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

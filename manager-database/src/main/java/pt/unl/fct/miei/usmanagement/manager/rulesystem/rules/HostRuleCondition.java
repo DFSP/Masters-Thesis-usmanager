@@ -31,14 +31,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import javax.persistence.CascadeType;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 import java.util.Objects;
 
@@ -49,19 +53,19 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_rule_conditions")
-public class HostRuleCondition {
+public class HostRuleCondition /*extends AbstractEntity<Long> */{
 
-	@Id
-	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
-	@GeneratedValue(generator = "IdGenerator")
-	private Long id;
+	@EmbeddedId
+	private RuleConditionKey id;
 
+	@MapsId("ruleId")
 	@ManyToOne
-	@JoinColumn(name = "host_rule")
+	@JoinColumn(name = "host_rule_id")
 	private HostRule hostRule;
 
+	@MapsId("conditionId")
 	@ManyToOne
-	@JoinColumn(name = "condition")
+	@JoinColumn(name = "condition_id")
 	private Condition hostCondition;
 
 	@Override

@@ -228,7 +228,7 @@ public class AwsService {
 	@Async
 	public CompletableFuture<String> launchInstance(AwsRegion region, InstanceType type) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
-			.withImageId(region.getAmi())
+			.withImageId(region.getAmi().get(type))
 			.withInstanceType(type)
 			.withMinCount(1)
 			.withMaxCount(1)

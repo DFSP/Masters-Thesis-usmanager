@@ -34,14 +34,15 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
@@ -53,6 +54,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -107,8 +110,10 @@ public class ServiceRulesService {
 
 	public ServiceRule addRule(ServiceRule rule) {
 		checkRuleDoesntExist(rule);
-		log.info("Saving rule {}", ToStringBuilder.reflectionToString(rule));
 		rule = saveRule(rule);
+		/*ServiceRule kafkaRule = rule;
+		kafkaRule.setNew(true);
+		kafkaService.sendServiceRule(kafkaRule);*/
 		kafkaService.sendServiceRule(rule);
 		return rule;
 	}
@@ -123,9 +128,27 @@ public class ServiceRulesService {
 	}
 
 	public ServiceRule saveRule(ServiceRule serviceRule) {
+		log.info("Saving serviceRule {}", ToStringBuilder.reflectionToString(serviceRule));
 		serviceRule = rules.save(serviceRule);
 		setLastUpdateServiceRules();
 		return serviceRule;
+	}
+
+	public ServiceRule addOrUpdateRule(ServiceRule serviceRule) {
+		Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
+		if (serviceRuleOptional.isPresent()) {
+			ServiceRule rule = serviceRuleOptional.get();
+			Set<ServiceRuleCondition> conditions = serviceRule.getConditions();
+			if (conditions != null) {
+				rule.getConditions().retainAll(conditions);
+				rule.getConditions().addAll(conditions);
+			}
+			EntityUtils.copyValidProperties(serviceRule, rule);
+			return saveRule(rule);
+		}
+		else {
+			return saveRule(serviceRule);
+		}
 	}
 
 	public void deleteRule(Long id) {
@@ -169,7 +192,9 @@ public class ServiceRulesService {
 		log.info("Adding condition {} to rule {}", conditionName, ruleName);
 		Condition condition = conditionsService.getCondition(conditionName);
 		ServiceRule rule = getRule(ruleName);
-		ServiceRuleCondition serviceRuleCondition = ServiceRuleCondition.builder().serviceCondition(condition).serviceRule(rule).build();
+		ServiceRuleCondition serviceRuleCondition = ServiceRuleCondition.builder()
+			.id(new RuleConditionKey(rule.getId(), condition.getId()))
+			.serviceRule(rule).serviceCondition(condition).build();
 		ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition);
 		rule = rule.toBuilder().condition(serviceRuleCondition).build();
 		kafkaService.sendServiceRule(rule);

@@ -42,6 +42,7 @@ public class EntityUtils {
 	public void copyValidProperties(Object source, Object target) {
 		List<String> ignoreProperties = new LinkedList<>();
 		ignoreProperties.add("id");
+		ignoreProperties.add("isNew");
 		// loop to include super classes except Object
 		for (Class<?> current = target.getClass(); current.getSuperclass() != null; current = current.getSuperclass()) {
 			Arrays.stream(current.getDeclaredFields()).forEach(field -> {

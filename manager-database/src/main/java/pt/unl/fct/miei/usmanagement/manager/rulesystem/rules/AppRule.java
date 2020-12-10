@@ -57,10 +57,10 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "app_rules")
-public class AppRule {
+@Table(name = "rules_app")
+public class AppRule /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -82,7 +82,7 @@ public class AppRule {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "appRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(mappedBy = "appRules")
 	private Set<App> apps;
 
 	public void removeAssociations() {

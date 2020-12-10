@@ -151,8 +151,10 @@ public class ContainersService {
 
 	public Container addContainer(Container container) {
 		checkContainerDoesntExist(container);
-		log.info("Saving container {}", ToStringBuilder.reflectionToString(container));
 		container = saveContainer(container);
+		/*Container kafkaContainer = container;
+		kafkaContainer.setNew(true);
+		kafkaService.sendContainer(kafkaContainer);*/
 		kafkaService.sendContainer(container);
 		return container;
 	}
@@ -165,11 +167,12 @@ public class ContainersService {
 	}
 
 	public Container saveContainer(Container container) {
+		log.info("Saving container {}", container.toString());
 		return containers.save(container);
 	}
 
 	public Container updateContainer(Container container) {
-		/*log.info("Updating container {}", ToStringBuilder.reflectionToString(container));*/
+		log.info("Updating container {}", container.toString());
 		container = saveContainer(container);
 		kafkaService.sendContainer(container);
 		return container;

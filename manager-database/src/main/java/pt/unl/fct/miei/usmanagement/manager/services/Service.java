@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -65,7 +66,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "services")
-public class Service {
+public class Service /*extends AbstractEntity<Long> */{
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -121,7 +122,7 @@ public class Service {
   	/*// Affinities to maybe dynamically calculate the dependencies
   	@Singular
   	@JsonIgnore
-  	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  	@ManyToMany
   	@JoinTable(name = "service_affinity",
       	joinColumns = @JoinColumn(name = "service_id"),
       	inverseJoinColumns = @JoinColumn(name = "affinity_id")
@@ -135,12 +136,12 @@ public class Service {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service")
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "dependency")
 	private Set<ServiceDependency> dependents;
 
 	@Singular
@@ -150,8 +151,8 @@ public class Service {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "service_rule",
+	@ManyToMany
+	@JoinTable(name = "service_rules",
 		joinColumns = @JoinColumn(name = "service_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
@@ -159,8 +160,8 @@ public class Service {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "service_simulated_metric",
+	@ManyToMany
+	@JoinTable(name = "service_simulated_metrics",
 		joinColumns = @JoinColumn(name = "service_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)

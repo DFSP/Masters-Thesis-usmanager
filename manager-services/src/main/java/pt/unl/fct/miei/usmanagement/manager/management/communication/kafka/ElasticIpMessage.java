@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ public class ElasticIpMessage {
 	private String publicIp;
 	private String associationId;
 	private String instanceId;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ElasticIpMessage(Long id) {
 		this.id = id;
@@ -31,10 +34,11 @@ public class ElasticIpMessage {
 		this.publicIp = elasticIp.getPublicIp();
 		this.associationId = elasticIp.getAssociationId();
 		this.instanceId = elasticIp.getInstanceId();
+		/*this.isNew = elasticIp.isNew();*/
 	}
 
 	public ElasticIp get() {
-		return ElasticIp.builder()
+		ElasticIp elasticIp = ElasticIp.builder()
 			.id(id)
 			.region(region)
 			.allocationId(allocationId)
@@ -42,5 +46,7 @@ public class ElasticIpMessage {
 			.associationId(associationId)
 			.instanceId(instanceId)
 			.build();
+		/*elasticIp.setNew(isNew);*/
+		return elasticIp;
 	}
 }

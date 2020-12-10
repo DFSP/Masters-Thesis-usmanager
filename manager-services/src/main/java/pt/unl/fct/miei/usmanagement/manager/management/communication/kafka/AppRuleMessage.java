@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class AppRuleMessage {
 	private Decision decision;
 	private Set<App> apps;
 	private Set<AppRuleCondition> conditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew;*/
 
 	public AppRuleMessage(Long id) {
 		this.id = id;
@@ -36,10 +39,11 @@ public class AppRuleMessage {
 		this.decision = rule.getDecision();
 		this.apps = rule.getApps();
 		this.conditions = rule.getConditions();
+		/*this.isNew = rule.isNew();*/
 	}
 
 	public AppRule get() {
-		return AppRule.builder()
+		AppRule appRule = AppRule.builder()
 			.id(id)
 			.name(name)
 			.priority(priority)
@@ -47,6 +51,8 @@ public class AppRuleMessage {
 			.apps(apps != null ? apps : new HashSet<>())
 			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
+		/*appRule.setNew(isNew);*/
+		return appRule;
 	}
 
 }

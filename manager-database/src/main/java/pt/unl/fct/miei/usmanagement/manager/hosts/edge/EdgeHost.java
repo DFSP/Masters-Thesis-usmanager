@@ -35,6 +35,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
@@ -63,7 +64,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "edge_hosts")
-public class EdgeHost {
+public class EdgeHost /*extends AbstractEntity<Long> */{
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -95,8 +96,8 @@ public class EdgeHost {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "edge_host_rule",
+	@ManyToMany
+	@JoinTable(name = "edge_host_rules",
 		joinColumns = @JoinColumn(name = "edge_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
@@ -104,8 +105,8 @@ public class EdgeHost {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "edge_host_simulated_metric",
+	@ManyToMany
+	@JoinTable(name = "edge_host_simulated_metrics",
 		joinColumns = @JoinColumn(name = "edge_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)

@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/*
 
-package pt.unl.fct.miei.usmanagement.manager.database.regions;
+/*package pt.unl.fct.miei.usmanagement.manager.database.regions;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,6 +30,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,7 +48,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "regions")
-public class Region {
+public class Region extends AbstractEntity<Long> {
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -78,5 +79,4 @@ public class Region {
 		return id != null && id.equals(other.getId());
 	}
 
-}
-*/
+}*/

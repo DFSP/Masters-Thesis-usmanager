@@ -107,13 +107,13 @@ public class DecisionsService {
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addDecision(pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision) {
 		checkDecisionDoesntExist(decision);
-		log.info("Saving decision {}", ToStringBuilder.reflectionToString(decision));
 		decision = saveDecision(decision);
 		kafkaService.sendDecision(decision);
 		return decision;
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision saveDecision(Decision decision) {
+		log.info("Saving decision {}", ToStringBuilder.reflectionToString(decision));
 		return decisions.save(decision);
 	}
 

@@ -33,6 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
@@ -76,8 +77,10 @@ public class ContainerSimulatedMetricsService {
 
 	public ContainerSimulatedMetric addContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
 		checkContainerSimulatedMetricDoesntExist(containerSimulatedMetric);
-		log.info("Saving simulated container metric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
 		containerSimulatedMetric = saveContainerSimulatedMetric(containerSimulatedMetric);
+		/*ContainerSimulatedMetric kafkaContainerSimulatedMetric = containerSimulatedMetric;
+		kafkaContainerSimulatedMetric.setNew(true);
+		kafkaService.sendContainerSimulatedMetric(kafkaContainerSimulatedMetric);*/
 		kafkaService.sendContainerSimulatedMetric(containerSimulatedMetric);
 		return containerSimulatedMetric;
 	}
@@ -94,6 +97,7 @@ public class ContainerSimulatedMetricsService {
 	}
 
 	public ContainerSimulatedMetric saveContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
+		log.info("Saving containerSimulatedMetric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
 	}
 

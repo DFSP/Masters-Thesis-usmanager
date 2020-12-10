@@ -48,7 +48,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_affinity")
-public class ServiceAffinity {
+public class ServiceAffinity extends AbstractEntity<Long> {
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class HostMonitoringLogMessage {
 	private String field;
 	private double value;
 	private LocalDateTime timestamp;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public HostMonitoringLogMessage(HostMonitoringLog hostMonitoringLog) {
 		this.id = hostMonitoringLog.getId();
@@ -28,10 +31,11 @@ public class HostMonitoringLogMessage {
 		this.field = hostMonitoringLog.getField();
 		this.value = hostMonitoringLog.getValue();
 		this.timestamp = hostMonitoringLog.getTimestamp();
+		/*this.isNew = hostMonitoringLog.isNew();*/
 	}
 
 	public HostMonitoringLog get() {
-		return HostMonitoringLog.builder()
+		HostMonitoringLog hostMonitoringLog = HostMonitoringLog.builder()
 			.id(id)
 			.publicIpAddress(publicIpAddress)
 			.privateIpAddress(privateIpAddress)
@@ -39,5 +43,7 @@ public class HostMonitoringLogMessage {
 			.value(value)
 			.timestamp(timestamp)
 			.build();
+		/*hostMonitoringLog.setNew(isNew);*/
+		return hostMonitoringLog;
 	}
 }

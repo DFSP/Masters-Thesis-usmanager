@@ -24,21 +24,17 @@
 
 package pt.unl.fct.miei.usmanagement.manager.apps;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.CascadeType;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -51,30 +47,13 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-/*@IdClass(AppServiceKey.class)*/
 @Table(name = "app_services")
-public class AppService {
+public class AppService /*extends AbstractEntity<Long> */ {
 
-	@Id
-	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
-	@GeneratedValue(generator = "IdGenerator")
-	private Long id;
-
-	@ManyToOne
-	@JoinColumn(name = "app_id")
-	private App app;
-
-	@ManyToOne
-	@JoinColumn(name = "service_id")
-	private Service service;
+	@EmbeddedId
+	private AppServiceKey id;
 
 	private int launchOrder;
-
-	/*@Id
-	private String appId;
-
-	@Id
-	private String serviceId;
 
 	@ManyToOne
 	@MapsId("appId")
@@ -85,8 +64,6 @@ public class AppService {
 	@MapsId("serviceId")
 	@JoinColumn(name = "service_id")
 	private Service service;
-
-	private int launchOrder;*/
 
 	@Override
 	public int hashCode() {
@@ -104,24 +81,5 @@ public class AppService {
 		AppService other = (AppService) o;
 		return id != null && id.equals(other.getId());
 	}
-
-	/*@Override
-	public int hashCode() {
-		return Objects.hash(getAppId(), getServiceId());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof AppService)) {
-			return false;
-		}
-		AppService other = (AppService) o;
-		return appId != null && appId.equals(other.getAppId())
-			&& serviceId != null && serviceId.equals(other.getServiceId());
-	}*/
-
 
 }

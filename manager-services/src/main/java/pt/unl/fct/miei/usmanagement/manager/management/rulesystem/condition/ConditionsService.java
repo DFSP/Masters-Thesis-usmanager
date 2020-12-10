@@ -34,16 +34,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -54,16 +52,10 @@ public class ConditionsService {
 
 	private final Conditions conditions;
 
-	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService,
-							 HostRuleConditions hostRuleConditions, AppRuleConditions appRuleConditions,
-							 ServiceRuleConditions serviceRuleConditions, ContainerRuleConditions containerRuleConditions) {
+	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService) {
 		this.fieldsService = fieldsService;
 		this.conditions = conditions;
 		this.kafkaService = kafkaService;
-		this.hostRuleConditions = hostRuleConditions;
-		this.appRuleConditions = appRuleConditions;
-		this.serviceRuleConditions = serviceRuleConditions;
-		this.containerRuleConditions = containerRuleConditions;
 	}
 
 	public List<Condition> getConditions() {
@@ -82,8 +74,10 @@ public class ConditionsService {
 
 	public Condition addCondition(Condition condition) {
 		checkConditionDoesntExist(condition);
-		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
 		condition = saveCondition(condition);
+		/*Condition kafkaCondition = condition;
+		kafkaCondition.setNew(true);
+		kafkaService.sendCondition(kafkaCondition);*/
 		kafkaService.sendCondition(condition);
 		return condition;
 	}
@@ -99,7 +93,40 @@ public class ConditionsService {
 	}
 
 	public Condition saveCondition(Condition condition) {
+		log.info("Saving condition {}", ToStringBuilder.reflectionToString(condition));
 		return conditions.save(condition);
+	}
+
+	public Condition addOrUpdateCondition(Condition condition) {
+		Optional<Condition> optionalCondition = conditions.findById(condition.getId());
+		if (optionalCondition.isPresent()) {
+			Condition cond = optionalCondition.get();
+			Set<HostRuleCondition> hostConditions = condition.getHostConditions();
+			if (hostConditions != null) {
+				cond.getHostConditions().retainAll(hostConditions);
+				cond.getHostConditions().addAll(hostConditions);
+			}
+			Set<AppRuleCondition> appConditions = condition.getAppConditions();
+			if (appConditions != null) {
+				cond.getAppConditions().retainAll(appConditions);
+				cond.getAppConditions().addAll(appConditions);
+			}
+			Set<ServiceRuleCondition> serviceConditions = condition.getServiceConditions();
+			if (serviceConditions != null) {
+				cond.getServiceConditions().retainAll(serviceConditions);
+				cond.getServiceConditions().addAll(serviceConditions);
+			}
+			Set<ContainerRuleCondition> containerConditions = condition.getContainerConditions();
+			if (containerConditions != null) {
+				cond.getContainerConditions().retainAll(containerConditions);
+				cond.getContainerConditions().addAll(containerConditions);
+			}
+			EntityUtils.copyValidProperties(condition, cond);
+			return saveCondition(condition);
+		}
+		else {
+			return saveCondition(condition);
+		}
 	}
 
 	public void deleteCondition(Long id) {

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import javax.persistence.Entity;
@@ -24,7 +25,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "eips")
-public class ElasticIp {
+public class ElasticIp /*extends AbstractEntity<Long> */{
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

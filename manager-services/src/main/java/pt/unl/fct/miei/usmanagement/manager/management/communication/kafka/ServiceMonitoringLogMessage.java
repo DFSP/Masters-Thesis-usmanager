@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class ServiceMonitoringLogMessage {
 	private String field;
 	private double value;
 	private LocalDateTime timestamp;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ServiceMonitoringLogMessage(ServiceMonitoringLog serviceMonitoringLog) {
 		this.id = serviceMonitoringLog.getId();
@@ -28,10 +31,11 @@ public class ServiceMonitoringLogMessage {
 		this.field = serviceMonitoringLog.getField();
 		this.value = serviceMonitoringLog.getValue();
 		this.timestamp = serviceMonitoringLog.getTimestamp();
+		/*this.isNew = serviceMonitoringLog.isNew();*/
 	}
 
 	public ServiceMonitoringLog get() {
-		return ServiceMonitoringLog.builder()
+		ServiceMonitoringLog serviceMonitoringLog = ServiceMonitoringLog.builder()
 			.id(id)
 			.containerId(containerId)
 			.serviceName(serviceName)
@@ -39,5 +43,7 @@ public class ServiceMonitoringLogMessage {
 			.value(value)
 			.timestamp(timestamp)
 			.build();
+		/*serviceMonitoringLog.setNew(isNew);*/
+		return serviceMonitoringLog;
 	}
 }

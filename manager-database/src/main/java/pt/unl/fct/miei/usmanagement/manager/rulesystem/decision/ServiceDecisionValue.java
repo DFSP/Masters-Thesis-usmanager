@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.CascadeType;
@@ -49,7 +50,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_decision_values")
-public class ServiceDecisionValue {
+public class ServiceDecisionValue /*extends AbstractEntity<Long> */{
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

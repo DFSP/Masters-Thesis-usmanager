@@ -34,6 +34,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import javax.persistence.CascadeType;
@@ -54,7 +55,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "component_types")
-public class ComponentType {
+public class ComponentType /*extends AbstractEntity<Long> */{
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

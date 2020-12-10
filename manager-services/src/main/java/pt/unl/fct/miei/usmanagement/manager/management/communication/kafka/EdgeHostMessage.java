@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,8 @@ public class EdgeHostMessage {
 	private WorkerManager managedByWorker;
 	private Set<HostRule> hostRules;
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public EdgeHostMessage(Long id) {
 		this.id = id;
@@ -46,10 +49,11 @@ public class EdgeHostMessage {
 		this.managedByWorker = edgeHost.getManagedByWorker();
 		this.hostRules = edgeHost.getHostRules();
 		this.simulatedHostMetrics = edgeHost.getSimulatedHostMetrics();
+		/*this.isNew = edgeHost.isNew();*/
 	}
 
 	public EdgeHost get() {
-		return EdgeHost.builder()
+		EdgeHost edgeHost = EdgeHost.builder()
 			.id(id)
 			.username(username)
 			.publicIpAddress(publicIpAddress)
@@ -61,6 +65,8 @@ public class EdgeHostMessage {
 			.hostRules(hostRules != null ? hostRules : new HashSet<>())
 			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics : new HashSet<>())
 			.build();
+		/*edgeHost.setNew(isNew);*/
+		return edgeHost;
 	}
 
 }

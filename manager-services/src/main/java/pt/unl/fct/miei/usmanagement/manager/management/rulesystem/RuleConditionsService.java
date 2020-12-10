@@ -1,7 +1,9 @@
-package pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition;
+package pt.unl.fct.miei.usmanagement.manager.management.rulesystem;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
@@ -20,6 +22,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
 
+import java.util.List;
+
 @Service
 public class RuleConditionsService {
 
@@ -34,8 +38,8 @@ public class RuleConditionsService {
 	private final ServiceRuleConditions serviceRuleConditions;
 	private final ContainerRuleConditions containerRuleConditions;
 
-	public RuleConditionsService(HostRulesService hostRulesService, AppRulesService appRulesService,
-								 ServiceRulesService serviceRulesService, ContainerRulesService containerRulesService,
+	public RuleConditionsService(@Lazy HostRulesService hostRulesService, @Lazy AppRulesService appRulesService,
+								 @Lazy ServiceRulesService serviceRulesService, @Lazy ContainerRulesService containerRulesService,
 								 ConditionsService conditionsService, HostRuleConditions hostRuleConditions, AppRuleConditions appRuleConditions,
 								 ServiceRuleConditions serviceRuleConditions, ContainerRuleConditions containerRuleConditions) {
 		this.hostRulesService = hostRulesService;
@@ -49,6 +53,10 @@ public class RuleConditionsService {
 		this.containerRuleConditions = containerRuleConditions;
 	}
 
+	public List<HostRuleCondition> getHostRuleConditions() {
+		return hostRuleConditions.findAll();
+	}
+
 	@Transactional
 	public void saveHostRuleCondition(HostRuleCondition hostRuleCondition) {
 		Condition condition = hostRuleCondition.getHostCondition();
@@ -56,6 +64,10 @@ public class RuleConditionsService {
 		HostRule hostRule = hostRuleCondition.getHostRule();
 		hostRulesService.saveRule(hostRule);
 		hostRuleConditions.save(hostRuleCondition);
+	}
+
+	public List<AppRuleCondition> getAppRuleConditions() {
+		return appRuleConditions.findAll();
 	}
 
 	@Transactional
@@ -67,13 +79,21 @@ public class RuleConditionsService {
 		appRuleConditions.save(appRuleCondition);
 	}
 
+	public List<ServiceRuleCondition> getServiceRuleConditions() {
+		return serviceRuleConditions.findAll();
+	}
+
 	@Transactional
 	public void saveServiceRuleCondition(ServiceRuleCondition serviceRuleCondition) {
 		Condition condition = serviceRuleCondition.getServiceCondition();
-		conditionsService.saveCondition(condition);
+		conditionsService.addOrUpdateCondition(condition);
 		ServiceRule serviceRule = serviceRuleCondition.getServiceRule();
-		serviceRulesService.saveRule(serviceRule);
+		serviceRulesService.addOrUpdateRule(serviceRule);
 		serviceRuleConditions.save(serviceRuleCondition);
+	}
+
+	public List<ContainerRuleCondition> getContainerRuleConditions() {
+		return containerRuleConditions.findAll();
 	}
 
 	@Transactional

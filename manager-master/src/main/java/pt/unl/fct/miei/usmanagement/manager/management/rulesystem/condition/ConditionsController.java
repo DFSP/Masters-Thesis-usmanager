@@ -32,7 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
@@ -42,9 +47,11 @@ import java.util.List;
 public class ConditionsController {
 
 	private final ConditionsService conditionsService;
+	private final RuleConditionsService ruleConditionsService;
 
-	public ConditionsController(ConditionsService conditionsService) {
+	public ConditionsController(ConditionsService conditionsService, RuleConditionsService ruleConditionsService) {
 		this.conditionsService = conditionsService;
+		this.ruleConditionsService = ruleConditionsService;
 	}
 
 	@GetMapping
@@ -72,6 +79,26 @@ public class ConditionsController {
 	@DeleteMapping("/{conditionName}")
 	public void deleteCondition(@PathVariable String conditionName) {
 		conditionsService.deleteCondition(conditionName);
+	}
+
+	@GetMapping("/hosts")
+	public List<HostRuleCondition> getHostConditions() {
+		return ruleConditionsService.getHostRuleConditions();
+	}
+
+	@GetMapping("/apps")
+	public List<AppRuleCondition> getAppConditions() {
+		return ruleConditionsService.getAppRuleConditions();
+	}
+
+	@GetMapping("/services")
+	public List<ServiceRuleCondition> getServiceConditions() {
+		return ruleConditionsService.getServiceRuleConditions();
+	}
+
+	@GetMapping("/containers")
+	public List<ContainerRuleCondition> getContainerConditions() {
+		return ruleConditionsService.getContainerRuleConditions();
 	}
 
 }

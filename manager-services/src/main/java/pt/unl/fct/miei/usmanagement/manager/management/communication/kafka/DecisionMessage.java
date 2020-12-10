@@ -1,17 +1,13 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +18,8 @@ public class DecisionMessage {
 	private Long id;
 	private RuleDecisionEnum ruleDecision;
 	private ComponentType componentType;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public DecisionMessage(Long id) {
 		this.id = id;
@@ -31,14 +29,17 @@ public class DecisionMessage {
 		this.id = decision.getId();
 		this.ruleDecision = decision.getRuleDecision();
 		this.componentType = decision.getComponentType();
+		/*this.isNew = decision.isNew();*/
 	}
 
 	public Decision get() {
-		return Decision.builder()
+		Decision decision = Decision.builder()
 			.id(id)
 			.ruleDecision(ruleDecision)
 			.componentType(componentType)
 			.build();
+		/*decision.setNew(isNew);*/
+		return decision;
 	}
 
 }

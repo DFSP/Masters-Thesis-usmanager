@@ -51,7 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
@@ -77,7 +77,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
-import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -157,11 +156,9 @@ public class WorkerKafkaService {
 				Set<AppService> appServices = app.getAppServices();
 				appServices.forEach(appService -> {
 					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService();
-					try {
+					if (!servicesService.hasService(service.getServiceName())) {
+						log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 						servicesService.saveService(service);
-					}
-					catch (ConstraintViolationException e) {
-						log.warn("Not adding service {}: {}", service.getServiceName(), e.getMessage());
 					}
 				});
 				appsService.saveApp(app);
@@ -276,6 +273,8 @@ public class WorkerKafkaService {
 				decisionsService.deleteDecision(id);
 			}
 			else {
+				ComponentType componentType = decision.getComponentType();
+				componentTypesService.saveComponentType(componentType);
 				decisionsService.saveDecision(decision);
 			}
 		}
@@ -486,15 +485,12 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<HostRuleCondition> hostRuleConditions = hostRule.getConditions();
-				hostRuleConditions.forEach(hostRuleCondition -> {
-					hostRulesService.saveRule(hostRuleCondition.getHostRule());
-					conditionsService.saveCondition(hostRuleCondition.getHostCondition());
-				});
+				hostRuleConditions.forEach(ruleConditionsService::saveHostRuleCondition);
 				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
 				cloudHosts.forEach(cloudHostsService::saveCloudHost);
 				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
 				edgeHosts.forEach(edgeHostsService::saveEdgeHost);
-				hostRulesService.saveRule(hostRule);
+				hostRulesService.addOrUpdateRule(hostRule);
 			}
 		}
 		catch (Exception e) {
@@ -514,10 +510,7 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<AppRuleCondition> appRuleConditions = appRule.getConditions();
-				appRuleConditions.forEach(appRuleCondition -> {
-					appRulesService.saveRule(appRuleCondition.getAppRule());
-					conditionsService.saveCondition(appRuleCondition.getAppCondition());
-				});
+				appRuleConditions.forEach(ruleConditionsService::saveAppRuleCondition);
 				Set<App> apps = appRule.getApps();
 				apps.forEach(appsService::saveApp);
 				appRulesService.saveRule(appRule);
@@ -540,12 +533,11 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<ServiceRuleCondition> serviceRuleConditions = serviceRule.getConditions();
-				serviceRuleConditions.forEach(serviceRuleCondition -> {
-					serviceRulesService.saveRule(serviceRuleCondition.getServiceRule());
-					conditionsService.saveCondition(serviceRuleCondition.getServiceCondition());
-				});
+				serviceRuleConditions.forEach(ruleConditionsService::saveServiceRuleCondition);
 				Set<pt.unl.fct.miei.usmanagement.manager.services.Service> services = serviceRule.getServices();
 				services.forEach(servicesService::saveService);
+				Decision decision = serviceRule.getDecision();
+				decisionsService.saveDecision(decision);
 				serviceRulesService.saveRule(serviceRule);
 			}
 		}
@@ -566,10 +558,7 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<ContainerRuleCondition> containerRuleConditions = containerRule.getConditions();
-				containerRuleConditions.forEach(containerRuleCondition -> {
-					containerRulesService.saveRule(containerRuleCondition.getContainerRule());
-					conditionsService.saveCondition(containerRuleCondition.getContainerCondition());
-				});
+				containerRuleConditions.forEach(ruleConditionsService::saveContainerRuleCondition);
 				Set<pt.unl.fct.miei.usmanagement.manager.containers.Container> containers = containerRule.getContainers();
 				containers.forEach(containersService::saveContainer);
 				containerRulesService.saveRule(containerRule);
@@ -592,7 +581,12 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<Condition> conditions = valueMode.getConditions();
-				conditions.forEach(conditionsService::saveCondition);
+				conditions.forEach(condition -> {
+					Field field = condition.getField();
+					fieldsService.saveField(field);
+					Operator operator = condition.getOperator();
+					operatorsService.addOrUpdateOperator(operator);
+				});
 				valueModesService.saveValueMode(valueMode);
 			}
 		}

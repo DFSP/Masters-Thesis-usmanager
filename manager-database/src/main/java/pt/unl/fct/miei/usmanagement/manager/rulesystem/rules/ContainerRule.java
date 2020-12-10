@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
@@ -57,8 +58,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "container_rules")
-public class ContainerRule {
+@Table(name = "rules_container")
+public class ContainerRule /*extends AbstractEntity<Long> */{
 
 		@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -77,13 +78,13 @@ public class ContainerRule {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "containerRules", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Container> containers;
+	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ContainerRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ContainerRuleCondition> conditions;
+	@ManyToMany(mappedBy = "containerRules")
+	private Set<Container> containers;
 
 	public void removeAssociations() {
 		Iterator<Container> containersIterator = containers.iterator();

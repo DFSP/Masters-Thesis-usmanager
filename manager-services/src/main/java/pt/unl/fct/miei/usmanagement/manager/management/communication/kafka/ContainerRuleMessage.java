@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.communication.kafka;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class ContainerRuleMessage {
 	private Decision decision;
 	private Set<Container> containers;
 	private Set<ContainerRuleCondition> conditions;
+	/*@JsonProperty("isNew")
+	private boolean isNew; */
 
 	public ContainerRuleMessage(Long id) {
 		this.id = id;
@@ -36,10 +39,11 @@ public class ContainerRuleMessage {
 		this.decision = containerRule.getDecision();
 		this.containers = containerRule.getContainers();
 		this.conditions = containerRule.getConditions();
+		/*this.isNew = containerRule.isNew();*/
 	}
 
 	public ContainerRule get() {
-		return ContainerRule.builder()
+		ContainerRule containerRule = ContainerRule.builder()
 			.id(id)
 			.name(name)
 			.priority(priority)
@@ -47,6 +51,8 @@ public class ContainerRuleMessage {
 			.containers(containers != null ? containers : new HashSet<>())
 			.conditions(conditions != null ? conditions : new HashSet<>())
 			.build();
+		/*containerRule.setNew(isNew);*/
+		return containerRule;
 	}
 
 }

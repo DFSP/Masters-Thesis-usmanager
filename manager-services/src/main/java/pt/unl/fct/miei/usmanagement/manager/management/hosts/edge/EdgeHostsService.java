@@ -122,7 +122,6 @@ public class EdgeHostsService {
 
 	public EdgeHost addEdgeHost(EdgeHost edgeHost) {
 		checkHostDoesntExist(edgeHost);
-		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
 		edgeHost = saveEdgeHost(edgeHost);
 
 		boolean setup = false;
@@ -145,13 +144,15 @@ public class EdgeHostsService {
 			throw new ManagerException("Unable to setup new edge host");
 		}
 
+		/*EdgeHost kafkaEdgeHost = edgeHost;
+		kafkaEdgeHost.setNew(true);
+		kafkaService.sendEdgeHost(kafkaEdgeHost);*/
 		kafkaService.sendEdgeHost(edgeHost);
 		return edgeHost;
 	}
 
 	public EdgeHost addEdgeHost(EdgeHost edgeHost, char[] password) {
 		checkHostDoesntExist(edgeHost);
-		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
 		edgeHost = saveEdgeHost(edgeHost);
 		if (password != null) {
 			try {
@@ -165,6 +166,10 @@ public class EdgeHostsService {
 				java.util.Arrays.fill(password, ' ');
 			}
 		}
+
+		/*EdgeHost kafkaEdgeHost = edgeHost;
+		kafkaEdgeHost.setNew(true);
+		kafkaService.sendEdgeHost(kafkaEdgeHost);*/
 		kafkaService.sendEdgeHost(edgeHost);
 		return edgeHost;
 	}
@@ -208,6 +213,7 @@ public class EdgeHostsService {
 	}
 
 	public EdgeHost saveEdgeHost(EdgeHost edgeHost) {
+		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
 		return edgeHosts.save(edgeHost);
 	}
 

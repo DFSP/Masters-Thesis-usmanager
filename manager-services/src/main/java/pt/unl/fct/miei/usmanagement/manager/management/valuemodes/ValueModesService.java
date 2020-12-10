@@ -65,8 +65,10 @@ public class ValueModesService {
 
 	public ValueMode addValueMode(ValueMode valueMode) {
 		checkValueModeDoesntExist(valueMode);
-		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
 		valueMode = saveValueMode(valueMode);
+		/*ValueMode kafkaValueMode = valueMode;
+		kafkaValueMode.setNew(false);
+		kafkaService.sendValueMode(kafkaValueMode);*/
 		kafkaService.sendValueMode(valueMode);
 		return valueMode;
 	}
@@ -81,6 +83,7 @@ public class ValueModesService {
 	}
 
 	public ValueMode saveValueMode(ValueMode valueMode) {
+		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
 		return valueModes.save(valueMode);
 	}
 

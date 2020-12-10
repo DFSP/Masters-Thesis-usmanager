@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
+import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
@@ -99,9 +100,11 @@ public class ServicesService {
 
 	public Service addService(Service service) {
 		checkServiceDoesntExist(service);
-		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 		service = saveService(service);
-		kafkaService.sendService(service);
+		/*Service kafkaService = service;
+		kafkaService.setNew(true);
+		this.kafkaService.sendService(kafkaService);*/
+		this.kafkaService.sendService(service);
 		return service;
 	}
 
@@ -115,6 +118,7 @@ public class ServicesService {
 	}
 
 	public Service saveService(Service service) {
+		log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 		return services.save(service);
 	}
 
@@ -144,7 +148,7 @@ public class ServicesService {
 		String appName = addServiceApp.getName();
 		int launchOrder = addServiceApp.getLaunchOrder();
 		App app = appsService.getApp(appName);
-		AppService appService = AppService.builder().app(app).service(service).launchOrder(launchOrder).build();
+		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getId())).app(app).service(service).launchOrder(launchOrder).build();
 		service.getAppServices().add(appService);
 		service = saveService(service);
 		kafkaService.sendService(service);
@@ -161,7 +165,7 @@ public class ServicesService {
 	public void removeApps(String serviceName, List<String> apps) {
 		Service service = getService(serviceName);
 		log.info("Removing apps {}", apps);
-		service.getAppServices().removeIf(app -> apps.contains(app.getApp().getName()));
+		service.getAppServices().removeIf(appService -> apps.contains(appsService.getApp(appService.getId().getAppId()).getName()));
 		service = saveService(service);
 		kafkaService.sendService(service);
 	}
