@@ -28,9 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
@@ -38,7 +40,9 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Slf4j
 @org.springframework.stereotype.Service
@@ -98,6 +102,23 @@ public class ServiceSimulatedMetricsService {
 	public ServiceSimulatedMetric saveServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
 		log.info("Saving serviceSimulatedMetric {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric));
 		return serviceSimulatedMetrics.save(serviceSimulatedMetric);
+	}
+
+	public ServiceSimulatedMetric addOrUpdateSimulatedMetric(ServiceSimulatedMetric simulatedMetric) {
+		Optional<ServiceSimulatedMetric> simulatedMetricOptional = serviceSimulatedMetrics.findById(simulatedMetric.getId());
+		if (simulatedMetricOptional.isPresent()) {
+			ServiceSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+			Set<Service> services = simulatedMetric.getServices();
+			if (services != null) {
+				existingSimulatedMetric.getServices().retainAll(services);
+				existingSimulatedMetric.getServices().addAll(services);
+			}
+			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+			return saveServiceSimulatedMetric(existingSimulatedMetric);
+		}
+		else {
+			return saveServiceSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public void deleteServiceSimulatedMetric(Long id) {
@@ -184,4 +205,5 @@ public class ServiceSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated service metric '" + name + "' already exists");
 		}
 	}
+
 }

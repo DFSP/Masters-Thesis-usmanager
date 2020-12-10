@@ -49,12 +49,14 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Nodes;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -159,6 +161,18 @@ public class NodesService {
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node saveNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
 		log.info("Saving node {}", ToStringBuilder.reflectionToString(node));
 		return nodes.save(node);
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addOrUpdateNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
+		Optional<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodeOptional = nodes.findById(node.getId());
+		if (nodeOptional.isPresent()) {
+			pt.unl.fct.miei.usmanagement.manager.nodes.Node existingNode = nodeOptional.get();
+			EntityUtils.copyValidProperties(node, existingNode);
+			return saveNode(existingNode);
+		}
+		else {
+			return saveNode(node);
+		}
 	}
 
 	public void removeHost(HostAddress hostAddress) {

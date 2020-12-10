@@ -56,10 +56,13 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetri
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
@@ -144,6 +147,28 @@ public class CloudHostsService {
 	public CloudHost saveCloudHost(CloudHost cloudHost) {
 		log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
 		return cloudHosts.save(cloudHost);
+	}
+
+	public CloudHost addOrUpdateCloudHost(CloudHost cloudHost) {
+		Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());
+		if (cloudHostOptional.isPresent()) {
+			CloudHost existingCloudHost = cloudHostOptional.get();
+			Set<HostRule> rules = cloudHost.getHostRules();
+			if (rules != null) {
+				existingCloudHost.getHostRules().retainAll(rules);
+				existingCloudHost.getHostRules().addAll(rules);
+			}
+			Set<HostSimulatedMetric> simulatedMetrics = cloudHost.getSimulatedHostMetrics();
+			if (simulatedMetrics != null) {
+				existingCloudHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
+				existingCloudHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+			}
+			EntityUtils.copyValidProperties(cloudHost, existingCloudHost);
+			return saveCloudHost(existingCloudHost);
+		}
+		else {
+			return saveCloudHost(cloudHost);
+		}
 	}
 
 	public CloudHost updateCloudHost(CloudHost cloudHost) {

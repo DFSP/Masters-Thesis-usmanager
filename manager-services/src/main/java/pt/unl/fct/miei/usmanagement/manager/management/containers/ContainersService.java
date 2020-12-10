@@ -59,6 +59,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.LinkedList;
@@ -169,6 +170,28 @@ public class ContainersService {
 	public Container saveContainer(Container container) {
 		log.info("Saving container {}", container.toString());
 		return containers.save(container);
+	}
+
+	public Container addOrUpdateContainer(Container container) {
+		Optional<Container> containerOptional = containers.findById(container.getId());
+		if (containerOptional.isPresent()) {
+			Container existingContainer = containerOptional.get();
+			Set<ContainerRule> containerRules = container.getContainerRules();
+			if (containerRules != null) {
+				existingContainer.getContainerRules().retainAll(containerRules);
+				existingContainer.getContainerRules().addAll(containerRules);
+			}
+			Set<ContainerSimulatedMetric> containerSimulatedMetrics = container.getSimulatedContainerMetrics();
+			if (containerSimulatedMetrics != null) {
+				existingContainer.getSimulatedContainerMetrics().retainAll(containerSimulatedMetrics);
+				existingContainer.getSimulatedContainerMetrics().addAll(containerSimulatedMetrics);
+			}
+			EntityUtils.copyValidProperties(container, existingContainer);
+			return saveContainer(existingContainer);
+		}
+		else {
+			return saveContainer(container);
+		}
 	}
 
 	public Container updateContainer(Container container) {

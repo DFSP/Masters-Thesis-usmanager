@@ -50,8 +50,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simula
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
@@ -77,7 +77,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -158,14 +157,14 @@ public class WorkerKafkaService {
 					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService();
 					if (!servicesService.hasService(service.getServiceName())) {
 						log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
-						servicesService.saveService(service);
+						servicesService.addOrUpdateService(service);
 					}
 				});
-				appsService.saveApp(app);
+				appsService.addOrUpdateApp(app);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());
+			log.error("Error while processing topic apps with message {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());
 		}
 	}
 
@@ -180,11 +179,11 @@ public class WorkerKafkaService {
 				cloudHostsService.deleteCloudHost(id);
 			}
 			else {
-				cloudHostsService.saveCloudHost(cloudHost);
+				cloudHostsService.addOrUpdateCloudHost(cloudHost);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(cloudHost), e.getMessage());
+			log.error("Error while processing topic cloud-hosts with message {}: {}", ToStringBuilder.reflectionToString(cloudHostMessage), e.getMessage());
 		}
 
 	}
@@ -201,13 +200,12 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<Decision> decisions = componentType.getDecisions();
-				componentType.setDecisions(new HashSet<>());
-				componentTypesService.saveComponentType(componentType);
-				decisions.forEach(decisionsService::saveDecision);
+				decisions.forEach(decisionsService::addOrUpdateDecision);
+				componentTypesService.addOrUpdateComponentType(componentType);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(componentType), e.getMessage());
+			log.error("Error while processing topic component-types with message {}: {}", ToStringBuilder.reflectionToString(componentTypeMessage), e.getMessage());
 		}
 	}
 
@@ -222,24 +220,32 @@ public class WorkerKafkaService {
 				conditionsService.deleteCondition(id);
 			}
 			else {
-				Set<HostRuleCondition> hostRuleConditions = condition.getHostConditions();
-				hostRuleConditions.forEach(hostRuleCondition -> hostRulesService.saveRule(hostRuleCondition.getHostRule()));
-				condition.setHostConditions(new HashSet<>());
-				Set<AppRuleCondition> appRuleConditions = condition.getAppConditions();
-				appRuleConditions.forEach(appRuleCondition -> appRulesService.saveRule(appRuleCondition.getAppRule()));
-				condition.setAppConditions(new HashSet<>());
-				Set<ServiceRuleCondition> serviceRuleConditions = condition.getServiceConditions();
-				serviceRuleConditions.forEach(serviceRuleCondition -> serviceRulesService.saveRule(serviceRuleCondition.getServiceRule()));
-				condition.setServiceConditions(new HashSet<>());
-				Set<ContainerRuleCondition> containerRuleConditions = condition.getContainerConditions();
-				containerRuleConditions.forEach(containerRuleCondition -> containerRulesService.saveRule(containerRuleCondition.getContainerRule()));
-				condition.setContainerConditions(new HashSet<>());
+				condition.getHostConditions().forEach(hostRuleCondition -> {
+					conditionsService.addOrUpdateCondition(hostRuleCondition.getHostCondition());
+					hostRulesService.addOrUpdateRule(hostRuleCondition.getHostRule());
+				});
+				condition.getAppConditions().forEach(appRuleCondition -> {
+					conditionsService.addOrUpdateCondition(appRuleCondition.getAppCondition());
+					appRulesService.addOrUpdateRule(appRuleCondition.getAppRule());
+				});
+				condition.getServiceConditions().forEach(serviceRuleCondition -> {
+					conditionsService.addOrUpdateCondition(serviceRuleCondition.getServiceCondition());
+					serviceRulesService.addOrUpdateRule(serviceRuleCondition.getServiceRule());
+				});
+				condition.getContainerConditions().forEach(containerRuleCondition -> {
+					conditionsService.addOrUpdateCondition(containerRuleCondition.getContainerCondition());
+					containerRulesService.addOrUpdateRule(containerRuleCondition.getContainerRule());
+				});
 
-				conditionsService.saveCondition(condition);
+				operatorsService.addOrUpdateOperator(condition.getOperator());
+				fieldsService.addOrUpdateField(condition.getField());
+				valueModesService.addOrUpdateValueMode(condition.getValueMode());
+
+				conditionsService.addOrUpdateCondition(condition);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(condition), e.getMessage());
+			log.error("Error while processing topic conditions with message {}: {}", ToStringBuilder.reflectionToString(conditionMessage), e.getMessage());
 		}
 	}
 
@@ -254,11 +260,11 @@ public class WorkerKafkaService {
 				containersService.deleteContainer(id);
 			}
 			else {
-				containersService.saveContainer(container);
+				containersService.addOrUpdateContainer(container);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(container), e.getMessage());
+			log.error("Error while processing topic containers with message {}: {}", ToStringBuilder.reflectionToString(containerMessage), e.getMessage());
 		}
 	}
 
@@ -274,12 +280,12 @@ public class WorkerKafkaService {
 			}
 			else {
 				ComponentType componentType = decision.getComponentType();
-				componentTypesService.saveComponentType(componentType);
-				decisionsService.saveDecision(decision);
+				componentTypesService.addOrUpdateComponentType(componentType);
+				decisionsService.addOrUpdateDecision(decision);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(decision), e.getMessage());
+			log.error("Error while processing topic decisions with message {}: {}", ToStringBuilder.reflectionToString(decisionMessage), e.getMessage());
 		}
 	}
 
@@ -294,11 +300,11 @@ public class WorkerKafkaService {
 				edgeHostsService.deleteEdgeHost(id);
 			}
 			else {
-				edgeHostsService.saveEdgeHost(edgeHost);
+				edgeHostsService.addOrUpdateEdgeHost(edgeHost);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(edgeHost), e.getMessage());
+			log.error("Error while processing topic edge-hosts with message {}: {}", ToStringBuilder.reflectionToString(edgeHostMessage), e.getMessage());
 		}
 	}
 
@@ -313,11 +319,11 @@ public class WorkerKafkaService {
 				elasticIpsService.deleteElasticIp(id);
 			}
 			else {
-				elasticIpsService.saveElasticIp(elasticIp);
+				elasticIpsService.addOrUpdateElasticIp(elasticIp);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(elasticIp), e.getMessage());
+			log.error("Error while processing topic eips with message {}: {}", ToStringBuilder.reflectionToString(elasticIpMessage), e.getMessage());
 		}
 	}
 
@@ -332,11 +338,17 @@ public class WorkerKafkaService {
 				fieldsService.deleteField(id);
 			}
 			else {
-				fieldsService.saveField(field);
+				Set<Condition> conditions = field.getConditions();
+				conditions.forEach(condition -> {
+					Operator operator = condition.getOperator();
+					operatorsService.addOrUpdateOperator(operator);
+					conditionsService.addOrUpdateCondition(condition);
+				});
+				fieldsService.addOrUpdateField(field);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(field), e.getMessage());
+			log.error("Error while processing topic fields with message {}: {}", ToStringBuilder.reflectionToString(fieldMessage), e.getMessage());
 		}
 	}
 
@@ -351,11 +363,11 @@ public class WorkerKafkaService {
 				nodesService.deleteNode(id);
 			}
 			else {
-				nodesService.saveNode(node);
+				nodesService.addOrUpdateNode(node);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(node), e.getMessage());
+			log.error("Error while processing topic nodes with message {}: {}", ToStringBuilder.reflectionToString(nodeMessage), e.getMessage());
 		}
 	}
 
@@ -370,11 +382,11 @@ public class WorkerKafkaService {
 				operatorsService.deleteOperator(id);
 			}
 			else {
-				operatorsService.saveOperator(operator);
+				operatorsService.addOrUpdateOperator(operator);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(operator), e.getMessage());
+			log.error("Error while processing topic operators with message {}: {}", ToStringBuilder.reflectionToString(operatorMessage), e.getMessage());
 		}
 	}
 
@@ -389,11 +401,11 @@ public class WorkerKafkaService {
 				servicesService.deleteService(id);
 			}
 			else {
-				servicesService.saveService(service);
+				servicesService.addOrUpdateService(service);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(service), e.getMessage());
+			log.error("Error while processing topic services with message {}: {}", ToStringBuilder.reflectionToString(serviceMessage), e.getMessage());
 		}
 	}
 
@@ -408,11 +420,22 @@ public class WorkerKafkaService {
 				hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
 			}
 			else {
-				hostSimulatedMetricsService.saveHostSimulatedMetric(hostSimulatedMetric);
+				fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
+				hostSimulatedMetric.getCloudHosts().forEach(cloudHost -> {
+					cloudHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);
+					cloudHost.getSimulatedHostMetrics().forEach(hostSimulatedMetricsService::addOrUpdateSimulatedMetric);
+					cloudHostsService.addOrUpdateCloudHost(cloudHost);
+				});
+				hostSimulatedMetric.getEdgeHosts().forEach(edgeHost -> {
+					edgeHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);
+					edgeHost.getSimulatedHostMetrics().forEach(hostSimulatedMetricsService::addOrUpdateSimulatedMetric);
+					edgeHostsService.addOrUpdateEdgeHost(edgeHost);
+				});
+				hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetric), e.getMessage());
+			log.error("Error while processing topic simulated-host-metrics with message {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetricMessage), e.getMessage());
 		}
 	}
 
@@ -427,11 +450,17 @@ public class WorkerKafkaService {
 				appSimulatedMetricsService.deleteAppSimulatedMetric(id);
 			}
 			else {
-				appSimulatedMetricsService.saveAppSimulatedMetric(appSimulatedMetric);
+				fieldsService.addField(appSimulatedMetric.getField());
+				appSimulatedMetric.getApps().forEach(app -> {
+					app.getAppRules().forEach(appRulesService::addOrUpdateRule);
+					app.getSimulatedAppMetrics().forEach(appSimulatedMetricsService::addOrUpdateSimulatedMetric);
+					appsService.addOrUpdateApp(app);
+				});
+				appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetric), e.getMessage());
+			log.error("Error while processing topic simulated-app-metrics with message {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetricMessage), e.getMessage());
 		}
 	}
 
@@ -446,11 +475,17 @@ public class WorkerKafkaService {
 				serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
 			}
 			else {
-				serviceSimulatedMetricsService.saveServiceSimulatedMetric(serviceSimulatedMetric);
+				fieldsService.addOrUpdateField(serviceSimulatedMetric.getField());
+				serviceSimulatedMetric.getServices().forEach(service -> {
+					service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);
+					service.getSimulatedServiceMetrics().forEach(serviceSimulatedMetricsService::addOrUpdateSimulatedMetric);
+					servicesService.addOrUpdateService(service);
+				});
+				serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetric), e.getMessage());
+			log.error("Error while processing topic simulated-service-metrics with message {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetricMessage), e.getMessage());
 		}
 	}
 
@@ -465,11 +500,17 @@ public class WorkerKafkaService {
 				containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
 			}
 			else {
-				containerSimulatedMetricsService.saveContainerSimulatedMetric(containerSimulatedMetric);
+				fieldsService.addOrUpdateField(containerSimulatedMetric.getField());
+				containerSimulatedMetric.getContainers().forEach(container -> {
+					container.getContainerRules().forEach(containerRulesService::addOrUpdateRule);
+					container.getSimulatedContainerMetrics().forEach(containerSimulatedMetricsService::addOrUpdateSimulatedMetric);
+					containersService.addOrUpdateContainer(container);
+				});
+				containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetric), e.getMessage());
+			log.error("Error while processing topic simulated-container-metrics with message {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetricMessage), e.getMessage());
 		}
 	}
 
@@ -485,16 +526,21 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<HostRuleCondition> hostRuleConditions = hostRule.getConditions();
-				hostRuleConditions.forEach(ruleConditionsService::saveHostRuleCondition);
+				hostRuleConditions.forEach(hostRuleCondition -> {
+					operatorsService.addOrUpdateOperator(hostRuleCondition.getHostCondition().getOperator());
+					fieldsService.addOrUpdateField(hostRuleCondition.getHostCondition().getField());
+					valueModesService.addOrUpdateValueMode(hostRuleCondition.getHostCondition().getValueMode());
+					ruleConditionsService.saveHostRuleCondition(hostRuleCondition);
+				});
 				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
-				cloudHosts.forEach(cloudHostsService::saveCloudHost);
+				cloudHosts.forEach(cloudHostsService::addOrUpdateCloudHost);
 				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
-				edgeHosts.forEach(edgeHostsService::saveEdgeHost);
+				edgeHosts.forEach(edgeHostsService::addOrUpdateEdgeHost);
 				hostRulesService.addOrUpdateRule(hostRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(hostRule), e.getMessage());
+			log.error("Error while processing topic host-rules with message {}: {}", ToStringBuilder.reflectionToString(hostRuleMessage), e.getMessage());
 		}
 	}
 
@@ -512,12 +558,12 @@ public class WorkerKafkaService {
 				Set<AppRuleCondition> appRuleConditions = appRule.getConditions();
 				appRuleConditions.forEach(ruleConditionsService::saveAppRuleCondition);
 				Set<App> apps = appRule.getApps();
-				apps.forEach(appsService::saveApp);
-				appRulesService.saveRule(appRule);
+				apps.forEach(appsService::addOrUpdateApp);
+				appRulesService.addOrUpdateRule(appRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(appRule), e.getMessage());
+			log.error("Error while processing topic app-rules with message {}: {}", ToStringBuilder.reflectionToString(appRuleMessage), e.getMessage());
 		}
 	}
 
@@ -533,16 +579,25 @@ public class WorkerKafkaService {
 			}
 			else {
 				Set<ServiceRuleCondition> serviceRuleConditions = serviceRule.getConditions();
-				serviceRuleConditions.forEach(ruleConditionsService::saveServiceRuleCondition);
+				serviceRuleConditions.forEach(serviceRuleCondition -> {
+					Decision ruleDecision = serviceRuleCondition.getServiceRule().getDecision();
+					componentTypesService.addOrUpdateComponentType(ruleDecision.getComponentType());
+					decisionsService.addOrUpdateDecision(ruleDecision);
+					Condition ruleCondition = serviceRuleCondition.getServiceCondition();
+					valueModesService.addOrUpdateValueMode(ruleCondition.getValueMode());
+					operatorsService.addOrUpdateOperator(ruleCondition.getOperator());
+					fieldsService.addOrUpdateField(ruleCondition.getField());
+					ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition);
+				});
 				Set<pt.unl.fct.miei.usmanagement.manager.services.Service> services = serviceRule.getServices();
 				services.forEach(servicesService::saveService);
 				Decision decision = serviceRule.getDecision();
-				decisionsService.saveDecision(decision);
-				serviceRulesService.saveRule(serviceRule);
+				decisionsService.addOrUpdateDecision(decision);
+				serviceRulesService.addOrUpdateRule(serviceRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(serviceRule), e.getMessage());
+			log.error("Error from topic service-rules while saving {}: {}", ToStringBuilder.reflectionToString(serviceRuleMessage), e.getMessage());
 		}
 	}
 
@@ -561,11 +616,11 @@ public class WorkerKafkaService {
 				containerRuleConditions.forEach(ruleConditionsService::saveContainerRuleCondition);
 				Set<pt.unl.fct.miei.usmanagement.manager.containers.Container> containers = containerRule.getContainers();
 				containers.forEach(containersService::saveContainer);
-				containerRulesService.saveRule(containerRule);
+				containerRulesService.addOrUpdateRule(containerRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(containerRule), e.getMessage());
+			log.error("Error while processing topic container-rules with message {}: {}", ToStringBuilder.reflectionToString(containerRuleMessage), e.getMessage());
 		}
 	}
 
@@ -583,15 +638,16 @@ public class WorkerKafkaService {
 				Set<Condition> conditions = valueMode.getConditions();
 				conditions.forEach(condition -> {
 					Field field = condition.getField();
-					fieldsService.saveField(field);
+					fieldsService.addOrUpdateField(field);
 					Operator operator = condition.getOperator();
 					operatorsService.addOrUpdateOperator(operator);
+					conditionsService.addOrUpdateCondition(condition);
 				});
-				valueModesService.saveValueMode(valueMode);
+				valueModesService.addOrUpdateValueMode(valueMode);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while saving {}: {}", ToStringBuilder.reflectionToString(valueMode), e.getMessage());
+			log.error("Error while processing topic value-modes with message {}: {}", ToStringBuilder.reflectionToString(valueModeMessage), e.getMessage());
 		}
 	}
 

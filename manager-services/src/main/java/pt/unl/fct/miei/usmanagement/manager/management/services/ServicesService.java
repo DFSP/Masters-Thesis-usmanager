@@ -31,6 +31,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencies;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
@@ -51,6 +52,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @org.springframework.stereotype.Service
@@ -115,6 +118,48 @@ public class ServicesService {
 		service = saveService(service);
 		kafkaService.sendService(service);
 		return service;
+	}
+
+	public Service addOrUpdateService(Service service) {
+		Optional<Service> serviceOptional = services.findById(service.getId());
+		if (serviceOptional.isPresent()) {
+			Service existingService = serviceOptional.get();
+			Set<ServiceRule> rules = service.getServiceRules();
+			if (rules != null) {
+				existingService.getServiceRules().retainAll(rules);
+				existingService.getServiceRules().addAll(rules);
+			}
+			Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
+			if (simulatedMetrics != null) {
+				existingService.getSimulatedServiceMetrics().retainAll(simulatedMetrics);
+				existingService.getSimulatedServiceMetrics().addAll(simulatedMetrics);
+			}
+			Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
+			if (serviceEventPredictions != null) {
+				existingService.getEventPredictions().retainAll(serviceEventPredictions);
+				existingService.getEventPredictions().addAll(serviceEventPredictions);
+			}
+			Set<AppService> appServices = service.getAppServices();
+			if (appServices != null) {
+				existingService.getAppServices().retainAll(appServices);
+				existingService.getAppServices().addAll(appServices);
+			}
+			Set<ServiceDependency> dependencies = service.getDependencies();
+			if (dependencies != null) {
+				existingService.getDependencies().retainAll(dependencies);
+				existingService.getDependencies().addAll(dependencies);
+			}
+			Set<ServiceDependency> dependents = service.getDependents();
+			if (dependents != null) {
+				existingService.getDependents().retainAll(dependents);
+				existingService.getDependents().addAll(dependents);
+			}
+			EntityUtils.copyValidProperties(service, existingService);
+			return saveService(existingService);
+		}
+		else {
+			return saveService(service);
+		}
 	}
 
 	public Service saveService(Service service) {
@@ -362,4 +407,5 @@ public class ServicesService {
 	public boolean hasService(String name) {
 		return services.hasService(name);
 	}
+
 }

@@ -48,11 +48,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisions
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -110,6 +112,18 @@ public class DecisionsService {
 		decision = saveDecision(decision);
 		kafkaService.sendDecision(decision);
 		return decision;
+	}
+
+	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addOrUpdateDecision(Decision decision) {
+		Optional<Decision> decisionOptional = decisions.findById(decision.getId());
+		if (decisionOptional.isPresent()) {
+			Decision existingDecision = decisionOptional.get();
+			EntityUtils.copyValidProperties(decision, existingDecision);
+			return saveDecision(existingDecision);
+		}
+		else {
+			return saveDecision(decision);
+		}
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision saveDecision(Decision decision) {

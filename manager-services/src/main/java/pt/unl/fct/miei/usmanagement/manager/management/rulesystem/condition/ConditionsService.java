@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
@@ -47,13 +49,18 @@ import java.util.Set;
 @Service
 public class ConditionsService {
 
+	private final ValueModesService valueModesService;
 	private final FieldsService fieldsService;
+	private final OperatorsService operatorsService;
 	private final KafkaService kafkaService;
 
 	private final Conditions conditions;
 
-	public ConditionsService(FieldsService fieldsService, Conditions conditions, KafkaService kafkaService) {
+	public ConditionsService(ValueModesService valueModesService, FieldsService fieldsService,
+							 OperatorsService operatorsService, Conditions conditions, KafkaService kafkaService) {
+		this.valueModesService = valueModesService;
 		this.fieldsService = fieldsService;
+		this.operatorsService = operatorsService;
 		this.conditions = conditions;
 		this.kafkaService = kafkaService;
 	}
@@ -100,31 +107,34 @@ public class ConditionsService {
 	public Condition addOrUpdateCondition(Condition condition) {
 		Optional<Condition> optionalCondition = conditions.findById(condition.getId());
 		if (optionalCondition.isPresent()) {
-			Condition cond = optionalCondition.get();
+			Condition existingCondition = optionalCondition.get();
 			Set<HostRuleCondition> hostConditions = condition.getHostConditions();
 			if (hostConditions != null) {
-				cond.getHostConditions().retainAll(hostConditions);
-				cond.getHostConditions().addAll(hostConditions);
+				existingCondition.getHostConditions().retainAll(hostConditions);
+				existingCondition.getHostConditions().addAll(hostConditions);
 			}
 			Set<AppRuleCondition> appConditions = condition.getAppConditions();
 			if (appConditions != null) {
-				cond.getAppConditions().retainAll(appConditions);
-				cond.getAppConditions().addAll(appConditions);
+				existingCondition.getAppConditions().retainAll(appConditions);
+				existingCondition.getAppConditions().addAll(appConditions);
 			}
 			Set<ServiceRuleCondition> serviceConditions = condition.getServiceConditions();
 			if (serviceConditions != null) {
-				cond.getServiceConditions().retainAll(serviceConditions);
-				cond.getServiceConditions().addAll(serviceConditions);
+				existingCondition.getServiceConditions().retainAll(serviceConditions);
+				existingCondition.getServiceConditions().addAll(serviceConditions);
 			}
 			Set<ContainerRuleCondition> containerConditions = condition.getContainerConditions();
 			if (containerConditions != null) {
-				cond.getContainerConditions().retainAll(containerConditions);
-				cond.getContainerConditions().addAll(containerConditions);
+				existingCondition.getContainerConditions().retainAll(containerConditions);
+				existingCondition.getContainerConditions().addAll(containerConditions);
 			}
-			EntityUtils.copyValidProperties(condition, cond);
-			return saveCondition(condition);
+			EntityUtils.copyValidProperties(condition, existingCondition);
+			return saveCondition(existingCondition);
 		}
 		else {
+			valueModesService.addOrUpdateValueMode(condition.getValueMode());
+			fieldsService.addOrUpdateField(condition.getField());
+			operatorsService.addOrUpdateOperator(condition.getOperator());
 			return saveCondition(condition);
 		}
 	}

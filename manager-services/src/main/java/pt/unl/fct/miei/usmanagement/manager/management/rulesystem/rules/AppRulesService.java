@@ -31,6 +31,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
@@ -39,10 +41,14 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRules;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -217,6 +223,28 @@ public class AppRulesService {
 		String name = appRule.getName();
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("App rule '" + name + "' already exists");
+		}
+	}
+
+	public AppRule addOrUpdateRule(AppRule appRule) {
+		Optional<AppRule> optionalRule = rules.findById(appRule.getId());
+		if (optionalRule.isPresent()) {
+			AppRule rule = optionalRule.get();
+			Set<AppRuleCondition> conditions = appRule.getConditions();
+			if (conditions != null) {
+				rule.getConditions().retainAll(appRule.getConditions());
+				rule.getConditions().addAll(appRule.getConditions());
+			}
+			Set<App> apps = appRule.getApps();
+			if (apps != null) {
+				rule.getApps().retainAll(appRule.getApps());
+				rule.getApps().addAll(appRule.getApps());
+			}
+			EntityUtils.copyValidProperties(appRule, rule);
+			return saveRule(rule);
+		}
+		else {
+			return saveRule(appRule);
 		}
 	}
 }

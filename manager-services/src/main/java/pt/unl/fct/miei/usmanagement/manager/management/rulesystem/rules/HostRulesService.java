@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -139,13 +140,26 @@ public class HostRulesService {
 		Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
 		if (optionalRule.isPresent()) {
 			HostRule rule = optionalRule.get();
+			Set<HostRuleCondition> conditions = hostRule.getConditions();
+			if (conditions != null) {
+				rule.getConditions().retainAll(hostRule.getConditions());
+				rule.getConditions().addAll(hostRule.getConditions());
+			}
+			Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
+			if (edgeHosts != null) {
+				rule.getEdgeHosts().retainAll(hostRule.getEdgeHosts());
+				rule.getEdgeHosts().addAll(hostRule.getEdgeHosts());
+			}
+			Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
+			if (cloudHosts != null) {
+				rule.getCloudHosts().retainAll(hostRule.getCloudHosts());
+				rule.getCloudHosts().addAll(hostRule.getCloudHosts());
+			}
 			EntityUtils.copyValidProperties(hostRule, rule);
-			rule.getConditions().clear();
-			rule.getConditions().addAll(hostRule.getConditions());
-			return rules.save(rule);
+			return saveRule(rule);
 		}
 		else {
-			return rules.save(hostRule);
+			return saveRule(hostRule);
 		}
 	}
 

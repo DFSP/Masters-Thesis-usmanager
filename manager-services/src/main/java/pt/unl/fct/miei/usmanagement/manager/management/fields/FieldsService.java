@@ -32,9 +32,13 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -59,7 +63,7 @@ public class FieldsService {
 
 
 	public Field getField(String name) {
-		return fields.findByNameIgnoreCase(name).orElseThrow(() ->
+		return fields.findByName(name).orElseThrow(() ->
 			new EntityNotFoundException(Field.class, "name", name));
 	}
 
@@ -86,6 +90,33 @@ public class FieldsService {
 	public Field saveField(Field field) {
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		return fields.save(field);
+	}
+
+	public Field addOrUpdateField(Field field) {
+		Optional<Field> fieldOptional = fields.findById(field.getId());
+		if (fieldOptional.isPresent()) {
+			Field existingField = fieldOptional.get();
+			Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition> conditions = field.getConditions();
+			if (conditions != null) {
+				existingField.getConditions().retainAll(conditions);
+				existingField.getConditions().addAll(conditions);
+			}
+			Set<HostSimulatedMetric> simulatedHostMetrics = field.getSimulatedHostMetrics();
+			if (simulatedHostMetrics != null) {
+				existingField.getSimulatedHostMetrics().retainAll(simulatedHostMetrics);
+				existingField.getSimulatedHostMetrics().addAll(simulatedHostMetrics);
+			}
+			Set<ServiceSimulatedMetric> simulatedServiceMetrics = field.getSimulatedServiceMetrics();
+			if (simulatedServiceMetrics != null) {
+				existingField.getSimulatedServiceMetrics().retainAll(simulatedServiceMetrics);
+				existingField.getSimulatedServiceMetrics().addAll(simulatedServiceMetrics);
+			}
+			EntityUtils.copyValidProperties(field, existingField);
+			return saveField(existingField);
+		}
+		else {
+			return saveField(field);
+		}
 	}
 
 	public void deleteField(Long id) {

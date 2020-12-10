@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
@@ -37,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.Cond
 import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
@@ -44,6 +46,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -214,4 +218,27 @@ public class ContainerRulesService {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}
 	}
+
+	public ContainerRule addOrUpdateRule(ContainerRule containerRule) {
+		Optional<ContainerRule> optionalRule = rules.findById(containerRule.getId());
+		if (optionalRule.isPresent()) {
+			ContainerRule rule = optionalRule.get();
+			Set<ContainerRuleCondition> conditions = containerRule.getConditions();
+			if (conditions != null) {
+				rule.getConditions().retainAll(containerRule.getConditions());
+				rule.getConditions().addAll(containerRule.getConditions());
+			}
+			Set<Container> containers = containerRule.getContainers();
+			if (containers != null) {
+				rule.getContainers().retainAll(containerRule.getContainers());
+				rule.getContainers().addAll(containerRule.getContainers());
+			}
+			EntityUtils.copyValidProperties(containerRule, rule);
+			return saveRule(rule);
+		}
+		else {
+			return saveRule(containerRule);
+		}
+	}
+	
 }

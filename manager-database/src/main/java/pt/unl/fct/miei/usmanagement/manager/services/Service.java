@@ -136,12 +136,12 @@ public class Service /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service")
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "dependency")
+	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependents;
 
 	@Singular

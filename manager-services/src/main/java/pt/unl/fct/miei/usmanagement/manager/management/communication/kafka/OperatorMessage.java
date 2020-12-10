@@ -30,6 +30,7 @@ public class OperatorMessage {
 	}
 
 	public OperatorMessage(Operator operator) {
+		this.id = operator.getId();
 		this.operator = operator.getOperator();
 		this.symbol = operator.getSymbol();
 		this.conditions = operator.getConditions();
@@ -38,6 +39,7 @@ public class OperatorMessage {
 
 	public Operator get() {
 		Operator operator = Operator.builder()
+			.id(id)
 			.operator(this.operator)
 			.symbol(symbol)
 			.conditions(conditions != null ? conditions : new HashSet<>())

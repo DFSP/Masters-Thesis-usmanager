@@ -36,6 +36,8 @@ import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.Kafka
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -86,7 +88,24 @@ public class ComponentTypesService {
 		kafkaService.sendComponentType(componentType);
 		return componentType;
 	}
-	
+
+	public ComponentType addOrUpdateComponentType(ComponentType componentType) {
+		Optional<ComponentType> componentTypeOptional = componentTypes.findById(componentType.getId());
+		if (componentTypeOptional.isPresent()) {
+			ComponentType existingComponentType = componentTypeOptional.get();
+			Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> decisions = componentType.getDecisions();
+			if (decisions != null) {
+				existingComponentType.getDecisions().retainAll(decisions);
+				existingComponentType.getDecisions().addAll(decisions);
+			}
+			EntityUtils.copyValidProperties(componentType, existingComponentType);
+			return saveComponentType(existingComponentType);
+		}
+		else {
+			return saveComponentType(componentType);
+		}
+	}
+
 	public ComponentType saveComponentType(ComponentType componentType) {
 		log.info("Saving componentType {}", ToStringBuilder.reflectionToString(componentType));
 		return componentTypes.save(componentType);

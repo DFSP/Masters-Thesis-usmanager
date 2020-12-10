@@ -48,6 +48,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,28 @@ public class AppsService {
 	public App saveApp(App app) {
 		log.info("Saving app {}", app.getName());
 		return apps.save(app);
+	}
+
+	public App addOrUpdateApp(App app) {
+		Optional<App> appOptional = apps.findById(app.getId());
+		if (appOptional.isPresent()) {
+			App existingApp = appOptional.get();
+			Set<AppRule> rules = app.getAppRules();
+			if (rules != null) {
+				existingApp.getAppRules().retainAll(rules);
+				existingApp.getAppRules().addAll(rules);
+			}
+			Set<AppSimulatedMetric> simulatedMetrics = app.getSimulatedAppMetrics();
+			if (simulatedMetrics != null) {
+				existingApp.getSimulatedAppMetrics().retainAll(simulatedMetrics);
+				existingApp.getSimulatedAppMetrics().addAll(simulatedMetrics);
+			}
+			EntityUtils.copyValidProperties(app, existingApp);
+			return saveApp(existingApp);
+		}
+		else {
+			return saveApp(app);
+		}
 	}
 
 	public App getApp(Long id) {

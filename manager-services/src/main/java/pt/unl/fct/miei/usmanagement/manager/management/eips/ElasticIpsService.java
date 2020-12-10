@@ -27,12 +27,14 @@ import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsSer
 import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.management.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +97,18 @@ public class ElasticIpsService {
 	public ElasticIp saveElasticIp(ElasticIp elasticIp) {
 		log.info("Saving elasticIp {}", ToStringBuilder.reflectionToString(elasticIp));
 		return elasticIps.save(elasticIp);
+	}
+
+	public ElasticIp addOrUpdateElasticIp(ElasticIp elasticIp) {
+		Optional<ElasticIp> elasticIpOptional = elasticIps.findById(elasticIp.getId());
+		if (elasticIpOptional.isPresent()) {
+			ElasticIp existingElasticIp = elasticIpOptional.get();
+			EntityUtils.copyValidProperties(elasticIp, existingElasticIp);
+			return saveElasticIp(existingElasticIp);
+		}
+		else {
+			return saveElasticIp(elasticIp);
+		}
 	}
 
 	public void clearElasticIps() {

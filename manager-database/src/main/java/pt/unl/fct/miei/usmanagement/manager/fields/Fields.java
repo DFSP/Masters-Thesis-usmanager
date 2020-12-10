@@ -32,7 +32,10 @@ import java.util.Optional;
 
 public interface Fields extends JpaRepository<Field, Long> {
 
-	Optional<Field> findByNameIgnoreCase(@Param("name") String name);
+	@Query("select f "
+		+ "from Field f left join fetch f.conditions "
+		+ "where lower(f.name) = lower(:name)")
+	Optional<Field> findByName(@Param("name") String name);
 
 	@Query("select case when count(f) > 0 then true else false end "
 		+ "from Field f "

@@ -30,11 +30,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModes;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -59,7 +62,7 @@ public class ValueModesService {
 
 
 	public ValueMode getValueMode(String valueModeName) {
-		return valueModes.findByNameIgnoreCase(valueModeName).orElseThrow(() ->
+		return valueModes.findByName(valueModeName).orElseThrow(() ->
 			new EntityNotFoundException(ValueMode.class, "name", valueModeName));
 	}
 
@@ -85,6 +88,23 @@ public class ValueModesService {
 	public ValueMode saveValueMode(ValueMode valueMode) {
 		log.info("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
 		return valueModes.save(valueMode);
+	}
+
+	public ValueMode addOrUpdateValueMode(ValueMode valueMode) {
+		Optional<ValueMode> valueModeOptional = valueModes.findById(valueMode.getId());
+		if (valueModeOptional.isPresent()) {
+			ValueMode existingValueMode = valueModeOptional.get();
+			Set<Condition> conditions = valueMode.getConditions();
+			if (conditions != null) {
+				existingValueMode.getConditions().retainAll(conditions);
+				existingValueMode.getConditions().addAll(conditions);
+			}
+			EntityUtils.copyValidProperties(valueMode, existingValueMode);
+			return saveValueMode(existingValueMode);
+		}
+		else {
+			return saveValueMode(valueMode);
+		}
 	}
 
 	public void deleteValueMode(Long id) {

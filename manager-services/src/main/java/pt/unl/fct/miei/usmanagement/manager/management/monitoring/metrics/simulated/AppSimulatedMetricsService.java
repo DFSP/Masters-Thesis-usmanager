@@ -38,7 +38,9 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -98,6 +100,23 @@ public class AppSimulatedMetricsService {
 	public AppSimulatedMetric saveAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
 		log.info("Saving appSimulatedMetric {}", ToStringBuilder.reflectionToString(appSimulatedMetric));
 		return appSimulatedMetrics.save(appSimulatedMetric);
+	}
+
+	public AppSimulatedMetric addOrUpdateSimulatedMetric(AppSimulatedMetric simulatedMetric) {
+		Optional<AppSimulatedMetric> simulatedMetricOptional = appSimulatedMetrics.findById(simulatedMetric.getId());
+		if (simulatedMetricOptional.isPresent()) {
+			AppSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+			Set<App> apps = simulatedMetric.getApps();
+			if (apps != null) {
+				existingSimulatedMetric.getApps().retainAll(apps);
+				existingSimulatedMetric.getApps().addAll(apps);
+			}
+			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+			return saveAppSimulatedMetric(existingSimulatedMetric);
+		}
+		else {
+			return saveAppSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public void deleteAppSimulatedMetric(Long id) {
@@ -173,4 +192,5 @@ public class AppSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated app metric '" + name + "' already exists");
 		}
 	}
+	
 }

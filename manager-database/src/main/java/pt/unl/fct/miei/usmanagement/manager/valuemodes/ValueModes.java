@@ -32,7 +32,10 @@ import java.util.Optional;
 
 public interface ValueModes extends JpaRepository<ValueMode, Long> {
 
-	Optional<ValueMode> findByNameIgnoreCase(@Param("name") String name);
+	@Query("select m "
+		+ "from ValueMode m left join fetch m.conditions "
+		+ "where lower(m.name) = lower(:name)")
+	Optional<ValueMode> findByName(@Param("name") String name);
 
 	@Query("select case when count(m) > 0 then true else false end "
 		+ "from ValueMode m "

@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
@@ -39,7 +40,9 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulated
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -99,6 +102,23 @@ public class ContainerSimulatedMetricsService {
 	public ContainerSimulatedMetric saveContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
 		log.info("Saving containerSimulatedMetric {}", ToStringBuilder.reflectionToString(containerSimulatedMetric));
 		return containerSimulatedMetrics.save(containerSimulatedMetric);
+	}
+
+	public ContainerSimulatedMetric addOrUpdateSimulatedMetric(ContainerSimulatedMetric simulatedMetric) {
+		Optional<ContainerSimulatedMetric> simulatedMetricOptional = containerSimulatedMetrics.findById(simulatedMetric.getId());
+		if (simulatedMetricOptional.isPresent()) {
+			ContainerSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+			Set<Container> containers = simulatedMetric.getContainers();
+			if (containers != null) {
+				existingSimulatedMetric.getContainers().retainAll(containers);
+				existingSimulatedMetric.getContainers().addAll(containers);
+			}
+			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+			return saveContainerSimulatedMetric(existingSimulatedMetric);
+		}
+		else {
+			return saveContainerSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public void deleteContainerSimulatedMetric(Long id) {
@@ -176,4 +196,5 @@ public class ContainerSimulatedMetricsService {
 		double maxValue = metric.getMaximumValue();
 		return minValue + (maxValue - minValue) * random.nextDouble();
 	}
+
 }

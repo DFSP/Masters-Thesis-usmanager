@@ -34,7 +34,7 @@ public class FieldMessage {
 	}
 
 	public FieldMessage(Field field) {
-		this.id = id;
+		this.id = field.getId();
 		this.name = field.getName();
 		this.prometheusQuery = field.getPrometheusQuery();
 		this.conditions = field.getConditions();

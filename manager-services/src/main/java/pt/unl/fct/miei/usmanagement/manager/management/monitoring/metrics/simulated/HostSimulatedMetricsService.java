@@ -41,7 +41,9 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetri
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -100,9 +102,31 @@ public class HostSimulatedMetricsService {
 		return hostSimulatedMetric;
 	}
 
-	public HostSimulatedMetric saveHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
-		log.info("Saving hostSimulatedMetric {}", ToStringBuilder.reflectionToString(hostSimulatedMetric));
-		return hostSimulatedMetrics.save(hostSimulatedMetric);
+	public HostSimulatedMetric saveHostSimulatedMetric(HostSimulatedMetric simulatedMetric) {
+		log.info("Saving hostSimulatedMetric {}", ToStringBuilder.reflectionToString(simulatedMetric));
+		return hostSimulatedMetrics.save(simulatedMetric);
+	}
+
+	public HostSimulatedMetric addOrUpdateSimulatedMetric(HostSimulatedMetric simulatedMetric) {
+		Optional<HostSimulatedMetric> simulatedMetricOptional = hostSimulatedMetrics.findById(simulatedMetric.getId());
+		if (simulatedMetricOptional.isPresent()) {
+			HostSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+			Set<CloudHost> cloudHosts = simulatedMetric.getCloudHosts();
+			if (cloudHosts != null) {
+				existingSimulatedMetric.getCloudHosts().retainAll(cloudHosts);
+				existingSimulatedMetric.getCloudHosts().addAll(cloudHosts);
+			}
+			Set<EdgeHost> edgeHosts = simulatedMetric.getEdgeHosts();
+			if (edgeHosts != null) {
+				existingSimulatedMetric.getEdgeHosts().retainAll(edgeHosts);
+				existingSimulatedMetric.getEdgeHosts().addAll(edgeHosts);
+			}
+			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+			return saveHostSimulatedMetric(existingSimulatedMetric);
+		}
+		else {
+			return saveHostSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public void deleteHostSimulatedMetric(Long id) {

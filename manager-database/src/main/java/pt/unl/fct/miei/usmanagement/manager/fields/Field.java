@@ -73,17 +73,17 @@ public class Field /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<Condition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field")
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
 	@Override

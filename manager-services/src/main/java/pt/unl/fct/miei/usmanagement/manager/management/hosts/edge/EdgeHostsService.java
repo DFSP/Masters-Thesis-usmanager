@@ -49,6 +49,8 @@ import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -215,6 +217,28 @@ public class EdgeHostsService {
 	public EdgeHost saveEdgeHost(EdgeHost edgeHost) {
 		log.info("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
 		return edgeHosts.save(edgeHost);
+	}
+
+	public EdgeHost addOrUpdateEdgeHost(EdgeHost edgeHost) {
+		Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
+		if (edgeHostOptional.isPresent()) {
+			EdgeHost existingEdgeHost = edgeHostOptional.get();
+			Set<HostRule> rules = edgeHost.getHostRules();
+			if (rules != null) {
+				existingEdgeHost.getHostRules().retainAll(rules);
+				existingEdgeHost.getHostRules().addAll(rules);
+			}
+			Set<HostSimulatedMetric> simulatedMetrics = edgeHost.getSimulatedHostMetrics();
+			if (simulatedMetrics != null) {
+				existingEdgeHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
+				existingEdgeHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+			}
+			EntityUtils.copyValidProperties(edgeHost, existingEdgeHost);
+			return saveEdgeHost(existingEdgeHost);
+		}
+		else {
+			return saveEdgeHost(edgeHost);
+		}
 	}
 
 	public void deleteEdgeHost(Long id) {

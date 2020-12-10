@@ -81,14 +81,14 @@ public class OperatorsService {
 	public Operator addOrUpdateOperator(Operator operator) {
 		Optional<Operator> optionalOptional = operators.findById(operator.getId());
 		if (optionalOptional.isPresent()) {
-			Operator op = optionalOptional.get();
+			Operator existingOperator = optionalOptional.get();
 			Set<Condition> conditions = operator.getConditions();
 			if (conditions != null) {
-				op.getConditions().retainAll(conditions);
-				op.getConditions().addAll(conditions);
+				existingOperator.getConditions().retainAll(conditions);
+				existingOperator.getConditions().addAll(conditions);
 			}
-			EntityUtils.copyValidProperties(operator, op);
-			return saveOperator(op);
+			EntityUtils.copyValidProperties(operator, existingOperator);
+			return saveOperator(existingOperator);
 		}
 		else {
 			return saveOperator(operator);

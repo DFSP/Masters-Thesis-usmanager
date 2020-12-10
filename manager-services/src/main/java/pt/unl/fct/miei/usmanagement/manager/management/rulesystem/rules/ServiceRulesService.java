@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
@@ -142,6 +143,11 @@ public class ServiceRulesService {
 			if (conditions != null) {
 				rule.getConditions().retainAll(conditions);
 				rule.getConditions().addAll(conditions);
+			}
+			Set<Service> services = serviceRule.getServices();
+			if (services != null) {
+				rule.getServices().retainAll(serviceRule.getServices());
+				rule.getServices().addAll(serviceRule.getServices());
 			}
 			EntityUtils.copyValidProperties(serviceRule, rule);
 			return saveRule(rule);
