@@ -32,6 +32,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
 
 import java.util.List;
 

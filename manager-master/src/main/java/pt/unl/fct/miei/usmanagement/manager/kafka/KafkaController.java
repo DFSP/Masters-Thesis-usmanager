@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.zookeeper.ZookeeperService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
 

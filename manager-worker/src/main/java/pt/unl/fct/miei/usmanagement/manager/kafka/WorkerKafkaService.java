@@ -3,62 +3,65 @@ package pt.unl.fct.miei.usmanagement.manager.kafka;
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.management.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.AppMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.AppRuleMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.AppSimulatedMetricMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.CloudHostMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ComponentTypeMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ConditionMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ContainerMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ContainerRuleMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ContainerSimulatedMetricMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.DecisionMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.EdgeHostMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ElasticIpMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.FieldMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.HostRuleMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.HostSimulatedMetricMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.NodeMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.OperatorMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceRuleMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceSimulatedMetricMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ValueModeMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.componenttypes.ComponentTypesService;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
-import pt.unl.fct.miei.usmanagement.manager.management.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.AppSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.RuleConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.AppRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ContainerRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.management.valuemodes.ValueModesService;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppSimulatedMetricDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.CloudHostDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ComponentTypeDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ConditionDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerRuleDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerSimulatedMetricDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.DecisionDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.EdgeHostDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ElasticIpDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.FieldDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostRuleDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostSimulatedMetricDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.NodeDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.OperatorDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ValueModeDTO;
+import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
+import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
@@ -68,13 +71,9 @@ import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.Set;
@@ -141,20 +140,20 @@ public class WorkerKafkaService {
 		this.ruleConditionsService = ruleConditionsService;
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "apps", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppMessage appMessage) {
-		log.info("Received key={} message={}", key, appMessage.toString());
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppDTO appDTO) {
+		log.info("Received key={} message={}", key, appDTO.toString());
 		try {
-			App app = appMessage.getEntity();
+			App app = appDTO.toEntity();
 			if (Objects.equal(key, "DELETE")) {
 				Long id = app.getId();
 				appsService.deleteApp(id);
 			}
 			else {
-				Set<AppService> appServices = app.getAppServices();
+				Set<AppServiceDTO> appServices = appDTO.getAppServices();
 				appServices.forEach(appService -> {
-					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService();
+					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService().toEntity();
 					if (!servicesService.hasService(service.getServiceName())) {
 						log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 						servicesService.addOrUpdateService(service);
@@ -164,77 +163,96 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic apps with message {}: {}", ToStringBuilder.reflectionToString(appMessage), e.getMessage());
+			log.error("Error while processing topic apps with message {}: {}", ToStringBuilder.reflectionToString(appDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "cloud-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostMessage cloudHostMessage) {
-		log.info("Received key={} message={}", key, cloudHostMessage.toString());
-		CloudHost cloudHost = cloudHostMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload CloudHostDTO cloudHostDTO) {
+		log.info("Received key={} message={}", key, cloudHostDTO.toString());
+		CloudHost cloudHost = cloudHostDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = cloudHost.getId();
 				cloudHostsService.deleteCloudHost(id);
 			}
 			else {
+				/*Set<HostRule> rules = cloudHostDTO.getHostRules();
+				rules.forEach(rule -> {
+					decisionsService.addOrUpdateDecision(rule.getDecision());
+					//rule.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
+					rule.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
+					rule.getConditions().forEach(ruleConditionsService::saveHostRuleCondition);
+				});
+				Set<HostSimulatedMetric> hostSimulatedMetrics = cloudHostDTO.getSimulatedHostMetrics();
+				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
+					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
+					//hostSimulatedMetric.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
+					hostSimulatedMetric.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
+				});*/
 				cloudHostsService.addOrUpdateCloudHost(cloudHost);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic cloud-hosts with message {}: {}", ToStringBuilder.reflectionToString(cloudHostMessage), e.getMessage());
+			log.error("Error while processing topic cloud-hosts with message {}: {}", ToStringBuilder.reflectionToString(cloudHostDTO), e.getMessage());
 		}
 
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "component-types", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeMessage componentTypeMessage) {
-		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(componentTypeMessage));
-		ComponentType componentType = componentTypeMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ComponentTypeDTO componentTypeDTO) {
+		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(componentTypeDTO));
+		ComponentType componentType = componentTypeDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = componentType.getId();
 				componentTypesService.deleteComponentType(id);
 			}
 			else {
-				Set<Decision> decisions = componentType.getDecisions();
-				decisions.forEach(decisionsService::addOrUpdateDecision);
+				componentTypeDTO.getDecisions().forEach(decision -> {
+					componentTypesService.addOrUpdateComponentType(decision.getComponentType().toEntity());
+					decisionsService.addOrUpdateDecision(decision.toEntity());
+				});
 				componentTypesService.addOrUpdateComponentType(componentType);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic component-types with message {}: {}", ToStringBuilder.reflectionToString(componentTypeMessage), e.getMessage());
+			log.error("Error while processing topic component-types with message {}: {}", ToStringBuilder.reflectionToString(componentTypeDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "conditions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionMessage conditionMessage) {
-		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionMessage));
-		Condition condition = conditionMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ConditionDTO conditionDTO) {
+		log.info("Received key={} message={}", key, ToStringBuilder.reflectionToString(conditionDTO));
+		Condition condition = conditionDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = condition.getId();
 				conditionsService.deleteCondition(id);
 			}
 			else {
-				condition.getHostConditions().forEach(hostRuleCondition -> {
-					conditionsService.addOrUpdateCondition(hostRuleCondition.getHostCondition());
-					hostRulesService.addOrUpdateRule(hostRuleCondition.getHostRule());
+				conditionDTO.getHostConditions().forEach(hostRuleCondition -> {
+					conditionsService.addOrUpdateCondition(hostRuleCondition.getCondition().toEntity());
+					decisionsService.addOrUpdateDecision(hostRuleCondition.getHostRule().getDecision().toEntity());
+					hostRulesService.addOrUpdateRule(hostRuleCondition.getHostRule().toEntity());
 				});
-				condition.getAppConditions().forEach(appRuleCondition -> {
-					conditionsService.addOrUpdateCondition(appRuleCondition.getAppCondition());
-					appRulesService.addOrUpdateRule(appRuleCondition.getAppRule());
+				conditionDTO.getAppConditions().forEach(appRuleCondition -> {
+					conditionsService.addOrUpdateCondition(appRuleCondition.getCondition().toEntity());
+					decisionsService.addOrUpdateDecision(appRuleCondition.getAppRule().getDecision().toEntity());
+					appRulesService.addOrUpdateRule(appRuleCondition.getAppRule().toEntity());
 				});
-				condition.getServiceConditions().forEach(serviceRuleCondition -> {
-					conditionsService.addOrUpdateCondition(serviceRuleCondition.getServiceCondition());
-					serviceRulesService.addOrUpdateRule(serviceRuleCondition.getServiceRule());
+				conditionDTO.getServiceConditions().forEach(serviceRuleCondition -> {
+					conditionsService.addOrUpdateCondition(serviceRuleCondition.getCondition().toEntity());
+					decisionsService.addOrUpdateDecision(serviceRuleCondition.getServiceRule().getDecision());
+					serviceRulesService.addOrUpdateRule(serviceRuleCondition.getServiceRule().toEntity());
 				});
-				condition.getContainerConditions().forEach(containerRuleCondition -> {
-					conditionsService.addOrUpdateCondition(containerRuleCondition.getContainerCondition());
-					containerRulesService.addOrUpdateRule(containerRuleCondition.getContainerRule());
+				conditionDTO.getContainerConditions().forEach(containerRuleCondition -> {
+					conditionsService.addOrUpdateCondition(containerRuleCondition.getCondition().toEntity());
+					decisionsService.addOrUpdateDecision(containerRuleCondition.getContainerRule().getDecision().toEntity());
+					containerRulesService.addOrUpdateRule(containerRuleCondition.getContainerRule().toEntity());
 				});
 
 				operatorsService.addOrUpdateOperator(condition.getOperator());
@@ -245,34 +263,45 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic conditions with message {}: {}", ToStringBuilder.reflectionToString(conditionMessage), e.getMessage());
+			log.error("Error while processing topic conditions with message {}: {}", ToStringBuilder.reflectionToString(conditionDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "containers", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerMessage containerMessage) {
-		log.info("Received key={} message={}", key, containerMessage.toString());
-		Container container = containerMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerDTO containerDTO) {
+		log.info("Received key={} message={}", key, containerDTO.toString());
+		Container container = containerDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				String id = container.getId();
 				containersService.deleteContainer(id);
 			}
 			else {
+				/*Set<ContainerRule> rules = containerDTO.getContainerRules();
+				rules.forEach(rule -> {
+					decisionsService.addOrUpdateDecision(rule.getDecision());
+					//rule.getContainers().forEach(containersService::addOrUpdateContainer);
+					rule.getConditions().forEach(ruleConditionsService::saveContainerRuleCondition);
+				});
+				Set<ContainerSimulatedMetric> hostSimulatedMetrics = containerDTO.getSimulatedContainerMetrics();
+				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
+					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
+					//hostSimulatedMetric.getContainers().forEach(containersService::addOrUpdateContainer);
+				});*/
 				containersService.addOrUpdateContainer(container);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic containers with message {}: {}", ToStringBuilder.reflectionToString(containerMessage), e.getMessage());
+			log.error("Error while processing topic containers with message {}: {}", ToStringBuilder.reflectionToString(containerDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionMessage decisionMessage) {
-		log.info("Received key={} message={}", key, decisionMessage.toString());
-		Decision decision = decisionMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload DecisionDTO decisionDTO) {
+		log.info("Received key={} message={}", key, decisionDTO.toString());
+		Decision decision = decisionDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = decision.getId();
@@ -285,34 +314,47 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic decisions with message {}: {}", ToStringBuilder.reflectionToString(decisionMessage), e.getMessage());
+			log.error("Error while processing topic decisions with message {}: {}", ToStringBuilder.reflectionToString(decisionDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "edge-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostMessage edgeHostMessage) {
-		log.info("Received key={} message={}", key, edgeHostMessage.toString());
-		EdgeHost edgeHost = edgeHostMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload EdgeHostDTO edgeHostDTO) {
+		log.info("Received key={} message={}", key, edgeHostDTO.toString());
+		EdgeHost edgeHost = edgeHostDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = edgeHost.getId();
 				edgeHostsService.deleteEdgeHost(id);
 			}
 			else {
+				/*Set<HostRule> rules = edgeHostDTO.getHostRules();
+				rules.forEach(rule -> {
+					decisionsService.addOrUpdateDecision(rule.getDecision());
+					rule.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
+					//rule.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
+					rule.getConditions().forEach(ruleConditionsService::saveHostRuleCondition);
+				});
+				Set<HostSimulatedMetric> hostSimulatedMetrics = edgeHostDTO.getSimulatedHostMetrics();
+				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
+					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
+					hostSimulatedMetric.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
+					//hostSimulatedMetric.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
+				});*/
 				edgeHostsService.addOrUpdateEdgeHost(edgeHost);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic edge-hosts with message {}: {}", ToStringBuilder.reflectionToString(edgeHostMessage), e.getMessage());
+			log.error("Error while processing topic edge-hosts with message {}: {}", ToStringBuilder.reflectionToString(edgeHostDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "eips", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpMessage elasticIpMessage) {
-		log.info("Received key={} message={}", key, elasticIpMessage.toString());
-		ElasticIp elasticIp = elasticIpMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ElasticIpDTO elasticIpDTO) {
+		log.info("Received key={} message={}", key, elasticIpDTO.toString());
+		ElasticIp elasticIp = elasticIpDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = elasticIp.getId();
@@ -323,22 +365,22 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic eips with message {}: {}", ToStringBuilder.reflectionToString(elasticIpMessage), e.getMessage());
+			log.error("Error while processing topic eips with message {}: {}", ToStringBuilder.reflectionToString(elasticIpDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "fields", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldMessage fieldMessage) {
-		log.info("Received key={} message={}", key, fieldMessage.toString());
-		Field field = fieldMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload FieldDTO fieldDTO) {
+		log.info("Received key={} message={}", key, fieldDTO.toString());
+		Field field = fieldDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = field.getId();
 				fieldsService.deleteField(id);
 			}
 			else {
-				Set<Condition> conditions = field.getConditions();
+				Set<Condition> conditions = fieldDTO.getConditions();
 				conditions.forEach(condition -> {
 					Operator operator = condition.getOperator();
 					operatorsService.addOrUpdateOperator(operator);
@@ -348,15 +390,15 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic fields with message {}: {}", ToStringBuilder.reflectionToString(fieldMessage), e.getMessage());
+			log.error("Error while processing topic fields with message {}: {}", ToStringBuilder.reflectionToString(fieldDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "nodes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeMessage nodeMessage) {
-		log.info("Received key={} message={}", key, nodeMessage.toString());
-		Node node = nodeMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload NodeDTO nodeDTO) {
+		log.info("Received key={} message={}", key, nodeDTO.toString());
+		Node node = nodeDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				String id = node.getId();
@@ -367,53 +409,69 @@ public class WorkerKafkaService {
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic nodes with message {}: {}", ToStringBuilder.reflectionToString(nodeMessage), e.getMessage());
+			log.error("Error while processing topic nodes with message {}: {}", ToStringBuilder.reflectionToString(nodeDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "operators", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorMessage operatorMessage) {
-		log.info("Received key={} message={}", key, operatorMessage.toString());
-		Operator operator = operatorMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload OperatorDTO operatorDTO) {
+		log.info("Received key={} message={}", key, operatorDTO.toString());
+		Operator operator = operatorDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = operator.getId();
 				operatorsService.deleteOperator(id);
 			}
 			else {
+				operatorDTO.getConditions().forEach(condition -> {
+					fieldsService.addOrUpdateField(condition.getField().toEntity());
+					valueModesService.addOrUpdateValueMode(condition.getValueMode().toEntity());
+					conditionsService.addOrUpdateCondition(condition.toEntity());
+				});
 				operatorsService.addOrUpdateOperator(operator);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic operators with message {}: {}", ToStringBuilder.reflectionToString(operatorMessage), e.getMessage());
+			log.error("Error while processing topic operators with message {}: {}", ToStringBuilder.reflectionToString(operatorDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "services", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMessage serviceMessage) {
-		log.info("Received key={} message={}", key, serviceMessage.toString());
-		pt.unl.fct.miei.usmanagement.manager.services.Service service = serviceMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDTO serviceDTO) {
+		log.info("Received key={} message={}", key, serviceDTO.toString());
+		pt.unl.fct.miei.usmanagement.manager.services.Service service = serviceDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = service.getId();
 				servicesService.deleteService(id);
 			}
 			else {
+				/*Set<ServiceRule> rules = serviceDTO.getServiceRules();
+				rules.forEach(rule -> {
+					decisionsService.addOrUpdateDecision(rule.getDecision());
+					//rule.getServices().forEach(servicesService::addOrUpdateService);
+					rule.getConditions().forEach(ruleConditionsService::saveServiceRuleCondition);
+				});
+				Set<ServiceSimulatedMetric> hostSimulatedMetrics = serviceDTO.getSimulatedServiceMetrics();
+				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
+					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
+					//hostSimulatedMetric.getServices().forEach(servicesService::addOrUpdateService);
+				});*/
 				servicesService.addOrUpdateService(service);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic services with message {}: {}", ToStringBuilder.reflectionToString(serviceMessage), e.getMessage());
+			log.error("Error while processing topic services with message {}: {}", ToStringBuilder.reflectionToString(serviceDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-host-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricMessage hostSimulatedMetricMessage) {
-		log.info("Received key={} message={}", key, hostSimulatedMetricMessage.toString());
-		HostSimulatedMetric hostSimulatedMetric = hostSimulatedMetricMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostSimulatedMetricDTO hostSimulatedMetricDTO) {
+		log.info("Received key={} message={}", key, hostSimulatedMetricDTO.toString());
+		HostSimulatedMetric hostSimulatedMetric = hostSimulatedMetricDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = hostSimulatedMetric.getId();
@@ -421,29 +479,31 @@ public class WorkerKafkaService {
 			}
 			else {
 				fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-				hostSimulatedMetric.getCloudHosts().forEach(cloudHost -> {
-					cloudHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);
-					cloudHost.getSimulatedHostMetrics().forEach(hostSimulatedMetricsService::addOrUpdateSimulatedMetric);
-					cloudHostsService.addOrUpdateCloudHost(cloudHost);
+				hostSimulatedMetricDTO.getCloudHosts().forEach(cloudHost -> {
+					/*cloudHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);*/
+					cloudHost.getSimulatedHostMetrics().forEach(simulatedMetric ->
+						hostSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity()));
+					cloudHostsService.addOrUpdateCloudHost(cloudHost.toEntity());
 				});
-				hostSimulatedMetric.getEdgeHosts().forEach(edgeHost -> {
-					edgeHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);
-					edgeHost.getSimulatedHostMetrics().forEach(hostSimulatedMetricsService::addOrUpdateSimulatedMetric);
-					edgeHostsService.addOrUpdateEdgeHost(edgeHost);
+				hostSimulatedMetricDTO.getEdgeHosts().forEach(edgeHost -> {
+					/*edgeHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);*/
+					edgeHost.getSimulatedHostMetrics().forEach(simulatedMetric ->
+						hostSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity()));
+					edgeHostsService.addOrUpdateEdgeHost(edgeHost.toEntity());
 				});
 				hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic simulated-host-metrics with message {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetricMessage), e.getMessage());
+			log.error("Error while processing topic simulated-host-metrics with message {}: {}", ToStringBuilder.reflectionToString(hostSimulatedMetricDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-app-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricMessage appSimulatedMetricMessage) {
-		log.info("Received key={} message={}", key, appSimulatedMetricMessage.toString());
-		AppSimulatedMetric appSimulatedMetric = appSimulatedMetricMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppSimulatedMetricDTO appSimulatedMetricDTO) {
+		log.info("Received key={} message={}", key, appSimulatedMetricDTO.toString());
+		AppSimulatedMetric appSimulatedMetric = appSimulatedMetricDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = appSimulatedMetric.getId();
@@ -451,24 +511,26 @@ public class WorkerKafkaService {
 			}
 			else {
 				fieldsService.addField(appSimulatedMetric.getField());
-				appSimulatedMetric.getApps().forEach(app -> {
-					app.getAppRules().forEach(appRulesService::addOrUpdateRule);
-					app.getSimulatedAppMetrics().forEach(appSimulatedMetricsService::addOrUpdateSimulatedMetric);
-					appsService.addOrUpdateApp(app);
+				appSimulatedMetricDTO.getApps().forEach(app -> {
+					/*app.getAppRules().forEach(appRulesService::addOrUpdateRule);*/
+					app.getSimulatedAppMetrics().forEach(simulatedMetric -> {
+						appSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity());
+					});
+					appsService.addOrUpdateApp(app.toEntity());
 				});
 				appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic simulated-app-metrics with message {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetricMessage), e.getMessage());
+			log.error("Error while processing topic simulated-app-metrics with message {}: {}", ToStringBuilder.reflectionToString(appSimulatedMetricDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-service-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricMessage serviceSimulatedMetricMessage) {
-		log.info("Received key={} message={}", key, serviceSimulatedMetricMessage.toString());
-		ServiceSimulatedMetric serviceSimulatedMetric = serviceSimulatedMetricMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricDTO serviceSimulatedMetricDTO) {
+		log.info("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
+		ServiceSimulatedMetric serviceSimulatedMetric = serviceSimulatedMetricDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = serviceSimulatedMetric.getId();
@@ -476,24 +538,26 @@ public class WorkerKafkaService {
 			}
 			else {
 				fieldsService.addOrUpdateField(serviceSimulatedMetric.getField());
-				serviceSimulatedMetric.getServices().forEach(service -> {
-					service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);
-					service.getSimulatedServiceMetrics().forEach(serviceSimulatedMetricsService::addOrUpdateSimulatedMetric);
-					servicesService.addOrUpdateService(service);
+				serviceSimulatedMetricDTO.getServices().forEach(service -> {
+					/*service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);*/
+					service.getSimulatedServiceMetrics().forEach(simulatedMetric -> {
+						serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity());
+					});
+					servicesService.addOrUpdateService(service.toEntity());
 				});
 				serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic simulated-service-metrics with message {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetricMessage), e.getMessage());
+			log.error("Error while processing topic simulated-service-metrics with message {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetricDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-container-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricMessage containerSimulatedMetricMessage) {
-		log.info("Received key={} message={}", key, containerSimulatedMetricMessage.toString());
-		ContainerSimulatedMetric containerSimulatedMetric = containerSimulatedMetricMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerSimulatedMetricDTO containerSimulatedMetricDTO) {
+		log.info("Received key={} message={}", key, containerSimulatedMetricDTO.toString());
+		ContainerSimulatedMetric containerSimulatedMetric = containerSimulatedMetricDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = containerSimulatedMetric.getId();
@@ -501,153 +565,152 @@ public class WorkerKafkaService {
 			}
 			else {
 				fieldsService.addOrUpdateField(containerSimulatedMetric.getField());
-				containerSimulatedMetric.getContainers().forEach(container -> {
-					container.getContainerRules().forEach(containerRulesService::addOrUpdateRule);
-					container.getSimulatedContainerMetrics().forEach(containerSimulatedMetricsService::addOrUpdateSimulatedMetric);
-					containersService.addOrUpdateContainer(container);
+				containerSimulatedMetricDTO.getContainers().forEach(container -> {
+					/*container.getContainerRules().forEach(containerRulesService::addOrUpdateRule);*/
+					container.getSimulatedContainerMetrics().forEach(simulatedMetric -> {
+						containerSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity());
+					});
+					containersService.addOrUpdateContainer(container.toEntity());
 				});
 				containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic simulated-container-metrics with message {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetricMessage), e.getMessage());
+			log.error("Error while processing topic simulated-container-metrics with message {}: {}", ToStringBuilder.reflectionToString(containerSimulatedMetricDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "host-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleMessage hostRuleMessage) {
-		log.info("Received key={} message={}", key, hostRuleMessage.toString());
-		HostRule hostRule = hostRuleMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostRuleDTO hostRuleDTO) {
+		log.info("Received key={} message={}", key, hostRuleDTO.toString());
+		HostRule hostRule = hostRuleDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = hostRule.getId();
 				hostRulesService.deleteRule(id);
 			}
 			else {
-				Set<HostRuleCondition> hostRuleConditions = hostRule.getConditions();
-				hostRuleConditions.forEach(hostRuleCondition -> {
-					operatorsService.addOrUpdateOperator(hostRuleCondition.getHostCondition().getOperator());
-					fieldsService.addOrUpdateField(hostRuleCondition.getHostCondition().getField());
-					valueModesService.addOrUpdateValueMode(hostRuleCondition.getHostCondition().getValueMode());
-					ruleConditionsService.saveHostRuleCondition(hostRuleCondition);
+				hostRuleDTO.getConditions().forEach(hostRuleCondition -> {
+					operatorsService.addOrUpdateOperator(hostRuleCondition.getCondition().getOperator().toEntity());
+					fieldsService.addOrUpdateField(hostRuleCondition.getCondition().getField().toEntity());
+					valueModesService.addOrUpdateValueMode(hostRuleCondition.getCondition().getValueMode().toEntity());
+					ruleConditionsService.saveHostRuleCondition(hostRuleCondition.toEntity());
 				});
-				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
-				cloudHosts.forEach(cloudHostsService::addOrUpdateCloudHost);
-				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
-				edgeHosts.forEach(edgeHostsService::addOrUpdateEdgeHost);
+				hostRuleDTO.getCloudHosts().forEach(cloudHost -> cloudHostsService.addOrUpdateCloudHost(cloudHost.toEntity()));
+				hostRuleDTO.getEdgeHosts().forEach(edgeHost -> edgeHostsService.addOrUpdateEdgeHost(edgeHost.toEntity()));
 				hostRulesService.addOrUpdateRule(hostRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic host-rules with message {}: {}", ToStringBuilder.reflectionToString(hostRuleMessage), e.getMessage());
+			log.error("Error while processing topic host-rules with message {}: {}", ToStringBuilder.reflectionToString(hostRuleDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "app-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleMessage appRuleMessage) {
-		log.info("Received key={} message={}", key, appRuleMessage.toString());
-		AppRule appRule = appRuleMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppRuleDTO appRuleDTO) {
+		log.info("Received key={} message={}", key, appRuleDTO.toString());
+		AppRule appRule = appRuleDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = appRule.getId();
 				appRulesService.deleteRule(id);
 			}
 			else {
-				Set<AppRuleCondition> appRuleConditions = appRule.getConditions();
-				appRuleConditions.forEach(ruleConditionsService::saveAppRuleCondition);
-				Set<App> apps = appRule.getApps();
-				apps.forEach(appsService::addOrUpdateApp);
+				appRuleDTO.getConditions().forEach(appRuleCondition -> {
+					operatorsService.addOrUpdateOperator(appRuleCondition.getCondition().getOperator().toEntity());
+					fieldsService.addOrUpdateField(appRuleCondition.getCondition().getField().toEntity());
+					valueModesService.addOrUpdateValueMode(appRuleCondition.getCondition().getValueMode().toEntity());
+					ruleConditionsService.saveAppRuleCondition(appRuleCondition.toEntity());
+				});
+				appRuleDTO.getApps().forEach(app -> appsService.addOrUpdateApp(app.toEntity()));
 				appRulesService.addOrUpdateRule(appRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic app-rules with message {}: {}", ToStringBuilder.reflectionToString(appRuleMessage), e.getMessage());
+			log.error("Error while processing topic app-rules with message {}: {}", ToStringBuilder.reflectionToString(appRuleDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "service-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleMessage serviceRuleMessage) {
-		log.info("Received key={} message={}", key, serviceRuleMessage.toString());
-		ServiceRule serviceRule = serviceRuleMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleDTO serviceRuleDTO) {
+		log.info("Received key={} message={}", key, serviceRuleDTO.toString());
+		ServiceRule serviceRule = serviceRuleDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = serviceRule.getId();
 				serviceRulesService.deleteRule(id);
 			}
 			else {
-				Set<ServiceRuleCondition> serviceRuleConditions = serviceRule.getConditions();
-				serviceRuleConditions.forEach(serviceRuleCondition -> {
+				serviceRuleDTO.getConditions().forEach(serviceRuleCondition -> {
 					Decision ruleDecision = serviceRuleCondition.getServiceRule().getDecision();
 					componentTypesService.addOrUpdateComponentType(ruleDecision.getComponentType());
 					decisionsService.addOrUpdateDecision(ruleDecision);
-					Condition ruleCondition = serviceRuleCondition.getServiceCondition();
+					Condition ruleCondition = serviceRuleCondition.getCondition().toEntity();
 					valueModesService.addOrUpdateValueMode(ruleCondition.getValueMode());
 					operatorsService.addOrUpdateOperator(ruleCondition.getOperator());
 					fieldsService.addOrUpdateField(ruleCondition.getField());
-					ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition);
+					ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition.toEntity());
 				});
-				Set<pt.unl.fct.miei.usmanagement.manager.services.Service> services = serviceRule.getServices();
-				services.forEach(servicesService::saveService);
-				Decision decision = serviceRule.getDecision();
-				decisionsService.addOrUpdateDecision(decision);
+				serviceRuleDTO.getServices().forEach(service -> servicesService.addOrUpdateService(service.toEntity()));
+				decisionsService.addOrUpdateDecision(serviceRule.getDecision());
 				serviceRulesService.addOrUpdateRule(serviceRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error from topic service-rules while saving {}: {}", ToStringBuilder.reflectionToString(serviceRuleMessage), e.getMessage());
+			log.error("Error from topic service-rules while saving {}: {}", ToStringBuilder.reflectionToString(serviceRuleDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "container-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleMessage containerRuleMessage) {
-		log.info("Received key={} message={}", key, containerRuleMessage.toString());
-		ContainerRule containerRule = containerRuleMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ContainerRuleDTO containerRuleDTO) {
+		log.info("Received key={} message={}", key, containerRuleDTO.toString());
+		ContainerRule containerRule = containerRuleDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = containerRule.getId();
 				containerRulesService.deleteRule(id);
 			}
 			else {
-				Set<ContainerRuleCondition> containerRuleConditions = containerRule.getConditions();
-				containerRuleConditions.forEach(ruleConditionsService::saveContainerRuleCondition);
-				Set<pt.unl.fct.miei.usmanagement.manager.containers.Container> containers = containerRule.getContainers();
-				containers.forEach(containersService::saveContainer);
+				containerRuleDTO.getConditions().forEach(containerRuleCondition -> {
+					operatorsService.addOrUpdateOperator(containerRuleCondition.getCondition().getOperator().toEntity());
+					fieldsService.addOrUpdateField(containerRuleCondition.getCondition().getField().toEntity());
+					valueModesService.addOrUpdateValueMode(containerRuleCondition.getCondition().getValueMode().toEntity());
+					ruleConditionsService.saveContainerRuleCondition(containerRuleCondition.toEntity());
+				});
+				containerRuleDTO.getContainers().forEach(container -> containersService.addOrUpdateContainer(container.toEntity()));
 				containerRulesService.addOrUpdateRule(containerRule);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic container-rules with message {}: {}", ToStringBuilder.reflectionToString(containerRuleMessage), e.getMessage());
+			log.error("Error while processing topic container-rules with message {}: {}", ToStringBuilder.reflectionToString(containerRuleDTO), e.getMessage());
 		}
 	}
 
-	//@Transactional(noRollbackFor = ConstraintViolationException.class)
+	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "value-modes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeMessage valueModeMessage) {
-		log.info("Received key={} message={}", key, valueModeMessage.toString());
-		ValueMode valueMode = valueModeMessage.get();
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ValueModeDTO valueModeDTO) {
+		log.info("Received key={} message={}", key, valueModeDTO.toString());
+		ValueMode valueMode = valueModeDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = valueMode.getId();
 				valueModesService.deleteValueMode(id);
 			}
 			else {
-				Set<Condition> conditions = valueMode.getConditions();
-				conditions.forEach(condition -> {
-					Field field = condition.getField();
-					fieldsService.addOrUpdateField(field);
-					Operator operator = condition.getOperator();
-					operatorsService.addOrUpdateOperator(operator);
-					conditionsService.addOrUpdateCondition(condition);
+				valueModeDTO.getConditions().forEach(condition -> {
+					operatorsService.addOrUpdateOperator(condition.getOperator().toEntity());
+					fieldsService.addOrUpdateField(condition.getField().toEntity());
+					conditionsService.addOrUpdateCondition(condition.toEntity());
 				});
 				valueModesService.addOrUpdateValueMode(valueMode);
 			}
 		}
 		catch (Exception e) {
-			log.error("Error while processing topic value-modes with message {}: {}", ToStringBuilder.reflectionToString(valueModeMessage), e.getMessage());
+			log.error("Error while processing topic value-modes with message {}: {}", ToStringBuilder.reflectionToString(valueModeDTO), e.getMessage());
 		}
 	}
 

@@ -7,17 +7,17 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.HostDecisionMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.HostEventMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.HostMonitoringLogMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceDecisionMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceEventMessage;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.ServiceMonitoringLogMessage;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostDecisionDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostEventDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostMonitoringLogDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDecisionDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceEventDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceMonitoringLogDTO;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
@@ -46,7 +46,7 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventMessage hostEventMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventDTO hostEventMessage) {
 		log.info("Received key={} value={}", key, hostEventMessage.toString());
 		HostEvent hostEvent = hostEventMessage.get();
 		try {
@@ -57,9 +57,9 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventMessage serviceEventMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceEventDTO serviceEventMessage) {
 		log.info("Received key={} value={}", key, serviceEventMessage.toString());
-		ServiceEvent serviceEvent = serviceEventMessage.get();
+		ServiceEvent serviceEvent = serviceEventMessage.toEntity();
 		try {
 			servicesEventsService.addServiceEvent(serviceEvent);
 		} catch (Exception e) {
@@ -68,7 +68,7 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogMessage hostMonitoringLogMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogDTO hostMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, hostMonitoringLogMessage.toString());
 		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.get();
 		try {
@@ -79,7 +79,7 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogMessage serviceMonitoringLogMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogDTO serviceMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, serviceMonitoringLogMessage.toString());
 		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.get();
 		try {
@@ -90,7 +90,7 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionMessage hostDecisionMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionDTO hostDecisionMessage) {
 		log.info("Received key={} value={}", key, hostDecisionMessage.toString());
 		HostDecision hostDecision = hostDecisionMessage.get();
 		try {
@@ -101,7 +101,7 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionMessage serviceDecisionMessage) {
+	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionDTO serviceDecisionMessage) {
 		log.info("Received key={} value={}", key, serviceDecisionMessage.toString());
 		ServiceDecision serviceDecision = serviceDecisionMessage.get();
 		try {

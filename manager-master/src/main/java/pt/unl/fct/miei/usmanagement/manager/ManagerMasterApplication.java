@@ -31,6 +31,8 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class/*, KafkaAutoConfiguration.class*/})
 public class ManagerMasterApplication {
 
+	// TODO: send DTOs from controllers instead of entities
+
 	public static void main(String[] args) {
 		SpringApplication.run(ManagerMasterApplication.class, args);
 	}

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.Arrays;

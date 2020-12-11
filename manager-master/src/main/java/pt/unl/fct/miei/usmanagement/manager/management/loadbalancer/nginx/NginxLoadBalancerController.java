@@ -35,6 +35,10 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LaunchNginxLoadBalancer;
+import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.NginxServer;
+import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.NginxServiceServers;
 
 import java.util.Arrays;
 import java.util.List;

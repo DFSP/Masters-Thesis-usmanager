@@ -86,7 +86,7 @@ public class HostDecision /*extends AbstractEntity<Long> */{
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<HostDecisionValue> hostDecisions;
+	private Set<HostDecisionValue> hostDecisionValues;
 
 	@PrePersist
 	public void prePersist() {

@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
+import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 
 import java.util.List;
 

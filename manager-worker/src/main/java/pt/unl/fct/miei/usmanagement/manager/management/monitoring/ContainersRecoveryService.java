@@ -8,9 +8,9 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 
 import java.util.ArrayList;
 import java.util.Collections;

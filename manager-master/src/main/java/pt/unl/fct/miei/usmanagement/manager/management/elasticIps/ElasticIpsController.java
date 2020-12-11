@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
-import pt.unl.fct.miei.usmanagement.manager.management.eips.ElasticIpsService;
+import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.List;

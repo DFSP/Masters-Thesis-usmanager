@@ -36,6 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;

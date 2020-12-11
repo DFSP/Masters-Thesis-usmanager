@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
+import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
 
 import java.util.Arrays;
 import java.util.List;

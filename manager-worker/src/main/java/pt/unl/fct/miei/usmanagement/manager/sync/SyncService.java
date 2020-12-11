@@ -6,12 +6,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
-import pt.unl.fct.miei.usmanagement.manager.management.configurations.ConfigurationsService;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainer;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.containers.DockerContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 

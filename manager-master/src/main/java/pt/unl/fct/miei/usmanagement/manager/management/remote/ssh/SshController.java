@@ -30,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.ExecuteHostSftpRequest;
+import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.ExecuteHostSshRequest;
+import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult;
+import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 
 import java.util.Set;
 

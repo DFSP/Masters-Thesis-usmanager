@@ -85,7 +85,7 @@ public class ServiceDecision /*extends AbstractEntity<Long> */{
 	@Singular
 	@JsonIgnore
 	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ServiceDecisionValue> serviceDecisions;
+	private Set<ServiceDecisionValue> serviceDecisionValues;
 
 	@PrePersist
 	public void prePersist() {

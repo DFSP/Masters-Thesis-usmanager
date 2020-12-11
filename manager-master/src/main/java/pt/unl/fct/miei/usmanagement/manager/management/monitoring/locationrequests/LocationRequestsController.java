@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.management.location.LocationRequestsService;
-import pt.unl.fct.miei.usmanagement.manager.management.location.LocationWeight;
-import pt.unl.fct.miei.usmanagement.manager.management.location.NodeLocationRequests;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationWeight;
+import pt.unl.fct.miei.usmanagement.manager.services.location.NodeLocationRequests;
 
 import java.util.List;
 import java.util.Map;

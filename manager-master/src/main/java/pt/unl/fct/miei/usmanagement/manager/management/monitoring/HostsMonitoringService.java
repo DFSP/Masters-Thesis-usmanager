@@ -31,18 +31,18 @@ import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.management.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.management.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.HostMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.monitoring.metrics.simulated.HostSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.MonitoringProperties;
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.management.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.HostDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.MonitoringProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostFieldAverage;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoring;
@@ -277,8 +277,8 @@ public class HostsMonitoringService {
 	private HostDecisionResult runRules(Node node, Map<String, Double> newFields) {
 		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
-		pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent hostEvent =
-			new pt.unl.fct.miei.usmanagement.manager.management.monitoring.events.HostEvent(node, hostAddress);
+		pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostEvent hostEvent =
+			new pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostEvent(node, hostAddress);
 		Map<String, Double> hostEventFields = hostEvent.getFields();
 
 		getHostMonitoring(hostAddress)

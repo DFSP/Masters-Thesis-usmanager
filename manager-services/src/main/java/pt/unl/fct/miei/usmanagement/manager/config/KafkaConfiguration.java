@@ -18,7 +18,7 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import pt.unl.fct.miei.usmanagement.manager.management.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 
 import java.util.HashMap;
 import java.util.Map;

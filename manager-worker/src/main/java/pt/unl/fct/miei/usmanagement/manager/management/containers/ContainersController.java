@@ -39,6 +39,8 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.ArrayList;
