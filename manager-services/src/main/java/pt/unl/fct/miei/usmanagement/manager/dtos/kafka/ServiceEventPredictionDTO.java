@@ -1,9 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class ServiceEventPredictionDTO {
 
 	private Long id;
@@ -32,12 +35,13 @@ public class ServiceEventPredictionDTO {
 	@JsonFormat(pattern = "HH:mm")
 	private LocalTime endTime;
 	private int minimumReplicas;
+	@JsonManagedReference
 	private ServiceDTO service;
 	private Timestamp lastUpdate;
 	/*@JsonProperty("isNew")
 	private boolean isNew; */
 
-	public ServiceEventPredictionDTO(ServiceEventPrediction serviceEventPrediction) {
+	/*public ServiceEventPredictionDTO(ServiceEventPrediction serviceEventPrediction) {
 		this.id = serviceEventPrediction.getId();
 		this.name = serviceEventPrediction.getName();
 		this.description = serviceEventPrediction.getDescription();
@@ -48,7 +52,7 @@ public class ServiceEventPredictionDTO {
 		this.minimumReplicas = serviceEventPrediction.getMinimumReplicas();
 		this.service = new ServiceDTO(serviceEventPrediction.getService());
 		this.lastUpdate = serviceEventPrediction.getLastUpdate();
-		/*this.isNew = serviceEventPrediction.isNew();*/
+		*//*this.isNew = serviceEventPrediction.isNew();*//*
 	}
 
 	public ServiceEventPrediction toEntity() {
@@ -64,8 +68,8 @@ public class ServiceEventPredictionDTO {
 			.service(service.toEntity())
 			.lastUpdate(lastUpdate)
 			.build();
-		/*serviceEventPrediction.setNew(isNew);*/
+		*//*serviceEventPrediction.setNew(isNew);*//*
 		return serviceEventPrediction;
-	}
+	}*/
 
 }

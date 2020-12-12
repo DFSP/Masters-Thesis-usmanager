@@ -1,10 +1,12 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class ServiceSimulatedMetricDTO {
 
 	private Long id;
@@ -28,6 +31,7 @@ public class ServiceSimulatedMetricDTO {
 	private boolean generic;
 	private boolean override;
 	private boolean active;
+	@JsonManagedReference
 	private Set<ServiceDTO> services;
 	/*@JsonProperty("isNew")
 	private boolean isNew; */

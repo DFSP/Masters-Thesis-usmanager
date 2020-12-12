@@ -103,20 +103,20 @@ public class ContainerSimulatedMetricsService {
 	}
 
 	public ContainerSimulatedMetric addOrUpdateSimulatedMetric(ContainerSimulatedMetric simulatedMetric) {
-		Optional<ContainerSimulatedMetric> simulatedMetricOptional = containerSimulatedMetrics.findById(simulatedMetric.getId());
-		if (simulatedMetricOptional.isPresent()) {
-			ContainerSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
-			Set<Container> containers = simulatedMetric.getContainers();
-			if (containers != null) {
-				existingSimulatedMetric.getContainers().retainAll(containers);
-				existingSimulatedMetric.getContainers().addAll(containers);
+		if (simulatedMetric.getId() != null) {
+			Optional<ContainerSimulatedMetric> simulatedMetricOptional = containerSimulatedMetrics.findById(simulatedMetric.getId());
+			if (simulatedMetricOptional.isPresent()) {
+				ContainerSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+				Set<Container> containers = simulatedMetric.getContainers();
+				if (containers != null) {
+					existingSimulatedMetric.getContainers().retainAll(containers);
+					existingSimulatedMetric.getContainers().addAll(containers);
+				}
+				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+				return saveContainerSimulatedMetric(existingSimulatedMetric);
 			}
-			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
-			return saveContainerSimulatedMetric(existingSimulatedMetric);
 		}
-		else {
 			return saveContainerSimulatedMetric(simulatedMetric);
-		}
 	}
 
 	public void deleteContainerSimulatedMetric(Long id) {

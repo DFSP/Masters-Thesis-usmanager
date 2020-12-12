@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
@@ -20,6 +21,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class HostDecisionValueDTO {
 
 	private Long id;

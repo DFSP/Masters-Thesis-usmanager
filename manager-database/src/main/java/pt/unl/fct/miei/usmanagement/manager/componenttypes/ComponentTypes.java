@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ComponentTypes extends JpaRepository<ComponentType, Long> {
@@ -41,5 +42,9 @@ public interface ComponentTypes extends JpaRepository<ComponentType, Long> {
 		+ "from ComponentType t "
 		+ "where lower(t.type) = lower(:type)")
 	boolean hasComponentType(@Param("type") String type);
+
+	@Query("select t "
+		+ "from ComponentType t left join fetch t.decisions")
+	List<ComponentType> getComponentTypesAndRelations();
 
 }

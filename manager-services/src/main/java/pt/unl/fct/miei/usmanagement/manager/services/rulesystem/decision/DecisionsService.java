@@ -115,15 +115,15 @@ public class DecisionsService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addOrUpdateDecision(Decision decision) {
-		Optional<Decision> decisionOptional = decisions.findById(decision.getId());
-		if (decisionOptional.isPresent()) {
-			Decision existingDecision = decisionOptional.get();
-			EntityUtils.copyValidProperties(decision, existingDecision);
-			return saveDecision(existingDecision);
+		if (decision.getId() != null) {
+			Optional<Decision> decisionOptional = decisions.findById(decision.getId());
+			if (decisionOptional.isPresent()) {
+				Decision existingDecision = decisionOptional.get();
+				EntityUtils.copyValidProperties(decision, existingDecision);
+				return saveDecision(existingDecision);
+			}
 		}
-		else {
 			return saveDecision(decision);
-		}
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision saveDecision(Decision decision) {

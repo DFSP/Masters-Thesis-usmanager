@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 
@@ -13,8 +14,8 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
+@Setter
 public class AppDTO {
 
 	private Long id;
@@ -34,7 +35,7 @@ public class AppDTO {
 		this.id = app.getId();
 		this.name = app.getName();
 		this.description = app.getDescription();
-		this.appServices = app.getAppServices().stream().map(AppServiceDTO::new).collect(Collectors.toSet());
+		//this.appServices = app.getAppServices().stream().map(AppServiceDTO::new).collect(Collectors.toSet());
 		this.appRules = app.getAppRules().stream().map(AppRuleDTO::new).collect(Collectors.toSet());
 		this.simulatedAppMetrics = app.getSimulatedAppMetrics().stream().map(AppSimulatedMetricDTO::new).collect(Collectors.toSet());
 		/*this.isNew = app.isNew();*/
@@ -46,7 +47,7 @@ public class AppDTO {
 			.id(id)
 			.name(name)
 			.description(description)
-			.appServices(appServices != null ? appServices.stream().map(AppServiceDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
+			//.appServices(appServices != null ? appServices.stream().map(AppServiceDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
 			.appRules(appRules != null ? appRules.stream().map(AppRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
 			.simulatedAppMetrics(simulatedAppMetrics != null ? simulatedAppMetrics .stream().map(AppSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
 			.build();
@@ -54,4 +55,15 @@ public class AppDTO {
 		return app;
 	}
 
+	@Override
+	public String toString() {
+		return "AppDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", description='" + description + '\'' +
+			", appServices=" + (appServices != null ? appServices.stream().map(AppServiceDTO::getId).collect(Collectors.toSet()) : "null") +
+			", appRules=" + (appRules != null ? appRules.stream().map(AppRuleDTO::getId).collect(Collectors.toSet()) : "null") +
+			", simulatedAppMetrics=" + (simulatedAppMetrics != null ? simulatedAppMetrics .stream().map(AppSimulatedMetricDTO::getId).collect(Collectors.toSet()) : "null") +
+			'}';
+	}
 }

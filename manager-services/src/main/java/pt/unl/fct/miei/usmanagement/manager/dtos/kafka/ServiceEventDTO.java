@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 
@@ -11,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class ServiceEventDTO {
 
 	private Long id;

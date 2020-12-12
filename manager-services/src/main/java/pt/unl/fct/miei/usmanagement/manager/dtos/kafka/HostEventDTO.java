@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -13,6 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class HostEventDTO {
 
 	private Long id;

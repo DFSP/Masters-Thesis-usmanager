@@ -65,7 +65,7 @@ class KafkaBrokerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (kafkaBroker: IKafkaBroker): void => {
-        super.toast(`<span class="green-text">O kafka broker <b class="white-text">${kafkaBroker.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O kafka broker <b class="white-text">${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -73,7 +73,7 @@ class KafkaBrokerCard extends BaseComponent<Props, State> {
     }
 
     private onStopFailure = (reason: string, kafkaBroker: IKafkaBroker): void => {
-        super.toast(`Não foi possível parar o kafka broker <a href='/kafka/${kafkaBroker.id}'><b>${kafkaBroker.id}</b></a>`, 10000, reason, true);
+        super.toast(`Não foi possível parar o kafka broker <a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.brokerId}</b></a>`, 10000, reason, true);
         if (this.mounted) {
             this.setState({loading: false});
         }
@@ -93,7 +93,7 @@ class KafkaBrokerCard extends BaseComponent<Props, State> {
         const {kafkaBroker} = this.props;
         const {loading} = this.state;
         const CardKafkaBroker = Card<IKafkaBroker>();
-        return <CardKafkaBroker id={`kafkaBroker-${kafkaBroker.id}`}
+        return <CardKafkaBroker id={`kafkaBroker-${kafkaBroker.brokerId}`}
                                 title={kafkaBroker.brokerId.toString()}
                                 link={{
                                     to: {

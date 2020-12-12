@@ -55,6 +55,10 @@ public class ComponentTypesService {
 		return componentTypes.findAll();
 	}
 
+	public List<ComponentType> getComponentTypesAndRelations() {
+		return componentTypes.getComponentTypesAndRelations();
+	}
+
 	public ComponentType getComponentType(Long id) {
 		return componentTypes.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(ComponentType.class, "id", id.toString()));
@@ -90,20 +94,20 @@ public class ComponentTypesService {
 	}
 
 	public ComponentType addOrUpdateComponentType(ComponentType componentType) {
-		Optional<ComponentType> componentTypeOptional = componentTypes.findById(componentType.getId());
-		if (componentTypeOptional.isPresent()) {
-			ComponentType existingComponentType = componentTypeOptional.get();
-			Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> decisions = componentType.getDecisions();
-			if (decisions != null) {
-				existingComponentType.getDecisions().retainAll(decisions);
-				existingComponentType.getDecisions().addAll(decisions);
+		if (componentType.getId() != null) {
+			Optional<ComponentType> componentTypeOptional = componentTypes.findById(componentType.getId());
+			if (componentTypeOptional.isPresent()) {
+				ComponentType existingComponentType = componentTypeOptional.get();
+				Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> decisions = componentType.getDecisions();
+				if (decisions != null) {
+					existingComponentType.getDecisions().retainAll(decisions);
+					existingComponentType.getDecisions().addAll(decisions);
+				}
+				EntityUtils.copyValidProperties(componentType, existingComponentType);
+				return saveComponentType(existingComponentType);
 			}
-			EntityUtils.copyValidProperties(componentType, existingComponentType);
-			return saveComponentType(existingComponentType);
 		}
-		else {
 			return saveComponentType(componentType);
-		}
 	}
 
 	public ComponentType saveComponentType(ComponentType componentType) {

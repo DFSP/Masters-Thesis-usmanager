@@ -172,25 +172,25 @@ public class ContainersService {
 	}
 
 	public Container addOrUpdateContainer(Container container) {
-		Optional<Container> containerOptional = containers.findById(container.getId());
-		if (containerOptional.isPresent()) {
-			Container existingContainer = containerOptional.get();
-			Set<ContainerRule> containerRules = container.getContainerRules();
-			if (containerRules != null) {
-				existingContainer.getContainerRules().retainAll(containerRules);
-				existingContainer.getContainerRules().addAll(containerRules);
+		if (container.getId() != null) {
+			Optional<Container> containerOptional = containers.findById(container.getId());
+			if (containerOptional.isPresent()) {
+				Container existingContainer = containerOptional.get();
+				Set<ContainerRule> containerRules = container.getContainerRules();
+				if (containerRules != null) {
+					existingContainer.getContainerRules().retainAll(containerRules);
+					existingContainer.getContainerRules().addAll(containerRules);
+				}
+				Set<ContainerSimulatedMetric> containerSimulatedMetrics = container.getSimulatedContainerMetrics();
+				if (containerSimulatedMetrics != null) {
+					existingContainer.getSimulatedContainerMetrics().retainAll(containerSimulatedMetrics);
+					existingContainer.getSimulatedContainerMetrics().addAll(containerSimulatedMetrics);
+				}
+				EntityUtils.copyValidProperties(container, existingContainer);
+				return saveContainer(existingContainer);
 			}
-			Set<ContainerSimulatedMetric> containerSimulatedMetrics = container.getSimulatedContainerMetrics();
-			if (containerSimulatedMetrics != null) {
-				existingContainer.getSimulatedContainerMetrics().retainAll(containerSimulatedMetrics);
-				existingContainer.getSimulatedContainerMetrics().addAll(containerSimulatedMetrics);
-			}
-			EntityUtils.copyValidProperties(container, existingContainer);
-			return saveContainer(existingContainer);
 		}
-		else {
 			return saveContainer(container);
-		}
 	}
 
 	public Container updateContainer(Container container) {
@@ -202,6 +202,10 @@ public class ContainersService {
 
 	public List<Container> getContainers() {
 		return containers.findAll();
+	}
+
+	public List<Container> getContainersAndEntities() {
+		return containers.getContainersAndEntities();
 	}
 
 	public List<Container> getContainers(WorkerManager workerManager) {

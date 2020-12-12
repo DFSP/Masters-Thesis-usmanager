@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class ContainerSimulatedMetricDTO {
 
 	private Long id;

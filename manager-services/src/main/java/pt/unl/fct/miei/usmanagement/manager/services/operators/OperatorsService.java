@@ -77,22 +77,21 @@ public class OperatorsService {
 		return operator;
 	}
 
-	@Transactional
 	public Operator addOrUpdateOperator(Operator operator) {
-		Optional<Operator> optionalOptional = operators.findById(operator.getId());
-		if (optionalOptional.isPresent()) {
-			Operator existingOperator = optionalOptional.get();
-			Set<Condition> conditions = operator.getConditions();
-			if (conditions != null) {
-				existingOperator.getConditions().retainAll(conditions);
-				existingOperator.getConditions().addAll(conditions);
+		if (operator.getId() != null) {
+			Optional<Operator> optionalOptional = operators.findById(operator.getId());
+			if (optionalOptional.isPresent()) {
+				Operator existingOperator = optionalOptional.get();
+				Set<Condition> conditions = operator.getConditions();
+				if (conditions != null) {
+					existingOperator.getConditions().retainAll(conditions);
+					existingOperator.getConditions().addAll(conditions);
+				}
+				EntityUtils.copyValidProperties(operator, existingOperator);
+				return saveOperator(existingOperator);
 			}
-			EntityUtils.copyValidProperties(operator, existingOperator);
-			return saveOperator(existingOperator);
 		}
-		else {
 			return saveOperator(operator);
-		}
 	}
 
 	public Operator saveOperator(Operator operator) {

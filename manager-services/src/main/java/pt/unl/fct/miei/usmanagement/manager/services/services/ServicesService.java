@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
@@ -77,6 +78,7 @@ public class ServicesService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<Service> getServices() {
 		return services.findAll();
 	}
@@ -120,45 +122,45 @@ public class ServicesService {
 	}
 
 	public Service addOrUpdateService(Service service) {
-		Optional<Service> serviceOptional = services.findById(service.getId());
-		if (serviceOptional.isPresent()) {
-			Service existingService = serviceOptional.get();
-			Set<ServiceRule> rules = service.getServiceRules();
-			if (rules != null) {
-				existingService.getServiceRules().retainAll(rules);
-				existingService.getServiceRules().addAll(rules);
+		if (service.getId() != null) {
+			Optional<Service> serviceOptional = services.findById(service.getId());
+			if (serviceOptional.isPresent()) {
+				Service existingService = serviceOptional.get();
+				Set<ServiceRule> rules = service.getServiceRules();
+				if (rules != null) {
+					existingService.getServiceRules().retainAll(rules);
+					existingService.getServiceRules().addAll(rules);
+				}
+				Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
+				if (simulatedMetrics != null) {
+					existingService.getSimulatedServiceMetrics().retainAll(simulatedMetrics);
+					existingService.getSimulatedServiceMetrics().addAll(simulatedMetrics);
+				}
+				Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
+				if (serviceEventPredictions != null) {
+					existingService.getEventPredictions().retainAll(serviceEventPredictions);
+					existingService.getEventPredictions().addAll(serviceEventPredictions);
+				}
+				Set<AppService> appServices = service.getAppServices();
+				if (appServices != null) {
+					existingService.getAppServices().retainAll(appServices);
+					existingService.getAppServices().addAll(appServices);
+				}
+				Set<ServiceDependency> dependencies = service.getDependencies();
+				if (dependencies != null) {
+					existingService.getDependencies().retainAll(dependencies);
+					existingService.getDependencies().addAll(dependencies);
+				}
+				Set<ServiceDependency> dependents = service.getDependents();
+				if (dependents != null) {
+					existingService.getDependents().retainAll(dependents);
+					existingService.getDependents().addAll(dependents);
+				}
+				EntityUtils.copyValidProperties(service, existingService);
+				return saveService(existingService);
 			}
-			Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
-			if (simulatedMetrics != null) {
-				existingService.getSimulatedServiceMetrics().retainAll(simulatedMetrics);
-				existingService.getSimulatedServiceMetrics().addAll(simulatedMetrics);
-			}
-			Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
-			if (serviceEventPredictions != null) {
-				existingService.getEventPredictions().retainAll(serviceEventPredictions);
-				existingService.getEventPredictions().addAll(serviceEventPredictions);
-			}
-			Set<AppService> appServices = service.getAppServices();
-			if (appServices != null) {
-				existingService.getAppServices().retainAll(appServices);
-				existingService.getAppServices().addAll(appServices);
-			}
-			Set<ServiceDependency> dependencies = service.getDependencies();
-			if (dependencies != null) {
-				existingService.getDependencies().retainAll(dependencies);
-				existingService.getDependencies().addAll(dependencies);
-			}
-			Set<ServiceDependency> dependents = service.getDependents();
-			if (dependents != null) {
-				existingService.getDependents().retainAll(dependents);
-				existingService.getDependents().addAll(dependents);
-			}
-			EntityUtils.copyValidProperties(service, existingService);
-			return saveService(existingService);
 		}
-		else {
 			return saveService(service);
-		}
 	}
 
 	public Service saveService(Service service) {

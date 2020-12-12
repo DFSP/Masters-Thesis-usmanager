@@ -102,20 +102,20 @@ public class ServiceSimulatedMetricsService {
 	}
 
 	public ServiceSimulatedMetric addOrUpdateSimulatedMetric(ServiceSimulatedMetric simulatedMetric) {
-		Optional<ServiceSimulatedMetric> simulatedMetricOptional = serviceSimulatedMetrics.findById(simulatedMetric.getId());
-		if (simulatedMetricOptional.isPresent()) {
-			ServiceSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
-			Set<Service> services = simulatedMetric.getServices();
-			if (services != null) {
-				existingSimulatedMetric.getServices().retainAll(services);
-				existingSimulatedMetric.getServices().addAll(services);
+		if (simulatedMetric.getId() != null) {
+			Optional<ServiceSimulatedMetric> simulatedMetricOptional = serviceSimulatedMetrics.findById(simulatedMetric.getId());
+			if (simulatedMetricOptional.isPresent()) {
+				ServiceSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+				Set<Service> services = simulatedMetric.getServices();
+				if (services != null) {
+					existingSimulatedMetric.getServices().retainAll(services);
+					existingSimulatedMetric.getServices().addAll(services);
+				}
+				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+				return saveServiceSimulatedMetric(existingSimulatedMetric);
 			}
-			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
-			return saveServiceSimulatedMetric(existingSimulatedMetric);
 		}
-		else {
 			return saveServiceSimulatedMetric(simulatedMetric);
-		}
 	}
 
 	public void deleteServiceSimulatedMetric(Long id) {

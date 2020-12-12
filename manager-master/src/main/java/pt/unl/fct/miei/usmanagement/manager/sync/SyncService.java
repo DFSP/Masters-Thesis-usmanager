@@ -107,7 +107,7 @@ public class SyncService {
 
 	public List<CloudHost> synchronizeCloudHostsDatabase() {
 		log.debug("Synchronizing cloud hosts data with amazon");
-		List<CloudHost> cloudHosts = cloudHostsService.getCloudHosts();
+		List<CloudHost> cloudHosts = cloudHostsService.getCloudHostsAndRelations();
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
 			.collect(Collectors.toMap(Instance::getInstanceId, instance -> instance));
@@ -152,8 +152,7 @@ public class SyncService {
 		// Add missing cloud host entities
 		awsInstances.forEach(instance -> {
 			String instanceId = instance.getInstanceId();
-			Optional<Configuration> configuration = configurationsService.getConfiguration(instanceId);
-			if (configuration.isEmpty() && instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()
+			if (!configurationsService.isConfiguring(instanceId) && instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()
 				&& !cloudHostsService.hasCloudHost(instanceId)) {
 				CloudHost cloudHost = cloudHostsService.addCloudHostFromSimpleInstance(new AwsSimpleInstance(instance));
 				cloudHosts.add(cloudHost);

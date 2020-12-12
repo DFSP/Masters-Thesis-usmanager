@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
@@ -17,6 +18,7 @@ import java.util.Map;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class NodeDTO {
 
 	private String id;

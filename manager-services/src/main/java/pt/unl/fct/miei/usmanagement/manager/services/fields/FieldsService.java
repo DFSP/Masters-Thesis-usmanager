@@ -92,30 +92,30 @@ public class FieldsService {
 	}
 
 	public Field addOrUpdateField(Field field) {
-		Optional<Field> fieldOptional = fields.findById(field.getId());
-		if (fieldOptional.isPresent()) {
-			Field existingField = fieldOptional.get();
-			Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition> conditions = field.getConditions();
-			if (conditions != null) {
-				existingField.getConditions().retainAll(conditions);
-				existingField.getConditions().addAll(conditions);
+		if (field.getId() != null) {
+			Optional<Field> fieldOptional = fields.findById(field.getId());
+			if (fieldOptional.isPresent()) {
+				Field existingField = fieldOptional.get();
+				Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition> conditions = field.getConditions();
+				if (conditions != null) {
+					existingField.getConditions().retainAll(conditions);
+					existingField.getConditions().addAll(conditions);
+				}
+				Set<HostSimulatedMetric> simulatedHostMetrics = field.getSimulatedHostMetrics();
+				if (simulatedHostMetrics != null) {
+					existingField.getSimulatedHostMetrics().retainAll(simulatedHostMetrics);
+					existingField.getSimulatedHostMetrics().addAll(simulatedHostMetrics);
+				}
+				Set<ServiceSimulatedMetric> simulatedServiceMetrics = field.getSimulatedServiceMetrics();
+				if (simulatedServiceMetrics != null) {
+					existingField.getSimulatedServiceMetrics().retainAll(simulatedServiceMetrics);
+					existingField.getSimulatedServiceMetrics().addAll(simulatedServiceMetrics);
+				}
+				EntityUtils.copyValidProperties(field, existingField);
+				return saveField(existingField);
 			}
-			Set<HostSimulatedMetric> simulatedHostMetrics = field.getSimulatedHostMetrics();
-			if (simulatedHostMetrics != null) {
-				existingField.getSimulatedHostMetrics().retainAll(simulatedHostMetrics);
-				existingField.getSimulatedHostMetrics().addAll(simulatedHostMetrics);
-			}
-			Set<ServiceSimulatedMetric> simulatedServiceMetrics = field.getSimulatedServiceMetrics();
-			if (simulatedServiceMetrics != null) {
-				existingField.getSimulatedServiceMetrics().retainAll(simulatedServiceMetrics);
-				existingField.getSimulatedServiceMetrics().addAll(simulatedServiceMetrics);
-			}
-			EntityUtils.copyValidProperties(field, existingField);
-			return saveField(existingField);
 		}
-		else {
 			return saveField(field);
-		}
 	}
 
 	public void deleteField(Long id) {

@@ -79,31 +79,35 @@ public class AppsService {
 		return apps.findAll();
 	}
 
+	public List<App> getAppsAndRelations() {
+		return apps.getAppsAndRelations();
+	}
+
 	public App saveApp(App app) {
 		log.info("Saving app {}", app.getName());
 		return apps.save(app);
 	}
 
 	public App addOrUpdateApp(App app) {
-		Optional<App> appOptional = apps.findById(app.getId());
-		if (appOptional.isPresent()) {
-			App existingApp = appOptional.get();
-			Set<AppRule> rules = app.getAppRules();
-			if (rules != null) {
-				existingApp.getAppRules().retainAll(rules);
-				existingApp.getAppRules().addAll(rules);
+		if (app.getId() != null) {
+			Optional<App> appOptional = apps.findById(app.getId());
+			if (appOptional.isPresent()) {
+				App existingApp = appOptional.get();
+				Set<AppRule> rules = app.getAppRules();
+				if (rules != null) {
+					existingApp.getAppRules().retainAll(rules);
+					existingApp.getAppRules().addAll(rules);
+				}
+				Set<AppSimulatedMetric> simulatedMetrics = app.getSimulatedAppMetrics();
+				if (simulatedMetrics != null) {
+					existingApp.getSimulatedAppMetrics().retainAll(simulatedMetrics);
+					existingApp.getSimulatedAppMetrics().addAll(simulatedMetrics);
+				}
+				EntityUtils.copyValidProperties(app, existingApp);
+				return saveApp(existingApp);
 			}
-			Set<AppSimulatedMetric> simulatedMetrics = app.getSimulatedAppMetrics();
-			if (simulatedMetrics != null) {
-				existingApp.getSimulatedAppMetrics().retainAll(simulatedMetrics);
-				existingApp.getSimulatedAppMetrics().addAll(simulatedMetrics);
-			}
-			EntityUtils.copyValidProperties(app, existingApp);
-			return saveApp(existingApp);
 		}
-		else {
 			return saveApp(app);
-		}
 	}
 
 	public App getApp(Long id) {
@@ -116,7 +120,7 @@ public class AppsService {
 			new EntityNotFoundException(App.class, "name", appName));
 	}
 
-	public App getAppAndEntities(String appName) {
+	public App getAppAndRelations(String appName) {
 		return apps.findByNameWithEntities(appName).orElseThrow(() ->
 			new EntityNotFoundException(App.class, "name", appName));
 	}
@@ -132,7 +136,7 @@ public class AppsService {
 	}
 
 	public App updateApp(String appName, App newApp) {
-		App app = getAppAndEntities(appName);
+		App app = getAppAndRelations(appName);
 		log.info("Updating app {} with {}", ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
 		EntityUtils.copyValidProperties(newApp, app);
 		app = saveApp(app);
@@ -168,7 +172,7 @@ public class AppsService {
 	}
 
 	public void addService(String appName, String serviceName, int order) {
-		App app = getAppAndEntities(appName);
+		App app = getAppAndRelations(appName);
 		Service service = servicesService.getService(serviceName);
 		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getId())).app(app).service(service).launchOrder(order).build();
 		app = addService(app, appService);
@@ -188,7 +192,7 @@ public class AppsService {
 	}
 
 	public void removeServices(String appName, List<String> services) {
-		App app = getAppAndEntities(appName);
+		App app = getAppAndRelations(appName);
 		log.info("Removing services {}", services);
 		app.getAppServices().removeIf(appService -> services.contains(servicesService.getService(appService.getId().getServiceId()).getServiceName()));
 		app = apps.save(app);

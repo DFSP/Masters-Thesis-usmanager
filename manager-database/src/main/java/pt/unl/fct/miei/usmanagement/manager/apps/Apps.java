@@ -81,6 +81,9 @@ public interface Apps extends JpaRepository<App, Long> {
 	Optional<AppSimulatedMetric> getSimulatedMetric(@Param("appName") String appName,
 													@Param("simulatedMetricName") String simulatedMetricName);
 
+	@Query("select a "
+	+ "from App a left join fetch a.simulatedAppMetrics join fetch a.appRules join fetch a.appServices")
+	List<App> getAppsAndRelations();
 }
 
 

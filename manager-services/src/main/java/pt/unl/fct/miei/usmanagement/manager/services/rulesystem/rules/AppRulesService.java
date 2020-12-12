@@ -223,24 +223,24 @@ public class AppRulesService {
 	}
 
 	public AppRule addOrUpdateRule(AppRule appRule) {
-		Optional<AppRule> optionalRule = rules.findById(appRule.getId());
-		if (optionalRule.isPresent()) {
-			AppRule rule = optionalRule.get();
-			Set<AppRuleCondition> conditions = appRule.getConditions();
-			if (conditions != null) {
-				rule.getConditions().retainAll(appRule.getConditions());
-				rule.getConditions().addAll(appRule.getConditions());
+		if (appRule.getId() != null) {
+			Optional<AppRule> optionalRule = rules.findById(appRule.getId());
+			if (optionalRule.isPresent()) {
+				AppRule rule = optionalRule.get();
+				Set<AppRuleCondition> conditions = appRule.getConditions();
+				if (conditions != null) {
+					rule.getConditions().retainAll(appRule.getConditions());
+					rule.getConditions().addAll(appRule.getConditions());
+				}
+				Set<App> apps = appRule.getApps();
+				if (apps != null) {
+					rule.getApps().retainAll(appRule.getApps());
+					rule.getApps().addAll(appRule.getApps());
+				}
+				EntityUtils.copyValidProperties(appRule, rule);
+				return saveRule(rule);
 			}
-			Set<App> apps = appRule.getApps();
-			if (apps != null) {
-				rule.getApps().retainAll(appRule.getApps());
-				rule.getApps().addAll(appRule.getApps());
-			}
-			EntityUtils.copyValidProperties(appRule, rule);
-			return saveRule(rule);
 		}
-		else {
 			return saveRule(appRule);
-		}
 	}
 }

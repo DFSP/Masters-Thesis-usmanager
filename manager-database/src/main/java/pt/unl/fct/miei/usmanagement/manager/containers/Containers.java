@@ -67,4 +67,8 @@ public interface Containers extends JpaRepository<Container, String> {
 	boolean hasContainer(@Param("containerId") String containerId);
 
 	List<Container> findByManagerId(String managerId);
+
+	@Query("select c "
+		+ "from Container c left join fetch c.containerRules left join fetch c.simulatedContainerMetrics")
+	List<Container> getContainersAndEntities();
 }

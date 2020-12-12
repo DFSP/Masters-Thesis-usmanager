@@ -1,10 +1,12 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class ServiceRuleDTO {
 
 	private Long id;
@@ -26,6 +29,7 @@ public class ServiceRuleDTO {
 	private int priority;
 	private boolean generic;
 	private Decision decision;
+	@JsonManagedReference
 	private Set<ServiceDTO> services;
 	private Set<ServiceRuleConditionDTO> conditions;
 	/*@JsonProperty("isNew")

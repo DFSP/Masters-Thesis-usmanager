@@ -11,17 +11,11 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
-import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.CloudHostDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ComponentTypeDTO;
@@ -41,6 +35,25 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ValueModeDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
+import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
@@ -62,18 +75,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesS
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.Set;
@@ -104,6 +105,7 @@ public class WorkerKafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final RuleConditionsService ruleConditionsService;
+	private final CycleAvoidingMappingContext cycleAvoidingMappingContext;
 
 	public WorkerKafkaService(AppsService appsService, CloudHostsService cloudHostsService,
 							  ComponentTypesService componentTypesService, ConditionsService conditionsService,
@@ -138,12 +140,13 @@ public class WorkerKafkaService {
 		this.containerRulesService = containerRulesService;
 		this.valueModesService = valueModesService;
 		this.ruleConditionsService = ruleConditionsService;
+		this.cycleAvoidingMappingContext = new CycleAvoidingMappingContext();
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "apps", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload AppDTO appDTO) {
-		log.info("Received key={} message={}", key, appDTO.toString());
+		/*log.info("Received key={} message={}", key, appDTO.toString());
 		try {
 			App app = appDTO.toEntity();
 			if (Objects.equal(key, "DELETE")) {
@@ -153,7 +156,7 @@ public class WorkerKafkaService {
 			else {
 				Set<AppServiceDTO> appServices = appDTO.getAppServices();
 				appServices.forEach(appService -> {
-					pt.unl.fct.miei.usmanagement.manager.services.Service service = appService.getService().toEntity();
+					pt.unl.fct.miei.usmanagement.manager.services.Service service = modelMapper.map(appService.getService(), pt.unl.fct.miei.usmanagement.manager.services.Service.class);
 					if (!servicesService.hasService(service.getServiceName())) {
 						log.info("Saving service {}", ToStringBuilder.reflectionToString(service));
 						servicesService.addOrUpdateService(service);
@@ -164,7 +167,7 @@ public class WorkerKafkaService {
 		}
 		catch (Exception e) {
 			log.error("Error while processing topic apps with message {}: {}", ToStringBuilder.reflectionToString(appDTO), e.getMessage());
-		}
+		}*/
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
@@ -441,7 +444,7 @@ public class WorkerKafkaService {
 	@KafkaListener(groupId = "manager-worker", topics = "services", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDTO serviceDTO) {
 		log.info("Received key={} message={}", key, serviceDTO.toString());
-		pt.unl.fct.miei.usmanagement.manager.services.Service service = serviceDTO.toEntity();
+		pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, cycleAvoidingMappingContext);
 		try {
 			if (Objects.equal(key, "DELETE")) {
 				Long id = service.getId();
@@ -529,7 +532,7 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "simulated-service-metrics", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceSimulatedMetricDTO serviceSimulatedMetricDTO) {
-		log.info("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
+		/*log.info("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
 		ServiceSimulatedMetric serviceSimulatedMetric = serviceSimulatedMetricDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
@@ -539,18 +542,18 @@ public class WorkerKafkaService {
 			else {
 				fieldsService.addOrUpdateField(serviceSimulatedMetric.getField());
 				serviceSimulatedMetricDTO.getServices().forEach(service -> {
-					/*service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);*/
+					*//*service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);*//*
 					service.getSimulatedServiceMetrics().forEach(simulatedMetric -> {
 						serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(simulatedMetric.toEntity());
 					});
-					servicesService.addOrUpdateService(service.toEntity());
+					servicesService.addOrUpdateService(modelMapper.map(service, pt.unl.fct.miei.usmanagement.manager.services.Service.class));
 				});
 				serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
 			}
 		}
 		catch (Exception e) {
 			log.error("Error while processing topic simulated-service-metrics with message {}: {}", ToStringBuilder.reflectionToString(serviceSimulatedMetricDTO), e.getMessage());
-		}
+		}*/
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
@@ -636,7 +639,7 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(groupId = "manager-worker", topics = "service-rules", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceRuleDTO serviceRuleDTO) {
-		log.info("Received key={} message={}", key, serviceRuleDTO.toString());
+		/*log.info("Received key={} message={}", key, serviceRuleDTO.toString());
 		ServiceRule serviceRule = serviceRuleDTO.toEntity();
 		try {
 			if (Objects.equal(key, "DELETE")) {
@@ -654,14 +657,15 @@ public class WorkerKafkaService {
 					fieldsService.addOrUpdateField(ruleCondition.getField());
 					ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition.toEntity());
 				});
-				serviceRuleDTO.getServices().forEach(service -> servicesService.addOrUpdateService(service.toEntity()));
+				serviceRuleDTO.getServices().forEach(service ->
+					servicesService.addOrUpdateService(modelMapper.map(service, pt.unl.fct.miei.usmanagement.manager.services.Service.class)));
 				decisionsService.addOrUpdateDecision(serviceRule.getDecision());
 				serviceRulesService.addOrUpdateRule(serviceRule);
 			}
 		}
 		catch (Exception e) {
 			log.error("Error from topic service-rules while saving {}: {}", ToStringBuilder.reflectionToString(serviceRuleDTO), e.getMessage());
-		}
+		}*/
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)

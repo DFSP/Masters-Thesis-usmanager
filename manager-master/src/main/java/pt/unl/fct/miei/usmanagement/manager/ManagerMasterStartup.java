@@ -51,7 +51,6 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
-	private final RegionsService regionsService;
 
 	private final Environment environment;
 
@@ -60,13 +59,12 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								RegionsService regionsService, Environment environment) {
+								Environment environment) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
-		this.regionsService = regionsService;
 		this.environment = environment;
 	}
 

@@ -54,7 +54,7 @@ import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter

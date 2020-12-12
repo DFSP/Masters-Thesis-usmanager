@@ -20,12 +20,12 @@ public class ConfigurationsService {
 
 	public Configuration addConfiguration(String id) {
 		log.info("Saving configuration {}", id);
-		return configurations.save(Configuration.builder().id(id).build());
+		return configurations.saveAndFlush(Configuration.builder().id(id).build());
 	}
 
 	public Configuration addConfiguration(Configuration configuration) {
 		log.info("Saving configuration {}", configuration);
-		return configurations.save(configuration);
+		return configurations.saveAndFlush(configuration);
 	}
 
 	public List<Configuration> getConfigurations() {
@@ -47,7 +47,7 @@ public class ConfigurationsService {
 	}
 
 	public boolean isConfiguring(String id) {
-		return configurations.isConfiguring(id);
+		return configurations.existsById(id);
 	}
 
 	public void reset() {

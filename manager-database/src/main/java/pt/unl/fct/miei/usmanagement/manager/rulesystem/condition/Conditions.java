@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface Conditions extends JpaRepository<Condition, Long> {
@@ -38,5 +39,10 @@ public interface Conditions extends JpaRepository<Condition, Long> {
 	boolean hasCondition(@Param("name") String name);
 
 	Optional<Condition> findByNameIgnoreCase(@Param("name") String name);
+
+	@Query("select c "
+		+ "from Condition c left join fetch c.containerConditions left join fetch c.serviceConditions "
+		+ "left join fetch c.appConditions left join fetch c.hostConditions")
+	List<Condition> getConditionsAndRelations();
 
 }

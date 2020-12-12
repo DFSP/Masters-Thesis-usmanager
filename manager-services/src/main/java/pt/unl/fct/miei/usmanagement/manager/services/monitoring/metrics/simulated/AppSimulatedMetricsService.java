@@ -103,20 +103,20 @@ public class AppSimulatedMetricsService {
 	}
 
 	public AppSimulatedMetric addOrUpdateSimulatedMetric(AppSimulatedMetric simulatedMetric) {
-		Optional<AppSimulatedMetric> simulatedMetricOptional = appSimulatedMetrics.findById(simulatedMetric.getId());
-		if (simulatedMetricOptional.isPresent()) {
-			AppSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
-			Set<App> apps = simulatedMetric.getApps();
-			if (apps != null) {
-				existingSimulatedMetric.getApps().retainAll(apps);
-				existingSimulatedMetric.getApps().addAll(apps);
+		if (simulatedMetric.getId() != null) {
+			Optional<AppSimulatedMetric> simulatedMetricOptional = appSimulatedMetrics.findById(simulatedMetric.getId());
+			if (simulatedMetricOptional.isPresent()) {
+				AppSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
+				Set<App> apps = simulatedMetric.getApps();
+				if (apps != null) {
+					existingSimulatedMetric.getApps().retainAll(apps);
+					existingSimulatedMetric.getApps().addAll(apps);
+				}
+				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
+				return saveAppSimulatedMetric(existingSimulatedMetric);
 			}
-			EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
-			return saveAppSimulatedMetric(existingSimulatedMetric);
 		}
-		else {
 			return saveAppSimulatedMetric(simulatedMetric);
-		}
 	}
 
 	public void deleteAppSimulatedMetric(Long id) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
@@ -12,6 +13,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class DecisionDTO {
 
 	private Long id;

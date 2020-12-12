@@ -145,6 +145,7 @@
     <orderEntry type="library" name="Maven: org.xerial.snappy:snappy-java:1.1.7.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.12.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.0" level="project" />
-    <orderEntry type="library" name="Maven: org.modelmapper:modelmapper:2.3.9" level="project" />
+    <orderEntry type="library" name="Maven: org.mapstruct:mapstruct:1.4.1.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.mapstruct:mapstruct-processor:1.4.1.Final" level="project" />
   </component>
 </module>

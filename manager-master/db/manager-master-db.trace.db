@@ -217,3 +217,308 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
 	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:35)
+2020-12-11 13:07:17 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Class "pt.unl.fct.miei.usmanagement.manager.database.DatabaseFunctions" not found; SQL statement:
+CALL drop_sym_tables() [90086-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:576)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:194)
+	at org.h2.util.JdbcUtils.loadUserClass(JdbcUtils.java:199)
+	at org.h2.engine.FunctionAlias.loadClass(FunctionAlias.java:138)
+	at org.h2.engine.FunctionAlias.load(FunctionAlias.java:114)
+	at org.h2.engine.FunctionAlias.findJavaMethod(FunctionAlias.java:255)
+	at org.h2.expression.function.JavaFunction.<init>(JavaFunction.java:34)
+	at org.h2.command.Parser.readJavaFunction(Parser.java:3576)
+	at org.h2.command.Parser.readFunction(Parser.java:3770)
+	at org.h2.command.Parser.readTerm(Parser.java:4305)
+	at org.h2.command.Parser.readFactor(Parser.java:3343)
+	at org.h2.command.Parser.readSum(Parser.java:3330)
+	at org.h2.command.Parser.readConcat(Parser.java:3305)
+	at org.h2.command.Parser.readCondition(Parser.java:3108)
+	at org.h2.command.Parser.readExpression(Parser.java:3059)
+	at org.h2.command.Parser.parseCall(Parser.java:6480)
+	at org.h2.command.Parser.parsePrepared(Parser.java:905)
+	at org.h2.command.Parser.parse(Parser.java:843)
+	at org.h2.command.Parser.parse(Parser.java:815)
+	at org.h2.command.Parser.prepareCommand(Parser.java:738)
+	at org.h2.engine.Session.prepareLocal(Session.java:657)
+	at org.h2.engine.Session.prepareCommand(Session.java:595)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1235)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:212)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:201)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:601)
+	at org.springframework.jdbc.datasource.init.ResourceDatabasePopulator.populate(ResourceDatabasePopulator.java:254)
+	at org.springframework.jdbc.datasource.init.DatabasePopulatorUtils.execute(DatabasePopulatorUtils.java:49)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceInitializer.runScripts(DataSourceInitializer.java:203)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceInitializer.createSchema(DataSourceInitializer.java:102)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceInitializerInvoker.afterPropertiesSet(DataSourceInitializerInvoker.java:63)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1855)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1792)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:595)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:517)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:323)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:226)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:227)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1172)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:420)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:350)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBean(DefaultListableBeanFactory.java:343)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceInitializerPostProcessor.postProcessAfterInitialization(DataSourceInitializerPostProcessor.java:52)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsAfterInitialization(AbstractAutowireCapableBeanFactory.java:431)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:595)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:517)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:323)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:226)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1304)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.getIfAvailable(DefaultListableBeanFactory.java:1939)
+	at org.springframework.beans.factory.ObjectProvider.ifAvailable(ObjectProvider.java:91)
+	at org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration.h2Console(H2ConsoleAutoConfiguration.java:72)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:650)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:635)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1338)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1177)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:557)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:517)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:323)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:226)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:321)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:211)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:202)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addServletContextInitializerBeans(ServletContextInitializerBeans.java:96)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:85)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:255)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:229)
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:53)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5128)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1384)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1374)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:909)
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:841)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1384)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1374)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:140)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:909)
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:262)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:421)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:930)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:468)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:123)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:104)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:437)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:191)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:178)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:158)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:545)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:758)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:750)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:397)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:315)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+Caused by: java.lang.ClassNotFoundException: pt.unl.fct.miei.usmanagement.manager.database.DatabaseFunctions
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:581)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:178)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:522)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:315)
+	at org.h2.util.JdbcUtils.loadUserClass(JdbcUtils.java:192)
+	... 116 more
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''h2Console'' de... (1405)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.boot.w... (1131)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''dataSource'' d... (927)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''org.springfram... (661)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script s... (444)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 13:07:19 jdbc[21]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''h2Console'' de... (1405)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''h2Console'' de... (1405)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.boot.w... (1131)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''dataSource'' d... (927)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''org.springfram... (661)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script s... (444)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 21:53:45 jdbc[542]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000x890x010x000x000x850x030x03<0xbb0x... (588)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2020-12-11 21:53:45 jdbc[542]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000x890x010x000x000x850x030x03<0xbb0x... (588)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.info(DirectJDKLog.java:121)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:310)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000x890x010x000x000x850x030x03<0xbb0x... (588)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
+	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
+	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
+	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
+	at org.h2.command.dml.Insert.update(Insert.java:151)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
+	at org.h2.command.Command.executeUpdate(Command.java:251)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
+	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
+	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
+	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
+	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
+	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
+	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
+	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
+	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
+	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
+	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
+	at ch.qos.logback.classic.Logger.log(Logger.java:765)
+	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
+	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
+	at java.logging/java.util.logging.Logger.log(Logger.java:979)
+	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
+	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
+	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
+	at org.apache.juli.logging.DirectJDKLog.info(DirectJDKLog.java:121)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:310)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 9"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+2020-12-12 10:51:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-200]

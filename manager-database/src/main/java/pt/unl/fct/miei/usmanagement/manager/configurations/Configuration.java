@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 
 import javax.persistence.Entity;
@@ -22,6 +23,7 @@ import javax.persistence.Table;
 public class Configuration /*extends AbstractEntity<String> */{
 
 	@Id
+	@NaturalId
 	private String id;
 
 }

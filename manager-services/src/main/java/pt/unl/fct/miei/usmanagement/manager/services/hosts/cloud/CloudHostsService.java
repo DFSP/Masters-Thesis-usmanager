@@ -59,6 +59,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -113,6 +114,10 @@ public class CloudHostsService {
 		return cloudHosts.findAll();
 	}
 
+	public List<CloudHost> getCloudHostsAndRelations() {
+		return cloudHosts.getCloudHostsAndRelations();
+	}
+
 	public List<CloudHost> getInactiveCloudHosts() {
 		return getCloudHosts().stream()
 			.filter(host -> !nodesService.isPartOfSwarm(host.getAddress()))
@@ -150,30 +155,30 @@ public class CloudHostsService {
 	}
 
 	public CloudHost addOrUpdateCloudHost(CloudHost cloudHost) {
-		Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());
-		if (cloudHostOptional.isPresent()) {
-			CloudHost existingCloudHost = cloudHostOptional.get();
-			Set<HostRule> rules = cloudHost.getHostRules();
-			if (rules != null) {
-				existingCloudHost.getHostRules().retainAll(rules);
-				existingCloudHost.getHostRules().addAll(rules);
+		if (cloudHost.getId() != null) {
+			Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());
+			if (cloudHostOptional.isPresent()) {
+				CloudHost existingCloudHost = cloudHostOptional.get();
+				Set<HostRule> rules = cloudHost.getHostRules();
+				if (rules != null) {
+					existingCloudHost.getHostRules().retainAll(rules);
+					existingCloudHost.getHostRules().addAll(rules);
+				}
+				Set<HostSimulatedMetric> simulatedMetrics = cloudHost.getSimulatedHostMetrics();
+				if (simulatedMetrics != null) {
+					existingCloudHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
+					existingCloudHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+				}
+				EntityUtils.copyValidProperties(cloudHost, existingCloudHost);
+				return saveCloudHost(existingCloudHost);
 			}
-			Set<HostSimulatedMetric> simulatedMetrics = cloudHost.getSimulatedHostMetrics();
-			if (simulatedMetrics != null) {
-				existingCloudHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
-				existingCloudHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
-			}
-			EntityUtils.copyValidProperties(cloudHost, existingCloudHost);
-			return saveCloudHost(existingCloudHost);
 		}
-		else {
-			return saveCloudHost(cloudHost);
-		}
+		return saveCloudHost(cloudHost);
 	}
 
 	public CloudHost updateCloudHost(CloudHost cloudHost) {
 		checkCloudHostExists(cloudHost.getInstanceId());
-		cloudHost = cloudHosts.save(cloudHost);
+		cloudHost = saveCloudHost(cloudHost);
 		kafkaService.sendCloudHost(cloudHost);
 		return cloudHost;
 	}
@@ -196,7 +201,11 @@ public class CloudHostsService {
 			.placement(instance.getPlacement())
 			.build();
 		/*cloudHost.setNew(id == null);*/
-		cloudHost = saveCloudHost(cloudHost);
+		Optional<CloudHost> savedCloudHost = cloudHosts.findByInstanceId(cloudHost.getInstanceId());
+		if (savedCloudHost.isPresent()) {
+			cloudHost.setId(savedCloudHost.get().getId());
+		}
+		cloudHost = addOrUpdateCloudHost(cloudHost);
 		/*CloudHost kafkaCloudHost = cloudHost;
 		kafkaCloudHost.setNew(id == null);
 		kafkaService.sendCloudHost(kafkaCloudHost);*/

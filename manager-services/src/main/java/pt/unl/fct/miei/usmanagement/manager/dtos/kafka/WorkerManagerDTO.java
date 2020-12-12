@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class WorkerManagerDTO {
 
 	private String id;

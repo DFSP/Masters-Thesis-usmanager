@@ -28,10 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueModes;
@@ -90,22 +89,21 @@ public class ValueModesService {
 		return valueModes.save(valueMode);
 	}
 
-	@Transactional
 	public ValueMode addOrUpdateValueMode(ValueMode valueMode) {
-		Optional<ValueMode> valueModeOptional = valueModes.findById(valueMode.getId());
-		if (valueModeOptional.isPresent()) {
-			ValueMode existingValueMode = valueModeOptional.get();
-			Set<Condition> conditions = valueMode.getConditions();
-			if (conditions != null) {
-				existingValueMode.getConditions().retainAll(conditions);
-				existingValueMode.getConditions().addAll(conditions);
+		if (valueMode.getId() != null) {
+			Optional<ValueMode> valueModeOptional = valueModes.findById(valueMode.getId());
+			if (valueModeOptional.isPresent()) {
+				ValueMode existingValueMode = valueModeOptional.get();
+				Set<Condition> conditions = valueMode.getConditions();
+				if (conditions != null) {
+					existingValueMode.getConditions().retainAll(conditions);
+					existingValueMode.getConditions().addAll(conditions);
+				}
+				EntityUtils.copyValidProperties(valueMode, existingValueMode);
+				return saveValueMode(existingValueMode);
 			}
-			EntityUtils.copyValidProperties(valueMode, existingValueMode);
-			return saveValueMode(existingValueMode);
 		}
-		else {
-			return saveValueMode(valueMode);
-		}
+		return saveValueMode(valueMode);
 	}
 
 	public void deleteValueMode(Long id) {

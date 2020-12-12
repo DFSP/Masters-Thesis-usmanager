@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class CloudHostDTO {
 
 	private Long id;
@@ -31,7 +33,7 @@ public class CloudHostDTO {
 	private String privateIpAddress;
 	private Placement placement;
 	private AwsRegion awsRegion;
-	private WorkerManager managedByWorker;
+	private WorkerManagerDTO managedByWorker;
 	private Set<HostRuleDTO> hostRules;
 	private Set<HostSimulatedMetricDTO> simulatedHostMetrics;
 	/*@JsonProperty("isNew")
@@ -52,7 +54,7 @@ public class CloudHostDTO {
 		this.privateIpAddress = cloudHost.getPrivateIpAddress();
 		this.placement = cloudHost.getPlacement();
 		this.awsRegion = cloudHost.getAwsRegion();
-		this.managedByWorker = cloudHost.getManagedByWorker();
+		this.managedByWorker = cloudHost.getManagedByWorker() == null ? null : new WorkerManagerDTO(cloudHost.getManagedByWorker());
 		this.hostRules = cloudHost.getHostRules().stream().map(HostRuleDTO::new).collect(Collectors.toSet());
 		this.simulatedHostMetrics = cloudHost.getSimulatedHostMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toSet());
 		/*this.isNew = cloudHost.isNew();*/
@@ -71,7 +73,7 @@ public class CloudHostDTO {
 			.privateIpAddress(privateIpAddress)
 			.placement(placement)
 			.awsRegion(awsRegion)
-			.managedByWorker(managedByWorker)
+			.managedByWorker(managedByWorker == null ? null : managedByWorker.toEntity())
 			.hostRules(hostRules != null ? hostRules.stream().map(HostRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
 			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics.stream().map(HostSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
 			.build();

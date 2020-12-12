@@ -220,25 +220,25 @@ public class EdgeHostsService {
 	}
 
 	public EdgeHost addOrUpdateEdgeHost(EdgeHost edgeHost) {
-		Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
-		if (edgeHostOptional.isPresent()) {
-			EdgeHost existingEdgeHost = edgeHostOptional.get();
-			Set<HostRule> rules = edgeHost.getHostRules();
-			if (rules != null) {
-				existingEdgeHost.getHostRules().retainAll(rules);
-				existingEdgeHost.getHostRules().addAll(rules);
+		if (edgeHost.getId() != null) {
+			Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
+			if (edgeHostOptional.isPresent()) {
+				EdgeHost existingEdgeHost = edgeHostOptional.get();
+				Set<HostRule> rules = edgeHost.getHostRules();
+				if (rules != null) {
+					existingEdgeHost.getHostRules().retainAll(rules);
+					existingEdgeHost.getHostRules().addAll(rules);
+				}
+				Set<HostSimulatedMetric> simulatedMetrics = edgeHost.getSimulatedHostMetrics();
+				if (simulatedMetrics != null) {
+					existingEdgeHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
+					existingEdgeHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+				}
+				EntityUtils.copyValidProperties(edgeHost, existingEdgeHost);
+				return saveEdgeHost(existingEdgeHost);
 			}
-			Set<HostSimulatedMetric> simulatedMetrics = edgeHost.getSimulatedHostMetrics();
-			if (simulatedMetrics != null) {
-				existingEdgeHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
-				existingEdgeHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
-			}
-			EntityUtils.copyValidProperties(edgeHost, existingEdgeHost);
-			return saveEdgeHost(existingEdgeHost);
 		}
-		else {
 			return saveEdgeHost(edgeHost);
-		}
 	}
 
 	public void deleteEdgeHost(Long id) {

@@ -136,30 +136,30 @@ public class HostRulesService {
 	}
 
 	public HostRule addOrUpdateRule(HostRule hostRule) {
-		Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
-		if (optionalRule.isPresent()) {
-			HostRule rule = optionalRule.get();
-			Set<HostRuleCondition> conditions = hostRule.getConditions();
-			if (conditions != null) {
-				rule.getConditions().retainAll(hostRule.getConditions());
-				rule.getConditions().addAll(hostRule.getConditions());
+		if (hostRule.getId() != null) {
+			Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
+			if (optionalRule.isPresent()) {
+				HostRule rule = optionalRule.get();
+				Set<HostRuleCondition> conditions = hostRule.getConditions();
+				if (conditions != null) {
+					rule.getConditions().retainAll(hostRule.getConditions());
+					rule.getConditions().addAll(hostRule.getConditions());
+				}
+				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
+				if (edgeHosts != null) {
+					rule.getEdgeHosts().retainAll(hostRule.getEdgeHosts());
+					rule.getEdgeHosts().addAll(hostRule.getEdgeHosts());
+				}
+				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
+				if (cloudHosts != null) {
+					rule.getCloudHosts().retainAll(hostRule.getCloudHosts());
+					rule.getCloudHosts().addAll(hostRule.getCloudHosts());
+				}
+				EntityUtils.copyValidProperties(hostRule, rule);
+				return saveRule(rule);
 			}
-			Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
-			if (edgeHosts != null) {
-				rule.getEdgeHosts().retainAll(hostRule.getEdgeHosts());
-				rule.getEdgeHosts().addAll(hostRule.getEdgeHosts());
-			}
-			Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
-			if (cloudHosts != null) {
-				rule.getCloudHosts().retainAll(hostRule.getCloudHosts());
-				rule.getCloudHosts().addAll(hostRule.getCloudHosts());
-			}
-			EntityUtils.copyValidProperties(hostRule, rule);
-			return saveRule(rule);
 		}
-		else {
 			return saveRule(hostRule);
-		}
 	}
 
 	public HostRule saveRule(HostRule hostRule) {

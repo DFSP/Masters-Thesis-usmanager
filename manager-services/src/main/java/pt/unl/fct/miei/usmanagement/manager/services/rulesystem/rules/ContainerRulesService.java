@@ -217,25 +217,25 @@ public class ContainerRulesService {
 	}
 
 	public ContainerRule addOrUpdateRule(ContainerRule containerRule) {
-		Optional<ContainerRule> optionalRule = rules.findById(containerRule.getId());
-		if (optionalRule.isPresent()) {
-			ContainerRule rule = optionalRule.get();
-			Set<ContainerRuleCondition> conditions = containerRule.getConditions();
-			if (conditions != null) {
-				rule.getConditions().retainAll(containerRule.getConditions());
-				rule.getConditions().addAll(containerRule.getConditions());
+		if (containerRule.getId() != null) {
+			Optional<ContainerRule> optionalRule = rules.findById(containerRule.getId());
+			if (optionalRule.isPresent()) {
+				ContainerRule rule = optionalRule.get();
+				Set<ContainerRuleCondition> conditions = containerRule.getConditions();
+				if (conditions != null) {
+					rule.getConditions().retainAll(containerRule.getConditions());
+					rule.getConditions().addAll(containerRule.getConditions());
+				}
+				Set<Container> containers = containerRule.getContainers();
+				if (containers != null) {
+					rule.getContainers().retainAll(containerRule.getContainers());
+					rule.getContainers().addAll(containerRule.getContainers());
+				}
+				EntityUtils.copyValidProperties(containerRule, rule);
+				return saveRule(rule);
 			}
-			Set<Container> containers = containerRule.getContainers();
-			if (containers != null) {
-				rule.getContainers().retainAll(containerRule.getContainers());
-				rule.getContainers().addAll(containerRule.getContainers());
-			}
-			EntityUtils.copyValidProperties(containerRule, rule);
-			return saveRule(rule);
 		}
-		else {
 			return saveRule(containerRule);
-		}
 	}
 	
 }

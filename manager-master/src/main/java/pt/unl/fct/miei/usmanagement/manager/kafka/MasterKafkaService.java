@@ -48,7 +48,7 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostEventDTO hostEventMessage) {
 		log.info("Received key={} value={}", key, hostEventMessage.toString());
-		HostEvent hostEvent = hostEventMessage.get();
+		HostEvent hostEvent = hostEventMessage.toEntity();
 		try {
 			hostsEventsService.addHostEvent(hostEvent);
 		} catch (Exception e) {
@@ -70,7 +70,7 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostMonitoringLogDTO hostMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, hostMonitoringLogMessage.toString());
-		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.get();
+		HostMonitoringLog hostMonitoringLog = hostMonitoringLogMessage.toEntity();
 		try {
 			hostsMonitoringService.addHostMonitoringLog(hostMonitoringLog);
 		} catch (Exception e) {
@@ -81,7 +81,7 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceMonitoringLogDTO serviceMonitoringLogMessage) {
 		log.info("Received key={} value={}", key, serviceMonitoringLogMessage.toString());
-		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.get();
+		ServiceMonitoringLog serviceMonitoringLog = serviceMonitoringLogMessage.toEntity();
 		try {
 			servicesMonitoringService.addServiceMonitoringLog(serviceMonitoringLog);
 		} catch (Exception e) {
@@ -92,7 +92,7 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload HostDecisionDTO hostDecisionMessage) {
 		log.info("Received key={} value={}", key, hostDecisionMessage.toString());
-		HostDecision hostDecision = hostDecisionMessage.get();
+		HostDecision hostDecision = hostDecisionMessage.toEntity();
 		try {
 			decisionsService.saveHostDecision(hostDecision);
 		} catch (Exception e) {
@@ -103,7 +103,7 @@ public class MasterKafkaService {
 	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
 	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload ServiceDecisionDTO serviceDecisionMessage) {
 		log.info("Received key={} value={}", key, serviceDecisionMessage.toString());
-		ServiceDecision serviceDecision = serviceDecisionMessage.get();
+		ServiceDecision serviceDecision = serviceDecisionMessage.toEntity();
 		try {
 			decisionsService.saveServiceDecision(serviceDecision);
 		} catch (Exception e) {

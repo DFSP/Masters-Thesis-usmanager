@@ -135,25 +135,25 @@ public class ServiceRulesService {
 	}
 
 	public ServiceRule addOrUpdateRule(ServiceRule serviceRule) {
-		Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
-		if (serviceRuleOptional.isPresent()) {
-			ServiceRule rule = serviceRuleOptional.get();
-			Set<ServiceRuleCondition> conditions = serviceRule.getConditions();
-			if (conditions != null) {
-				rule.getConditions().retainAll(conditions);
-				rule.getConditions().addAll(conditions);
+		if (serviceRule.getId() != null) {
+			Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
+			if (serviceRuleOptional.isPresent()) {
+				ServiceRule rule = serviceRuleOptional.get();
+				Set<ServiceRuleCondition> conditions = serviceRule.getConditions();
+				if (conditions != null) {
+					rule.getConditions().retainAll(conditions);
+					rule.getConditions().addAll(conditions);
+				}
+				Set<Service> services = serviceRule.getServices();
+				if (services != null) {
+					rule.getServices().retainAll(serviceRule.getServices());
+					rule.getServices().addAll(serviceRule.getServices());
+				}
+				EntityUtils.copyValidProperties(serviceRule, rule);
+				return saveRule(rule);
 			}
-			Set<Service> services = serviceRule.getServices();
-			if (services != null) {
-				rule.getServices().retainAll(serviceRule.getServices());
-				rule.getServices().addAll(serviceRule.getServices());
-			}
-			EntityUtils.copyValidProperties(serviceRule, rule);
-			return saveRule(rule);
 		}
-		else {
 			return saveRule(serviceRule);
-		}
 	}
 
 	public void deleteRule(Long id) {

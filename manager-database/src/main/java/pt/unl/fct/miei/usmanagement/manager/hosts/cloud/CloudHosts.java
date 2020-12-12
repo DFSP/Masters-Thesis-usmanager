@@ -83,4 +83,7 @@ public interface CloudHosts extends JpaRepository<CloudHost, Long> {
 		+ "where h.publicIpAddress = :hostname or h.instanceId = :hostname")
 	boolean hasCloudHost(@Param("hostname") String hostname);
 
+	@Query("select h "
+		+ "from CloudHost h left join fetch h.hostRules left join fetch h.simulatedHostMetrics")
+	List<CloudHost> getCloudHostsAndRelations();
 }

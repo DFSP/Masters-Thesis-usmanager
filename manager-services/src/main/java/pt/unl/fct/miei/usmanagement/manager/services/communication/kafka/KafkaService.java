@@ -3,7 +3,6 @@ package pt.unl.fct.miei.usmanagement.manager.services.communication.kafka;
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.KafkaException;
@@ -43,6 +42,8 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceMonitoringLogDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ValueModeDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
@@ -51,6 +52,26 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.kafka.KafkaBroker;
 import pt.unl.fct.miei.usmanagement.manager.kafka.KafkaBrokers;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
@@ -73,26 +94,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesS
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
-import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
@@ -144,8 +145,8 @@ public class KafkaService {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 	private final String managerId;
 	private final String kafkaBootstrapServers;
-	private final ModelMapper modelMapper;
 	private final AtomicLong increment;
+	private final CycleAvoidingMappingContext cycleAvoidingMappingContext;
 	private boolean populated;
 
 	public KafkaService(@Lazy ContainersService containersService,
@@ -174,7 +175,7 @@ public class KafkaService {
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
 						@Lazy KafkaTemplate<String, Object> kafkaTemplate,
-						Environment environment, ModelMapper modelMapper) {
+						Environment environment) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -203,9 +204,9 @@ public class KafkaService {
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.kafkaBootstrapServers = environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS);
-		this.modelMapper = modelMapper;
 		this.increment = new AtomicLong();
 		this.populated = false;
+		this.cycleAvoidingMappingContext = new CycleAvoidingMappingContext();
 	}
 
 	public KafkaBroker launchKafkaBroker(RegionEnum region) {
@@ -350,6 +351,7 @@ public class KafkaService {
 					values.forEach(value -> kafkaTemplate.send(topic, value));
 				}
 				populated = true;
+				log.info("Populated kafka topics");
 			}
 			catch (KafkaException e) {
 				String message = e.getMessage();
@@ -362,20 +364,19 @@ public class KafkaService {
 
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
-
-		topicsValues.put("apps", () -> appsService.getApps().stream().map(AppDTO::new).collect(Collectors.toList()));
-		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHosts().stream().map(CloudHostDTO::new).collect(Collectors.toList()));
-		topicsValues.put("component-types", () -> componentTypesService.getComponentTypes().stream().map(ComponentTypeDTO::new).collect(Collectors.toList()));
-		topicsValues.put("conditions", () -> conditionsService.getConditions().stream().map(ConditionDTO::new).collect(Collectors.toList()));
-		topicsValues.put("containers", () -> containersService.getContainers().stream().map(ContainerDTO::new).collect(Collectors.toList()));
+	/*	topicsValues.put("apps", () -> appsService.getAppsAndRelations().stream().map(AppDTO::new).collect(Collectors.toList()));
+		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHostsAndRelations().stream().map(CloudHostDTO::new).collect(Collectors.toList()));
+		topicsValues.put("component-types", () -> componentTypesService.getComponentTypesAndRelations().stream().map(ComponentTypeDTO::new).collect(Collectors.toList()));
+		topicsValues.put("conditions", () -> conditionsService.getConditionsAndRelations().stream().map(ConditionDTO::new).collect(Collectors.toList()));
+		topicsValues.put("containers", () -> containersService.getContainersAndEntities().stream().map(ContainerDTO::new).collect(Collectors.toList()));
 		topicsValues.put("decisions", () -> decisionsService.getDecisions().stream().map(DecisionDTO::new).collect(Collectors.toList()));
 		topicsValues.put("edge-hosts", () -> edgeHostsService.getEdgeHosts().stream().map(EdgeHostDTO::new).collect(Collectors.toList()));
 		topicsValues.put("eips", () -> elasticIpsService.getElasticIps().stream().map(ElasticIpDTO::new).collect(Collectors.toList()));
 		topicsValues.put("fields", () -> fieldsService.getFields().stream().map(FieldDTO::new).collect(Collectors.toList()));
 		topicsValues.put("nodes", () -> nodesService.getNodes().stream().map(NodeDTO::new).collect(Collectors.toList()));
-		topicsValues.put("operators", () -> operatorsService.getOperators().stream().map(OperatorDTO::new).collect(Collectors.toList()));
-		topicsValues.put("services", () -> servicesService.getServices().stream().map(ServiceDTO::new).collect(Collectors.toList()));
-		topicsValues.put("simulated-host-metrics", () -> hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toList()));
+		topicsValues.put("operators", () -> operatorsService.getOperators().stream().map(OperatorDTO::new).collect(Collectors.toList()));*/
+		topicsValues.put("services", () -> servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		/*topicsValues.put("simulated-host-metrics", () -> hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toList()));
 		topicsValues.put("simulated-app-metrics", () -> appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(AppSimulatedMetricDTO::new).collect(Collectors.toList()));
 		topicsValues.put("simulated-service-metrics", () -> serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(ServiceSimulatedMetricDTO::new).collect(Collectors.toList()));
 		topicsValues.put("simulated-container-metrics", () -> containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(ContainerSimulatedMetricDTO::new).collect(Collectors.toList()));
@@ -383,7 +384,7 @@ public class KafkaService {
 		topicsValues.put("app-rules", () -> appRulesService.getRules().stream().map(AppRuleDTO::new).collect(Collectors.toList()));
 		topicsValues.put("service-rules", () -> serviceRulesService.getRules().stream().map(ServiceRuleDTO::new).collect(Collectors.toList()));
 		topicsValues.put("container-rules", () -> containerRulesService.getRules().stream().map(ContainerRuleDTO::new).collect(Collectors.toList()));
-		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeDTO::new).collect(Collectors.toList()));
+		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeDTO::new).collect(Collectors.toList()));*/
 		return topicsValues;
 	}
 
@@ -414,7 +415,7 @@ public class KafkaService {
 
 	@Async
 	public void sendApp(App app) {
-		send("apps", modelMapper.map(app, AppDTO.class), app.getId());
+		/*send("apps", modelMapper.map(app, AppDTO.class), app.getId());*/
 	}
 
 	@Async
@@ -524,7 +525,7 @@ public class KafkaService {
 
 	@Async
 	public void sendService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		send("services", new ServiceDTO(service), service.getId());
+		send("services", ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext), service.getId());
 	}
 
 	@Async

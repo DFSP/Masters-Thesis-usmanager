@@ -164,15 +164,15 @@ public class NodesService {
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node addOrUpdateNode(pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
-		Optional<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodeOptional = nodes.findById(node.getId());
-		if (nodeOptional.isPresent()) {
-			pt.unl.fct.miei.usmanagement.manager.nodes.Node existingNode = nodeOptional.get();
-			EntityUtils.copyValidProperties(node, existingNode);
-			return saveNode(existingNode);
+		if (node.getId() != null) {
+			Optional<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodeOptional = nodes.findById(node.getId());
+			if (nodeOptional.isPresent()) {
+				pt.unl.fct.miei.usmanagement.manager.nodes.Node existingNode = nodeOptional.get();
+				EntityUtils.copyValidProperties(node, existingNode);
+				return saveNode(existingNode);
+			}
 		}
-		else {
 			return saveNode(node);
-		}
 	}
 
 	public void removeHost(HostAddress hostAddress) {

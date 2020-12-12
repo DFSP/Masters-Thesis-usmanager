@@ -100,15 +100,15 @@ public class ElasticIpsService {
 	}
 
 	public ElasticIp addOrUpdateElasticIp(ElasticIp elasticIp) {
-		Optional<ElasticIp> elasticIpOptional = elasticIps.findById(elasticIp.getId());
-		if (elasticIpOptional.isPresent()) {
-			ElasticIp existingElasticIp = elasticIpOptional.get();
-			EntityUtils.copyValidProperties(elasticIp, existingElasticIp);
-			return saveElasticIp(existingElasticIp);
+		if (elasticIp.getId() != null) {
+			Optional<ElasticIp> elasticIpOptional = elasticIps.findById(elasticIp.getId());
+			if (elasticIpOptional.isPresent()) {
+				ElasticIp existingElasticIp = elasticIpOptional.get();
+				EntityUtils.copyValidProperties(elasticIp, existingElasticIp);
+				return saveElasticIp(existingElasticIp);
+			}
 		}
-		else {
 			return saveElasticIp(elasticIp);
-		}
 	}
 
 	public void clearElasticIps() {

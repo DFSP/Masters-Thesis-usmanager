@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 
@@ -11,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 public class HostRuleConditionDTO {
 
 	private HostRuleDTO hostRule;

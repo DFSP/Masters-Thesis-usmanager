@@ -69,6 +69,11 @@ public class ConditionsService {
 		return conditions.findAll();
 	}
 
+	public List<Condition> getConditionsAndRelations() {
+		return conditions.getConditionsAndRelations();
+	}
+
+
 	public Condition getCondition(Long id) {
 		return conditions.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(Condition.class, "id", id.toString()));
@@ -105,38 +110,35 @@ public class ConditionsService {
 	}
 
 	public Condition addOrUpdateCondition(Condition condition) {
-		Optional<Condition> optionalCondition = conditions.findById(condition.getId());
-		if (optionalCondition.isPresent()) {
-			Condition existingCondition = optionalCondition.get();
-			Set<HostRuleCondition> hostConditions = condition.getHostConditions();
-			if (hostConditions != null) {
-				existingCondition.getHostConditions().retainAll(hostConditions);
-				existingCondition.getHostConditions().addAll(hostConditions);
+		if (condition.getId() != null) {
+			Optional<Condition> optionalCondition = conditions.findById(condition.getId());
+			if (optionalCondition.isPresent()) {
+				Condition existingCondition = optionalCondition.get();
+				Set<HostRuleCondition> hostConditions = condition.getHostConditions();
+				if (hostConditions != null) {
+					existingCondition.getHostConditions().retainAll(hostConditions);
+					existingCondition.getHostConditions().addAll(hostConditions);
+				}
+				Set<AppRuleCondition> appConditions = condition.getAppConditions();
+				if (appConditions != null) {
+					existingCondition.getAppConditions().retainAll(appConditions);
+					existingCondition.getAppConditions().addAll(appConditions);
+				}
+				Set<ServiceRuleCondition> serviceConditions = condition.getServiceConditions();
+				if (serviceConditions != null) {
+					existingCondition.getServiceConditions().retainAll(serviceConditions);
+					existingCondition.getServiceConditions().addAll(serviceConditions);
+				}
+				Set<ContainerRuleCondition> containerConditions = condition.getContainerConditions();
+				if (containerConditions != null) {
+					existingCondition.getContainerConditions().retainAll(containerConditions);
+					existingCondition.getContainerConditions().addAll(containerConditions);
+				}
+				EntityUtils.copyValidProperties(condition, existingCondition);
+				return saveCondition(existingCondition);
 			}
-			Set<AppRuleCondition> appConditions = condition.getAppConditions();
-			if (appConditions != null) {
-				existingCondition.getAppConditions().retainAll(appConditions);
-				existingCondition.getAppConditions().addAll(appConditions);
-			}
-			Set<ServiceRuleCondition> serviceConditions = condition.getServiceConditions();
-			if (serviceConditions != null) {
-				existingCondition.getServiceConditions().retainAll(serviceConditions);
-				existingCondition.getServiceConditions().addAll(serviceConditions);
-			}
-			Set<ContainerRuleCondition> containerConditions = condition.getContainerConditions();
-			if (containerConditions != null) {
-				existingCondition.getContainerConditions().retainAll(containerConditions);
-				existingCondition.getContainerConditions().addAll(containerConditions);
-			}
-			EntityUtils.copyValidProperties(condition, existingCondition);
-			return saveCondition(existingCondition);
 		}
-		else {
-			valueModesService.addOrUpdateValueMode(condition.getValueMode());
-			fieldsService.addOrUpdateField(condition.getField());
-			operatorsService.addOrUpdateOperator(condition.getOperator());
-			return saveCondition(condition);
-		}
+		return saveCondition(condition);
 	}
 
 	public void deleteCondition(Long id) {
