@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -19,9 +20,9 @@ public class AppServiceDTO {
 
 	private AppServiceKey id;
 	private int launchOrder;
-	@JsonManagedReference
+	@JsonBackReference
 	private AppDTO app;
-	@JsonManagedReference
+	@JsonBackReference
 	private ServiceDTO service;
 	/*@JsonProperty("isNew")
 	private boolean isNew;*/

@@ -3,6 +3,7 @@ package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
@@ -43,7 +44,7 @@ public class ServiceDTO {
 	private Set<String> environment;
 	private Set<String> volumes;
 	private Double expectedMemoryConsumption;
-	//@JsonBackReference
+	@JsonManagedReference
 	private Set<AppServiceDTO> appServices;
 	//@JsonBackReference
 	//private Set<ServiceDependencyDTO> dependencies;
