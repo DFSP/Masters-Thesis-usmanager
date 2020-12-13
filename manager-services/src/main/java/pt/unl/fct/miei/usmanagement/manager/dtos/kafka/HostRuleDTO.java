@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +18,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostRuleDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class HostRuleDTO {
@@ -32,39 +37,39 @@ public class HostRuleDTO {
 	private Set<CloudHostDTO> cloudHosts;
 	private Set<EdgeHostDTO> edgeHosts;
 	private Set<HostRuleConditionDTO> conditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public HostRuleDTO(Long id) {
 		this.id = id;
 	}
 
-	public HostRuleDTO(HostRule hostRule) {
-		this.id = hostRule.getId();
-		this.name = hostRule.getName();
-		this.priority = hostRule.getPriority();
-		this.decision = new DecisionDTO(hostRule.getDecision());
-		this.generic = hostRule.isGeneric();
-		this.cloudHosts = hostRule.getCloudHosts().stream().map(CloudHostDTO::new).collect(Collectors.toSet());
-		this.edgeHosts = hostRule.getEdgeHosts().stream().map(EdgeHostDTO::new).collect(Collectors.toSet());
-		this.conditions = hostRule.getConditions().stream().map(HostRuleConditionDTO::new).collect(Collectors.toSet());
-		/*this.isNew = hostRule.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public HostRule toEntity() {
-		HostRule hostRule = HostRule.builder()
-			.id(id)
-			.name(name)
-			.priority(priority)
-			.decision(decision.toEntity())
-			.generic(generic)
-			.cloudHosts(cloudHosts != null ? cloudHosts.stream().map(CloudHostDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.edgeHosts(edgeHosts != null ? edgeHosts.stream().map(EdgeHostDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.conditions(conditions != null ? conditions.stream().map(HostRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*hostRule.setNew(isNew);*/
-		return hostRule;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostRule)) {
+			return false;
+		}
+		HostRule other = (HostRule) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "HostRuleDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", priority=" + priority +
+			", decision=" + decision +
+			", generic=" + generic +
+			", cloudHosts=" + (cloudHosts == null ? "null" : cloudHosts.stream().map(CloudHostDTO::getId).collect(Collectors.toSet())) +
+			", edgeHosts=" + (edgeHosts == null ? "null" : edgeHosts.stream().map(EdgeHostDTO::getId).collect(Collectors.toSet())) +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(HostRuleConditionDTO::getId).collect(Collectors.toSet())) +
+			'}';
+	}
 }

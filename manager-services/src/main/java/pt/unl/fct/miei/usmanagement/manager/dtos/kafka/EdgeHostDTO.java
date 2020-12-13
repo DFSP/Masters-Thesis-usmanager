@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,12 +19,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = EdgeHostDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class EdgeHostDTO {
@@ -35,43 +40,42 @@ public class EdgeHostDTO {
 	private WorkerManagerDTO managedByWorker;
 	private Set<HostRuleDTO> hostRules;
 	private Set<HostSimulatedMetricDTO> simulatedHostMetrics;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public EdgeHostDTO(Long id) {
 		this.id = id;
 	}
 
-	public EdgeHostDTO(EdgeHost edgeHost) {
-		this.id = edgeHost.getId();
-		this.username = edgeHost.getUsername();
-		this.publicIpAddress = edgeHost.getPublicIpAddress();
-		this.privateIpAddress = edgeHost.getPrivateIpAddress();
-		this.publicDnsName = edgeHost.getPublicDnsName();
-		this.region = edgeHost.getRegion();
-		this.coordinates = edgeHost.getCoordinates();
-		this.managedByWorker = edgeHost.getManagedByWorker() == null ? null : new WorkerManagerDTO(edgeHost.getManagedByWorker());
-		this.hostRules = edgeHost.getHostRules().stream().map(HostRuleDTO::new).collect(Collectors.toSet());;
-		this.simulatedHostMetrics = edgeHost.getSimulatedHostMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toSet());;
-		/*this.isNew = edgeHost.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public EdgeHost toEntity() {
-		EdgeHost edgeHost = EdgeHost.builder()
-			.id(id)
-			.username(username)
-			.publicIpAddress(publicIpAddress)
-			.privateIpAddress(privateIpAddress)
-			.publicDnsName(publicDnsName)
-			.region(region)
-			.coordinates(coordinates)
-			.managedByWorker(managedByWorker == null ? null : managedByWorker.toEntity())
-			.hostRules(hostRules != null ? hostRules.stream().map(HostRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics.stream().map(HostSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*edgeHost.setNew(isNew);*/
-		return edgeHost;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof EdgeHost)) {
+			return false;
+		}
+		EdgeHost other = (EdgeHost) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "EdgeHostDTO{" +
+			"id=" + id +
+			", username='" + username + '\'' +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", privateIpAddress='" + privateIpAddress + '\'' +
+			", publicDnsName='" + publicDnsName + '\'' +
+			", region=" + region +
+			", coordinates=" + coordinates +
+			", managedByWorker=" + managedByWorker +
+			", hostRules=" + (hostRules == null ? "null" : hostRules.stream().map(HostRuleDTO::getId).collect(Collectors.toSet())) +
+			", simulatedHostMetrics=" + (simulatedHostMetrics == null ? "null" : simulatedHostMetrics.stream()
+			.map(HostSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
+			'}';
+	}
 }

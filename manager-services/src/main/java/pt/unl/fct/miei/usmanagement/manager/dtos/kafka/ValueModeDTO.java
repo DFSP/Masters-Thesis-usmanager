@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +15,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ValueModeDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ValueModeDTO {
@@ -24,28 +29,34 @@ public class ValueModeDTO {
 	private Long id;
 	private String name;
 	private Set<ConditionDTO> conditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public ValueModeDTO(Long id) {
 		this.id = id;
 	}
 
-	public ValueModeDTO(ValueMode valueMode) {
-		this.id = valueMode.getId();
-		this.name = valueMode.getName();
-		this.conditions = valueMode.getConditions().stream().map(ConditionDTO::new).collect(Collectors.toSet());;
-		/*this.isNew = valueMode.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public ValueMode toEntity() {
-		ValueMode valueMode = ValueMode.builder()
-			.id(id)
-			.name(name)
-			.conditions(conditions != null ? conditions.stream().map(ConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*valueMode.setNew(isNew);*/
-		return valueMode;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ValueMode)) {
+			return false;
+		}
+		ValueMode other = (ValueMode) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ValueModeDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(ConditionDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

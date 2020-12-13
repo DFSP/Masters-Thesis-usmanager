@@ -1,0 +1,30 @@
+{
+  "id": 2,
+  "serviceName": "service",
+  "dockerRepository": null,
+  "defaultExternalPort": null,
+  "defaultInternalPort": null,
+  "defaultDb": null,
+  "launchCommand": null,
+  "minimumReplicas": null,
+  "maximumReplicas": 0,
+  "outputLabel": null,
+  "serviceType": null,
+  "environment": null,
+  "volumes": null,
+  "expectedMemoryConsumption": null,
+  "appServices": [
+    {
+      "id": {
+        "appId": 1,
+        "serviceId": 2
+      },
+      "launchOrder": 0
+    }
+  ],
+  "dependencies": [],
+  "dependents": [],
+  "eventPredictions": [],
+  "serviceRules": [],
+  "simulatedServiceMetrics": []
+}

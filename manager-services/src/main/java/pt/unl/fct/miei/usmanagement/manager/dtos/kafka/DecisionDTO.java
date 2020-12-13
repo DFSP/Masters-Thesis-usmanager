@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.spotify.docker.client.shaded.com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +13,11 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DecisionDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class DecisionDTO {
@@ -19,29 +25,34 @@ public class DecisionDTO {
 	private Long id;
 	private RuleDecisionEnum ruleDecision;
 	private ComponentTypeDTO componentType;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public DecisionDTO(Long id) {
 		this.id = id;
 	}
 
-	public DecisionDTO(Decision decision) {
-		this.id = decision.getId();
-		this.ruleDecision = decision.getRuleDecision();
-		this.componentType = new ComponentTypeDTO(decision.getComponentType());
-		/*this.isNew = decision.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Decision toEntity() {
-		Decision decision = Decision.builder()
-			.id(id)
-			.ruleDecision(ruleDecision)
-			.componentType(componentType.toEntity())
-			.build();
-		/*decision.setNew(isNew);*/
-		return decision;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Decision)) {
+			return false;
+		}
+		Decision other = (Decision) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "DecisionDTO{" +
+			"id=" + id +
+			", ruleDecision=" + ruleDecision +
+			", componentType=" + componentType +
+			'}';
+	}
 }

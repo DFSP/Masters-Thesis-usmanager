@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.spotify.docker.client.shaded.com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +12,11 @@ import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionValue;
 
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDecisionValueDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ServiceDecisionValueDTO {
@@ -20,23 +26,30 @@ public class ServiceDecisionValueDTO {
 	private FieldDTO field;
 	private double value;
 
-	public ServiceDecisionValueDTO(ServiceDecisionValue serviceDecisionValue) {
-		this.id = serviceDecisionValue.getId();
-		this.serviceDecision = new ServiceDecisionDTO(serviceDecisionValue.getServiceDecision());
-		this.field = new FieldDTO(serviceDecisionValue.getField());
-		this.value = serviceDecisionValue.getValue();
-		/*this.isNew = serviceDecisionValue.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public ServiceDecisionValue toEntity() {
-		ServiceDecisionValue serviceDecisionValue = ServiceDecisionValue.builder()
-			.id(id)
-			.serviceDecision(serviceDecision.toEntity())
-			.field(field.toEntity())
-			.value(value)
-			.build();
-		/*serviceDecisionValue.setNew(isNew);*/
-		return serviceDecisionValue;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceDecisionValue)) {
+			return false;
+		}
+		ServiceDecisionValue other = (ServiceDecisionValue) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ServiceDecisionValueDTO{" +
+			"id=" + id +
+			", serviceDecision=" + serviceDecision +
+			", field=" + field +
+			", value=" + value +
+			'}';
 	}
 }

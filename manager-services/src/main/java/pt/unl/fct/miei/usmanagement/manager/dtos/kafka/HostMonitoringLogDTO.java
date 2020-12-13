@@ -1,7 +1,9 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +12,11 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostMonitoringLogDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class HostMonitoringLogDTO {
@@ -24,30 +27,33 @@ public class HostMonitoringLogDTO {
 	private String field;
 	private double value;
 	private LocalDateTime timestamp;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
-	public HostMonitoringLogDTO(HostMonitoringLog hostMonitoringLog) {
-		this.id = hostMonitoringLog.getId();
-		this.publicIpAddress = hostMonitoringLog.getPublicIpAddress();
-		this.privateIpAddress = hostMonitoringLog.getPrivateIpAddress();
-		this.field = hostMonitoringLog.getField();
-		this.value = hostMonitoringLog.getValue();
-		this.timestamp = hostMonitoringLog.getTimestamp();
-		/*this.isNew = hostMonitoringLog.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public HostMonitoringLog toEntity() {
-		HostMonitoringLog hostMonitoringLog = HostMonitoringLog.builder()
-			.id(id)
-			.publicIpAddress(publicIpAddress)
-			.privateIpAddress(privateIpAddress)
-			.field(field)
-			.value(value)
-			.timestamp(timestamp)
-			.build();
-		/*hostMonitoringLog.setNew(isNew);*/
-		return hostMonitoringLog;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostMonitoringLog)) {
+			return false;
+		}
+		HostMonitoringLog other = (HostMonitoringLog) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "HostMonitoringLogDTO{" +
+			"id=" + id +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", privateIpAddress='" + privateIpAddress + '\'' +
+			", field='" + field + '\'' +
+			", value=" + value +
+			", timestamp=" + timestamp +
+			'}';
 	}
 }

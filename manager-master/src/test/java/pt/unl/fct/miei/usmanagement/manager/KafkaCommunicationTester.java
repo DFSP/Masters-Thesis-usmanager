@@ -15,13 +15,16 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingCont
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("unused")
-public class KafkaCommunicationMappingTester {
+public class KafkaCommunicationTester {
 
 	private final CycleAvoidingMappingContext cycleAvoidingMappingContext = new CycleAvoidingMappingContext();
 	private JacksonTester<ServiceDTO> serviceDTOJson;
@@ -62,12 +65,17 @@ public class KafkaCommunicationMappingTester {
 	}
 
 	@Test
-	public void testWriteJson() throws IOException {
+	public void testWriteReadJson() throws IOException {
 		ServiceDTO serviceDTO = getServiceDTO();
 		System.out.println(serviceDTO);
 		JsonContent<ServiceDTO> jsonContent = serviceDTOJson.write(serviceDTO);
 		System.out.println(jsonContent);
-		assertThat(jsonContent).isEqualToJson("{\"@id\":1,\"id\":2,\"serviceName\":\"service\",\"dockerRepository\":null,\"defaultExternalPort\":null,\"defaultInternalPort\":null,\"defaultDb\":null,\"launchCommand\":null,\"minimumReplicas\":null,\"maximumReplicas\":0,\"outputLabel\":null,\"serviceType\":null,\"environment\":null,\"volumes\":null,\"expectedMemoryConsumption\":null,\"appServices\":[{\"id\":{\"appId\":1,\"serviceId\":2},\"launchOrder\":0}]}");
+		String json = "{\"id\":2,\"serviceName\":\"service\",\"dockerRepository\":null,\"defaultExternalPort\":null,\"defaultInternalPort\":null,\"defaultDb\":null,\"launchCommand\":null,\"minimumReplicas\":null,\"maximumReplicas\":0,\"outputLabel\":null,\"serviceType\":null,\"environment\":null,\"volumes\":null,\"expectedMemoryConsumption\":null,\"appServices\":[{\"id\":{\"appId\":1,\"serviceId\":2},\"launchOrder\":0}]}";
+		assertThat(jsonContent).isEqualToJson(json);
+		File serviceDto = new File("src/test/resources/serviceDto.json");
+		ServiceDTO deserializedServiceDTO = serviceDTOJson.readObject(serviceDto);
+		System.out.println(serviceDTO);
+		assertThat(deserializedServiceDTO.getId()).isEqualTo(serviceDTO.getId());
 	}
 
 	private ServiceDTO getServiceDTO() {

@@ -2,7 +2,11 @@ package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,12 +17,13 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = CloudHostDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class CloudHostDTO {
@@ -36,49 +41,44 @@ public class CloudHostDTO {
 	private WorkerManagerDTO managedByWorker;
 	private Set<HostRuleDTO> hostRules;
 	private Set<HostSimulatedMetricDTO> simulatedHostMetrics;
-	/*@JsonProperty("isNew")
-	private boolean isNew;*/
 
 	public CloudHostDTO(Long id) {
 		this.id = id;
 	}
 
-	public CloudHostDTO(CloudHost cloudHost) {
-		this.id = cloudHost.getId();
-		this.instanceId = cloudHost.getInstanceId();
-		this.instanceType = cloudHost.getInstanceType();
-		this.state = cloudHost.getState();
-		this.imageId = cloudHost.getImageId();
-		this.publicDnsName = cloudHost.getPublicDnsName();
-		this.publicIpAddress = cloudHost.getPublicIpAddress();
-		this.privateIpAddress = cloudHost.getPrivateIpAddress();
-		this.placement = cloudHost.getPlacement();
-		this.awsRegion = cloudHost.getAwsRegion();
-		this.managedByWorker = cloudHost.getManagedByWorker() == null ? null : new WorkerManagerDTO(cloudHost.getManagedByWorker());
-		this.hostRules = cloudHost.getHostRules().stream().map(HostRuleDTO::new).collect(Collectors.toSet());
-		this.simulatedHostMetrics = cloudHost.getSimulatedHostMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toSet());
-		/*this.isNew = cloudHost.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public CloudHost toEntity() {
-		CloudHost cloudHost = CloudHost.builder()
-			.id(id)
-			.instanceId(instanceId)
-			.instanceType(instanceType)
-			.state(state)
-			.imageId(imageId)
-			.publicDnsName(publicDnsName)
-			.publicIpAddress(publicIpAddress)
-			.privateIpAddress(privateIpAddress)
-			.placement(placement)
-			.awsRegion(awsRegion)
-			.managedByWorker(managedByWorker == null ? null : managedByWorker.toEntity())
-			.hostRules(hostRules != null ? hostRules.stream().map(HostRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics.stream().map(HostSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*cloudHost.setNew(isNew);*/
-		return cloudHost;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof CloudHost)) {
+			return false;
+		}
+		CloudHost other = (CloudHost) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "CloudHostDTO{" +
+			"id=" + id +
+			", instanceId='" + instanceId + '\'' +
+			", instanceType='" + instanceType + '\'' +
+			", state=" + state +
+			", imageId='" + imageId + '\'' +
+			", publicDnsName='" + publicDnsName + '\'' +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", privateIpAddress='" + privateIpAddress + '\'' +
+			", placement=" + placement +
+			", awsRegion=" + awsRegion +
+			", managedByWorker=" + managedByWorker +
+			", hostRules=" + (hostRules == null ? "null" : hostRules.stream().map(HostRuleDTO::getId).collect(Collectors.toSet())) +
+			", simulatedHostMetrics=" + (simulatedHostMetrics == null ? "null" : simulatedHostMetrics.stream().map(HostSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
+			'}';
+	}
 }

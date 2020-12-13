@@ -1,8 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +17,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditio
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceRuleDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ServiceRuleDTO {
@@ -28,40 +32,41 @@ public class ServiceRuleDTO {
 	private String name;
 	private int priority;
 	private boolean generic;
-	private Decision decision;
-	@JsonManagedReference
+	private DecisionDTO decision;
 	private Set<ServiceDTO> services;
 	private Set<ServiceRuleConditionDTO> conditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public ServiceRuleDTO(Long id) {
 		this.id = id;
 	}
 
-	public ServiceRuleDTO(ServiceRule serviceRule) {
-		this.id = serviceRule.getId();
-		this.name = serviceRule.getName();
-		this.priority = serviceRule.getPriority();
-		this.generic = serviceRule.isGeneric();
-		this.decision = serviceRule.getDecision();
-		this.services = serviceRule.getServices().stream().map(ServiceDTO::new).collect(Collectors.toSet());
-		this.conditions = serviceRule.getConditions().stream().map(ServiceRuleConditionDTO::new).collect(Collectors.toSet());
-		/*this.isNew = serviceRule.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public ServiceRule toEntity() {
-		ServiceRule serviceRule = ServiceRule.builder()
-			.id(id)
-			.name(name)
-			.priority(priority)
-			.generic(generic)
-			.decision(decision)
-			.services(services != null ? services.stream().map(ServiceDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.conditions(conditions != null ? conditions.stream().map(ServiceRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*serviceRule.setNew(serviceRule.isNew());*/
-		return serviceRule;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceRule)) {
+			return false;
+		}
+		ServiceRule other = (ServiceRule) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ServiceRuleDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", priority=" + priority +
+			", generic=" + generic +
+			", decision=" + decision +
+			", services=" + (services == null ? "null" : services.stream().map(ServiceDTO::getId).collect(Collectors.toSet())) +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(ServiceRuleConditionDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

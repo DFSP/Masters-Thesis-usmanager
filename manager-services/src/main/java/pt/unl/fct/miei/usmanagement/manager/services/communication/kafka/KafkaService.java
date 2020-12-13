@@ -42,8 +42,34 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceMonitoringLogDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ValueModeDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.AppMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.AppRuleMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.AppSimulatedMetricMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CloudHostMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ComponentTypeMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ConditionMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ContainerMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ContainerRuleMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ContainerSimulatedMetricMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.DecisionMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.EdgeHostMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ElasticIpMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.FieldMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostDecisionMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostEventMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostMonitoringLogMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostRuleMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostSimulatedMetricMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.NodeMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.OperatorMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceDecisionMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceEventMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMonitoringLogMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceRuleMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceSimulatedMetricMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ValueModeMapper;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
@@ -308,7 +334,7 @@ public class KafkaService {
 		kafkaBrokers.delete(kafkaBroker);
 		containersService.stopContainer(containerId);
 		if (!hasKafkaBrokers()) {
-			this.stop();
+			kafkaListenerEndpointRegistry.stop();
 		}
 	}
 
@@ -316,7 +342,7 @@ public class KafkaService {
 		KafkaBroker kafkaBroker = getKafkaBrokerByContainer(container);
 		kafkaBrokers.delete(kafkaBroker);
 		if (!hasKafkaBrokers()) {
-			this.stop();
+			kafkaListenerEndpointRegistry.stop();
 		}
 	}
 
@@ -341,14 +367,17 @@ public class KafkaService {
 		kafkaListenerEndpointRegistry.start();
 	}
 
-	private void populateTopics() {
+	public void populateTopics() { // TODO private
 		Random random = new Random();
 		do {
 			try {
 				for (Map.Entry<String, Supplier<?>> topicKeyValue : topicsValues().entrySet()) {
 					String topic = topicKeyValue.getKey();
 					List<?> values = (List<?>) topicKeyValue.getValue().get();
-					values.forEach(value -> kafkaTemplate.send(topic, value));
+					for (Object value : values) {
+						log.info("Sending {} to topic={}", value, topic);
+						kafkaTemplate.send(topic, value);
+					}
 				}
 				populated = true;
 				log.info("Populated kafka topics");
@@ -364,27 +393,48 @@ public class KafkaService {
 
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
-	/*	topicsValues.put("apps", () -> appsService.getAppsAndRelations().stream().map(AppDTO::new).collect(Collectors.toList()));
-		topicsValues.put("cloud-hosts", () -> cloudHostsService.getCloudHostsAndRelations().stream().map(CloudHostDTO::new).collect(Collectors.toList()));
-		topicsValues.put("component-types", () -> componentTypesService.getComponentTypesAndRelations().stream().map(ComponentTypeDTO::new).collect(Collectors.toList()));
-		topicsValues.put("conditions", () -> conditionsService.getConditionsAndRelations().stream().map(ConditionDTO::new).collect(Collectors.toList()));
-		topicsValues.put("containers", () -> containersService.getContainersAndEntities().stream().map(ContainerDTO::new).collect(Collectors.toList()));
-		topicsValues.put("decisions", () -> decisionsService.getDecisions().stream().map(DecisionDTO::new).collect(Collectors.toList()));
-		topicsValues.put("edge-hosts", () -> edgeHostsService.getEdgeHosts().stream().map(EdgeHostDTO::new).collect(Collectors.toList()));
-		topicsValues.put("eips", () -> elasticIpsService.getElasticIps().stream().map(ElasticIpDTO::new).collect(Collectors.toList()));
-		topicsValues.put("fields", () -> fieldsService.getFields().stream().map(FieldDTO::new).collect(Collectors.toList()));
-		topicsValues.put("nodes", () -> nodesService.getNodes().stream().map(NodeDTO::new).collect(Collectors.toList()));
-		topicsValues.put("operators", () -> operatorsService.getOperators().stream().map(OperatorDTO::new).collect(Collectors.toList()));*/
-		topicsValues.put("services", () -> servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		/*topicsValues.put("simulated-host-metrics", () -> hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toList()));
-		topicsValues.put("simulated-app-metrics", () -> appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(AppSimulatedMetricDTO::new).collect(Collectors.toList()));
-		topicsValues.put("simulated-service-metrics", () -> serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(ServiceSimulatedMetricDTO::new).collect(Collectors.toList()));
-		topicsValues.put("simulated-container-metrics", () -> containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(ContainerSimulatedMetricDTO::new).collect(Collectors.toList()));
-		topicsValues.put("host-rules", () -> hostRulesService.getRules().stream().map(HostRuleDTO::new).collect(Collectors.toList()));
-		topicsValues.put("app-rules", () -> appRulesService.getRules().stream().map(AppRuleDTO::new).collect(Collectors.toList()));
-		topicsValues.put("service-rules", () -> serviceRulesService.getRules().stream().map(ServiceRuleDTO::new).collect(Collectors.toList()));
-		topicsValues.put("container-rules", () -> containerRulesService.getRules().stream().map(ContainerRuleDTO::new).collect(Collectors.toList()));
-		topicsValues.put("value-modes", () -> valueModesService.getValueModes().stream().map(ValueModeDTO::new).collect(Collectors.toList()));*/
+		topicsValues.put("apps", () ->
+			appsService.getApps().stream().map(app -> AppMapper.MAPPER.fromApp(app, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("cloud-hosts", () ->
+			cloudHostsService.getCloudHosts().stream().map(cloudHost -> CloudHostMapper.MAPPER.fromCloudHost(cloudHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("component-types", () ->
+			componentTypesService.getComponentTypes().stream().map(componentType -> ComponentTypeMapper.MAPPER.fromComponentType(componentType, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("conditions", () ->
+			conditionsService.getConditions().stream().map(condition -> ConditionMapper.MAPPER.fromCondition(condition, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("containers", () ->
+			containersService.getContainers().stream().map(container -> ContainerMapper.MAPPER.fromContainer(container, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("decisions", () ->
+			decisionsService.getDecisions().stream().map(decision -> DecisionMapper.MAPPER.fromDecision(decision, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("edge-hosts", () ->
+			edgeHostsService.getEdgeHosts().stream().map(edgeHost -> EdgeHostMapper.MAPPER.fromEdgeHost(edgeHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("eips", () ->
+			elasticIpsService.getElasticIps().stream().map(elasticIp -> ElasticIpMapper.MAPPER.fromElasticIp(elasticIp, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("fields", () ->
+			fieldsService.getFields().stream().map(field -> FieldMapper.MAPPER.fromField(field, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("nodes", () ->
+			nodesService.getNodes().stream().map(node -> NodeMapper.MAPPER.fromNode(node, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("operators", () ->
+			operatorsService.getOperators().stream().map(operator -> OperatorMapper.MAPPER.fromOperator(operator, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("services", () ->
+			servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-host-metrics", () ->
+			hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(metric -> HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-app-metrics", () ->
+			appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(metric -> AppSimulatedMetricMapper.MAPPER.fromAppSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-service-metrics", () ->
+			serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(metric -> ServiceSimulatedMetricMapper.MAPPER.fromServiceSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-container-metrics", () ->
+			containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(metric -> ContainerSimulatedMetricMapper.MAPPER.fromContainerSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("host-rules", () ->
+			hostRulesService.getRules().stream().map(rule -> HostRuleMapper.MAPPER.fromHostRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("app-rules", () ->
+			appRulesService.getRules().stream().map(rule -> AppRuleMapper.MAPPER.fromAppRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("service-rules", () ->
+			serviceRulesService.getRules().stream().map(rule -> ServiceRuleMapper.MAPPER.fromServiceRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("container-rules", () ->
+			containerRulesService.getRules().stream().map(rule -> ContainerRuleMapper.MAPPER.fromContainerRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("value-modes", () ->
+			valueModesService.getValueModes().stream().map(valueMode -> ValueModeMapper.MAPPER.fromValueMode(valueMode, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		return topicsValues;
 	}
 
@@ -402,12 +452,6 @@ public class KafkaService {
 		kafkaListenerEndpointRegistry.start();
 	}
 
-	public void restart() {
-		producerFactory.reset();
-		kafkaListenerEndpointRegistry.stop();
-		kafkaListenerEndpointRegistry.start();
-	}
-
 	public void stop() {
 		producerFactory.reset();
 		kafkaListenerEndpointRegistry.stop();
@@ -415,8 +459,9 @@ public class KafkaService {
 
 	@Async
 	public void sendApp(App app) {
-		/*send("apps", modelMapper.map(app, AppDTO.class), app.getId());*/
+		send("apps", AppMapper.MAPPER.fromApp(app, cycleAvoidingMappingContext), app.getId());
 	}
+
 
 	@Async
 	public void sendDeleteApp(App app) {
@@ -425,7 +470,7 @@ public class KafkaService {
 
 	@Async
 	public void sendCloudHost(CloudHost cloudHost) {
-		send("cloud-hosts", new CloudHostDTO(cloudHost), cloudHost.getId());
+		send("cloud-hosts", CloudHostMapper.MAPPER.fromCloudHost(cloudHost, cycleAvoidingMappingContext), cloudHost.getId());
 	}
 
 	@Async
@@ -435,7 +480,7 @@ public class KafkaService {
 
 	@Async
 	public void sendComponentType(ComponentType componentType) {
-		send("component-types", new ComponentTypeDTO(componentType), componentType.getId());
+		send("component-types", ComponentTypeMapper.MAPPER.fromComponentType(componentType, cycleAvoidingMappingContext), componentType.getId());
 	}
 
 	@Async
@@ -445,7 +490,7 @@ public class KafkaService {
 
 	@Async
 	public void sendCondition(Condition condition) {
-		send("conditions", new ConditionDTO(condition), condition.getId());
+		send("conditions", ConditionMapper.MAPPER.fromCondition(condition, cycleAvoidingMappingContext), condition.getId());
 	}
 
 	@Async
@@ -455,7 +500,7 @@ public class KafkaService {
 
 	@Async
 	public void sendContainer(Container container) {
-		send("containers", new ContainerDTO(container), container.getId());
+		send("containers", ContainerMapper.MAPPER.fromContainer(container, cycleAvoidingMappingContext), container.getId());
 	}
 
 	@Async
@@ -465,7 +510,7 @@ public class KafkaService {
 
 	@Async
 	public void sendDecision(Decision decision) {
-		send("decisions", new DecisionDTO(decision), decision.getId());
+		send("decisions", DecisionMapper.MAPPER.fromDecision(decision, cycleAvoidingMappingContext), decision.getId());
 	}
 
 	@Async
@@ -475,7 +520,7 @@ public class KafkaService {
 
 	@Async
 	public void sendEdgeHost(EdgeHost edgeHost) {
-		send("edge-hosts", new EdgeHostDTO(edgeHost), edgeHost.getId());
+		send("edge-hosts", EdgeHostMapper.MAPPER.fromEdgeHost(edgeHost, cycleAvoidingMappingContext), edgeHost.getId());
 	}
 
 	@Async
@@ -485,7 +530,7 @@ public class KafkaService {
 
 	@Async
 	public void sendElasticIp(ElasticIp elasticIp) {
-		send("eips", new ElasticIpDTO(elasticIp), elasticIp.getId());
+		send("eips", ElasticIpMapper.MAPPER.fromElasticIp(elasticIp, cycleAvoidingMappingContext), elasticIp.getId());
 	}
 
 	@Async
@@ -495,7 +540,7 @@ public class KafkaService {
 
 	@Async
 	public void sendField(Field field) {
-		send("fields", new FieldDTO(field), field.getId());
+		send("fields", FieldMapper.MAPPER.fromField(field, cycleAvoidingMappingContext), field.getId());
 	}
 
 	@Async
@@ -505,7 +550,7 @@ public class KafkaService {
 
 	@Async
 	public void sendNode(Node node) {
-		send("nodes", new NodeDTO(node), node.getId());
+		send("nodes", NodeMapper.MAPPER.fromNode(node, cycleAvoidingMappingContext), node.getId());
 	}
 
 	@Async
@@ -515,7 +560,7 @@ public class KafkaService {
 
 	@Async
 	public void sendOperator(Operator operator) {
-		send("operators", new OperatorDTO(operator), operator.getId());
+		send("operators", OperatorMapper.MAPPER.fromOperator(operator, cycleAvoidingMappingContext), operator.getId());
 	}
 
 	@Async
@@ -535,7 +580,7 @@ public class KafkaService {
 
 	@Async
 	public void sendHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {
-		send("simulated-host-metrics", new HostSimulatedMetricDTO(hostSimulatedMetric), hostSimulatedMetric.getId());
+		send("simulated-host-metrics", HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(hostSimulatedMetric, cycleAvoidingMappingContext), hostSimulatedMetric.getId());
 	}
 
 	@Async
@@ -545,7 +590,7 @@ public class KafkaService {
 
 	@Async
 	public void sendAppSimulatedMetric(AppSimulatedMetric appSimulatedMetric) {
-		send("simulated-app-metrics", new AppSimulatedMetricDTO(appSimulatedMetric), appSimulatedMetric.getId());
+		send("simulated-app-metrics", AppSimulatedMetricMapper.MAPPER.fromAppSimulatedMetric(appSimulatedMetric, cycleAvoidingMappingContext), appSimulatedMetric.getId());
 	}
 
 	@Async
@@ -555,7 +600,7 @@ public class KafkaService {
 
 	@Async
 	public void sendServiceSimulatedMetric(ServiceSimulatedMetric serviceSimulatedMetric) {
-		send("simulated-service-metrics", new ServiceSimulatedMetricDTO(serviceSimulatedMetric), serviceSimulatedMetric.getId());
+		send("simulated-service-metrics", ServiceSimulatedMetricMapper.MAPPER.fromServiceSimulatedMetric(serviceSimulatedMetric, cycleAvoidingMappingContext), serviceSimulatedMetric.getId());
 	}
 
 	@Async
@@ -565,7 +610,7 @@ public class KafkaService {
 
 	@Async
 	public void sendContainerSimulatedMetric(ContainerSimulatedMetric containerSimulatedMetric) {
-		send("simulated-container-metrics", new ContainerSimulatedMetricDTO(containerSimulatedMetric), containerSimulatedMetric.getId());
+		send("simulated-container-metrics", ContainerSimulatedMetricMapper.MAPPER.fromContainerSimulatedMetric(containerSimulatedMetric, cycleAvoidingMappingContext), containerSimulatedMetric.getId());
 	}
 
 	@Async
@@ -575,7 +620,7 @@ public class KafkaService {
 
 	@Async
 	public void sendHostRule(HostRule hostRule) {
-		send("host-rules", new HostRuleDTO(hostRule), hostRule.getId());
+		send("host-rules", HostRuleMapper.MAPPER.fromHostRule(hostRule, cycleAvoidingMappingContext), hostRule.getId());
 	}
 
 	@Async
@@ -585,7 +630,7 @@ public class KafkaService {
 
 	@Async
 	public void sendAppRule(AppRule appRule) {
-		send("app-rules", new AppRuleDTO(appRule), appRule.getId());
+		send("app-rules", AppRuleMapper.MAPPER.fromAppRule(appRule, cycleAvoidingMappingContext), appRule.getId());
 	}
 
 	@Async
@@ -595,7 +640,7 @@ public class KafkaService {
 
 	@Async
 	public void sendServiceRule(ServiceRule serviceRule) {
-		send("service-rules", new ServiceRuleDTO(serviceRule), serviceRule.getId());
+		send("service-rules", ServiceRuleMapper.MAPPER.fromServiceRule(serviceRule, cycleAvoidingMappingContext), serviceRule.getId());
 	}
 
 	@Async
@@ -605,7 +650,7 @@ public class KafkaService {
 
 	@Async
 	public void sendContainerRule(ContainerRule containerRule) {
-		send("container-rules", new ContainerRuleDTO(containerRule), containerRule.getId());
+		send("container-rules", ContainerRuleMapper.MAPPER.fromContainerRule(containerRule, cycleAvoidingMappingContext), containerRule.getId());
 	}
 
 	@Async
@@ -615,7 +660,7 @@ public class KafkaService {
 
 	@Async
 	public void sendValueMode(ValueMode valueMode) {
-		send("value-modes", new ValueModeDTO(valueMode), valueMode.getId());
+		send("value-modes", ValueModeMapper.MAPPER.fromValueMode(valueMode, cycleAvoidingMappingContext), valueMode.getId());
 	}
 
 	@Async
@@ -625,32 +670,32 @@ public class KafkaService {
 
 	@Async
 	public void sendHostEvent(HostEvent hostEvent) {
-		send("host-events", new HostEventDTO(hostEvent), hostEvent.getId());
+		send("host-events", HostEventMapper.MAPPER.fromHostEvent(hostEvent, cycleAvoidingMappingContext), hostEvent.getId());
 	}
 
 	@Async
 	public void sendServiceEvent(ServiceEvent serviceEvent) {
-		send("service-events", new ServiceEventDTO(serviceEvent), serviceEvent.getId());
+		send("service-events", ServiceEventMapper.MAPPER.fromServiceEvent(serviceEvent, cycleAvoidingMappingContext), serviceEvent.getId());
 	}
 
 	@Async
 	public void sendHostMonitoringLog(HostMonitoringLog hostMonitoringLog) {
-		send("host-monitoring-logs", new HostMonitoringLogDTO(hostMonitoringLog), hostMonitoringLog.getId());
+		send("host-monitoring-logs", HostMonitoringLogMapper.MAPPER.fromHostMonitoringLog(hostMonitoringLog, cycleAvoidingMappingContext), hostMonitoringLog.getId());
 	}
 
 	@Async
 	public void sendServiceMonitoringLog(ServiceMonitoringLog serviceMonitoringLog) {
-		send("service-monitoring-logs", new ServiceMonitoringLogDTO(serviceMonitoringLog), serviceMonitoringLog.getId());
+		send("service-monitoring-logs", ServiceMonitoringLogMapper.MAPPER.fromServiceMonitoringLog(serviceMonitoringLog, cycleAvoidingMappingContext), serviceMonitoringLog.getId());
 	}
 
 	@Async
 	public void sendHostDecision(HostDecision hostDecision) {
-		send("host-decisions", new HostDecisionDTO(hostDecision), hostDecision.getId());
+		send("host-decisions", HostDecisionMapper.MAPPER.fromHostDecision(hostDecision, cycleAvoidingMappingContext), hostDecision.getId());
 	}
 
 	@Async
 	public void sendServiceDecision(ServiceDecision serviceDecision) {
-		send("service-decisions", new ServiceDecisionDTO(serviceDecision), serviceDecision.getId());
+		send("service-decisions", ServiceDecisionMapper.MAPPER.fromServiceDecision(serviceDecision, cycleAvoidingMappingContext), serviceDecision.getId());
 	}
 
 	@Async

@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.spotify.docker.client.shaded.com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +14,11 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostEventDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class HostEventDTO {
@@ -24,32 +30,34 @@ public class HostEventDTO {
 	private String managerPrivateIpAddress;
 	private DecisionDTO decision;
 	private int count;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
-	public HostEventDTO(HostEvent hostEvent) {
-		this.id = hostEvent.getId();
-		this.publicIpAddress = hostEvent.getPublicIpAddress();
-		this.privateIpAddress = hostEvent.getPrivateIpAddress();
-		this.managerPublicIpAddress = hostEvent.getManagerPublicIpAddress();
-		this.managerPrivateIpAddress = hostEvent.getManagerPrivateIpAddress();
-		this.decision = new DecisionDTO(hostEvent.getDecision());
-		this.count = hostEvent.getCount();
-		/*this.isNew = hostEvent.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public HostEvent toEntity() {
-		HostEvent hostEvent = HostEvent.builder()
-			.id(id)
-			.publicIpAddress(publicIpAddress)
-			.privateIpAddress(privateIpAddress)
-			.managerPublicIpAddress(managerPublicIpAddress)
-			.managerPrivateIpAddress(managerPrivateIpAddress)
-			.decision(decision.toEntity())
-			.count(count)
-			.build();
-		/*hostEvent.setNew(isNew);*/
-		return hostEvent;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostEvent)) {
+			return false;
+		}
+		HostEvent other = (HostEvent) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "HostEventDTO{" +
+			"id=" + id +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", privateIpAddress='" + privateIpAddress + '\'' +
+			", managerPublicIpAddress='" + managerPublicIpAddress + '\'' +
+			", managerPrivateIpAddress='" + managerPrivateIpAddress + '\'' +
+			", decision=" + decision +
+			", count=" + count +
+			'}';
 	}
 }

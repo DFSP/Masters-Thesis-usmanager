@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.spotify.docker.client.shaded.com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +12,11 @@ import lombok.Setter;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceEventDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ServiceEventDTO {
@@ -22,31 +28,34 @@ public class ServiceEventDTO {
 	private String managerPrivateIpAddress;
 	private DecisionDTO decision;
 	private int count;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
-	public ServiceEventDTO(ServiceEvent serviceEvent) {
-		this.id = serviceEvent.getId();
-		this.containerId = serviceEvent.getContainerId();
-		this.managerPublicIpAddress = serviceEvent.getManagerPublicIpAddress();
-		this.managerPrivateIpAddress = serviceEvent.getManagerPrivateIpAddress();
-		this.decision = new DecisionDTO(serviceEvent.getDecision());
-		this.count = serviceEvent.getCount();
-		/*this.isNew = serviceEvent.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public ServiceEvent toEntity() {
-		ServiceEvent serviceEvent = ServiceEvent.builder()
-			.id(id)
-			.serviceName(serviceName)
-			.containerId(containerId)
-			.managerPublicIpAddress(managerPublicIpAddress)
-			.managerPrivateIpAddress(managerPrivateIpAddress)
-			.decision(decision.toEntity())
-			.count(count)
-			.build();
-		/*serviceEvent.setNew(isNew);*/
-		return serviceEvent;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceEvent)) {
+			return false;
+		}
+		ServiceEvent other = (ServiceEvent) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ServiceEventDTO{" +
+			"id=" + id +
+			", containerId='" + containerId + '\'' +
+			", serviceName='" + serviceName + '\'' +
+			", managerPublicIpAddress='" + managerPublicIpAddress + '\'' +
+			", managerPrivateIpAddress='" + managerPrivateIpAddress + '\'' +
+			", decision=" + decision +
+			", count=" + count +
+			'}';
 	}
 }

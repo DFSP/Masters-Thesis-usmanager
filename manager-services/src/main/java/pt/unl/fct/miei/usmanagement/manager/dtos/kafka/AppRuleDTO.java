@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +14,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = AppRuleDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class AppRuleDTO {
@@ -26,35 +31,39 @@ public class AppRuleDTO {
 	private DecisionDTO decision;
 	private Set<AppDTO> apps;
 	private Set<AppRuleConditionDTO> conditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew;*/
 
 	public AppRuleDTO(Long id) {
 		this.id = id;
 	}
 
-	public AppRuleDTO(AppRule rule) {
-		this.id = rule.getId();
-		this.name = rule.getName();
-		this.priority = rule.getPriority();
-		this.decision = new DecisionDTO(rule.getDecision());
-		this.apps = rule.getApps().stream().map(AppDTO::new).collect(Collectors.toSet());
-		this.conditions = rule.getConditions().stream().map(AppRuleConditionDTO::new).collect(Collectors.toSet());
-		/*this.isNew = rule.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public AppRule toEntity() {
-		AppRule appRule = AppRule.builder()
-			.id(id)
-			.name(name)
-			.priority(priority)
-			.decision(decision.toEntity())
-			.apps(apps != null ? apps.stream().map(AppDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.conditions(conditions != null ? conditions.stream().map(AppRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*appRule.setNew(isNew);*/
-		return appRule;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof AppRule)) {
+			return false;
+		}
+		AppRule other = (AppRule) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "AppRuleDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", priority=" + priority +
+			", decision=" + decision +
+			", apps=" + (apps == null ? "null" : apps.stream().map(AppDTO::getId).collect(Collectors.toSet())) +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(appRuleConditionDTO ->
+			"{rule=" + appRuleConditionDTO.getAppRule().toString() + ", condition=" + appRuleConditionDTO.getCondition().toString() + "}")
+			.collect(Collectors.toSet())) +
+			'}';
+	}
 }

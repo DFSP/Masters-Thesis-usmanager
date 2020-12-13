@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,12 +17,13 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostSimulatedMetricDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class HostSimulatedMetricDTO {
@@ -33,42 +38,41 @@ public class HostSimulatedMetricDTO {
 	private boolean active;
 	private Set<CloudHostDTO> cloudHosts;
 	private Set<EdgeHostDTO> edgeHosts;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public HostSimulatedMetricDTO(Long id) {
 		this.id = id;
 	}
 
-	public HostSimulatedMetricDTO(HostSimulatedMetric hostSimulatedMetric) {
-		this.id = hostSimulatedMetric.getId();
-		this.name = hostSimulatedMetric.getName();
-		this.field = hostSimulatedMetric.getField();
-		this.minimumValue = hostSimulatedMetric.getMinimumValue();
-		this.maximumValue = hostSimulatedMetric.getMaximumValue();
-		this.generic = hostSimulatedMetric.isGeneric();
-		this.override = hostSimulatedMetric.isOverride();
-		this.active = hostSimulatedMetric.isActive();
-		this.cloudHosts = hostSimulatedMetric.getCloudHosts().stream().map(CloudHostDTO::new).collect(Collectors.toSet());
-		this.edgeHosts = hostSimulatedMetric.getEdgeHosts().stream().map(EdgeHostDTO::new).collect(Collectors.toSet());
-		/*this.isNew = hostSimulatedMetric.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public HostSimulatedMetric toEntity() {
-		HostSimulatedMetric hostSimulatedMetric = HostSimulatedMetric.builder()
-			.id(id)
-			.name(name)
-			.field(field)
-			.minimumValue(minimumValue)
-			.maximumValue(maximumValue)
-			.generic(generic)
-			.override(override)
-			.active(active)
-			.cloudHosts(cloudHosts != null ? cloudHosts.stream().map(CloudHostDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.edgeHosts(edgeHosts != null ? edgeHosts.stream().map(EdgeHostDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*hostSimulatedMetric.setNew(isNew);*/
-		return hostSimulatedMetric;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof HostSimulatedMetric)) {
+			return false;
+		}
+		HostSimulatedMetric other = (HostSimulatedMetric) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "HostSimulatedMetricDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", field=" + field +
+			", minimumValue=" + minimumValue +
+			", maximumValue=" + maximumValue +
+			", generic=" + generic +
+			", override=" + override +
+			", active=" + active +
+			", cloudHosts=" + (cloudHosts == null ? "null" : cloudHosts.stream().map(CloudHostDTO::getId).collect(Collectors.toSet())) +
+			", edgeHosts=" + (edgeHosts == null ? "null" : edgeHosts.stream().map(EdgeHostDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

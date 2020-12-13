@@ -89,5 +89,10 @@ public class KafkaController {
 		return zookeeperService.getZookeepers();
 	}
 
+	@GetMapping("/populate")
+	public void populate() {
+		kafkaService.populateTopics();
+	}
+
 }
 

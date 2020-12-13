@@ -1,23 +1,20 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ConditionDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ConditionDTO {
@@ -32,42 +29,47 @@ public class ConditionDTO {
 	private Set<AppRuleConditionDTO> appConditions;
 	private Set<ServiceRuleConditionDTO> serviceConditions;
 	private Set<ContainerRuleConditionDTO> containerConditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public ConditionDTO(Long id) {
 		this.id = id;
 	}
 
-	public ConditionDTO(Condition condition) {
-		this.id = condition.getId();
-		this.name = condition.getName();
-		this.valueMode = new ValueModeDTO(condition.getValueMode());
-		this.field = new FieldDTO(condition.getField());
-		this.operator = new OperatorDTO(condition.getOperator());
-		this.value = condition.getValue();
-		this.hostConditions = condition.getHostConditions().stream().map(HostRuleConditionDTO::new).collect(Collectors.toSet());
-		this.appConditions = condition.getAppConditions().stream().map(AppRuleConditionDTO::new).collect(Collectors.toSet());
-		this.serviceConditions = condition.getServiceConditions().stream().map(ServiceRuleConditionDTO::new).collect(Collectors.toSet());
-		this.containerConditions = condition.getContainerConditions().stream().map(ContainerRuleConditionDTO::new).collect(Collectors.toSet());
-		/*this.isNew = condition.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Condition toEntity() {
-		Condition condition = Condition.builder()
-			.id(id)
-			.name(name)
-			.valueMode(valueMode.toEntity())
-			.field(field.toEntity())
-			.operator(operator.toEntity())
-			.value(value)
-			.hostConditions(hostConditions != null ? hostConditions.stream().map(HostRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.appConditions(appConditions != null ? appConditions.stream().map(AppRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.serviceConditions(serviceConditions != null ? serviceConditions.stream().map(ServiceRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.containerConditions(containerConditions != null ? containerConditions.stream().map(ContainerRuleConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*condition.setNew(condition.isNew());*/
-		return condition;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Condition)) {
+			return false;
+		}
+		Condition other = (Condition) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ConditionDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", valueMode=" + valueMode +
+			", field=" + field +
+			", operator=" + operator +
+			", value=" + value +
+			", hostConditions=" + (hostConditions == null ? "null" : hostConditions.stream().map(hostRuleConditionDTO ->
+			"{rule=" + hostRuleConditionDTO.getHostRule().getId() + ", condition=" + hostRuleConditionDTO.getCondition().getId() + "}")
+			.collect(Collectors.toSet())) +
+			", appConditions=" + (appConditions == null ? "null" : appConditions.stream().map(AppRuleConditionDTO::getId).collect(Collectors.toSet())) +
+			", serviceConditions=" + (serviceConditions == null ? "null" : serviceConditions.stream().map(serviceRuleConditionDTO ->
+			"{rule=" + serviceRuleConditionDTO.getServiceRule().getId() + ", condition=" + serviceRuleConditionDTO.getCondition().getId() + "}")
+			.collect(Collectors.toSet())) +
+			", containerConditions=" + (containerConditions == null ? "null" : containerConditions.stream().map(containerRuleConditionDTO ->
+			"{rule=" + containerRuleConditionDTO.getContainerRule().getId() + ", condition=" + containerRuleConditionDTO.getCondition().getId() + "}")
+			.collect(Collectors.toSet())) +
+			'}';
 	}
 }

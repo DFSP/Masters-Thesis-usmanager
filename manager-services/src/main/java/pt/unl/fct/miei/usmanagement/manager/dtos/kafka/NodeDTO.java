@@ -1,7 +1,9 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +15,11 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 
 import java.util.Map;
+import java.util.Objects;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = NodeDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class NodeDTO {
@@ -30,41 +33,40 @@ public class NodeDTO {
 	private ManagerStatus managerStatus;
 	private String managerId;
 	private Map<String, String> labels;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public NodeDTO(String id) {
 		this.id = id;
 	}
 
-	public NodeDTO(Node node) {
-		this.id = node.getId();
-		this.publicIpAddress = node.getPublicIpAddress();
-		this.availability = node.getAvailability();
-		this.role = node.getRole();
-		this.version = node.getVersion();
-		this.state = node.getState();
-		this.managerStatus = node.getManagerStatus();
-		this.managerId = node.getManagerId();
-		this.labels = node.getLabels();
-		/*this.isNew = node.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Node toEntity() {
-		Node node = Node.builder()
-			.id(id)
-			.publicIpAddress(publicIpAddress)
-			.availability(availability)
-			.role(role)
-			.version(version)
-			.state(state)
-			.managerStatus(managerStatus)
-			.managerId(managerId)
-			.labels(labels)
-			.build();
-		/*node.setNew(isNew);*/
-		return node;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Node)) {
+			return false;
+		}
+		Node other = (Node) o;
+		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "NodeDTO{" +
+			"id='" + id + '\'' +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", availability=" + availability +
+			", role=" + role +
+			", version=" + version +
+			", state='" + state + '\'' +
+			", managerStatus=" + managerStatus +
+			", managerId='" + managerId + '\'' +
+			", labels=" + labels +
+			'}';
+	}
 }

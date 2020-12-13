@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,10 +21,11 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -44,75 +46,32 @@ public class ServiceDTO {
 	private Set<String> environment;
 	private Set<String> volumes;
 	private Double expectedMemoryConsumption;
-	@JsonManagedReference
 	private Set<AppServiceDTO> appServices;
-	//@JsonBackReference
-	//private Set<ServiceDependencyDTO> dependencies;
-	//@JsonBackReference
-	//private Set<ServiceDependencyDTO> dependents;
-	//@JsonBackReference
-	//private Set<ServiceEventPredictionDTO> eventPredictions;
-	//@JsonBackReference
-	//private Set<ServiceRuleDTO> serviceRules;
-	//@JsonBackReference
-	//private Set<ServiceSimulatedMetricDTO> simulatedServiceMetrics;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
+	private Set<ServiceDependencyDTO> dependencies;
+	private Set<ServiceDependencyDTO> dependents;
+	private Set<ServiceEventPredictionDTO> eventPredictions;
+	private Set<ServiceRuleDTO> serviceRules;
+	private Set<ServiceSimulatedMetricDTO> simulatedServiceMetrics;
 
 	public ServiceDTO(Long id) {
 		this.id = id;
 	}
 
-	public ServiceDTO(Service service) {
-		this.id = service.getId();
-		this.serviceName = service.getServiceName();
-		this.dockerRepository = service.getDockerRepository();
-		this.defaultExternalPort = service.getDefaultExternalPort();
-		this.defaultInternalPort = service.getDefaultInternalPort();
-		this.defaultDb = service.getDefaultDb();
-		this.launchCommand = service.getLaunchCommand();
-		this.minimumReplicas = service.getMinimumReplicas();
-		this.maximumReplicas = service.getMaximumReplicas();
-		this.outputLabel = service.getOutputLabel();
-		this.serviceType = service.getServiceType();
-		this.environment = service.getEnvironment();
-		this.volumes = service.getVolumes();
-		this.expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-		//this.appServices = service.getAppServices().stream().map(AppServiceDTO::new).collect(Collectors.toSet());
-		//this.dependencies = service.getDependencies().stream().map(ServiceDependencyDTO::new).collect(Collectors.toSet());
-		//this.dependents = service.getDependents().stream().map(ServiceDependencyDTO::new).collect(Collectors.toSet());
-		//this.eventPredictions = service.getEventPredictions().stream().map(ServiceEventPredictionDTO::new).collect(Collectors.toSet());
-		//this.serviceRules = service.getServiceRules().stream().map(ServiceRuleDTO::new).collect(Collectors.toSet());
-		//this.simulatedServiceMetrics = service.getSimulatedServiceMetrics().stream().map(ServiceSimulatedMetricDTO::new).collect(Collectors.toSet());
-		//this.isNew = service.isNew();
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Service toEntity() {
-		Service service = Service.builder()
-			.id(id)
-			.serviceName(serviceName)
-			.dockerRepository(dockerRepository)
-			.defaultExternalPort(defaultExternalPort)
-			.defaultInternalPort(defaultInternalPort)
-			.defaultDb(defaultDb)
-			.launchCommand(launchCommand)
-			.minimumReplicas(minimumReplicas)
-			.maximumReplicas(maximumReplicas)
-			.outputLabel(outputLabel)
-			.serviceType(serviceType)
-			.environment(environment)
-			.volumes(volumes)
-			.expectedMemoryConsumption(expectedMemoryConsumption)
-			//.appServices(appServices != null ? appServices.stream().map(AppServiceDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			//.dependencies(dependencies != null ? dependencies.stream().map(ServiceDependencyDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			//.dependents(dependents != null ? dependents.stream().map(ServiceDependencyDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			//.eventPredictions(eventPredictions != null ? eventPredictions.stream().map(ServiceEventPredictionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			//	.serviceRules(serviceRules != null ? serviceRules.stream().map(ServiceRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			//.simulatedServiceMetrics(simulatedServiceMetrics != null ? simulatedServiceMetrics.stream().map(ServiceSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		//service.setNew(isNew);
-		return service;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Service)) {
+			return false;
+		}
+		Service other = (Service) o;
+		return id != null && id.equals(other.getId());
 	}
 
 	@Override
@@ -132,12 +91,12 @@ public class ServiceDTO {
 			", environment=" + environment +
 			", volumes=" + volumes +
 			", expectedMemoryConsumption=" + expectedMemoryConsumption +
-			", appServices=" + (appServices != null ? appServices.stream().map(AppServiceDTO::getId).collect(Collectors.toSet()) : "null") +
-			//", dependencies=" + (dependencies != null ? dependencies.stream().map(ServiceDependencyDTO::getId).collect(Collectors.toSet()) : "null") +
-			//", dependents=" + (dependents != null ? dependents.stream().map(ServiceDependencyDTO::getId).collect(Collectors.toSet()) : "null") +
-			//", eventPredictions=" + (eventPredictions != null ? eventPredictions.stream().map(ServiceEventPredictionDTO::getId).collect(Collectors.toSet()) : "null") +
-			//", serviceRules=" + (serviceRules != null ? serviceRules.stream().map(ServiceRuleDTO::getId).collect(Collectors.toSet()) : "null") +
-			//", simulatedServiceMetrics=" + (simulatedServiceMetrics) +
+			", appServices=" + (appServices == null ? "null" : appServices.stream().map(AppServiceDTO::toString).collect(Collectors.toSet())) +
+			", dependencies=" + (dependencies == null ? "null" : dependencies.stream().map(ServiceDependencyDTO::getId).collect(Collectors.toSet())) +
+			", dependents=" + (dependents == null ? "null" : dependents.stream().map(ServiceDependencyDTO::getId).collect(Collectors.toSet())) +
+			", eventPredictions=" + (eventPredictions == null ? "null" : eventPredictions.stream().map(ServiceEventPredictionDTO::getId).collect(Collectors.toSet())) +
+			", serviceRules=" + (serviceRules == null ? "null" : serviceRules.stream().map(ServiceRuleDTO::getId).collect(Collectors.toSet())) +
+			", simulatedServiceMetrics=" + (simulatedServiceMetrics) +
 			'}';
 	}
 }

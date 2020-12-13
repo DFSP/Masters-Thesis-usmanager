@@ -18,8 +18,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 @Embeddable
-public
-class AppServiceKey implements Serializable {
+public class AppServiceKey implements Serializable {
 
 	private static final long serialVersionUID = -3602299693295159087L;
 

@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +18,13 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ContainerDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ContainerDTO {
@@ -41,56 +46,49 @@ public class ContainerDTO {
 	private Coordinates coordinates;
 	private Set<ContainerRuleDTO> containerRules;
 	private Set<ContainerSimulatedMetricDTO> simulatedContainerMetrics;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public ContainerDTO(String id) {
 		this.id = id;
 	}
 
-	public ContainerDTO(Container container) {
-		this.id = container.getId();
-		this.type = container.getType();
-		this.created = container.getCreated();
-		this.name = container.getName();
-		this.image = container.getImage();
-		this.command = container.getCommand();
-		this.network = container.getNetwork();
-		this.publicIpAddress = container.getPublicIpAddress();
-		this.privateIpAddress = container.getPrivateIpAddress();
-		this.mounts = container.getMounts();
-		this.ports = container.getPorts();
-		this.labels = container.getLabels();
-		this.region = container.getRegion();
-		this.managerId = container.getManagerId();
-		this.coordinates = container.getCoordinates();
-		this.containerRules = container.getContainerRules().stream().map(ContainerRuleDTO::new).collect(Collectors.toSet());
-		this.simulatedContainerMetrics = container.getSimulatedContainerMetrics().stream().map(ContainerSimulatedMetricDTO::new).collect(Collectors.toSet());
-		/*this.isNew = container.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Container toEntity() {
-		Container container = Container.builder()
-			.id(id)
-			.type(type)
-			.created(created)
-			.name(name)
-			.image(image)
-			.command(command)
-			.network(network)
-			.publicIpAddress(publicIpAddress)
-			.privateIpAddress(privateIpAddress)
-			.mounts(mounts)
-			.ports(ports)
-			.labels(labels)
-			.region(region)
-			.managerId(managerId)
-			.coordinates(coordinates)
-			.containerRules(containerRules != null ? containerRules.stream().map(ContainerRuleDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.simulatedContainerMetrics(simulatedContainerMetrics != null ? simulatedContainerMetrics.stream().map(ContainerSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*container.setNew(isNew);*/
-		return container;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Container)) {
+			return false;
+		}
+		Container other = (Container) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ContainerDTO{" +
+			"id='" + id + '\'' +
+			", type=" + type +
+			", created=" + created +
+			", name='" + name + '\'' +
+			", image='" + image + '\'' +
+			", command='" + command + '\'' +
+			", network='" + network + '\'' +
+			", publicIpAddress='" + publicIpAddress + '\'' +
+			", privateIpAddress='" + privateIpAddress + '\'' +
+			", mounts=" + mounts +
+			", ports=" + ports +
+			", labels=" + labels +
+			", region=" + region +
+			", managerId='" + managerId + '\'' +
+			", coordinates=" + coordinates +
+			", containerRules=" + (containerRules == null ? "null" : containerRules.stream().map(ContainerRuleDTO::getId).collect(Collectors.toSet())) +
+			", simulatedContainerMetrics=" + (simulatedContainerMetrics == null ? "null" : simulatedContainerMetrics.stream()
+			.map(ContainerSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

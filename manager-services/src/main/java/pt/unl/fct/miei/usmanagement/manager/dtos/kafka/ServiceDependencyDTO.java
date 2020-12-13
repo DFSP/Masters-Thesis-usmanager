@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -8,38 +9,45 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDependencyDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ServiceDependencyDTO {
 
-	private Long id;
-	@JsonManagedReference
+	private ServiceDependencyKey id;
 	private ServiceDTO service;
-	@JsonManagedReference
 	private ServiceDTO dependency;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
-	/*public ServiceDependencyDTO(ServiceDependency serviceDependency) {
-		this.id = serviceDependency.getId();
-		this.service = new ServiceDTO(serviceDependency.getService());
-		this.dependency = new ServiceDTO(serviceDependency.getDependency());
-		*//*this.isNew = serviceDependency.isNew();*//*
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	public ServiceDependency toEntity() {
-		ServiceDependency serviceDependency = ServiceDependency.builder()
-			.id(id)
-			.service(service.toEntity())
-			.dependency(dependency.toEntity())
-			.build();
-		*//*serviceDependency.setNew(isNew);*//*
-		return serviceDependency;
-	}*/
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceDependency)) {
+			return false;
+		}
+		ServiceDependency other = (ServiceDependency) o;
+		return id != null && id.equals(other.getId());
+	}
 
+	@Override
+	public String toString() {
+		return "ServiceDependencyDTO{" +
+			"id=" + id +
+			", service=" + service +
+			", dependency=" + dependency +
+			'}';
+	}
 }

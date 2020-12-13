@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +18,13 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMe
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = FieldDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class FieldDTO {
@@ -30,34 +35,39 @@ public class FieldDTO {
 	private Set<Condition> conditions;
 	private Set<HostSimulatedMetricDTO> simulatedHostMetrics;
 	private Set<ServiceSimulatedMetricDTO> simulatedServiceMetrics;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public FieldDTO(Long id) {
 		this.id = id;
 	}
 
-	public FieldDTO(Field field) {
-		this.id = field.getId();
-		this.name = field.getName();
-		this.prometheusQuery = field.getPrometheusQuery();
-		this.conditions = field.getConditions();
-		this.simulatedHostMetrics = field.getSimulatedHostMetrics().stream().map(HostSimulatedMetricDTO::new).collect(Collectors.toSet());
-		this.simulatedServiceMetrics = field.getSimulatedServiceMetrics().stream().map(ServiceSimulatedMetricDTO::new).collect(Collectors.toSet());
-		/*this.isNew = field.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Field toEntity() {
-		Field field = Field.builder()
-			.id(id)
-			.name(name)
-			.prometheusQuery(prometheusQuery)
-			.conditions(conditions)
-			.simulatedHostMetrics(simulatedHostMetrics != null ? simulatedHostMetrics.stream().map(HostSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.simulatedServiceMetrics(simulatedServiceMetrics != null ? simulatedServiceMetrics.stream().map(ServiceSimulatedMetricDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*field.setNew(isNew);*/
-		return field;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Field)) {
+			return false;
+		}
+		Field other = (Field) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "FieldDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", prometheusQuery=" + prometheusQuery +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(Condition::getId).collect(Collectors.toSet())) +
+			", simulatedHostMetrics=" + (simulatedHostMetrics == null ? "null" : simulatedHostMetrics.stream()
+			.map(HostSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
+			", simulatedServiceMetrics=" + (simulatedServiceMetrics == null ? "null" : simulatedServiceMetrics.stream()
+			.map(ServiceSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

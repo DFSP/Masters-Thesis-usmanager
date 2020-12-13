@@ -1,7 +1,9 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +12,11 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
+import java.util.Objects;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ElasticIpDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ElasticIpDTO {
@@ -23,34 +27,37 @@ public class ElasticIpDTO {
 	private String publicIp;
 	private String associationId;
 	private String instanceId;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public ElasticIpDTO(Long id) {
 		this.id = id;
 	}
 
-	public ElasticIpDTO(ElasticIp elasticIp) {
-		this.id = elasticIp.getId();
-		this.region = elasticIp.getRegion();
-		this.allocationId = elasticIp.getAllocationId();
-		this.publicIp = elasticIp.getPublicIp();
-		this.associationId = elasticIp.getAssociationId();
-		this.instanceId = elasticIp.getInstanceId();
-		/*this.isNew = elasticIp.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public ElasticIp toEntity() {
-		ElasticIp elasticIp = ElasticIp.builder()
-			.id(id)
-			.region(region)
-			.allocationId(allocationId)
-			.publicIp(publicIp)
-			.associationId(associationId)
-			.instanceId(instanceId)
-			.build();
-		/*elasticIp.setNew(isNew);*/
-		return elasticIp;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ElasticIp)) {
+			return false;
+		}
+		ElasticIp other = (ElasticIp) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "ElasticIpDTO{" +
+			"id=" + id +
+			", region=" + region +
+			", allocationId='" + allocationId + '\'' +
+			", publicIp='" + publicIp + '\'' +
+			", associationId='" + associationId + '\'' +
+			", instanceId='" + instanceId + '\'' +
+			'}';
 	}
 }

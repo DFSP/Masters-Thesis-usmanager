@@ -1,7 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +17,12 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceEventPredictionDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class ServiceEventPredictionDTO {
@@ -35,41 +39,39 @@ public class ServiceEventPredictionDTO {
 	@JsonFormat(pattern = "HH:mm")
 	private LocalTime endTime;
 	private int minimumReplicas;
-	@JsonManagedReference
 	private ServiceDTO service;
 	private Timestamp lastUpdate;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
-	/*public ServiceEventPredictionDTO(ServiceEventPrediction serviceEventPrediction) {
-		this.id = serviceEventPrediction.getId();
-		this.name = serviceEventPrediction.getName();
-		this.description = serviceEventPrediction.getDescription();
-		this.startDate = serviceEventPrediction.getStartDate();
-		this.startTime = serviceEventPrediction.getStartTime();
-		this.endDate = serviceEventPrediction.getEndDate();
-		this.endTime = serviceEventPrediction.getEndTime();
-		this.minimumReplicas = serviceEventPrediction.getMinimumReplicas();
-		this.service = new ServiceDTO(serviceEventPrediction.getService());
-		this.lastUpdate = serviceEventPrediction.getLastUpdate();
-		*//*this.isNew = serviceEventPrediction.isNew();*//*
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	public ServiceEventPrediction toEntity() {
-		ServiceEventPrediction serviceEventPrediction = ServiceEventPrediction.builder()
-			.id(id)
-			.name(name)
-			.description(description)
-			.startDate(startDate)
-			.startTime(startTime)
-			.endDate(endDate)
-			.endTime(endTime)
-			.minimumReplicas(minimumReplicas)
-			.service(service.toEntity())
-			.lastUpdate(lastUpdate)
-			.build();
-		*//*serviceEventPrediction.setNew(isNew);*//*
-		return serviceEventPrediction;
-	}*/
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ServiceEventPrediction)) {
+			return false;
+		}
+		ServiceEventPrediction other = (ServiceEventPrediction) o;
+		return id != null && id.equals(other.getId());
+	}
 
+	@Override
+	public String toString() {
+		return "ServiceEventPredictionDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", description='" + description + '\'' +
+			", startDate=" + startDate +
+			", startTime=" + startTime +
+			", endDate=" + endDate +
+			", endTime=" + endTime +
+			", minimumReplicas=" + minimumReplicas +
+			", service=" + service +
+			", lastUpdate=" + lastUpdate +
+			'}';
+	}
 }

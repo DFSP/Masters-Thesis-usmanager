@@ -1,6 +1,10 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +14,13 @@ import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = AppSimulatedMetricDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class AppSimulatedMetricDTO {
@@ -28,38 +33,39 @@ public class AppSimulatedMetricDTO {
 	private boolean override;
 	private boolean active;
 	private Set<AppDTO> apps;
-	/*@JsonProperty("isNew")
-	private boolean isNew;*/
 
 	public AppSimulatedMetricDTO(Long id) {
 		this.id = id;
 	}
 
-	public AppSimulatedMetricDTO(AppSimulatedMetric appSimulatedMetric) {
-		this.id = appSimulatedMetric.getId();
-		this.name = appSimulatedMetric.getName();
-		this.field = appSimulatedMetric.getField();
-		this.minimumValue = appSimulatedMetric.getMinimumValue();
-		this.maximumValue = appSimulatedMetric.getMaximumValue();
-		this.override = appSimulatedMetric.isOverride();
-		this.active = appSimulatedMetric.isActive();
-		this.apps = appSimulatedMetric.getApps().stream().map(AppDTO::new).collect(Collectors.toSet());
-		/*this.isNew = appSimulatedMetric.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public AppSimulatedMetric toEntity() {
-		AppSimulatedMetric appSimulatedMetric = AppSimulatedMetric.builder()
-			.id(id)
-			.name(name)
-			.field(field)
-			.minimumValue(minimumValue)
-			.maximumValue(maximumValue)
-			.override(override)
-			.active(active)
-			.apps(apps != null ? apps.stream().map(AppDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*appSimulatedMetric.setNew(isNew);*/
-		return appSimulatedMetric;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof AppSimulatedMetric)) {
+			return false;
+		}
+		AppSimulatedMetric other = (AppSimulatedMetric) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "AppSimulatedMetricDTO{" +
+			"id=" + id +
+			", name='" + name + '\'' +
+			", field=" + field +
+			", minimumValue=" + minimumValue +
+			", maximumValue=" + maximumValue +
+			", override=" + override +
+			", active=" + active +
+			", apps=" + (apps == null ? "null" : apps.stream().map(AppDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }

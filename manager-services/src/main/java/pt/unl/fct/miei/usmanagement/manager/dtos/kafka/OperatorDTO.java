@@ -1,7 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +16,13 @@ import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = OperatorDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 public class OperatorDTO {
@@ -26,30 +31,35 @@ public class OperatorDTO {
 	private OperatorEnum operator;
 	private String symbol;
 	private Set<ConditionDTO> conditions;
-	/*@JsonProperty("isNew")
-	private boolean isNew; */
 
 	public OperatorDTO(Long id) {
 		this.id = id;
 	}
 
-	public OperatorDTO(Operator operator) {
-		this.id = operator.getId();
-		this.operator = operator.getOperator();
-		this.symbol = operator.getSymbol();
-		this.conditions = operator.getConditions().stream().map(ConditionDTO::new).collect(Collectors.toSet());
-		/*this.isNew = operator.isNew();*/
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 
-	@JsonIgnore
-	public Operator toEntity() {
-		Operator operator = Operator.builder()
-			.id(id)
-			.operator(this.operator)
-			.symbol(symbol)
-			.conditions(conditions != null ? conditions.stream().map(ConditionDTO::toEntity).collect(Collectors.toSet()) : new HashSet<>())
-			.build();
-		/*operator.setNew(isNew);*/
-		return operator;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Operator)) {
+			return false;
+		}
+		Operator other = (Operator) o;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return "OperatorDTO{" +
+			"id=" + id +
+			", operator=" + operator +
+			", symbol='" + symbol + '\'' +
+			", conditions=" + (conditions == null ? "null" : conditions.stream().map(ConditionDTO::getId).collect(Collectors.toSet())) +
+			'}';
 	}
 }
