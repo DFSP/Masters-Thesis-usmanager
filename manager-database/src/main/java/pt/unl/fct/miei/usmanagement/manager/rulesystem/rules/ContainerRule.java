@@ -78,7 +78,7 @@ public class ContainerRule /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "containerRule")
 	private Set<ContainerRuleCondition> conditions;
 
 	@Singular

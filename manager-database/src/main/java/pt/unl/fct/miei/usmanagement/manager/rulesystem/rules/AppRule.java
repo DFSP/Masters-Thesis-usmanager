@@ -77,7 +77,7 @@ public class AppRule /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appRule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "appRule")
 	private Set<AppRuleCondition> conditions;
 
 	@Singular

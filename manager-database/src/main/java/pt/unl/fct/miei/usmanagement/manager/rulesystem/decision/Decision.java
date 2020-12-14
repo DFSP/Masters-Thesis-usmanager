@@ -75,12 +75,12 @@ public class Decision /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "decision")
 	private Set<ServiceEvent> serviceEvents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "decision")
 	private Set<HostEvent> hostEvents;
 
   /*@Singular

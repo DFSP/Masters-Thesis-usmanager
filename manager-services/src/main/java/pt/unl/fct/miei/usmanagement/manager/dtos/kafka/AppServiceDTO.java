@@ -50,8 +50,8 @@ public class AppServiceDTO {
 		return "AppServiceDTO{" +
 			"id=" + id +
 			", launchOrder=" + launchOrder +
-			", app=" + app +
-			", service=" + service +
+			", app=" + (app == null ? "null" : app.getId()) +
+			", service=" + (service == null ? "null" : service.getId()) +
 			'}';
 	}
 }

@@ -28,6 +28,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
@@ -74,7 +75,7 @@ public interface Services extends JpaRepository<Service, Long> {
 	@Query("select d.dependency "
 		+ "from Service s join s.dependencies d "
 		+ "where lower(s.serviceName) = lower(:serviceName)")
-	List<Service> getDependencies(@Param("serviceName") String serviceName);
+	List<Service> getDependenciesServices(@Param("serviceName") String serviceName);
 
 	@Query("select d.dependency "
 		+ "from Service s join s.dependencies d "
@@ -148,4 +149,8 @@ public interface Services extends JpaRepository<Service, Long> {
 		+ "where lower(s.serviceName) = lower(:serviceName)")
 	Optional<Service> findByServiceNameIgnoreCaseWithEntities(String serviceName);
 
+	@Query("select d "
+		+ "from Service s join s.dependencies d "
+		+ "where lower(s.serviceName) = lower(:serviceName)")
+	List<ServiceDependency> getDependencies(String serviceName);
 }

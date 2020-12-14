@@ -131,22 +131,22 @@ public class Service /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany//(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany//(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany//(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceDependency> dependents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany//(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceEventPrediction> eventPredictions;
 
 	@Singular
@@ -185,6 +185,27 @@ public class Service /*extends AbstractEntity<Long> */{
 	public void removeServiceSimulatedMetric(ServiceSimulatedMetric serviceMetric) {
 		simulatedServiceMetrics.remove(serviceMetric);
 		serviceMetric.getServices().remove(this);
+	}
+
+	public void clearAssociations() {
+		if (appServices != null) {
+			appServices.clear();
+		}
+		if (dependencies != null) {
+			dependencies.clear();
+		}
+		if (dependents != null) {
+			dependents.clear();
+		}
+		if (eventPredictions != null) {
+			eventPredictions.clear();
+		}
+		if (serviceRules != null) {
+			serviceRules.clear();
+		}
+		if (simulatedServiceMetrics != null) {
+			simulatedServiceMetrics.clear();
+		}
 	}
 
 	@JsonIgnore

@@ -322,7 +322,7 @@ public class DockerContainersService {
 					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
 				}
 
-				Optional<Service> optionalMemcached = servicesService.getDependencies(serviceName).stream()
+				Optional<Service> optionalMemcached = servicesService.getDependenciesServices(serviceName).stream()
 					.filter(s -> s.getServiceName().contains("memcached"))
 					.collect(Collectors.toList()).stream().findFirst();
 				if (optionalMemcached.isPresent()) {

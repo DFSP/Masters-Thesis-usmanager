@@ -115,6 +115,12 @@ public class App /*extends AbstractEntity<Long> */{
 		appMetric.getApps().remove(this);
 	}
 
+	public void clearAssociations() {
+		appServices.clear();
+		appRules.clear();
+		simulatedAppMetrics.clear();
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

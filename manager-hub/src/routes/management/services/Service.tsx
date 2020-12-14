@@ -69,6 +69,8 @@ export interface IService extends IDatabaseData {
     maximumReplicas: number;
     outputLabel?: string;
     serviceType: ServiceType;
+    environment: string[];
+    volumes: string[];
     expectedMemoryConsumption: number;
     apps?: string[];
     dependencies?: string[];
@@ -91,6 +93,8 @@ const buildNewService = (): Partial<IService> => ({
     maximumReplicas: undefined,
     outputLabel: undefined,
     serviceType: undefined,
+    environment: undefined,
+    volumes: undefined,
     expectedMemoryConsumption: undefined,
 });
 
@@ -287,7 +291,7 @@ class Service extends BaseComponent<Props, State> {
     private saveServiceDependencies = (service: IService): void => {
         const {unsavedDependencies} = this.state;
         if (unsavedDependencies.length) {
-            postData(`services/${service.serviceName}/dependencies`, unsavedDependencies,
+            postData(`services/${service.serviceName}/dependencies/services`, unsavedDependencies,
                 () => this.onSaveDependenciesSuccess(service),
                 (reason) => this.onSaveDependenciesFailure(service, reason));
         }
@@ -403,8 +407,9 @@ class Service extends BaseComponent<Props, State> {
         this.setState({service: service, formService: formService});
     };
 
-    private getFields = (service: Partial<IService>): IFields =>
-        Object.entries(service).map(([key, value]) => {
+    private getFields = (service: Partial<IService>): IFields => {
+        console.log(service)
+       return Object.entries(service).map(([key, value]) => {
             return {
                 [key]: {
                     id: key,
@@ -412,7 +417,7 @@ class Service extends BaseComponent<Props, State> {
                     validation:
                         getTypeFromValue(value) === 'number'
                             ? {rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647]}
-                            : !['defaultDb', 'launchCommand', 'minimumReplicas', 'maximumReplicas', 'expectedMemoryConsumption'].includes(key)
+                            : !['defaultDb', 'launchCommand', 'minimumReplicas', 'maximumReplicas', 'expectedMemoryConsumption', 'environment', 'volumes'].includes(key)
                             ? {rule: requiredAndTrimmed}
                             : undefined
                 }
@@ -423,6 +428,8 @@ class Service extends BaseComponent<Props, State> {
             }
             return fields;
         }, {});
+    }
+
 
     private service = () => {
         const {isLoading, error} = this.props;

@@ -1,8 +1,6 @@
-package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
+package pt.unl.fct.miei.usmanagement.manager.dtos;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +11,7 @@ import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 
 import java.util.Objects;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDependencyDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,11 +21,6 @@ public class ServiceDependencyDTO {
 	private ServiceDependencyKey id;
 	private ServiceDTO service;
 	private ServiceDTO dependency;
-
-	public void clearAssociations() {
-		service.clearAssociations();
-		dependency.clearAssociations();
-	}
 
 	@Override
 	public int hashCode() {

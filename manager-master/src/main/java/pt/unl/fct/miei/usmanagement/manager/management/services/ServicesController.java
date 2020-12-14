@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.dtos.ServiceDependencyDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
+import pt.unl.fct.miei.usmanagement.manager.dtos.ServiceDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mappers.ServiceDependencyMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mappers.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
@@ -44,36 +50,41 @@ import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/services")
 public class ServicesController {
 
 	private final ServicesService servicesService;
+	private final CycleAvoidingMappingContext context;
 
-	public ServicesController(ServicesService servicesService) {
+	public ServicesController(ServicesService servicesService, CycleAvoidingMappingContext context) {
 		this.servicesService = servicesService;
+		this.context = context;
 	}
 
 	@GetMapping
-	public List<Service> getServices() {
-		return servicesService.getServices();
+	public List<ServiceDTO> getServices() {
+		return ServiceMapper.MAPPER.fromServices(servicesService.getServices(), context);
 	}
 
 	@GetMapping("/{serviceName}")
-	public Service getService(@PathVariable String serviceName) {
-		return servicesService.getService(serviceName);
+	public ServiceDTO getService(@PathVariable String serviceName) {
+		return ServiceMapper.MAPPER.fromService(servicesService.getService(serviceName), context);
 	}
 
 	@PostMapping
-	public Service addService(@RequestBody Service service) {
+	public ServiceDTO addService(@RequestBody ServiceDTO serviceDTO) {
+		Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 		Validation.validatePostRequest(service.getId());
-		return servicesService.addService(service);
+		return ServiceMapper.MAPPER.fromService(servicesService.addService(service), context);
 	}
 
 	@PutMapping("/{serviceName}")
-	public Service updateService(@PathVariable String serviceName, @RequestBody Service service) {
+	public ServiceDTO updateService(@PathVariable String serviceName, @RequestBody ServiceDTO serviceDTO) {
+		Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 		Validation.validatePutRequest(service.getId());
-		return servicesService.updateService(serviceName, service);
+		return ServiceMapper.MAPPER.fromService(servicesService.updateService(serviceName, service), context);
 	}
 
 	@DeleteMapping("/{serviceName}")
@@ -101,9 +112,14 @@ public class ServicesController {
 		servicesService.removeApp(serviceName, appName);
 	}
 
+	@GetMapping("/{serviceName}/dependencies/services")
+	public List<ServiceDTO> getDependenciesServices(@PathVariable String serviceName) {
+		return ServiceMapper.MAPPER.fromServices(servicesService.getDependenciesServices(serviceName), context);
+	}
+
 	@GetMapping("/{serviceName}/dependencies")
-	public List<Service> getServiceDependencies(@PathVariable String serviceName) {
-		return servicesService.getDependencies(serviceName);
+	public List<ServiceDependencyDTO> getDependencies(@PathVariable String serviceName) {
+		return ServiceDependencyMapper.MAPPER.fromServiceDependencies(servicesService.getDependencies(serviceName), context);
 	}
 
 	@PostMapping("/{serviceName}/dependencies")

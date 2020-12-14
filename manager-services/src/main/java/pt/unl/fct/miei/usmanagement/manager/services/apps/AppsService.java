@@ -35,18 +35,19 @@ import pt.unl.fct.miei.usmanagement.manager.apps.Apps;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -93,19 +94,31 @@ public class AppsService {
 				App existingApp = appOptional.get();
 				Set<AppRule> rules = app.getAppRules();
 				if (rules != null) {
-					existingApp.getAppRules().retainAll(rules);
-					existingApp.getAppRules().addAll(rules);
+					Set<AppRule> currentRules = existingApp.getAppRules();
+					if (currentRules == null) {
+						existingApp.setAppRules(new HashSet<>(rules));
+					}
+					else {
+						currentRules.retainAll(rules);
+						currentRules.addAll(rules);
+					}
 				}
 				Set<AppSimulatedMetric> simulatedMetrics = app.getSimulatedAppMetrics();
 				if (simulatedMetrics != null) {
-					existingApp.getSimulatedAppMetrics().retainAll(simulatedMetrics);
-					existingApp.getSimulatedAppMetrics().addAll(simulatedMetrics);
+					Set<AppSimulatedMetric> currentSimulatedMetrics = existingApp.getSimulatedAppMetrics();
+					if (currentSimulatedMetrics == null) {
+						existingApp.setSimulatedAppMetrics(new HashSet<>(simulatedMetrics));
+					}
+					else {
+						currentSimulatedMetrics.retainAll(simulatedMetrics);
+						currentSimulatedMetrics.addAll(simulatedMetrics);
+					}
 				}
 				EntityUtils.copyValidProperties(app, existingApp);
 				return saveApp(existingApp);
 			}
 		}
-			return saveApp(app);
+		return saveApp(app);
 	}
 
 	public App getApp(Long id) {
@@ -267,6 +280,10 @@ public class AppsService {
 
 	public boolean hasApp(String name) {
 		return apps.hasApp(name);
+	}
+
+	public boolean hasApp(Long id) {
+		return apps.existsById(id);
 	}
 
 	private void checkAppExists(String appName) {

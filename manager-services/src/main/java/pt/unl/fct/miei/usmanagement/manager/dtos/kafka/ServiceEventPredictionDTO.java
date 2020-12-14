@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceEventPredictionDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

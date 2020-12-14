@@ -33,6 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
@@ -51,6 +52,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -128,33 +130,69 @@ public class ServicesService {
 				Service existingService = serviceOptional.get();
 				Set<ServiceRule> rules = service.getServiceRules();
 				if (rules != null) {
-					existingService.getServiceRules().retainAll(rules);
-					existingService.getServiceRules().addAll(rules);
+					Set<ServiceRule> currentServiceRules = existingService.getServiceRules();
+					if (currentServiceRules == null) {
+						existingService.setServiceRules(new HashSet<>(rules));
+					}
+					else {
+						currentServiceRules.retainAll(rules);
+						currentServiceRules.addAll(rules);
+					}
 				}
 				Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
 				if (simulatedMetrics != null) {
-					existingService.getSimulatedServiceMetrics().retainAll(simulatedMetrics);
-					existingService.getSimulatedServiceMetrics().addAll(simulatedMetrics);
+					Set<ServiceSimulatedMetric> currentSimulatedMetrics = existingService.getSimulatedServiceMetrics();
+					if (currentSimulatedMetrics == null) {
+						existingService.setSimulatedServiceMetrics(new HashSet<>(simulatedMetrics));
+					}
+					else {
+						currentSimulatedMetrics.retainAll(simulatedMetrics);
+						currentSimulatedMetrics.addAll(simulatedMetrics);
+					}
 				}
 				Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
 				if (serviceEventPredictions != null) {
-					existingService.getEventPredictions().retainAll(serviceEventPredictions);
-					existingService.getEventPredictions().addAll(serviceEventPredictions);
+					Set<ServiceEventPrediction> currentServiceEventPredictions = existingService.getEventPredictions();
+					if (currentServiceEventPredictions == null) {
+						existingService.setEventPredictions(new HashSet<>(serviceEventPredictions));
+					}
+					else {
+						currentServiceEventPredictions.retainAll(serviceEventPredictions);
+						currentServiceEventPredictions.addAll(serviceEventPredictions);
+					}
 				}
 				Set<AppService> appServices = service.getAppServices();
 				if (appServices != null) {
-					existingService.getAppServices().retainAll(appServices);
-					existingService.getAppServices().addAll(appServices);
+					Set<AppService> currentAppServices = existingService.getAppServices();
+					if (currentAppServices == null) {
+						existingService.setAppServices(new HashSet<>(appServices));
+					}
+					else {
+						currentAppServices.retainAll(appServices);
+						currentAppServices.addAll(appServices);
+					}
 				}
 				Set<ServiceDependency> dependencies = service.getDependencies();
 				if (dependencies != null) {
-					existingService.getDependencies().retainAll(dependencies);
-					existingService.getDependencies().addAll(dependencies);
+					Set<ServiceDependency> currentDependencies = existingService.getDependencies();
+					if (currentDependencies == null) {
+						existingService.setDependencies(new HashSet<>(dependencies));
+					}
+					else {
+						currentDependencies.retainAll(dependencies);
+						currentDependencies.addAll(dependencies);
+					}
 				}
 				Set<ServiceDependency> dependents = service.getDependents();
 				if (dependents != null) {
-					existingService.getDependents().retainAll(dependents);
-					existingService.getDependents().addAll(dependents);
+					Set<ServiceDependency> currentDependents = existingService.getDependents();
+					if (currentDependents == null) {
+						existingService.setDependents(new HashSet<>(dependents));
+					}
+					else {
+						currentDependents.retainAll(dependents);
+						currentDependents.addAll(dependents);
+					}
 				}
 				EntityUtils.copyValidProperties(service, existingService);
 				return saveService(existingService);
@@ -216,8 +254,12 @@ public class ServicesService {
 		kafkaService.sendService(service);
 	}
 
-	public List<Service> getDependencies(String serviceName) {
+	public List<Service> getDependenciesServices(String serviceName) {
 		checkServiceExists(serviceName);
+		return services.getDependenciesServices(serviceName);
+	}
+
+	public List<ServiceDependency> getDependencies(String serviceName) {
 		return services.getDependencies(serviceName);
 	}
 
@@ -235,7 +277,8 @@ public class ServicesService {
 	public void addDependency(String serviceName, String dependencyName) {
 		Service service = getService(serviceName);
 		Service dependency = getService(dependencyName);
-		ServiceDependency serviceDependency = ServiceDependency.builder().service(service).dependency(dependency).build();
+		ServiceDependency serviceDependency = ServiceDependency.builder()
+			.id(new ServiceDependencyKey(service.getId(), dependency.getId())).service(service).dependency(dependency).build();
 		service = service.toBuilder().dependency(serviceDependency).build();
 		service = saveService(service);
 		kafkaService.sendService(service);
@@ -407,6 +450,10 @@ public class ServicesService {
 
 	public boolean hasService(String name) {
 		return services.hasService(name);
+	}
+
+	public boolean hasService(Long id) {
+		return services.existsById(id);
 	}
 
 }

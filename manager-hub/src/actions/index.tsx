@@ -298,7 +298,7 @@ export const loadServiceDependencies = (serviceName: string) => (dispatch: any) 
 const fetchServiceDependencies = (serviceName: string) => ({
     [CALL_API]: {
         types: [SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE],
-        endpoint: `services/${serviceName}/dependencies`,
+        endpoint: `services/${serviceName}/dependencies/services`,
         schema: Schemas.SERVICE_DEPENDENCY_ARRAY,
         entity: serviceName
     }

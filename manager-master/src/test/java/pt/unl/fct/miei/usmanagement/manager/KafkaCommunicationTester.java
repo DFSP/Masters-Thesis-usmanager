@@ -1,33 +1,35 @@
 package pt.unl.fct.miei.usmanagement.manager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import pt.unl.fct.miei.usmanagement.manager.apps.App;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDependencyDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SuppressWarnings("unused")
 public class KafkaCommunicationTester {
 
 	private final CycleAvoidingMappingContext cycleAvoidingMappingContext = new CycleAvoidingMappingContext();
 	private JacksonTester<ServiceDTO> serviceDTOJson;
+	private JacksonTester<Set<ServiceDependencyDTO>> serviceDependenciesDTOJson;
 
 	@Before
 	public void setup() {
@@ -36,19 +38,45 @@ public class KafkaCommunicationTester {
 	}
 
 	@Test
-	public void testMapDtoToEntity() {
-		AppDTO appDTO = new AppDTO(1L);
-		ServiceDTO serviceDto = new ServiceDTO(2L);
-		AppServiceDTO appServiceDTO = new AppServiceDTO(new AppServiceKey(serviceDto.getId(), appDTO.getId()), 0, appDTO, serviceDto);
-		serviceDto.setAppServices(Set.of(appServiceDTO));
+	public void testServiceDTO() throws IOException {
+		File serviceDTOJsonFile = new File("src/test/resources/media-text.json");
+		ServiceDTO serviceDTO = serviceDTOJson.readObject(serviceDTOJsonFile);
+		Service service = ServiceMapper.MAPPER.toService(serviceDTO, cycleAvoidingMappingContext);
+		log.info("{}", service.toString());
+	}
 
-		Service service = ServiceMapper.MAPPER.toService(serviceDto, cycleAvoidingMappingContext);
+	@Test
+	public void testServiceDependency() throws IOException {
+		File serviceDTOJsonFile = new File("src/test/resources/media-movie-id.json");
+		ServiceDTO serviceDTO = serviceDTOJson.readObject(serviceDTOJsonFile);
+		File dependenciesJsonFile = new File("src/test/resources/media-movie-id-dependencies.json");
+		Set<ServiceDependencyDTO> dependenciesDTO = serviceDependenciesDTOJson.readObject(dependenciesJsonFile);
+		serviceDTO.setDependencies(dependenciesDTO);
+		Service service = ServiceMapper.MAPPER.toService(serviceDTO, cycleAvoidingMappingContext);
 		assertThat(service).isNotNull();
-		assertThat(service.getId()).isEqualTo(2L);
 
-		Set<AppService> appServices = service.getAppServices();
-		assertThat(appServices).hasSize(1);
-		assertThat(appServices).extracting("service").containsExactly(service);
+		assertThat(service.getDependencies()).hasSize(4);
+		serviceDTO = ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext);
+		assertThat(serviceDTO).isNotNull();
+		assertThat(serviceDTO.getDependencies()).hasSize(4);
+		log.info("{}", serviceDTO.toString());
+	}
+
+	@Test
+	public void testMapDtoToEntity() {
+		ServiceDTO serviceDTO = new ServiceDTO(1L);
+		ServiceDTO dependencyDto = new ServiceDTO(2L);
+		ServiceDependencyDTO serviceDependencyDTO = new ServiceDependencyDTO(
+			new ServiceDependencyKey(serviceDTO.getId(), dependencyDto.getId()), serviceDTO, dependencyDto);
+		serviceDTO.setDependencies(Set.of(serviceDependencyDTO));
+
+		Service service = ServiceMapper.MAPPER.toService(serviceDTO, cycleAvoidingMappingContext);
+		assertThat(service).isNotNull();
+		assertThat(service.getId()).isEqualTo(1L);
+
+		Set<ServiceDependency> serviceDependencies = service.getDependencies();
+		assertThat(serviceDependencies).hasSize(1);
+		assertThat(serviceDependencies).extracting("service").containsExactly(service);
 	}
 
 	@Test
@@ -58,10 +86,10 @@ public class KafkaCommunicationTester {
 		assertThat(serviceDTO).isNotNull();
 		assertThat(serviceDTO.getId()).isNotNull();
 
-		Set<AppServiceDTO> appServicesDTO = serviceDTO.getAppServices();
-		System.out.println(appServicesDTO);
-		assertThat(appServicesDTO).hasSize(1);
-		assertThat(appServicesDTO).extracting("service").contains(serviceDTO);
+		Set<ServiceDependencyDTO> serviceDependenciesDTO = serviceDTO.getDependencies();
+		System.out.println(serviceDependenciesDTO);
+		assertThat(serviceDependenciesDTO).hasSize(1);
+		assertThat(serviceDependenciesDTO).extracting("service").contains(serviceDTO);
 	}
 
 	@Test
@@ -70,7 +98,7 @@ public class KafkaCommunicationTester {
 		System.out.println(serviceDTO);
 		JsonContent<ServiceDTO> jsonContent = serviceDTOJson.write(serviceDTO);
 		System.out.println(jsonContent);
-		String json = "{\"id\":2,\"serviceName\":\"service\",\"dockerRepository\":null,\"defaultExternalPort\":null,\"defaultInternalPort\":null,\"defaultDb\":null,\"launchCommand\":null,\"minimumReplicas\":null,\"maximumReplicas\":0,\"outputLabel\":null,\"serviceType\":null,\"environment\":null,\"volumes\":null,\"expectedMemoryConsumption\":null,\"appServices\":[{\"id\":{\"appId\":1,\"serviceId\":2},\"launchOrder\":0}]}";
+		String json = "{\"id\":1,\"serviceName\":\"service\",\"dockerRepository\":null,\"defaultExternalPort\":null,\"defaultInternalPort\":null,\"defaultDb\":null,\"launchCommand\":null,\"minimumReplicas\":null,\"maximumReplicas\":0,\"outputLabel\":null,\"serviceType\":null,\"environment\":null,\"volumes\":null,\"expectedMemoryConsumption\":null,\"dependencies\":[{\"id\":{\"serviceId\":1,\"dependencyId\":2},\"service\":1,\"dependency\":{\"id\":2,\"serviceName\":\"dependency\",\"dockerRepository\":null,\"defaultExternalPort\":null,\"defaultInternalPort\":null,\"defaultDb\":null,\"launchCommand\":null,\"minimumReplicas\":null,\"maximumReplicas\":0,\"outputLabel\":null,\"serviceType\":null,\"environment\":null,\"volumes\":null,\"expectedMemoryConsumption\":null,\"dependencies\":[],\"dependents\":[],\"eventPredictions\":[]}}],\"dependents\":[],\"eventPredictions\":[]}";
 		assertThat(jsonContent).isEqualToJson(json);
 		File serviceDto = new File("src/test/resources/serviceDto.json");
 		ServiceDTO deserializedServiceDTO = serviceDTOJson.readObject(serviceDto);
@@ -79,14 +107,14 @@ public class KafkaCommunicationTester {
 	}
 
 	private ServiceDTO getServiceDTO() {
-		AppService appService = AppService.builder().build();
-		App app = App.builder().id(1L).name("app").appService(appService).build();
-		Service service = Service.builder().id(2L).serviceName("service").build();
-		appService.setId(new AppServiceKey(app.getId(), service.getId()));
-		appService.setApp(app);
-		appService.setService(service);
-		service.setAppServices(Set.of(appService));
-		app.setAppServices(Set.of(appService));
+		Service service = Service.builder().id(1L).serviceName("service").build();
+		Service dependency = Service.builder().id(2L).serviceName("dependency").build();
+		ServiceDependency serviceDependency = ServiceDependency.builder()
+			.id(new ServiceDependencyKey(service.getId(), dependency.getId()))
+			.service(service)
+			.dependency(dependency)
+			.build();
+		service.setDependencies(Set.of(serviceDependency));
 
 		return ServiceMapper.MAPPER.fromService(service, new CycleAvoidingMappingContext());
 	}

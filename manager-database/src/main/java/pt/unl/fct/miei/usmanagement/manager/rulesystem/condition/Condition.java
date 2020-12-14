@@ -73,15 +73,15 @@ public class Condition /*extends AbstractEntity<Long> */{
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "value_mode_id")
 	private ValueMode valueMode;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "field_id")
 	private Field field;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "operator_id")
 	private Operator operator;
 
@@ -89,22 +89,22 @@ public class Condition /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "hostCondition")
 	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "appCondition")
 	private Set<AppRuleCondition> appConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "serviceCondition")
 	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "containerCondition")
 	private Set<ContainerRuleCondition> containerConditions;
 
 	@Override

@@ -68,7 +68,7 @@ public class ComponentType /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "componentType")
+	@OneToMany(mappedBy = "componentType", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private Set<Decision> decisions;
 
 	@Override

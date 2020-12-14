@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.CycleAvoidingMappingContext;
 import pt.unl.fct.miei.usmanagement.manager.util.json.JsonPathArgumentResolver;
 
 import java.util.Collections;
@@ -63,6 +64,11 @@ public class ManagerMasterConfiguration extends CachingConfigurerSupport impleme
 		SimpleCacheManager cacheManager = new SimpleCacheManager();
 		cacheManager.setCaches(Collections.singletonList(new ConcurrentMapCache("default")));
 		return cacheManager;
+	}
+
+	@Bean
+	public CycleAvoidingMappingContext cycleAvoidingMappingContext() {
+		return new CycleAvoidingMappingContext();
 	}
 
 }

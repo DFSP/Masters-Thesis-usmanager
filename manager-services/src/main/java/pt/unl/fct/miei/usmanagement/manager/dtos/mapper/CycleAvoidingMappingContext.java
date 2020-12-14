@@ -1,11 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.mapper;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.TargetType;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class CycleAvoidingMappingContext {

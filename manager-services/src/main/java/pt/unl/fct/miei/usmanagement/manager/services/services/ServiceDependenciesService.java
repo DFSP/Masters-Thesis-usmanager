@@ -3,6 +3,7 @@ package pt.unl.fct.miei.usmanagement.manager.services.services;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencies;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
+import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 
 @Service
 public class ServiceDependenciesService {
@@ -20,6 +21,7 @@ public class ServiceDependenciesService {
 	public ServiceDependency addDependency(pt.unl.fct.miei.usmanagement.manager.services.Service service,
 										   pt.unl.fct.miei.usmanagement.manager.services.Service dependency) {
 		ServiceDependency serviceDependency = ServiceDependency.builder()
+			.id(new ServiceDependencyKey(service.getId(), dependency.getId()))
 			.service(service)
 			.dependency(dependency)
 			.build();
