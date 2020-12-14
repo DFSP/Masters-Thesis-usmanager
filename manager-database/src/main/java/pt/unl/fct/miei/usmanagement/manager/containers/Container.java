@@ -160,6 +160,15 @@ public class Container /*extends AbstractEntity<String> */ {
 		containerMetric.getContainers().remove(this);
 	}
 
+	public void clearAssociations() {
+		if (containerRules != null) {
+			containerRules.clear();
+		}
+		if (simulatedContainerMetrics != null) {
+			simulatedContainerMetrics.clear();
+		}
+	}
+
 	@JsonIgnore
 	public HostAddress getHostAddress() {
 		return new HostAddress(publicIpAddress, privateIpAddress, coordinates, region);
@@ -181,5 +190,4 @@ public class Container /*extends AbstractEntity<String> */ {
 		Container other = (Container) o;
 		return id != null && id.equals(other.getId());
 	}
-
 }

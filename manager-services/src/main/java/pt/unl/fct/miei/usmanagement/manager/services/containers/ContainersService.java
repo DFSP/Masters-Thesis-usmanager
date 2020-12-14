@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
@@ -643,6 +644,14 @@ public class ContainersService {
 		containers.deleteAll();
 	}
 
+	public Container addIfNotPresent(Container container) {
+		Optional<Container> containerOptional = containers.findById(container.getId());
+		return containerOptional.orElseGet(() -> {
+			container.clearAssociations();
+			return saveContainer(container);
+		});
+	}
+	
 	public List<Container> updateAddress(HostAddress hostAddress, String publicIpAddress) {
 		List<Container> containers = getHostContainers(hostAddress);
 		containers.forEach(container -> {

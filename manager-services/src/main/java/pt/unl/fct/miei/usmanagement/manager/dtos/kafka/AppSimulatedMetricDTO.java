@@ -27,7 +27,7 @@ public class AppSimulatedMetricDTO {
 
 	private Long id;
 	private String name;
-	private Field field;
+	private FieldDTO field;
 	private double minimumValue;
 	private double maximumValue;
 	private boolean override;

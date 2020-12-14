@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.services.workermanagers;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -36,6 +37,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -66,6 +68,7 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -150,7 +153,12 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager saveWorkerManager(Container container) {
-		return workerManagers.save(WorkerManager.builder().container(container).region(container.getRegion()).build());
+		return saveWorkerManager(WorkerManager.builder().container(container).region(container.getRegion()).build());
+	}
+
+	public WorkerManager saveWorkerManager(WorkerManager workerManager) {
+		log.info("Saving worker manager {}", ToStringBuilder.reflectionToString(workerManager));
+		return workerManagers.save(workerManager);
 	}
 
 	public WorkerManager launchWorkerManager(HostAddress hostAddress) {
@@ -493,5 +501,10 @@ public class WorkerManagersService {
 
 	public boolean hasWorkerManager(Container container) {
 		return workerManagers.hasWorkerManagerByContainer(container.getId());
+	}
+
+	public WorkerManager addIfNotPresent(WorkerManager workerManager) {
+		Optional<WorkerManager> workerManagerOptional = workerManagers.findById(workerManager.getId());
+		return workerManagerOptional.orElseGet(() -> saveWorkerManager(workerManager));
 	}
 }

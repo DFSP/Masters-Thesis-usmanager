@@ -71,6 +71,12 @@ public class ComponentType /*extends AbstractEntity<Long> */{
 	@OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Decision> decisions;
 
+	public void clearAssociations() {
+		if (decisions != null) {
+			decisions.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

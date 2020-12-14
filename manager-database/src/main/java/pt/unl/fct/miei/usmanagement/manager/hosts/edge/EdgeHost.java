@@ -142,6 +142,15 @@ public class EdgeHost /*extends AbstractEntity<Long> */{
 		return new HostAddress(username, publicDnsName, publicIpAddress, privateIpAddress, coordinates, region, PlaceEnum.EDGE);
 	}
 
+	public void clearAssociations() {
+		if (hostRules != null) {
+			hostRules.clear();
+		}
+		if (simulatedHostMetrics != null) {
+			simulatedHostMetrics.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

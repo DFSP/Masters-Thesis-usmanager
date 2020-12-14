@@ -34,6 +34,7 @@ import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypes;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
+import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.HashSet;
 import java.util.List;
@@ -94,6 +95,14 @@ public class ComponentTypesService {
 		return componentType;
 	}
 
+	public ComponentType addIfNotPresent(ComponentType componentType) {
+		Optional<ComponentType> componentTypeOptional = componentTypes.findById(componentType.getId());
+		return componentTypeOptional.orElseGet(() -> {
+			componentType.clearAssociations();
+			return saveComponentType(componentType);
+		});
+	}
+	
 	public ComponentType addOrUpdateComponentType(ComponentType componentType) {
 		if (componentType.getId() != null) {
 			Optional<ComponentType> componentTypeOptional = componentTypes.findById(componentType.getId());

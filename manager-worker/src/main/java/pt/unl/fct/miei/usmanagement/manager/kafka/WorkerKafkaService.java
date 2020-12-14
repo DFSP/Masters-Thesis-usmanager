@@ -56,6 +56,7 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceRuleMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceSimulatedMetricMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ValueModeMapper;
+import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.WorkerManagerMapper;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -94,6 +95,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesS
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.List;
@@ -125,6 +127,7 @@ public class WorkerKafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final RuleConditionsService ruleConditionsService;
+	private final WorkerManagersService workerManagersService;
 
 	private final CycleAvoidingMappingContext context;
 
@@ -138,7 +141,8 @@ public class WorkerKafkaService {
 							  ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 							  ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							  HostRulesService hostRulesService, AppRulesService appRulesService, ServiceRulesService serviceRulesService,
-							  ContainerRulesService containerRulesService, ValueModesService valueModesService, RuleConditionsService ruleConditionsService) {
+							  ContainerRulesService containerRulesService, ValueModesService valueModesService,
+							  RuleConditionsService ruleConditionsService, WorkerManagersService workerManagersService) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -161,6 +165,7 @@ public class WorkerKafkaService {
 		this.containerRulesService = containerRulesService;
 		this.valueModesService = valueModesService;
 		this.ruleConditionsService = ruleConditionsService;
+		this.workerManagersService = workerManagersService;
 		this.context = new CycleAvoidingMappingContext();
 	}
 
@@ -206,6 +211,7 @@ public class WorkerKafkaService {
 					cloudHostsService.deleteCloudHost(id);
 				}
 				else {
+					workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(cloudHostDTO.getManagedByWorker(), context));
 					cloudHostsService.addOrUpdateCloudHost(cloudHost);
 				}
 			}
@@ -277,9 +283,9 @@ public class WorkerKafkaService {
 					containerRulesService.addOrUpdateRule(ContainerRuleMapper.MAPPER.toContainerRule(containerRuleCondition.getContainerRule(), context));
 				});*/
 
-					operatorsService.addIfNotPresent(condition.getOperator());
-					fieldsService.addIfNotPresent(condition.getField());
-					valueModesService.addIfNotPresent(condition.getValueMode());
+					operatorsService.addIfNotPresent(OperatorMapper.MAPPER.toOperator(conditionDTO.getOperator(), context));
+					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(conditionDTO.getField(), context));
+					valueModesService.addIfNotPresent(ValueModeMapper.MAPPER.toValueMode(conditionDTO.getValueMode(), context));
 
 					conditionsService.addOrUpdateCondition(condition);
 				}
@@ -292,177 +298,171 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "containers", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ContainerDTO containerDTO) {
-		log.debug("Received key={} message={}", key, containerDTO);
-		Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				String id = container.getId();
-				containersService.deleteContainer(id);
+	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerDTO> containerDTOs) {
+		int i = 0;
+		for (ContainerDTO containerDTO : containerDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, containerDTO);
+			Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					String id = container.getId();
+					containersService.deleteContainer(id);
+				}
+				else {
+					containersService.addOrUpdateContainer(container);
+				}
 			}
-			else {
-				/*Set<ContainerRule> rules = containerDTO.getContainerRules();
-				rules.forEach(rule -> {
-					decisionsService.addOrUpdateDecision(rule.getDecision());
-					//rule.getContainers().forEach(containersService::addOrUpdateContainer);
-					rule.getConditions().forEach(ruleConditionsService::saveContainerRuleCondition);
-				});
-				Set<ContainerSimulatedMetric> hostSimulatedMetrics = containerDTO.getSimulatedContainerMetrics();
-				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
-					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-					//hostSimulatedMetric.getContainers().forEach(containersService::addOrUpdateContainer);
-				});*/
-				containersService.addOrUpdateContainer(container);
+			catch (Exception e) {
+				log.error("Error while processing topic containers with message {}: {}", containerDTO, e.getMessage());
 			}
 		}
-		catch (Exception e) {
-			log.error("Error while processing topic containers with message {}: {}", containerDTO, e.getMessage());
-		}
+
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "decisions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, DecisionDTO decisionDTO) {
-		log.debug("Received key={} message={}", key, decisionDTO.toString());
-		Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = decision.getId();
-				decisionsService.deleteDecision(id);
+	public void listenDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<DecisionDTO> decisionDTOs) {
+		int i = 0;
+		for (DecisionDTO decisionDTO : decisionDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, decisionDTO.toString());
+			Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = decision.getId();
+					decisionsService.deleteDecision(id);
+				}
+				else {
+					componentTypesService.addIfNotPresent(ComponentTypeMapper.MAPPER.toComponentType(decisionDTO.getComponentType(), context));
+					decisionsService.addOrUpdateDecision(decision);
+				}
 			}
-			else {
-				/*ComponentType componentType = decision.getComponentType();
-				componentTypesService.addOrUpdateComponentType(componentType);*/
-				decisionsService.addOrUpdateDecision(decision);
+			catch (Exception e) {
+				log.error("Error while processing topic decisions with message {}: {}", decisionDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic decisions with message {}: {}", decisionDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "edge-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, EdgeHostDTO edgeHostDTO) {
-		log.debug("Received key={} message={}", key, edgeHostDTO.toString());
-		EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = edgeHost.getId();
-				edgeHostsService.deleteEdgeHost(id);
+	public void listenEdgeHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<EdgeHostDTO> edgeHostDTOs) {
+		int i = 0;
+		for (EdgeHostDTO edgeHostDTO : edgeHostDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, edgeHostDTO.toString());
+			EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = edgeHost.getId();
+					edgeHostsService.deleteEdgeHost(id);
+				}
+				else {
+					workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(edgeHostDTO.getManagedByWorker(), context));
+					edgeHostsService.addOrUpdateEdgeHost(edgeHost);
+				}
 			}
-			else {
-				/*Set<HostRule> rules = edgeHostDTO.getHostRules();
-				rules.forEach(rule -> {
-					decisionsService.addOrUpdateDecision(rule.getDecision());
-					rule.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
-					//rule.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
-					rule.getConditions().forEach(ruleConditionsService::saveHostRuleCondition);
-				});
-				Set<HostSimulatedMetric> hostSimulatedMetrics = edgeHostDTO.getSimulatedHostMetrics();
-				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
-					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-					hostSimulatedMetric.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
-					//hostSimulatedMetric.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
-				});*/
-				edgeHostsService.addOrUpdateEdgeHost(edgeHost);
+			catch (Exception e) {
+				log.error("Error while processing topic edge-hosts with message {}: {}", edgeHostDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic edge-hosts with message {}: {}", edgeHostDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "eips", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ElasticIpDTO elasticIpDTO) {
-		log.debug("Received key={} message={}", key, elasticIpDTO.toString());
-		ElasticIp elasticIp = ElasticIpMapper.MAPPER.toElasticIp(elasticIpDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = elasticIp.getId();
-				elasticIpsService.deleteElasticIp(id);
+	public void listenElasticIps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ElasticIpDTO> elasticIpDTOs) {
+		int i = 0;
+		for (ElasticIpDTO elasticIpDTO : elasticIpDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, elasticIpDTO.toString());
+			ElasticIp elasticIp = ElasticIpMapper.MAPPER.toElasticIp(elasticIpDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = elasticIp.getId();
+					elasticIpsService.deleteElasticIp(id);
+				}
+				else {
+					elasticIpsService.addOrUpdateElasticIp(elasticIp);
+				}
 			}
-			else {
-				elasticIpsService.addOrUpdateElasticIp(elasticIp);
+			catch (Exception e) {
+				log.error("Error while processing topic eips with message {}: {}", elasticIpDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic eips with message {}: {}", elasticIpDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "fields", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, FieldDTO fieldDTO) {
-		log.debug("Received key={} message={}", key, fieldDTO.toString());
-		Field field = FieldMapper.MAPPER.toField(fieldDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = field.getId();
-				fieldsService.deleteField(id);
+	public void listenFields(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<FieldDTO> fieldDTOs) {
+		int i = 0;
+		for (FieldDTO fieldDTO : fieldDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, fieldDTO.toString());
+			Field field = FieldMapper.MAPPER.toField(fieldDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = field.getId();
+					fieldsService.deleteField(id);
+				}
+				else {
+					fieldsService.addOrUpdateField(field);
+				}
 			}
-			else {
-				/*Set<Condition> conditions = fieldDTO.getConditions();
-				conditions.forEach(condition -> {
-					Operator operator = condition.getOperator();
-					operatorsService.addOrUpdateOperator(operator);
-					conditionsService.addOrUpdateCondition(condition);
-				});*/
-				fieldsService.addOrUpdateField(field);
+			catch (Exception e) {
+				log.error("Error while processing topic fields with message {}: {}", fieldDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic fields with message {}: {}", fieldDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, NodeDTO nodeDTO) {
-		log.debug("Received key={} message={}", key, nodeDTO.toString());
-		Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				String id = node.getId();
-				nodesService.deleteNode(id);
+	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<NodeDTO> nodeDTOs) {
+		int i = 0;
+		for (NodeDTO nodeDTO : nodeDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, nodeDTO.toString());
+			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					String id = node.getId();
+					nodesService.deleteNode(id);
+				}
+				else {
+					nodesService.addOrUpdateNode(node);
+				}
 			}
-			else {
-				nodesService.addOrUpdateNode(node);
+			catch (Exception e) {
+				log.error("Error while processing topic nodes with message {}: {}", nodeDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic nodes with message {}: {}", nodeDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "operators", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, OperatorDTO operatorDTO) {
-		log.debug("Received key={} message={}", key, operatorDTO.toString());
-		Operator operator = OperatorMapper.MAPPER.toOperator(operatorDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = operator.getId();
-				operatorsService.deleteOperator(id);
+	public void listenOperators(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<OperatorDTO> operatorDTOs) {
+		int i = 0;
+		for (OperatorDTO operatorDTO : operatorDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, operatorDTO.toString());
+			Operator operator = OperatorMapper.MAPPER.toOperator(operatorDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = operator.getId();
+					operatorsService.deleteOperator(id);
+				}
+				else {
+					operatorsService.addOrUpdateOperator(operator);
+				}
 			}
-			else {
-				/*operatorDTO.getConditions().forEach(condition -> {
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(condition.getField(), context));
-					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(condition.getValueMode(), context));
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(condition, context));
-				});*/
-				operatorsService.addOrUpdateOperator(operator);
+			catch (Exception e) {
+				log.error("Error while processing topic operators with message {}: {}", operatorDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic operators with message {}: {}", operatorDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "services", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ServiceDTO> serviceDTOs) {
+	public void listenService(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ServiceDTO> serviceDTOs) {
 		int i = 0;
 		for (ServiceDTO serviceDTO : serviceDTOs) {
 			String key = keys.get(i++);
@@ -498,15 +498,19 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-host-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, HostSimulatedMetricDTO hostSimulatedMetricDTO) {
-		log.debug("Received key={} message={}", key, hostSimulatedMetricDTO.toString());
-		HostSimulatedMetric hostSimulatedMetric = HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(hostSimulatedMetricDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = hostSimulatedMetric.getId();
-				hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
-			}
-			else {
+	public void listenSimulatedHostMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+										   List<HostSimulatedMetricDTO> hostSimulatedMetricDTOs) {
+		int i = 0;
+		for (HostSimulatedMetricDTO hostSimulatedMetricDTO : hostSimulatedMetricDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, hostSimulatedMetricDTO.toString());
+			HostSimulatedMetric hostSimulatedMetric = HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(hostSimulatedMetricDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = hostSimulatedMetric.getId();
+					hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
+				}
+				else {
 				/*fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
 				hostSimulatedMetricDTO.getCloudHosts().forEach(cloudHost -> {
 					*//*cloudHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);*//*
@@ -520,25 +524,31 @@ public class WorkerKafkaService {
 						hostSimulatedMetricsService.addOrUpdateSimulatedMetric(HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(simulatedMetric, context)));
 					edgeHostsService.addOrUpdateEdgeHost(EdgeHostMapper.MAPPER.toEdgeHost(edgeHost, context));
 				});*/
-				hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
+					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(hostSimulatedMetricDTO.getField(), context));
+					hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic simulated-host-metrics with message {}: {}", hostSimulatedMetricDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic simulated-host-metrics with message {}: {}", hostSimulatedMetricDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-app-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, AppSimulatedMetricDTO appSimulatedMetricDTO) {
-		log.debug("Received key={} message={}", key, appSimulatedMetricDTO.toString());
-		AppSimulatedMetric appSimulatedMetric = AppSimulatedMetricMapper.MAPPER.toAppSimulatedMetric(appSimulatedMetricDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = appSimulatedMetric.getId();
-				appSimulatedMetricsService.deleteAppSimulatedMetric(id);
-			}
-			else {
+	public void listenSimulatedAppMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+										  List<AppSimulatedMetricDTO> appSimulatedMetricDTOs) {
+		int i = 0;
+		for (AppSimulatedMetricDTO appSimulatedMetricDTO : appSimulatedMetricDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, appSimulatedMetricDTO.toString());
+			AppSimulatedMetric appSimulatedMetric = AppSimulatedMetricMapper.MAPPER.toAppSimulatedMetric(appSimulatedMetricDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = appSimulatedMetric.getId();
+					appSimulatedMetricsService.deleteAppSimulatedMetric(id);
+				}
+				else {
 				/*fieldsService.addField(appSimulatedMetric.getField());
 				appSimulatedMetricDTO.getApps().forEach(app -> {
 					*//*app.getAppRules().forEach(appRulesService::addOrUpdateRule);*//*
@@ -547,25 +557,31 @@ public class WorkerKafkaService {
 					});
 					appsService.addOrUpdateApp(AppMapper.MAPPER.toApp(app, context));
 				});*/
-				appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
+					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(appSimulatedMetricDTO.getField(), context));
+					appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic simulated-app-metrics with message {}: {}", appSimulatedMetricDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic simulated-app-metrics with message {}: {}", appSimulatedMetricDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-service-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ServiceSimulatedMetricDTO serviceSimulatedMetricDTO) {
-		log.debug("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
-		ServiceSimulatedMetric serviceSimulatedMetric = ServiceSimulatedMetricMapper.MAPPER.toServiceSimulatedMetric(serviceSimulatedMetricDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = serviceSimulatedMetric.getId();
-				serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
-			}
-			else {
+	public void listenSimulatedServiceMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+											  List<ServiceSimulatedMetricDTO> serviceSimulatedMetricDTOs) {
+		int i = 0;
+		for (ServiceSimulatedMetricDTO serviceSimulatedMetricDTO : serviceSimulatedMetricDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
+			ServiceSimulatedMetric serviceSimulatedMetric = ServiceSimulatedMetricMapper.MAPPER.toServiceSimulatedMetric(serviceSimulatedMetricDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = serviceSimulatedMetric.getId();
+					serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
+				}
+				else {
 				/*fieldsService.addOrUpdateField(serviceSimulatedMetric.getField());
 				serviceSimulatedMetricDTO.getServices().forEach(service -> {
 					*//*service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);*//*
@@ -574,25 +590,30 @@ public class WorkerKafkaService {
 					});
 					servicesService.addOrUpdateService(ServiceMapper.MAPPER.toService(service, context));
 				});*/
-				serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
+					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(serviceSimulatedMetricDTO.getField(), context));
+					serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic simulated-service-metrics with message {}: {}", serviceSimulatedMetricDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic simulated-service-metrics with message {}: {}", serviceSimulatedMetricDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-container-metrics", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ContainerSimulatedMetricDTO containerSimulatedMetricDTO) {
-		log.debug("Received key={} message={}", key, containerSimulatedMetricDTO.toString());
-		ContainerSimulatedMetric containerSimulatedMetric = ContainerSimulatedMetricMapper.MAPPER.toContainerSimulatedMetric(containerSimulatedMetricDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = containerSimulatedMetric.getId();
-				containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
-			}
-			else {
+	public void listenSimulatedContainerMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerSimulatedMetricDTO> containerSimulatedMetricDTOs) {
+		int i = 0;
+		for (ContainerSimulatedMetricDTO containerSimulatedMetricDTO : containerSimulatedMetricDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, containerSimulatedMetricDTO.toString());
+			ContainerSimulatedMetric containerSimulatedMetric = ContainerSimulatedMetricMapper.MAPPER.toContainerSimulatedMetric(containerSimulatedMetricDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = containerSimulatedMetric.getId();
+					containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
+				}
+				else {
 				/*fieldsService.addOrUpdateField(containerSimulatedMetric.getField());
 				containerSimulatedMetricDTO.getContainers().forEach(container -> {
 					*//*container.getContainerRules().forEach(containerRulesService::addOrUpdateRule);*//*
@@ -601,52 +622,62 @@ public class WorkerKafkaService {
 					});
 					containersService.addOrUpdateContainer(ContainerMapper.MAPPER.toContainer(container, context));
 				});*/
-				containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
+					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(containerSimulatedMetricDTO.getField(), context));
+					containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic simulated-container-metrics with message {}: {}", containerSimulatedMetricDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic simulated-container-metrics with message {}: {}", containerSimulatedMetricDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "host-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, HostRuleDTO hostRuleDTO) {
-		log.debug("Received key={} message={}", key, hostRuleDTO.toString());
-		HostRule hostRule = HostRuleMapper.MAPPER.toHostRule(hostRuleDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = hostRule.getId();
-				hostRulesService.deleteRule(id);
-			}
-			else {
+	public void listenHostRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<HostRuleDTO> hostRuleDTOs) {
+		int i = 0;
+		for (HostRuleDTO hostRuleDTO : hostRuleDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, hostRuleDTO.toString());
+			HostRule hostRule = HostRuleMapper.MAPPER.toHostRule(hostRuleDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = hostRule.getId();
+					hostRulesService.deleteRule(id);
+				}
+				else {
 				/*hostRuleDTO.getConditions().forEach(hostRuleCondition -> {
 					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(hostRuleCondition.getCondition().getOperator(), context));
 					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(hostRuleCondition.getCondition().getField(), context));
 					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(hostRuleCondition.getCondition().getValueMode(), context));
 					ruleConditionsService.saveHostRuleCondition(HostRuleConditionMapper.MAPPER.toHostRuleCondition(hostRuleCondition, context));
 				});*/
-				hostRuleDTO.getCloudHosts().forEach(cloudHost -> cloudHostsService.addOrUpdateCloudHost(CloudHostMapper.MAPPER.toCloudHost(cloudHost, context)));
-				hostRuleDTO.getEdgeHosts().forEach(edgeHost -> edgeHostsService.addOrUpdateEdgeHost(EdgeHostMapper.MAPPER.toEdgeHost(edgeHost, context)));
-				hostRulesService.addOrUpdateRule(hostRule);
+					//hostRuleDTO.getCloudHosts().forEach(cloudHost -> cloudHostsService.addOrUpdateCloudHost(CloudHostMapper.MAPPER.toCloudHost(cloudHost, context)));
+					//hostRuleDTO.getEdgeHosts().forEach(edgeHost -> edgeHostsService.addOrUpdateEdgeHost(EdgeHostMapper.MAPPER.toEdgeHost(edgeHost, context)));
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(hostRuleDTO.getDecision(), context));
+					hostRulesService.addOrUpdateRule(hostRule);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic host-rules with message {}: {}", hostRuleDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic host-rules with message {}: {}", hostRuleDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "app-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, AppRuleDTO appRuleDTO) {
-		log.debug("Received key={} message={}", key, appRuleDTO.toString());
-		AppRule appRule = AppRuleMapper.MAPPER.toAppRule(appRuleDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = appRule.getId();
-				appRulesService.deleteRule(id);
-			}
-			else {
+	public void listenAppRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<AppRuleDTO> appRuleDTOs) {
+		int i = 0;
+		for (AppRuleDTO appRuleDTO : appRuleDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, appRuleDTO.toString());
+			AppRule appRule = AppRuleMapper.MAPPER.toAppRule(appRuleDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = appRule.getId();
+					appRulesService.deleteRule(id);
+				}
+				else {
 				/*appRuleDTO.getConditions().forEach(appRuleCondition -> {
 					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(appRuleCondition.getCondition().getOperator(), context));
 					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(appRuleCondition.getCondition().getField(), context));
@@ -654,25 +685,30 @@ public class WorkerKafkaService {
 					ruleConditionsService.saveAppRuleCondition(AppRuleConditionMapper.MAPPER.toAppRuleCondition(appRuleCondition, context));
 				});
 				appRuleDTO.getApps().forEach(app -> appsService.addOrUpdateApp(AppMapper.MAPPER.toApp(app, context)));*/
-				appRulesService.addOrUpdateRule(appRule);
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(appRuleDTO.getDecision(), context));
+					appRulesService.addOrUpdateRule(appRule);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic app-rules with message {}: {}", appRuleDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic app-rules with message {}: {}", appRuleDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "service-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ServiceRuleDTO serviceRuleDTO) {
-		log.debug("Received key={} message={}", key, serviceRuleDTO.toString());
-		ServiceRule serviceRule = ServiceRuleMapper.MAPPER.toServiceRule(serviceRuleDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = serviceRule.getId();
-				serviceRulesService.deleteRule(id);
-			}
-			else {
+	public void listenServiceRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ServiceRuleDTO> serviceRuleDTOs) {
+		int i = 0;
+		for (ServiceRuleDTO serviceRuleDTO : serviceRuleDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, serviceRuleDTO.toString());
+			ServiceRule serviceRule = ServiceRuleMapper.MAPPER.toServiceRule(serviceRuleDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = serviceRule.getId();
+					serviceRulesService.deleteRule(id);
+				}
+				else {
 				/*serviceRuleDTO.getConditions().forEach(serviceRuleCondition -> {
 					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(serviceRuleCondition.getCondition().getOperator(), context));
 					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(serviceRuleCondition.getCondition().getField(), context));
@@ -682,25 +718,30 @@ public class WorkerKafkaService {
 				serviceRuleDTO.getServices().forEach(service -> servicesService.addOrUpdateService(ServiceMapper.MAPPER.toService(service, context)));
 
 				decisionsService.addOrUpdateDecision(serviceRule.getDecision());*/
-				serviceRulesService.addOrUpdateRule(serviceRule);
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(serviceRuleDTO.getDecision(), context));
+					serviceRulesService.addOrUpdateRule(serviceRule);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error from topic service-rules while saving {}: {}", serviceRuleDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error from topic service-rules while saving {}: {}", serviceRuleDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "container-rules", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ContainerRuleDTO containerRuleDTO) {
-		log.debug("Received key={} message={}", key, containerRuleDTO.toString());
-		ContainerRule containerRule = ContainerRuleMapper.MAPPER.toContainerRule(containerRuleDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = containerRule.getId();
-				containerRulesService.deleteRule(id);
-			}
-			else {
+	public void listenContainerRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerRuleDTO> containerRuleDTOs) {
+		int i = 0;
+		for (ContainerRuleDTO containerRuleDTO : containerRuleDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, containerRuleDTO.toString());
+			ContainerRule containerRule = ContainerRuleMapper.MAPPER.toContainerRule(containerRuleDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = containerRule.getId();
+					containerRulesService.deleteRule(id);
+				}
+				else {
 				/*containerRuleDTO.getConditions().forEach(containerRuleCondition -> {
 					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(containerRuleCondition.getCondition().getOperator(), context));
 					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(containerRuleCondition.getCondition().getField(), context));
@@ -708,35 +749,41 @@ public class WorkerKafkaService {
 					ruleConditionsService.saveContainerRuleCondition(ContainerRuleConditionMapper.MAPPER.toContainerRuleCondition(containerRuleCondition, context));
 				});
 				containerRuleDTO.getContainers().forEach(container -> containersService.addOrUpdateContainer(ContainerMapper.MAPPER.toContainer(container, context)));*/
-				containerRulesService.addOrUpdateRule(containerRule);
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(containerRuleDTO.getDecision(), context));
+					containerRulesService.addOrUpdateRule(containerRule);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic container-rules with message {}: {}", containerRuleDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic container-rules with message {}: {}", containerRuleDTO, e.getMessage());
+			}
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "value-modes", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ValueModeDTO valueModeDTO) {
-		log.debug("Received key={} message={}", key, valueModeDTO.toString());
-		ValueMode valueMode = ValueModeMapper.MAPPER.toValueMode(valueModeDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = valueMode.getId();
-				valueModesService.deleteValueMode(id);
-			}
-			else {
+	public void listenValueModes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ValueModeDTO> valueModeDTOs) {
+		int i = 0;
+		for (ValueModeDTO valueModeDTO : valueModeDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, valueModeDTO.toString());
+			ValueMode valueMode = ValueModeMapper.MAPPER.toValueMode(valueModeDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = valueMode.getId();
+					valueModesService.deleteValueMode(id);
+				}
+				else {
 				/*valueModeDTO.getConditions().forEach(condition -> {
 					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(condition.getOperator(), context));
 					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(condition.getField(), context));
 					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(condition, context));
 				});*/
-				valueModesService.addOrUpdateValueMode(valueMode);
+					valueModesService.addOrUpdateValueMode(valueMode);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic value-modes with message {}: {}", valueModeDTO.toString(), e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic value-modes with message {}: {}", valueModeDTO.toString(), e.getMessage());
+			}
 		}
 	}
 

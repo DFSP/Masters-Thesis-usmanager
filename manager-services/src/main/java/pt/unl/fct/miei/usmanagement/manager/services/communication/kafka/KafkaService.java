@@ -419,8 +419,8 @@ public class KafkaService {
 		//	nodesService.getNodes().stream().map(node -> NodeMapper.MAPPER.fromNode(node, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("operators", () ->
 		//	operatorsService.getOperators().stream().map(operator -> OperatorMapper.MAPPER.fromOperator(operator, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		topicsValues.put("services", () ->
-			servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		//topicsValues.put("services", () ->
+		//	servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("simulated-host-metrics", () ->
 		//	hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(metric -> HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("simulated-app-metrics", () ->

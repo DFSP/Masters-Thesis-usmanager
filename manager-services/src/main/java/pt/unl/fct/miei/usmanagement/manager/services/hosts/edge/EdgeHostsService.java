@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -219,6 +220,14 @@ public class EdgeHostsService {
 		return edgeHosts.save(edgeHost);
 	}
 
+	public EdgeHost addIfNotPresent(EdgeHost edgeHost) {
+		Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
+		return edgeHostOptional.orElseGet(() -> {
+			edgeHost.clearAssociations();
+			return saveEdgeHost(edgeHost);
+		});
+	}
+	
 	public EdgeHost addOrUpdateEdgeHost(EdgeHost edgeHost) {
 		if (edgeHost.getId() != null) {
 			Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
