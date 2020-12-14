@@ -45,27 +45,6 @@ public class ServiceDTO {
 		this.id = id;
 	}
 
-	public void clearAssociations() {
-		if (appServices != null) {
-			appServices.clear();
-		}
-		if (dependencies != null) {
-			dependencies.clear();
-		}
-		if (dependents != null) {
-			dependents.clear();
-		}
-		if (eventPredictions != null) {
-			eventPredictions.clear();
-		}
-		if (serviceRules != null) {
-			serviceRules.clear();
-		}
-		if (simulatedServiceMetrics != null) {
-			simulatedServiceMetrics.clear();
-		}
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

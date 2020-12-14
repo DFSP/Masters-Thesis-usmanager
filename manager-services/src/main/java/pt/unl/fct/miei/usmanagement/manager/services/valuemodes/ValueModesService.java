@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
@@ -89,6 +90,14 @@ public class ValueModesService {
 		return valueModes.save(valueMode);
 	}
 
+	public ValueMode addIfNotPresent(ValueMode valueMode) {
+		Optional<ValueMode> valueModeOptional = valueModes.findById(valueMode.getId());
+		return valueModeOptional.orElseGet(() -> {
+			valueMode.clearAssociations();
+			return saveValueMode(valueMode);
+		});
+	}
+	
 	public ValueMode addOrUpdateValueMode(ValueMode valueMode) {
 		if (valueMode.getId() != null) {
 			Optional<ValueMode> valueModeOptional = valueModes.findById(valueMode.getId());

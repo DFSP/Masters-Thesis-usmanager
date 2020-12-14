@@ -23,11 +23,6 @@ public class ServiceDependencyDTO {
 	private ServiceDTO service;
 	private ServiceDTO dependency;
 
-	public void clearAssociations() {
-		service.clearAssociations();
-		dependency.clearAssociations();
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

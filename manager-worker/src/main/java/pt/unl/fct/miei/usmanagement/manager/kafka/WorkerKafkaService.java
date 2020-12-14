@@ -97,6 +97,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesServic
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -166,7 +167,7 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "apps", autoStartup = "false")
 	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<AppDTO> appDTOs) {
-		/*int i = 0;
+		int i = 0;
 		for (AppDTO appDTO : appDTOs) {
 			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, appDTO.toString());
@@ -180,7 +181,7 @@ public class WorkerKafkaService {
 					Set<AppServiceDTO> appServices = appDTO.getAppServices();
 					appServices.forEach(appService -> {
 						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(appService.getService(), context);
-						servicesService.addOrUpdateService(service);
+						servicesService.addIfNotPresent(service);
 					});
 					appsService.addOrUpdateApp(app);
 				}
@@ -188,74 +189,73 @@ public class WorkerKafkaService {
 			catch (Exception e) {
 				log.error("Error while processing topic apps with message {}: {}", appDTO.toString(), e.getMessage());
 			}
-		}*/
+		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "cloud-hosts", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, CloudHostDTO cloudHostDTO) {
-		log.debug("Received key={} message={}", key, cloudHostDTO.toString());
-		CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = cloudHost.getId();
-				cloudHostsService.deleteCloudHost(id);
+	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<CloudHostDTO> cloudHostDTOs) {
+		int i = 0;
+		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, cloudHostDTO.toString());
+			CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = cloudHost.getId();
+					cloudHostsService.deleteCloudHost(id);
+				}
+				else {
+					cloudHostsService.addOrUpdateCloudHost(cloudHost);
+				}
 			}
-			else {
-				/*Set<HostRule> rules = cloudHostDTO.getHostRules();
-				rules.forEach(rule -> {
-					decisionsService.addOrUpdateDecision(rule.getDecision());
-					//rule.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
-					rule.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
-					rule.getConditions().forEach(ruleConditionsService::saveHostRuleCondition);
-				});
-				Set<HostSimulatedMetric> hostSimulatedMetrics = cloudHostDTO.getSimulatedHostMetrics();
-				hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
-					fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-					//hostSimulatedMetric.getCloudHosts().forEach(cloudHostsService::addOrUpdateCloudHost);
-					hostSimulatedMetric.getEdgeHosts().forEach(edgeHostsService::addOrUpdateEdgeHost);
-				});*/
-				cloudHostsService.addOrUpdateCloudHost(cloudHost);
+			catch (Exception e) {
+				log.error("Error while processing topic cloud-hosts with message {}: {}", cloudHostDTO.toString(), e.getMessage());
 			}
 		}
-		catch (Exception e) {
-			log.error("Error while processing topic cloud-hosts with message {}: {}", cloudHostDTO.toString(), e.getMessage());
-		}
-
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "component-types", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ComponentTypeDTO componentTypeDTO) {
-		log.debug("Received key={} message={}", key, componentTypeDTO);
-		ComponentType componentType = ComponentTypeMapper.MAPPER.toComponentType(componentTypeDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = componentType.getId();
-				componentTypesService.deleteComponentType(id);
+	public void listenComponentTypes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ComponentTypeDTO> componentTypeDTOs) {
+		int i = 0;
+		for (ComponentTypeDTO componentTypeDTO : componentTypeDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, componentTypeDTO);
+			ComponentType componentType = ComponentTypeMapper.MAPPER.toComponentType(componentTypeDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = componentType.getId();
+					componentTypesService.deleteComponentType(id);
+				}
+				else {
+					componentTypeDTO.getDecisions().forEach(decisionDTO -> {
+						Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
+						decisionsService.addIfNotPresent(decision);
+					});
+					componentTypesService.addOrUpdateComponentType(componentType);
+				}
 			}
-			else {
-				/*componentTypeDTO.getDecisions().forEach(decision ->
-					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(decision, context)));*/
-				componentTypesService.addOrUpdateComponentType(componentType);
+			catch (Exception e) {
+				log.error("Error while processing topic component-types with message {}: {}", componentTypeDTO, e.getMessage());
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic component-types with message {}: {}", componentTypeDTO, e.getMessage());
 		}
 	}
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "conditions", autoStartup = "false")
-	public void listen(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, ConditionDTO conditionDTO) {
-		log.debug("Received key={} message={}", key, conditionDTO);
-		Condition condition = ConditionMapper.MAPPER.toCondition(conditionDTO, context);
-		try {
-			if (Objects.equal(key, "DELETE")) {
-				Long id = condition.getId();
-				conditionsService.deleteCondition(id);
-			}
-			else {
+	public void listenConditions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ConditionDTO> conditionDTOs) {
+		int i = 0;
+		for (ConditionDTO conditionDTO : conditionDTOs) {
+			String key = keys.get(i++);
+			log.debug("Received key={} message={}", key, conditionDTO);
+			Condition condition = ConditionMapper.MAPPER.toCondition(conditionDTO, context);
+			try {
+				if (Objects.equal(key, "DELETE")) {
+					Long id = condition.getId();
+					conditionsService.deleteCondition(id);
+				}
+				else {
 				/*conditionDTO.getHostConditions().forEach(hostRuleCondition -> {
 					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(hostRuleCondition.getCondition(), context));
 					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(hostRuleCondition.getHostRule().getDecision(), context));
@@ -275,17 +275,18 @@ public class WorkerKafkaService {
 					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(containerRuleCondition.getCondition(), context));
 					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(containerRuleCondition.getContainerRule().getDecision(), context));
 					containerRulesService.addOrUpdateRule(ContainerRuleMapper.MAPPER.toContainerRule(containerRuleCondition.getContainerRule(), context));
-				});
+				});*/
 
-				operatorsService.addOrUpdateOperator(condition.getOperator());
-				fieldsService.addOrUpdateField(condition.getField());
-				valueModesService.addOrUpdateValueMode(condition.getValueMode());*/
+					operatorsService.addIfNotPresent(condition.getOperator());
+					fieldsService.addIfNotPresent(condition.getField());
+					valueModesService.addIfNotPresent(condition.getValueMode());
 
-				conditionsService.addOrUpdateCondition(condition);
+					conditionsService.addOrUpdateCondition(condition);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.error("Error while processing topic conditions with message {}: {}", conditionDTO, e.getMessage());
+			catch (Exception e) {
+				log.error("Error while processing topic conditions with message {}: {}", conditionDTO, e.getMessage());
+			}
 		}
 	}
 
@@ -467,42 +468,24 @@ public class WorkerKafkaService {
 			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, serviceDTO.toString());
 			try {
+				pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 				if (Objects.equal(key, "DELETE")) {
-					Long id = ServiceMapper.MAPPER.toService(serviceDTO, context).getId();
+					Long id = service.getId();
 					servicesService.deleteService(id);
 				}
 				else {
-					/*Set<ServiceRule> rules = serviceDTO.getServiceRules();
-					rules.forEach(rule -> {
-						decisionsService.addOrUpdateDecision(rule.getDecision());
-						//rule.getServices().forEach(servicesService::addOrUpdateService);
-						rule.getConditions().forEach(ruleConditionsService::saveServiceRuleCondition);
-					});
-					Set<ServiceSimulatedMetric> hostSimulatedMetrics = serviceDTO.getSimulatedServiceMetrics();
-					hostSimulatedMetrics.forEach(hostSimulatedMetric -> {
-						fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-						//hostSimulatedMetric.getServices().forEach(servicesService::addOrUpdateService);
-					});*/
-
-					pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 					for (AppServiceDTO appService : serviceDTO.getAppServices()) {
 						App app = AppMapper.MAPPER.toApp(appService.getApp(), context);
-						app.clearAssociations();
-						appsService.addOrUpdateApp(app);
+						appsService.addIfNotPresent(app);
 					}
-
 					for (ServiceDependencyDTO dependencyDTO : serviceDTO.getDependencies()) {
 						pt.unl.fct.miei.usmanagement.manager.services.Service dependencyService = ServiceMapper.MAPPER.toService(dependencyDTO.getDependency(), context);
-						dependencyService.clearAssociations();
-						servicesService.addOrUpdateService(dependencyService);
+						servicesService.addIfNotPresent(dependencyService);
 					}
-
 					for (ServiceDependencyDTO dependentDTO : serviceDTO.getDependents()) {
-						pt.unl.fct.miei.usmanagement.manager.services.Service dependentService = ServiceMapper.MAPPER.toService(dependentDTO.getDependency(), context);
-						dependentService.clearAssociations();
-						servicesService.addOrUpdateService(dependentService);
+						pt.unl.fct.miei.usmanagement.manager.services.Service dependentService = ServiceMapper.MAPPER.toService(dependentDTO.getService(), context);
+						servicesService.addIfNotPresent(dependentService);
 					}
-
 					servicesService.addOrUpdateService(service);
 				}
 			}

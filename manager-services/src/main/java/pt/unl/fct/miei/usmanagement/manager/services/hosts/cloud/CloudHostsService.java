@@ -60,6 +60,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.validation.ConstraintViolationException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -161,13 +162,25 @@ public class CloudHostsService {
 				CloudHost existingCloudHost = cloudHostOptional.get();
 				Set<HostRule> rules = cloudHost.getHostRules();
 				if (rules != null) {
-					existingCloudHost.getHostRules().retainAll(rules);
-					existingCloudHost.getHostRules().addAll(rules);
+					Set<HostRule> currentRules = existingCloudHost.getHostRules();
+					if (currentRules == null) {
+						existingCloudHost.setHostRules(new HashSet<>(rules));
+					}
+					else {
+						currentRules.retainAll(rules);
+						currentRules.addAll(rules);
+					}
 				}
 				Set<HostSimulatedMetric> simulatedMetrics = cloudHost.getSimulatedHostMetrics();
 				if (simulatedMetrics != null) {
-					existingCloudHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
-					existingCloudHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+					Set<HostSimulatedMetric> currentSimulatedMetrics = existingCloudHost.getSimulatedHostMetrics();
+					if (currentSimulatedMetrics == null) {
+						existingCloudHost.setSimulatedHostMetrics(new HashSet<>(simulatedMetrics));
+					}
+					else {
+						currentSimulatedMetrics.retainAll(simulatedMetrics);
+						currentSimulatedMetrics.addAll(simulatedMetrics);
+					}
 				}
 				EntityUtils.copyValidProperties(cloudHost, existingCloudHost);
 				return saveCloudHost(existingCloudHost);

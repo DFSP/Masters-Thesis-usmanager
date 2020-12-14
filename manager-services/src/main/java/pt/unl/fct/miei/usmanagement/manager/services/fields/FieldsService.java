@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
+import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -89,6 +90,14 @@ public class FieldsService {
 	public Field saveField(Field field) {
 		log.info("Saving field {}", ToStringBuilder.reflectionToString(field));
 		return fields.save(field);
+	}
+
+	public Field addIfNotPresent(Field field) {
+		Optional<Field> fieldOptional = fields.findById(field.getId());
+		return fieldOptional.orElseGet(() -> {
+			field.clearAssociations();
+			return saveField(field);
+		});
 	}
 
 	public Field addOrUpdateField(Field field) {

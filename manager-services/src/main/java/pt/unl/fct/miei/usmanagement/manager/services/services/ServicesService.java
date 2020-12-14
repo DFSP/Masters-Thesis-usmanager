@@ -35,10 +35,6 @@ import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPredictions;
@@ -46,6 +42,10 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.Services;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.sql.Timestamp;
@@ -123,6 +123,14 @@ public class ServicesService {
 		return service;
 	}
 
+	public Service addIfNotPresent(Service service) {
+		Optional<Service> serviceOptional = services.findById(service.getId());
+		return serviceOptional.orElseGet(() -> {
+			service.clearAssociations();
+			return saveService(service);
+		});
+	}
+
 	public Service addOrUpdateService(Service service) {
 		if (service.getId() != null) {
 			Optional<Service> serviceOptional = services.findById(service.getId());
@@ -198,7 +206,7 @@ public class ServicesService {
 				return saveService(existingService);
 			}
 		}
-			return saveService(service);
+		return saveService(service);
 	}
 
 	public Service saveService(Service service) {
@@ -207,6 +215,7 @@ public class ServicesService {
 	}
 
 	public void deleteService(Long id) {
+		log.info("Deleting service {}", id);
 		services.deleteById(id);
 	}
 

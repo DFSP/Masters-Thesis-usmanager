@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
@@ -75,18 +74,23 @@ public class Decision /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision")
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceEvent> serviceEvents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "decision")
+	@OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostEvent> hostEvents;
 
   /*@Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceDecisionEntity> componentDecisionLogs;*/
+
+	public void clearAssociations() {
+		serviceEvents.clear();
+		hostEvents.clear();
+	}
 
 	@Override
 	public int hashCode() {

@@ -70,6 +70,12 @@ public class ValueMode /*extends AbstractEntity<Long> */{
 	@OneToMany(mappedBy = "valueMode")
 	private Set<Condition> conditions;
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

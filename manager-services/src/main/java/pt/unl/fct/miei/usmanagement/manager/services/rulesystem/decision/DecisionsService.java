@@ -28,13 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decisions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
@@ -48,13 +47,19 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisions
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -114,16 +119,46 @@ public class DecisionsService {
 		return decision;
 	}
 
-	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision addOrUpdateDecision(Decision decision) {
+	public Decision addIfNotPresent(Decision decision) {
+		Optional<Decision> decisionOptional = decisions.findById(decision.getId());
+		return decisionOptional.orElseGet(() -> {
+			decision.clearAssociations();
+			return saveDecision(decision);
+		});
+	}
+	
+	public Decision addOrUpdateDecision(Decision decision) {
 		if (decision.getId() != null) {
 			Optional<Decision> decisionOptional = decisions.findById(decision.getId());
 			if (decisionOptional.isPresent()) {
 				Decision existingDecision = decisionOptional.get();
+				Set<ServiceEvent> serviceEvents = decision.getServiceEvents();
+				if (serviceEvents != null) {
+					Set<pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent> currentServiceEvents = existingDecision.getServiceEvents();
+					if (currentServiceEvents == null) {
+						existingDecision.setServiceEvents(new HashSet<>(serviceEvents));
+					}
+					else {
+						currentServiceEvents.retainAll(serviceEvents);
+						currentServiceEvents.addAll(serviceEvents);
+					}
+				}
+				Set<HostEvent> hostEvents = decision.getHostEvents();
+				if (hostEvents != null) {
+					Set<HostEvent> currentHostEvents = existingDecision.getHostEvents();
+					if (currentHostEvents == null) {
+						existingDecision.setHostEvents(new HashSet<>(hostEvents));
+					}
+					else {
+						currentHostEvents.retainAll(hostEvents);
+						currentHostEvents.addAll(hostEvents);
+					}
+				}
 				EntityUtils.copyValidProperties(decision, existingDecision);
 				return saveDecision(existingDecision);
 			}
 		}
-			return saveDecision(decision);
+		return saveDecision(decision);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision saveDecision(Decision decision) {

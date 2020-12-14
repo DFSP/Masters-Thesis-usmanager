@@ -87,6 +87,14 @@ public class AppsService {
 		return apps.save(app);
 	}
 
+	public App addIfNotPresent(App app) {
+		Optional<App> appOptional = apps.findById(app.getId());
+		return appOptional.orElseGet(() -> {
+			app.clearAssociations();
+			return saveApp(app);
+		});
+	}
+	
 	public App addOrUpdateApp(App app) {
 		if (app.getId() != null) {
 			Optional<App> appOptional = apps.findById(app.getId());

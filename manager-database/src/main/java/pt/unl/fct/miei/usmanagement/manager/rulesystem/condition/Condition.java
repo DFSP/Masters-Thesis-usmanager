@@ -73,15 +73,15 @@ public class Condition /*extends AbstractEntity<Long> */{
 	@Column(unique = true)
 	private String name;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne
 	@JoinColumn(name = "value_mode_id")
 	private ValueMode valueMode;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne
 	@JoinColumn(name = "field_id")
 	private Field field;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne
 	@JoinColumn(name = "operator_id")
 	private Operator operator;
 

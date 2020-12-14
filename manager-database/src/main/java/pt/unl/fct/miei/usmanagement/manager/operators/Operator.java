@@ -77,6 +77,12 @@ public class Operator /*extends AbstractEntity<Long> */{
 	@OneToMany(mappedBy = "operator")
 	private Set<Condition> conditions;
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -100,8 +101,14 @@ public class ComponentTypesService {
 				ComponentType existingComponentType = componentTypeOptional.get();
 				Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> decisions = componentType.getDecisions();
 				if (decisions != null) {
-					existingComponentType.getDecisions().retainAll(decisions);
-					existingComponentType.getDecisions().addAll(decisions);
+					Set<pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision> currentDecisions = existingComponentType.getDecisions();
+					if (currentDecisions == null) {
+						existingComponentType.setDecisions(new HashSet<>(decisions));
+					}
+					else {
+						currentDecisions.retainAll(decisions);
+						currentDecisions.addAll(decisions);
+					}
 				}
 				EntityUtils.copyValidProperties(componentType, existingComponentType);
 				return saveComponentType(existingComponentType);

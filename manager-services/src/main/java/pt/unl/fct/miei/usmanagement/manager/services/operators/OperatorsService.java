@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,6 +78,14 @@ public class OperatorsService {
 		return operator;
 	}
 
+	public Operator addIfNotPresent(Operator operator) {
+		Optional<Operator> operatorOptional = operators.findById(operator.getId());
+		return operatorOptional.orElseGet(() -> {
+			operator.clearAssociations();
+			return saveOperator(operator);
+		});
+	}
+
 	public Operator addOrUpdateOperator(Operator operator) {
 		if (operator.getId() != null) {
 			Optional<Operator> optionalOptional = operators.findById(operator.getId());
@@ -84,8 +93,14 @@ public class OperatorsService {
 				Operator existingOperator = optionalOptional.get();
 				Set<Condition> conditions = operator.getConditions();
 				if (conditions != null) {
-					existingOperator.getConditions().retainAll(conditions);
-					existingOperator.getConditions().addAll(conditions);
+					Set<Condition> currentConditions = existingOperator.getConditions();
+					if (currentConditions == null) {
+						existingOperator.setConditions(new HashSet<>(conditions));
+					}
+					else {
+						currentConditions.addAll(conditions);
+						currentConditions.retainAll(conditions);
+					}
 				}
 				EntityUtils.copyValidProperties(operator, existingOperator);
 				return saveOperator(existingOperator);

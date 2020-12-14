@@ -13,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -369,7 +370,7 @@ public class KafkaService {
 		kafkaListenerEndpointRegistry.start();
 	}
 
-	public void populateTopics() { // TODO private
+	private void populateTopics() {
 		Random random = new Random();
 		do {
 			try {
@@ -393,22 +394,11 @@ public class KafkaService {
 		} while (!populated);
 	}
 
+	//TODO @Transactional(readOnly = true)
 	private Map<String, Supplier<?>> topicsValues() {
-		List<pt.unl.fct.miei.usmanagement.manager.services.Service> servicse = servicesService.getServices();
-		for (pt.unl.fct.miei.usmanagement.manager.services.Service service1 : servicse) {
-			if (service1.getServiceName().equalsIgnoreCase("media-text")) {
-				ServiceDTO c = ServiceMapper.MAPPER.fromService(service1, cycleAvoidingMappingContext);
-				ObjectMapper objectMapper = new ObjectMapper();
-				try {
-					String js = objectMapper.writeValueAsString(c);
-					log.error(js);
-				} catch (Exception e) { }
-
-			}
-		}
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
-		//topicsValues.put("apps", () ->
-		//	appsService.getApps().stream().map(app -> AppMapper.MAPPER.fromApp(app, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("apps", () ->
+			appsService.getApps().stream().map(app -> AppMapper.MAPPER.fromApp(app, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("cloud-hosts", () ->
 		//	cloudHostsService.getCloudHosts().stream().map(cloudHost -> CloudHostMapper.MAPPER.fromCloudHost(cloudHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("component-types", () ->

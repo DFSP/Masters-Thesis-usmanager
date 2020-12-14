@@ -86,6 +86,18 @@ public class Field /*extends AbstractEntity<Long> */{
 	@OneToMany(mappedBy = "field")
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+		if (simulatedHostMetrics != null) {
+			simulatedHostMetrics.clear();
+		}
+		if (simulatedServiceMetrics != null) {
+			simulatedServiceMetrics.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());
