@@ -76,7 +76,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
@@ -91,7 +90,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulate
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.HostSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ServiceSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
@@ -190,10 +188,12 @@ public class WorkerKafkaService {
 				}
 				else {
 					Set<AppServiceDTO> appServices = appDTO.getAppServices();
-					appServices.forEach(appService -> {
-						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(appService.getService(), context);
-						servicesService.addIfNotPresent(service);
-					});
+					if (appServices != null) {
+						appServices.forEach(appService -> {
+							pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(appService.getService(), context);
+							servicesService.addIfNotPresent(service);
+						});
+					}
 					appsService.addOrUpdateApp(app);
 				}
 			}
@@ -245,10 +245,14 @@ public class WorkerKafkaService {
 					componentTypesService.deleteComponentType(id);
 				}
 				else {
-					componentTypeDTO.getDecisions().forEach(decisionDTO -> {
-						Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
-						decisionsService.addIfNotPresent(decision);
-					});
+					componentTypesService.addIfNotPresent(componentType);
+					Set<DecisionDTO> decisions = componentTypeDTO.getDecisions();
+					if (decisions != null) {
+						decisions.forEach(decisionDTO -> {
+							Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
+							decisionsService.addIfNotPresent(decision);
+						});
+					}
 					componentTypesService.addOrUpdateComponentType(componentType);
 				}
 			}
@@ -282,19 +286,19 @@ public class WorkerKafkaService {
 						Set<HostRuleDTO> hostRules = hostRuleConditions.stream().map(HostRuleConditionDTO::getRule).collect(Collectors.toSet());
 						listenHostRules(new ArrayList<>(Collections.nCopies(hostRuleConditions.size(), null)), hostRules);
 					}
-					
+
 					Set<AppRuleConditionDTO> appRuleConditions = conditionDTO.getAppConditions();
 					if (appRuleConditions != null && appRuleConditions.size() > 0) {
 						Set<AppRuleDTO> appRules = appRuleConditions.stream().map(AppRuleConditionDTO::getRule).collect(Collectors.toSet());
 						listenAppRules(new ArrayList<>(Collections.nCopies(appRuleConditions.size(), null)), appRules);
 					}
-					
+
 					Set<ServiceRuleConditionDTO> serviceRuleConditions = conditionDTO.getServiceConditions();
 					if (serviceRuleConditions != null && serviceRuleConditions.size() > 0) {
 						Set<ServiceRuleDTO> serviceRules = serviceRuleConditions.stream().map(ServiceRuleConditionDTO::getRule).collect(Collectors.toSet());
 						listenServiceRules(new ArrayList<>(Collections.nCopies(serviceRuleConditions.size(), null)), serviceRules);
 					}
-					
+
 					Set<ContainerRuleConditionDTO> containerRuleConditions = conditionDTO.getContainerConditions();
 					if (containerRuleConditions != null && containerRuleConditions.size() > 0) {
 						Set<ContainerRuleDTO> containerRules = containerRuleConditions.stream().map(ContainerRuleConditionDTO::getRule).collect(Collectors.toSet());
@@ -314,6 +318,7 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "containers", autoStartup = "false")
 	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerDTO> containerDTOs) {
+		// TODO filter
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
 			String key = keys.get(i++);
@@ -443,6 +448,7 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
 	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
+		// TODO filter
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
 			String key = keys.get(i++);
@@ -506,17 +512,26 @@ public class WorkerKafkaService {
 					servicesService.deleteService(id);
 				}
 				else {
-					for (AppServiceDTO appService : serviceDTO.getAppServices()) {
-						App app = AppMapper.MAPPER.toApp(appService.getApp(), context);
-						appsService.addIfNotPresent(app);
+					Set<AppServiceDTO> appServices = serviceDTO.getAppServices();
+					if (appServices != null) {
+						for (AppServiceDTO appService : appServices) {
+							App app = AppMapper.MAPPER.toApp(appService.getApp(), context);
+							appsService.addIfNotPresent(app);
+						}
 					}
-					for (ServiceDependencyDTO dependencyDTO : serviceDTO.getDependencies()) {
-						pt.unl.fct.miei.usmanagement.manager.services.Service dependencyService = ServiceMapper.MAPPER.toService(dependencyDTO.getDependency(), context);
-						servicesService.addIfNotPresent(dependencyService);
+					Set<ServiceDependencyDTO> serviceDependencies = serviceDTO.getDependencies();
+					if (serviceDependencies != null) {
+						for (ServiceDependencyDTO dependencyDTO : serviceDependencies) {
+							pt.unl.fct.miei.usmanagement.manager.services.Service dependencyService = ServiceMapper.MAPPER.toService(dependencyDTO.getDependency(), context);
+							servicesService.addIfNotPresent(dependencyService);
+						}
 					}
-					for (ServiceDependencyDTO dependentDTO : serviceDTO.getDependents()) {
-						pt.unl.fct.miei.usmanagement.manager.services.Service dependentService = ServiceMapper.MAPPER.toService(dependentDTO.getService(), context);
-						servicesService.addIfNotPresent(dependentService);
+					Set<ServiceDependencyDTO> serviceDependents = serviceDTO.getDependents();
+					if (serviceDependents != null) {
+						for (ServiceDependencyDTO dependentDTO : serviceDependents) {
+							pt.unl.fct.miei.usmanagement.manager.services.Service dependentService = ServiceMapper.MAPPER.toService(dependentDTO.getService(), context);
+							servicesService.addIfNotPresent(dependentService);
+						}
 					}
 					servicesService.addOrUpdateService(service);
 				}
@@ -544,15 +559,21 @@ public class WorkerKafkaService {
 				}
 				else {
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(hostSimulatedMetricDTO.getField(), context));
-					for (CloudHostDTO cloudHostDTO : hostSimulatedMetricDTO.getCloudHosts()) {
-						CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
-						cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
-						cloudHost.addHostSimulatedMetric(hostSimulatedMetric);
+					Set<CloudHostDTO> cloudHosts = hostSimulatedMetricDTO.getCloudHosts();
+					if (cloudHosts != null) {
+						for (CloudHostDTO cloudHostDTO : hostSimulatedMetricDTO.getCloudHosts()) {
+							CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
+							cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
+							cloudHost.addHostSimulatedMetric(hostSimulatedMetric);
+						}
 					}
-					for (EdgeHostDTO edgeHostDTO : hostSimulatedMetricDTO.getEdgeHosts()) {
-						EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
-						edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
-						edgeHost.addHostSimulatedMetric(hostSimulatedMetric);
+					Set<EdgeHostDTO> edgeHosts = hostSimulatedMetricDTO.getEdgeHosts();
+					if (edgeHosts != null) {
+						for (EdgeHostDTO edgeHostDTO : edgeHosts) {
+							EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
+							edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
+							edgeHost.addHostSimulatedMetric(hostSimulatedMetric);
+						}
 					}
 					hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
 				}
@@ -580,10 +601,13 @@ public class WorkerKafkaService {
 				}
 				else {
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(appSimulatedMetricDTO.getField(), context));
-					for (AppDTO appDTO : appSimulatedMetricDTO.getApps()) {
-						pt.unl.fct.miei.usmanagement.manager.apps.App app = AppMapper.MAPPER.toApp(appDTO, context);
-						app = appsService.addIfNotPresent(app);
-						app.addAppSimulatedMetric(appSimulatedMetric);
+					Set<AppDTO> apps = appSimulatedMetricDTO.getApps();
+					if (apps != null) {
+						for (AppDTO appDTO : apps) {
+							pt.unl.fct.miei.usmanagement.manager.apps.App app = AppMapper.MAPPER.toApp(appDTO, context);
+							app = appsService.addIfNotPresent(app);
+							app.addAppSimulatedMetric(appSimulatedMetric);
+						}
 					}
 					appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
 				}
@@ -611,10 +635,13 @@ public class WorkerKafkaService {
 				}
 				else {
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(serviceSimulatedMetricDTO.getField(), context));
-					for (ServiceDTO serviceDTO : serviceSimulatedMetricDTO.getServices()) {
-						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
-						service = servicesService.addIfNotPresent(service);
-						service.addServiceSimulatedMetric(serviceSimulatedMetric);
+					Set<ServiceDTO> services = serviceSimulatedMetricDTO.getServices();
+					if (services != null) {
+						for (ServiceDTO serviceDTO : services) {
+							pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
+							service = servicesService.addIfNotPresent(service);
+							service.addServiceSimulatedMetric(serviceSimulatedMetric);
+						}
 					}
 					serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
 				}
@@ -641,10 +668,13 @@ public class WorkerKafkaService {
 				}
 				else {
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(containerSimulatedMetricDTO.getField(), context));
-					for (ContainerDTO containerDTO : containerSimulatedMetricDTO.getContainers()) {
-						pt.unl.fct.miei.usmanagement.manager.containers.Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
-						container = containersService.addIfNotPresent(container);
-						container.addContainerSimulatedMetric(containerSimulatedMetric);
+					Set<ContainerDTO> containers = containerSimulatedMetricDTO.getContainers();
+					if (containers != null) {
+						for (ContainerDTO containerDTO : containers) {
+							pt.unl.fct.miei.usmanagement.manager.containers.Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
+							container = containersService.addIfNotPresent(container);
+							container.addContainerSimulatedMetric(containerSimulatedMetric);
+						}
 					}
 					containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
 				}
@@ -687,15 +717,21 @@ public class WorkerKafkaService {
 							.collect(Collectors.toSet())
 							.forEach(hostRulesService::addIfNotPresent);
 					}
-					for (CloudHostDTO cloudHostDTO : hostRuleDTO.getCloudHosts()) {
-						CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
-						cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
-						cloudHost.addRule(hostRule);
+					Set<CloudHostDTO> cloudHosts = hostRuleDTO.getCloudHosts();
+					if (cloudHosts != null) {
+						for (CloudHostDTO cloudHostDTO : cloudHosts) {
+							CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
+							cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
+							cloudHost.addRule(hostRule);
+						}
 					}
-					for (EdgeHostDTO edgeHostDTO : hostRuleDTO.getEdgeHosts()) {
-						EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
-						edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
-						edgeHost.addRule(hostRule);
+					Set<EdgeHostDTO> edgeHosts = hostRuleDTO.getEdgeHosts();
+					if (edgeHosts != null) {
+						for (EdgeHostDTO edgeHostDTO : edgeHosts) {
+							EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
+							edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
+							edgeHost.addRule(hostRule);
+						}
 					}
 					hostRulesService.addOrUpdateRule(hostRule);
 				}
