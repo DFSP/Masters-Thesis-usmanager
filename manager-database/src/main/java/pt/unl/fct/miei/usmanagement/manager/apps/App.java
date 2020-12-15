@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
@@ -58,7 +57,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "apps")
-public class App /*extends AbstractEntity<Long> */{
+public class App /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -116,9 +115,15 @@ public class App /*extends AbstractEntity<Long> */{
 	}
 
 	public void clearAssociations() {
-		appServices.clear();
-		appRules.clear();
-		simulatedAppMetrics.clear();
+		if (appServices != null) {
+			appServices.clear();
+		}
+		if (appRules != null) {
+			appRules.clear();
+		}
+		if (simulatedAppMetrics != null) {
+			simulatedAppMetrics.clear();
+		}
 	}
 
 	@Override

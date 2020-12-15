@@ -143,6 +143,7 @@ public class HostSimulatedMetricsService {
 	public void deleteHostSimulatedMetric(HostSimulatedMetric simulatedMetric) {
 		simulatedMetric.removeAssociations();
 		hostSimulatedMetrics.delete(simulatedMetric);
+		kafkaService.sendDeleteHostSimulatedMetric(simulatedMetric);
 	}
 
 	public List<HostSimulatedMetric> getGenericHostSimulatedMetrics() {
@@ -176,7 +177,7 @@ public class HostSimulatedMetricsService {
 			CloudHost cloudHost = cloudHostsService.getCloudHostByIdOrIp(instanceId);
 			cloudHost.addHostSimulatedMetric(hostMetric);
 		});
-		hostSimulatedMetrics.save(hostMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetrics.save(hostMetric));
 	}
 
 	public void removeCloudHost(String simulatedMetricName, String instanceId) {
@@ -187,7 +188,7 @@ public class HostSimulatedMetricsService {
 		log.info("Removing cloud hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
 		HostSimulatedMetric hostMetric = getHostSimulatedMetric(simulatedMetricName);
 		instanceIds.forEach(instanceId -> cloudHostsService.getCloudHostByIdOrIp(instanceId).removeHostSimulatedMetric(hostMetric));
-		hostSimulatedMetrics.save(hostMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetrics.save(hostMetric));
 	}
 
 	public List<EdgeHost> getEdgeHosts(String simulatedMetricName) {
@@ -212,7 +213,7 @@ public class HostSimulatedMetricsService {
 			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			edgeHost.addHostSimulatedMetric(hostMetric);
 		});
-		hostSimulatedMetrics.save(hostMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetrics.save(hostMetric));
 	}
 
 	public void removeEdgeHost(String simulatedMetricName, HostAddress hostAddress) {
@@ -223,7 +224,7 @@ public class HostSimulatedMetricsService {
 		log.info("Removing edge hosts {} from simulated metric {}", hostAddresses, simulatedMetricName);
 		HostSimulatedMetric hostMetric = getHostSimulatedMetric(simulatedMetricName);
 		hostAddresses.forEach(hostAddress -> edgeHostsService.getEdgeHostByAddress(hostAddress).removeHostSimulatedMetric(hostMetric));
-		hostSimulatedMetrics.save(hostMetric);
+		kafkaService.sendHostSimulatedMetric(hostSimulatedMetrics.save(hostMetric));
 	}
 
 	public Double randomizeFieldValue(HostSimulatedMetric metric) {

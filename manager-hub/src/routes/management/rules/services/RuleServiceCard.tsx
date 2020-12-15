@@ -111,7 +111,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
                                 margin={'10px 0'}
                                 hoverable
                                 delete={{
-                                    url: `rules/hosts/${rule.name}`,
+                                    url: `rules/services/${rule.name}`,
                                     successCallback: this.onDeleteSuccess,
                                     failureCallback: this.onDeleteFailure,
                                 }}

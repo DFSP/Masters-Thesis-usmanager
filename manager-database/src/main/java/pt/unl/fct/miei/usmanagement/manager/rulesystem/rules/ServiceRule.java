@@ -80,7 +80,7 @@ public class ServiceRule /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceRule")
+	@OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceRuleCondition> conditions;
 
 	@Singular

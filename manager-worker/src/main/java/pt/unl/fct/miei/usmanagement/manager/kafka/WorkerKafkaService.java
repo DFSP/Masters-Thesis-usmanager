@@ -98,6 +98,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesServic
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -511,20 +512,17 @@ public class WorkerKafkaService {
 					hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
 				}
 				else {
-				/*fieldsService.addOrUpdateField(hostSimulatedMetric.getField());
-				hostSimulatedMetricDTO.getCloudHosts().forEach(cloudHost -> {
-					*//*cloudHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);*//*
-					cloudHost.getSimulatedHostMetrics().forEach(simulatedMetric ->
-						hostSimulatedMetricsService.addOrUpdateSimulatedMetric(HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(simulatedMetric, context)));
-					cloudHostsService.addOrUpdateCloudHost(CloudHostMapper.MAPPER.toCloudHost(cloudHost, context));
-				});
-				hostSimulatedMetricDTO.getEdgeHosts().forEach(edgeHost -> {
-					*//*edgeHost.getHostRules().forEach(hostRulesService::addOrUpdateRule);*//*
-					edgeHost.getSimulatedHostMetrics().forEach(simulatedMetric ->
-						hostSimulatedMetricsService.addOrUpdateSimulatedMetric(HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(simulatedMetric, context)));
-					edgeHostsService.addOrUpdateEdgeHost(EdgeHostMapper.MAPPER.toEdgeHost(edgeHost, context));
-				});*/
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(hostSimulatedMetricDTO.getField(), context));
+					for (CloudHostDTO cloudHostDTO : hostSimulatedMetricDTO.getCloudHosts()) {
+						CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
+						cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
+						cloudHost.addHostSimulatedMetric(hostSimulatedMetric);
+					}
+					for (EdgeHostDTO edgeHostDTO : hostSimulatedMetricDTO.getEdgeHosts()) {
+						EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
+						edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
+						edgeHost.addHostSimulatedMetric(hostSimulatedMetric);
+					}
 					hostSimulatedMetricsService.addOrUpdateSimulatedMetric(hostSimulatedMetric);
 				}
 			}
@@ -549,15 +547,12 @@ public class WorkerKafkaService {
 					appSimulatedMetricsService.deleteAppSimulatedMetric(id);
 				}
 				else {
-				/*fieldsService.addField(appSimulatedMetric.getField());
-				appSimulatedMetricDTO.getApps().forEach(app -> {
-					*//*app.getAppRules().forEach(appRulesService::addOrUpdateRule);*//*
-					app.getSimulatedAppMetrics().forEach(simulatedMetric -> {
-						appSimulatedMetricsService.addOrUpdateSimulatedMetric(AppSimulatedMetricMapper.MAPPER.toAppSimulatedMetric(simulatedMetric, context));
-					});
-					appsService.addOrUpdateApp(AppMapper.MAPPER.toApp(app, context));
-				});*/
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(appSimulatedMetricDTO.getField(), context));
+					for (AppDTO appDTO : appSimulatedMetricDTO.getApps()) {
+						pt.unl.fct.miei.usmanagement.manager.apps.App app = AppMapper.MAPPER.toApp(appDTO, context);
+						app = appsService.addIfNotPresent(app);
+						app.addAppSimulatedMetric(appSimulatedMetric);
+					}
 					appSimulatedMetricsService.addOrUpdateSimulatedMetric(appSimulatedMetric);
 				}
 			}
@@ -582,15 +577,12 @@ public class WorkerKafkaService {
 					serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
 				}
 				else {
-				/*fieldsService.addOrUpdateField(serviceSimulatedMetric.getField());
-				serviceSimulatedMetricDTO.getServices().forEach(service -> {
-					*//*service.getServiceRules().forEach(serviceRulesService::addOrUpdateRule);*//*
-					service.getSimulatedServiceMetrics().forEach(simulatedMetric -> {
-						serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(ServiceSimulatedMetricMapper.MAPPER.toServiceSimulatedMetric(simulatedMetric, context));
-					});
-					servicesService.addOrUpdateService(ServiceMapper.MAPPER.toService(service, context));
-				});*/
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(serviceSimulatedMetricDTO.getField(), context));
+					for (ServiceDTO serviceDTO : serviceSimulatedMetricDTO.getServices()) {
+						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
+						service = servicesService.addIfNotPresent(service);
+						service.addServiceSimulatedMetric(serviceSimulatedMetric);
+					}
 					serviceSimulatedMetricsService.addOrUpdateSimulatedMetric(serviceSimulatedMetric);
 				}
 			}
@@ -614,15 +606,12 @@ public class WorkerKafkaService {
 					containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
 				}
 				else {
-				/*fieldsService.addOrUpdateField(containerSimulatedMetric.getField());
-				containerSimulatedMetricDTO.getContainers().forEach(container -> {
-					*//*container.getContainerRules().forEach(containerRulesService::addOrUpdateRule);*//*
-					container.getSimulatedContainerMetrics().forEach(simulatedMetric -> {
-						containerSimulatedMetricsService.addOrUpdateSimulatedMetric(ContainerSimulatedMetricMapper.MAPPER.toContainerSimulatedMetric(simulatedMetric, context));
-					});
-					containersService.addOrUpdateContainer(ContainerMapper.MAPPER.toContainer(container, context));
-				});*/
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(containerSimulatedMetricDTO.getField(), context));
+					for (ContainerDTO containerDTO : containerSimulatedMetricDTO.getContainers()) {
+						pt.unl.fct.miei.usmanagement.manager.containers.Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
+						container = containersService.addIfNotPresent(container);
+						container.addContainerSimulatedMetric(containerSimulatedMetric);
+					}
 					containerSimulatedMetricsService.addOrUpdateSimulatedMetric(containerSimulatedMetric);
 				}
 			}
@@ -646,14 +635,17 @@ public class WorkerKafkaService {
 					hostRulesService.deleteRule(id);
 				}
 				else {
-				/*hostRuleDTO.getConditions().forEach(hostRuleCondition -> {
-					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(hostRuleCondition.getCondition().getOperator(), context));
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(hostRuleCondition.getCondition().getField(), context));
-					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(hostRuleCondition.getCondition().getValueMode(), context));
-					ruleConditionsService.saveHostRuleCondition(HostRuleConditionMapper.MAPPER.toHostRuleCondition(hostRuleCondition, context));
-				});*/
-					//hostRuleDTO.getCloudHosts().forEach(cloudHost -> cloudHostsService.addOrUpdateCloudHost(CloudHostMapper.MAPPER.toCloudHost(cloudHost, context)));
-					//hostRuleDTO.getEdgeHosts().forEach(edgeHost -> edgeHostsService.addOrUpdateEdgeHost(EdgeHostMapper.MAPPER.toEdgeHost(edgeHost, context)));
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(hostRuleDTO.getDecision(), context));
+					for (CloudHostDTO cloudHostDTO : hostRuleDTO.getCloudHosts()) {
+						CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
+						cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
+						cloudHost.addRule(hostRule);
+					}
+					for (EdgeHostDTO edgeHostDTO : hostRuleDTO.getEdgeHosts()) {
+						EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
+						edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
+						edgeHost.addRule(hostRule);
+					}
 					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(hostRuleDTO.getDecision(), context));
 					hostRulesService.addOrUpdateRule(hostRule);
 				}
@@ -678,14 +670,12 @@ public class WorkerKafkaService {
 					appRulesService.deleteRule(id);
 				}
 				else {
-				/*appRuleDTO.getConditions().forEach(appRuleCondition -> {
-					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(appRuleCondition.getCondition().getOperator(), context));
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(appRuleCondition.getCondition().getField(), context));
-					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(appRuleCondition.getCondition().getValueMode(), context));
-					ruleConditionsService.saveAppRuleCondition(AppRuleConditionMapper.MAPPER.toAppRuleCondition(appRuleCondition, context));
-				});
-				appRuleDTO.getApps().forEach(app -> appsService.addOrUpdateApp(AppMapper.MAPPER.toApp(app, context)));*/
 					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(appRuleDTO.getDecision(), context));
+					for (AppDTO appDTO : appRuleDTO.getApps()) {
+						App app = AppMapper.MAPPER.toApp(appDTO, context);
+						app = appsService.addIfNotPresent(app);
+						app.addRule(appRule);
+					}
 					appRulesService.addOrUpdateRule(appRule);
 				}
 			}
@@ -709,16 +699,12 @@ public class WorkerKafkaService {
 					serviceRulesService.deleteRule(id);
 				}
 				else {
-				/*serviceRuleDTO.getConditions().forEach(serviceRuleCondition -> {
-					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(serviceRuleCondition.getCondition().getOperator(), context));
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(serviceRuleCondition.getCondition().getField(), context));
-					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(serviceRuleCondition.getCondition().getValueMode(), context));
-					ruleConditionsService.saveServiceRuleCondition(ServiceRuleConditionMapper.MAPPER.toServiceRuleCondition(serviceRuleCondition, context));
-				});
-				serviceRuleDTO.getServices().forEach(service -> servicesService.addOrUpdateService(ServiceMapper.MAPPER.toService(service, context)));
-
-				decisionsService.addOrUpdateDecision(serviceRule.getDecision());*/
 					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(serviceRuleDTO.getDecision(), context));
+					for (ServiceDTO serviceDTO : serviceRuleDTO.getServices()) {
+						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
+						service = servicesService.addIfNotPresent(service);
+						service.addRule(serviceRule);
+					}
 					serviceRulesService.addOrUpdateRule(serviceRule);
 				}
 			}
@@ -742,14 +728,12 @@ public class WorkerKafkaService {
 					containerRulesService.deleteRule(id);
 				}
 				else {
-				/*containerRuleDTO.getConditions().forEach(containerRuleCondition -> {
-					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(containerRuleCondition.getCondition().getOperator(), context));
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(containerRuleCondition.getCondition().getField(), context));
-					valueModesService.addOrUpdateValueMode(ValueModeMapper.MAPPER.toValueMode(containerRuleCondition.getCondition().getValueMode(), context));
-					ruleConditionsService.saveContainerRuleCondition(ContainerRuleConditionMapper.MAPPER.toContainerRuleCondition(containerRuleCondition, context));
-				});
-				containerRuleDTO.getContainers().forEach(container -> containersService.addOrUpdateContainer(ContainerMapper.MAPPER.toContainer(container, context)));*/
 					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(containerRuleDTO.getDecision(), context));
+					for (ContainerDTO containerDTO : containerRuleDTO.getContainers()) {
+						Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
+						container = containersService.addIfNotPresent(container);
+						container.addRule(containerRule);
+					}
 					containerRulesService.addOrUpdateRule(containerRule);
 				}
 			}

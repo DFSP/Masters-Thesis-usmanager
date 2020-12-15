@@ -423,8 +423,8 @@ public class KafkaService {
 		//	servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("simulated-host-metrics", () ->
 		//	hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(metric -> HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("simulated-app-metrics", () ->
-		//	appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(metric -> AppSimulatedMetricMapper.MAPPER.fromAppSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-app-metrics", () ->
+			appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(metric -> AppSimulatedMetricMapper.MAPPER.fromAppSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("simulated-service-metrics", () ->
 		//	serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(metric -> ServiceSimulatedMetricMapper.MAPPER.fromServiceSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		//topicsValues.put("simulated-container-metrics", () ->

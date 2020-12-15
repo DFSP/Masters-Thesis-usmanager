@@ -60,8 +60,7 @@ public class ServiceSimulatedMetricsController {
 	}
 
 	@PostMapping
-	public ServiceSimulatedMetric addServiceSimulatedMetric(
-		@RequestBody ServiceSimulatedMetric serviceSimulatedMetric) {
+	public ServiceSimulatedMetric addServiceSimulatedMetric(@RequestBody ServiceSimulatedMetric serviceSimulatedMetric) {
 		Validation.validatePostRequest(serviceSimulatedMetric.getId());
 		return serviceSimulatedMetricsService.addServiceSimulatedMetric(serviceSimulatedMetric);
 	}

@@ -81,7 +81,7 @@ public class HostRule /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostRule")
+	@OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostRuleCondition> conditions;
 
 	@Singular

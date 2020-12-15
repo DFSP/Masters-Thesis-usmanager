@@ -142,6 +142,15 @@ public class CloudHost /*extends AbstractEntity<Long> */{
 			awsRegion.getCoordinates(), awsRegion.getRegion(), PlaceEnum.CLOUD);
 	}
 
+	public void clearAssociations() {
+		if (hostRules != null) {
+			hostRules.clear();
+		}
+		if (simulatedHostMetrics != null) {
+			simulatedHostMetrics.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());
@@ -158,5 +167,4 @@ public class CloudHost /*extends AbstractEntity<Long> */{
 		CloudHost other = (CloudHost) o;
 		return id != null && id.equals(other.getId());
 	}
-
 }

@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -155,6 +156,14 @@ public class CloudHostsService {
 		return cloudHosts.save(cloudHost);
 	}
 
+	public CloudHost addIfNotPresent(CloudHost cloudHost) {
+		Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());
+		return cloudHostOptional.orElseGet(() -> {
+			cloudHost.clearAssociations();
+			return saveCloudHost(cloudHost);
+		});
+	}
+	
 	public CloudHost addOrUpdateCloudHost(CloudHost cloudHost) {
 		if (cloudHost.getId() != null) {
 			Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());

@@ -134,6 +134,7 @@ public class AppSimulatedMetricsService {
 	public void deleteAppSimulatedMetric(AppSimulatedMetric simulatedMetric) {
 		simulatedMetric.removeAssociations();
 		appSimulatedMetrics.delete(simulatedMetric);
+		kafkaService.sendDeleteAppSimulatedMetric(simulatedMetric);
 	}
 
 	public List<App> getApps(String simulatedMetricName) {
@@ -158,7 +159,7 @@ public class AppSimulatedMetricsService {
 			App app = appsService.getApp(appName);
 			app.addAppSimulatedMetric(appMetric);
 		});
-		appSimulatedMetrics.save(appMetric);
+		kafkaService.sendAppSimulatedMetric(appSimulatedMetrics.save(appMetric));
 	}
 
 	public void removeApp(String simulatedMetricName, String appName) {
@@ -170,7 +171,7 @@ public class AppSimulatedMetricsService {
 		AppSimulatedMetric appMetric = getAppSimulatedMetric(simulatedMetricName);
 		appNames.forEach(appName ->
 			appsService.getApp(appName).removeAppSimulatedMetric(appMetric));
-		appSimulatedMetrics.save(appMetric);
+		kafkaService.sendAppSimulatedMetric(appSimulatedMetrics.save(appMetric));
 	}
 
 	public Double randomizeFieldValue(AppSimulatedMetric appSimulatedMetric) {
