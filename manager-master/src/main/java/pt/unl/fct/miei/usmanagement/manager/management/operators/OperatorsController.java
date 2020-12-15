@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
@@ -73,6 +74,11 @@ public class OperatorsController {
 	@DeleteMapping("/{operatorName}")
 	public void deleteOperator(@PathVariable String operatorName) {
 		operatorsService.deleteOperator(operatorName);
+	}
+
+	@GetMapping("/{operatorName}/conditions")
+	public List<Condition> getConditions(@PathVariable String operatorName) {
+		return operatorsService.getConditions(operatorName);
 	}
 
 }

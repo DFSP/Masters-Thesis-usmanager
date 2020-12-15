@@ -1,72 +1,59 @@
-2020-12-13 16:44:17 jdbc[3]: exception
+2020-12-15 17:06:16 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:17 jdbc[3]: exception
+2020-12-15 17:06:16 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:18 jdbc[3]: exception
+2020-12-15 17:06:17 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:19 jdbc[3]: exception
+2020-12-15 17:06:17 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:19 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:19 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:19 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:18 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[3]: exception
+2020-12-15 17:06:19 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:20 jdbc[4]: exception
+2020-12-15 17:06:19 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-13 16:44:28 jdbc[50]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.orm.jpa.JpaSystemException: Could not set field value [9] value by reflection : [class pt.unl.fc... (594)"; SQL statement:
+2020-12-15 17:06:26 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''hostRules'': FactoryBean threw excepti... (390)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-13 16:44:28 jdbc[50]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.hibernate.PropertyAccessException: Could not set field value [9] value by reflection : [class pt.unl.fct.miei.us... (287)"; SQL statement:
+2020-12-15 17:06:26 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: java.lang.IllegalArgumentException: org.hibernate.QueryException: could not resolve property: hostCondition of: pt.u... (412)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-13 17:11:25 jdbc[32]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.springframework.orm.jpa.JpaSystemException: Could not set field value [9] value by reflection : [class pt.unl.fc... (594)"; SQL statement:
+2020-12-15 17:06:26 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.hibernate.QueryException: could not resolve property: hostCondition of: pt.unl.fct.miei.usmanagement.manager.rul... (376)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-13 17:11:25 jdbc[32]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.hibernate.PropertyAccessException: Could not set field value [9] value by reflection : [class pt.unl.fct.miei.us... (287)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-14 00:17:03 jdbc[4]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationNotAllowedException: Error creating bean with name ''awsService'': Singleton bean... (277)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-14 01:04:15 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-200]
-2020-12-14 01:04:15 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-200]
-2020-12-14 12:52:51 jdbc[124]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.ClassCastException: class pt.unl.fct.miei.usmanagement.manager.dtos.ServiceDependencyDTO cannot be cast to class pt.u... (367)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-14 12:52:51 jdbc[124]: exception
-org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.ClassCastException: class pt.unl.fct.miei.usmanagement.manager.dtos.ServiceDependencyDTO cannot be cast to class pt.u... (367)"; SQL statement:
+2020-12-15 17:06:27 jdbc[3]: exception
+org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''hostRules'': FactoryBean threw excepti... (390)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
 	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
 	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
@@ -80,30 +67,14 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
 	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
 	at ch.qos.logback.classic.Logger.log(Logger.java:765)
-	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
-	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
-	at java.logging/java.util.logging.Logger.log(Logger.java:979)
-	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
-	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
-	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
-	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
-	at java.base/java.lang.Thread.run(Thread.java:834)
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'java.lang.ClassCastException: class pt.unl.fct.miei.usmanagement.manager.dtos.ServiceDependencyDTO cannot be cast to class pt.u... (367)"; SQL statement:
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''hostRules'': FactoryBean threw excepti... (390)"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
@@ -129,29 +100,13 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
 	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
 	at ch.qos.logback.classic.Logger.log(Logger.java:765)
-	at org.slf4j.bridge.SLF4JBridgeHandler.callLocationAwareLogger(SLF4JBridgeHandler.java:221)
-	at org.slf4j.bridge.SLF4JBridgeHandler.publish(SLF4JBridgeHandler.java:303)
-	at java.logging/java.util.logging.Logger.log(Logger.java:979)
-	at java.logging/java.util.logging.Logger.doLog(Logger.java:1006)
-	at java.logging/java.util.logging.Logger.logp(Logger.java:1283)
-	at org.apache.juli.logging.DirectJDKLog.log(DirectJDKLog.java:175)
-	at org.apache.juli.logging.DirectJDKLog.error(DirectJDKLog.java:141)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:244)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:373)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
-	at java.base/java.lang.Thread.run(Thread.java:834)
+	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
+	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
+	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
@@ -262,6 +217,8 @@ org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primar
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: java.lang.IllegalArgumentException: org.hibernate.QueryException: could not resolve property: hostCondition of: pt.u... (412)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
@@ -286,10 +243,8 @@ org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primar
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: org.hibernate.QueryException: could not resolve property: hostCondition of: pt.unl.fct.miei.usmanagement.manager.rul... (376)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:

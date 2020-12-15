@@ -52,14 +52,14 @@ public interface AppRules extends JpaRepository<AppRule, Long> {
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
-	@Query("select rc.appCondition "
+	@Query("select rc.condition "
 		+ "from AppRule r left join r.conditions rc "
 		+ "where r.name = :ruleName")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
-	@Query("select rc.appCondition "
+	@Query("select rc.condition "
 		+ "from AppRule r left join r.conditions rc "
-		+ "where r.name = :ruleName and rc.appCondition.name = :conditionName")
+		+ "where r.name = :ruleName and rc.condition.name = :conditionName")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 

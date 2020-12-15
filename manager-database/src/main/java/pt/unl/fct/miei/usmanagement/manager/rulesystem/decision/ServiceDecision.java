@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import javax.persistence.Basic;
@@ -58,9 +57,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "service_decisions")
-public class ServiceDecision /*extends AbstractEntity<Long> */{
+public class ServiceDecision /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

@@ -61,14 +61,24 @@ public class ConditionDTO {
 			", operator=" + operator +
 			", value=" + value +
 			", hostConditions=" + (hostConditions == null ? "null" : hostConditions.stream().map(hostRuleConditionDTO ->
-			"{rule=" + hostRuleConditionDTO.getHostRule().getId() + ", condition=" + hostRuleConditionDTO.getCondition().getId() + "}")
+			hostRuleConditionDTO == null ? "null" :
+				"{rule=" + (hostRuleConditionDTO.getRule() == null ? "null" : hostRuleConditionDTO.getRule().getId()) +
+					", condition=" + (hostRuleConditionDTO.getCondition() == null ? "null" : hostRuleConditionDTO.getCondition().getId()) + "}")
 			.collect(Collectors.toSet())) +
-			", appConditions=" + (appConditions == null ? "null" : appConditions.stream().map(AppRuleConditionDTO::getId).collect(Collectors.toSet())) +
+			", appConditions=" + (appConditions == null ? "null" : appConditions.stream().map(appRuleConditionDTO ->
+			appRuleConditionDTO == null ? "null" :
+				"{rule=" + (appRuleConditionDTO.getRule() == null ? "null" : appRuleConditionDTO.getRule().getId()) +
+					", condition=" + (appRuleConditionDTO.getCondition() == null ? "null" : appRuleConditionDTO.getCondition().getId()) + "}")
+			.collect(Collectors.toSet())) +
 			", serviceConditions=" + (serviceConditions == null ? "null" : serviceConditions.stream().map(serviceRuleConditionDTO ->
-			"{rule=" + serviceRuleConditionDTO.getServiceRule().getId() + ", condition=" + serviceRuleConditionDTO.getCondition().getId() + "}")
+			serviceRuleConditionDTO == null ? "null" :
+				"{rule=" + (serviceRuleConditionDTO.getRule() == null ? "null" : serviceRuleConditionDTO.getRule().getId()) +
+					", condition=" + (serviceRuleConditionDTO.getCondition() == null ? "null" : serviceRuleConditionDTO.getCondition().getId()) + "}")
 			.collect(Collectors.toSet())) +
 			", containerConditions=" + (containerConditions == null ? "null" : containerConditions.stream().map(containerRuleConditionDTO ->
-			"{rule=" + containerRuleConditionDTO.getContainerRule().getId() + ", condition=" + containerRuleConditionDTO.getCondition().getId() + "}")
+			containerRuleConditionDTO == null ? "null" :
+				"{rule=" + (containerRuleConditionDTO.getRule() == null ? "null" : containerRuleConditionDTO.getRule().getId()) +
+					", condition=" + (containerRuleConditionDTO.getCondition() == null ? "null" : containerRuleConditionDTO.getCondition().getId()) + "}")
 			.collect(Collectors.toSet())) +
 			'}';
 	}

@@ -25,6 +25,9 @@
 package pt.unl.fct.miei.usmanagement.manager.rulesystem.rules;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface HostRuleConditions extends JpaRepository<HostRuleCondition, Long> {
 

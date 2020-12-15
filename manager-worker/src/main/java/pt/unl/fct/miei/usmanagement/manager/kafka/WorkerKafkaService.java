@@ -12,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppSimulatedMetricDTO;
@@ -19,18 +20,21 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.CloudHostDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ComponentTypeDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ContainerSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.DecisionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.EdgeHostDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ElasticIpDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.FieldDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.NodeDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.OperatorDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDependencyDTO;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ValueModeDTO;
@@ -98,9 +102,11 @@ import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesServic
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -172,7 +178,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "apps", autoStartup = "false")
-	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<AppDTO> appDTOs) {
+	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<AppDTO> appDTOs) {
 		int i = 0;
 		for (AppDTO appDTO : appDTOs) {
 			String key = keys.get(i++);
@@ -200,7 +206,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "cloud-hosts", autoStartup = "false")
-	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<CloudHostDTO> cloudHostDTOs) {
+	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<CloudHostDTO> cloudHostDTOs) {
 		int i = 0;
 		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
 			String key = keys.get(i++);
@@ -224,7 +230,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "component-types", autoStartup = "false")
-	public void listenComponentTypes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ComponentTypeDTO> componentTypeDTOs) {
+	public void listenComponentTypes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ComponentTypeDTO> componentTypeDTOs) {
 		int i = 0;
 		for (ComponentTypeDTO componentTypeDTO : componentTypeDTOs) {
 			String key = keys.get(i++);
@@ -251,7 +257,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "conditions", autoStartup = "false")
-	public void listenConditions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ConditionDTO> conditionDTOs) {
+	public void listenConditions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ConditionDTO> conditionDTOs) {
 		int i = 0;
 		for (ConditionDTO conditionDTO : conditionDTOs) {
 			String key = keys.get(i++);
@@ -263,30 +269,33 @@ public class WorkerKafkaService {
 					conditionsService.deleteCondition(id);
 				}
 				else {
-				/*conditionDTO.getHostConditions().forEach(hostRuleCondition -> {
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(hostRuleCondition.getCondition(), context));
-					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(hostRuleCondition.getHostRule().getDecision(), context));
-					hostRulesService.addOrUpdateRule(HostRuleMapper.MAPPER.toHostRule(hostRuleCondition.getHostRule(), context));
-				});
-				conditionDTO.getAppConditions().forEach(appRuleCondition -> {
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(appRuleCondition.getCondition(), context));
-					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(appRuleCondition.getAppRule().getDecision(), context));
-					appRulesService.addOrUpdateRule(AppRuleMapper.MAPPER.toAppRule(appRuleCondition.getAppRule(), context));
-				});
-				conditionDTO.getServiceConditions().forEach(serviceRuleCondition -> {
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(serviceRuleCondition.getCondition(), context));
-					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(serviceRuleCondition.getServiceRule().getDecision(), context));
-					serviceRulesService.addOrUpdateRule(ServiceRuleMapper.MAPPER.toServiceRule(serviceRuleCondition.getServiceRule(), context));
-				});
-				conditionDTO.getContainerConditions().forEach(containerRuleCondition -> {
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(containerRuleCondition.getCondition(), context));
-					decisionsService.addOrUpdateDecision(DecisionMapper.MAPPER.toDecision(containerRuleCondition.getContainerRule().getDecision(), context));
-					containerRulesService.addOrUpdateRule(ContainerRuleMapper.MAPPER.toContainerRule(containerRuleCondition.getContainerRule(), context));
-				});*/
-
 					operatorsService.addIfNotPresent(OperatorMapper.MAPPER.toOperator(conditionDTO.getOperator(), context));
 					fieldsService.addIfNotPresent(FieldMapper.MAPPER.toField(conditionDTO.getField(), context));
 					valueModesService.addIfNotPresent(ValueModeMapper.MAPPER.toValueMode(conditionDTO.getValueMode(), context));
+
+					Set<HostRuleConditionDTO> hostRuleConditions = conditionDTO.getHostConditions();
+					if (hostRuleConditions != null && hostRuleConditions.size() > 0) {
+						Set<HostRuleDTO> hostRules = hostRuleConditions.stream().map(HostRuleConditionDTO::getRule).collect(Collectors.toSet());
+						listenHostRules(new ArrayList<>(Collections.nCopies(hostRuleConditions.size(), null)), hostRules);
+					}
+					
+					Set<AppRuleConditionDTO> appRuleConditions = conditionDTO.getAppConditions();
+					if (appRuleConditions != null && appRuleConditions.size() > 0) {
+						Set<AppRuleDTO> appRules = appRuleConditions.stream().map(AppRuleConditionDTO::getRule).collect(Collectors.toSet());
+						listenAppRules(new ArrayList<>(Collections.nCopies(appRuleConditions.size(), null)), appRules);
+					}
+					
+					Set<ServiceRuleConditionDTO> serviceRuleConditions = conditionDTO.getServiceConditions();
+					if (serviceRuleConditions != null && serviceRuleConditions.size() > 0) {
+						Set<ServiceRuleDTO> serviceRules = serviceRuleConditions.stream().map(ServiceRuleConditionDTO::getRule).collect(Collectors.toSet());
+						listenServiceRules(new ArrayList<>(Collections.nCopies(serviceRuleConditions.size(), null)), serviceRules);
+					}
+					
+					Set<ContainerRuleConditionDTO> containerRuleConditions = conditionDTO.getContainerConditions();
+					if (containerRuleConditions != null && containerRuleConditions.size() > 0) {
+						Set<ContainerRuleDTO> containerRules = containerRuleConditions.stream().map(ContainerRuleConditionDTO::getRule).collect(Collectors.toSet());
+						listenContainerRules(new ArrayList<>(Collections.nCopies(containerRuleConditions.size(), null)), containerRules);
+					}
 
 					conditionsService.addOrUpdateCondition(condition);
 				}
@@ -299,7 +308,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "containers", autoStartup = "false")
-	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerDTO> containerDTOs) {
+	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerDTO> containerDTOs) {
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
 			String key = keys.get(i++);
@@ -323,7 +332,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "decisions", autoStartup = "false")
-	public void listenDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<DecisionDTO> decisionDTOs) {
+	public void listenDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<DecisionDTO> decisionDTOs) {
 		int i = 0;
 		for (DecisionDTO decisionDTO : decisionDTOs) {
 			String key = keys.get(i++);
@@ -347,7 +356,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "edge-hosts", autoStartup = "false")
-	public void listenEdgeHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<EdgeHostDTO> edgeHostDTOs) {
+	public void listenEdgeHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<EdgeHostDTO> edgeHostDTOs) {
 		int i = 0;
 		for (EdgeHostDTO edgeHostDTO : edgeHostDTOs) {
 			String key = keys.get(i++);
@@ -371,7 +380,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "eips", autoStartup = "false")
-	public void listenElasticIps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ElasticIpDTO> elasticIpDTOs) {
+	public void listenElasticIps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ElasticIpDTO> elasticIpDTOs) {
 		int i = 0;
 		for (ElasticIpDTO elasticIpDTO : elasticIpDTOs) {
 			String key = keys.get(i++);
@@ -394,7 +403,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "fields", autoStartup = "false")
-	public void listenFields(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<FieldDTO> fieldDTOs) {
+	public void listenFields(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<FieldDTO> fieldDTOs) {
 		int i = 0;
 		for (FieldDTO fieldDTO : fieldDTOs) {
 			String key = keys.get(i++);
@@ -406,6 +415,10 @@ public class WorkerKafkaService {
 					fieldsService.deleteField(id);
 				}
 				else {
+					Set<ConditionDTO> conditions = fieldDTO.getConditions();
+					if (conditions != null && conditions.size() > 0) {
+						listenConditions(new ArrayList<>(Collections.nCopies(conditions.size(), null)), conditions);
+					}
 					fieldsService.addOrUpdateField(field);
 				}
 			}
@@ -417,7 +430,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
-	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<NodeDTO> nodeDTOs) {
+	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
 			String key = keys.get(i++);
@@ -440,7 +453,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "operators", autoStartup = "false")
-	public void listenOperators(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<OperatorDTO> operatorDTOs) {
+	public void listenOperators(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<OperatorDTO> operatorDTOs) {
 		int i = 0;
 		for (OperatorDTO operatorDTO : operatorDTOs) {
 			String key = keys.get(i++);
@@ -452,6 +465,10 @@ public class WorkerKafkaService {
 					operatorsService.deleteOperator(id);
 				}
 				else {
+					operatorDTO.getConditions().forEach(conditionDTO -> {
+						Condition condition = ConditionMapper.MAPPER.toCondition(conditionDTO, context);
+						conditionsService.addIfNotPresent(condition);
+					});
 					operatorsService.addOrUpdateOperator(operator);
 				}
 			}
@@ -463,7 +480,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "services", autoStartup = "false")
-	public void listenService(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ServiceDTO> serviceDTOs) {
+	public void listenService(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ServiceDTO> serviceDTOs) {
 		int i = 0;
 		for (ServiceDTO serviceDTO : serviceDTOs) {
 			String key = keys.get(i++);
@@ -594,7 +611,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-container-metrics", autoStartup = "false")
-	public void listenSimulatedContainerMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerSimulatedMetricDTO> containerSimulatedMetricDTOs) {
+	public void listenSimulatedContainerMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerSimulatedMetricDTO> containerSimulatedMetricDTOs) {
 		int i = 0;
 		for (ContainerSimulatedMetricDTO containerSimulatedMetricDTO : containerSimulatedMetricDTOs) {
 			String key = keys.get(i++);
@@ -623,7 +640,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "host-rules", autoStartup = "false")
-	public void listenHostRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<HostRuleDTO> hostRuleDTOs) {
+	public void listenHostRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<HostRuleDTO> hostRuleDTOs) {
 		int i = 0;
 		for (HostRuleDTO hostRuleDTO : hostRuleDTOs) {
 			String key = keys.get(i++);
@@ -657,7 +674,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "app-rules", autoStartup = "false")
-	public void listenAppRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<AppRuleDTO> appRuleDTOs) {
+	public void listenAppRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<AppRuleDTO> appRuleDTOs) {
 		int i = 0;
 		for (AppRuleDTO appRuleDTO : appRuleDTOs) {
 			String key = keys.get(i++);
@@ -686,7 +703,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "service-rules", autoStartup = "false")
-	public void listenServiceRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ServiceRuleDTO> serviceRuleDTOs) {
+	public void listenServiceRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ServiceRuleDTO> serviceRuleDTOs) {
 		int i = 0;
 		for (ServiceRuleDTO serviceRuleDTO : serviceRuleDTOs) {
 			String key = keys.get(i++);
@@ -715,7 +732,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "container-rules", autoStartup = "false")
-	public void listenContainerRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ContainerRuleDTO> containerRuleDTOs) {
+	public void listenContainerRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerRuleDTO> containerRuleDTOs) {
 		int i = 0;
 		for (ContainerRuleDTO containerRuleDTO : containerRuleDTOs) {
 			String key = keys.get(i++);
@@ -744,7 +761,7 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "value-modes", autoStartup = "false")
-	public void listenValueModes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, List<ValueModeDTO> valueModeDTOs) {
+	public void listenValueModes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ValueModeDTO> valueModeDTOs) {
 		int i = 0;
 		for (ValueModeDTO valueModeDTO : valueModeDTOs) {
 			String key = keys.get(i++);
@@ -756,11 +773,10 @@ public class WorkerKafkaService {
 					valueModesService.deleteValueMode(id);
 				}
 				else {
-				/*valueModeDTO.getConditions().forEach(condition -> {
-					operatorsService.addOrUpdateOperator(OperatorMapper.MAPPER.toOperator(condition.getOperator(), context));
-					fieldsService.addOrUpdateField(FieldMapper.MAPPER.toField(condition.getField(), context));
-					conditionsService.addOrUpdateCondition(ConditionMapper.MAPPER.toCondition(condition, context));
-				});*/
+					Set<ConditionDTO> conditions = valueModeDTO.getConditions();
+					if (conditions != null && conditions.size() > 0) {
+						listenConditions(new ArrayList<>(Collections.nCopies(conditions.size(), null)), conditions);
+					}
 					valueModesService.addOrUpdateValueMode(valueMode);
 				}
 			}

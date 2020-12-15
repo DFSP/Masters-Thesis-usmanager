@@ -47,14 +47,14 @@ public interface ContainerRules extends JpaRepository<ContainerRule, Long> {
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
-	@Query("select rc.containerCondition "
+	@Query("select rc.condition "
 		+ "from ContainerRule r join r.conditions rc "
 		+ "where r.name = :ruleName")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
-	@Query("select rc.containerCondition "
+	@Query("select rc.condition "
 		+ "from ContainerRule r join r.conditions rc "
-		+ "where r.name = :ruleName and rc.containerCondition.name = :conditionName")
+		+ "where r.name = :ruleName and rc.condition.name = :conditionName")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 

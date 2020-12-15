@@ -32,12 +32,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
@@ -82,11 +82,31 @@ public class ConditionsController {
 		conditionsService.deleteCondition(conditionName);
 	}
 
+	@GetMapping("/{conditionName}/hosts")
+	public List<HostRuleCondition> getHostConditions(@PathVariable String conditionName) {
+		return conditionsService.getHostRuleConditions(conditionName);
+	}
+	
+	@GetMapping("/{conditionName}/apps")
+	public List<AppRuleCondition> getAppConditions(@PathVariable String conditionName) {
+		return conditionsService.getAppRuleConditions(conditionName);
+	}
+	
+	@GetMapping("/{conditionName}/services")
+	public List<ServiceRuleCondition> getServiceConditions(@PathVariable String conditionName) {
+		return conditionsService.getServiceRuleConditions(conditionName);
+	}
+	
+	@GetMapping("/{conditionName}/containers")
+	public List<ContainerRuleCondition> getContainerConditions(@PathVariable String conditionName) {
+		return conditionsService.getContainerRuleConditions(conditionName);
+	}
+
 	@GetMapping("/hosts")
 	public List<HostRuleCondition> getHostConditions() {
 		return ruleConditionsService.getHostRuleConditions();
 	}
-
+	
 	@GetMapping("/apps")
 	public List<AppRuleCondition> getAppConditions() {
 		return ruleConditionsService.getAppRuleConditions();

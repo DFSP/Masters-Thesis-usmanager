@@ -203,8 +203,8 @@ public class DatabaseLoader {
 			rxOver500000GenericServiceRule = serviceRulesService.addRule(rxOver500000GenericServiceRule);
 			ServiceRuleCondition rxOver500000Condition = ServiceRuleCondition.builder()
 				.id(new RuleConditionKey(rxOver500000GenericServiceRule.getId(), rxBytesPerSecOver500000.getId()))
-				.serviceRule(rxOver500000GenericServiceRule)
-				.serviceCondition(rxBytesPerSecOver500000)
+				.rule(rxOver500000GenericServiceRule)
+				.condition(rxBytesPerSecOver500000)
 				.build();
 			serviceRuleConditions.save(rxOver500000Condition);
 		}
@@ -235,15 +235,15 @@ public class DatabaseLoader {
 			Condition cpuPercentageOver90 = conditions.get("CpuPercentageOver90");
 			HostRuleCondition cpuOver90Condition = HostRuleCondition.builder()
 				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), cpuPercentageOver90.getId()))
-				.hostRule(cpuAndRamOver90GenericHostRule)
-				.hostCondition(cpuPercentageOver90)
+				.rule(cpuAndRamOver90GenericHostRule)
+				.condition(cpuPercentageOver90)
 				.build();
 			Condition ramPercentageOver90 = conditions.get("RamPercentageOver90");
 			ruleConditionsService.saveHostRuleCondition(cpuOver90Condition);
 			HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
 				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), ramPercentageOver90.getId()))
-				.hostRule(cpuAndRamOver90GenericHostRule)
-				.hostCondition(ramPercentageOver90)
+				.rule(cpuAndRamOver90GenericHostRule)
+				.condition(ramPercentageOver90)
 				.build();
 			ruleConditionsService.saveHostRuleCondition(ramOver90Condition);
 		}

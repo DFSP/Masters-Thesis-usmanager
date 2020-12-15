@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
@@ -71,10 +72,6 @@ public class ConditionsService {
 		return conditions.findAll();
 	}
 
-	public List<Condition> getConditionsAndRelations() {
-		return conditions.getConditionsAndRelations();
-	}
-
 
 	public Condition getCondition(Long id) {
 		return conditions.findById(id).orElseThrow(() ->
@@ -111,6 +108,14 @@ public class ConditionsService {
 		return conditions.save(condition);
 	}
 
+	public Condition addIfNotPresent(Condition condition) {
+		Optional<Condition> conditionOptional = conditions.findById(condition.getId());
+		return conditionOptional.orElseGet(() -> {
+			condition.clearAssociations();
+			return saveCondition(condition);
+		});
+	}
+	
 	public Condition addOrUpdateCondition(Condition condition) {
 		if (condition.getId() != null) {
 			Optional<Condition> optionalCondition = conditions.findById(condition.getId());
@@ -152,6 +157,22 @@ public class ConditionsService {
 		conditions.delete(condition);
 		kafkaService.sendDeleteCondition(condition);
 	}
+	
+	public List<HostRuleCondition> getHostRuleConditions(String conditionName) {
+		return conditions.getHostRuleConditions(conditionName);
+	}
+	
+	public List<AppRuleCondition> getAppRuleConditions(String conditionName) {
+		return conditions.getAppRuleConditions(conditionName);
+	}
+	
+	public List<ServiceRuleCondition> getServiceRuleConditions(String conditionName) {
+		return conditions.getServiceRuleConditions(conditionName);
+	}
+	
+	public List<ContainerRuleCondition> getContainerRuleConditions(String conditionName) {
+		return conditions.getContainerRuleConditions(conditionName);
+	}
 
 	private void checkConditionDoesntExist(Condition condition) {
 		String name = condition.getName();
@@ -159,5 +180,4 @@ public class ConditionsService {
 			throw new DataIntegrityViolationException("Condition '" + name + "' already exists");
 		}
 	}
-
 }

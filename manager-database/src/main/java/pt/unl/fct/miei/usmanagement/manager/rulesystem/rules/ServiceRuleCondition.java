@@ -60,12 +60,12 @@ public class ServiceRuleCondition /*extends AbstractEntity<Long> */{
 	@MapsId("ruleId")
 	@ManyToOne
 	@JoinColumn(name = "service_rule_id")
-	private ServiceRule serviceRule;
+	private ServiceRule rule;
 
 	@MapsId("conditionId")
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
-	private Condition serviceCondition;
+	private Condition condition;
 
 	@Override
 	public int hashCode() {

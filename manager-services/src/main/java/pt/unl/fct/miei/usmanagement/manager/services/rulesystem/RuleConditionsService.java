@@ -59,9 +59,9 @@ public class RuleConditionsService {
 
 	@Transactional
 	public void saveHostRuleCondition(HostRuleCondition hostRuleCondition) {
-		Condition condition = hostRuleCondition.getHostCondition();
+		Condition condition = hostRuleCondition.getCondition();
 		conditionsService.saveCondition(condition);
-		HostRule hostRule = hostRuleCondition.getHostRule();
+		HostRule hostRule = hostRuleCondition.getRule();
 		hostRulesService.saveRule(hostRule);
 		hostRuleConditions.save(hostRuleCondition);
 	}
@@ -72,9 +72,9 @@ public class RuleConditionsService {
 
 	@Transactional
 	public void saveAppRuleCondition(AppRuleCondition appRuleCondition) {
-		Condition condition = appRuleCondition.getAppCondition();
+		Condition condition = appRuleCondition.getCondition();
 		conditionsService.saveCondition(condition);
-		AppRule appRule = appRuleCondition.getAppRule();
+		AppRule appRule = appRuleCondition.getRule();
 		appRulesService.saveRule(appRule);
 		appRuleConditions.save(appRuleCondition);
 	}
@@ -85,9 +85,9 @@ public class RuleConditionsService {
 
 	@Transactional
 	public void saveServiceRuleCondition(ServiceRuleCondition serviceRuleCondition) {
-		Condition condition = serviceRuleCondition.getServiceCondition();
+		Condition condition = serviceRuleCondition.getCondition();
 		conditionsService.addOrUpdateCondition(condition);
-		ServiceRule serviceRule = serviceRuleCondition.getServiceRule();
+		ServiceRule serviceRule = serviceRuleCondition.getRule();
 		serviceRulesService.addOrUpdateRule(serviceRule);
 		serviceRuleConditions.save(serviceRuleCondition);
 	}
@@ -98,9 +98,9 @@ public class RuleConditionsService {
 
 	@Transactional
 	public void saveContainerRuleCondition(ContainerRuleCondition containerRuleCondition) {
-		Condition condition = containerRuleCondition.getContainerCondition();
+		Condition condition = containerRuleCondition.getCondition();
 		conditionsService.saveCondition(condition);
-		ContainerRule containerRule = containerRuleCondition.getContainerRule();
+		ContainerRule containerRule = containerRuleCondition.getRule();
 		containerRulesService.saveRule(containerRule);
 		containerRuleConditions.save(containerRuleCondition);
 	}

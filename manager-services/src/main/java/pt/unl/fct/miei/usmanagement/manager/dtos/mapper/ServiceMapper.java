@@ -8,6 +8,7 @@ import org.mapstruct.MapMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;

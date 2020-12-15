@@ -60,12 +60,12 @@ public class ContainerRuleCondition /*extends AbstractEntity<Long> */{
 	@MapsId("ruleId")
 	@ManyToOne
 	@JoinColumn(name = "container_rule_id")
-	private ContainerRule containerRule;
+	private ContainerRule rule;
 
 	@MapsId("conditionId")
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
-	private Condition containerCondition;
+	private Condition condition;
 
 	@Override
 	public int hashCode() {

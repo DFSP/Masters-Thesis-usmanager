@@ -204,7 +204,7 @@ public class ServiceRulesService {
 		ServiceRule rule = getRule(ruleName);
 		ServiceRuleCondition serviceRuleCondition = ServiceRuleCondition.builder()
 			.id(new RuleConditionKey(rule.getId(), condition.getId()))
-			.serviceRule(rule).serviceCondition(condition).build();
+			.rule(rule).condition(condition).build();
 		ruleConditionsService.saveServiceRuleCondition(serviceRuleCondition);
 		rule = rule.toBuilder().condition(serviceRuleCondition).build();
 		kafkaService.sendServiceRule(rule);
@@ -221,7 +221,7 @@ public class ServiceRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		ServiceRule rule = getRule(ruleName);
-		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendServiceRule(rule);
 	}

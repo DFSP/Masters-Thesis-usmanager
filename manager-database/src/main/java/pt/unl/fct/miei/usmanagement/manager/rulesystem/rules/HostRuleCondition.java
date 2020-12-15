@@ -60,13 +60,13 @@ public class HostRuleCondition /*extends AbstractEntity<Long> */{
 
 	@MapsId("ruleId")
 	@ManyToOne
-	@JoinColumn(name = "host_rule_id")
-	private HostRule hostRule;
+	@JoinColumn(name = "rule_id")
+	private HostRule rule;
 
 	@MapsId("conditionId")
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
-	private Condition hostCondition;
+	private Condition condition;
 
 	@Override
 	public int hashCode() {

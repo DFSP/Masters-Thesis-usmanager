@@ -27,7 +27,9 @@ package pt.unl.fct.miei.usmanagement.manager.operators;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface Operators extends JpaRepository<Operator, Long> {
@@ -39,4 +41,8 @@ public interface Operators extends JpaRepository<Operator, Long> {
 		+ "where o.operator = :operator")
 	boolean hasOperator(@Param("operator") OperatorEnum operator);
 
+	@Query("select o.conditions "
+		+ "from Operator o "
+		+ "where o.operator = :operator")
+	List<Condition> getConditions(@Param("operator") OperatorEnum operator);
 }

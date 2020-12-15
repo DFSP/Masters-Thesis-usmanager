@@ -22,7 +22,7 @@ import java.util.Objects;
 public class AppRuleConditionDTO {
 
 	private RuleConditionKey id;
-	private AppRuleDTO appRule;
+	private AppRuleDTO rule;
 	private ConditionDTO condition;
 
 	@Override

@@ -89,23 +89,38 @@ public class Condition /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "hostCondition")
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "appCondition")
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AppRuleCondition> appConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceCondition")
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "containerCondition")
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ContainerRuleCondition> containerConditions;
+
+	public void clearAssociations() {
+		if (hostConditions != null) {
+			hostConditions.clear();
+		}
+		if (appConditions != null) {
+			appConditions.clear();
+		}
+		if (serviceConditions != null) {
+			serviceConditions.clear();
+		}
+		if (containerConditions != null) {
+			containerConditions.clear();
+		}
+	}
 
 	@Override
 	public int hashCode() {

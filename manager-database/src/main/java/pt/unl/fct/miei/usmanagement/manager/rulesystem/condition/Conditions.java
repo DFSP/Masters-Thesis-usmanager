@@ -27,6 +27,10 @@ package pt.unl.fct.miei.usmanagement.manager.rulesystem.condition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +44,24 @@ public interface Conditions extends JpaRepository<Condition, Long> {
 
 	Optional<Condition> findByNameIgnoreCase(@Param("name") String name);
 
-	@Query("select c "
-		+ "from Condition c left join fetch c.containerConditions left join fetch c.serviceConditions "
-		+ "left join fetch c.appConditions left join fetch c.hostConditions")
-	List<Condition> getConditionsAndRelations();
+	@Query("select c.hostConditions "
+		+ "from Condition c "
+		+ "where lower(c.name) = lower(:name)")
+	List<HostRuleCondition> getHostRuleConditions(String name);
+	
+	@Query("select c.appConditions "
+		+ "from Condition c "
+		+ "where lower(c.name) = lower(:name)")
+	List<AppRuleCondition> getAppRuleConditions(String name);
+	
+	@Query("select c.serviceConditions "
+		+ "from Condition c "
+		+ "where lower(c.name) = lower(:name)")
+	List<ServiceRuleCondition> getServiceRuleConditions(String name);
+	
+	@Query("select c.containerConditions "
+		+ "from Condition c "
+		+ "where lower(c.name) = lower(:name)")
+	List<ContainerRuleCondition> getContainerRuleConditions(String name);
 
 }

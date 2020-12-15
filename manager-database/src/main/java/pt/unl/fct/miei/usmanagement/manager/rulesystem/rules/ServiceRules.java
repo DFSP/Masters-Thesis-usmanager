@@ -52,14 +52,14 @@ public interface ServiceRules extends JpaRepository<ServiceRule, Long> {
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
-	@Query("select rc.serviceCondition "
+	@Query("select rc.condition "
 		+ "from ServiceRule r join r.conditions rc "
 		+ "where lower(r.name) = lower(:ruleName)")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
-	@Query("select rc.serviceCondition "
+	@Query("select rc.condition "
 		+ "from ServiceRule r join r.conditions rc "
-		+ "where lower(r.name) = lower(:ruleName) and lower(rc.serviceCondition.name) = lower(:conditionName)")
+		+ "where lower(r.name) = lower(:ruleName) and lower(rc.condition.name) = lower(:conditionName)")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 

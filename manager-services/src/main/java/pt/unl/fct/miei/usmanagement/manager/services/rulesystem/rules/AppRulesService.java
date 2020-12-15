@@ -154,7 +154,7 @@ public class AppRulesService {
 		AppRule rule = getRule(ruleName);
 		AppRuleCondition appRuleCondition = AppRuleCondition.builder()
 			.id(new RuleConditionKey(rule.getId(), condition.getId()))
-			.appRule(rule).appCondition(condition).build();
+			.rule(rule).condition(condition).build();
 		ruleConditionsService.saveAppRuleCondition(appRuleCondition);
 		rule = rule.toBuilder().condition(appRuleCondition).build();
 		kafkaService.sendAppRule(rule);
@@ -171,7 +171,7 @@ public class AppRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		AppRule rule = getRule(ruleName);
-		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getAppCondition().getName()));
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendAppRule(rule);
 	}

@@ -140,4 +140,9 @@ public class OperatorsService {
 			throw new DataIntegrityViolationException("Operator '" + op.getSymbol() + "' already exists");
 		}
 	}
+
+	public List<Condition> getConditions(String operatorName) {
+		OperatorEnum operator = OperatorEnum.valueOf(operatorName.toUpperCase());
+		return operators.getConditions(operator);
+	}
 }

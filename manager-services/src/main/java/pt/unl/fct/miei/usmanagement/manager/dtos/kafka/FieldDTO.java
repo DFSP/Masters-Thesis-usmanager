@@ -32,7 +32,7 @@ public class FieldDTO {
 	private Long id;
 	private String name;
 	private PrometheusQueryEnum prometheusQuery;
-	private Set<Condition> conditions;
+	private Set<ConditionDTO> conditions;
 	private Set<HostSimulatedMetricDTO> simulatedHostMetrics;
 	private Set<ServiceSimulatedMetricDTO> simulatedServiceMetrics;
 
@@ -63,7 +63,8 @@ public class FieldDTO {
 			"id=" + id +
 			", name='" + name + '\'' +
 			", prometheusQuery=" + prometheusQuery +
-			", conditions=" + (conditions == null ? "null" : conditions.stream().map(Condition::getId).collect(Collectors.toSet())) +
+			", conditions=" + (conditions == null ? "null" : conditions.stream()
+			.map(ConditionDTO::getId).collect(Collectors.toSet())) +
 			", simulatedHostMetrics=" + (simulatedHostMetrics == null ? "null" : simulatedHostMetrics.stream()
 			.map(HostSimulatedMetricDTO::getId).collect(Collectors.toSet())) +
 			", simulatedServiceMetrics=" + (simulatedServiceMetrics == null ? "null" : simulatedServiceMetrics.stream()

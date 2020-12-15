@@ -66,14 +66,14 @@ public interface HostRules extends JpaRepository<HostRule, Long> {
 		+ "where lower(r.name) = lower(:ruleName)")
 	boolean hasRule(@Param("ruleName") String ruleName);
 
-	@Query("select rc.hostCondition "
+	@Query("select rc.condition "
 		+ "from HostRule r left join r.conditions rc "
 		+ "where lower(r.name) = lower(:ruleName)")
 	List<Condition> getConditions(@Param("ruleName") String ruleName);
 
-	@Query("select rc.hostCondition "
+	@Query("select rc.condition "
 		+ "from HostRule r left join r.conditions rc "
-		+ "where lower(r.name) = lower(:ruleName) and lower(rc.hostCondition.name) = lower(:conditionName)")
+		+ "where lower(r.name) = lower(:ruleName) and lower(rc.condition.name) = lower(:conditionName)")
 	Optional<Condition> getCondition(@Param("ruleName") String ruleName,
 									 @Param("conditionName") String conditionName);
 

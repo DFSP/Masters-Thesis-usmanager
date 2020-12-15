@@ -148,7 +148,7 @@ public class ContainerRulesService {
 		ContainerRule rule = getRule(ruleName);
 		ContainerRuleCondition containerRuleCondition = ContainerRuleCondition.builder()
 			.id(new RuleConditionKey(rule.getId(), condition.getId()))
-			.containerRule(rule).containerCondition(condition).build();
+			.rule(rule).condition(condition).build();
 		ruleConditionsService.saveContainerRuleCondition(containerRuleCondition);
 		rule = rule.toBuilder().condition(containerRuleCondition).build();
 		kafkaService.sendContainerRule(rule);
@@ -165,7 +165,7 @@ public class ContainerRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		ContainerRule rule = getRule(ruleName);
-		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getContainerCondition().getName()));
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendContainerRule(rule);
 	}

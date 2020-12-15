@@ -247,7 +247,7 @@ public class HostRulesService {
 		HostRule rule = getRuleAndEntities(ruleName);
 		HostRuleCondition hostRuleCondition = HostRuleCondition.builder()
 			.id(new RuleConditionKey(rule.getId(), condition.getId()))
-			.hostRule(rule).hostCondition(condition).build();
+			.rule(rule).condition(condition).build();
 		ruleConditionsService.saveHostRuleCondition(hostRuleCondition);
 		rule = rule.toBuilder().condition(hostRuleCondition).build();
 		kafkaService.sendHostRule(rule);
@@ -264,7 +264,7 @@ public class HostRulesService {
 	public void removeConditions(String ruleName, List<String> conditionNames) {
 		log.info("Removing conditions {}", conditionNames);
 		HostRule rule = getRuleAndEntities(ruleName);
-		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
+		rule.getConditions().removeIf(condition -> conditionNames.contains(condition.getCondition().getName()));
 		rule = saveRule(rule);
 		kafkaService.sendHostRule(rule);
 	}

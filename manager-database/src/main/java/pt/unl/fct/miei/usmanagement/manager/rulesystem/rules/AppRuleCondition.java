@@ -60,12 +60,12 @@ public class AppRuleCondition /*extends AbstractEntity<Long> */{
 	@MapsId("ruleId")
 	@ManyToOne
 	@JoinColumn(name = "app_rule_id")
-	private AppRule appRule;
+	private AppRule rule;
 
 	@MapsId("conditionId")
 	@ManyToOne
 	@JoinColumn(name = "condition_id")
-	private Condition appCondition;
+	private Condition condition;
 
 	@Override
 	public int hashCode() {
