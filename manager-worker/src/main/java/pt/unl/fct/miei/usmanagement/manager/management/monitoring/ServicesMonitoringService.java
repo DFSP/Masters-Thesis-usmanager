@@ -30,6 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
@@ -96,6 +97,7 @@ public class ServicesMonitoringService {
 	private final ContainerSimulatedMetricsService containerSimulatedMetricsService;
 	private final ContainersRecoveryService containersRecoveryService;
 	private final SyncService syncService;
+	private final KafkaService kafkaService;
 
 	private final long monitorPeriod;
 	private final int stopContainerOnEventCount;
@@ -115,7 +117,7 @@ public class ServicesMonitoringService {
 									 ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 									 ContainerSimulatedMetricsService containerSimulatedMetricsService,
 									 ContainersRecoveryService containersRecoveryService, SyncService syncService,
-									 MonitoringProperties monitoringProperties, WorkerManagerProperties workerManagerProperties) {
+									 KafkaService kafkaService, MonitoringProperties monitoringProperties, WorkerManagerProperties workerManagerProperties) {
 		this.serviceMonitoringLogs = serviceMonitoringLogs;
 		this.servicesMonitoring = servicesMonitoring;
 		this.dockerContainersService = dockerContainersService;
@@ -132,6 +134,7 @@ public class ServicesMonitoringService {
 		this.containerSimulatedMetricsService = containerSimulatedMetricsService;
 		this.containersRecoveryService = containersRecoveryService;
 		this.syncService = syncService;
+		this.kafkaService = kafkaService;
 		this.monitorPeriod = monitoringProperties.getServices().getPeriod();
 		this.stopContainerOnEventCount = monitoringProperties.getServices().getStopEventCount();
 		this.replicateContainerOnEventCount = monitoringProperties.getServices().getReplicateEventCount();
@@ -172,9 +175,9 @@ public class ServicesMonitoringService {
 			serviceMonitoring.update(value, updateTime);
 		}
 		servicesMonitoring.save(serviceMonitoring);
-		if (isTestEnable) {
+		/*if (isTestEnable) {*/
 			saveServiceMonitoringLog(containerId, serviceName, field, value);
-		}
+		/*}*/
 	}
 
 	public List<ServiceFieldAverage> getServiceFieldsAvg(String serviceName) {
@@ -205,7 +208,8 @@ public class ServicesMonitoringService {
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
 			.build();
-		serviceMonitoringLogs.save(serviceMonitoringLog);
+		serviceMonitoringLog = serviceMonitoringLogs.save(serviceMonitoringLog);
+		kafkaService.sendServiceMonitoringLog(serviceMonitoringLog);
 	}
 
 	public List<ServiceMonitoringLog> getServiceMonitoringLogs() {
@@ -364,8 +368,8 @@ public class ServicesMonitoringService {
 				String containerId = containerDecision.getContainerId();
 				RuleDecisionEnum decision = containerDecision.getDecision();
 				log.info("Service {} on container {} had decision {}", serviceName, containerId, decision);
-				ServiceEvent serviceEvent =
-					servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
+				ServiceEvent serviceEvent = servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
+				kafkaService.sendServiceEvent(serviceEvent);
 				int serviceEventCount = serviceEvent.getCount();
 				if (decision == RuleDecisionEnum.STOP && serviceEventCount >= stopContainerOnEventCount
 					|| decision == RuleDecisionEnum.REPLICATE && serviceEventCount >= replicateContainerOnEventCount
@@ -454,6 +458,7 @@ public class ServicesMonitoringService {
 		log.info("Executed decision: {}", result);
 		servicesEventsService.resetServiceEvent(serviceName);
 		ServiceDecision serviceDecision = decisionsService.addServiceDecision(containerId, serviceName, decision, ruleId, result);
+		kafkaService.sendServiceDecision(serviceDecision);
 		decisionsService.addServiceDecisionValueFromFields(serviceDecision, fields);
 	}
 

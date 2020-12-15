@@ -44,6 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -240,19 +241,33 @@ public class AppRulesService {
 		if (appRule.getId() != null) {
 			Optional<AppRule> optionalRule = rules.findById(appRule.getId());
 			if (optionalRule.isPresent()) {
-				AppRule rule = optionalRule.get();
+				AppRule existingRule = optionalRule.get();
 				Set<AppRuleCondition> conditions = appRule.getConditions();
 				if (conditions != null) {
-					rule.getConditions().retainAll(appRule.getConditions());
-					rule.getConditions().addAll(appRule.getConditions());
+					existingRule.getConditions().retainAll(appRule.getConditions());
+					existingRule.getConditions().addAll(appRule.getConditions());
 				}
 				Set<App> apps = appRule.getApps();
 				if (apps != null) {
-					rule.getApps().retainAll(appRule.getApps());
-					rule.getApps().addAll(appRule.getApps());
+					Set<App> currentApps = existingRule.getApps();
+					if (currentApps == null) {
+						existingRule.setApps(new HashSet<>(apps));
+					}
+					else {
+						apps.iterator().forEachRemaining(app -> {
+							if (!currentApps.contains(app)) {
+								app.addRule(existingRule);
+							}
+						});
+						currentApps.iterator().forEachRemaining(currentApp -> {
+							if (!apps.contains(currentApp)) {
+								currentApp.removeRule(existingRule);
+							}
+						});
+					}
 				}
-				EntityUtils.copyValidProperties(appRule, rule);
-				return saveRule(rule);
+				EntityUtils.copyValidProperties(appRule, existingRule);
+				return saveRule(existingRule);
 			}
 		}
 			return saveRule(appRule);

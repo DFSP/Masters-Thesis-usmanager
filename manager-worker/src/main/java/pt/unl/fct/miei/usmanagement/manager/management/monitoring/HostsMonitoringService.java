@@ -30,6 +30,7 @@ import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
@@ -90,6 +91,7 @@ public class HostsMonitoringService {
 	private final DecisionsService decisionsService;
 	private final HostSimulatedMetricsService hostSimulatedMetricsService;
 	private final NodesService nodesService;
+	private final KafkaService kafkaService;
 
 	private final long monitorPeriod;
 	private final int resolveOverworkedHostOnEventsCount;
@@ -105,8 +107,8 @@ public class HostsMonitoringService {
 								  HostsService hostsService, HostMetricsService hostMetricsService,
 								  ServicesService servicesService, HostsEventsService hostsEventsService,
 								  DecisionsService decisionsService, HostSimulatedMetricsService hostSimulatedMetricsService,
-								  NodesService nodesService, HostProperties hostProperties, WorkerManagerProperties workerManagerProperties,
-								  MonitoringProperties monitoringProperties) {
+								  NodesService nodesService, KafkaService kafkaService, HostProperties hostProperties,
+								  WorkerManagerProperties workerManagerProperties, MonitoringProperties monitoringProperties) {
 		this.hostsMonitoring = hostsMonitoring;
 		this.hostMonitoringLogs = hostMonitoringLogs;
 		this.dockerSwarmService = dockerSwarmService;
@@ -119,6 +121,7 @@ public class HostsMonitoringService {
 		this.decisionsService = decisionsService;
 		this.hostSimulatedMetricsService = hostSimulatedMetricsService;
 		this.nodesService = nodesService;
+		this.kafkaService = kafkaService;
 		this.monitorPeriod = monitoringProperties.getHosts().getPeriod();
 		this.resolveOverworkedHostOnEventsCount = monitoringProperties.getHosts().getOverworkEventCount();
 		this.resolveUnderworkedHostOnEventsCount = monitoringProperties.getHosts().getUnderworkEventCount();
@@ -153,9 +156,9 @@ public class HostsMonitoringService {
 			hostMonitoring.update(value, updateTime);
 		}
 		hostsMonitoring.save(hostMonitoring);
-		if (isTestEnable) {
+		/*if (isTestEnable) {*/
 			saveHostMonitoringLog(hostAddress, field, value);
-		}
+		/*}*/
 	}
 
 	public List<HostFieldAverage> getHostMonitoringFieldsAverage(HostAddress hostAddress) {
@@ -176,7 +179,8 @@ public class HostsMonitoringService {
 			.timestamp(LocalDateTime.now())
 			.value(effectiveValue)
 			.build();
-		hostMonitoringLogs.save(hostMonitoringLog);
+		hostMonitoringLog = hostMonitoringLogs.save(hostMonitoringLog);
+		kafkaService.sendHostMonitoringLog(hostMonitoringLog);
 	}
 
 	public List<HostMonitoringLog> getHostMonitoringLogs() {
@@ -308,12 +312,13 @@ public class HostsMonitoringService {
 			HostAddress hostAddress = decision.getHostAddress();
 			RuleDecisionEnum ruleDecision = decision.getDecision();
 			HostEvent hostEvent = hostsEventsService.saveHostEvent(hostAddress, ruleDecision.toString());
+			kafkaService.sendHostEvent(hostEvent);
 			int hostEventCount = hostEvent.getCount();
 			if ((ruleDecision == RuleDecisionEnum.OVERWORK && hostEventCount >= resolveOverworkedHostOnEventsCount)
 				|| (ruleDecision == RuleDecisionEnum.UNDERWORK && hostEventCount >= resolveUnderworkedHostOnEventsCount)) {
 				decisions.add(decision);
-				HostDecision hostDecision = decisionsService.addHostDecision(hostAddress, ruleDecision.name(),
-					decision.getRuleId());
+				HostDecision hostDecision = decisionsService.addHostDecision(hostAddress, ruleDecision.name(), decision.getRuleId());
+				kafkaService.sendHostDecision(hostDecision);
 				decisionsService.addHostDecisionValueFromFields(hostDecision, decision.getFields());
 				log.info("Host {} had decision {} as event #{}. Triggering action {}", hostAddress, ruleDecision, hostEventCount, ruleDecision);
 			}

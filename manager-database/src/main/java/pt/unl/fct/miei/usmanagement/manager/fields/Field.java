@@ -78,12 +78,12 @@ public class Field /*extends AbstractEntity<Long> */{
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field")
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field")
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
 	public void clearAssociations() {

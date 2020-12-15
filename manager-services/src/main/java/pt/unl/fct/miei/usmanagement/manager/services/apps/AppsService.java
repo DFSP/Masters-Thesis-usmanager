@@ -100,6 +100,17 @@ public class AppsService {
 			Optional<App> appOptional = apps.findById(app.getId());
 			if (appOptional.isPresent()) {
 				App existingApp = appOptional.get();
+				Set<AppService> appServices = app.getAppServices();
+				if (appServices != null) {
+					Set<AppService> currentAppServices = existingApp.getAppServices();
+					if (currentAppServices == null) {
+						existingApp.setAppServices(new HashSet<>(appServices));
+					}
+					else {
+						currentAppServices.retainAll(appServices);
+						currentAppServices.addAll(appServices);
+					}
+				}
 				Set<AppRule> rules = app.getAppRules();
 				if (rules != null) {
 					Set<AppRule> currentRules = existingApp.getAppRules();

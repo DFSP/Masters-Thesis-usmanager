@@ -54,7 +54,7 @@ public class MasterKafkaService {
 		this.context = new CycleAvoidingMappingContext();
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "host-events", autoStartup = "false")
+	@KafkaListener(topics = "host-events", autoStartup = "false")
 	public void listenHostEvents(List<HostEventDTO> hostEventDTOs) {
 		for (HostEventDTO hostEventDTO : hostEventDTOs) {
 			log.debug("Received message={}", hostEventDTO.toString());
@@ -68,7 +68,7 @@ public class MasterKafkaService {
 		}
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "service-events", autoStartup = "false")
+	@KafkaListener(topics = "service-events", autoStartup = "false")
 	public void listenServiceEvents(List<ServiceEventDTO> serviceEventDTOs) {
 		for (ServiceEventDTO serviceEventDTO : serviceEventDTOs) {
 			log.debug("Received message={}", serviceEventDTO.toString());
@@ -82,7 +82,7 @@ public class MasterKafkaService {
 		}
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "host-monitoring-logs", autoStartup = "false")
+	@KafkaListener(topics = "host-monitoring-logs", autoStartup = "false")
 	public void listenHostMonitoringLogs(List<HostMonitoringLogDTO> hostMonitoringLogDTOs) {
 		for (HostMonitoringLogDTO hostMonitoringLogDTO : hostMonitoringLogDTOs) {
 			log.debug("Received message={}", hostMonitoringLogDTO.toString());
@@ -96,7 +96,7 @@ public class MasterKafkaService {
 		}
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "service-monitoring-logs", autoStartup = "false")
+	@KafkaListener(topics = "service-monitoring-logs", autoStartup = "false")
 	public void listenServiceMonitoringLogs(List<ServiceMonitoringLogDTO> serviceMonitoringLogDTOs) {
 		for (ServiceMonitoringLogDTO serviceMonitoringLogDTO : serviceMonitoringLogDTOs) {
 			log.debug("Received message={}", serviceMonitoringLogDTO.toString());
@@ -110,7 +110,7 @@ public class MasterKafkaService {
 		}
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "host-decisions", autoStartup = "false")
+	@KafkaListener(topics = "host-decisions", autoStartup = "false")
 	public void listenHostDecisions(List<HostDecisionDTO> hostDecisionDTOs) {
 		for (HostDecisionDTO hostDecisionDTO : hostDecisionDTOs) {
 			log.debug("Received value={}", hostDecisionDTO.toString());
@@ -124,7 +124,7 @@ public class MasterKafkaService {
 		}
 	}
 
-	@KafkaListener(groupId = "manager-master", topics = "service-decisions", autoStartup = "false")
+	@KafkaListener(topics = "service-decisions", autoStartup = "false")
 	public void listenServiceDecisions(List<ServiceDecisionDTO> serviceDecisionDTOs) {
 		for (ServiceDecisionDTO serviceDecisionDTO : serviceDecisionDTOs) {
 			log.debug("Received message={}", serviceDecisionDTO.toString());
