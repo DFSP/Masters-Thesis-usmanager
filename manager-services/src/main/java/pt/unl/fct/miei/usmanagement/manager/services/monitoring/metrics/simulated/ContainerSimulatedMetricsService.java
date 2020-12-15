@@ -29,14 +29,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -58,6 +61,7 @@ public class ContainerSimulatedMetricsService {
 		this.containerSimulatedMetrics = containerSimulatedMetrics;
 	}
 
+	@Transactional(readOnly = true)
 	public List<ContainerSimulatedMetric> getContainerSimulatedMetrics() {
 		return containerSimulatedMetrics.findAll();
 	}
@@ -109,8 +113,22 @@ public class ContainerSimulatedMetricsService {
 				ContainerSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
 				Set<Container> containers = simulatedMetric.getContainers();
 				if (containers != null) {
-					existingSimulatedMetric.getContainers().retainAll(containers);
-					existingSimulatedMetric.getContainers().addAll(containers);
+					Set<Container> currentContainers = existingSimulatedMetric.getContainers();
+					if (currentContainers == null) {
+						existingSimulatedMetric.setContainers(new HashSet<>(containers));
+					}
+					else {
+						containers.iterator().forEachRemaining(container -> {
+							if (!currentContainers.contains(container)) {
+								container.addContainerSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+						currentContainers.iterator().forEachRemaining(currentContainer -> {
+							if (!containers.contains(currentContainer)) {
+								currentContainer.removeContainerSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
 				return saveContainerSimulatedMetric(existingSimulatedMetric);
@@ -122,18 +140,21 @@ public class ContainerSimulatedMetricsService {
 	public void deleteContainerSimulatedMetric(Long id) {
 		log.info("Deleting simulated container metric {}", id);
 		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(id);
-		deleteContainerSimulatedMetric(containerSimulatedMetric);
+		deleteContainerSimulatedMetric(containerSimulatedMetric, false);
 	}
 
 	public void deleteContainerSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated container metric {}", simulatedMetricName);
 		ContainerSimulatedMetric containerSimulatedMetric = getContainerSimulatedMetric(simulatedMetricName);
-		deleteContainerSimulatedMetric(containerSimulatedMetric);
+		deleteContainerSimulatedMetric(containerSimulatedMetric, true);
 	}
 
-	public void deleteContainerSimulatedMetric(ContainerSimulatedMetric simulatedMetric) {
+	public void deleteContainerSimulatedMetric(ContainerSimulatedMetric simulatedMetric, boolean kafka) {
 		simulatedMetric.removeAssociations();
 		containerSimulatedMetrics.delete(simulatedMetric);
+		if (kafka) {
+			kafkaService.sendDeleteContainerSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public List<Container> getContainers(String simulatedMetricName) {

@@ -85,6 +85,16 @@ public class AppRule /*extends AbstractEntity<Long> */ {
 	@ManyToMany(mappedBy = "appRules")
 	private Set<App> apps;
 
+	public void addApp(App app) {
+		apps.add(app);
+		app.getAppRules().add(this);
+	}
+
+	public void removeApp(App app) {
+		apps.remove(app);
+		app.getAppRules().remove(this);
+	}
+
 	public void removeAssociations() {
 		Iterator<App> appsIterator = apps.iterator();
 		while (appsIterator.hasNext()) {

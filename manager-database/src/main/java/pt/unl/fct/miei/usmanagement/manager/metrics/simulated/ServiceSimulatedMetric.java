@@ -35,6 +35,7 @@ import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.CascadeType;
@@ -95,6 +96,16 @@ public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */{
 	@ManyToMany(mappedBy = "simulatedServiceMetrics")
 	private Set<Service> services;
 
+	public void addService(Service service) {
+		services.add(service);
+		service.getSimulatedServiceMetrics().add(this);
+	}
+
+	public void removeService(Service service) {
+		services.remove(service);
+		service.getSimulatedServiceMetrics().remove(this);
+	}
+	
 	public void removeAssociations() {
 		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {

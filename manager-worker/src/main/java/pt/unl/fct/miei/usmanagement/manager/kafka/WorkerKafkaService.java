@@ -646,7 +646,6 @@ public class WorkerKafkaService {
 						edgeHost = edgeHostsService.addIfNotPresent(edgeHost);
 						edgeHost.addRule(hostRule);
 					}
-					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(hostRuleDTO.getDecision(), context));
 					hostRulesService.addOrUpdateRule(hostRule);
 				}
 			}

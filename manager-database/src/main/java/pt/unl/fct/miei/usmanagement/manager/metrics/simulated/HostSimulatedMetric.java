@@ -35,6 +35,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
+import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
@@ -102,6 +103,26 @@ public class HostSimulatedMetric /*extends AbstractEntity<Long> */{
 	@ManyToMany(mappedBy = "simulatedHostMetrics")
 	private Set<EdgeHost> edgeHosts;
 
+	public void addCloudHost(CloudHost cloudHost) {
+		cloudHosts.add(cloudHost);
+		cloudHost.getSimulatedHostMetrics().add(this);
+	}
+
+	public void removeCloudHost(CloudHost cloudHost) {
+		cloudHosts.remove(cloudHost);
+		cloudHost.getSimulatedHostMetrics().remove(this);
+	}
+	
+	public void addEdgeHost(EdgeHost edgeHost) {
+		edgeHosts.add(edgeHost);
+		edgeHost.getSimulatedHostMetrics().add(this);
+	}
+
+	public void removeEdgeHost(EdgeHost edgeHost) {
+		edgeHosts.remove(edgeHost);
+		edgeHost.getSimulatedHostMetrics().remove(this);
+	}
+	
 	public void removeAssociations() {
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
 		while (cloudHostsIterator.hasNext()) {

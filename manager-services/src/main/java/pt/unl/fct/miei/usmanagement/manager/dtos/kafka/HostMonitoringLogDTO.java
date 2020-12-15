@@ -14,7 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostMonitoringLogDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = HostMonitoringLogDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

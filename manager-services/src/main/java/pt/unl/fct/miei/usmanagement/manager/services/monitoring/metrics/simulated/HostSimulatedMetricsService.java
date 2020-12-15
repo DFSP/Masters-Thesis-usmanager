@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -39,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetri
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -62,6 +64,7 @@ public class HostSimulatedMetricsService {
 		this.hostSimulatedMetrics = hostSimulatedMetrics;
 	}
 
+	@Transactional(readOnly = true)
 	public List<HostSimulatedMetric> getHostSimulatedMetrics() {
 		return hostSimulatedMetrics.findAll();
 	}
@@ -113,13 +116,41 @@ public class HostSimulatedMetricsService {
 				HostSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
 				Set<CloudHost> cloudHosts = simulatedMetric.getCloudHosts();
 				if (cloudHosts != null) {
-					existingSimulatedMetric.getCloudHosts().retainAll(cloudHosts);
-					existingSimulatedMetric.getCloudHosts().addAll(cloudHosts);
+					Set<CloudHost> currentCloudHosts = existingSimulatedMetric.getCloudHosts();
+					if (currentCloudHosts == null) {
+						existingSimulatedMetric.setCloudHosts(new HashSet<>(cloudHosts));
+					}
+					else {
+						cloudHosts.iterator().forEachRemaining(cloudHost -> {
+							if (!currentCloudHosts.contains(cloudHost)) {
+								cloudHost.addHostSimulatedMetric(simulatedMetric);
+							}
+						});
+						currentCloudHosts.iterator().forEachRemaining(currentCloudHost -> {
+							if (!cloudHosts.contains(currentCloudHost)) {
+								currentCloudHost.removeHostSimulatedMetric(simulatedMetric);
+							}
+						});
+					}
 				}
 				Set<EdgeHost> edgeHosts = simulatedMetric.getEdgeHosts();
 				if (edgeHosts != null) {
-					existingSimulatedMetric.getEdgeHosts().retainAll(edgeHosts);
-					existingSimulatedMetric.getEdgeHosts().addAll(edgeHosts);
+					Set<EdgeHost> currentEdgeHosts = existingSimulatedMetric.getEdgeHosts();
+					if (currentEdgeHosts == null) {
+						existingSimulatedMetric.setEdgeHosts(new HashSet<>(edgeHosts));
+					}
+					else {
+						edgeHosts.iterator().forEachRemaining(edgeHost -> {
+							if (!currentEdgeHosts.contains(edgeHost)) {
+								edgeHost.addHostSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+						currentEdgeHosts.iterator().forEachRemaining(currentEdgeHost -> {
+							if (!edgeHosts.contains(currentEdgeHost)) {
+								currentEdgeHost.removeHostSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
 				return saveHostSimulatedMetric(existingSimulatedMetric);
@@ -131,19 +162,21 @@ public class HostSimulatedMetricsService {
 	public void deleteHostSimulatedMetric(Long id) {
 		log.info("Deleting simulated host metric {}", id);
 		HostSimulatedMetric simulatedHostMetric = getHostSimulatedMetric(id);
-		deleteHostSimulatedMetric(simulatedHostMetric);
+		deleteHostSimulatedMetric(simulatedHostMetric, false);
 	}
 
 	public void deleteHostSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated host metric {}", simulatedMetricName);
 		HostSimulatedMetric simulatedHostMetric = getHostSimulatedMetric(simulatedMetricName);
-		deleteHostSimulatedMetric(simulatedHostMetric);
+		deleteHostSimulatedMetric(simulatedHostMetric, true);
 	}
 
-	public void deleteHostSimulatedMetric(HostSimulatedMetric simulatedMetric) {
+	public void deleteHostSimulatedMetric(HostSimulatedMetric simulatedMetric, boolean kafka) {
 		simulatedMetric.removeAssociations();
 		hostSimulatedMetrics.delete(simulatedMetric);
-		kafkaService.sendDeleteHostSimulatedMetric(simulatedMetric);
+		if (kafka) {
+			kafkaService.sendDeleteHostSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public List<HostSimulatedMetric> getGenericHostSimulatedMetrics() {

@@ -29,7 +29,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
@@ -37,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -58,6 +61,7 @@ public class AppSimulatedMetricsService {
 		this.appSimulatedMetrics = appSimulatedMetrics;
 	}
 
+	@Transactional(readOnly = true)
 	public List<AppSimulatedMetric> getAppSimulatedMetrics() {
 		return appSimulatedMetrics.findAll();
 	}
@@ -109,8 +113,22 @@ public class AppSimulatedMetricsService {
 				AppSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
 				Set<App> apps = simulatedMetric.getApps();
 				if (apps != null) {
-					existingSimulatedMetric.getApps().retainAll(apps);
-					existingSimulatedMetric.getApps().addAll(apps);
+					Set<App> currentApps = existingSimulatedMetric.getApps();
+					if (currentApps == null) {
+						existingSimulatedMetric.setApps(new HashSet<>(apps));
+					}
+					else {
+						apps.iterator().forEachRemaining(app -> {
+							if (!currentApps.contains(app)) {
+								app.addAppSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+						currentApps.iterator().forEachRemaining(currentApp -> {
+							if (!apps.contains(currentApp)) {
+								currentApp.removeAppSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
 				return saveAppSimulatedMetric(existingSimulatedMetric);
@@ -122,19 +140,21 @@ public class AppSimulatedMetricsService {
 	public void deleteAppSimulatedMetric(Long id) {
 		log.info("Deleting simulated app metric {}", id);
 		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(id);
-		deleteAppSimulatedMetric(appSimulatedMetric);
+		deleteAppSimulatedMetric(appSimulatedMetric, false);
 	}
 
 	public void deleteAppSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated app metric {}", simulatedMetricName);
 		AppSimulatedMetric appSimulatedMetric = getAppSimulatedMetric(simulatedMetricName);
-		deleteAppSimulatedMetric(appSimulatedMetric);
+		deleteAppSimulatedMetric(appSimulatedMetric, true);
 	}
 
-	public void deleteAppSimulatedMetric(AppSimulatedMetric simulatedMetric) {
+	public void deleteAppSimulatedMetric(AppSimulatedMetric simulatedMetric, boolean kafka) {
 		simulatedMetric.removeAssociations();
 		appSimulatedMetrics.delete(simulatedMetric);
-		kafkaService.sendDeleteAppSimulatedMetric(simulatedMetric);
+		if (kafka) {
+			kafkaService.sendDeleteAppSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public List<App> getApps(String simulatedMetricName) {

@@ -143,8 +143,16 @@ public class ServicesService {
 						existingService.setServiceRules(new HashSet<>(rules));
 					}
 					else {
-						currentServiceRules.retainAll(rules);
-						currentServiceRules.addAll(rules);
+						rules.iterator().forEachRemaining(rule -> {
+							if (!currentServiceRules.contains(rule)) {
+								rule.addService(existingService);
+							}
+						});
+						currentServiceRules.iterator().forEachRemaining(currentRule -> {
+							if (!rules.contains(currentRule)) {
+								currentRule.removeService(existingService);
+							}
+						});
 					}
 				}
 				Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
@@ -154,8 +162,16 @@ public class ServicesService {
 						existingService.setSimulatedServiceMetrics(new HashSet<>(simulatedMetrics));
 					}
 					else {
-						currentSimulatedMetrics.retainAll(simulatedMetrics);
-						currentSimulatedMetrics.addAll(simulatedMetrics);
+						simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+								simulatedMetric.addService(existingService);
+							}
+						});
+						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+							if (!simulatedMetrics.contains(currentSimulatedMetric)) {
+								currentSimulatedMetric.removeService(existingService);
+							}
+						});
 					}
 				}
 				Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();

@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
@@ -53,6 +54,7 @@ public class FieldsService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<Field> getFields() {
 		return fields.findAll();
 	}
@@ -134,6 +136,7 @@ public class FieldsService {
 	public void deleteField(String fieldName) {
 		Field field = getField(fieldName);
 		fields.delete(field);
+		kafkaService.sendDeleteField(field);
 	}
 
 	public boolean hasField(String fieldName) {

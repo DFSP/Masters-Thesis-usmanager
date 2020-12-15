@@ -16,7 +16,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = HostEventDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = HostEventDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

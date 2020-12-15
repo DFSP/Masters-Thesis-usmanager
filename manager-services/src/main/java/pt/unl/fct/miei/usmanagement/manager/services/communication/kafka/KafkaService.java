@@ -394,51 +394,51 @@ public class KafkaService {
 		} while (!populated);
 	}
 
-	//TODO @Transactional(readOnly = true)
 	private Map<String, Supplier<?>> topicsValues() {
 		Map<String, Supplier<?>> topicsValues = new HashMap<>();
 		topicsValues.put("apps", () ->
 			appsService.getApps().stream().map(app -> AppMapper.MAPPER.fromApp(app, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("cloud-hosts", () ->
-		//	cloudHostsService.getCloudHosts().stream().map(cloudHost -> CloudHostMapper.MAPPER.fromCloudHost(cloudHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("component-types", () ->
-		//	componentTypesService.getComponentTypes().stream().map(componentType -> ComponentTypeMapper.MAPPER.fromComponentType(componentType, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("conditions", () ->
-		//	conditionsService.getConditions().stream().map(condition -> ConditionMapper.MAPPER.fromCondition(condition, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("containers", () ->
-		//	containersService.getContainers().stream().map(container -> ContainerMapper.MAPPER.fromContainer(container, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("decisions", () ->
-		//	decisionsService.getDecisions().stream().map(decision -> DecisionMapper.MAPPER.fromDecision(decision, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("edge-hosts", () ->
-		//	edgeHostsService.getEdgeHosts().stream().map(edgeHost -> EdgeHostMapper.MAPPER.fromEdgeHost(edgeHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("eips", () ->
-		//	elasticIpsService.getElasticIps().stream().map(elasticIp -> ElasticIpMapper.MAPPER.fromElasticIp(elasticIp, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("fields", () ->
-		//	fieldsService.getFields().stream().map(field -> FieldMapper.MAPPER.fromField(field, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("nodes", () ->
-		//	nodesService.getNodes().stream().map(node -> NodeMapper.MAPPER.fromNode(node, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("operators", () ->
-		//	operatorsService.getOperators().stream().map(operator -> OperatorMapper.MAPPER.fromOperator(operator, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("services", () ->
-		//	servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("simulated-host-metrics", () ->
-		//	hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(metric -> HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("cloud-hosts", () ->
+			cloudHostsService.getCloudHosts().stream().map(cloudHost -> CloudHostMapper.MAPPER.fromCloudHost(cloudHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("component-types", () ->
+			componentTypesService.getComponentTypes().stream().map(componentType -> ComponentTypeMapper.MAPPER.fromComponentType(componentType, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("conditions", () ->
+			conditionsService.getConditions().stream().map(condition -> ConditionMapper.MAPPER.fromCondition(condition, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("containers", () ->
+			containersService.getContainers().stream().map(container -> ContainerMapper.MAPPER.fromContainer(container, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		// TODO check where kafka is sent on decisions
+		topicsValues.put("decisions", () ->
+			decisionsService.getDecisions().stream().map(decision -> DecisionMapper.MAPPER.fromDecision(decision, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("edge-hosts", () ->
+			edgeHostsService.getEdgeHosts().stream().map(edgeHost -> EdgeHostMapper.MAPPER.fromEdgeHost(edgeHost, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("eips", () ->
+			elasticIpsService.getElasticIps().stream().map(elasticIp -> ElasticIpMapper.MAPPER.fromElasticIp(elasticIp, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("fields", () ->
+			fieldsService.getFields().stream().map(field -> FieldMapper.MAPPER.fromField(field, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("nodes", () ->
+			nodesService.getNodes().stream().map(node -> NodeMapper.MAPPER.fromNode(node, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("operators", () ->
+			operatorsService.getOperators().stream().map(operator -> OperatorMapper.MAPPER.fromOperator(operator, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("services", () ->
+			servicesService.getServices().stream().map(service -> ServiceMapper.MAPPER.fromService(service, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-host-metrics", () ->
+			hostSimulatedMetricsService.getHostSimulatedMetrics().stream().map(metric -> HostSimulatedMetricMapper.MAPPER.fromHostSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		topicsValues.put("simulated-app-metrics", () ->
 			appSimulatedMetricsService.getAppSimulatedMetrics().stream().map(metric -> AppSimulatedMetricMapper.MAPPER.fromAppSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("simulated-service-metrics", () ->
-		//	serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(metric -> ServiceSimulatedMetricMapper.MAPPER.fromServiceSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("simulated-container-metrics", () ->
-		//	containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(metric -> ContainerSimulatedMetricMapper.MAPPER.fromContainerSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("host-rules", () ->
-		//	hostRulesService.getRules().stream().map(rule -> HostRuleMapper.MAPPER.fromHostRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("app-rules", () ->
-		//	appRulesService.getRules().stream().map(rule -> AppRuleMapper.MAPPER.fromAppRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("service-rules", () ->
-		//	serviceRulesService.getRules().stream().map(rule -> ServiceRuleMapper.MAPPER.fromServiceRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("container-rules", () ->
-		//	containerRulesService.getRules().stream().map(rule -> ContainerRuleMapper.MAPPER.fromContainerRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
-		//topicsValues.put("value-modes", () ->
-		//	valueModesService.getValueModes().stream().map(valueMode -> ValueModeMapper.MAPPER.fromValueMode(valueMode, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-service-metrics", () ->
+			serviceSimulatedMetricsService.getServiceSimulatedMetrics().stream().map(metric -> ServiceSimulatedMetricMapper.MAPPER.fromServiceSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("simulated-container-metrics", () ->
+			containerSimulatedMetricsService.getContainerSimulatedMetrics().stream().map(metric -> ContainerSimulatedMetricMapper.MAPPER.fromContainerSimulatedMetric(metric, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("host-rules", () ->
+			hostRulesService.getRules().stream().map(rule -> HostRuleMapper.MAPPER.fromHostRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("app-rules", () ->
+			appRulesService.getRules().stream().map(rule -> AppRuleMapper.MAPPER.fromAppRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("service-rules", () ->
+			serviceRulesService.getRules().stream().map(rule -> ServiceRuleMapper.MAPPER.fromServiceRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("container-rules", () ->
+			containerRulesService.getRules().stream().map(rule -> ContainerRuleMapper.MAPPER.fromContainerRule(rule, cycleAvoidingMappingContext)).collect(Collectors.toList()));
+		topicsValues.put("value-modes", () ->
+			valueModesService.getValueModes().stream().map(valueMode -> ValueModeMapper.MAPPER.fromValueMode(valueMode, cycleAvoidingMappingContext)).collect(Collectors.toList()));
 		return topicsValues;
 	}
 

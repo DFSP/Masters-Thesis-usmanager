@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
@@ -36,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMe
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -57,6 +59,7 @@ public class ServiceSimulatedMetricsService {
 		this.serviceSimulatedMetrics = serviceSimulatedMetrics;
 	}
 
+	@Transactional(readOnly = true)
 	public List<ServiceSimulatedMetric> getServiceSimulatedMetrics() {
 		return serviceSimulatedMetrics.findAll();
 	}
@@ -108,8 +111,22 @@ public class ServiceSimulatedMetricsService {
 				ServiceSimulatedMetric existingSimulatedMetric = simulatedMetricOptional.get();
 				Set<Service> services = simulatedMetric.getServices();
 				if (services != null) {
-					existingSimulatedMetric.getServices().retainAll(services);
-					existingSimulatedMetric.getServices().addAll(services);
+					Set<Service> currentServices = existingSimulatedMetric.getServices();
+					if (currentServices == null) {
+						existingSimulatedMetric.setServices(new HashSet<>(services));
+					}
+					else {
+						services.iterator().forEachRemaining(service -> {
+							if (!currentServices.contains(service)) {
+								service.addServiceSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+						currentServices.iterator().forEachRemaining(currentService -> {
+							if (!services.contains(currentService)) {
+								currentService.removeServiceSimulatedMetric(existingSimulatedMetric);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(simulatedMetric, existingSimulatedMetric);
 				return saveServiceSimulatedMetric(existingSimulatedMetric);
@@ -121,18 +138,21 @@ public class ServiceSimulatedMetricsService {
 	public void deleteServiceSimulatedMetric(Long id) {
 		log.info("Deleting simulated service metric {}", id);
 		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(id);
-		deleteServiceSimulatedMetric(serviceSimulatedMetric);
+		deleteServiceSimulatedMetric(serviceSimulatedMetric, false);
 	}
 
 	public void deleteServiceSimulatedMetric(String simulatedMetricName) {
 		log.info("Deleting simulated service metric {}", simulatedMetricName);
 		ServiceSimulatedMetric serviceSimulatedMetric = getServiceSimulatedMetric(simulatedMetricName);
-		deleteServiceSimulatedMetric(serviceSimulatedMetric);
+		deleteServiceSimulatedMetric(serviceSimulatedMetric, true);
 	}
 
-	public void deleteServiceSimulatedMetric(ServiceSimulatedMetric simulatedMetric) {
+	public void deleteServiceSimulatedMetric(ServiceSimulatedMetric simulatedMetric, boolean kafka) {
 		simulatedMetric.removeAssociations();
 		serviceSimulatedMetrics.delete(simulatedMetric);
+		if (kafka) {
+			kafkaService.sendDeleteServiceSimulatedMetric(simulatedMetric);
+		}
 	}
 
 	public List<ServiceSimulatedMetric> getGenericServiceSimulatedMetrics() {

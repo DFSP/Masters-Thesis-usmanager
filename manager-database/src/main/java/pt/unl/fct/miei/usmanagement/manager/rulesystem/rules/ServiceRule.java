@@ -34,6 +34,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -88,6 +89,16 @@ public class ServiceRule /*extends AbstractEntity<Long> */{
 	@ManyToMany(mappedBy = "serviceRules")
 	private Set<Service> services;
 
+	public void addService(Service service) {
+		services.add(service);
+		service.getServiceRules().add(this);
+	}
+
+	public void removeService(Service service) {
+		services.remove(service);
+		service.getServiceRules().remove(this);
+	}
+	
 	public void removeAssociations() {
 		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {

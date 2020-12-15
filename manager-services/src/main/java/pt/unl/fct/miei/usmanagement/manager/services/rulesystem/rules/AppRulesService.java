@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
@@ -70,7 +71,7 @@ public class AppRulesService {
 		this.kafkaService = kafkaService;
 	}
 
-
+	@Transactional(readOnly = true)
 	public List<AppRule> getRules() {
 		return rules.findAll();
 	}
@@ -114,18 +115,22 @@ public class AppRulesService {
 	public void deleteRule(Long id) {
 		log.info("Deleting rule {}", id);
 		AppRule rule = getRule(id);
-
+		deleteRule(rule, false);
 	}
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		AppRule rule = getRule(ruleName);
+		deleteRule(rule, true);
 	}
 
-	public void deleteRule(AppRule rule) {
+	public void deleteRule(AppRule rule, boolean kafka) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		serviceRulesService.setLastUpdateServiceRules();
+		if (kafka) {
+			kafkaService.sendDeleteAppRule(rule);
+		}
 	}
 
 	public List<AppRule> getAppRules(String appName) {

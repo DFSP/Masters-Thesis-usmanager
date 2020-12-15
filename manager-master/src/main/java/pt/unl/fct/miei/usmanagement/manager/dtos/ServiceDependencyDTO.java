@@ -11,7 +11,7 @@ import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDependencyDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = ServiceDependencyDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

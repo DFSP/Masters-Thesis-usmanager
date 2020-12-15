@@ -14,7 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecisionV
 
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceDecisionValueDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = ServiceDecisionValueDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -107,8 +107,16 @@ public class AppsService {
 						existingApp.setAppRules(new HashSet<>(rules));
 					}
 					else {
-						currentRules.retainAll(rules);
-						currentRules.addAll(rules);
+						rules.iterator().forEachRemaining(rule -> {
+							if (!currentRules.contains(rule)) {
+								rule.addApp(existingApp);
+							}
+						});
+						currentRules.iterator().forEachRemaining(currentRule -> {
+							if (!rules.contains(currentRule)) {
+								currentRule.removeApp(existingApp);
+							}
+						});
 					}
 				}
 				Set<AppSimulatedMetric> simulatedMetrics = app.getSimulatedAppMetrics();
@@ -118,8 +126,16 @@ public class AppsService {
 						existingApp.setSimulatedAppMetrics(new HashSet<>(simulatedMetrics));
 					}
 					else {
-						currentSimulatedMetrics.retainAll(simulatedMetrics);
-						currentSimulatedMetrics.addAll(simulatedMetrics);
+						simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+								simulatedMetric.addApp(existingApp);
+							}
+						});
+						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+							if (!simulatedMetrics.contains(currentSimulatedMetric)) {
+								currentSimulatedMetric.removeApp(existingApp);
+							}
+						});
 					}
 				}
 				EntityUtils.copyValidProperties(app, existingApp);

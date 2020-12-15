@@ -14,7 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ServiceEventDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = ServiceEventDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -17,7 +17,7 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import java.util.Map;
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = NodeDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = NodeDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

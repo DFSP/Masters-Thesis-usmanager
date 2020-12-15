@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -94,6 +95,7 @@ public class ServiceRulesService {
 		lastUpdateServiceRules.getAndSet(currentTime);
 	}
 
+	@Transactional(readOnly = true)
 	public List<ServiceRule> getRules() {
 		return rules.findAll();
 	}
@@ -159,19 +161,22 @@ public class ServiceRulesService {
 	public void deleteRule(Long id) {
 		log.info("Deleting rule {}", id);
 		ServiceRule rule = getRule(id);
-		deleteRule(rule);
+		deleteRule(rule, false);
 	}
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		ServiceRule rule = getRule(ruleName);
-		deleteRule(rule);
+		deleteRule(rule, true);
 	}
 
-	public void deleteRule(ServiceRule rule) {
+	public void deleteRule(ServiceRule rule, boolean kafka) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateServiceRules();
+		if (kafka) {
+			kafkaService.sendDeleteServiceRule(rule);
+		}
 	}
 
 	public List<ServiceRule> getServiceRules(String serviceName) {

@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
@@ -112,6 +113,7 @@ public class CloudHostsService {
 		this.threads = parallelismProperties.getThreads();
 	}
 
+	@Transactional(readOnly = true)
 	public List<CloudHost> getCloudHosts() {
 		return cloudHosts.findAll();
 	}
@@ -163,7 +165,7 @@ public class CloudHostsService {
 			return saveCloudHost(cloudHost);
 		});
 	}
-	
+
 	public CloudHost addOrUpdateCloudHost(CloudHost cloudHost) {
 		if (cloudHost.getId() != null) {
 			Optional<CloudHost> cloudHostOptional = cloudHosts.findById(cloudHost.getId());
@@ -176,8 +178,16 @@ public class CloudHostsService {
 						existingCloudHost.setHostRules(new HashSet<>(rules));
 					}
 					else {
-						currentRules.retainAll(rules);
-						currentRules.addAll(rules);
+						rules.iterator().forEachRemaining(rule -> {
+							if (!currentRules.contains(rule)) {
+								rule.addCloudHost(existingCloudHost);
+							}
+						});
+						currentRules.iterator().forEachRemaining(currentRule -> {
+							if (!rules.contains(currentRule)) {
+								currentRule.removeCloudHost(existingCloudHost);
+							}
+						});
 					}
 				}
 				Set<HostSimulatedMetric> simulatedMetrics = cloudHost.getSimulatedHostMetrics();
@@ -187,8 +197,16 @@ public class CloudHostsService {
 						existingCloudHost.setSimulatedHostMetrics(new HashSet<>(simulatedMetrics));
 					}
 					else {
-						currentSimulatedMetrics.retainAll(simulatedMetrics);
-						currentSimulatedMetrics.addAll(simulatedMetrics);
+						simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+								simulatedMetric.addCloudHost(existingCloudHost);
+							}
+						});
+						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+							if (!simulatedMetrics.contains(currentSimulatedMetric)) {
+								currentSimulatedMetric.removeCloudHost(existingCloudHost);
+							}
+						});
 					}
 				}
 				EntityUtils.copyValidProperties(cloudHost, existingCloudHost);
@@ -261,6 +279,7 @@ public class CloudHostsService {
 
 	public void deleteCloudHost(CloudHost cloudHost) {
 		deleteCloudHost(cloudHost.getId());
+		kafkaService.sendDeleteCloudHost(cloudHost);
 		try {
 			RegionEnum region = cloudHost.getAwsRegion().getRegion();
 			ElasticIp elasticIp = elasticIpsService.getElasticIp(region);

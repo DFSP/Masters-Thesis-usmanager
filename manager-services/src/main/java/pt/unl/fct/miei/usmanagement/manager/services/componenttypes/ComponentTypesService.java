@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypes;
@@ -53,6 +54,7 @@ public class ComponentTypesService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<ComponentType> getComponentTypes() {
 		return componentTypes.findAll();
 	}
@@ -138,6 +140,7 @@ public class ComponentTypesService {
 	public void deleteComponentType(String componentTypeName) {
 		ComponentType componentType = getComponentType(componentTypeName);
 		componentTypes.delete(componentType);
+		kafkaService.sendDeleteComponentType(componentType);
 	}
 
 	private void checkComponentTypeDoesntExist(ComponentType componentType) {

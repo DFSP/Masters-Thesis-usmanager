@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -86,6 +87,7 @@ public class NodesService {
 		this.threads = parallelismProperties.getThreads();
 	}
 
+	@Transactional(readOnly = true)
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes() {
 		return nodes.findAll();
 	}

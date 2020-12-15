@@ -92,6 +92,16 @@ public class AppSimulatedMetric /*extends AbstractEntity<Long> */{
 	@ManyToMany(mappedBy = "simulatedAppMetrics")
 	private Set<App> apps;
 
+	public void addApp(App app) {
+		apps.add(app);
+		app.getSimulatedAppMetrics().add(this);
+	}
+
+	public void removeApp(App app) {
+		apps.remove(app);
+		app.getSimulatedAppMetrics().remove(this);
+	}
+
 	public void removeAssociations() {
 		Iterator<App> appsIterator = apps.iterator();
 		while (appsIterator.hasNext()) {

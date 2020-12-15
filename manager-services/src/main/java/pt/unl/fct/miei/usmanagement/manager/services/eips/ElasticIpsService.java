@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIps;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
@@ -65,6 +66,7 @@ public class ElasticIpsService {
 		this.elasticIps = elasticIps;
 	}
 
+	@Transactional(readOnly = true)
 	public List<ElasticIp> getElasticIps() {
 		return elasticIps.findAll();
 	}
@@ -241,6 +243,7 @@ public class ElasticIpsService {
 		ReleaseAddressResult result = awsService.releaseElasticIpAddress(allocationId, region);
 		ElasticIp elasticIp = getElasticIp(allocationId);
 		elasticIps.delete(elasticIp);
+		kafkaService.sendDeleteElasticIp(elasticIp);
 		log.info("Released elastic ip {}", allocationId);
 		return CompletableFuture.completedFuture(result);
 	}
@@ -261,8 +264,10 @@ public class ElasticIpsService {
 	}
 
 	public void reset() {
-		elasticIps.deleteAll();
 		log.info("Clearing all elastic ips");
+		List<ElasticIp> elasticIps = getElasticIps();
+		this.elasticIps.deleteAll();
+		elasticIps.forEach(kafkaService::sendDeleteElasticIp);
 	}
 
 	public ElasticIp dissociate(CloudHost cloudHost) {

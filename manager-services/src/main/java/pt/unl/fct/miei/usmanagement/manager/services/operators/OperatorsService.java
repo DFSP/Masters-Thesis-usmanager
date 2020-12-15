@@ -54,6 +54,7 @@ public class OperatorsService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<Operator> getOperators() {
 		return operators.findAll();
 	}
@@ -130,6 +131,7 @@ public class OperatorsService {
 	public void deleteOperator(String operatorName) {
 		Operator operator = getOperator(operatorName);
 		operators.delete(operator);
+		kafkaService.sendDeleteOperator(operator);
 	}
 
 	private void checkOperatorDoesntExist(Operator operator) {

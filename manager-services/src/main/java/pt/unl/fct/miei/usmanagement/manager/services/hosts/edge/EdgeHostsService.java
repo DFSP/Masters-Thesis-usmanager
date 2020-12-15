@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -49,6 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -91,6 +93,7 @@ public class EdgeHostsService {
 			hostname.replace(".", "_"));
 	}
 
+	@Transactional(readOnly = true)
 	public List<EdgeHost> getEdgeHosts() {
 		return edgeHosts.findAll();
 	}
@@ -235,13 +238,41 @@ public class EdgeHostsService {
 				EdgeHost existingEdgeHost = edgeHostOptional.get();
 				Set<HostRule> rules = edgeHost.getHostRules();
 				if (rules != null) {
-					existingEdgeHost.getHostRules().retainAll(rules);
-					existingEdgeHost.getHostRules().addAll(rules);
+					Set<HostRule> currentRules = existingEdgeHost.getHostRules();
+					if (currentRules == null) {
+						existingEdgeHost.setHostRules(new HashSet<>(rules));
+					}
+					else {
+						rules.iterator().forEachRemaining(rule -> {
+							if (!currentRules.contains(rule)) {
+								rule.addEdgeHost(existingEdgeHost);
+							}
+						});
+						currentRules.iterator().forEachRemaining(currentRule -> {
+							if (!rules.contains(currentRule)) {
+								currentRule.removeEdgeHost(existingEdgeHost);
+							}
+						});
+					}
 				}
 				Set<HostSimulatedMetric> simulatedMetrics = edgeHost.getSimulatedHostMetrics();
 				if (simulatedMetrics != null) {
-					existingEdgeHost.getSimulatedHostMetrics().retainAll(simulatedMetrics);
-					existingEdgeHost.getSimulatedHostMetrics().addAll(simulatedMetrics);
+					Set<HostSimulatedMetric> currentSimulatedMetrics = existingEdgeHost.getSimulatedHostMetrics();
+					if (currentSimulatedMetrics == null) {
+						existingEdgeHost.setSimulatedHostMetrics(new HashSet<>(simulatedMetrics));
+					}
+					else {
+						simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+								simulatedMetric.addEdgeHost(existingEdgeHost);
+							}
+						});
+						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+							if (!simulatedMetrics.contains(currentSimulatedMetric)) {
+								currentSimulatedMetric.removeEdgeHost(existingEdgeHost);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(edgeHost, existingEdgeHost);
 				return saveEdgeHost(existingEdgeHost);

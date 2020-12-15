@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -39,7 +40,9 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
@@ -62,6 +65,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -179,13 +183,41 @@ public class ContainersService {
 				Container existingContainer = containerOptional.get();
 				Set<ContainerRule> containerRules = container.getContainerRules();
 				if (containerRules != null) {
-					existingContainer.getContainerRules().retainAll(containerRules);
-					existingContainer.getContainerRules().addAll(containerRules);
+					Set<ContainerRule> currentContainerRules = existingContainer.getContainerRules();
+					if (currentContainerRules == null) {
+						existingContainer.setContainerRules(new HashSet<>(containerRules));
+					}
+					else {
+						containerRules.iterator().forEachRemaining(rule -> {
+							if (!currentContainerRules.contains(rule)) {
+								rule.addContainer(existingContainer);
+							}
+						});
+						currentContainerRules.iterator().forEachRemaining(currentRule -> {
+							if (!containerRules.contains(currentRule)) {
+								currentRule.removeContainer(existingContainer);
+							}
+						});
+					}
 				}
 				Set<ContainerSimulatedMetric> containerSimulatedMetrics = container.getSimulatedContainerMetrics();
 				if (containerSimulatedMetrics != null) {
-					existingContainer.getSimulatedContainerMetrics().retainAll(containerSimulatedMetrics);
-					existingContainer.getSimulatedContainerMetrics().addAll(containerSimulatedMetrics);
+					Set<ContainerSimulatedMetric> currentSimulatedMetrics = existingContainer.getSimulatedContainerMetrics();
+					if (currentSimulatedMetrics == null) {
+						existingContainer.setSimulatedContainerMetrics(new HashSet<>(containerSimulatedMetrics));
+					}
+					else {
+						containerSimulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+								simulatedMetric.addContainer(existingContainer);
+							}
+						});
+						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+							if (!containerSimulatedMetrics.contains(currentSimulatedMetric)) {
+								currentSimulatedMetric.removeContainer(existingContainer);
+							}
+						});
+					}
 				}
 				EntityUtils.copyValidProperties(container, existingContainer);
 				return saveContainer(existingContainer);
@@ -201,6 +233,7 @@ public class ContainersService {
 		return container;
 	}
 
+	@Transactional(readOnly = true)
 	public List<Container> getContainers() {
 		return containers.findAll();
 	}
@@ -443,6 +476,7 @@ public class ContainersService {
 			}
 		}
 		containers.delete(container);
+		kafkaService.sendDeleteContainer(container);
 	}
 
 	public List<Container> getAppContainers() {

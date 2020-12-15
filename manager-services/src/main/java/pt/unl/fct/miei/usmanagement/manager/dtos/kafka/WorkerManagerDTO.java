@@ -17,7 +17,7 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 import java.util.HashSet;
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = WorkerManagerDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = WorkerManagerDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

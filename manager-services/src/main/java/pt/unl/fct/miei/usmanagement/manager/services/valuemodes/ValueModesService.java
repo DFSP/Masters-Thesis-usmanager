@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
@@ -52,6 +53,7 @@ public class ValueModesService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<ValueMode> getValueModes() {
 		return valueModes.findAll();
 	}
@@ -122,6 +124,7 @@ public class ValueModesService {
 	public void deleteValueMode(String valueModeName) {
 		ValueMode valueMode = getValueMode(valueModeName);
 		valueModes.delete(valueMode);
+		kafkaService.sendDeleteValueMode(valueMode);
 	}
 
 	private void checkValueModeDoesntExist(ValueMode valueMode) {

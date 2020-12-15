@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -49,6 +50,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,6 +93,7 @@ public class HostRulesService {
 		lastUpdateHostRules.getAndSet(currentTime);
 	}
 
+	@Transactional(readOnly = true)
 	public List<HostRule> getRules() {
 		return rules.findAll();
 	}
@@ -139,24 +142,52 @@ public class HostRulesService {
 		if (hostRule.getId() != null) {
 			Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
 			if (optionalRule.isPresent()) {
-				HostRule rule = optionalRule.get();
+				HostRule existingRule = optionalRule.get();
 				Set<HostRuleCondition> conditions = hostRule.getConditions();
 				if (conditions != null) {
-					rule.getConditions().retainAll(hostRule.getConditions());
-					rule.getConditions().addAll(hostRule.getConditions());
+					existingRule.getConditions().retainAll(hostRule.getConditions());
+					existingRule.getConditions().addAll(hostRule.getConditions());
 				}
 				Set<EdgeHost> edgeHosts = hostRule.getEdgeHosts();
 				if (edgeHosts != null) {
-					rule.getEdgeHosts().retainAll(hostRule.getEdgeHosts());
-					rule.getEdgeHosts().addAll(hostRule.getEdgeHosts());
+					Set<EdgeHost> currentEdgeHosts = existingRule.getEdgeHosts();
+					if (currentEdgeHosts == null) {
+						existingRule.setEdgeHosts(new HashSet<>(edgeHosts));
+					}
+					else {
+						edgeHosts.iterator().forEachRemaining(edgeHost -> {
+							if (!currentEdgeHosts.contains(edgeHost)) {
+								edgeHost.addRule(existingRule);
+							}
+						});
+						currentEdgeHosts.iterator().forEachRemaining(currentEdgeHost -> {
+							if (!edgeHosts.contains(currentEdgeHost)) {
+								currentEdgeHost.removeRule(existingRule);
+							}
+						});
+					}
 				}
 				Set<CloudHost> cloudHosts = hostRule.getCloudHosts();
 				if (cloudHosts != null) {
-					rule.getCloudHosts().retainAll(hostRule.getCloudHosts());
-					rule.getCloudHosts().addAll(hostRule.getCloudHosts());
+					Set<CloudHost> currentCloudHosts = existingRule.getCloudHosts();
+					if (currentCloudHosts == null) {
+						existingRule.setCloudHosts(new HashSet<>(cloudHosts));
+					}
+					else {
+						cloudHosts.iterator().forEachRemaining(cloudHost -> {
+							if (!currentCloudHosts.contains(cloudHost)) {
+								cloudHost.addRule(existingRule);
+							}
+						});
+						currentCloudHosts.iterator().forEachRemaining(currentCloudHost -> {
+							if (!cloudHosts.contains(currentCloudHost)) {
+								currentCloudHost.removeRule(existingRule);
+							}
+						});
+					}
 				}
-				EntityUtils.copyValidProperties(hostRule, rule);
-				return saveRule(rule);
+				EntityUtils.copyValidProperties(hostRule, existingRule);
+				return saveRule(existingRule);
 			}
 		}
 			return saveRule(hostRule);
@@ -172,19 +203,22 @@ public class HostRulesService {
 	public void deleteRule(Long id) {
 		log.info("Deleting rule {}", id);
 		HostRule rule = getRule(id);
-		deleteRule(rule);
+		deleteRule(rule, false);
 	}
 
 	public void deleteRule(String ruleName) {
 		log.info("Deleting rule {}", ruleName);
 		HostRule rule = getRule(ruleName);
-		deleteRule(rule);
+		deleteRule(rule, true);
 	}
 
-	public void deleteRule(HostRule rule) {
+	public void deleteRule(HostRule rule, boolean kafka) {
 		rule.removeAssociations();
 		rules.delete(rule);
 		setLastUpdateHostRules();
+		if (kafka) {
+			kafkaService.sendDeleteHostRule(rule);
+		}
 	}
 
 	public List<HostRule> getGenericHostRules() {

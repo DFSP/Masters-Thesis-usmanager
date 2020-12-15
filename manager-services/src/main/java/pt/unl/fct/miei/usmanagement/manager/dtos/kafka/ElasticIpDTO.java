@@ -14,7 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Objects;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = ElasticIpDTO.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = ElasticIpDTO.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

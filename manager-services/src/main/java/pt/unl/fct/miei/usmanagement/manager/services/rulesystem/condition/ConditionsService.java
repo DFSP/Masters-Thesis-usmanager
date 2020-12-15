@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
@@ -65,6 +66,7 @@ public class ConditionsService {
 		this.kafkaService = kafkaService;
 	}
 
+	@Transactional(readOnly = true)
 	public List<Condition> getConditions() {
 		return conditions.findAll();
 	}
@@ -148,6 +150,7 @@ public class ConditionsService {
 	public void deleteCondition(String conditionName) {
 		Condition condition = getCondition(conditionName);
 		conditions.delete(condition);
+		kafkaService.sendDeleteCondition(condition);
 	}
 
 	private void checkConditionDoesntExist(Condition condition) {
