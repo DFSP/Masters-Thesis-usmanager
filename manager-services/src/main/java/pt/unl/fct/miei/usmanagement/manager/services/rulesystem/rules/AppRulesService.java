@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
@@ -225,6 +226,14 @@ public class AppRulesService {
 		if (rules.hasRule(name)) {
 			throw new DataIntegrityViolationException("App rule '" + name + "' already exists");
 		}
+	}
+
+	public AppRule addIfNotPresent(AppRule appRule) {
+		Optional<AppRule> appRuleOptional = rules.findById(appRule.getId());
+		return appRuleOptional.orElseGet(() -> {
+			appRule.clearAssociations();
+			return saveRule(appRule);
+		});
 	}
 
 	public AppRule addOrUpdateRule(AppRule appRule) {

@@ -58,7 +58,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "decisions")
-public class Decision /*extends AbstractEntity<Long> */{
+public class Decision /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -88,8 +88,12 @@ public class Decision /*extends AbstractEntity<Long> */{
   private Set<ServiceDecisionEntity> componentDecisionLogs;*/
 
 	public void clearAssociations() {
-		serviceEvents.clear();
-		hostEvents.clear();
+		if (serviceEvents != null) {
+			serviceEvents.clear();
+		}
+		if (hostEvents != null) {
+			hostEvents.clear();
+		}
 	}
 
 	@Override

@@ -104,6 +104,15 @@ public class AppRule /*extends AbstractEntity<Long> */ {
 		}
 	}
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+		if (apps != null) {
+			apps.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

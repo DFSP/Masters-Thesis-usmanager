@@ -106,6 +106,15 @@ public class ContainerRule /*extends AbstractEntity<Long> */{
 		}
 	}
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+		if (containers != null) {
+			containers.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

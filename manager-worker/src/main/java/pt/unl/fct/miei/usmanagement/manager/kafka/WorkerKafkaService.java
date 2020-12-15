@@ -76,6 +76,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
@@ -133,7 +134,6 @@ public class WorkerKafkaService {
 	private final ServiceRulesService serviceRulesService;
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
-	private final RuleConditionsService ruleConditionsService;
 	private final WorkerManagersService workerManagersService;
 
 	private final CycleAvoidingMappingContext context;
@@ -147,9 +147,9 @@ public class WorkerKafkaService {
 							  AppSimulatedMetricsService appSimulatedMetricsService,
 							  ServiceSimulatedMetricsService serviceSimulatedMetricsService,
 							  ContainerSimulatedMetricsService containerSimulatedMetricsService,
-							  HostRulesService hostRulesService, AppRulesService appRulesService, ServiceRulesService serviceRulesService,
-							  ContainerRulesService containerRulesService, ValueModesService valueModesService,
-							  RuleConditionsService ruleConditionsService, WorkerManagersService workerManagersService) {
+							  HostRulesService hostRulesService, AppRulesService appRulesService,
+							  ServiceRulesService serviceRulesService, ContainerRulesService containerRulesService,
+							  ValueModesService valueModesService, WorkerManagersService workerManagersService) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -171,7 +171,6 @@ public class WorkerKafkaService {
 		this.serviceRulesService = serviceRulesService;
 		this.containerRulesService = containerRulesService;
 		this.valueModesService = valueModesService;
-		this.ruleConditionsService = ruleConditionsService;
 		this.workerManagersService = workerManagersService;
 		this.context = new CycleAvoidingMappingContext();
 	}
@@ -200,6 +199,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic apps with message {}: {}", appDTO.toString(), e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -218,12 +218,15 @@ public class WorkerKafkaService {
 					cloudHostsService.deleteCloudHost(id);
 				}
 				else {
-					workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(cloudHostDTO.getManagedByWorker(), context));
+					if (cloudHostDTO.getManagedByWorker() != null) {
+						workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(cloudHostDTO.getManagedByWorker(), context));
+					}
 					cloudHostsService.addOrUpdateCloudHost(cloudHost);
 				}
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic cloud-hosts with message {}: {}", cloudHostDTO.toString(), e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -251,6 +254,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic component-types with message {}: {}", componentTypeDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -302,6 +306,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic conditions with message {}: {}", conditionDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -325,6 +330,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic containers with message {}: {}", containerDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 
@@ -350,6 +356,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic decisions with message {}: {}", decisionDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -368,12 +375,15 @@ public class WorkerKafkaService {
 					edgeHostsService.deleteEdgeHost(id);
 				}
 				else {
-					workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(edgeHostDTO.getManagedByWorker(), context));
+					if (edgeHostDTO.getManagedByWorker() != null) {
+						workerManagersService.addIfNotPresent(WorkerManagerMapper.MAPPER.toWorkerManager(edgeHostDTO.getManagedByWorker(), context));
+					}
 					edgeHostsService.addOrUpdateEdgeHost(edgeHost);
 				}
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic edge-hosts with message {}: {}", edgeHostDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -397,6 +407,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic eips with message {}: {}", elasticIpDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -424,6 +435,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic fields with message {}: {}", fieldDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -447,6 +459,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic nodes with message {}: {}", nodeDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -465,15 +478,16 @@ public class WorkerKafkaService {
 					operatorsService.deleteOperator(id);
 				}
 				else {
-					operatorDTO.getConditions().forEach(conditionDTO -> {
-						Condition condition = ConditionMapper.MAPPER.toCondition(conditionDTO, context);
-						conditionsService.addIfNotPresent(condition);
-					});
+					Set<ConditionDTO> conditions = operatorDTO.getConditions();
+					if (conditions != null && conditions.size() > 0) {
+						listenConditions(new ArrayList<>(Collections.nCopies(conditions.size(), null)), conditions);
+					}
 					operatorsService.addOrUpdateOperator(operator);
 				}
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic operators with message {}: {}", operatorDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -545,6 +559,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic simulated-host-metrics with message {}: {}", hostSimulatedMetricDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -575,6 +590,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic simulated-app-metrics with message {}: {}", appSimulatedMetricDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -605,6 +621,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic simulated-service-metrics with message {}: {}", serviceSimulatedMetricDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -634,6 +651,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic simulated-container-metrics with message {}: {}", containerSimulatedMetricDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -652,7 +670,23 @@ public class WorkerKafkaService {
 					hostRulesService.deleteRule(id);
 				}
 				else {
-					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(hostRuleDTO.getDecision(), context));
+					listenDecisions(new ArrayList<>(Collections.nCopies(1, null)), Set.of(hostRuleDTO.getDecision()));
+					Set<HostRuleConditionDTO> ruleConditions = hostRuleDTO.getConditions();
+					if (ruleConditions != null && ruleConditions.size() > 0) {
+						ruleConditions.stream().map(HostRuleConditionDTO::getCondition)
+							.map(condition -> ConditionMapper.MAPPER.toCondition(condition, context))
+							.collect(Collectors.toSet())
+							.forEach(condition -> {
+								operatorsService.addIfNotPresent(condition.getOperator());
+								fieldsService.addIfNotPresent(condition.getField());
+								valueModesService.addIfNotPresent(condition.getValueMode());
+								conditionsService.addIfNotPresent(condition);
+							});
+						ruleConditions.stream().map(HostRuleConditionDTO::getRule)
+							.map(rule -> HostRuleMapper.MAPPER.toHostRule(rule, context))
+							.collect(Collectors.toSet())
+							.forEach(hostRulesService::addIfNotPresent);
+					}
 					for (CloudHostDTO cloudHostDTO : hostRuleDTO.getCloudHosts()) {
 						CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
 						cloudHost = cloudHostsService.addIfNotPresent(cloudHost);
@@ -668,6 +702,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic host-rules with message {}: {}", hostRuleDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -686,7 +721,23 @@ public class WorkerKafkaService {
 					appRulesService.deleteRule(id);
 				}
 				else {
-					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(appRuleDTO.getDecision(), context));
+					listenDecisions(new ArrayList<>(Collections.nCopies(1, null)), Set.of(appRuleDTO.getDecision()));
+					Set<AppRuleConditionDTO> ruleConditions = appRuleDTO.getConditions();
+					if (ruleConditions != null && ruleConditions.size() > 0) {
+						ruleConditions.stream().map(AppRuleConditionDTO::getCondition)
+							.map(condition -> ConditionMapper.MAPPER.toCondition(condition, context))
+							.collect(Collectors.toSet())
+							.forEach(condition -> {
+								operatorsService.addIfNotPresent(condition.getOperator());
+								fieldsService.addIfNotPresent(condition.getField());
+								valueModesService.addIfNotPresent(condition.getValueMode());
+								conditionsService.addIfNotPresent(condition);
+							});
+						ruleConditions.stream().map(AppRuleConditionDTO::getRule)
+							.map(rule -> AppRuleMapper.MAPPER.toAppRule(rule, context))
+							.collect(Collectors.toSet())
+							.forEach(appRulesService::addIfNotPresent);
+					}
 					for (AppDTO appDTO : appRuleDTO.getApps()) {
 						App app = AppMapper.MAPPER.toApp(appDTO, context);
 						app = appsService.addIfNotPresent(app);
@@ -697,6 +748,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic app-rules with message {}: {}", appRuleDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -715,7 +767,23 @@ public class WorkerKafkaService {
 					serviceRulesService.deleteRule(id);
 				}
 				else {
-					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(serviceRuleDTO.getDecision(), context));
+					listenDecisions(new ArrayList<>(Collections.nCopies(1, null)), Set.of(serviceRuleDTO.getDecision()));
+					Set<ServiceRuleConditionDTO> ruleConditions = serviceRuleDTO.getConditions();
+					if (ruleConditions != null && ruleConditions.size() > 0) {
+						ruleConditions.stream().map(ServiceRuleConditionDTO::getCondition)
+							.map(condition -> ConditionMapper.MAPPER.toCondition(condition, context))
+							.collect(Collectors.toSet())
+							.forEach(condition -> {
+								operatorsService.addIfNotPresent(condition.getOperator());
+								fieldsService.addIfNotPresent(condition.getField());
+								valueModesService.addIfNotPresent(condition.getValueMode());
+								conditionsService.addIfNotPresent(condition);
+							});
+						ruleConditions.stream().map(ServiceRuleConditionDTO::getRule)
+							.map(rule -> ServiceRuleMapper.MAPPER.toServiceRule(rule, context))
+							.collect(Collectors.toSet())
+							.forEach(serviceRulesService::addIfNotPresent);
+					}
 					for (ServiceDTO serviceDTO : serviceRuleDTO.getServices()) {
 						pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 						service = servicesService.addIfNotPresent(service);
@@ -726,6 +794,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error from topic service-rules while saving {}: {}", serviceRuleDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -744,7 +813,23 @@ public class WorkerKafkaService {
 					containerRulesService.deleteRule(id);
 				}
 				else {
-					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(containerRuleDTO.getDecision(), context));
+					listenDecisions(new ArrayList<>(Collections.nCopies(1, null)), Set.of(containerRuleDTO.getDecision()));
+					Set<ContainerRuleConditionDTO> ruleConditions = containerRuleDTO.getConditions();
+					if (ruleConditions != null && ruleConditions.size() > 0) {
+						ruleConditions.stream().map(ContainerRuleConditionDTO::getCondition)
+							.map(condition -> ConditionMapper.MAPPER.toCondition(condition, context))
+							.collect(Collectors.toSet())
+							.forEach(condition -> {
+								operatorsService.addIfNotPresent(condition.getOperator());
+								fieldsService.addIfNotPresent(condition.getField());
+								valueModesService.addIfNotPresent(condition.getValueMode());
+								conditionsService.addIfNotPresent(condition);
+							});
+						ruleConditions.stream().map(ContainerRuleConditionDTO::getRule)
+							.map(rule -> ContainerRuleMapper.MAPPER.toContainerRule(rule, context))
+							.collect(Collectors.toSet())
+							.forEach(containerRulesService::addIfNotPresent);
+					}
 					for (ContainerDTO containerDTO : containerRuleDTO.getContainers()) {
 						Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
 						container = containersService.addIfNotPresent(container);
@@ -755,6 +840,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic container-rules with message {}: {}", containerRuleDTO, e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -782,6 +868,7 @@ public class WorkerKafkaService {
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic value-modes with message {}: {}", valueModeDTO.toString(), e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}

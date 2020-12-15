@@ -135,7 +135,15 @@ public class ServiceRulesService {
 		setLastUpdateServiceRules();
 		return serviceRule;
 	}
-
+	
+	public ServiceRule addIfNotPresent(ServiceRule serviceRule) {
+		Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
+		return serviceRuleOptional.orElseGet(() -> {
+			serviceRule.clearAssociations();
+			return saveRule(serviceRule);
+		});
+	}
+	
 	public ServiceRule addOrUpdateRule(ServiceRule serviceRule) {
 		if (serviceRule.getId() != null) {
 			Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());

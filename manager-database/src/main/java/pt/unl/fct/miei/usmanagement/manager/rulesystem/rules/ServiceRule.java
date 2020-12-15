@@ -108,6 +108,15 @@ public class ServiceRule /*extends AbstractEntity<Long> */{
 		}
 	}
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+		if (services != null) {
+			services.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());

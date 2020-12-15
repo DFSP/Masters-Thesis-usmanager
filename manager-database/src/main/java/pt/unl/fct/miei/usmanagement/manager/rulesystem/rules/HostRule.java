@@ -130,6 +130,18 @@ public class HostRule /*extends AbstractEntity<Long> */{
 		}
 	}
 
+	public void clearAssociations() {
+		if (conditions != null) {
+			conditions.clear();
+		}
+		if (cloudHosts != null) {
+			cloudHosts.clear();
+		}
+		if (edgeHosts != null) {
+			edgeHosts.clear();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getId());
@@ -146,6 +158,5 @@ public class HostRule /*extends AbstractEntity<Long> */{
 		HostRule other = (HostRule) o;
 		return id != null && id.equals(other.getId());
 	}
-
 
 }

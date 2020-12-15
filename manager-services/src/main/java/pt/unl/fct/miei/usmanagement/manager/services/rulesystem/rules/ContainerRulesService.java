@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
@@ -220,7 +221,15 @@ public class ContainerRulesService {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}
 	}
-
+	
+	public ContainerRule addIfNotPresent(ContainerRule containerRule) {
+		Optional<ContainerRule> containerRuleOptional = rules.findById(containerRule.getId());
+		return containerRuleOptional.orElseGet(() -> {
+			containerRule.clearAssociations();
+			return saveRule(containerRule);
+		});
+	}
+	
 	public ContainerRule addOrUpdateRule(ContainerRule containerRule) {
 		if (containerRule.getId() != null) {
 			Optional<ContainerRule> optionalRule = rules.findById(containerRule.getId());

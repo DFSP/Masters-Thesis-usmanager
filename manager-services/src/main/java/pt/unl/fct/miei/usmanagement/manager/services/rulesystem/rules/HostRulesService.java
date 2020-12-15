@@ -138,6 +138,14 @@ public class HostRulesService {
 		return rule;
 	}
 
+	public HostRule addIfNotPresent(HostRule hostRule) {
+		Optional<HostRule> hostRuleOptional = rules.findById(hostRule.getId());
+		return hostRuleOptional.orElseGet(() -> {
+			hostRule.clearAssociations();
+			return saveRule(hostRule);
+		});
+	}
+	
 	public HostRule addOrUpdateRule(HostRule hostRule) {
 		if (hostRule.getId() != null) {
 			Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
