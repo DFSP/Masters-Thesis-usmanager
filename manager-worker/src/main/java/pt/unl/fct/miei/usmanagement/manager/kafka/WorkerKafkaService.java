@@ -757,7 +757,8 @@ public class WorkerKafkaService {
 					appRulesService.deleteRule(id);
 				}
 				else {
-					listenDecisions(new ArrayList<>(Collections.nCopies(1, null)), Set.of(appRuleDTO.getDecision()));
+					componentTypesService.addIfNotPresent(ComponentTypeMapper.MAPPER.toComponentType(appRuleDTO.getDecision().getComponentType(), context));
+					decisionsService.addIfNotPresent(DecisionMapper.MAPPER.toDecision(appRuleDTO.getDecision(), context));
 					Set<AppRuleConditionDTO> ruleConditions = appRuleDTO.getConditions();
 					if (ruleConditions != null && ruleConditions.size() > 0) {
 						ruleConditions.stream().map(AppRuleConditionDTO::getCondition)
@@ -774,10 +775,13 @@ public class WorkerKafkaService {
 							.collect(Collectors.toSet())
 							.forEach(appRulesService::addIfNotPresent);
 					}
-					for (AppDTO appDTO : appRuleDTO.getApps()) {
-						App app = AppMapper.MAPPER.toApp(appDTO, context);
-						app = appsService.addIfNotPresent(app);
-						app.addRule(appRule);
+					Set<AppDTO> apps = appRuleDTO.getApps();
+					if (apps != null) {
+						for (AppDTO appDTO : appRuleDTO.getApps()) {
+							App app = AppMapper.MAPPER.toApp(appDTO, context);
+							app = appsService.addIfNotPresent(app);
+							app.addRule(appRule);
+						}
 					}
 					appRulesService.addOrUpdateRule(appRule);
 				}
