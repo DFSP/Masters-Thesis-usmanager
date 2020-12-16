@@ -12,7 +12,9 @@ import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Map;
 import java.util.Objects;
@@ -69,4 +71,11 @@ public class NodeDTO {
 			", labels=" + labels +
 			'}';
 	}
+
+	@JsonIgnore
+	public RegionEnum getRegion() {
+		String region = labels.get(NodeConstants.Label.REGION);
+		return region == null ? null : RegionEnum.getRegion(region);
+	}
+
 }

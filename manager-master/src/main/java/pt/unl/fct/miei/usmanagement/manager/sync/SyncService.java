@@ -237,20 +237,6 @@ public class SyncService {
 				if (updated) {
 					containersService.updateContainer(container);
 				}
-
-				String containerName = container.getName();
-				if (containerName.contains(ServiceConstants.Name.LOAD_BALANCER) && !loadBalancerService.hasLoadBalancer(container)) {
-					loadBalancerService.saveLoadBalancer(container);
-				}
-				else if (containerName.contains(ServiceConstants.Name.REGISTRATION_SERVER) && !registrationServerService.hasRegistrationServer(container)) {
-					registrationServerService.saveRegistrationServer(container);
-				}
-				else if (containerName.contains(ServiceConstants.Name.WORKER_MANAGER) && !workerManagersService.hasWorkerManager(container)) {
-					workerManagersService.saveWorkerManager(container);
-				}
-				else if (containerName.contains(ServiceConstants.Name.KAFKA) && !kafkaService.hasKafkaBroker(container)) {
-					kafkaService.saveKafkaBroker(container);
-				}
 			}
 		}
 

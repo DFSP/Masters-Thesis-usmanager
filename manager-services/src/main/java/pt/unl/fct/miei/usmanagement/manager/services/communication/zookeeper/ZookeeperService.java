@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.kafka.KafkaBroker;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeepers;
 
@@ -66,5 +68,14 @@ public class ZookeeperService {
 
 	public void reset() {
 		zookeepers.deleteAll();
+	}
+
+	public boolean hasZookeeper(Container container) {
+		return zookeepers.hasZookeeperByContainer(container.getId());
+	}
+
+	public Zookeeper saveZookeeper(Container container) {
+		Zookeeper zookeeper = Zookeeper.builder().container(container).region(container.getRegion()).build();
+		return zookeepers.save(zookeeper);
 	}
 }

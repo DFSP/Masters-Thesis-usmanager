@@ -70,6 +70,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulated
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -83,6 +84,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
@@ -133,6 +135,7 @@ public class WorkerKafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final WorkerManagersService workerManagersService;
+	private final HostsService hostsService;
 
 	private final CycleAvoidingMappingContext context;
 
@@ -147,7 +150,7 @@ public class WorkerKafkaService {
 							  ContainerSimulatedMetricsService containerSimulatedMetricsService,
 							  HostRulesService hostRulesService, AppRulesService appRulesService,
 							  ServiceRulesService serviceRulesService, ContainerRulesService containerRulesService,
-							  ValueModesService valueModesService, WorkerManagersService workerManagersService) {
+							  ValueModesService valueModesService, WorkerManagersService workerManagersService, HostsService hostsService) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
 		this.componentTypesService = componentTypesService;
@@ -170,6 +173,7 @@ public class WorkerKafkaService {
 		this.containerRulesService = containerRulesService;
 		this.valueModesService = valueModesService;
 		this.workerManagersService = workerManagersService;
+		this.hostsService = hostsService;
 		this.context = new CycleAvoidingMappingContext();
 	}
 
@@ -318,9 +322,12 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "containers", autoStartup = "false")
 	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerDTO> containerDTOs) {
-		// TODO filter
+
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
+			if (containerDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
+				continue;
+			}
 			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, containerDTO);
 			Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
@@ -448,9 +455,11 @@ public class WorkerKafkaService {
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
 	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
-		// TODO filter
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
+			if (nodeDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
+				continue;
+			}
 			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
 			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);

@@ -19,4 +19,9 @@ public interface Zookeepers extends JpaRepository<Zookeeper, String> {
 	Optional<Zookeeper> getByContainer(Container container);
 
 	List<Zookeeper> getByRegion(RegionEnum region);
+
+	@Query("select case when count(z) > 0 then true else false end "
+		+ "from Zookeeper z "
+		+ "where z.container.id = :id")
+	boolean hasZookeeperByContainer(@Param("id") String id);
 }

@@ -40,9 +40,12 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
@@ -56,12 +59,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ContainerR
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
@@ -92,6 +89,7 @@ public class ContainersService {
 	private final LoadBalancerService nginxLoadBalancerService;
 	private final KafkaService kafkaService;
 	private final ZookeeperService zookeeperService;
+	private final LoadBalancerService loadBalancerService;
 	private final Environment environment;
 
 	private final Containers containers;
@@ -105,7 +103,7 @@ public class ContainersService {
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
 							 RegistrationServerService registrationServerService, LoadBalancerService nginxLoadBalancerService,
 							 KafkaService kafkaService, ZookeeperService zookeeperService,
-							 Environment environment, Containers containers,
+							 LoadBalancerService loadBalancerService, Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -119,6 +117,7 @@ public class ContainersService {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.kafkaService = kafkaService;
 		this.zookeeperService = zookeeperService;
+		this.loadBalancerService = loadBalancerService;
 		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
@@ -173,7 +172,24 @@ public class ContainersService {
 
 	public Container saveContainer(Container container) {
 		log.info("Saving container {}", container.toString());
-		return containers.save(container);
+		container = containers.save(container);
+		String containerName = container.getName();
+		if (containerName.contains(ServiceConstants.Name.LOAD_BALANCER) && !loadBalancerService.hasLoadBalancer(container)) {
+			loadBalancerService.saveLoadBalancer(container);
+		}
+		else if (containerName.contains(ServiceConstants.Name.REGISTRATION_SERVER) && !registrationServerService.hasRegistrationServer(container)) {
+			registrationServerService.saveRegistrationServer(container);
+		}
+		else if (containerName.contains(ServiceConstants.Name.WORKER_MANAGER) && !workerManagersService.hasWorkerManager(container)) {
+			workerManagersService.saveWorkerManager(container);
+		}
+		else if (containerName.contains(ServiceConstants.Name.KAFKA) && !kafkaService.hasKafkaBroker(container)) {
+			kafkaService.saveKafkaBroker(container);
+		}
+		else if (containerName.contains(ServiceConstants.Name.ZOOKEEPER) && !zookeeperService.hasZookeeper(container)) {
+			zookeeperService.saveZookeeper(container);
+		}
+		return container;
 	}
 
 	public Container addOrUpdateContainer(Container container) {
@@ -223,7 +239,7 @@ public class ContainersService {
 				return saveContainer(existingContainer);
 			}
 		}
-			return saveContainer(container);
+		return saveContainer(container);
 	}
 
 	public Container updateContainer(Container container) {
@@ -685,7 +701,7 @@ public class ContainersService {
 			return saveContainer(container);
 		});
 	}
-	
+
 	public List<Container> updateAddress(HostAddress hostAddress, String publicIpAddress) {
 		List<Container> containers = getHostContainers(hostAddress);
 		containers.forEach(container -> {
@@ -699,4 +715,5 @@ public class ContainersService {
 		});
 		return saveContainers(containers);
 	}
+
 }
