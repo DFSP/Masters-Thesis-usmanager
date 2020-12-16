@@ -55,6 +55,7 @@ import ManagedContainersList from "./ManagedContainersList";
 export interface IWorkerManager extends IDatabaseData {
     container: IContainer,
     region: IRegion,
+    state: string,
 }
 
 interface INewWorkerManagerRegion {

@@ -84,7 +84,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Alterar a lista de contentores'}
-                pathname={`/métricas simuladas/containers/${simulatedContainerMetric.name}`}
+                pathname={`/métricas simuladas/contentores/${simulatedContainerMetric.name}`}
                 selected={'containers'}
                 state={simulatedContainerMetric}/>,
         ];
@@ -98,7 +98,7 @@ class SimulatedContainerMetricCard extends BaseComponent<Props, State> {
                                              title={simulatedContainerMetric.name}
                                              link={{
                                                  to: {
-                                                     pathname: `/métricas simuladas/containers/${simulatedContainerMetric.name}`,
+                                                     pathname: `/métricas simuladas/contentores/${simulatedContainerMetric.name}`,
                                                      state: simulatedContainerMetric
                                                  }
                                              }}

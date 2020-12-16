@@ -35,7 +35,7 @@ import RulesAppList from "./apps/RulesAppList";
 
 const Rules = () =>
     <MainLayout>
-        <AddButton button={{text: 'Nova condição ou regra'}}
+        <AddButton button={{text: 'Nova regra ou condição'}}
                    dropdown={{
                        id: 'addRuleOrCondition',
                        title: 'Regra aplicada a...',
@@ -47,15 +47,6 @@ const Rules = () =>
                            {text: 'ou adicionar condição', pathname: '/regras/condições/nova condição?new'},
                        ],
                    }}/>
-        <div className={`${styles.collapsibleContainer}`}>
-            <Collapsible id={"rulesConditionCollapsible"}
-                         title={'Condições'}
-                         active
-                         headerClassname={styles.collapsibleSubtitle}
-                         bodyClassname={styles.collapsibleCardList}>
-                <RuleConditionsList/>
-            </Collapsible>
-        </div>
         <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesHostCollapsible"}
                          title={'Hosts'}
@@ -90,6 +81,15 @@ const Rules = () =>
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
                 <RulesContainerList/>
+            </Collapsible>
+        </div>
+        <div className={`${styles.collapsibleContainer}`}>
+            <Collapsible id={"rulesConditionCollapsible"}
+                         title={'Condições'}
+                         active
+                         headerClassname={styles.collapsibleSubtitle}
+                         bodyClassname={styles.collapsibleCardList}>
+                <RuleConditionsList/>
             </Collapsible>
         </div>
     </MainLayout>;

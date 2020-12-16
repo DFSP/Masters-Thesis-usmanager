@@ -381,6 +381,7 @@ public class AwsService {
 		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		AllocateAddressRequest allocateRequest = new AllocateAddressRequest().withDomain(DomainType.Vpc);
 		AllocateAddressResult allocateResponse = ec2.allocateAddress(allocateRequest);
+		log.info("Allocated elastic ip address at region {}", awsRegion);
 		return allocateResponse.getAllocationId();
 	}
 

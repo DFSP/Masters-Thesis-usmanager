@@ -186,6 +186,7 @@ public class ElasticIpsService {
 	public CloudHost associateElasticIpAddress(RegionEnum region, String allocationId, CloudHost cloudHost) {
 		ElasticIp elasticIp = getElasticIp(allocationId);
 		String instanceId = cloudHost.getInstanceId();
+		HostAddress previousHostAddress = cloudHost.getAddress();
 		AssociateAddressResult associateResult = awsService.associateElasticIpAddress(region, allocationId, instanceId);
 		String associationId = associateResult.getAssociationId();
 		elasticIp.setAssociationId(associationId);
@@ -194,7 +195,6 @@ public class ElasticIpsService {
 		kafkaService.sendElasticIp(elasticIp);
 		log.info("Associated public ip address {} from elastic ip {} to cloud instance {} with association id {}",
 			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associationId);
-		HostAddress previousHostAddress = cloudHost.getAddress();
 		AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
 		Instance instance = awsService.getInstance(instanceId, awsRegion);
 		cloudHost.setPublicIpAddress(instance.getPublicIpAddress());

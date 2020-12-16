@@ -201,6 +201,7 @@ public class HostsMonitoringService {
 					monitorHostsTask();
 				}
 				catch (Exception e) {
+					log.error("Failed to execute monitor hosts task: {}", e.getMessage());
 					e.printStackTrace();
 				}
 			}

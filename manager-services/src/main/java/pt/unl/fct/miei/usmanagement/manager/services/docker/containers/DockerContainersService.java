@@ -34,6 +34,7 @@ import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.ContainerMount;
 import com.spotify.docker.client.messages.ContainerStats;
+import com.spotify.docker.client.messages.ContainerUpdate;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
 import com.spotify.docker.client.shaded.com.google.common.collect.ImmutableList;
@@ -51,6 +52,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
@@ -268,10 +270,8 @@ public class DockerContainersService {
 				if (containerType == ContainerTypeEnum.SINGLETON) {
 					List<DockerContainer> containers = List.of();
 					try {
-						containers = getContainers(
-							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
-							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress()),
-							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress()));
+						containers = getContainers(hostAddress,
+							DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName));
 					}
 					catch (ManagerException ignored) {
 					}
@@ -308,7 +308,10 @@ public class DockerContainersService {
 					String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
-						.orElseGet(() -> registrationServerService.launchRegistrationServer(region).getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS));
+						.orElseGet(() -> {
+							RegistrationServer registrationServer = registrationServerService.launchRegistrationServer(region);
+							return registrationServer.getContainer().getAddress();
+						});
 					launchCommand = launchCommand.replace(outputLabel, registrationAddress);
 				}
 
@@ -347,9 +350,10 @@ public class DockerContainersService {
 				containerLabels.put(ContainerConstants.Label.CONTAINER_TYPE, containerType.name());
 				containerLabels.put(ContainerConstants.Label.SERVICE_NAME, serviceName);
 				containerLabels.put(ContainerConstants.Label.SERVICE_TYPE, serviceType);
-				containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
-				containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
-				containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
+				containerLabels.put(ContainerConstants.Label.SERVICE_PORT, String.valueOf(externalPort));
+				//containerLabels.put(ContainerConstants.Label.SERVICE_ADDRESS, serviceAddress);
+				//containerLabels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress());
+				//containerLabels.put(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress());
 				containerLabels.put(ContainerConstants.Label.COORDINATES, new Gson().toJson(hostAddress.getCoordinates()));
 				containerLabels.put(ContainerConstants.Label.REGION, region.name());
 				if (containerType == ContainerTypeEnum.SINGLETON && hostAddress.equals(hostsService.getManagerHostAddress())) {
@@ -425,13 +429,13 @@ public class DockerContainersService {
 	}
 
 	private String getDatabaseHostForService(HostAddress hostAddress, String databaseServiceName) {
-		Container databaseContainer = containersService.getHostContainersWithLabels(hostAddress,
+		Container database = containersService.getHostContainersWithLabels(hostAddress,
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
 			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, databaseServiceName));
-		if (databaseContainer == null) {
+		if (database == null) {
 			throw new ManagerException("Failed to launch database %s on host %s", databaseServiceName, hostAddress);
 		}
-		String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = database.getAddress();
 		log.info("Using database {} on host {}", address, hostAddress);
 		return address;
 	}
@@ -443,7 +447,7 @@ public class DockerContainersService {
 		if (memcached == null) {
 			throw new ManagerException("Failed to launch memcached %s on host %s", memcachedService, hostAddress);
 		}
-		String address = memcached.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = memcached.getAddress();
 		log.info("Using memcached {} on host {}", address, hostAddress);
 		return address;
 	}
@@ -459,7 +463,7 @@ public class DockerContainersService {
 		String serviceName = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_NAME);
 		ServiceTypeEnum serviceType = ServiceTypeEnum.getServiceType(containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE));
 		if (serviceType == ServiceTypeEnum.FRONTEND) {
-			String serviceAddress = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+			String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_PORT));
 			RegionEnum region = RegionEnum.getRegion(containerInfo.config().labels().get(ContainerConstants.Label.REGION));
 			nginxLoadBalancerService.removeServer(serviceName, serviceAddress, region);
 		}
@@ -533,7 +537,8 @@ public class DockerContainersService {
 		filtersList.add(DockerClient.ListContainersFilterParam.withLabel(ContainerConstants.Label.US_MANAGER, String.valueOf(true)));
 		filter = filtersList.toArray(new DockerClient.ListContainersParam[0]);
 		try (DockerClient dockerClient = dockerCoreService.getDockerClient(hostAddress)) {
-			return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
+			return dockerClient.listContainers(filter).stream().map(container -> this.buildDockerContainer(hostAddress, container))
+				.collect(Collectors.toList());
 		}
 		catch (DockerException | InterruptedException e) {
 			throw new ManagerException("Failed to get containers running at %s: %s", hostAddress.toSimpleString(), e.getMessage());
@@ -579,7 +584,7 @@ public class DockerContainersService {
 		return Optional.empty();
 	}
 
-	private DockerContainer buildDockerContainer(com.spotify.docker.client.messages.Container container) {
+	private DockerContainer buildDockerContainer(HostAddress hostAddress, com.spotify.docker.client.messages.Container container) {
 		Gson gson = new Gson();
 		String id = container.id();
 		long created = container.created();
@@ -600,8 +605,8 @@ public class DockerContainersService {
 		String state = container.state();
 		String status = container.status();
 		ContainerTypeEnum type = ContainerTypeEnum.getContainerType(container.labels().get(ContainerConstants.Label.CONTAINER_TYPE));
-		String publicIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS);
-		String privateIpAddress = container.labels().get(ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS);
+		String publicIpAddress = hostAddress.getPublicIpAddress();
+		String privateIpAddress = hostAddress.getPrivateIpAddress();
 		ImmutableList<ContainerMount> containerMounts = container.mounts();
 		Set<String> mounts = new HashSet<>();
 		containerMounts.forEach(mount -> mounts.add(mount.source() + ":" + mount.destination()));
@@ -698,4 +703,12 @@ public class DockerContainersService {
 			.collect(Collectors.toList());
 	}
 
+	public ContainerUpdate updateContainer(Container container, HostConfig config) {
+		try (DockerClient dockerClient = dockerCoreService.getDockerClient(container.getHostAddress())) {
+			return dockerClient.updateContainer(container.getId(), config);
+		}
+		catch (DockerException | InterruptedException e) {
+			throw new ManagerException("Failed to update container %s: %s", container.getId(), e.getMessage());
+		}
+	}
 }

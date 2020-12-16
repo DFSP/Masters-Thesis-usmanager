@@ -49,4 +49,7 @@ public interface WorkerManagers extends JpaRepository<WorkerManager, String> {
 
 	List<WorkerManager> getByRegion(RegionEnum region);
 
+	List<WorkerManager> getByState(String state);
+
+	List<WorkerManager> getByRegionAndState(RegionEnum region, String state);
 }

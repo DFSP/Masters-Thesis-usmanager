@@ -158,13 +158,14 @@ public class ServicesMonitoringService {
 		return servicesMonitoring.getByContainerIdAndFieldIgnoreCase(containerId, field);
 	}
 
-	public void saveServiceMonitoring(String containerId, String serviceName, String field, double value) {
+	public void saveServiceMonitoring(String containerId, String serviceName, String hostname, String field, double value) {
 		ServiceMonitoring serviceMonitoring = getContainerMonitoring(containerId, field);
 		Timestamp updateTime = Timestamp.from(Instant.now());
 		if (serviceMonitoring == null) {
 			serviceMonitoring = ServiceMonitoring.builder()
 				.containerId(containerId)
 				.serviceName(serviceName)
+				.hostname(hostname)
 				.field(field)
 				.minValue(value).maxValue(value).sumValue(value).lastValue(value)
 				.count(1)
@@ -239,6 +240,7 @@ public class ServicesMonitoringService {
 				}
 				catch (Exception e) {
 					log.error("Failed to execute monitor services task: {}", e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}, monitorPeriod, monitorPeriod);
@@ -311,7 +313,7 @@ public class ServicesMonitoringService {
 				stats.put(field + "-per-sec", bytesPerSec);
 			});
 
-			stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, stat, value));
+			stats.forEach((stat, value) -> saveServiceMonitoring(containerId, serviceName, hostAddress.getPublicIpAddress(), stat, value));
 
 			ServiceDecisionResult containerDecisionResult = runRules(hostAddress, containerId, serviceName, stats);
 			List<ServiceDecisionResult> containerDecisions = containersDecisions.get(serviceName);

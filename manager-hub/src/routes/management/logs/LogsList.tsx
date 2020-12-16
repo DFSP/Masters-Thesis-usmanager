@@ -112,6 +112,22 @@ class LogsList extends React.Component<Props, {}> {
         }
     };
 
+    private getLevelMargin = (levelString: string): string => {
+        switch (levelString.toLowerCase()) {
+            case 'trace':
+                return '0 7px 0 7px';
+            case 'debug':
+                return '0 0 0 7px';
+            case 'info':
+                return '0 17px 0 7px';
+            case 'warn':
+                return '0 9px 0 7px';
+            case 'error':
+                return '0 9px 0 7px';
+        }
+        return '0px';
+    }
+
     private header = (): JSX.Element =>
         <ListItem>
             <div className={`${styles.headerItem}`}>
@@ -133,7 +149,7 @@ class LogsList extends React.Component<Props, {}> {
         <span className={`${styles.column}`}>
           {new Date(log.timestmp).toLocaleString()}
         </span>
-                <span className={`${styles.column} ${this.getLevelColor(log.levelString)}`}>
+                <span className={`${styles.column} ${this.getLevelColor(log.levelString)}`} style={{margin: this.getLevelMargin(log.levelString)}}>
           {capitalize(log.levelString.toLowerCase())}
         </span>
                 <span className={`${styles.column}`}>

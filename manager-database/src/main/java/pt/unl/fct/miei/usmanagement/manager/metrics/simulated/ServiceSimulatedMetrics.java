@@ -37,12 +37,12 @@ public interface ServiceSimulatedMetrics extends JpaRepository<ServiceSimulatedM
 	Optional<ServiceSimulatedMetric> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetric m join m.services s "
-		+ "where m.generic = true or s.serviceName = :serviceName")
+		+ "from ServiceSimulatedMetric m left join m.services s "
+		+ "where m.generic = true or lower(s.serviceName) = lower(:serviceName)")
 	List<ServiceSimulatedMetric> findByService(@Param("serviceName") String serviceName);
 
 	@Query("select m "
-		+ "from ServiceSimulatedMetric m join m.services s "
+		+ "from ServiceSimulatedMetric m left join m.services s "
 		+ "where lower(s.serviceName) = lower(:serviceName) and lower(m.field.name) = lower(:field)")
 	Optional<ServiceSimulatedMetric> findByServiceAndField(@Param("serviceName") String serviceName,
 														   @Param("field") String field);

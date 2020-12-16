@@ -53,12 +53,12 @@ public interface AppSimulatedMetrics extends JpaRepository<AppSimulatedMetric, L
 	boolean hasAppSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select s "
-		+ "from AppSimulatedMetric m left join m.apps s "
+		+ "from AppSimulatedMetric m join m.apps s "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
 	List<App> getApps(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select s "
-		+ "from AppSimulatedMetric m left join m.apps s "
+		+ "from AppSimulatedMetric m join m.apps s "
 		+ "where lower(m.name) = lower(:simulatedMetricName) and s.name = :name")
 	Optional<App> getApp(@Param("simulatedMetricName") String simulatedMetricName, @Param("name") String name);
 

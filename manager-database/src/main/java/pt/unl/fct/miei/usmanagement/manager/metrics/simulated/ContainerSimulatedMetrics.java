@@ -53,12 +53,12 @@ public interface ContainerSimulatedMetrics extends JpaRepository<ContainerSimula
 	boolean hasContainerSimulatedMetric(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select c "
-		+ "from ContainerSimulatedMetric m left join m.containers c "
+		+ "from ContainerSimulatedMetric m join m.containers c "
 		+ "where lower(m.name) = lower(:simulatedMetricName)")
 	List<Container> getContainers(@Param("simulatedMetricName") String simulatedMetricName);
 
 	@Query("select c "
-		+ "from ContainerSimulatedMetric m left join m.containers c "
+		+ "from ContainerSimulatedMetric m join m.containers c "
 		+ "where lower(m.name) = lower(:simulatedMetricName) and c.id = :containerId")
 	Optional<Container> getContainer(@Param("simulatedMetricName") String simulatedMetricName,
 									 @Param("containerId") String containerId);

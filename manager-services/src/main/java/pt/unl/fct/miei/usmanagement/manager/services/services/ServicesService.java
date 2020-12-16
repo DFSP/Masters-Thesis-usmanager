@@ -252,6 +252,11 @@ public class ServicesService {
 		return services.getApps(serviceName);
 	}
 
+	public List<App> getAppsAndAppRules(String serviceName) {
+		checkServiceExists(serviceName);
+		return services.getAppsAndAppRules(serviceName);
+	}
+
 	public void addApp(String serviceName, AddServiceApp addServiceApp) {
 		Service service = getServiceAndEntities(serviceName);
 		String appName = addServiceApp.getName();

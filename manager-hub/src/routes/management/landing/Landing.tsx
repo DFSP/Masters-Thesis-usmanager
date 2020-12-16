@@ -107,27 +107,42 @@ class Landing extends React.Component<Props, State> {
     }
 
     private getContainersMarkers = (): IMarker[] => {
-        const containers: IContainer[] = Object.values(this.props.containers);
+        const containers: IContainer[] = Object.values(this.props.containers)
+            .sort((container1, container2) => container1.publicIpAddress.localeCompare(container2.publicIpAddress));
         const containerMarkers = new Map<String, IMarker>();
-        containers.forEach(container => {
+        let previousContainer;
+        for (let i = 0; i < containers.length; i++) {
+            const container = containers[i];
+
             const publicIpAddress = container.publicIpAddress;
             const privateIpAddress = container.privateIpAddress;
-            const marker = containerMarkers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
+            const latitude = container.coordinates.latitude;
+            const longitude = container.coordinates.longitude;
+            const previousMarker = containerMarkers.get(latitude + ':' + longitude);
+            const marker = previousMarker || {title: '', label: '', latitude: 0, longitude: 0};
             if (marker.title === '') {
-                marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + '<br/>';
+                marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + ':<br/>';
+            }
+            if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress != container.publicIpAddress) {
+                marker.title += publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
             marker.title += container.id.toString().substr(0, 10) + ' - ' + container.labels['serviceName'] + '<br/>';
             marker.label = publicIpAddress;
             marker.latitude = container.coordinates.latitude;
             marker.longitude = container.coordinates.longitude;
             marker.color = this.getMarkerColor(container);
-            containerMarkers.set(publicIpAddress, marker);
-        });
+
+            containerMarkers.set(latitude + ':' + longitude, marker);
+            previousContainer = container;
+        }
+
+        console.log(containerMarkers.values())
 
         const cloudHosts: ICloudHost[] = Object.values(this.props.cloudHosts);
-        const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) => !containerMarkers.has(host.publicIpAddress)
-            && !isEqual(host.state, awsInstanceStates.SHUTTING_DOWN) && !isEqual(host.state, awsInstanceStates.TERMINATED))
-            .map(host => ({
+        const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) =>
+            !containerMarkers.has(host.awsRegion.coordinates.latitude + ':' + host.awsRegion.coordinates.longitude)
+            && !isEqual(host.state, awsInstanceStates.SHUTTING_DOWN) && !isEqual(host.state, awsInstanceStates.TERMINATED)
+        ).map(host => ({
                 title: host.awsRegion.name + ' (' + host.awsRegion.zone + ')' + '<br/>' + host.instanceId.substr(0, 10) + '<br/>',
                 label: host.publicIpAddress,
                 latitude: host.awsRegion.coordinates.latitude,
@@ -136,7 +151,7 @@ class Landing extends React.Component<Props, State> {
             }))
 
         const edgeHosts: IEdgeHost[] = Object.values(this.props.edgeHosts);
-        const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.publicIpAddress))
+        const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.coordinates.latitude + ':' + host.coordinates.latitude))
             .map(host => ({
                 title: host.coordinates.label + '<br/>' + host.publicIpAddress + '<br/>',
                 label: host.publicIpAddress,

@@ -380,7 +380,7 @@ public class KafkaService {
 					}
 				}
 				populated = true;
-				log.info("Populated kafka topics");
+				log.info("Finished populating kafka topics");
 			}
 			catch (KafkaException e) {
 				String message = e.getMessage();

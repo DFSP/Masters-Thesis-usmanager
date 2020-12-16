@@ -346,7 +346,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>O contentor ${container.image.split('/').splice(1)} foi replicado no contentor </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }
@@ -373,7 +373,7 @@ class Container extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class='green-text'>Migrated ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} to container </span><a href='/contentores/'${container.id}>${container.id}</a>`, 15000);
+        super.toast(`<span class='green-text'>O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o host ${container.publicIpAddress} com o id </span><a href='/contentores/'${container.id}>${container.id}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }

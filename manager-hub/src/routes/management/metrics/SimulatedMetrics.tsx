@@ -37,7 +37,7 @@ const SimulatedMetrics = () =>
         <AddButton button={{text: 'Nova métrica simulada'}}
                    dropdown={{
                        id: 'simulatedMetrics',
-                       title: 'Selecionar o tipo de métrica...',
+                       title: 'Nova métrica simulada...',
                        data: [
                            {text: 'aplicada a hosts', pathname: '/métricas simuladas/hosts/nova métrica?new'},
                            {text: 'aplicada a aplicações', pathname: '/métricas simuladas/aplicações/nova métrica?new'},
@@ -59,7 +59,7 @@ const SimulatedMetrics = () =>
         </div>
         <div className={`${styles.container}`}>
             <Collapsible id={"appsCollapsible"}
-                         title={'Apps'}
+                         title={'Aplicações'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
@@ -68,7 +68,7 @@ const SimulatedMetrics = () =>
         </div>
         <div className={`${styles.container}`}>
             <Collapsible id={"servicesCollapsible"}
-                         title={'Services'}
+                         title={'Serviços'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
@@ -77,7 +77,7 @@ const SimulatedMetrics = () =>
         </div>
         <div className={`${styles.container}`}>
             <Collapsible id={"containersCollapsible"}
-                         title={'Containers'}
+                         title={'Contentores'}
                          active
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>

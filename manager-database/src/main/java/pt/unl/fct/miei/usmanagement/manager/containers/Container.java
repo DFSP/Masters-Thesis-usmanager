@@ -140,6 +140,11 @@ public class Container /*extends AbstractEntity<String> */ {
 		return getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 	}
 
+	@JsonIgnore
+	public String getAddress() {
+		return String.format("%s:%s", publicIpAddress, labels.get(ContainerConstants.Label.SERVICE_PORT));
+	}
+
 	public void addRule(ContainerRule rule) {
 		containerRules.add(rule);
 		rule.getContainers().add(this);

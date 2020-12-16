@@ -68,6 +68,11 @@ public interface Services extends JpaRepository<Service, Long> {
 	List<App> getApps(@Param("serviceName") String serviceName);
 
 	@Query("select a.app "
+		+ "from Service s join s.appServices a left join fetch a.app.appRules "
+		+ "where lower(s.serviceName) = lower(:serviceName)")
+	List<App> getAppsAndAppRules(@Param("serviceName") String serviceName);
+
+	@Query("select a.app "
 		+ "from Service s join s.appServices a "
 		+ "where lower(s.serviceName) = lower(:serviceName) and lower(a.app.name) = lower(:appName)")
 	Optional<App> getApp(@Param("serviceName") String serviceName, String appName);

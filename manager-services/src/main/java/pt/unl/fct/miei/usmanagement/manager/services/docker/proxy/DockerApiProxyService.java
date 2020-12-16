@@ -75,7 +75,7 @@ public class DockerApiProxyService {
 				+ "docker pull %s && "
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
@@ -84,9 +84,9 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
 			ContainerConstants.Label.SERVICE_TYPE, serviceType,
-			ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,
-			ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
-			ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
+			//ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,
+			//ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
+			//ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
 			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
 			dockerRepository);

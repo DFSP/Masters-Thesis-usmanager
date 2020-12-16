@@ -142,6 +142,14 @@ public class WorkerManagersService {
 		return workerManagers.getByRegion(region);
 	}
 
+	public List<WorkerManager> getReadyWorkerManagers() {
+		return workerManagers.getByState("ready");
+	}
+
+	public List<WorkerManager> getReadyWorkerManagers(RegionEnum region) {
+		return workerManagers.getByRegionAndState(region, "ready");
+	}
+
 	public WorkerManager getRegionWorkerManager(RegionEnum region) {
 		List<WorkerManager> workerManagers = getWorkerManagers(region);
 		log.info("Looking for worker managers at region {}, found {}", region.name(), workerManagers.toString());
@@ -227,7 +235,7 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Container>> getContainers(Container workerManager, boolean sync) {
 		List<Container> containers = new ArrayList<>();
-		String address = workerManager.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getAddress();
 		String url = String.format("http://%s/api/containers%s", address, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
@@ -348,7 +356,7 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Node>> getNodes(Container workerManager, boolean sync) {
 		List<Node> nodes = new ArrayList<>();
-		String address = workerManager.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getAddress();
 		String url = String.format("http://%s/api/nodes%s", address, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
@@ -398,7 +406,7 @@ public class WorkerManagersService {
 
 	@Async
 	public CompletableFuture<String> getContainerLogs(WorkerManager workerManager) {
-		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getContainer().getAddress();
 		String url = String.format("http://%s/api/containers/logs", address);
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
@@ -414,7 +422,7 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<Container> replicateContainer(String managerId, String containerId, HostAddress toHostAddress) {
 		WorkerManager workerManager = getWorkerManager(managerId);
-		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getContainer().getAddress();
 		String url = String.format("http://%s/api/containers/%s/replicate", address, containerId);
 		try {
 			HttpEntity<?> request = new HttpEntity<>(toHostAddress, headers);
@@ -430,7 +438,7 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<Container> migrateContainer(String managerId, String containerId, HostAddress hostAddress) {
 		WorkerManager workerManager = getWorkerManager(managerId);
-		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getContainer().getAddress();
 		String url = String.format("http://%s/api/containers/%s/migrate", address, containerId);
 		HttpEntity<?> request = new HttpEntity<>(hostAddress, headers);
 		try {
@@ -461,7 +469,7 @@ public class WorkerManagersService {
 
 	@Async
 	public void stopContainer(WorkerManager workerManager, String containerId) {
-		String address = workerManager.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+		String address = workerManager.getContainer().getAddress();
 		String url = String.format("http://%s/api/containers/%s", address, containerId);
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {

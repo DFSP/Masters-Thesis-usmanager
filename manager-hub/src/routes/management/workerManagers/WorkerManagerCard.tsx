@@ -126,6 +126,9 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
             <CardItem key={'region'}
                       label={'Region'}
                       value={workerManager.region.region}/>
+            <CardItem key={'state'}
+                      label={'State'}
+                      value={workerManager.state}/>
         </CardWorkerManager>
     }
 

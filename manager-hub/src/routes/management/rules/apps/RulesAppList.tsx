@@ -54,7 +54,7 @@ class RulesAppList extends BaseComponent<Props, {}> {
             <CardList<IRuleApp>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não está definida nenhuma regra sobre aplicações"}
+                emptyMessage={"Não estão definidas regras aplicadas a aplicações"}
                 list={this.props.appRules}
                 card={this.rule}
                 predicate={this.predicate}/>

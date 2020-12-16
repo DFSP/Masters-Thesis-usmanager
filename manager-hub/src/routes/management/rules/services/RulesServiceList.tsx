@@ -54,7 +54,7 @@ class RulesServiceList extends BaseComponent<Props, {}> {
             <CardList<IRuleService>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não existem regras aplicadas sobre serviços"}
+                emptyMessage={"Não estão definidas regras aplicadas a serviços"}
                 list={this.props.serviceRules}
                 card={this.rule}
                 predicate={this.predicate}/>

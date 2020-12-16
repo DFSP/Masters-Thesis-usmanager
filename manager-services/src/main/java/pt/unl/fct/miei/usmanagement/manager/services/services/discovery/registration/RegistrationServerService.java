@@ -131,7 +131,7 @@ public class RegistrationServerService {
 	public Optional<String> getRegistrationServerAddress(RegionEnum region) {
 		return getRegistrationServer(region)
 			.stream()
-			.map(registrationServer -> registrationServer.getContainer().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
+			.map(registrationServer -> registrationServer.getContainer().getAddress())
 			.findFirst();
 	}
 

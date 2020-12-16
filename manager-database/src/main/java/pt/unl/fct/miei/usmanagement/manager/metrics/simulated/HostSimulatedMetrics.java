@@ -45,7 +45,7 @@ public interface HostSimulatedMetrics extends JpaRepository<HostSimulatedMetric,
 										 @Param("privateIpAddress") String privateIpAddress);
 
 	@Query("select m "
-		+ "from HostSimulatedMetric m join m.cloudHosts c join m.edgeHosts e "
+		+ "from HostSimulatedMetric m left join m.cloudHosts c left join m.edgeHosts e "
 		+ "where ((c.publicIpAddress = :publicIpAddress and c.privateIpAddress = :privateIpAddress) or "
 		+ "(e.publicIpAddress = :publicIpAddress and e.privateIpAddress = :privateIpAddress)) "
 		+ "and lower(m.field.name) = lower(:field)")
@@ -54,23 +54,23 @@ public interface HostSimulatedMetrics extends JpaRepository<HostSimulatedMetric,
 													 @Param("field") String field);
 
 	@Query("select m "
-		+ "from HostSimulatedMetric m join m.cloudHosts h "
+		+ "from HostSimulatedMetric m left join m.cloudHosts h "
 		+ "where h.publicIpAddress = :hostname")
 	List<HostSimulatedMetric> findByCloudHost(@Param("hostname") String hostname);
 
 	@Query("select m "
-		+ "from HostSimulatedMetric m join m.cloudHosts h "
+		+ "from HostSimulatedMetric m left join m.cloudHosts h "
 		+ "where h.publicIpAddress = :hostname and lower(m.field.name) = lower(:field)")
 	Optional<HostSimulatedMetric> findByCloudHostAndField(@Param("field") String field,
 														  @Param("hostname") String hostname);
 
 	@Query("select m "
-		+ "from HostSimulatedMetric m join m.edgeHosts h "
+		+ "from HostSimulatedMetric m left join m.edgeHosts h "
 		+ "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
 	List<HostSimulatedMetric> findByEdgeHost(@Param("hostname") String hostname);
 
 	@Query("select m "
-		+ "from HostSimulatedMetric m join m.edgeHosts h "
+		+ "from HostSimulatedMetric m left join m.edgeHosts h "
 		+ "where h.publicDnsName = :publicDnsName and lower(m.field.name) = lower(:field)")
 	Optional<HostSimulatedMetric> findByEdgeHostAndField(@Param("field") String field,
 														 @Param("publicDnsName") String publicDnsName);

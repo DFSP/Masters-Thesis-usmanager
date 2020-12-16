@@ -62,10 +62,15 @@ public class WorkerManager /*extends AbstractEntity<String> */{
 	@NotNull
 	private RegionEnum region;
 
+	private String state;
+
 	@PrePersist
 	private void prePersist() {
 		if (this.getId() == null) {
 			this.setId(UUID.randomUUID().toString());
+		}
+		if (this.getState() == null) {
+			this.setState("ready");
 		}
 	}
 

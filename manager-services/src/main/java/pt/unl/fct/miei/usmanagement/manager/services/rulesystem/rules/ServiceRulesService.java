@@ -299,7 +299,7 @@ public class ServiceRulesService {
 	private List<Rule> generateServiceRules(String serviceName, String containerId) {
 		List<ServiceRule> genericServiceRules = getGenericServiceRules();
 		List<AppRule> appRules = new LinkedList<>();
-		for (App app : servicesService.getApps(serviceName)) {
+		for (App app : servicesService.getAppsAndAppRules(serviceName)) {
 			appRules.addAll(app.getAppRules());
 		}
 		List<ServiceRule> serviceRules = getServiceRules(serviceName);

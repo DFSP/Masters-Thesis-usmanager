@@ -131,7 +131,7 @@ class ContainerCard extends BaseComponent<Props, State> {
     }
 
     private onReplicateSuccess = (container: IContainer) => {
-        super.toast(`<span class='green-text'>Replicated ${container.image.split('/').splice(1)} to container </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
+        super.toast(`<span class='green-text'>O contentor ${container.image.split('/').splice(1)} foi replicado no contentor </span><a href='/contentores/${container.id}'><b>${container.id}</b></a>`, 15000);
         if (this.mounted) {
             this.setState({loading: false});
         }

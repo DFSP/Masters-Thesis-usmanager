@@ -24,7 +24,9 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.containers;
 
+import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerStats;
+import com.spotify.docker.client.messages.HostConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -707,12 +709,12 @@ public class ContainersService {
 		List<Container> containers = getHostContainers(hostAddress);
 		containers.forEach(container -> {
 			container.setPublicIpAddress(publicIpAddress);
-			container.setPrivateIpAddress(hostAddress.getPrivateIpAddress());
+			/*container.setPrivateIpAddress(hostAddress.getPrivateIpAddress());
 			Map<String, String> labels = container.getLabels();
 			String serviceAddress = container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
 			String port = serviceAddress.split(":")[1];
 			labels.put(ContainerConstants.Label.SERVICE_ADDRESS, String.format("%s:%s", publicIpAddress, port));
-			labels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, publicIpAddress);
+			labels.put(ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, publicIpAddress);*/
 		});
 		return saveContainers(containers);
 	}
