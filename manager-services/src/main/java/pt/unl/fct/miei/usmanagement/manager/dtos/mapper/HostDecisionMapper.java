@@ -5,9 +5,7 @@ import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostDecisionDTO;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
@@ -18,10 +16,9 @@ public interface HostDecisionMapper {
 	HostDecisionMapper MAPPER = Mappers.getMapper(HostDecisionMapper.class);
 
 	@IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-	@Mapping(source = "id", target = "id")
 	HostDecision toHostDecision(HostDecisionDTO hostDecisionDTO, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration
 	HostDecisionDTO fromHostDecision(HostDecision hostDecision, @Context CycleAvoidingMappingContext context);
-	
+
 }

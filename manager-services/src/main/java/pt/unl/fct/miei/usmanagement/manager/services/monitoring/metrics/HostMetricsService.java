@@ -28,10 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.MonitoringProperties;
-import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 
 import java.util.ArrayList;
 import java.util.List;

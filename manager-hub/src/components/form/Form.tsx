@@ -360,14 +360,6 @@ class Form extends BaseComponent<Props, State> {
                                     :
                                     <>
                                         <div className={`${styles.controlButton}`}>
-                                            {!loading && (
-                                                <button
-                                                    className={`btn-flat btn-small green-text slide inline-button`}
-                                                    /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
-                                                    style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}
-                                                    disabled={!saveRequired}>
-                                                    {(editable !== undefined && this.props.post?.textButton) || 'Guardar'}
-                                                </button>)}
                                             {!loading && customButtons?.map((button, index) => (
                                                 <div key={index} className={styles.customButton}>
                                                     {button.confirm && (
@@ -385,6 +377,14 @@ class Form extends BaseComponent<Props, State> {
                                                     data-target='confirm-delete'
                                                     onClick={confirmationDialog ? undefined : this.onClickDelete}>
                                                     {this.props.delete?.textButton || 'Apagar'}
+                                                </button>)}
+                                            {!loading && (
+                                                <button
+                                                    className={`btn-flat btn-small green-text slide inline-button`}
+                                                    /*style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}*/
+                                                    style={editable === undefined && !saveRequired ? {visibility: 'hidden'} : undefined}
+                                                    disabled={!saveRequired}>
+                                                    {(editable !== undefined && this.props.post?.textButton) || 'Guardar'}
                                                 </button>)}
                                         </div>
                                         {editable !== undefined && !loading && (

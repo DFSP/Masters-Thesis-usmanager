@@ -2,21 +2,14 @@ package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Placement;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,10 +49,10 @@ public class CloudHostDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof CloudHost)) {
+		if (!(o instanceof CloudHostDTO)) {
 			return false;
 		}
-		CloudHost other = (CloudHost) o;
+		CloudHostDTO other = (CloudHostDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -37,6 +37,9 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -51,9 +54,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsSe
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;

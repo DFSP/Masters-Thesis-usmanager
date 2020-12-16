@@ -63,10 +63,10 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.io.IOException;

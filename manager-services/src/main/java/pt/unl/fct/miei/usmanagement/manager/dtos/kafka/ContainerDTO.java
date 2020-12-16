@@ -1,22 +1,16 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerPortMapping;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,10 +55,10 @@ public class ContainerDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof Container)) {
+		if (!(o instanceof ContainerDTO)) {
 			return false;
 		}
-		Container other = (Container) o;
+		ContainerDTO other = (ContainerDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

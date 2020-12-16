@@ -4,12 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor

@@ -5,8 +5,8 @@ import com.amazonaws.services.ec2.model.InstanceState;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
@@ -15,6 +15,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerCon
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
@@ -24,7 +25,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registra
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -54,10 +54,6 @@ public class SyncService {
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 	private final HeartbeatService heartbeatService;
-	private final LoadBalancerService loadBalancerService;
-	private final RegistrationServerService registrationServerService;
-	private final WorkerManagersService workerManagersService;
-	private final KafkaService kafkaService;
 
 	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
@@ -66,9 +62,7 @@ public class SyncService {
 	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
 					   DockerContainersService dockerContainersService, NodesService nodesService,
 					   DockerSwarmService dockerSwarmService, ConfigurationsService configurationsService,
-					   HeartbeatService heartbeatService, LoadBalancerService loadBalancerService,
-					   RegistrationServerService registrationServerService,
-					   WorkerManagersService workerManagersService, KafkaService kafkaService) {
+					   HeartbeatService heartbeatService) {
 		this.cloudHostsService = cloudHostsService;
 		this.awsService = awsService;
 		this.containersService = containersService;
@@ -77,10 +71,6 @@ public class SyncService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.heartbeatService = heartbeatService;
-		this.loadBalancerService = loadBalancerService;
-		this.registrationServerService = registrationServerService;
-		this.workerManagersService = workerManagersService;
-		this.kafkaService = kafkaService;
 	}
 
 	public void startCloudHostsDatabaseSynchronization() {
@@ -216,7 +206,7 @@ public class SyncService {
 			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
 			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
 			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !dockerContainerIds.containsKey(containerId))
-				|| (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout))) {
+				|| (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
@@ -299,7 +289,7 @@ public class SyncService {
 			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
 			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
 			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId))
-				|| (heartbeat.isPresent() && heartbeat.get().getHeartbeatTime().isAfter(timeout))) {
+				|| (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);

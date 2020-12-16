@@ -33,11 +33,11 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -156,7 +156,7 @@ public class HostSimulatedMetricsService {
 				return saveHostSimulatedMetric(existingSimulatedMetric);
 			}
 		}
-			return saveHostSimulatedMetric(simulatedMetric);
+		return saveHostSimulatedMetric(simulatedMetric);
 	}
 
 	public void deleteHostSimulatedMetric(Long id) {

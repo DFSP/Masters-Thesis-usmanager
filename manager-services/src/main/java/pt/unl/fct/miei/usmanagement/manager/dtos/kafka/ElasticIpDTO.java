@@ -1,15 +1,11 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.eips.ElasticIp;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.Objects;
@@ -42,10 +38,10 @@ public class ElasticIpDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ElasticIp)) {
+		if (!(o instanceof ElasticIpDTO)) {
 			return false;
 		}
-		ElasticIp other = (ElasticIp) o;
+		ElasticIpDTO other = (ElasticIpDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

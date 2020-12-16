@@ -21,13 +21,13 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
@@ -110,7 +110,7 @@ public class ElasticIpsService {
 				return saveElasticIp(existingElasticIp);
 			}
 		}
-			return saveElasticIp(elasticIp);
+		return saveElasticIp(elasticIp);
 	}
 
 	public void clearElasticIps() {

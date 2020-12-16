@@ -32,11 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetrics;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -134,7 +133,7 @@ public class ContainerSimulatedMetricsService {
 				return saveContainerSimulatedMetric(existingSimulatedMetric);
 			}
 		}
-			return saveContainerSimulatedMetric(simulatedMetric);
+		return saveContainerSimulatedMetric(simulatedMetric);
 	}
 
 	public void deleteContainerSimulatedMetric(Long id) {

@@ -30,11 +30,11 @@ import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
 import java.util.List;
 

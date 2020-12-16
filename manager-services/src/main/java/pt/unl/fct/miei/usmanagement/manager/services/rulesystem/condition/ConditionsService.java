@@ -29,18 +29,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Conditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
@@ -115,7 +114,7 @@ public class ConditionsService {
 			return saveCondition(condition);
 		});
 	}
-	
+
 	public Condition addOrUpdateCondition(Condition condition) {
 		if (condition.getId() != null) {
 			Optional<Condition> optionalCondition = conditions.findById(condition.getId());
@@ -157,19 +156,19 @@ public class ConditionsService {
 		conditions.delete(condition);
 		kafkaService.sendDeleteCondition(condition);
 	}
-	
+
 	public List<HostRuleCondition> getHostRuleConditions(String conditionName) {
 		return conditions.getHostRuleConditions(conditionName);
 	}
-	
+
 	public List<AppRuleCondition> getAppRuleConditions(String conditionName) {
 		return conditions.getAppRuleConditions(conditionName);
 	}
-	
+
 	public List<ServiceRuleCondition> getServiceRuleConditions(String conditionName) {
 		return conditions.getServiceRuleConditions(conditionName);
 	}
-	
+
 	public List<ContainerRuleCondition> getContainerRuleConditions(String conditionName) {
 		return conditions.getContainerRuleConditions(conditionName);
 	}

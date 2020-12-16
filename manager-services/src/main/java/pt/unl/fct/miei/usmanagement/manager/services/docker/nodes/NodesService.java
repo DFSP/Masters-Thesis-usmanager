@@ -38,11 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
@@ -50,6 +45,11 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Nodes;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
@@ -174,7 +174,7 @@ public class NodesService {
 				return saveNode(existingNode);
 			}
 		}
-			return saveNode(node);
+		return saveNode(node);
 	}
 
 	public void removeHost(HostAddress hostAddress) {

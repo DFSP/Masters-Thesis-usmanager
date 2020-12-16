@@ -7,18 +7,18 @@ import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.EdgeHostDTO;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
+import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HeartbeatDTO;
+import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 
 @Mapper(builder = @Builder(disableBuilder = true))
-public interface EdgeHostMapper {
+public interface HeartbeatMapper {
 
-	EdgeHostMapper MAPPER = Mappers.getMapper(EdgeHostMapper.class);
+	HeartbeatMapper MAPPER = Mappers.getMapper(HeartbeatMapper.class);
 
 	@IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-	EdgeHost toEdgeHost(EdgeHostDTO edgeHostDTO, @Context CycleAvoidingMappingContext context);
+	Heartbeat toHeartbeat(HeartbeatDTO heartbeatDTO, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration
-	EdgeHostDTO fromEdgeHost(EdgeHost edgeHost, @Context CycleAvoidingMappingContext context);
+	HeartbeatDTO fromHeartbeat(Heartbeat heartbeat, @Context CycleAvoidingMappingContext context);
 
 }

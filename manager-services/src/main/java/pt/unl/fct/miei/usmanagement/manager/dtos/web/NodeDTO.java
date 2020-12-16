@@ -5,11 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
-
-import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor

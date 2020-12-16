@@ -4,15 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
-import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor

@@ -26,9 +26,9 @@ package pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.EventType;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.util.List;
 

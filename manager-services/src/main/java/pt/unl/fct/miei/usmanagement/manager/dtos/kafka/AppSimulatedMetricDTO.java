@@ -1,19 +1,12 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,10 +41,10 @@ public class AppSimulatedMetricDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppSimulatedMetric)) {
+		if (!(o instanceof AppSimulatedMetricDTO)) {
 			return false;
 		}
-		AppSimulatedMetric other = (AppSimulatedMetric) o;
+		AppSimulatedMetricDTO other = (AppSimulatedMetricDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

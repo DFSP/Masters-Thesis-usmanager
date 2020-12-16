@@ -30,11 +30,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operators;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -107,7 +107,7 @@ public class OperatorsService {
 				return saveOperator(existingOperator);
 			}
 		}
-			return saveOperator(operator);
+		return saveOperator(operator);
 	}
 
 	public Operator saveOperator(Operator operator) {

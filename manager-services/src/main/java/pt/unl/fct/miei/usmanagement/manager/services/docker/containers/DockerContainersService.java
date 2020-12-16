@@ -50,6 +50,10 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -61,10 +65,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBala
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.util.ArrayList;

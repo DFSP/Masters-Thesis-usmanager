@@ -5,9 +5,7 @@ import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceEventDTO;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
@@ -18,10 +16,9 @@ public interface ServiceEventMapper {
 	ServiceEventMapper MAPPER = Mappers.getMapper(ServiceEventMapper.class);
 
 	@IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-	@Mapping(source = "id", target = "id")
 	ServiceEvent toServiceEvent(ServiceEventDTO serviceEventDTO, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration
 	ServiceEventDTO fromServiceEvent(ServiceEvent serviceEvent, @Context CycleAvoidingMappingContext context);
-	
+
 }

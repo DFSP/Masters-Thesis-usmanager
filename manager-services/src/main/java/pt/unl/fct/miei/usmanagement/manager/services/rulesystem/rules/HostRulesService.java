@@ -33,13 +33,6 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostEvent;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
@@ -47,6 +40,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
@@ -145,7 +145,7 @@ public class HostRulesService {
 			return saveRule(hostRule);
 		});
 	}
-	
+
 	public HostRule addOrUpdateRule(HostRule hostRule) {
 		if (hostRule.getId() != null) {
 			Optional<HostRule> optionalRule = rules.findById(hostRule.getId());
@@ -198,7 +198,7 @@ public class HostRulesService {
 				return saveRule(existingRule);
 			}
 		}
-			return saveRule(hostRule);
+		return saveRule(hostRule);
 	}
 
 	public HostRule saveRule(HostRule hostRule) {

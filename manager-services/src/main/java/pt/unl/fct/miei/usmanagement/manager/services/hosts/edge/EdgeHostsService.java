@@ -30,13 +30,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHosts;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
@@ -44,9 +46,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulate
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
@@ -230,7 +229,7 @@ public class EdgeHostsService {
 			return saveEdgeHost(edgeHost);
 		});
 	}
-	
+
 	public EdgeHost addOrUpdateEdgeHost(EdgeHost edgeHost) {
 		if (edgeHost.getId() != null) {
 			Optional<EdgeHost> edgeHostOptional = edgeHosts.findById(edgeHost.getId());
@@ -278,7 +277,7 @@ public class EdgeHostsService {
 				return saveEdgeHost(existingEdgeHost);
 			}
 		}
-			return saveEdgeHost(edgeHost);
+		return saveEdgeHost(edgeHost);
 	}
 
 	public void deleteEdgeHost(Long id) {

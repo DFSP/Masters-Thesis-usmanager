@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.sync;
+package pt.unl.fct.miei.usmanagement.manager.heartbeats;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
@@ -8,12 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Builder(toBuilder = true)
@@ -21,15 +25,37 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "sym_node_host")
+@Table(name = "heartbeats")
 public class Heartbeat {
 
 	@Id
 	@NotNull
-	private String nodeId;
+	private String id;
 
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	@JsonFormat(pattern = "yyyy-dd-MM HH:mm:ss")
-	private LocalDateTime heartbeatTime;
+	private LocalDateTime timestamp;
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void setTimestamp() {
+		this.timestamp = LocalDateTime.now();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Heartbeat)) {
+			return false;
+		}
+		Heartbeat other = (Heartbeat) o;
+		return id != null && id.equals(other.getId());
+	}
 }

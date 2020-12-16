@@ -63,6 +63,7 @@ worker-manager:
   monitor-period: 45000
   tests:
     enabled: ${tests:true}
+  heartbeat-interval: 15000
 ssh:
   connection-timeout: 10000
 edge:

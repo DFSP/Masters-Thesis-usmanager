@@ -32,13 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ContainerEvent;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
@@ -49,6 +42,13 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRules;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ContainerEvent;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
@@ -135,7 +135,7 @@ public class ServiceRulesService {
 		setLastUpdateServiceRules();
 		return serviceRule;
 	}
-	
+
 	public ServiceRule addIfNotPresent(ServiceRule serviceRule) {
 		Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
 		return serviceRuleOptional.orElseGet(() -> {
@@ -143,7 +143,7 @@ public class ServiceRulesService {
 			return saveRule(serviceRule);
 		});
 	}
-	
+
 	public ServiceRule addOrUpdateRule(ServiceRule serviceRule) {
 		if (serviceRule.getId() != null) {
 			Optional<ServiceRule> serviceRuleOptional = rules.findById(serviceRule.getId());
@@ -163,7 +163,7 @@ public class ServiceRulesService {
 				return saveRule(rule);
 			}
 		}
-			return saveRule(serviceRule);
+		return saveRule(serviceRule);
 	}
 
 	public void deleteRule(Long id) {

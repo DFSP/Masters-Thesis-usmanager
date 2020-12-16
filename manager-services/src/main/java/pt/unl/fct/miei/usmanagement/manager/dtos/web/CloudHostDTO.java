@@ -7,12 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor

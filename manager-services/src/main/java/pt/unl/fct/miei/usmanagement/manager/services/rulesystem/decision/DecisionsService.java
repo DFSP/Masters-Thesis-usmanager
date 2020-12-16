@@ -29,7 +29,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -128,7 +127,7 @@ public class DecisionsService {
 			return saveDecision(decision);
 		});
 	}
-	
+
 	public Decision addOrUpdateDecision(Decision decision) {
 		if (decision.getId() != null) {
 			Optional<Decision> decisionOptional = decisions.findById(decision.getId());

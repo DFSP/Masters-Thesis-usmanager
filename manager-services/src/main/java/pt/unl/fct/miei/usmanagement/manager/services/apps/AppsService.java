@@ -94,7 +94,7 @@ public class AppsService {
 			return saveApp(app);
 		});
 	}
-	
+
 	public App addOrUpdateApp(App app) {
 		if (app.getId() != null) {
 			Optional<App> appOptional = apps.findById(app.getId());

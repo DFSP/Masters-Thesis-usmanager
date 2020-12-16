@@ -5,9 +5,7 @@ import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
@@ -18,7 +16,6 @@ public interface AppSimulatedMetricMapper {
 	AppSimulatedMetricMapper MAPPER = Mappers.getMapper(AppSimulatedMetricMapper.class);
 
 	@IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-	@Mapping(source = "id", target = "id")
 	AppSimulatedMetric toAppSimulatedMetric(AppSimulatedMetricDTO appSimulatedMetricDTO, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration

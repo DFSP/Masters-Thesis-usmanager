@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
 import java.util.Objects;
@@ -55,10 +54,10 @@ public class ServiceDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof Service)) {
+		if (!(o instanceof ServiceDTO)) {
 			return false;
 		}
-		Service other = (Service) o;
+		ServiceDTO other = (ServiceDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

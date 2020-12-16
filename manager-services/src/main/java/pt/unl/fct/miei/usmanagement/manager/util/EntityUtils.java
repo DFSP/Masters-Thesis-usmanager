@@ -29,7 +29,6 @@ import lombok.experimental.UtilityClass;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.util.Arrays;

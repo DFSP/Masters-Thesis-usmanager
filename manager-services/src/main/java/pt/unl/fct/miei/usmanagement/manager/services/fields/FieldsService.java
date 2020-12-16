@@ -32,10 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.fields.Fields;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
@@ -126,7 +125,7 @@ public class FieldsService {
 				return saveField(existingField);
 			}
 		}
-			return saveField(field);
+		return saveField(field);
 	}
 
 	public void deleteField(Long id) {

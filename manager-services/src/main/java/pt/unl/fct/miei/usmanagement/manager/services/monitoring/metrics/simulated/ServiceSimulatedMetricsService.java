@@ -30,11 +30,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetrics;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -132,7 +132,7 @@ public class ServiceSimulatedMetricsService {
 				return saveServiceSimulatedMetric(existingSimulatedMetric);
 			}
 		}
-			return saveServiceSimulatedMetric(simulatedMetric);
+		return saveServiceSimulatedMetric(simulatedMetric);
 	}
 
 	public void deleteServiceSimulatedMetric(Long id) {

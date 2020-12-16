@@ -31,12 +31,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetrics;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -134,7 +133,7 @@ public class AppSimulatedMetricsService {
 				return saveAppSimulatedMetric(existingSimulatedMetric);
 			}
 		}
-			return saveAppSimulatedMetric(simulatedMetric);
+		return saveAppSimulatedMetric(simulatedMetric);
 	}
 
 	public void deleteAppSimulatedMetric(Long id) {
@@ -213,5 +212,5 @@ public class AppSimulatedMetricsService {
 			throw new DataIntegrityViolationException("Simulated app metric '" + name + "' already exists");
 		}
 	}
-	
+
 }

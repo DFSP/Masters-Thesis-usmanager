@@ -1,22 +1,12 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,10 +43,10 @@ public class HostSimulatedMetricDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HostSimulatedMetric)) {
+		if (!(o instanceof HostSimulatedMetricDTO)) {
 			return false;
 		}
-		HostSimulatedMetric other = (HostSimulatedMetric) o;
+		HostSimulatedMetricDTO other = (HostSimulatedMetricDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

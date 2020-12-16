@@ -5,9 +5,7 @@ import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.FieldDTO;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
@@ -18,7 +16,6 @@ public interface FieldMapper {
 	FieldMapper MAPPER = Mappers.getMapper(FieldMapper.class);
 
 	@IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-	@Mapping(source = "id", target = "id")
 	Field toField(FieldDTO fieldDTO, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration

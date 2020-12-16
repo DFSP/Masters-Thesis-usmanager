@@ -30,8 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,24 +1,15 @@
 package pt.unl.fct.miei.usmanagement.manager.dtos.kafka;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
-import pt.unl.fct.miei.usmanagement.manager.prediction.ServiceEventPrediction;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,10 +42,10 @@ public class ServiceEventPredictionDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ServiceEventPrediction)) {
+		if (!(o instanceof ServiceEventPredictionDTO)) {
 			return false;
 		}
-		ServiceEventPrediction other = (ServiceEventPrediction) o;
+		ServiceEventPredictionDTO other = (ServiceEventPredictionDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

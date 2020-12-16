@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
@@ -54,16 +55,18 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	private final HostsMonitoringService hostsMonitoringService;
 	private final SyncService syncService;
 	private final KafkaService kafkaService;
+	private final HeartbeatService heartbeatService;
 	private final Environment environment;
 
 	public ManagerWorkerStartup(HostsService hostsService, ServicesMonitoringService servicesMonitoringService,
 								HostsMonitoringService hostsMonitoringService, SyncService syncService,
-								KafkaService kafkaService, Environment environment) {
+								KafkaService kafkaService, HeartbeatService heartbeatService, Environment environment) {
 		this.hostsService = hostsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.syncService = syncService;
 		this.kafkaService = kafkaService;
+		this.heartbeatService = heartbeatService;
 		this.environment = environment;
 	}
 
@@ -79,6 +82,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();*/
+		heartbeatService.startHeartbeat();
 	}
 
 	private void requireEnvVars() {

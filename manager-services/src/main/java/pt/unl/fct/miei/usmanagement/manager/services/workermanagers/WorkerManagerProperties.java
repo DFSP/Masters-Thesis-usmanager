@@ -41,6 +41,7 @@ public class WorkerManagerProperties {
 	private String masterHostname;
 	private int monitorPeriod;
 	private int port;
+	private int heartbeatInterval;
 	private final Tests tests;
 
 	public WorkerManagerProperties() {

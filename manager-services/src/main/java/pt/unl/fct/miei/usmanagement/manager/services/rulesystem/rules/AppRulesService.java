@@ -32,16 +32,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -270,6 +269,6 @@ public class AppRulesService {
 				return saveRule(existingRule);
 			}
 		}
-			return saveRule(appRule);
+		return saveRule(appRule);
 	}
 }

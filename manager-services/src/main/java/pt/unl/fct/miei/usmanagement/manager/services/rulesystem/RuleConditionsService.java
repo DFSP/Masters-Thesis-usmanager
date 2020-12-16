@@ -3,11 +3,6 @@ package pt.unl.fct.miei.usmanagement.manager.services.rulesystem;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ContainerRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRuleCondition;
@@ -21,6 +16,11 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRuleConditions;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditions;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ContainerRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
 
 import java.util.List;
 

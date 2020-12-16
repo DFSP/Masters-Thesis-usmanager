@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 
 import java.util.Objects;
 import java.util.Set;
@@ -44,10 +43,10 @@ public class ConditionDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof Condition)) {
+		if (!(o instanceof ConditionDTO)) {
 			return false;
 		}
-		Condition other = (Condition) o;
+		ConditionDTO other = (ConditionDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 
 import java.util.Objects;
 import java.util.Set;
@@ -40,10 +39,10 @@ public class AppRuleDTO {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof AppRule)) {
+		if (!(o instanceof AppRuleDTO)) {
 			return false;
 		}
-		AppRule other = (AppRule) o;
+		AppRuleDTO other = (AppRuleDTO) o;
 		return id != null && id.equals(other.getId());
 	}
 

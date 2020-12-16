@@ -32,16 +32,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRuleCondition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRules;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleConditionKey;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.List;
@@ -221,7 +220,7 @@ public class ContainerRulesService {
 			throw new DataIntegrityViolationException("Container rule '" + name + "' already exists");
 		}
 	}
-	
+
 	public ContainerRule addIfNotPresent(ContainerRule containerRule) {
 		Optional<ContainerRule> containerRuleOptional = rules.findById(containerRule.getId());
 		return containerRuleOptional.orElseGet(() -> {
@@ -229,7 +228,7 @@ public class ContainerRulesService {
 			return saveRule(containerRule);
 		});
 	}
-	
+
 	public ContainerRule addOrUpdateRule(ContainerRule containerRule) {
 		if (containerRule.getId() != null) {
 			Optional<ContainerRule> optionalRule = rules.findById(containerRule.getId());
@@ -249,7 +248,7 @@ public class ContainerRulesService {
 				return saveRule(rule);
 			}
 		}
-			return saveRule(containerRule);
+		return saveRule(containerRule);
 	}
-	
+
 }

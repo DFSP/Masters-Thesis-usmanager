@@ -27,11 +27,11 @@ package pt.unl.fct.miei.usmanagement.manager.services.monitoring.events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvents;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
 
 import java.util.List;
 import java.util.Objects;

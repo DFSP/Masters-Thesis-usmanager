@@ -39,13 +39,13 @@ import org.kie.api.runtime.rule.Match;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ContainerEvent;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.Event;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostEvent;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.RuleDecisionEnum;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
