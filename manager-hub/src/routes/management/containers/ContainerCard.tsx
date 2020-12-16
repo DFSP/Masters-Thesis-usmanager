@@ -94,7 +94,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         if (container?.labels['serviceType'] !== 'SYSTEM') {
             menus.push(
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
-                                                       menu={'Replicate'}
+                                                       menu={'Replicar'}
                                                        state={container}
                                                        header={'Selecionar o endereço'}
                                                        emptyMessage={'Não há hosts disponíveis'}
@@ -103,7 +103,7 @@ class ContainerCard extends BaseComponent<Props, State> {
                                                        menuToString={(option: INode) => `${option.publicIpAddress + (option.labels['privateIpAddress'] ? " (" + option.labels['privateIpAddress'] + ")" : '')}`}
                                                        onClick={this.migrate}/>,
                 <ContextSubMenuItem<IContainer, INode> className={'blue-text'}
-                                                       menu={'Migrate'}
+                                                       menu={'Migrar'}
                                                        state={container}
                                                        header={'Selecionar o endereço'}
                                                        emptyMessage={'Não há hosts disponíveis'}

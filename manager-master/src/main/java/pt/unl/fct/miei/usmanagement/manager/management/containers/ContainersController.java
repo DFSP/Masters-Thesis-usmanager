@@ -37,12 +37,15 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
-import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,12 +59,14 @@ public class ContainersController {
 	private final ContainersService containersService;
 	private final WorkerManagersService workerManagersService;
 	private final SyncService syncService;
+	private final HostsService hostsService;
 
 	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
-								SyncService syncService) {
+								SyncService syncService, HostsService hostsService) {
 		this.containersService = containersService;
 		this.workerManagersService = workerManagersService;
 		this.syncService = syncService;
+		this.hostsService = hostsService;
 	}
 
 	@GetMapping
@@ -85,7 +90,16 @@ public class ContainersController {
 
 	@PostMapping
 	public List<Container> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
-		return workerManagersService.launchContainers(launchContainerRequest);
+		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+		if (hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress)) {
+			String service = launchContainerRequest.getService();
+			int internalPort = launchContainerRequest.getInternalPort();
+			int externalPort = launchContainerRequest.getExternalPort();
+			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
+		}
+		else {
+			return workerManagersService.launchContainers(launchContainerRequest);
+		}
 	}
 
 	@DeleteMapping("/{id}")
