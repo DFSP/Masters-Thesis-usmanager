@@ -41,7 +41,7 @@ public class Zookeeper /*extends AbstractEntity<String> */{
 	@PrePersist
 	private void prePersist() {
 		if (this.getId() == null) {
-			this.setId(UUID.randomUUID().toString());
+			this.setId(container.getId());
 		}
 	}
 

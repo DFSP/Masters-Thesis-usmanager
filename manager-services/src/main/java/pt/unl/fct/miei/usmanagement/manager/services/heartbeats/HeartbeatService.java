@@ -47,12 +47,12 @@ public class HeartbeatService {
 	}
 
 	public void startHeartbeat() {
-		new Timer().schedule(new TimerTask() {
+		new Timer("heartbeat").schedule(new TimerTask() {
 			@Override
 			public void run() {
 				String id = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 				kafkaService.sendHeartbeat(Heartbeat.builder().id(id).build());
 			}
-		}, heartbeatInterval);
+		}, heartbeatInterval, heartbeatInterval);
 	}
 }

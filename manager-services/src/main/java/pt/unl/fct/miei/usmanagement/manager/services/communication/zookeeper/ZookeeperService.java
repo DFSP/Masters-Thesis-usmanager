@@ -54,9 +54,8 @@ public class ZookeeperService {
 
 	public void stopZookeeper(String id) {
 		Zookeeper zookeeper = getZookeeper(id);
-		String containerId = zookeeper.getContainer().getId();
 		zookeepers.delete(zookeeper);
-		containersService.stopContainer(containerId);
+		containersService.stopContainer(id);
 	}
 
 	public void deleteZookeeperByContainer(Container container) {
@@ -69,7 +68,7 @@ public class ZookeeperService {
 	}
 
 	public boolean hasZookeeper(Container container) {
-		return zookeepers.hasZookeeperByContainer(container.getId());
+		return zookeepers.hasZookeeper(container.getId());
 	}
 
 	public Zookeeper saveZookeeper(Container container) {
