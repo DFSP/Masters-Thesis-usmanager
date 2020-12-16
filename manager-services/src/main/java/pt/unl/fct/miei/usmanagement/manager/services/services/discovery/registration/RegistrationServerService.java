@@ -76,7 +76,6 @@ public class RegistrationServerService {
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.REGISTRATION_SERVER,
 			Collections.emptyList(), Collections.emptyMap(), dynamicLaunchParams);
-		RegionEnum region = hostAddress.getRegion();
 		return CompletableFuture.completedFuture(saveRegistrationServer(container));
 	}
 
@@ -153,7 +152,8 @@ public class RegistrationServerService {
 	}
 
 	public RegistrationServer saveRegistrationServer(Container container) {
-		return registrationServers.save(RegistrationServer.builder().container(container).region(container.getRegion()).build());
+		return registrationServers.getByContainer(container).orElseGet(() ->
+			registrationServers.save(RegistrationServer.builder().container(container).region(container.getRegion()).build()));
 	}
 
 	public boolean hasRegistrationServer(Container container) {

@@ -168,9 +168,9 @@ public class WorkerManagersService {
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
-		WorkerManager workerManager = WorkerManager.builder().id(id).container(container).region(container.getRegion()).build();
 		nodesService.removeHost(hostAddress);
-		return workerManagers.save(workerManager);
+		return workerManagers.getByContainer(container).orElseGet(() ->
+			workerManagers.save(WorkerManager.builder().id(id).container(container).region(container.getRegion()).build()));
 	}
 
 	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {

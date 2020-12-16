@@ -169,6 +169,7 @@ public class KafkaService {
 	private final String kafkaBootstrapServers;
 	private final AtomicLong increment;
 	private final CycleAvoidingMappingContext context;
+	private boolean needsPopulate;
 	private boolean populated;
 
 	public KafkaService(@Lazy ContainersService containersService,
@@ -227,6 +228,8 @@ public class KafkaService {
 		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.kafkaBootstrapServers = environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS);
 		this.increment = new AtomicLong();
+		String id = environment.getProperty(ContainerConstants.Environment.Manager.ID);
+		this.needsPopulate = id == null || id.equalsIgnoreCase("manager-master");
 		this.populated = false;
 		this.context = new CycleAvoidingMappingContext();
 	}
@@ -348,7 +351,8 @@ public class KafkaService {
 
 	public KafkaBroker saveKafkaBroker(Container container) {
 		long brokerId = Long.parseLong(container.getLabels().get(ContainerConstants.Label.KAFKA_BROKER_ID));
-		return kafkaBrokers.save(KafkaBroker.builder().brokerId(brokerId).container(container).region(container.getRegion()).build());
+		return kafkaBrokers.findByBrokerId(brokerId).orElseGet(() ->
+			kafkaBrokers.save(KafkaBroker.builder().brokerId(brokerId).container(container).region(container.getRegion()).build()));
 	}
 
 	public boolean hasKafkaBroker(Container container) {
@@ -656,7 +660,7 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && populated) {
+		if (hasKafkaBrokers && (!needsPopulate || populated)) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, message);
 		}
@@ -668,7 +672,7 @@ public class KafkaService {
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && populated) {
+		if (hasKafkaBrokers && (!needsPopulate || populated)) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, "DELETE", id);
 		}

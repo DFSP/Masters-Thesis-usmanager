@@ -30,8 +30,8 @@ public class ZookeeperService {
 	public Zookeeper launchZookeeper(HostAddress hostAddress) {
 		RegionEnum region = hostAddress.getRegion();
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.ZOOKEEPER);
-		Zookeeper zookeeper = Zookeeper.builder().container(container).region(region).build();
-		return zookeepers.save(zookeeper);
+		return zookeepers.findById(container.getId()).orElseGet(() ->
+			zookeepers.save(Zookeeper.builder().container(container).region(region).build()));
 	}
 
 	public List<Zookeeper> getZookeepers() {

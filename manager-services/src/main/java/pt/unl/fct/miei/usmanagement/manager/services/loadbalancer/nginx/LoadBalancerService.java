@@ -147,8 +147,8 @@ public class LoadBalancerService {
 	}
 
 	public LoadBalancer saveLoadBalancer(Container container) {
-		LoadBalancer loadBalancer = LoadBalancer.builder().container(container).region(container.getRegion()).build();
-		return loadBalancers.save(loadBalancer);
+		return loadBalancers.getByContainer(container).orElseGet(() ->
+			loadBalancers.save(LoadBalancer.builder().container(container).region(container.getRegion()).build()));
 	}
 
 	private LoadBalancer launchLoadBalancer(RegionEnum region, NginxServer[] nginxServers) {
