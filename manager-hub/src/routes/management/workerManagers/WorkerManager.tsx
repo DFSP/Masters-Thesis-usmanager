@@ -44,7 +44,7 @@ import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import {IContainer} from "../containers/Container";
 import {INode} from "../nodes/Node";
 import ManagedHostsList from "./ManagedHostsList";

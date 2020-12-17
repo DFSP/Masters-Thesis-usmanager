@@ -830,7 +830,9 @@ public class DatabaseLoader {
 				.dockerRepository(dockerHubUsername + "/" + appName)
 				.defaultExternalPort(defaultExternalPort)
 				.defaultInternalPort(defaultInternalPort)
-				.launchCommand(String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand : ""))
+				.launchCommand(type == ServiceTypeEnum.DATABASE
+					? null
+					: String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand : ""))
 				.minimumReplicas(1)
 				.outputLabel(String.format("${%sHost}", serviceName))
 				.environment(environment)

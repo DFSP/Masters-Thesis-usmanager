@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import BaseComponent from "../../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {

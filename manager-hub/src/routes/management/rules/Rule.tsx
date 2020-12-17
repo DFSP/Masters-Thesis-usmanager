@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 
 export interface IRule extends IDatabaseData {
     name: string;

@@ -369,7 +369,6 @@ public class ServicesMonitoringService {
 				String serviceName = containerDecision.getServiceName();
 				String containerId = containerDecision.getContainerId();
 				RuleDecisionEnum decision = containerDecision.getDecision();
-				log.info("Service {} on container {} had decision {}", serviceName, containerId, decision);
 				ServiceEvent serviceEvent = servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
 				kafkaService.sendServiceEvent(serviceEvent);
 				int serviceEventCount = serviceEvent.getCount();
@@ -384,6 +383,10 @@ public class ServicesMonitoringService {
 						decisionsList = new ArrayList<>(List.of(containerDecision));
 						decisions.put(serviceName, decisionsList);
 					}
+					log.info("Service {} on container {} had decision {} as event #{}. Triggering action {}", serviceName, containerId, decision, serviceEventCount, decision);
+				}
+				else {
+					log.info("Service {} on container {} had decision {} as event #{}. Nothing to do", serviceName, containerId, decision, serviceEventCount);
 				}
 			}
 		}

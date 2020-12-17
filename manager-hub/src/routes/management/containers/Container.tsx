@@ -65,7 +65,7 @@ import {IReply, postData} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import ContainerRuleList from "./ContainerRuleList";
 import ContainerSimulatedMetricList from "./ContainerSimulatedMetricList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";

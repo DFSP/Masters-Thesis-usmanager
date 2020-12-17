@@ -42,7 +42,7 @@ import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
 import {connect} from "react-redux";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 
 export interface ILoadBalancer extends IDatabaseData {
     container: IContainer,

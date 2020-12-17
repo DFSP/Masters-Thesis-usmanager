@@ -61,7 +61,8 @@ export class TextBox<T> extends React.Component<TextBoxProps<T>, State> {
                     id={id}
                     name={name}
                     type={show ? "text" : "password"}
-                    value={typeof value === 'object' && valueToString ? valueToString(value) : (value !== undefined ? value : '')}
+                    value={typeof value === 'object' && valueToString ? valueToString(value)
+                        : (Array.isArray(value) ? value.join(" ") : (value !== undefined ? value : ''))}
                     disabled={disabled}
                     autoComplete="off"
                     onChange={onChange}

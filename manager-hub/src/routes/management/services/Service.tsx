@@ -25,7 +25,7 @@
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {IFields, requiredAndNumberAndMinAndMax, requiredAndTrimmed} from "../../../components/form/Form"
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData, IDto} from "../../../components/IData";
 import {
     addService,
     addServiceApps,
@@ -58,7 +58,7 @@ import {Schemas} from "../../../middleware/api";
 import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
 import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
 
-export interface IService extends IDatabaseData {
+export interface IService extends IDto {
     serviceName: string;
     dockerRepository: string;
     defaultExternalPort: number;
@@ -599,6 +599,7 @@ class Service extends BaseComponent<Props, State> {
 }
 
 function removeFields(service: Partial<IService>) {
+    delete service["@id"]
     delete service["id"];
     delete service["apps"];
     delete service["dependencies"];

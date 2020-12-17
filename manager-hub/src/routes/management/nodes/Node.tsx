@@ -49,7 +49,7 @@ import {Schemas} from "../../../middleware/api";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
 import formStyles from "../../../components/form/Form.module.css";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import {Point} from "react-simple-maps";
 import {ICoordinates} from "../../../components/map/LocationMap";
 import {IMarker} from "../../../components/map/Marker";

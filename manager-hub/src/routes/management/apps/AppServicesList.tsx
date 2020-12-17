@@ -37,7 +37,7 @@ import {IApp} from "./App";
 import {IService} from "../services/Service";
 import Field from "../../../components/form/Field";
 import {IFields, IValues, requiredAndNumberAndMinAndMax} from "../../../components/form/Form";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import {isEqual} from "lodash";
 import ScrollBar from "react-perfect-scrollbar";
 

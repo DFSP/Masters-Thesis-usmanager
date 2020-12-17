@@ -42,7 +42,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IHostAddress} from "../hosts/Hosts";
 import {INode} from "../nodes/Node";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 
 export interface IKafkaBroker extends IDatabaseData {
     brokerId: number,

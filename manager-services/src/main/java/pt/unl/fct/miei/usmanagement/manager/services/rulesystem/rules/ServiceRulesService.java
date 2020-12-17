@@ -69,6 +69,8 @@ public class ServiceRulesService {
 	private final DroolsService droolsService;
 	private final ServicesService servicesService;
 	private final ContainersService containersService;
+	private final AppRulesService appRulesService;
+	private final ContainerRulesService containerRulesService;
 	private final KafkaService kafkaService;
 
 	private final ServiceRules rules;
@@ -78,12 +80,15 @@ public class ServiceRulesService {
 
 	public ServiceRulesService(ConditionsService conditionsService, RuleConditionsService ruleConditionsService, DroolsService droolsService,
 							   @Lazy ServicesService servicesService, @Lazy ContainersService containersService,
+							   @Lazy AppRulesService appRulesService,  @Lazy ContainerRulesService containerRulesService,
 							   KafkaService kafkaService, ServiceRules rules, RulesProperties rulesProperties) {
 		this.conditionsService = conditionsService;
 		this.ruleConditionsService = ruleConditionsService;
 		this.droolsService = droolsService;
 		this.servicesService = servicesService;
 		this.containersService = containersService;
+		this.appRulesService = appRulesService;
+		this.containerRulesService = containerRulesService;
 		this.kafkaService = kafkaService;
 		this.rules = rules;
 		this.serviceRuleTemplateFile = rulesProperties.getServiceRuleTemplateFile();
@@ -314,28 +319,29 @@ public class ServiceRulesService {
 		return rules;
 	}
 
-	private Rule generateServiceRule(ServiceRule serviceRule) {
-		return generateRule(serviceRule.getId(), serviceRule.getName(), serviceRule.getDecision().getRuleDecision(),
-			serviceRule.getPriority());
+	private Rule generateServiceRule(AppRule appRule) {
+		return generateRule(appRule.getId(), appRule.getDecision().getRuleDecision(),
+			appRule.getPriority(), appRulesService.getConditions(appRule.getName()));
 	}
 
-	private Rule generateServiceRule(AppRule appRule) {
-		return generateRule(appRule.getId(), appRule.getName(), appRule.getDecision().getRuleDecision(),
-			appRule.getPriority());
+	private Rule generateServiceRule(ServiceRule serviceRule) {
+		return generateRule(serviceRule.getId(), serviceRule.getDecision().getRuleDecision(),
+			serviceRule.getPriority(), getConditions(serviceRule.getName()));
 	}
 
 	private Rule generateServiceRule(ContainerRule containerRule) {
-		return generateRule(containerRule.getId(), containerRule.getName(), containerRule.getDecision().getRuleDecision(),
-			containerRule.getPriority());
+		return generateRule(containerRule.getId(), containerRule.getDecision().getRuleDecision(),
+			containerRule.getPriority(), containerRulesService.getConditions(containerRule.getName()));
 	}
 
-	private Rule generateRule(Long id, String ruleName, RuleDecisionEnum decision, int priority) {
-		List<pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition> conditions = getConditions(ruleName).stream().map(condition -> {
-			String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
-			double value = condition.getValue();
-			OperatorEnum operator = condition.getOperator().getOperator();
-			return new pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition(fieldName, value, operator);
-		}).collect(Collectors.toList());
+	private Rule generateRule(Long id, RuleDecisionEnum decision, int priority, List<Condition> entityConditions) {
+		List<pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition> conditions = entityConditions
+			.stream().map(condition -> {
+				String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
+				double value = condition.getValue();
+				OperatorEnum operator = condition.getOperator().getOperator();
+				return new pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition(fieldName, value, operator);
+			}).collect(Collectors.toList());
 		return new Rule(id, conditions, decision, priority);
 	}
 

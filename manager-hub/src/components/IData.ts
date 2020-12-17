@@ -22,6 +22,10 @@
  * SOFTWARE.
  */
 
-export default interface IDatabaseData {
+export interface IDatabaseData {
     id: number | string;
+}
+
+export interface IDto extends IDatabaseData {
+    "@id" : number | string;
 }

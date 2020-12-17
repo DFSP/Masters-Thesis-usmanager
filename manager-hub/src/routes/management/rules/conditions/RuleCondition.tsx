@@ -24,7 +24,7 @@
 
 import React from "react";
 import {IField, IOperator, IValueMode} from "../Rule";
-import IDatabaseData from "../../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../../components/IData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../../components/form/Form";

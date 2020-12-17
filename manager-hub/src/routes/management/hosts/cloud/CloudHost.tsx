@@ -23,7 +23,7 @@
  */
 
 import {RouteComponentProps} from "react-router";
-import IDatabaseData from "../../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../../components/IData";
 import BaseComponent from "../../../../components/BaseComponent";
 import Form, {ICustomButton, IFields, IFormLoading, required} from "../../../../components/form/Form";
 import LoadingSpinner from "../../../../components/list/LoadingSpinner";

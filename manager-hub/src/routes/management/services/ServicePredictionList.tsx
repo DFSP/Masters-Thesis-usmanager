@@ -24,7 +24,7 @@
 
 import React from "react";
 import {IService} from "./Service";
-import IDatabaseData from "../../../components/IDatabaseData";
+import {IDatabaseData} from "../../../components/IData";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";

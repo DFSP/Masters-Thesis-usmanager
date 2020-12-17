@@ -2,12 +2,10 @@ package pt.unl.fct.miei.usmanagement.manager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependencyKey;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
@@ -18,7 +16,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,16 +61,14 @@ public class KafkaCommunicationTester {
 
 	@Test
 	public void testMapDtoToEntity() {
-		ServiceDTO serviceDTO = new ServiceDTO(1L);
+		ServiceDTO serviceDto = new ServiceDTO(1L);
 		ServiceDTO dependencyDto = new ServiceDTO(2L);
-		ServiceDependencyDTO serviceDependencyDTO = new ServiceDependencyDTO(
-			new ServiceDependencyKey(serviceDTO.getId(), dependencyDto.getId()), serviceDTO, dependencyDto);
-		serviceDTO.setDependencies(Set.of(serviceDependencyDTO));
-
-		Service service = ServiceMapper.MAPPER.toService(serviceDTO, cycleAvoidingMappingContext);
+		ServiceDependencyKey key = new ServiceDependencyKey(serviceDto.getId(), dependencyDto.getId());
+		ServiceDependencyDTO serviceDependencyDto = new ServiceDependencyDTO(key, serviceDto, dependencyDto);
+		serviceDto.setDependencies(Set.of(serviceDependencyDto));
+		Service service = ServiceMapper.MAPPER.toService(serviceDto, cycleAvoidingMappingContext);
 		assertThat(service).isNotNull();
 		assertThat(service.getId()).isEqualTo(1L);
-
 		Set<ServiceDependency> serviceDependencies = service.getDependencies();
 		assertThat(serviceDependencies).hasSize(1);
 		assertThat(serviceDependencies).extracting("service").containsExactly(service);

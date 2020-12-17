@@ -23,11 +23,11 @@ public interface ServiceMapper {
 	ServiceMapper MAPPER = Mappers.getMapper(ServiceMapper.class);
 
 	default Set<String> mapStringToSet(String str) {
-		return str == null ? new HashSet<>() : Arrays.stream(str.split(" ")).collect(Collectors.toSet());
+		return str == null || str.isEmpty() ? new HashSet<>() : Arrays.stream(str.split(" ")).collect(Collectors.toSet());
 	}
 
 	default String mapSetToString(Set<String> set) {
-		return set == null ? null : String.join(" ", set);
+		return set == null || set.isEmpty() ? null : String.join(" ", set);
 	}
 
 	@Mapping(source = "id", target = "id")
