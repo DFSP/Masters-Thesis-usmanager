@@ -421,7 +421,6 @@ public class DockerContainersService {
 			Matcher containerIdRegexExpression = CONTAINER_ID_PATTERN.matcher(errorMessage);
 			boolean found = containerIdRegexExpression.find();
 			if (found) {
-				log.info(containerIdRegexExpression.group(1));
 				return findContainer(containerIdRegexExpression.group(1));
 			}
 		}
@@ -489,7 +488,7 @@ public class DockerContainersService {
 		Map.Entry<String, List<PortBinding>> port = fromContainer.hostConfig().portBindings().entrySet().iterator().next();
 		int externalPort = Integer.parseInt(port.getValue().get(0).hostPort());
 		int internalPort = Integer.parseInt(port.getKey());
-		Service service = servicesService.getService(serviceName).toBuilder()
+		Service service = servicesService.getServiceAndEntities(serviceName).toBuilder()
 			.defaultInternalPort(internalPort)
 			.defaultExternalPort(externalPort)
 			.build();

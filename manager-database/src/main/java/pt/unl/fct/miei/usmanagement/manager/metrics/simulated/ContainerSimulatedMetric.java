@@ -33,12 +33,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -60,9 +57,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_container_metrics")
-public class ContainerSimulatedMetric /*extends AbstractEntity<Long> */{
+public class ContainerSimulatedMetric /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -92,7 +89,7 @@ public class ContainerSimulatedMetric /*extends AbstractEntity<Long> */{
 	@JsonIgnore
 	@ManyToMany(mappedBy = "simulatedContainerMetrics")
 	private Set<Container> containers;
-	
+
 	public void addContainer(Container container) {
 		containers.add(container);
 		container.getSimulatedContainerMetrics().add(this);
@@ -102,7 +99,7 @@ public class ContainerSimulatedMetric /*extends AbstractEntity<Long> */{
 		containers.remove(container);
 		container.getSimulatedContainerMetrics().remove(this);
 	}
-	
+
 	public void removeAssociations() {
 		Iterator<Container> containersIterator = containers.iterator();
 		while (containersIterator.hasNext()) {

@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

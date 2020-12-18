@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -17,7 +16,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Builder(toBuilder = true)
@@ -26,7 +24,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Table(name = "zookeepers")
-public class Zookeeper /*extends AbstractEntity<String> */{
+public class Zookeeper /*extends AbstractEntity<String> */ {
 
 	@Id
 	private String id;

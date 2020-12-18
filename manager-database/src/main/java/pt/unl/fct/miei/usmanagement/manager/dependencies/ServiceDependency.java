@@ -30,16 +30,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.AppServiceKey;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
-import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -53,7 +47,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "service_dependencies")
-public class ServiceDependency /*extends AbstractEntity<Long> */{
+public class ServiceDependency /*extends AbstractEntity<Long> */ {
 
 	@EmbeddedId
 	private ServiceDependencyKey id;

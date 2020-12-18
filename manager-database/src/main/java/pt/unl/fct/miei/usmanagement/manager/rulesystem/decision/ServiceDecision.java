@@ -33,10 +33,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -68,15 +68,14 @@ public class ServiceDecision /*extends AbstractEntity<Long> */ {
 
 	private String serviceName;
 
+	@Column(length = 512)
 	private String result;
 
 	@ManyToOne
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne
-	@JoinColumn(name = "rule_id")
-	private ServiceRule rule;
+	private String ruleName;
 
 	@Basic
 	private Timestamp timestamp;

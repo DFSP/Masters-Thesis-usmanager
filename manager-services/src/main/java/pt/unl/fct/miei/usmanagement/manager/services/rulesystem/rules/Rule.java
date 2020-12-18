@@ -86,7 +86,7 @@ public final class Rule {
 		String statement = statementBuilder.toString();
 
 		// remove trailing &&
-		return statement.substring(0, statement.length() - 4);
+		return statement.length() > 0 ? statement.substring(0, statement.length() - 4) : statement;
 	}
 
 }

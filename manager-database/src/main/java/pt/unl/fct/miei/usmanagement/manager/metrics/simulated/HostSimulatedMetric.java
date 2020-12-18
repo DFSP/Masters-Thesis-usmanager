@@ -34,13 +34,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -62,7 +59,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_host_metrics")
-public class HostSimulatedMetric /*extends AbstractEntity<Long> */{
+public class HostSimulatedMetric /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -112,7 +109,7 @@ public class HostSimulatedMetric /*extends AbstractEntity<Long> */{
 		cloudHosts.remove(cloudHost);
 		cloudHost.getSimulatedHostMetrics().remove(this);
 	}
-	
+
 	public void addEdgeHost(EdgeHost edgeHost) {
 		edgeHosts.add(edgeHost);
 		edgeHost.getSimulatedHostMetrics().add(this);
@@ -122,7 +119,7 @@ public class HostSimulatedMetric /*extends AbstractEntity<Long> */{
 		edgeHosts.remove(edgeHost);
 		edgeHost.getSimulatedHostMetrics().remove(this);
 	}
-	
+
 	public void removeAssociations() {
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
 		while (cloudHostsIterator.hasNext()) {

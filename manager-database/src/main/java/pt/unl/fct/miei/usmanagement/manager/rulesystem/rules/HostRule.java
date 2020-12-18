@@ -33,8 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -61,7 +59,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "rules_host")
-public class HostRule /*extends AbstractEntity<Long> */{
+public class HostRule /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -104,7 +102,7 @@ public class HostRule /*extends AbstractEntity<Long> */{
 		cloudHosts.remove(cloudHost);
 		cloudHost.getHostRules().remove(this);
 	}
-	
+
 	public void addEdgeHost(EdgeHost edgeHost) {
 		edgeHosts.add(edgeHost);
 		edgeHost.getHostRules().add(this);
@@ -114,7 +112,7 @@ public class HostRule /*extends AbstractEntity<Long> */{
 		edgeHosts.remove(edgeHost);
 		edgeHost.getHostRules().remove(this);
 	}
-	
+
 	public void removeAssociations() {
 		Iterator<CloudHost> cloudHostsIterator = cloudHosts.iterator();
 		while (cloudHostsIterator.hasNext()) {

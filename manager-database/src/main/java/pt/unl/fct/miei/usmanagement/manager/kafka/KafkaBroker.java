@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -27,9 +26,9 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "kafka_brokers")
-public class KafkaBroker /*extends AbstractEntity<Long> */{
+public class KafkaBroker /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

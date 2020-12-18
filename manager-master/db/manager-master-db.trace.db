@@ -1,45 +1,48 @@
-2020-12-16 18:56:22 jdbc[3]: exception
+2020-12-17 23:41:30 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:22 jdbc[3]: exception
+2020-12-17 23:42:41 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:24 jdbc[3]: exception
+2020-12-17 23:42:41 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:24 jdbc[3]: exception
+2020-12-17 23:42:42 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:24 jdbc[3]: exception
+2020-12-17 23:42:43 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:24 jdbc[3]: exception
+2020-12-17 23:42:43 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:24 jdbc[3]: exception
+2020-12-17 23:42:43 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:43 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:25 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:26 jdbc[3]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-16 18:56:26 jdbc[4]: exception
+2020-12-17 23:42:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
+INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
+2020-12-17 23:42:44 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]

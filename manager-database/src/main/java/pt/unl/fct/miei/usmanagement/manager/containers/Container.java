@@ -42,7 +42,6 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulated
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;

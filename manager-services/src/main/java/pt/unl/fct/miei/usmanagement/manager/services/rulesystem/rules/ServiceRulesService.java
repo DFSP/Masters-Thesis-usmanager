@@ -337,7 +337,7 @@ public class ServiceRulesService {
 	private Rule generateRule(Long id, RuleDecisionEnum decision, int priority, List<Condition> entityConditions) {
 		List<pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition> conditions = entityConditions
 			.stream().map(condition -> {
-				String fieldName = String.format("%s-%S", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
+				String fieldName = String.format("%s-%s", condition.getField().getName(), condition.getValueMode().getName().toLowerCase());
 				double value = condition.getValue();
 				OperatorEnum operator = condition.getOperator().getOperator();
 				return new pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.Condition(fieldName, value, operator);

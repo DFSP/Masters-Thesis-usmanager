@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.monitoring;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,10 +31,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -52,7 +49,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_events")
-public class HostEvent /*extends AbstractEntity<Long> */{
+public class HostEvent /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")

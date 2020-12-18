@@ -31,10 +31,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -50,9 +48,9 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_decision_values")
-public class HostDecisionValue /*extends AbstractEntity<Long> */{
+public class HostDecisionValue /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

@@ -188,7 +188,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
             <LinkedContextMenuItem
                 option={'Ver a lista de regras genéricas'}
                 pathname={`/hosts/cloud/${id}`}
-                selected={'genericContainerRules'}
+                selected={'genericHostRules'}
                 state={cloudHost}/>,
             <LinkedContextMenuItem
                 option={'Modificar a lista das métricas simuladas'}

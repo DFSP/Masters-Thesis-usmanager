@@ -110,6 +110,7 @@ class Landing extends React.Component<Props, State> {
         const containers: IContainer[] = Object.values(this.props.containers)
             .sort((container1, container2) => container1.publicIpAddress.localeCompare(container2.publicIpAddress));
         const containerMarkers = new Map<String, IMarker>();
+
         let previousContainer;
         for (let i = 0; i < containers.length; i++) {
             const container = containers[i];
@@ -123,7 +124,7 @@ class Landing extends React.Component<Props, State> {
             if (marker.title === '') {
                 marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
-            if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress != container.publicIpAddress) {
+            else if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress != container.publicIpAddress) {
                 marker.title += publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
             marker.title += container.id.toString().substr(0, 10) + ' - ' + container.labels['serviceName'] + '<br/>';
@@ -135,8 +136,6 @@ class Landing extends React.Component<Props, State> {
             containerMarkers.set(latitude + ':' + longitude, marker);
             previousContainer = container;
         }
-
-        console.log(containerMarkers.values())
 
         const cloudHosts: ICloudHost[] = Object.values(this.props.cloudHosts);
         const cloudHostsMarkers = cloudHosts.filter((host: ICloudHost) =>
@@ -151,7 +150,7 @@ class Landing extends React.Component<Props, State> {
             }))
 
         const edgeHosts: IEdgeHost[] = Object.values(this.props.edgeHosts);
-        const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.coordinates.latitude + ':' + host.coordinates.latitude))
+        const edgeHostsMarkers = edgeHosts.filter((host: IEdgeHost) => !containerMarkers.has(host.coordinates.latitude + ':' + host.coordinates.longitude))
             .map(host => ({
                 title: host.coordinates.label + '<br/>' + host.publicIpAddress + '<br/>',
                 label: host.publicIpAddress,

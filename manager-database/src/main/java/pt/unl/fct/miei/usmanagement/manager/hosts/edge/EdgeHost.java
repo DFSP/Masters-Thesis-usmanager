@@ -35,7 +35,6 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
@@ -44,7 +43,6 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -64,9 +62,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "edge_hosts")
-public class EdgeHost /*extends AbstractEntity<Long> */{
+public class EdgeHost /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

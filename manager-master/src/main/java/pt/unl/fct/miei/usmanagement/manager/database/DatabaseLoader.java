@@ -129,7 +129,7 @@ public class DatabaseLoader {
 			String dockerHubUsername = dockerProperties.getHub().getUsername();
 			Map<String, Service> services = new HashMap<>(loadSystemComponents(dockerHubUsername, servicesService, serviceDependenciesService, dockerProperties));
 			services.putAll(loadSockShop(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
-			services.putAll(loadMixal(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
+			//services.putAll(loadMixal(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadOnlineBoutique(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadHotelReservation(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
 			services.putAll(loadMediaMicroservices(dockerHubUsername, appsService, servicesService, serviceDependenciesService, appServices));
@@ -873,6 +873,268 @@ public class DatabaseLoader {
 										   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>();
 
+		String appName = "Social Network";
+
+		Map.Entry<String, Service> composePost = associateServiceToApp(appName, "compose-post", 9092, 9092, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis"), null);
+		servicesMap.put(composePost.getKey(), composePost.getValue());
+
+		Map.Entry<String, Service> composePostRedis = associateServiceToApp(appName, "compose-post-redis", 6379, 6379, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(composePostRedis.getKey(), composePostRedis.getValue());
+
+		Map.Entry<String, Service> readHomeTimeline = associateServiceToApp(appName, "read-home-timeline", 9101, 9101, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis"), null);
+		servicesMap.put(readHomeTimeline.getKey(), readHomeTimeline.getValue());
+
+		Map.Entry<String, Service> media = associateServiceToApp(appName, "media", 9096, 9096, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached", "database"), null);
+		servicesMap.put(media.getKey(), media.getValue());
+
+		Map.Entry<String, Service> mediaMemcached = associateServiceToApp(appName, "media-memcached", 11211, 11211, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(mediaMemcached.getKey(), mediaMemcached.getValue());
+
+		Map.Entry<String, Service> mediaMongodb = associateServiceToApp(appName, "media-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(mediaMongodb.getKey(), mediaMongodb.getValue());
+
+		Map.Entry<String, Service> postStorage = associateServiceToApp(appName, "post-storage", 9094, 9094, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached", "database"), null);
+		servicesMap.put(postStorage.getKey(), postStorage.getValue());
+
+		Map.Entry<String, Service> postStorageMemcached = associateServiceToApp(appName, "post-storage-memcached", 11211, 11211, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(postStorageMemcached.getKey(), postStorageMemcached.getValue());
+
+		Map.Entry<String, Service> postStorageMongodb = associateServiceToApp(appName, "post-storage-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(postStorageMongodb.getKey(), postStorageMongodb.getValue());
+
+		Map.Entry<String, Service> socialGraph = associateServiceToApp(appName, "social-graph", 9090, 9090, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached", "database"), null);
+		servicesMap.put(socialGraph.getKey(), socialGraph.getValue());
+
+		Map.Entry<String, Service> socialGraphMemcached = associateServiceToApp(appName, "social-graph-memcached", 11211, 11211, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(socialGraphMemcached.getKey(), socialGraphMemcached.getValue());
+
+		Map.Entry<String, Service> socialGraphMongodb = associateServiceToApp(appName, "social-graph-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(socialGraphMongodb.getKey(), socialGraphMongodb.getValue());
+
+		Map.Entry<String, Service> text = associateServiceToApp(appName, "text", 9097, 9097, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(text.getKey(), text.getValue());
+
+		Map.Entry<String, Service> uniqueId = associateServiceToApp(appName, "unique-id", 9095, 9095, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(uniqueId.getKey(), uniqueId.getValue());
+
+		Map.Entry<String, Service> urlShorten = associateServiceToApp(appName, "url-shorten", 9099, 9099, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached", "database"), null);
+		servicesMap.put(urlShorten.getKey(), urlShorten.getValue());
+
+		Map.Entry<String, Service> urlShortenMemcached = associateServiceToApp(appName, "url-shorten-memcached", 11211, 11211, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(urlShortenMemcached.getKey(), urlShortenMemcached.getValue());
+
+		Map.Entry<String, Service> urlShortenMongodb = associateServiceToApp(appName, "url-shorten-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(urlShortenMongodb.getKey(), urlShortenMongodb.getValue());
+
+		Map.Entry<String, Service> userTag = associateServiceToApp(appName, "user-tag", 9098, 9098, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(userTag.getKey(), userTag.getValue());
+
+		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 9100, 9100, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("memcached", "database"), null);
+		servicesMap.put(user.getKey(), user.getValue());
+
+		Map.Entry<String, Service> userMemcached = associateServiceToApp(appName, "user-memcached", 11211, 11211, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(userMemcached.getKey(), userMemcached.getValue());
+
+		Map.Entry<String, Service> userMongodb = associateServiceToApp(appName, "user-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(userMongodb.getKey(), userMongodb.getValue());
+
+		Map.Entry<String, Service> userTimeline = associateServiceToApp(appName, "user-timeline", 9093, 9093, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis", "database"), null);
+		servicesMap.put(userTimeline.getKey(), userTimeline.getValue());
+
+		Map.Entry<String, Service> userTimelineRedis = associateServiceToApp(appName, "user-timeline-redis", 6379, 6379, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(userTimelineRedis.getKey(), userTimelineRedis.getValue());
+
+		Map.Entry<String, Service> userTimelineMongodb = associateServiceToApp(appName, "user-timeline-mongodb", 27017, 27017, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(userTimelineMongodb.getKey(), userTimelineMongodb.getValue());
+
+		Map.Entry<String, Service> writeHomeTimeline = associateServiceToApp(appName, "write-home-timeline", 9091, 9091, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("redis"), null);
+		servicesMap.put(writeHomeTimeline.getKey(), writeHomeTimeline.getValue());
+
+		Map.Entry<String, Service> homeTimelineRedis = associateServiceToApp(appName, "home-timeline-redis", 6379, 6379, ServiceTypeEnum.DATABASE,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(homeTimelineRedis.getKey(), homeTimelineRedis.getValue());
+
+		Map.Entry<String, Service> rabbitmq = associateServiceToApp(appName, "rabbitmq", 5672, 5672, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
+		servicesMap.put(rabbitmq.getKey(), rabbitmq.getValue());
+
+		Map.Entry<String, Service> nginx = associateServiceToApp(appName, "nginx", 8080, 8080, ServiceTypeEnum.BACKEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(nginx.getKey(), nginx.getValue());
+
+		Map.Entry<String, Service> frontend = associateServiceToApp(appName, "frontend", 9089, 9089, ServiceTypeEnum.FRONTEND,
+			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
+		servicesMap.put(frontend.getKey(), frontend.getValue());
+
+		if (!appsService.hasApp(appName)) {
+			App socialNetwork = App.builder().name(appName)
+				.description("A social network with unidirectional follow relationships, implemented with loosely-coupled microservices, communicating with each other via Thrift RPCs.")
+				.build();
+			socialNetwork = appsService.addApp(socialNetwork);
+			appServices.saveAll(List.of(
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePost.getValue().getId())).app(socialNetwork).service(composePost.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePostRedis.getValue().getId())).app(socialNetwork).service(composePostRedis.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), readHomeTimeline.getValue().getId())).app(socialNetwork).service(readHomeTimeline.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), media.getValue().getId())).app(socialNetwork).service(media.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMemcached.getValue().getId())).app(socialNetwork).service(mediaMemcached.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMongodb.getValue().getId())).app(socialNetwork).service(mediaMongodb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorage.getValue().getId())).app(socialNetwork).service(postStorage.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMemcached.getValue().getId())).app(socialNetwork).service(postStorageMemcached.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMongodb.getValue().getId())).app(socialNetwork).service(postStorageMongodb.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraph.getValue().getId())).app(socialNetwork).service(socialGraph.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMemcached.getValue().getId())).app(socialNetwork).service(socialGraphMemcached.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMongodb.getValue().getId())).app(socialNetwork).service(socialGraphMongodb.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), text.getValue().getId())).app(socialNetwork).service(text.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), uniqueId.getValue().getId())).app(socialNetwork).service(uniqueId.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShorten.getValue().getId())).app(socialNetwork).service(urlShorten.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMemcached.getValue().getId())).app(socialNetwork).service(urlShortenMemcached.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMongodb.getValue().getId())).app(socialNetwork).service(urlShortenMongodb.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTag.getValue().getId())).app(socialNetwork).service(userTag.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), user.getValue().getId())).app(socialNetwork).service(user.getValue()).launchOrder(19).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMemcached.getValue().getId())).app(socialNetwork).service(userMemcached.getValue()).launchOrder(20).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMongodb.getValue().getId())).app(socialNetwork).service(userMongodb.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimeline.getValue().getId())).app(socialNetwork).service(userTimeline.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineRedis.getValue().getId())).app(socialNetwork).service(userTimelineRedis.getValue()).launchOrder(22).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineMongodb.getValue().getId())).app(socialNetwork).service(userTimelineMongodb.getValue()).launchOrder(23).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), writeHomeTimeline.getValue().getId())).app(socialNetwork).service(writeHomeTimeline.getValue()).launchOrder(24).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), homeTimelineRedis.getValue().getId())).app(socialNetwork).service(homeTimelineRedis.getValue()).launchOrder(25).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), rabbitmq.getValue().getId())).app(socialNetwork).service(rabbitmq.getValue()).launchOrder(26).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), nginx.getValue().getId())).app(socialNetwork).service(nginx.getValue()).launchOrder(27).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), frontend.getValue().getId())).app(socialNetwork).service(frontend.getValue()).launchOrder(28).build())
+			);
+
+			if (!serviceDependenciesService.hasDependency(composePost.getKey(), rabbitmq.getKey())) {
+				serviceDependenciesService.addDependency(composePost.getValue(), rabbitmq.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(composePost.getKey(), userTimeline.getKey())) {
+				serviceDependenciesService.addDependency(composePost.getValue(), userTimeline.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(composePost.getKey(), composePostRedis.getKey())) {
+				serviceDependenciesService.addDependency(composePost.getValue(), composePostRedis.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(readHomeTimeline.getKey(), postStorage.getKey())) {
+				serviceDependenciesService.addDependency(homeTimelineRedis.getValue(), postStorage.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(readHomeTimeline.getKey(), homeTimelineRedis.getKey())) {
+				serviceDependenciesService.addDependency(homeTimelineRedis.getValue(), homeTimelineRedis.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(media.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(media.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(media.getKey(), mediaMemcached.getKey())) {
+				serviceDependenciesService.addDependency(media.getValue(), mediaMemcached.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(media.getKey(), mediaMongodb.getKey())) {
+				serviceDependenciesService.addDependency(media.getValue(), mediaMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(postStorage.getKey(), postStorageMemcached.getKey())) {
+				serviceDependenciesService.addDependency(postStorage.getValue(), postStorageMemcached.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(postStorage.getKey(), postStorageMongodb.getKey())) {
+				serviceDependenciesService.addDependency(postStorage.getValue(), postStorageMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(socialGraph.getKey(), user.getKey())) {
+				serviceDependenciesService.addDependency(socialGraph.getValue(), user.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(socialGraph.getKey(), socialGraphMemcached.getKey())) {
+				serviceDependenciesService.addDependency(socialGraph.getValue(), socialGraphMemcached.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(socialGraph.getKey(), socialGraphMongodb.getKey())) {
+				serviceDependenciesService.addDependency(socialGraph.getValue(), socialGraphMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(text.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(text.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(text.getKey(), nginx.getKey())) {
+				serviceDependenciesService.addDependency(text.getValue(), nginx.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(uniqueId.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(uniqueId.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(urlShorten.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(urlShorten.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(urlShorten.getKey(), urlShortenMemcached.getKey())) {
+				serviceDependenciesService.addDependency(urlShorten.getValue(), urlShortenMemcached.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(urlShorten.getKey(), urlShortenMongodb.getKey())) {
+				serviceDependenciesService.addDependency(urlShorten.getValue(), urlShortenMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(userTag.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(userTag.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(user.getKey(), composePost.getKey())) {
+				serviceDependenciesService.addDependency(user.getValue(), composePost.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(user.getKey(), userMemcached.getKey())) {
+				serviceDependenciesService.addDependency(user.getValue(), userMemcached.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(user.getKey(), userMongodb.getKey())) {
+				serviceDependenciesService.addDependency(user.getValue(), userMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(userTimeline.getKey(), postStorage.getKey())) {
+				serviceDependenciesService.addDependency(userTimeline.getValue(), postStorage.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(userTimeline.getKey(), userTimelineRedis.getKey())) {
+				serviceDependenciesService.addDependency(userTimeline.getValue(), userTimelineRedis.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(userTimeline.getKey(), userTimelineMongodb.getKey())) {
+				serviceDependenciesService.addDependency(userTimeline.getValue(), userTimelineMongodb.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(writeHomeTimeline.getKey(), homeTimelineRedis.getKey())) {
+				serviceDependenciesService.addDependency(writeHomeTimeline.getValue(), homeTimelineRedis.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(writeHomeTimeline.getKey(), homeTimelineRedis.getKey())) {
+				serviceDependenciesService.addDependency(writeHomeTimeline.getValue(), homeTimelineRedis.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), readHomeTimeline.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), readHomeTimeline.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), uniqueId.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), uniqueId.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), urlShorten.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), urlShorten.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), media.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), media.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), text.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), text.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), userTag.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), userTag.getValue());
+			}
+			if (!serviceDependenciesService.hasDependency(nginx.getKey(), postStorage.getKey())) {
+				serviceDependenciesService.addDependency(nginx.getValue(), postStorage.getValue());
+			}
+		}
+
 		return servicesMap;
 	}
 
@@ -1264,6 +1526,28 @@ public class DatabaseLoader {
 		if (!serviceDependenciesService.hasDependency(reservation.getKey(), memcachedReserve.getKey())) {
 			serviceDependenciesService.addDependency(reservation.getValue(), memcachedReserve.getValue());
 		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), profile.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), profile.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), rate.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), rate.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), recommendation.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), recommendation.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), reservation.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), reservation.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), user.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), user.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(frontend.getKey(), search.getKey())) {
+			serviceDependenciesService.addDependency(frontend.getValue(), search.getValue());
+		}
+		if (!serviceDependenciesService.hasDependency(search.getKey(), geo.getKey())) {
+			serviceDependenciesService.addDependency(search.getValue(), geo.getValue());
+		}
+
 
 		return servicesMap;
 	}
@@ -1386,7 +1670,7 @@ public class DatabaseLoader {
 		return servicesMap;
 	}
 
-	@Transactional
+	/*@Transactional
 	Map<String, Service> loadMixal(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
 								   ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
 		Map<String, Service> servicesMap = new HashMap<>(5);
@@ -1436,7 +1720,7 @@ public class DatabaseLoader {
 		}
 
 		return servicesMap;
-	}
+	}*/
 
 	@Transactional
 	Map<String, Service> loadSockShop(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
@@ -1445,7 +1729,7 @@ public class DatabaseLoader {
 
 		String appName = "Sock Shop";
 
-		Map.Entry<String, Service> frontend = associateServiceToApp(appName, "frontend", 8085, 80, ServiceTypeEnum.FRONTEND,
+		Map.Entry<String, Service> frontend = associateServiceToApp(appName, "frontend", 8079, 8079, ServiceTypeEnum.FRONTEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, 209715200d);
 		servicesMap.put(frontend.getKey(), frontend.getValue());
 		Map.Entry<String, Service> user = associateServiceToApp(appName, "user", 8086, 80, ServiceTypeEnum.BACKEND,

@@ -31,7 +31,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -49,9 +48,9 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "host_monitoring")
-public class HostMonitoring /*extends AbstractEntity<Long> */{
+public class HostMonitoring /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;

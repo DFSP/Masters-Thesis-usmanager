@@ -25,7 +25,6 @@
 package pt.unl.fct.miei.usmanagement.manager.metrics.simulated;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,12 +32,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -60,9 +56,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "simulated_service_metrics")
-public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */{
+public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -105,7 +101,7 @@ public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */{
 		services.remove(service);
 		service.getSimulatedServiceMetrics().remove(this);
 	}
-	
+
 	public void removeAssociations() {
 		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {

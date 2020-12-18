@@ -33,8 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
@@ -60,7 +58,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "rules_service")
-public class ServiceRule /*extends AbstractEntity<Long> */{
+public class ServiceRule /*extends AbstractEntity<Long> */ {
 
 	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
@@ -98,7 +96,7 @@ public class ServiceRule /*extends AbstractEntity<Long> */{
 		services.remove(service);
 		service.getServiceRules().remove(this);
 	}
-	
+
 	public void removeAssociations() {
 		Iterator<Service> servicesIterator = services.iterator();
 		while (servicesIterator.hasNext()) {

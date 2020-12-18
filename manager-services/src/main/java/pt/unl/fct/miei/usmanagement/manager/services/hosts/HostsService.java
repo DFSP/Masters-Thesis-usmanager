@@ -524,7 +524,7 @@ public class HostsService {
 	}
 
 	public int findAvailableExternalPort(HostAddress hostAddress, int startExternalPort) {
-		String command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+		String command = "ss -lntu | grep LISTEN | awk '{print $5}' | rev | cut -d: -f1 | rev";
 		try {
 			List<Integer> usedExternalPorts = executeCommandSync(command, hostAddress).stream()
 				.filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())

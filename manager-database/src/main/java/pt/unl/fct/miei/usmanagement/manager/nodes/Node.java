@@ -11,7 +11,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -33,7 +32,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Table(name = "nodes")
-public class Node /*extends AbstractEntity<String> */{
+public class Node /*extends AbstractEntity<String> */ {
 
 	@Id
 	@NaturalId

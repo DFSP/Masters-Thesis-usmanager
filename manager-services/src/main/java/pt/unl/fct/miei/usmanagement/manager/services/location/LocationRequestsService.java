@@ -146,9 +146,8 @@ public class LocationRequestsService {
 	}
 
 	@Async
-	@SuppressWarnings("unchecked")
 	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname) {
-		String url = String.format("http://%s:%s/api/locations/requests?aggregation", hostname, locationRequestsPort);
+		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, locationRequestsPort);
 		long currentRequestTime = System.currentTimeMillis();
 		if (lastRequestTime >= 0) {
 			int interval = (int) (currentRequestTime - lastRequestTime);

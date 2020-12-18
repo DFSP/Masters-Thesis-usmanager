@@ -48,17 +48,17 @@ public interface Conditions extends JpaRepository<Condition, Long> {
 		+ "from Condition c "
 		+ "where lower(c.name) = lower(:name)")
 	List<HostRuleCondition> getHostRuleConditions(String name);
-	
+
 	@Query("select c.appConditions "
 		+ "from Condition c "
 		+ "where lower(c.name) = lower(:name)")
 	List<AppRuleCondition> getAppRuleConditions(String name);
-	
+
 	@Query("select c.serviceConditions "
 		+ "from Condition c "
 		+ "where lower(c.name) = lower(:name)")
 	List<ServiceRuleCondition> getServiceRuleConditions(String name);
-	
+
 	@Query("select c.containerConditions "
 		+ "from Condition c "
 		+ "where lower(c.name) = lower(:name)")

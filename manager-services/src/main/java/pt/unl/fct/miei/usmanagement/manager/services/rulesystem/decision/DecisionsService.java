@@ -214,7 +214,7 @@ public class DecisionsService {
 			.containerId(containerId)
 			.serviceName(serviceName)
 			.result(result)
-			.rule(rule)
+			.ruleName(rule.getName())
 			.decision(decision)
 			.timestamp(timestamp).build();
 		return saveServiceDecision(serviceDecision);
@@ -228,7 +228,7 @@ public class DecisionsService {
 		HostRule rule = hostRulesService.getRule(ruleId);
 		pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision decision = getHostPossibleDecision(decisionName);
 		HostDecision hostDecision = HostDecision.builder().publicIpAddress(hostAddress.getPublicIpAddress())
-			.privateIpAddress(hostAddress.getPrivateIpAddress()).rule(rule).decision(decision).build();
+			.privateIpAddress(hostAddress.getPrivateIpAddress()).ruleName(rule.getName()).decision(decision).build();
 		return saveHostDecision(hostDecision);
 	}
 

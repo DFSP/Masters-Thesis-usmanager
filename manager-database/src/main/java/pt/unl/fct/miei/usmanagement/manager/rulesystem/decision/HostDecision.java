@@ -33,8 +33,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
-import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -59,9 +57,9 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "host_decisions")
-public class HostDecision /*extends AbstractEntity<Long> */{
+public class HostDecision /*extends AbstractEntity<Long> */ {
 
-		@Id
+	@Id
 	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
 	@GeneratedValue(generator = "IdGenerator")
 	private Long id;
@@ -70,9 +68,7 @@ public class HostDecision /*extends AbstractEntity<Long> */{
 	@JoinColumn(name = "decision_id")
 	private Decision decision;
 
-	@ManyToOne
-	@JoinColumn(name = "rule_id")
-	private HostRule rule;
+	private String ruleName;
 
 	@NotNull
 	private String publicIpAddress;

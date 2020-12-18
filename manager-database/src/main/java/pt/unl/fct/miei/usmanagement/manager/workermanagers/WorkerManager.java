@@ -30,7 +30,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pt.unl.fct.miei.usmanagement.manager.AbstractEntity;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
@@ -50,7 +49,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Table(name = "worker_managers")
-public class WorkerManager /*extends AbstractEntity<String> */{
+public class WorkerManager /*extends AbstractEntity<String> */ {
 
 	@Id
 	private String id;
