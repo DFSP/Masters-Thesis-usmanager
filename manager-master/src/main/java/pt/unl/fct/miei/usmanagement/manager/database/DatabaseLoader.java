@@ -832,7 +832,7 @@ public class DatabaseLoader {
 				.defaultInternalPort(defaultInternalPort)
 				.launchCommand(type == ServiceTypeEnum.DATABASE
 					? null
-					: String.format("${%sHost} ${externalPort} ${internalPort} ${hostname}%s", serviceName, launchCommand != null ? " " + launchCommand : ""))
+					: String.format("${%sHost} ${externalPort} ${internalPort} ${hostname} ${registration-client-port}%s", serviceName, launchCommand != null ? " " + launchCommand : ""))
 				.minimumReplicas(1)
 				.outputLabel(String.format("${%sHost}", serviceName))
 				.environment(environment)
@@ -1464,9 +1464,9 @@ public class DatabaseLoader {
 			Set.of("MEMCACHED_CACHE_SIZE=128", "MEMCACHED_THREADS=2"), servicesService, dockerHubUsername, null, null);
 		servicesMap.put(memcachedReserve.getKey(), memcachedReserve.getValue());
 		// available: "14269", "5778:5778", "14268:14268", "14267", "16686:16686", "5775:5775/udp", "6831:6831/udp", "6832:6832/udp"
-		Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 5778, 5778, ServiceTypeEnum.BACKEND,
+		/*Map.Entry<String, Service> jaeger = associateServiceToApp(appName, "jaeger", 5778, 5778, ServiceTypeEnum.BACKEND,
 			Collections.emptySet(), servicesService, dockerHubUsername, null, null);
-		servicesMap.put(reservation.getKey(), reservation.getValue());
+		servicesMap.put(reservation.getKey(), reservation.getValue());*/
 
 		if (!appsService.hasApp(appName)) {
 			App hotelReservation = App.builder().name(appName)
@@ -1478,7 +1478,7 @@ public class DatabaseLoader {
 				.build();
 			hotelReservation = appsService.addApp(hotelReservation);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), jaeger.getValue().getId())).app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
+				//AppService.builder().id(new AppServiceKey(hotelReservation.getId(), jaeger.getValue().getId())).app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedProfile.getValue().getId())).app(hotelReservation).service(memcachedProfile.getValue()).launchOrder(2).build(),
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profileDb.getValue().getId())).app(hotelReservation).service(profileDb.getValue()).launchOrder(3).build(),
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profile.getValue().getId())).app(hotelReservation).service(profile.getValue()).launchOrder(4).build(),

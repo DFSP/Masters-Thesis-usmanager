@@ -195,7 +195,7 @@ public class ElasticIpsService {
 		kafkaService.sendElasticIp(elasticIp);
 		log.info("Associated public ip address {} from elastic ip {} to cloud instance {} with association id {}",
 			elasticIp.getPublicIp(), elasticIp.getAllocationId(), instanceId, associationId);
-		AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+		AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 		Instance instance = awsService.getInstance(instanceId, awsRegion);
 		cloudHost.setPublicIpAddress(instance.getPublicIpAddress());
 		cloudHost = cloudHostsService.updateCloudHost(cloudHost);
@@ -207,7 +207,7 @@ public class ElasticIpsService {
 	private Map<RegionEnum, List<Address>> getElasticIpAddresses() {
 		Map<RegionEnum, CompletableFuture<List<Address>>> futureElasticIpAddresses = new HashMap<>();
 		for (RegionEnum region : RegionEnum.values()) {
-			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+			AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 			final int retries = 3;
 			for (int i = 0; i < retries; i++) {
 				try {
@@ -293,7 +293,7 @@ public class ElasticIpsService {
 			return cloudHostsService.getCloudHostById(instanceId).getAddress();
 		}
 		else {
-			AwsRegion awsRegion = regionsService.mapToAwsRegion(region);
+			AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 			CloudHost cloudHost = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium);
 			String allocationId = elasticIp.getAllocationId();
 			return associateElasticIpAddress(region, allocationId, cloudHost).getAddress();

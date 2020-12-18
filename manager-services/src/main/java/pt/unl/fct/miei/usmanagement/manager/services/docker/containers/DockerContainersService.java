@@ -66,6 +66,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServiceDependenciesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
@@ -105,17 +106,17 @@ public class DockerContainersService {
 	private final LoadBalancerService nginxLoadBalancerService;
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
-
-	private final int dockerDelayBeforeStopContainer;
 	private final ConfigurationsService configurationsService;
 
+	private final RegistrationProperties registrationProperties;
+	private final int dockerDelayBeforeStopContainer;
 	private final int threads;
 
 	public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
 								   NodesService nodesService, ServicesService servicesService,
 								   ServiceDependenciesService serviceDependenciesService, LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
-								   ContainerProperties containerProperties, ConfigurationsService configurationsService,
+								   RegistrationProperties registrationProperties, ContainerProperties containerProperties, ConfigurationsService configurationsService,
 								   ParallelismProperties parallelismProperties) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
@@ -125,6 +126,7 @@ public class DockerContainersService {
 		this.nginxLoadBalancerService = nginxLoadBalancerService;
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
+		this.registrationProperties = registrationProperties;
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
 		this.threads = parallelismProperties.getThreads();
@@ -297,7 +299,8 @@ public class DockerContainersService {
 				launchCommand = launchCommand
 					.replace("${hostname}", hostAddress.getPublicIpAddress())
 					.replace("${externalPort}", String.valueOf(externalPort))
-					.replace("${internalPort}", String.valueOf(internalPort));
+					.replace("${internalPort}", String.valueOf(internalPort))
+					.replace("${registration-client-port}", String.valueOf(registrationProperties.getClient().getPort()));
 				if (!launchCommand.isEmpty()) {
 					log.info("Launch command: {}", launchCommand);
 				}
@@ -392,9 +395,9 @@ public class DockerContainersService {
 					ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
 					String containerId = containerCreation.id();
 					config = configurationsService.addConfiguration(containerId);
-					if (containerType != ContainerTypeEnum.SINGLETON) {
+					/*if (containerType != ContainerTypeEnum.SINGLETON) {
 						dockerClient.connectToNetwork(containerId, DockerSwarmService.NETWORK_OVERLAY);
-					}
+					}*/
 					dockerClient.startContainer(containerId);
 					if (ServiceTypeEnum.getServiceType(serviceType) == ServiceTypeEnum.FRONTEND) {
 						nginxLoadBalancerService.addServer(serviceName, serviceAddress, hostAddress.getCoordinates(), hostAddress.getRegion());

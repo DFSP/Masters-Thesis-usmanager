@@ -377,7 +377,7 @@ public class AwsService {
 	}
 
 	public String allocateElasticIpAddress(RegionEnum region) {
-		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		AllocateAddressRequest allocateRequest = new AllocateAddressRequest().withDomain(DomainType.Vpc);
 		AllocateAddressResult allocateResponse = ec2.allocateAddress(allocateRequest);
@@ -386,7 +386,7 @@ public class AwsService {
 	}
 
 	public AssociateAddressResult associateElasticIpAddress(RegionEnum region, String allocationId, String instanceId) {
-		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		AssociateAddressRequest associateRequest = new AssociateAddressRequest()
 			.withInstanceId(instanceId)
@@ -395,7 +395,7 @@ public class AwsService {
 	}
 
 	public DisassociateAddressResult dissociateElasticIpAddress(RegionEnum region, String associationId) {
-		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		DisassociateAddressRequest disassociateAddressRequest = new DisassociateAddressRequest()
 			.withAssociationId(associationId);
@@ -409,7 +409,7 @@ public class AwsService {
 	}
 
 	public ReleaseAddressResult releaseElasticIpAddress(String allocationId, RegionEnum region) {
-		final AwsRegion awsRegion = regionService.mapToAwsRegion(region);
+		final AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 		final AmazonEC2 ec2 = getEC2Client(awsRegion);
 		ReleaseAddressRequest request = new ReleaseAddressRequest().withAllocationId(allocationId);
 		return ec2.releaseAddress(request);

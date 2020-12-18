@@ -270,7 +270,8 @@ public class SyncService {
 				log.debug("Node {} is currently being configured, skipping", nodeId);
 				continue;
 			}
-			if (!nodeIds.contains(nodeId) && !swarmNode.status().state().equalsIgnoreCase("down")) {
+			if (!nodeIds.contains(nodeId) && !swarmNode.status().state().equalsIgnoreCase("down")
+				&& swarmNode.spec().labels().size() > 0) {
 				nodesService.addNode(swarmNode);
 				log.info("Added missing node {} to the database", nodeId);
 			}

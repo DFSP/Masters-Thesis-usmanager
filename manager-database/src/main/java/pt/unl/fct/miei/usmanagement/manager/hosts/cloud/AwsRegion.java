@@ -127,6 +127,9 @@ public enum AwsRegion {
 	@Getter
 	private static final List<AwsRegion> awsRegions;
 
+	@Getter
+	private static final Map<RegionEnum, AwsRegion> regionsToAwsRegions;
+
 	static {
 		awsRegions = new LinkedList<>();
 		for (AwsRegion region : values()) {
@@ -134,6 +137,15 @@ public enum AwsRegion {
 				awsRegions.add(region);
 			}
 		}
+		regionsToAwsRegions = Map.of(
+			RegionEnum.EUROPE, EU_CENTRAL_1,
+			RegionEnum.NORTH_AMERICA, US_EAST_1,
+			RegionEnum.SOUTH_AMERICA, SA_EAST_1,
+			RegionEnum.AFRICA, AF_SOUTH_1,
+			RegionEnum.MIDDLE_EAST, ME_SOUTH_1,
+			RegionEnum.ASIA, AP_SOUTH_1,
+			RegionEnum.OCEANIA, AP_SOUTHEAST_2
+		);
 	}
 
 	AwsRegion(String zone, String name, RegionEnum region, Map<InstanceType, String> ami, Coordinates coordinates) {

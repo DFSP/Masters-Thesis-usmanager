@@ -24,13 +24,14 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 
-@NoArgsConstructor
 @Getter
 @Setter
 @Configuration
@@ -38,5 +39,19 @@ import org.springframework.context.annotation.Configuration;
 public class RegistrationProperties {
 
 	private int port;
+	private Client client;
+
+	public RegistrationProperties() {
+		this.client = new Client();
+	}
+
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@Setter
+	public static final class Client {
+
+		private int port;
+
+	}
 
 }

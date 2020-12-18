@@ -101,4 +101,5 @@ ul.dropdown li.disabled a:hover {
 
 .labelIcon {
     cursor: default;
+    user-select: none;
 }
