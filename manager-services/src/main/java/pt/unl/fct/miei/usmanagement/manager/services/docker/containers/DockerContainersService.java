@@ -54,7 +54,6 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainerProperties;
@@ -292,6 +291,8 @@ public class DockerContainersService {
 					: String.format("%s_%s_%s_%s", serviceName, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress(), externalPort);
 				String serviceAddress = String.format("%s:%s", hostAddress.getPublicIpAddress(), externalPort);
 				String dockerRepository = service.getDockerRepository();
+
+				// build launch command
 				String launchCommand = service.getLaunchCommand();
 				if (launchCommand == null) {
 					launchCommand = "";
@@ -300,34 +301,26 @@ public class DockerContainersService {
 					.replace("${hostname}", hostAddress.getPublicIpAddress())
 					.replace("${externalPort}", String.valueOf(externalPort))
 					.replace("${internalPort}", String.valueOf(internalPort))
-					.replace("${registration-client-port}", String.valueOf(registrationProperties.getClient().getPort()));
-				if (!launchCommand.isEmpty()) {
-					log.info("Launch command: {}", launchCommand);
-				}
-
+					.replace("${registrationClientPort}", String.valueOf(registrationProperties.getClient().getPort()));
 				RegionEnum region = hostAddress.getRegion();
 				if (service.getServiceType() != ServiceTypeEnum.SYSTEM
 					&& serviceDependenciesService.hasDependencies(serviceName)) {
-					String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
+					//String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
 						.orElseGet(() -> {
 							RegistrationServer registrationServer = registrationServerService.launchRegistrationServer(region);
 							return registrationServer.getContainer().getAddress();
 						});
-					launchCommand = launchCommand.replace(outputLabel, registrationAddress);
+					//launchCommand += launchCommand.replace(outputLabel, registrationAddress);
+					launchCommand = registrationAddress + " " + launchCommand;
 				}
-
 				for (Service databaseService : servicesService.getDependenciesByType(serviceName, ServiceTypeEnum.DATABASE)) {
 					String databaseServiceName = databaseService.getServiceName();
 					String databaseHost = getDatabaseHostForService(hostAddress, databaseServiceName);
 					String outputLabel = databaseService.getOutputLabel();
 					launchCommand = launchCommand.replace(outputLabel, databaseHost);
 				}
-				for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
-					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
-				}
-
 				Optional<Service> optionalMemcached = servicesService.getDependenciesServices(serviceName).stream()
 					.filter(s -> s.getServiceName().contains("memcached"))
 					.collect(Collectors.toList()).stream().findFirst();
@@ -338,10 +331,10 @@ public class DockerContainersService {
 					String outputLabel = memcached.getOutputLabel();
 					launchCommand = launchCommand.replace(outputLabel, memcachedHost);
 				}
-
 				for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
 					launchCommand = launchCommand.replace(param.getKey(), param.getValue());
 				}
+				log.info("Launch command: {}", launchCommand);
 
 				List<String> containerEnvironment = new LinkedList<>();
 				containerEnvironment.add(ContainerConstants.Environment.SERVICE_REGION + "=" + region);

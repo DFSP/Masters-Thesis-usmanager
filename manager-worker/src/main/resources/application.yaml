@@ -98,6 +98,8 @@ docker:
     initial-max-workers: 1
 registration:
   port: 8761
+  client:
+    port: 1906
 prometheus:
   node-exporter:
     install-script: src/main/resources/scripts/node-exporter-install.sh

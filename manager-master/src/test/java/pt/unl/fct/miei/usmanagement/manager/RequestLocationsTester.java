@@ -3,6 +3,8 @@ package pt.unl.fct.miei.usmanagement.manager;
 import com.google.gson.Gson;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
@@ -16,13 +18,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
+@ContextConfiguration(classes={LocationRequestsService.class})
 public class RequestLocationsTester {
 
-	private final LocationRequestsService locationRequestsService;
-
-	public RequestLocationsTester(LocationRequestsService locationRequestsService) {
-		this.locationRequestsService = locationRequestsService;
-	}
+	@Autowired
+	private LocationRequestsService locationRequestsService;
 
 	@Test
 	public void testMiddlePoint() {

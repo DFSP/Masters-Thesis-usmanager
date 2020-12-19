@@ -42,7 +42,7 @@ var interval int
 var lock sync.Mutex
 
 func init() {
-	flag.IntVar(&interval, "interval", 60000, "Default interval (in seconds) to include instances on data aggregation")
+	flag.IntVar(&interval, "interval", 60000, "Default interval (in miliseconds) to include instances on data aggregation")
 }
 
 func ListLocationRequests(w http.ResponseWriter, r *http.Request) {
