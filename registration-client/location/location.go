@@ -104,7 +104,6 @@ func sendAllData() {
 				go clear(serviceKey)
 			}
 		}
-
 	}
 }
 

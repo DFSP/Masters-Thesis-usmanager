@@ -1401,7 +1401,7 @@ public class DatabaseLoader {
 	@Transactional
 	Map<String, Service> loadHotelReservation(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
 											  ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
-		Map<String, Service> servicesMap = new HashMap<>(18);
+		Map<String, Service> servicesMap = new HashMap<>(17);
 
 		String appName = "Hotel Reservation";
 
@@ -1486,15 +1486,15 @@ public class DatabaseLoader {
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geo.getValue().getId())).app(hotelReservation).service(geo.getValue()).launchOrder(7).build(),
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rateDb.getValue().getId())).app(hotelReservation).service(rateDb.getValue()).launchOrder(8).build(),
 				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedRate.getValue().getId())).app(hotelReservation).service(memcachedRate.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rate.getValue().getId())).launchOrder(10).app(hotelReservation).service(rate.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendationDb.getValue().getId())).launchOrder(12).app(hotelReservation).service(recommendationDb.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendation.getValue().getId())).launchOrder(13).app(hotelReservation).service(recommendation.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), userDb.getValue().getId())).launchOrder(14).app(hotelReservation).service(userDb.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), user.getValue().getId())).launchOrder(15).app(hotelReservation).service(user.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservationDb.getValue().getId())).launchOrder(16).app(hotelReservation).service(reservationDb.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedReserve.getValue().getId())).launchOrder(17).app(hotelReservation).service(memcachedReserve.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservation.getValue().getId())).launchOrder(18).app(hotelReservation).service(reservation.getValue()).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), frontend.getValue().getId())).launchOrder(19).app(hotelReservation).service(frontend.getValue()).build())
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rate.getValue().getId())).app(hotelReservation).service(rate.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendationDb.getValue().getId())).app(hotelReservation).service(recommendationDb.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendation.getValue().getId())).app(hotelReservation).service(recommendation.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), userDb.getValue().getId())).app(hotelReservation).service(userDb.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), user.getValue().getId())).app(hotelReservation).service(user.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservationDb.getValue().getId())).app(hotelReservation).service(reservationDb.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedReserve.getValue().getId())).app(hotelReservation).service(memcachedReserve.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservation.getValue().getId())).app(hotelReservation).service(reservation.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), frontend.getValue().getId())).app(hotelReservation).service(frontend.getValue()).launchOrder(19).build())
 			);
 		}
 
@@ -1546,7 +1546,9 @@ public class DatabaseLoader {
 		if (!serviceDependenciesService.hasDependency(search.getKey(), geo.getKey())) {
 			serviceDependenciesService.addDependency(search.getValue(), geo.getValue());
 		}
-
+		if (!serviceDependenciesService.hasDependency(search.getKey(), rate.getKey())) {
+			serviceDependenciesService.addDependency(search.getValue(), rate.getValue());
+		}
 
 		return servicesMap;
 	}
@@ -1554,7 +1556,7 @@ public class DatabaseLoader {
 	@Transactional
 	Map<String, Service> loadOnlineBoutique(String dockerHubUsername, AppsService appsService, ServicesService servicesService,
 											ServiceDependenciesService serviceDependenciesService, AppServices appServices) {
-		Map<String, Service> servicesMap = new HashMap<>(11);
+		Map<String, Service> servicesMap = new HashMap<>(12);
 
 		String appName = "Online Boutique";
 
