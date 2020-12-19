@@ -67,7 +67,8 @@ func listMonitoring(w http.ResponseWriter) {
 		}
 	}
 
-	json.NewEncoder(w).Encode(locationMonitoring)
+	reglog.Logger.Infof("Replying locationMonitoring with: %+v", locationMonitoring)
+	_ = json.NewEncoder(w).Encode(locationMonitoring)
 }
 
 func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +105,8 @@ func listMonitoringAggregation(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	json.NewEncoder(w).Encode(serviceLocationMonitoring)
+	reglog.Logger.Infof("Replying serviceLocationMonitoring with: %+v", serviceLocationMonitoring)
+	_ = json.NewEncoder(w).Encode(serviceLocationMonitoring)
 }
 
 func AddLocationRequest(w http.ResponseWriter, r *http.Request) {

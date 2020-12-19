@@ -50,13 +50,13 @@ public class LocationRequestsService {
 	private final NodesService nodesService;
 	private final int locationRequestsPort;
 	private final RestTemplate restTemplate;
-	private long lastRequestTime;
+	private final Map<String, Long> lastRequestTime;
 
 	public LocationRequestsService(NodesService nodesService, LocationRequestsProperties locationRequestsProperties) {
 		this.nodesService = nodesService;
 		this.locationRequestsPort = locationRequestsProperties.getPort();
 		this.restTemplate = new RestTemplate();
-		this.lastRequestTime = -1;
+		this.lastRequestTime = new HashMap<>();
 	}
 
 	public Map<String, Coordinates> getServicesWeightedMiddlePoint() {
@@ -70,16 +70,18 @@ public class LocationRequestsService {
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
 		for (NodeLocationRequests requests : nodeLocationRequests) {
 			Node node = requests.getNode();
-			requests.getLocationRequests().forEach((service, count) -> {
+			requests.getRequests().forEach((service, count) -> {
 				List<LocationWeight> locationWeights = servicesLocationsWeights.get(service);
 				if (locationWeights == null) {
 					locationWeights = new ArrayList<>(1);
 				}
 				LocationWeight locationWeight = new LocationWeight(node, count);
 				locationWeights.add(locationWeight);
+				servicesLocationsWeights.put(service, locationWeights);
 			});
 		}
 
+		log.info("Location weights: {}", servicesLocationsWeights);
 		return servicesLocationsWeights;
 	}
 
@@ -119,7 +121,15 @@ public class LocationRequestsService {
 		double hypersphere = Math.sqrt(x * x + y * y);
 		double latitude = Math.atan2(z, hypersphere);
 
-		return new Coordinates(latitude, longitude);
+		// Convert back from radians to degrees
+		latitude = latitude * 180 / Math.PI;
+		longitude = longitude * 180 / Math.PI;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude);
+
+		log.info("Middle point for location weights {}: {}", locationWeights, coordinates);
+
+		return coordinates;
 	}
 
 	public List<NodeLocationRequests> getNodesLocationRequests() {
@@ -149,15 +159,19 @@ public class LocationRequestsService {
 	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, locationRequestsPort);
 		long currentRequestTime = System.currentTimeMillis();
-		if (lastRequestTime >= 0) {
-			int interval = (int) (currentRequestTime - lastRequestTime);
+		Long interval = lastRequestTime.get(hostname);
+		if (interval != null && interval > 0) {
+			interval = currentRequestTime - interval;
 			url += String.format("&interval=%d", interval);
 		}
-		lastRequestTime = currentRequestTime;
+		lastRequestTime.put(hostname, interval);
+
+		log.info("Requesting location requests from {}", url);
 
 		Map<String, Integer> locationMonitoringData = new HashMap<>();
 		try {
 			locationMonitoringData = restTemplate.getForObject(url, Map.class);
+			log.info("Got reply from {}: {}", url, locationMonitoringData);
 		}
 		catch (RestClientException e) {
 			log.error("Failed to get node {} location requests: {}", hostname, e.getMessage());

@@ -1,4 +1,4 @@
-package pt.unl.fct.miei.usmanagement.manager.management.monitoring.locationrequests;
+package pt.unl.fct.miei.usmanagement.manager.management.monitoring.requestlocations;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +13,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/request-locations")
-public class LocationRequestsController {
+public class RequestLocationsController {
 
 	private final LocationRequestsService locationRequestsService;
 
-	private LocationRequestsController(LocationRequestsService locationRequestsService) {
+	private RequestLocationsController(LocationRequestsService locationRequestsService) {
 		this.locationRequestsService = locationRequestsService;
 	}
 

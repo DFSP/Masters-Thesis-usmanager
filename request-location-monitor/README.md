@@ -62,7 +62,7 @@ Regista uma nova monitorização de um serviço:
 curl -i \
      --header "Content-Type: application/json" \
      --data '{"service":"app","latitude":39.575097,"longitude":-8.909794,"count":1}' \
-     http://localhost:1919/api/monitoring
+     http://localhost:1919/api/location/requests
 ```
 
 ## Ferramentas

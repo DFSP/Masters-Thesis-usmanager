@@ -33,6 +33,6 @@ import java.util.Map;
 public final class NodeLocationRequests {
 
 	private final Node node;
-	private final Map<String, Integer> locationRequests;
+	private final Map<String, Integer> requests;
 
 }

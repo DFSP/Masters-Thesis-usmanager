@@ -58,8 +58,9 @@ func main() {
 		HandlerFunc(api.ListLocationRequests)
 
 	router.Methods("GET").
-		Path("/api/location").
+		Path("/api/location/requests").
 		Queries(
+		"aggregation", "",
 			"interval", "",
 			"interval", "{[0-9]+}").
 		HandlerFunc(api.ListLocationRequests)
