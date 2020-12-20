@@ -373,7 +373,7 @@ class Container extends BaseComponent<Props, State> {
 
     private onMigrateSuccess = (container: IContainer) => {
         const parentContainer = this.getContainer();
-        super.toast(`<span class='green-text'>O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o host ${container.publicIpAddress} com o id </span><a href='/contentores/'${container.id}>${container.id}</a>`, 15000);
+        super.toast(`<span class='green-text'>O contentor ${this.mounted ? parentContainer?.id : `<a href='/contentores/${parentContainer?.id}'>${parentContainer?.id}</a>`} foi migrado para o host ${container.publicIpAddress} com o id </span><a href='/contentores/${container.id}'>${container.id}</a>`, 15000);
         if (this.mounted) {
             this.setState({loading: undefined});
         }

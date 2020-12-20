@@ -1,8 +1,8 @@
 #!/bin/sh
 #Script to launch processes
 
-if [ -z "${internalPort}" ] || [ -z "${externalPort}" ] || [ -z "${hostname}" ]; then
-  echo "Usage: sh $(basename "$0") internalPort externalPort hostname"
+if [ -z "${internalPort}" ] || [ -z "${externalPort}" ] || [ -z "${hostname}" ] || [ -z "${zone}" ]; then
+  echo "Usage: sh $(basename "$0") internalPort externalPort hostname zone"
   exit
 fi
 
@@ -13,4 +13,4 @@ exec java -Djava.security.egd=file:/dev/urandom -jar ./registration-server.jar \
   --host="${hostname}" \
   --ip="${hostname}" \
   --id="${id}" \
-  --zone=http://"${hostname}":"${externalPort}"/eureka/
+  --zone="${zone}"

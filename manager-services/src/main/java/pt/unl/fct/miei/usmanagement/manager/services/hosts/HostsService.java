@@ -61,7 +61,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -284,21 +283,11 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestCapableHostIgnoring(double availableMemory, Coordinates coordinates, List<HostAddress> hostAddresses) {
-		List<EdgeHost> edgeHosts = edgeHostsService.getEdgeHosts().parallelStream().filter(host -> {
-			HostAddress hostAddress = host.getAddress();
-			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory);
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getReadyNodes().stream().filter(node -> {
+			HostAddress hostAddress = node.getHostAddress();
+			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory);
 		}).collect(Collectors.toList());
-		List<CloudHost> cloudHosts;
-		try {
-			cloudHosts = new ForkJoinPool(threads).submit(() ->
-				cloudHostsService.getCloudHosts().parallelStream().filter(host ->
-					hostMetricsService.hostHasEnoughResources(host.getAddress(), availableMemory)
-				).collect(Collectors.toList())).get();
-		}
-		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to get closest capable hosts: %s", e.getMessage());
-		}
-		return getClosestHost(coordinates, edgeHosts, cloudHosts);
+		return getClosestNode(coordinates, nodes);
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates) {
@@ -311,6 +300,22 @@ public class HostsService {
 		List<EdgeHost> inactiveEdgeHosts = edgeHostsService.getInactiveEdgeHosts();
 		List<CloudHost> inactiveCloudHosts = cloudHostsService.getInactiveCloudHosts();
 		return getClosestHost(coordinates, inactiveEdgeHosts, inactiveCloudHosts);
+	}
+
+	public HostAddress getClosestNode(Coordinates coordinates, List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+		nodes.sort((oneNode, anotherNode) -> {
+			double oneDistance = oneNode.getCoordinates().distanceTo(coordinates);
+			double anotherDistance = anotherNode.getCoordinates().distanceTo(coordinates);
+			return Double.compare(oneDistance, anotherDistance);
+		});
+		HostAddress hostAddress;
+		if (!nodes.isEmpty()) {
+			hostAddress = nodes.get(0).getHostAddress();
+		}
+		else {
+			hostAddress = cloudHostsService.launchInstance(coordinates).getAddress();
+		}
+		return hostAddress;
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHost> edgeHosts, List<CloudHost> cloudHosts) {

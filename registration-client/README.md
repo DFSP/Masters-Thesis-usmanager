@@ -77,7 +77,7 @@ HTTP request | Description
 ------------ | -------------
 **Post**  /register                     		  | Regista o serviço no servidor eureka
 **Get**   /services/{service}/endpoint            | Obtém o endpoint mais próximo do serviço `{service}`
-**Get**   /services/{service}/endpoint?among=x   | Obtém um endpoint aleatório para o serviço `{service}` entre os x serviços mais perto
+**Get**   /services/{service}/endpoint?among=x    | Obtém um endpoint aleatório para o serviço `{service}` entre os x serviços mais perto
 **Get**   /services/{service}/endpoint?range=d    | Obtém o melhor endpoint para o serviço `{service}` começando a procura à distância de d quilómetros
 **Get**   /services/{service}/endpoints           | Obtém todos os endpoints registados em nome do serviço `{service}`
 **Post**  /metrics                                | Adiciona uma nova monitorização deste endpoint. Request body: `{service, latitude, longitude, count}`

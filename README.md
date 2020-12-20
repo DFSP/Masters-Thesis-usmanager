@@ -116,7 +116,7 @@ Este projeto está enquadrado no contexto de várias dissertações para obtenç
 As ferramentas específicas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
 
 > [Manager services](manager-services/README.md#ferramentas)  
->
+
 > [Manager master](manager-master/README.md#ferramentas)  
 
 > [Manager worker](manager-worker/README.md#ferramentas)  

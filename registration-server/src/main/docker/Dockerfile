@@ -18,4 +18,5 @@ ENTRYPOINT ["/bin/bash", "-c", "./docker-init.sh"]
 ENV internalPort 8761
 ENV externalPort 8761
 ENV hostname 127.0.0.1
-CMD ${internalPort} ${externalPort} ${hostname}
+ENV zone http://127.0.0.1:8761
+CMD ${internalPort} ${externalPort} ${hostname} ${zone}
