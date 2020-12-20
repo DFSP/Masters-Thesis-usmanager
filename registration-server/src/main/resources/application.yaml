@@ -25,6 +25,9 @@
 server:
   port: 8761
 eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${zone:http://127.0.0.1:8761/eureka}
   instance:
     appname: eureka-server
     hostname: ${host:localhost}
