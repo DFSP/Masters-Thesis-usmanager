@@ -63,20 +63,18 @@ func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 	var instanceEndpoint data.InstanceEndpoint
 
 	instances, hasServiceInstances := serviceInstances[service]
-	if hasServiceInstances {
-		if serviceInstancesUpdate[service].Add(cache).After(time.Now()) {
-			instanceEndpoint = eureka.GetBestInstance(&instance.Instance, instances)
-		} else {
-			instances, err := instance.EurekaServer.GetInstancesByVIPAddress(service, false, eureka.ThatAreUp)
-			if err == nil {
-				if len(instances) > 0 {
-					instanceEndpoint = eureka.GetBestInstance(&instance.Instance, instances)
-					serviceInstances[service] = instances
-					serviceInstancesUpdate[service] = time.Now()
-				}
-			} else {
-				errorMessage = err.Error()
+	if hasServiceInstances && serviceInstancesUpdate[service].Add(cache).After(time.Now()) {
+		instanceEndpoint = eureka.GetBestInstance(&instance.Instance, instances)
+	} else {
+		instances, err := instance.EurekaServer.GetInstancesByVIPAddress(service, false, eureka.ThatAreUp)
+		if err == nil {
+			if len(instances) > 0 {
+				instanceEndpoint = eureka.GetBestInstance(&instance.Instance, instances)
+				serviceInstances[service] = instances
+				serviceInstancesUpdate[service] = time.Now()
 			}
+		} else {
+			errorMessage = err.Error()
 		}
 	}
 

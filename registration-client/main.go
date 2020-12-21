@@ -79,13 +79,13 @@ func main() {
 	go func() {
 		router := mux.NewRouter()
 		router.HandleFunc("/api/register", api.RegisterServiceEndpoint).Methods("POST")
-		router.HandleFunc("/api/services/{service}/endpoints", api.GetServiceEndpoint).Methods("GET")
+		router.HandleFunc("/api/services/{service}/endpoint", api.GetServiceEndpoint).Methods("GET")
 		router.Methods("GET").
-			Path("/api/services/{service}/endpoints").
+			Path("/api/services/{service}/endpoint").
 			Queries("among", "x").
 			HandlerFunc(api.GetServiceEndpoint)
 		router.Methods("GET").
-			Path("/api/services/{service}/endpoints").
+			Path("/api/services/{service}/endpoint").
 			Queries("distance", "d").
 			HandlerFunc(api.GetServiceEndpoint)
 		router.HandleFunc("/api/services/{service}/endpoints", api.GetServiceEndpoints).Methods("GET")
