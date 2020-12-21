@@ -304,7 +304,7 @@ public class DockerContainersService {
 					.replace("${registrationClientPort}", String.valueOf(registrationProperties.getClient().getPort()));
 				RegionEnum region = hostAddress.getRegion();
 				if (service.getServiceType() != ServiceTypeEnum.SYSTEM
-					&& serviceDependenciesService.hasDependencies(serviceName)) {
+					&& (serviceDependenciesService.hasDependencies(serviceName) || serviceDependenciesService.hasDependents(serviceName))) {
 					//String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
 						.getRegistrationServerAddress(region)
@@ -320,6 +320,16 @@ public class DockerContainersService {
 					String databaseHost = getDatabaseHostForService(hostAddress, databaseServiceName);
 					String outputLabel = databaseService.getOutputLabel();
 					launchCommand = launchCommand.replace(outputLabel, databaseHost);
+				}
+				Optional<Service> optionalRabbitmq = servicesService.getDependenciesServices(serviceName).stream()
+					.filter(s -> s.getServiceName().contains("rabbitmq"))
+					.collect(Collectors.toList()).stream().findFirst();
+				if (optionalRabbitmq.isPresent()) {
+					Service rabbitmq = optionalRabbitmq.get();
+					String rabbitmqServiceName = rabbitmq.getServiceName();
+					String rabbitmqHost = getRabbitmqHostForService(hostAddress, rabbitmqServiceName);
+					String outputLabel = rabbitmq.getOutputLabel();
+					launchCommand = launchCommand.replace(outputLabel, rabbitmqHost);
 				}
 				Optional<Service> optionalMemcached = servicesService.getDependenciesServices(serviceName).stream()
 					.filter(s -> s.getServiceName().contains("memcached"))
@@ -434,6 +444,19 @@ public class DockerContainersService {
 		log.info("Using database {} on host {}", address, hostAddress);
 		return address;
 	}
+
+	private String getRabbitmqHostForService(HostAddress hostAddress, String rabbitmqService) {
+		Container rabbitmq = containersService.getHostContainersWithLabels(hostAddress,
+			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, rabbitmqService)))
+			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, rabbitmqService));
+		if (rabbitmq == null) {
+			throw new ManagerException("Failed to launch rabbitmq %s on host %s", rabbitmqService, hostAddress);
+		}
+		String address = rabbitmq.getAddress();
+		log.info("Using rabbitmq {} on host {}", address, hostAddress);
+		return address;
+	}
+
 
 	private String getMemcachedHostForService(HostAddress hostAddress, String memcachedService) {
 		Container memcached = containersService.getHostContainersWithLabels(hostAddress,

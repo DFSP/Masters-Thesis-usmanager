@@ -65,7 +65,14 @@ func main() {
 
 	if register {
 		go func() {
-			instance.Register()
+			for i := 0; i < 5; i++ {
+				err := instance.Register()
+				if err == nil {
+					break
+				}
+				reglog.Logger.Error(err)
+				time.Sleep(5 * time.Second)
+			}
 		}()
 	}
 

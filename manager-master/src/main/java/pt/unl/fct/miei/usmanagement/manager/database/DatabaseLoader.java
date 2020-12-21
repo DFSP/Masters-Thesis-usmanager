@@ -1767,7 +1767,7 @@ public class DatabaseLoader {
 			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
 		servicesMap.put(queueMaster.getKey(), queueMaster.getValue());
 		Map.Entry<String, Service> rabbitmq = associateServiceToApp(appName, "rabbitmq", 5672, 5672, ServiceTypeEnum.BACKEND,
-			Collections.emptySet(), servicesService, dockerHubUsername, List.of("rabbitmq"), 262144000d);
+			Collections.emptySet(), servicesService, dockerHubUsername, null, 262144000d);
 		servicesMap.put(rabbitmq.getKey(), rabbitmq.getValue());
 
 		if (!appsService.hasApp(appName)) {

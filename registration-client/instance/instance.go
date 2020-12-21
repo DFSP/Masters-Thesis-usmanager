@@ -56,7 +56,7 @@ func init() {
 	flag.StringVar(&eurekaAddress, "server", "127.0.0.1:8761", "Registration server")
 }
 
-func Register() {
+func Register() error {
 	Service = strings.ToLower(Service)
 	eurekaUrl := fmt.Sprintf("http://%s/eureka", eurekaAddress)
 	EurekaServer = eureka.NewConn(eurekaUrl)
@@ -98,13 +98,12 @@ func Register() {
 	Instance.SetMetadataString("longitude", strconv.FormatFloat(Longitude, 'f', -1, 64))
 
 	err := EurekaServer.ReregisterInstance(&Instance)
-	if err != nil {
-		reglog.Logger.Error(err)
-	} else {
+	if err == nil {
 		registered = true
 		reglog.Logger.Infof("Instance registered as %s", Instance.InstanceId)
 		heartbeat.Ticker(EurekaServer, Instance)
 	}
+	return err
 }
 
 func Deregister() {
