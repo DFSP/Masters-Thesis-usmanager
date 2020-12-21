@@ -106,7 +106,7 @@ class Landing extends React.Component<Props, State> {
         }
     }
 
-    private getContainersMarkers = (): IMarker[] => {
+    private getMarkers = (): IMarker[] => {
         const containers: IContainer[] = Object.values(this.props.containers)
             .sort((container1, container2) => container1.publicIpAddress.localeCompare(container2.publicIpAddress));
         const containerMarkers = new Map<String, IMarker>();
@@ -176,7 +176,7 @@ class Landing extends React.Component<Props, State> {
             </>;
         const map = <>
             {error && <Error message={error}/>}
-            {!error && <LocationMap locations={this.getContainersMarkers()} zoomable center={center} hover keepRatio/>}
+            {!error && <LocationMap locations={this.getMarkers()} zoomable center={center} hover keepRatio/>}
         </>;
         return <div className={`${styles.container}`}>
             <div className={`${styles.buttons}`}>

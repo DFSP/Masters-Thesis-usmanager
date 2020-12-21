@@ -50,6 +50,7 @@ func init() {
 	serviceInstancesUpdate = make(map[string]time.Time)
 }
 
+// TODO implement ...?among=x and ...?distance=d algorithms, add the options to the swagger specs, and generate the updated APIs again
 func GetServiceEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 

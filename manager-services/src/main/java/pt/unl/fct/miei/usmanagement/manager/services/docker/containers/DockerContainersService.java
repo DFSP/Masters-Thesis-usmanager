@@ -303,7 +303,7 @@ public class DockerContainersService {
 					.replace("${internalPort}", String.valueOf(internalPort))
 					.replace("${registrationClientPort}", String.valueOf(registrationProperties.getClient().getPort()));
 				RegionEnum region = hostAddress.getRegion();
-				if (service.getServiceType() != ServiceTypeEnum.SYSTEM
+				if (service.getServiceType() != ServiceTypeEnum.SYSTEM && service.getServiceType() != ServiceTypeEnum.DATABASE
 					&& (serviceDependenciesService.hasDependencies(serviceName) || serviceDependenciesService.hasDependents(serviceName))) {
 					//String outputLabel = servicesService.getService(ServiceConstants.Name.REGISTRATION_SERVER).getOutputLabel();
 					String registrationAddress = registrationServerService
@@ -446,7 +446,7 @@ public class DockerContainersService {
 	}
 
 	private String getRabbitmqHostForService(HostAddress hostAddress, String rabbitmqService) {
-		Container rabbitmq = containersService.getHostContainersWithLabels(hostAddress,
+		Container rabbitmq = containersService.getContainersWithLabels(
 			Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, rabbitmqService)))
 			.stream().findFirst().orElseGet(() -> containersService.launchContainer(hostAddress, rabbitmqService));
 		if (rabbitmq == null) {

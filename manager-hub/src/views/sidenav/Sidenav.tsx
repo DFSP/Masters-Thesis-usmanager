@@ -66,7 +66,7 @@ const sidenavManagementLinks: ILink[] = [
     {link: '/balanceamento de carga', name: 'Balanceamento de carga'},
     {link: '/servidores de registo', name: 'Servidores de registo'},
     {link: '/gestores locais', name: 'Gestores locais'},
-    {link: '/kafka', name: 'Kafka brokers'},
+    {link: '/kafka', name: 'Agentes Kafka'},
     {link: '/secure shell', name: 'Secure shell'},
     {link: '/configurações', name: 'Configurações'},
     {link: '/logs', name: 'Logs'},

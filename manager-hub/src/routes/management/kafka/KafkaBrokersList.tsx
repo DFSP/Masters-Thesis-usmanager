@@ -54,7 +54,7 @@ class KafkaBrokersList extends BaseComponent<Props, {}> {
             <CardList<IKafkaBroker>
                 isLoading={this.props.isLoading}
                 error={this.props.error}
-                emptyMessage={"Não existem kafka brokers a executar"}
+                emptyMessage={"Não existem agentes kafka a executar"}
                 list={this.props.kafkaBrokers}
                 card={this.kafkaBroker}
                 predicate={this.predicate}/>
