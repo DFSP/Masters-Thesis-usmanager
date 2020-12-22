@@ -54,8 +54,8 @@ import KafkaBrokersList from "./KafkaBrokersList";
 
 const KafkaBrokers: React.FC = () =>
     <MainLayout>
-        <AddButton button={{text: 'Lançar broker'}}
-                   pathname={'/kafka/lançar broker?new'}/>
+        <AddButton button={{text: 'Lançar agente'}}
+                   pathname={'/kafka/lançar agente?new'}/>
         <div className={`${styles.container}`}>
             <KafkaBrokersList/>
         </div>

@@ -81,9 +81,9 @@ func Register() error {
 		SecurePort:        Port,
 		SecurePortEnabled: false,
 
-		HomePageUrl:    fmt.Sprintf("http://%s:%d", Hostname, Port),
-		StatusPageUrl:  fmt.Sprintf("http://%s:%d/health", Hostname, Port),
-		HealthCheckUrl: fmt.Sprintf("http://%s:%d/health", Hostname, Port),
+		HomePageUrl:    fmt.Sprintf("%s:%d", Hostname, Port),
+		StatusPageUrl:  fmt.Sprintf("%s:%d/health", Hostname, Port),
+		HealthCheckUrl: fmt.Sprintf("%s:%d/health", Hostname, Port),
 
 		CountryId: 1,
 		DataCenterInfo: eureka.DataCenterInfo{
