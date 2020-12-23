@@ -117,9 +117,9 @@ public class LocationRequestsService {
 		z /= totalWeight;
 
 		// Convert average x, y, z coordinate to latitude and longitude
-		double longitude = Math.atan2(y, x);
 		double hypersphere = Math.sqrt(x * x + y * y);
 		double latitude = Math.atan2(z, hypersphere);
+		double longitude = Math.atan2(y, x);
 
 		// Convert back from radians to degrees
 		latitude = latitude * 180 / Math.PI;

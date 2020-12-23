@@ -39,6 +39,7 @@ import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import BaseComponent from "../BaseComponent";
 import ReactTooltip from "react-tooltip";
+import {GoMarkGithub} from "react-icons/all";
 
 export interface IFormModal {
     id: string,
@@ -101,6 +102,7 @@ interface FormProps {
     customButtons?: ICustomButton[];
     switchDropdown?: ISwitchDropdown;
     loading?: IFormLoading;
+    href?: string;
 }
 
 interface StateToProps {
@@ -305,7 +307,7 @@ class Form extends BaseComponent<Props, State> {
         const {saveRequired, loading} = this.state;
         const {
             id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
-            children, confirmationDialog
+            children, confirmationDialog, href
         } = this.props;
         return (
             <>
@@ -396,6 +398,9 @@ class Form extends BaseComponent<Props, State> {
                                                 <i className={`large material-icons ${this.state.isEditing ? (this.state.isValid ? 'green-text' : 'red-text') : ''}`}>edit</i>
                                             </button>
                                         )}
+                                        {href && <a className='right' href={href} target='_blank' rel='noopener noreferrer'>
+                                            <i style={{marginTop: "4px"}} className='material-icons'>link</i>
+                                        </a>}
                                     </>
                                 }
                                 {loading && (

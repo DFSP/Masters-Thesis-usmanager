@@ -59,6 +59,7 @@ import CloudHostSshCommand from "./CloudHostSshCommand";
 import CloudHostSshFileTransfer from "./CloudHostSshFileTransfer";
 import {isEqual} from "lodash";
 import {IRegion} from "../../regions/Region";
+import {IContainer} from "../../containers/Container";
 
 export interface ICloudHost extends IDatabaseData {
     instanceId: string;
@@ -462,7 +463,10 @@ class CloudHost extends BaseComponent<Props, State> {
                           }}
                           customButtons={this.startStopTerminateButtons()}
                           saveEntities={this.saveEntities}
-                          loading={this.state.loading}>
+                          loading={this.state.loading}
+                          href={isNewCloudHost
+                              ? undefined
+                              : `https://${(cloudHost as ICloudHost).awsRegion.zone}.console.aws.amazon.com/ec2/v2/home?region=${(cloudHost as ICloudHost).awsRegion.zone}#InstanceDetails:instanceId=${(cloudHost as ICloudHost).instanceId}`}>
                         {isNewCloudHost ?
                             <Field key='coordinates' id='coordinates' type='map' label='select position'
                                    map={{

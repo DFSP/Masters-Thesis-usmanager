@@ -1042,3 +1042,7 @@ select.no-validation-field ~ input.select-dropdown {
         visibility: hidden;
     }
 }
+
+.material-icons {
+    user-select: none;
+}

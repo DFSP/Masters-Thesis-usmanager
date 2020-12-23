@@ -760,13 +760,24 @@ class Container extends BaseComponent<Props, State> {
                           switchDropdown={isNewContainer ? {
                               options: currentForm === 'Usando o endereço' ? ['Usando a localização'] : ['Usando o endereço'],
                               onSwitch: this.switchForm
-                          } : undefined}>
+                          } : undefined}
+                          href={isNewContainer
+                              ? undefined
+                              : `http://${(container as IContainer).publicIpAddress}:${this.getPort((container as IContainer).ports)}`}>
                         {this.formFields(formContainer || {}, isNewContainer)}
                     </Form>
                 )}
             </>
         )
     };
+
+    private getPort = (ports: IContainerPort[]) => {
+        for (let port of ports) {
+            if (port.publicPort) {
+                return port.publicPort
+            }
+        }
+    }
 
     private ports = (): JSX.Element =>
         <ContainerPortsList isLoadingContainer={this.props.isLoading}
