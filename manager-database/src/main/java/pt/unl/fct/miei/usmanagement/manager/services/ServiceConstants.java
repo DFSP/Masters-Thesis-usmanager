@@ -1,7 +1,5 @@
 package pt.unl.fct.miei.usmanagement.manager.services;
 
-import lombok.Getter;
-
 import java.util.List;
 
 public class ServiceConstants {
@@ -16,6 +14,7 @@ public class ServiceConstants {
 			Name.WORKER_MANAGER,
 			Name.REGISTRATION_SERVER,
 			Name.PROMETHEUS,
+			Name.DOCKER_API_PROXY,
 			Name.NODE_EXPORTER,
 			Name.LOAD_BALANCER,
 			Name.KAFKA,
@@ -31,6 +30,7 @@ public class ServiceConstants {
 		public static final String WORKER_MANAGER = "worker-manager";
 		public static final String REGISTRATION_SERVER = "registration-server";
 		public static final String PROMETHEUS = "prometheus";
+		public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
 		public static final String NODE_EXPORTER = "node_exporter";
 		public static final String LOAD_BALANCER = "load-balancer";
 		public static final String KAFKA = "kafka";

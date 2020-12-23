@@ -84,7 +84,6 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
 		heartbeatService.startHeartbeat();
-		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 	}
 
 	private void requireEnvVars() {

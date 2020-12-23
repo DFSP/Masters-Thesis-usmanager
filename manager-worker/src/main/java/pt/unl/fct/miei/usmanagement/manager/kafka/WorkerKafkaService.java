@@ -72,6 +72,7 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetri
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -546,6 +547,11 @@ public class WorkerKafkaService {
 						}
 					}
 					servicesService.addOrUpdateService(service);
+
+					if (service.getServiceName().equalsIgnoreCase(ServiceConstants.Name.DOCKER_API_PROXY)) {
+						hostsService.setupHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
+					}
+
 				}
 			}
 			catch (Exception e) {
