@@ -34,13 +34,10 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("worker-manager")
+@ConfigurationProperties("manager-worker")
 public class WorkerManagerProperties {
 
-	private String id;
-	private String masterHostname;
 	private int monitorPeriod;
-	private int port;
 	private int heartbeatInterval;
 	private final Tests tests;
 

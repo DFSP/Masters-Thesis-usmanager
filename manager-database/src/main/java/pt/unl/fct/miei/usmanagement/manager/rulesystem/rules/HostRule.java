@@ -40,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -80,17 +81,17 @@ public class HostRule /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<HostRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules")
+	@ManyToMany(mappedBy = "hostRules", fetch = FetchType.EAGER)
 	private Set<CloudHost> cloudHosts;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "hostRules")
+	@ManyToMany(mappedBy = "hostRules", fetch = FetchType.EAGER)
 	private Set<EdgeHost> edgeHosts;
 
 	public void addCloudHost(CloudHost cloudHost) {

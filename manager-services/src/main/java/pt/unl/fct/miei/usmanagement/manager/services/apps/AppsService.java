@@ -36,6 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceOrder;
@@ -45,6 +46,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.AppRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.HashSet;
@@ -68,7 +70,7 @@ public class AppsService {
 
 	public AppsService(ServicesService servicesService, AppRulesService appRulesService,
 					   AppSimulatedMetricsService appSimulatedMetricsService, ContainersService containersService,
-					   KafkaService kafkaService, Apps apps) {
+					   WorkerManagersService workerManagersService, KafkaService kafkaService, Apps apps) {
 		this.servicesService = servicesService;
 		this.appRulesService = appRulesService;
 		this.appSimulatedMetricsService = appSimulatedMetricsService;

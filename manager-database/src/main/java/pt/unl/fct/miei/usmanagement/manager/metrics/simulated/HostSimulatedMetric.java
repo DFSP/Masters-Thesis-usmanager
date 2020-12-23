@@ -40,6 +40,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -92,12 +93,12 @@ public class HostSimulatedMetric /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "simulatedHostMetrics")
+	@ManyToMany(mappedBy = "simulatedHostMetrics", fetch = FetchType.EAGER)
 	private Set<CloudHost> cloudHosts;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "simulatedHostMetrics")
+	@ManyToMany(mappedBy = "simulatedHostMetrics", fetch = FetchType.EAGER)
 	private Set<EdgeHost> edgeHosts;
 
 	public void addCloudHost(CloudHost cloudHost) {

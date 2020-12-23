@@ -43,7 +43,9 @@ public class ConfigurationsService {
 
 	public void removeConfiguration(Configuration configuration) {
 		log.info("Removing configuration {}", configuration.getId());
-		configurations.delete(configuration);
+		if (isConfiguring(configuration.getId())) {
+			configurations.delete(configuration);
+		}
 	}
 
 	public boolean isConfiguring(String id) {

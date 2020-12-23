@@ -37,6 +37,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -89,7 +90,7 @@ public class ServiceSimulatedMetric /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "simulatedServiceMetrics")
+	@ManyToMany(mappedBy = "simulatedServiceMetrics", fetch = FetchType.EAGER)
 	private Set<Service> services;
 
 	public void addService(Service service) {

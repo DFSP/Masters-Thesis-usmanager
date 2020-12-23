@@ -59,11 +59,10 @@ management:
     web:
       exposure:
         include: info, health, metrics, mappings
-worker-manager:
-  monitor-period: 45000
+manager-worker:
+  heartbeat-interval: 15000
   tests:
     enabled: ${tests:true}
-  heartbeat-interval: 15000
 ssh:
   connection-timeout: 10000
 edge:
@@ -120,7 +119,7 @@ host:
   minimum-hosts: 1
   local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 container:
-  delay-before-stop: 45000
+  delay-before-stop: 30000
 nginx-load-balancer:
   stop-delay: 300000
 location-request:

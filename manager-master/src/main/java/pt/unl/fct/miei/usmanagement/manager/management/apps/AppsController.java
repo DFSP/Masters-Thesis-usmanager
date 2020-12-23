@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.Arrays;
@@ -51,9 +52,11 @@ import java.util.stream.Collectors;
 public class AppsController {
 
 	private final AppsService appsService;
+	private final WorkerManagersService workerManagersService;
 
-	public AppsController(AppsService appsService) {
+	public AppsController(AppsService appsService, WorkerManagersService workerManagersService) {
 		this.appsService = appsService;
+		this.workerManagersService = workerManagersService;
 	}
 
 	@GetMapping
@@ -107,7 +110,7 @@ public class AppsController {
 
 	@PostMapping("/{appName}/launch")
 	public Map<String, List<Container>> launch(@PathVariable String appName, @RequestBody Coordinates coordinates) {
-		return appsService.launch(appName, coordinates);
+		return workerManagersService.launchApp(appName, coordinates);
 	}
 
 	@GetMapping("/{appId}/rules")

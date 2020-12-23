@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -66,7 +67,7 @@ public class ValueMode /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<Condition> conditions;
 
 	public void clearAssociations() {

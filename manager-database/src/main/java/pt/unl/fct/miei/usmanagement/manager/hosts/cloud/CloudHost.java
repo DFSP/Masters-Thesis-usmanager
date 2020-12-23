@@ -44,6 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -98,7 +99,7 @@ public class CloudHost /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "cloud_host_rules",
 		joinColumns = @JoinColumn(name = "cloud_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -107,7 +108,7 @@ public class CloudHost /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "cloud_host_simulated_metrics",
 		joinColumns = @JoinColumn(name = "cloud_host_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

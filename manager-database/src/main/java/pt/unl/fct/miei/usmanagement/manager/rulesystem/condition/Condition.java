@@ -44,6 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -88,22 +89,22 @@ public class Condition /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<HostRuleCondition> hostConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<AppRuleCondition> appConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceRuleCondition> serviceConditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ContainerRuleCondition> containerConditions;
 
 	public void clearAssociations() {

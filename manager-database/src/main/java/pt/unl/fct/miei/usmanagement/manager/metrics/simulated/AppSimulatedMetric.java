@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -87,7 +88,7 @@ public class AppSimulatedMetric /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "simulatedAppMetrics")
+	@ManyToMany(mappedBy = "simulatedAppMetrics", fetch = FetchType.EAGER)
 	private Set<App> apps;
 
 	public void addApp(App app) {

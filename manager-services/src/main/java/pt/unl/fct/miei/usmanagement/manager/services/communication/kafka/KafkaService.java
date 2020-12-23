@@ -9,7 +9,6 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
@@ -270,7 +269,6 @@ public class KafkaService {
 		return kafkaBrokers;
 	}
 
-	@Async
 	public CompletableFuture<KafkaBroker> launchKafkaBroker(HostAddress hostAddress) {
 		RegionEnum region = hostAddress.getRegion();
 		List<Zookeeper> zookeepers = zookeeperService.getZookeepers(region);

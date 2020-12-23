@@ -407,7 +407,7 @@ public class DockerContainersService {
 					}
 					return getContainer(containerId);
 				}
-				catch (DockerException | InterruptedException e) {
+				catch (DockerException | InterruptedException | ManagerException e) {
 					errorMessage = e.getMessage();
 					if (errorMessage.toLowerCase().contains("image not found")) {
 						throw new EntityNotFoundException("image", "name", serviceName);

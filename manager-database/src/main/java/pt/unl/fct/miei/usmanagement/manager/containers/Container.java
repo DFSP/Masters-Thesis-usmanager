@@ -118,7 +118,7 @@ public class Container /*extends AbstractEntity<String> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "container_rules",
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -127,7 +127,7 @@ public class Container /*extends AbstractEntity<String> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "container_simulated_metrics",
 		joinColumns = @JoinColumn(name = "container_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

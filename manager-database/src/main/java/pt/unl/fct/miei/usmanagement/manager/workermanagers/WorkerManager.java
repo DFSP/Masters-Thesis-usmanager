@@ -65,9 +65,6 @@ public class WorkerManager /*extends AbstractEntity<String> */ {
 
 	@PrePersist
 	private void prePersist() {
-		if (this.getId() == null) {
-			this.setId(UUID.randomUUID().toString());
-		}
 		if (this.getState() == null) {
 			this.setState("ready");
 		}

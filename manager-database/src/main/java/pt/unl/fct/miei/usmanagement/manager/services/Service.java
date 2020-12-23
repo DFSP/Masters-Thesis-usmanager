@@ -121,7 +121,7 @@ public class Service /*extends AbstractEntity<Long> */ {
   	/*// Affinities to maybe dynamically calculate the dependencies
   	@Singular
   	@JsonIgnore
-  	@ManyToMany
+  	@ManyToMany(fetch = FetchType.EAGER)
   	@JoinTable(name = "service_affinity",
       	joinColumns = @JoinColumn(name = "service_id"),
       	inverseJoinColumns = @JoinColumn(name = "affinity_id")
@@ -130,27 +130,27 @@ public class Service /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceDependency> dependencies;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceDependency> dependents;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceEventPrediction> eventPredictions;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "service_rules",
 		joinColumns = @JoinColumn(name = "service_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -159,7 +159,7 @@ public class Service /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "service_simulated_metrics",
 		joinColumns = @JoinColumn(name = "service_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

@@ -105,20 +105,6 @@ location-request:
 rules:
   service-rule-template-file: drools/service-rule-template.drl
   host-rule-template-file: drools/host-rule-template.drl
-symmetricds:
-  master:
-    tables:
-      exclude:
-        startsWith: sym, logging, node, worker, users
-        endsWith: events
-        contains: monitoring, configurations
-  worker:
-    tables:
-      include:
-        startsWith: container, node
-        contains: event, host_monitoring_logs, service_monitoring_logs, host_decisions, host_decision_values, service_decisions, service_decision_values
-worker-manager:
-  port: 8081
 parallelism:
   threads: 8
 #logging:

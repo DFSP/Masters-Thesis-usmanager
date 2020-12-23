@@ -30,7 +30,7 @@ aws:
 container:
   database:
     deploy-delay: 5000
-  delay-before-stop: 45000
+  delay-before-stop: 30000
   monitor-period: 60000
 docker:
   install-script: docker-install.sh

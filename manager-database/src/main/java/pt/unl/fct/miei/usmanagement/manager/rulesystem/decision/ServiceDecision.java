@@ -38,6 +38,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -82,7 +83,7 @@ public class ServiceDecision /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceDecisionValue> serviceDecisionValues;
 
 	@PrePersist

@@ -93,6 +93,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 			environment.getProperty(ContainerConstants.Environment.Manager.ID));
 		vars.put(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS,
 			environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS));
+		log.info("Environment: {}", vars);
 		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
 		if (!requiredVars.isEmpty()) {
 			log.error("Usage: {} is required and {} is missing", vars.keySet(), requiredVars);

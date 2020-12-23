@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticIpsService {
 
-	private final RegionsService regionsService;
 	private final AwsService awsService;
 	private final CloudHostsService cloudHostsService;
 	private final NodesService nodesService;
@@ -54,10 +53,9 @@ public class ElasticIpsService {
 
 	private final ElasticIps elasticIps;
 
-	public ElasticIpsService(RegionsService regionsService, @Lazy AwsService awsService,
-							 @Lazy CloudHostsService cloudHostsService, NodesService nodesService,
-							 @Lazy ContainersService containersService, KafkaService kafkaService, ElasticIps elasticIps) {
-		this.regionsService = regionsService;
+	public ElasticIpsService(@Lazy AwsService awsService, @Lazy CloudHostsService cloudHostsService,
+							 @Lazy NodesService nodesService, @Lazy ContainersService containersService,
+							 KafkaService kafkaService, ElasticIps elasticIps) {
 		this.awsService = awsService;
 		this.cloudHostsService = cloudHostsService;
 		this.nodesService = nodesService;
@@ -74,6 +72,9 @@ public class ElasticIpsService {
 	public ElasticIp getElasticIp(Long id) {
 		return elasticIps.findById(id).orElseThrow(() ->
 			new EntityNotFoundException(ElasticIp.class, "id", id.toString()));
+	}
+	public boolean hasElasticIpByPublicIp(String publicIpAddress) {
+		return elasticIps.hasElasticIpByPublicIp(publicIpAddress);
 	}
 
 	public ElasticIp getElasticIp(RegionEnum regionEnum) {

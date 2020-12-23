@@ -24,15 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.containers;
 
-import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerStats;
-import com.spotify.docker.client.messages.HostConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
@@ -145,7 +142,7 @@ public class ContainersService {
 				.labels(dockerContainer.getLabels())
 				.coordinates(dockerContainer.getCoordinates())
 				.region(dockerContainer.getRegion())
-				.managerId(environment.getProperty(EnvironmentConstants.EXTERNAL_ID))
+				.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
 				.build();
 			return addContainer(container);
 		}

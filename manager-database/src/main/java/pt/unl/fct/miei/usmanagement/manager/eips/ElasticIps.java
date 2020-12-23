@@ -15,6 +15,12 @@ public interface ElasticIps extends JpaRepository<ElasticIp, Long> {
 		+ "where e.region = :region")
 	boolean hasElasticIp(RegionEnum region);
 
+	@Query("select case when count(e) > 0 then true else false end "
+		+ "from ElasticIp e "
+		+ "where e.publicIp = :publicIp")
+	boolean hasElasticIpByPublicIp(String publicIp);
+
 	Optional<ElasticIp> getElasticIpByAllocationId(String allocationId);
+
 }
 

@@ -6,8 +6,10 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -22,6 +24,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
@@ -201,12 +204,14 @@ public class SyncService {
 		Iterator<Container> containerIterator = containers.iterator();
 		while (containerIterator.hasNext()) {
 			Container container = containerIterator.next();
+			String serviceName = container.getServiceName();
 			String containerId = container.getId();
 			String managerId = container.getManagerId();
 			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
 			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
-			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !dockerContainerIds.containsKey(containerId))
-				|| (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
+			if (((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER))
+				&& !serviceName.equalsIgnoreCase(ServiceConstants.Name.WORKER_MANAGER)
+				&& !dockerContainerIds.containsKey(containerId)) || (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);

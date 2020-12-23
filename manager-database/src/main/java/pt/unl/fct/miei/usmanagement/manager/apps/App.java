@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -73,12 +74,12 @@ public class App /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<AppService> appServices;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "app_rules",
 		joinColumns = @JoinColumn(name = "app_id"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
@@ -87,7 +88,7 @@ public class App /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "app_simulated_metrics",
 		joinColumns = @JoinColumn(name = "app_id"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")

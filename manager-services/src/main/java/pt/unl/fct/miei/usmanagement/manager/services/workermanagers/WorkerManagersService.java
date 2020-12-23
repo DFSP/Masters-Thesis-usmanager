@@ -55,6 +55,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerR
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
@@ -92,17 +93,17 @@ public class WorkerManagersService {
 	private final BashService bashService;
 	private final NodesService nodesService;
 	private final KafkaService kafkaService;
+	private final ElasticIpsService elasticIpsService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
-	private final int port;
 	private final int threads;
 
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 KafkaService kafkaService, Environment environment, WorkerManagerProperties workerManagerProperties,
+								 KafkaService kafkaService, ElasticIpsService elasticIpsService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
@@ -112,6 +113,7 @@ public class WorkerManagersService {
 		this.bashService = bashService;
 		this.nodesService = nodesService;
 		this.kafkaService = kafkaService;
+		this.elasticIpsService = elasticIpsService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -120,7 +122,6 @@ public class WorkerManagersService {
 		this.headers = new HttpHeaders();
 		this.headers.add("Authorization", basicAuthorization);
 		this.restTemplate = new RestTemplate();
-		this.port = workerManagerProperties.getPort();
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -135,7 +136,7 @@ public class WorkerManagersService {
 
 	public WorkerManager getWorkerManager(Container container) {
 		return workerManagers.getByContainer(container).orElseThrow(() ->
-			new EntityNotFoundException(WorkerManager.class, "containerEntity", container.getId()));
+			new EntityNotFoundException(WorkerManager.class, "container", container.getId()));
 	}
 
 	public List<WorkerManager> getWorkerManagers(RegionEnum region) {
@@ -173,6 +174,8 @@ public class WorkerManagersService {
 			hostAddress = hostsService.completeHostAddress(hostAddress);
 		}
 
+		kafkaService.launchKafkaBroker(hostAddress.getRegion());
+
 		log.info("Launching worker manager at {}", hostAddress);
 		String id = UUID.randomUUID().toString();
 		Container container = launchWorkerManager(hostAddress, id);
@@ -194,13 +197,15 @@ public class WorkerManagersService {
 						return regionWorkerManagers.get(0);
 					}
 					else {
-						Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress());
+						Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress())
+							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
 						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();
 		}
 		catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			throw new ManagerException("Unable to launch worker managers: %s", e.getMessage());
 		}
 	}
@@ -282,7 +287,8 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Container>> launchContainer(LaunchContainerRequest launchContainerRequest,
 															  WorkerManager workerManager) {
-		String url = String.format("http://%s:%s/api/containers", workerManager.getContainer().getPublicIpAddress(), port);
+		String url = String.format("http://%s:%s/api/containers", workerManager.getContainer().getPublicIpAddress(),
+			workerManager.getContainer().getPorts().stream().findFirst().get().getPublicPort());
 		HttpEntity<?> request = new HttpEntity<>(launchContainerRequest, headers);
 		try {
 			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
@@ -335,12 +341,14 @@ public class WorkerManagersService {
 							containers.addAll(workerContainers);
 						}
 						catch (InterruptedException | ExecutionException e) {
+							e.printStackTrace();
 							throw new ManagerException("Failed to launch containers on worker from region %s", workerManager.getRegion());
 						}
 					}
 				}
 			}
 			catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
 				log.error("Failed to launch containers: {}... retrying ({}/{})", e.getMessage(), tries + 1, retries);
 				Timing.sleep(tries * 2, TimeUnit.SECONDS);
 			}
@@ -513,5 +521,41 @@ public class WorkerManagersService {
 	public WorkerManager addIfNotPresent(WorkerManager workerManager) {
 		Optional<WorkerManager> workerManagerOptional = workerManagers.findById(workerManager.getId());
 		return workerManagerOptional.orElseGet(() -> saveWorkerManager(workerManager));
+	}
+
+	@Async
+	public CompletableFuture<Map<String, List<Container>>> launchApp(String appName, Coordinates coordinates, WorkerManager workerManager) {
+		String url = String.format("http://%s:%s/api/apps/%s/launch", appName, workerManager.getContainer().getPublicIpAddress(),
+			workerManager.getContainer().getPorts().stream().findFirst().get().getPublicPort());
+		HttpEntity<?> request = new HttpEntity<>(coordinates, headers);
+		try {
+			Map<String, List<Container>> response = restTemplate.postForObject(url, request, Map.class);
+			log.info("Got reply from {}: {}", url, response);
+			return CompletableFuture.completedFuture(response);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	public Map<String, List<Container>> launchApp(String appName, Coordinates coordinates) {
+		RegionEnum region = RegionEnum.getClosestRegion(coordinates);
+		String errorMessage = "";
+		final int retries = 5;
+		int tries = 0;
+		do {
+			try {
+				WorkerManager workerManager = getRegionWorkerManager(region);
+				CompletableFuture<Map<String, List<Container>>> futureApp = launchApp(appName, coordinates, workerManager);
+				return futureApp.get();
+			}
+			catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				errorMessage = e.getMessage();
+				log.error("Failed to launch app {}: {}... retrying ({}/{})", appName, e.getMessage(), tries + 1, retries);
+				Timing.sleep(tries * 2, TimeUnit.SECONDS);
+			}
+		} while (++tries < retries);
+		throw new ManagerException("Failed to launch app {}: {}", appName, errorMessage);
 	}
 }

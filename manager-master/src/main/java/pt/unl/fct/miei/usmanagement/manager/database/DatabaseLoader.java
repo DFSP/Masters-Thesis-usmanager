@@ -1912,7 +1912,6 @@ public class DatabaseLoader {
 				.dockerRepository(dockerHubUsername + "/manager-worker")
 				.defaultExternalPort(8081)
 				.defaultInternalPort(8081)
-				.launchCommand("${registrationHost} ${externalPort} ${internalPort} ${hostname}")
 				.outputLabel("${workerManagerHost}")
 				.serviceType(ServiceTypeEnum.SYSTEM)
 				.volumes(Set.of("/var/run/docker.sock:/var/run/docker.sock"))

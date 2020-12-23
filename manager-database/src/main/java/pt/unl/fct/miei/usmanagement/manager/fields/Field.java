@@ -41,6 +41,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -71,17 +72,17 @@ public class Field /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<Condition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<HostSimulatedMetric> simulatedHostMetrics;
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
 
 	public void clearAssociations() {

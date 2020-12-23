@@ -39,6 +39,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -79,12 +80,12 @@ public class ServiceRule /*extends AbstractEntity<Long> */ {
 
 	@Singular
 	@JsonIgnore
-	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<ServiceRuleCondition> conditions;
 
 	@Singular
 	@JsonIgnore
-	@ManyToMany(mappedBy = "serviceRules")
+	@ManyToMany(mappedBy = "serviceRules", fetch = FetchType.EAGER)
 	private Set<Service> services;
 
 	public void addService(Service service) {
