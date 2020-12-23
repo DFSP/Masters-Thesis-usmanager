@@ -68,6 +68,7 @@ public final class ContainerConstants {
 		public static final String RECOVERY = "recovery";
 		public static final String MASTER_MANAGER = "masterManager";
 		public static final String KAFKA_BROKER_ID = "kafkaBrokerId";
+		public static final String MANAGER_ID = "managerId";
 	}
 
 }

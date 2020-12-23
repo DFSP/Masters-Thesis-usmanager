@@ -1,8 +1,29 @@
 package pt.unl.fct.miei.usmanagement.manager.services;
 
+import lombok.Getter;
+
+import java.util.List;
+
 public class ServiceConstants {
 
-	private ServiceConstants() {
+	private static final List<String> systemServices;
+
+	private ServiceConstants() { }
+
+	static {
+		systemServices = List.of(
+			Name.MASTER_MANAGER,
+			Name.WORKER_MANAGER,
+			Name.REGISTRATION_SERVER,
+			Name.PROMETHEUS,
+			Name.NODE_EXPORTER,
+			Name.LOAD_BALANCER,
+			Name.KAFKA,
+			Name.ZOOKEEPER);
+	}
+
+	public static List<String> getSystemServices() {
+		return systemServices;
 	}
 
 	public static final class Name {
@@ -15,5 +36,4 @@ public class ServiceConstants {
 		public static final String KAFKA = "kafka";
 		public static final String ZOOKEEPER = "zookeeper";
 	}
-
 }

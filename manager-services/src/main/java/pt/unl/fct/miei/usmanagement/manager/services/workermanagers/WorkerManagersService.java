@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.workermanagers;
 
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -44,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
@@ -57,6 +59,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
@@ -94,6 +97,7 @@ public class WorkerManagersService {
 	private final NodesService nodesService;
 	private final KafkaService kafkaService;
 	private final ElasticIpsService elasticIpsService;
+	private final CloudHostsService cloudHostsService;
 	private final Environment environment;
 
 	private final HttpHeaders headers;
@@ -103,7 +107,7 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 KafkaService kafkaService, ElasticIpsService elasticIpsService, Environment environment, WorkerManagerProperties workerManagerProperties,
+								 KafkaService kafkaService, ElasticIpsService elasticIpsService, CloudHostsService cloudHostsService, Environment environment, WorkerManagerProperties workerManagerProperties,
 								 ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
@@ -114,6 +118,7 @@ public class WorkerManagersService {
 		this.nodesService = nodesService;
 		this.kafkaService = kafkaService;
 		this.elasticIpsService = elasticIpsService;
+		this.cloudHostsService = cloudHostsService;
 		this.environment = environment;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
@@ -161,7 +166,8 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager saveWorkerManager(Container container) {
-		return saveWorkerManager(WorkerManager.builder().container(container).region(container.getRegion()).build());
+		String managerId = container.getLabels().get(ContainerConstants.Label.MANAGER_ID);
+		return saveWorkerManager(WorkerManager.builder().id(managerId).container(container).region(container.getRegion()).build());
 	}
 
 	public WorkerManager saveWorkerManager(WorkerManager workerManager) {
@@ -197,9 +203,11 @@ public class WorkerManagersService {
 						return regionWorkerManagers.get(0);
 					}
 					else {
-						Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress())
+						/*Predicate<Node> filter = node -> !node.getHostAddress().equals(hostsService.getManagerHostAddress())
 							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
-						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);
+						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);*/
+						AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
+						HostAddress hostAddress = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium).getAddress();
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();
@@ -216,7 +224,10 @@ public class WorkerManagersService {
 			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress),
 			ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS + "=" + kafkaService.getKafkaBrokersHosts()
 		));
-		return containersService.launchContainer(hostAddress, ServiceConstants.Name.WORKER_MANAGER, environment);
+		Map<String, String> labels = Map.of(
+			ContainerConstants.Label.MANAGER_ID, String.valueOf(id)
+		);
+		return containersService.launchContainer(hostAddress, ServiceConstants.Name.WORKER_MANAGER, environment, labels);
 	}
 
 	public void stopWorkerManager(String workerManagerId) {
