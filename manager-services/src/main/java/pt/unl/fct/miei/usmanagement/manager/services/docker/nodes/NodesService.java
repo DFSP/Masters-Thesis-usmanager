@@ -33,8 +33,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.unl.fct.miei.usmanagement.manager.EnvironmentConstants;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -300,7 +300,7 @@ public class NodesService {
 			.version(node.version().index())
 			.state(node.status().state())
 			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
-			.managerId(environment.getProperty(EnvironmentConstants.EXTERNAL_ID))
+			.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
 			.labels(new HashMap<>(node.spec().labels()))
 			.build();
 	}
