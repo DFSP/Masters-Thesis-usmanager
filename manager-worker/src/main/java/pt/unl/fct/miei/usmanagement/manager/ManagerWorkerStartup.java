@@ -88,22 +88,13 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS);
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
+		heartbeatService.startHeartbeat();
 		kafkaService.start();
+		hostsService.setupWorkerManagerHost(hostAddress, NodeRole.MANAGER);
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
-		heartbeatService.startHeartbeat();
-		Service dockerApiProxy = Service.builder()
-			.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
-			.dockerRepository(dockerProperties.getHub().getUsername() + "/nginx-basic-auth-proxy")
-			.defaultExternalPort(dockerProperties.getApiProxy().getPort())
-			.defaultInternalPort(80)
-			.outputLabel("${dockerApiProxyHost}")
-			.serviceType(ServiceTypeEnum.SYSTEM)
-			.build();
-		servicesService.addService(dockerApiProxy);
-		hostsService.setupWorkerManagerHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
 	}
 
 	private void requireEnvVars() {

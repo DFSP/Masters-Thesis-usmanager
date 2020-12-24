@@ -14,6 +14,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,8 +40,8 @@ public class HeartbeatService {
 		this.heartbeatInterval = workerManagerProperties.getHeartbeatInterval();
 	}
 
-	public Optional<Heartbeat> lastHeartbeat(String nodeId) {
-		return heartbeats.findById(nodeId);
+	public Optional<Heartbeat> lastHeartbeat(String id) {
+		return heartbeats.findById(id);
 	}
 
 	public List<Heartbeat> lastHeartbeats() {
@@ -48,6 +49,10 @@ public class HeartbeatService {
 	}
 
 	public Heartbeat saveHeartbeat(Heartbeat heartbeat) {
+		return heartbeats.save(heartbeat);
+	}
+
+	public Heartbeat saveWorkerHeartbeat(Heartbeat heartbeat) {
 		String id = heartbeat.getId();
 		log.info("Received heartbeat from worker {}", id);
 		WorkerManager workerManager = workerManagersService.getWorkerManager(id);
@@ -64,5 +69,15 @@ public class HeartbeatService {
 				kafkaService.sendHeartbeat(Heartbeat.builder().id(id).build());
 			}
 		}, heartbeatInterval, heartbeatInterval);
+	}
+
+	public void deleteHeartbeat(String id) {
+		try {
+			heartbeats.deleteById(id);
+		} catch (EntityNotFoundException ignored) { }
+	}
+
+	public void reset() {
+		heartbeats.deleteAll();
 	}
 }

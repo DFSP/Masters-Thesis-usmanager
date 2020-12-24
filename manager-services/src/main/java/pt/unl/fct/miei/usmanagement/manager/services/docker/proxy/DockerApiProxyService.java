@@ -31,6 +31,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
@@ -42,32 +43,26 @@ import java.util.List;
 @org.springframework.stereotype.Service
 public class DockerApiProxyService {
 
-	public static final String DOCKER_API_PROXY = "nginx-basic-auth-proxy";
-
-	private final ServicesService servicesService;
 	private final HostsService hostsService;
 
 	private final String dockerApiProxyUsername;
 	private final String dockerApiProxyPassword;
+	private final int dockerApiProxyPort;
 	private final int dockerApiPort;
+	private final String dockerHubUsername;
 
-	public DockerApiProxyService(ServicesService servicesService,
-								 @Lazy HostsService hostsService,
-								 DockerProperties dockerProperties) {
-		this.servicesService = servicesService;
+	public DockerApiProxyService(@Lazy HostsService hostsService, DockerProperties dockerProperties) {
 		this.hostsService = hostsService;
 		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
+		this.dockerApiProxyPort = dockerProperties.getApiProxy().getPort();
 		this.dockerApiPort = dockerProperties.getApi().getPort();
+		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 	}
 
 	public String launchDockerApiProxy(HostAddress hostAddress) {
-		Service dockerApiProxy = servicesService.getService(DOCKER_API_PROXY);
-		String serviceName = dockerApiProxy.getServiceName();
-		ServiceTypeEnum serviceType = dockerApiProxy.getServiceType();
-		int externalPort = dockerApiProxy.getDefaultExternalPort();
-		int internalPort = dockerApiProxy.getDefaultInternalPort();
-		String dockerRepository = dockerApiProxy.getDockerRepository();
+		String serviceName = ServiceConstants.Name.DOCKER_API_PROXY;
+		String dockerRepository = dockerHubUsername + "/" + serviceName;
 		Gson gson = new Gson();
 		String command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
@@ -76,17 +71,14 @@ public class DockerApiProxyService {
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
 				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
-			serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,
+			serviceName, dockerRepository, serviceName, dockerApiProxyPort, 80, serviceName,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
 			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
 			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
-			ContainerConstants.Label.SERVICE_TYPE, serviceType,
-			//ContainerConstants.Label.SERVICE_ADDRESS, hostAddress.getPublicIpAddress(), externalPort,
-			//ContainerConstants.Label.SERVICE_PUBLIC_IP_ADDRESS, hostAddress.getPublicIpAddress(),
-			//ContainerConstants.Label.SERVICE_PRIVATE_IP_ADDRESS, hostAddress.getPrivateIpAddress(),
+			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
 			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
 			dockerRepository);
@@ -96,7 +88,7 @@ public class DockerApiProxyService {
 
 	public void stopDockerApiProxy(HostAddress hostAddress) {
 		log.info("Stopping docker api proxy on host {}", hostAddress.toSimpleString());
-		String command = String.format("docker stop $(docker ps -q -f \"name=%s\")", DOCKER_API_PROXY);
+		String command = String.format("docker stop $(docker ps -q -f \"name=%s\")", ServiceConstants.Name.DOCKER_API_PROXY);
 		hostsService.executeCommandAsync(command, hostAddress);
 	}
 

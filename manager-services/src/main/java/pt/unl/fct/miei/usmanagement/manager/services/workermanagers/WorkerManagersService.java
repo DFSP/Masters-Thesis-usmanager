@@ -35,6 +35,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
@@ -43,6 +44,7 @@ import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
+import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
@@ -56,9 +58,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaSe
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
+import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
@@ -95,7 +96,7 @@ public class WorkerManagersService {
 	private final BashService bashService;
 	private final KafkaService kafkaService;
 	private final CloudHostsService cloudHostsService;
-	private final DockerContainersService dockerContainersService;
+	private final HeartbeatService heartbeatService;
 
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
@@ -104,7 +105,8 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, KafkaService kafkaService,
-								 CloudHostsService cloudHostsService, DockerContainersService dockerContainersService, ParallelismProperties parallelismProperties) {
+								 CloudHostsService cloudHostsService,
+								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -113,7 +115,7 @@ public class WorkerManagersService {
 		this.bashService = bashService;
 		this.kafkaService = kafkaService;
 		this.cloudHostsService = cloudHostsService;
-		this.dockerContainersService = dockerContainersService;
+		this.heartbeatService = heartbeatService;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
 		byte[] auth = String.format("%s:%s", username, password).getBytes();
@@ -185,6 +187,7 @@ public class WorkerManagersService {
 			int port = servicesService.getService(ServiceConstants.Name.WORKER_MANAGER).getDefaultExternalPort();
 			WorkerManager workerManager = WorkerManager.builder()
 				.id(id).containerId(containerId).publicIpAddress(hostAddress.getPublicIpAddress()).port(port).region(address.getRegion()).build();
+			heartbeatService.saveHeartbeat(Heartbeat.builder().id(id).build());
 			return workerManagers.save(workerManager);
 		});
 	}
@@ -263,7 +266,12 @@ public class WorkerManagersService {
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		String containerId = workerManager.getContainerId();
 		workerManagers.delete(workerManager);
-		containersService.stopContainer(containerId);
+		try {
+			containersService.stopContainer(containerId);
+		} catch (EntityNotFoundException e) {
+			log.error("Failed to stop container {} associated with worker manager {}", containerId, workerManager.getId());
+		}
+		heartbeatService.deleteHeartbeat(workerManager.getId());
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {
@@ -593,5 +601,15 @@ public class WorkerManagersService {
 			}
 		} while (++tries < retries);
 		throw new ManagerException("Failed to launch app {}: {}", appName, errorMessage);
+	}
+
+	public void setWorkerManagerDown(String id) {
+		try {
+			WorkerManager workerManager = getWorkerManager(id);
+			workerManager = workerManager.toBuilder().state("down").build();
+			saveWorkerManager(workerManager);
+		} catch (EntityNotFoundException e) {
+			log.error("Failed to set worker manager to state down: {}", e.getMessage());
+		}
 	}
 }

@@ -45,6 +45,7 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Nodes;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.PlaceEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
@@ -309,7 +310,7 @@ public class NodesService {
 		containersService.migrateHostContainers(hostAddress);
 		new ForkJoinPool(threads).submit(() ->
 			containersService.getSystemContainers(hostAddress).parallelStream()
-				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.filter(c -> !Objects.equals(c.getServiceName(), ServiceConstants.Name.DOCKER_API_PROXY))
 				.forEach(c -> containersService.stopContainer(c.getId()))).join();
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		dockerSwarmService.leaveSwarm(hostAddress);

@@ -630,7 +630,7 @@ public class ContainersService {
 
 	public void stopDockerApiProxies() {
 		List<Container> dockerApiProxies = getContainersWithLabels(Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY)));
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, ServiceConstants.Name.DOCKER_API_PROXY)));
 		new ForkJoinPool(threads).execute(() ->
 			dockerApiProxies.parallelStream().forEach(dockerApiProxy -> {
 				dockerApiProxyService.stopDockerApiProxy(dockerApiProxy.getHostAddress());
@@ -640,7 +640,7 @@ public class ContainersService {
 
 	public void stopDockerApiProxy(HostAddress hostAddress) {
 		getHostContainersWithLabels(hostAddress, Set.of(
-			Pair.of(ContainerConstants.Label.SERVICE_NAME, DockerApiProxyService.DOCKER_API_PROXY))
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, ServiceConstants.Name.DOCKER_API_PROXY))
 		).stream().findFirst().ifPresent(container -> {
 			dockerApiProxyService.stopDockerApiProxy(hostAddress);
 			containers.delete(container);

@@ -182,7 +182,7 @@ public class HostsService {
 	private String launchDockerApiProxy(HostAddress hostAddress) {
 		final int retries = 5;
 		int tries = 0;
-		String dockerApiProxyContainerId = "";
+		String dockerApiProxyContainerId;
 		do {
 			log.info("Launching docker api proxy container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
 			dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
@@ -449,12 +449,12 @@ public class HostsService {
 	public void removeHost(HostAddress hostAddress) {
 		if (nodesService.isPartOfSwarm(hostAddress)) {
 			/*containersService.getSystemContainers(hostAddress).parallelStream()
-				.filter(c -> !Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.filter(c -> !Objects.equals(c.getServiceName(), ServiceConstants.Name.DOCKER_API_PROXY))
 				.forEach(c -> containersService.stopContainer(c.getContainerId()));*/
 			nodesService.leaveHost(hostAddress);
 			nodesService.removeHost(hostAddress);
 			/*containersService.getSystemContainers(hostAddress).stream()
-				.filter(c -> Objects.equals(c.getServiceName(), DockerApiProxyService.DOCKER_API_PROXY))
+				.filter(c -> Objects.equals(c.getServiceName(), ServiceConstants.Name.DOCKER_API_PROXY))
 				.forEach(c -> containersService.stopContainer(c.getContainerId()));*/
 		}
 	}

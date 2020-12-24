@@ -40,35 +40,8 @@ import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
-import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
-import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
-import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
-import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
-import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
-import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
-import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ServicesEventsService;
-import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServiceDependenciesService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
-import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.operators.OperatorEnum;
@@ -85,11 +58,37 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRuleConditio
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.zookeeper.ZookeeperService;
+import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
+import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
+import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ServicesEventsService;
+import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.RuleConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.condition.ConditionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.DecisionsService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ServiceRulesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServiceDependenciesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
+import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
+import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.users.User;
 import pt.unl.fct.miei.usmanagement.manager.users.UserRoleEnum;
 import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
-import pt.unl.fct.miei.usmanagement.manager.util.strings.Text;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public class DatabaseLoader {
 								   ContainersService containersService, WorkerManagersService workerManagersService,
 								   ConfigurationsService configurationsService, LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, ZookeeperService zookeeperService,
-								   KafkaService kafkaService) {
+								   KafkaService kafkaService, HeartbeatService heartbeatService) {
 		return args -> {
 
 			Map<String, User> users = loadUsers(usersService);
@@ -177,6 +176,7 @@ public class DatabaseLoader {
 			elasticIpsService.reset();
 
 			configurationsService.reset();
+			heartbeatService.reset();
 		};
 	}
 
@@ -1920,13 +1920,13 @@ public class DatabaseLoader {
 		}
 		servicesMap.put(ServiceConstants.Name.WORKER_MANAGER, workerManager);
 
-		Service dockerApiProxy;
+		/*Service dockerApiProxy;
 		try {
-			dockerApiProxy = servicesService.getService(DockerApiProxyService.DOCKER_API_PROXY);
+			dockerApiProxy = servicesService.getService(ServiceConstants.Name.DOCKER_API_PROXY);
 		}
 		catch (EntityNotFoundException ignored) {
 			dockerApiProxy = Service.builder()
-				.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
+				.serviceName(ServiceConstants.Name.DOCKER_API_PROXY)
 				.dockerRepository(dockerHubUsername + "/nginx-basic-auth-proxy")
 				.defaultExternalPort(dockerProperties.getApiProxy().getPort())
 				.defaultInternalPort(80)
@@ -1936,7 +1936,7 @@ public class DatabaseLoader {
 				.build();
 			dockerApiProxy = servicesService.addService(dockerApiProxy);
 		}
-		servicesMap.put(DockerApiProxyService.DOCKER_API_PROXY, dockerApiProxy);
+		servicesMap.put(ServiceConstants.Name.DOCKER_API_PROXY, dockerApiProxy);*/
 
 		Service loadBalancer;
 		try {

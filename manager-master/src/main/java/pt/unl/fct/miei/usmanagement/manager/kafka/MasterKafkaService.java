@@ -270,7 +270,7 @@ public class MasterKafkaService {
 			log.debug("Received message={}", heartbeatDTOs);
 			Heartbeat heartbeat = HeartbeatMapper.MAPPER.toHeartbeat(heartbeatDTO, context);
 			try {
-				heartbeatService.saveHeartbeat(heartbeat);
+				heartbeatService.saveWorkerHeartbeat(heartbeat);
 			}
 			catch (Exception e) {
 				log.error("Error while processing topic heartbeats with message {}: {}", heartbeatDTO, e.getMessage());

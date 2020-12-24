@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
@@ -91,7 +92,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		try {
 			Predicate<DockerContainer> containersPredicate = (dockerContainer) -> {
 				String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
-				return !Objects.equals(serviceName, DockerApiProxyService.DOCKER_API_PROXY);
+				return !Objects.equals(serviceName, ServiceConstants.Name.DOCKER_API_PROXY);
 			};
 			containersService.stopContainers(containersPredicate);
 		}

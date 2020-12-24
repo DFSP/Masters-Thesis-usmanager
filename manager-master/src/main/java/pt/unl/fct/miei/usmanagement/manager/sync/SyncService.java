@@ -6,11 +6,9 @@ import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
@@ -22,12 +20,10 @@ import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsServi
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsSimpleInstance;
-import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
-import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -57,6 +53,7 @@ public class SyncService {
 	private final DockerSwarmService dockerSwarmService;
 	private final ConfigurationsService configurationsService;
 	private final HeartbeatService heartbeatService;
+	private final WorkerManagersService workerManagersService;
 
 	private Timer cloudHostsDatabaseSyncTimer;
 	private Timer containersDatabaseSyncTimer;
@@ -65,7 +62,7 @@ public class SyncService {
 	public SyncService(CloudHostsService cloudHostsService, AwsService awsService, ContainersService containersService,
 					   DockerContainersService dockerContainersService, NodesService nodesService,
 					   DockerSwarmService dockerSwarmService, ConfigurationsService configurationsService,
-					   HeartbeatService heartbeatService) {
+					   HeartbeatService heartbeatService, WorkerManagersService workerManagersService) {
 		this.cloudHostsService = cloudHostsService;
 		this.awsService = awsService;
 		this.containersService = containersService;
@@ -74,6 +71,7 @@ public class SyncService {
 		this.dockerSwarmService = dockerSwarmService;
 		this.configurationsService = configurationsService;
 		this.heartbeatService = heartbeatService;
+		this.workerManagersService = workerManagersService;
 	}
 
 	public void startCloudHostsDatabaseSynchronization() {
@@ -99,7 +97,7 @@ public class SyncService {
 	}
 
 	public List<CloudHost> synchronizeCloudHostsDatabase() {
-		log.debug("Synchronizing cloud hosts data with amazon");
+		log.info("Synchronizing cloud hosts data with amazon");
 		List<CloudHost> cloudHosts = cloudHostsService.getCloudHostsAndRelations();
 		List<Instance> awsInstances = awsService.getInstances();
 		Map<String, Instance> awsInstancesIds = awsInstances.stream()
@@ -178,7 +176,7 @@ public class SyncService {
 	}
 
 	public List<Container> synchronizeContainersDatabase() {
-		log.debug("Synchronizing containers database with docker swarm");
+		log.info("Synchronizing containers database with docker swarm");
 
 		List<Container> containers = containersService.getContainers();
 		List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
@@ -208,10 +206,11 @@ public class SyncService {
 			String containerId = container.getId();
 			String managerId = container.getManagerId();
 			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
-			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
 			if (((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER))
 				&& !serviceName.equalsIgnoreCase(ServiceConstants.Name.WORKER_MANAGER)
-				&& !dockerContainerIds.containsKey(containerId)) || (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
+				&& !dockerContainerIds.containsKey(containerId)) ||
+				(heartbeat.isPresent()
+					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now()))) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
@@ -231,6 +230,17 @@ public class SyncService {
 				}
 				if (updated) {
 					containersService.updateContainer(container);
+				}
+			}
+		}
+
+		List<WorkerManager> workerManagers = workerManagersService.getWorkerManagers();
+		for (WorkerManager workerManager : workerManagers) {
+			Optional<Heartbeat> heartbeatOptional = heartbeatService.lastHeartbeat(workerManager.getId());
+			if (heartbeatOptional.isPresent()) {
+				Heartbeat heartbeat = heartbeatOptional.get();
+				if (heartbeat.getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
+					workerManagersService.setWorkerManagerDown(heartbeat.getId());
 				}
 			}
 		}
@@ -262,7 +272,7 @@ public class SyncService {
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> synchronizeNodesDatabase() {
-		log.debug("Synchronizing nodes database with docker swarm");
+		log.info("Synchronizing nodes database with docker swarm");
 
 		List<Node> swarmNodes = dockerSwarmService.getNodes();
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getNodes();
