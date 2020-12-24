@@ -567,6 +567,11 @@ public class DockerContainersService {
 		return getContainers(hostAddress, filter).stream().findFirst();
 	}
 
+	public Optional<DockerContainer> findContainer(HostAddress hostAddress, String id) {
+		DockerClient.ListContainersParam idFilter = DockerClient.ListContainersParam.filter("id", id);
+		return getContainers(hostAddress, idFilter).stream().findFirst();
+	}
+
 	private Optional<DockerContainer> findContainer(String id) {
 		DockerClient.ListContainersParam idFilter = DockerClient.ListContainersParam.filter("id", id);
 		return getContainers(idFilter).stream().findFirst();
@@ -660,7 +665,11 @@ public class DockerContainersService {
 			containers.removeIf(Predicate.not(containersPredicate));
 		}
 		new ForkJoinPool(threads).execute(() ->
-			containers.parallelStream().forEach(container -> stopContainer(container.getId(), container.getHostAddress()))
+			containers.parallelStream().forEach(container -> {
+				String id = container.getId();
+				HostAddress hostAddress = container.getHostAddress();
+				stopContainer(id, hostAddress);
+			})
 		);
 		return containers;
 	}

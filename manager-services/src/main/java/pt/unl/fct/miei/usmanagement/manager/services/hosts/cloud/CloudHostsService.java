@@ -309,12 +309,17 @@ public class CloudHostsService {
 	}
 
 	public CloudHost launchInstance(AwsRegion region, InstanceType type) {
+		return launchInstance(region, type, true);
+	}
+	public CloudHost launchInstance(AwsRegion region, InstanceType type, boolean joinSwarm) {
 		String instanceId = null;
 		try {
 			Instance instance = awsService.createInstance(region, type);
 			instanceId = instance.getInstanceId();
 			CloudHost cloudHost = saveCloudHostFromInstance(instance);
-			hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
+			if (joinSwarm) {
+				hostsService.addHost(instance.getPublicIpAddress(), NodeRole.WORKER);
+			}
 			return cloudHost;
 		}
 		finally {

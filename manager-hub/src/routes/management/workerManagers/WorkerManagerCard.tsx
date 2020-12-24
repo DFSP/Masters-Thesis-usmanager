@@ -84,8 +84,8 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
         return [
             <LinkedContextMenuItem
                 option={'Ir para o contentor associado'}
-                pathname={`/contentores/${workerManager.container.id}`}
-                state={workerManager.container}/>,
+                pathname={`/contentores/${workerManager.containerId}`}
+                state={workerManager}/>,
             <LinkedContextMenuItem
                 option={'Ver os hosts geridos'}
                 pathname={`/gestores locais/${workerManager.id}`}
@@ -119,10 +119,10 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                                   bottomContextMenuItems={this.contextMenu()}>
             <CardItem key={'container'}
                       label={'Container'}
-                      value={workerManager.container.id.toString()}/>
+                      value={workerManager.containerId}/>
             <CardItem key={'host'}
                       label={'Host'}
-                      value={workerManager.container.publicIpAddress}/>
+                      value={workerManager.publicIpAddress}/>
             <CardItem key={'region'}
                       label={'Region'}
                       value={workerManager.region.region}/>

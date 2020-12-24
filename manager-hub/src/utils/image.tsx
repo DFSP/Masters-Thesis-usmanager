@@ -165,7 +165,7 @@ export const mapLabelToIcon = (label: string, value: any): string | JSX.Element 
     if (label.includes('name')) {
         return "text_fields";
     }
-    if (label.includes('external')) {
+    if (label.includes('external') || label === 'port') {
         return <FaDoorOpen/>;
     }
     if (label.includes('internal')) {

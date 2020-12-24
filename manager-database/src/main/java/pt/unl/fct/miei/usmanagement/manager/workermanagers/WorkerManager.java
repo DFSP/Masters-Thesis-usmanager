@@ -55,8 +55,13 @@ public class WorkerManager /*extends AbstractEntity<String> */ {
 	private String id;
 
 	@NotNull
-	@OneToOne
-	private Container container;
+	private String containerId;
+
+	@NotNull
+	private String publicIpAddress;
+
+	@NotNull
+	private Integer port;
 
 	@NotNull
 	private RegionEnum region;

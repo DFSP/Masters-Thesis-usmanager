@@ -31,7 +31,6 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.FieldDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostRuleDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.HostSimulatedMetricDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.NodeDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.OperatorDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDependencyDTO;
@@ -55,7 +54,6 @@ import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ElasticIpMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.FieldMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostRuleMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.HostSimulatedMetricMapper;
-import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.NodeMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.OperatorMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceMapper;
 import pt.unl.fct.miei.usmanagement.manager.dtos.mapper.ServiceRuleMapper;
@@ -70,8 +68,6 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
-import pt.unl.fct.miei.usmanagement.manager.nodes.NodeConstants;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
@@ -329,7 +325,8 @@ public class WorkerKafkaService {
 		for (ContainerDTO containerDTO : containerDTOs) {
 			String serviceName = containerDTO.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
 			if (!ServiceConstants.getSystemServices().contains(serviceName)
-				&& containerDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
+				|| containerDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
+				i++;
 				continue;
 			}
 			String key = keys.get(i++);
@@ -456,12 +453,13 @@ public class WorkerKafkaService {
 		}
 	}
 
-	@Transactional(noRollbackFor = ConstraintViolationException.class)
+	/*@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
 	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
 			if (nodeDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
+				i++;
 				continue;
 			}
 			String key = keys.get(i++);
@@ -481,7 +479,7 @@ public class WorkerKafkaService {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "operators", autoStartup = "false")
@@ -549,9 +547,8 @@ public class WorkerKafkaService {
 					servicesService.addOrUpdateService(service);
 
 					if (service.getServiceName().equalsIgnoreCase(ServiceConstants.Name.DOCKER_API_PROXY)) {
-						hostsService.setupHostAsync(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
+						hostsService.setupWorkerManagerHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
 					}
-
 				}
 			}
 			catch (Exception e) {

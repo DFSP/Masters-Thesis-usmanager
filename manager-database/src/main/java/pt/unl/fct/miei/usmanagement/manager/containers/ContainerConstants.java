@@ -43,6 +43,7 @@ public final class ContainerConstants {
 			public static final String ID = "ID";
 			public static final String HOST_ADDRESS = "HOST_ADDRESS";
 			public static final String KAFKA_BOOTSTRAP_SERVERS = "KAFKA_BOOTSTRAP_SERVERS";
+			public static final String CONTAINER = "CONTAINER";
 		}
 
 		public static final class Kafka {

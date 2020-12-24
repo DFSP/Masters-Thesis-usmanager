@@ -43,8 +43,10 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
@@ -61,8 +63,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -168,25 +170,35 @@ public class HostsService {
 	}
 
 	@Async
-	public CompletableFuture<pt.unl.fct.miei.usmanagement.manager.nodes.Node> setupHostAsync(HostAddress hostAddress, NodeRole role) {
-		return CompletableFuture.completedFuture(setupHost(hostAddress, role));
+	public void setupWorkerManagerHost(HostAddress hostAddress, NodeRole role) {
+		setupHost(hostAddress, role);
+		String command = String.format("docker ps -q -f 'name=%s", ServiceConstants.Name.WORKER_MANAGER);
+		List<String> output = executeCommandSync(command, hostAddress);
+		String containerId = output.size() > 0 ? output.get(output.size() - 1) : "";
+		containersService.addContainer(containerId);
+	}
+
+	private String launchDockerApiProxy(HostAddress hostAddress) {
+		final int retries = 5;
+		int tries = 0;
+		String dockerApiProxyContainerId = "";
+		do {
+			log.info("Launching docker api proxy container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
+			Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+		} while (dockerApiProxyContainerId.isEmpty() && ++tries < retries);
+		if (dockerApiProxyContainerId.isEmpty()) {
+			throw new ManagerException("Failed to launch docker api proxy at %s", hostAddress.toSimpleString());
+		}
+		return dockerApiProxyContainerId;
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node setupHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = null;
-		String dockerApiProxyContainerId = "";
+		String dockerApiProxyContainerId = launchDockerApiProxy(hostAddress);
 		final int retries = 5;
 		int tries = 0;
-		do {
-			log.info("Launching docker api proxy container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
-			dockerApiProxyContainerId = containersService.launchDockerApiProxy(hostAddress, false);
-			Timing.sleep(tries, TimeUnit.SECONDS); // waits 0 seconds, then 1 seconds, then 2 seconds, etc
-		} while (dockerApiProxyContainerId.isEmpty() && ++tries < retries);
-		if (dockerApiProxyContainerId.isEmpty()) {
-			throw new ManagerException("Failed to launch docker api proxy at %s", hostAddress.toSimpleString());
-		}
-		tries = 0;
 		do {
 			try {
 				switch (role) {

@@ -29,7 +29,6 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -41,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -49,15 +49,16 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
-import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
@@ -68,7 +69,6 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,7 +79,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -94,11 +93,9 @@ public class WorkerManagersService {
 	private final ServicesService servicesService;
 	private final DockerSwarmService dockerSwarmService;
 	private final BashService bashService;
-	private final NodesService nodesService;
 	private final KafkaService kafkaService;
-	private final ElasticIpsService elasticIpsService;
 	private final CloudHostsService cloudHostsService;
-	private final Environment environment;
+	private final DockerContainersService dockerContainersService;
 
 	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
@@ -106,20 +103,17 @@ public class WorkerManagersService {
 
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
-								 DockerSwarmService dockerSwarmService, BashService bashService, NodesService nodesService,
-								 KafkaService kafkaService, ElasticIpsService elasticIpsService, CloudHostsService cloudHostsService, Environment environment, WorkerManagerProperties workerManagerProperties,
-								 ParallelismProperties parallelismProperties) {
+								 DockerSwarmService dockerSwarmService, BashService bashService, KafkaService kafkaService,
+								 CloudHostsService cloudHostsService, DockerContainersService dockerContainersService, ParallelismProperties parallelismProperties) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
 		this.servicesService = servicesService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.bashService = bashService;
-		this.nodesService = nodesService;
 		this.kafkaService = kafkaService;
-		this.elasticIpsService = elasticIpsService;
 		this.cloudHostsService = cloudHostsService;
-		this.environment = environment;
+		this.dockerContainersService = dockerContainersService;
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
 		byte[] auth = String.format("%s:%s", username, password).getBytes();
@@ -140,7 +134,7 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager getWorkerManager(Container container) {
-		return workerManagers.getByContainer(container).orElseThrow(() ->
+		return workerManagers.getByContainerId(container.getId()).orElseThrow(() ->
 			new EntityNotFoundException(WorkerManager.class, "container", container.getId()));
 	}
 
@@ -167,7 +161,11 @@ public class WorkerManagersService {
 
 	public WorkerManager saveWorkerManager(Container container) {
 		String managerId = container.getLabels().get(ContainerConstants.Label.MANAGER_ID);
-		return saveWorkerManager(WorkerManager.builder().id(managerId).container(container).region(container.getRegion()).build());
+		WorkerManager workerManager = WorkerManager.builder()
+			.id(managerId).containerId(container.getId())
+			.publicIpAddress(container.getPublicIpAddress())
+			.port(container.getPorts().stream().findFirst().get().getPublicPort()).region(container.getRegion()).build();
+		return saveWorkerManager(workerManager);
 	}
 
 	public WorkerManager saveWorkerManager(WorkerManager workerManager) {
@@ -176,24 +174,25 @@ public class WorkerManagersService {
 	}
 
 	public WorkerManager launchWorkerManager(HostAddress hostAddress) {
-		if (!hostAddress.isComplete()) {
-			hostAddress = hostsService.completeHostAddress(hostAddress);
-		}
+		HostAddress address = hostAddress.isComplete() ? hostAddress : hostsService.completeHostAddress(hostAddress);
 
-		kafkaService.launchKafkaBroker(hostAddress.getRegion());
+		kafkaService.launchKafkaBroker(address.getRegion());
 
-		log.info("Launching worker manager at {}", hostAddress);
+		log.info("Launching worker manager at {}", address);
 		String id = UUID.randomUUID().toString();
-		Container container = launchWorkerManager(hostAddress, id);
-		nodesService.removeHost(hostAddress);
-		return workerManagers.getByContainer(container).orElseGet(() ->
-			workerManagers.save(WorkerManager.builder().id(id).container(container).region(container.getRegion()).build()));
+		String containerId = launchWorkerManager(address, id);
+		return workerManagers.getByContainerId(containerId).orElseGet(() -> {
+			int port = servicesService.getService(ServiceConstants.Name.WORKER_MANAGER).getDefaultExternalPort();
+			WorkerManager workerManager = WorkerManager.builder()
+				.id(id).containerId(containerId).publicIpAddress(hostAddress.getPublicIpAddress()).port(port).region(address.getRegion()).build();
+			return workerManagers.save(workerManager);
+		});
 	}
 
 	public List<WorkerManager> launchWorkerManagers(List<RegionEnum> regions) {
 		log.info("Launching worker managers at regions {}", regions);
 
-		double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(ServiceConstants.Name.WORKER_MANAGER);
+		/*double expectedMemoryConsumption = servicesService.getExpectedMemoryConsumption(ServiceConstants.Name.WORKER_MANAGER);*/
 
 		try {
 			return new ForkJoinPool(threads).submit(() ->
@@ -207,7 +206,7 @@ public class WorkerManagersService {
 							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
 						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);*/
 						AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
-						HostAddress hostAddress = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium).getAddress();
+						HostAddress hostAddress = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium, false).getAddress();
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();
@@ -218,23 +217,53 @@ public class WorkerManagersService {
 		}
 	}
 
-	private Container launchWorkerManager(HostAddress hostAddress, String id) {
-		List<String> environment = new LinkedList<>(List.of(
-			ContainerConstants.Environment.Manager.ID + "=" + id,
-			ContainerConstants.Environment.Manager.HOST_ADDRESS + "=" + new Gson().toJson(hostAddress),
-			ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS + "=" + kafkaService.getKafkaBrokersHosts()
-		));
-		Map<String, String> labels = Map.of(
-			ContainerConstants.Label.MANAGER_ID, String.valueOf(id)
-		);
-		return containersService.launchContainer(hostAddress, ServiceConstants.Name.WORKER_MANAGER, environment, labels);
+	private String launchWorkerManager(HostAddress hostAddress, String id) {
+		final int retries = 5;
+		int tries = 0;
+		String containerId;
+		do {
+			log.info("Launching worker manager container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			pt.unl.fct.miei.usmanagement.manager.services.Service workerManager = servicesService.getService(ServiceConstants.Name.WORKER_MANAGER);
+			String serviceName = workerManager.getServiceName();
+			ServiceTypeEnum serviceType = workerManager.getServiceType();
+			int externalPort = workerManager.getDefaultExternalPort();
+			int internalPort = workerManager.getDefaultInternalPort();
+			String dockerRepository = workerManager.getDockerRepository();
+			Gson gson = new Gson();
+			String command = String.format("WORKER_MANAGER=$(docker ps -q -f 'name=%s') && "
+					+ "if [ $WORKER_MANAGER ]; then echo $WORKER_MANAGER; "
+					+ "else "
+					+ "docker pull %s && "
+					+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
+					+ "-e %s=%s -e %s='%s' -e %s=%s "
+					+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s=%s %s; fi",
+				serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,
+				ContainerConstants.Environment.Manager.ID, id,
+				ContainerConstants.Environment.Manager.HOST_ADDRESS, gson.toJson(hostAddress),
+				ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS, kafkaService.getKafkaBrokersHosts(),
+				ContainerConstants.Label.US_MANAGER, true,
+				ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.BY_REQUEST,
+				ContainerConstants.Label.SERVICE_NAME, serviceName,
+				ContainerConstants.Label.SERVICE_TYPE, serviceType,
+				ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
+				ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+				ContainerConstants.Label.MANAGER_ID, id,
+				dockerRepository);
+			List<String> output = hostsService.executeCommandSync(command, hostAddress);
+			containerId = output.size() > 0 ? output.get(output.size() - 1) : "";
+			Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+		} while (containerId.isEmpty() && ++tries < retries);
+		if (containerId.isEmpty()) {
+			throw new ManagerException("Failed to worker manager at %s", hostAddress.toSimpleString());
+		}
+		return containerId;
 	}
 
 	public void stopWorkerManager(String workerManagerId) {
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
-		Container container = workerManager.getContainer();
+		String containerId = workerManager.getContainerId();
 		workerManagers.delete(workerManager);
-		containersService.stopContainer(container.getId());
+		containersService.stopContainer(containerId);
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {
@@ -249,10 +278,11 @@ public class WorkerManagersService {
 	}
 
 	@Async
-	public CompletableFuture<List<Container>> getContainers(Container workerManager, boolean sync) {
+	public CompletableFuture<List<Container>> getContainers(WorkerManager workerManager, boolean sync) {
 		List<Container> containers = new ArrayList<>();
-		String address = workerManager.getAddress();
-		String url = String.format("http://%s/api/containers%s", address, sync ? "/sync" : "");
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers%s", publicIpAddress, port, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
 			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
@@ -274,7 +304,7 @@ public class WorkerManagersService {
 	public List<Container> getContainers(boolean sync) {
 		List<WorkerManager> workerManagers = getWorkerManagers();
 		List<CompletableFuture<List<Container>>> futureContainers =
-			workerManagers.stream().map(WorkerManager::getContainer).map(c -> getContainers(c, sync)).collect(Collectors.toList());
+			workerManagers.stream().map(workerManager -> getContainers(workerManager, sync)).collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureContainers.toArray(new CompletableFuture[0])).join();
 
@@ -298,8 +328,9 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<List<Container>> launchContainer(LaunchContainerRequest launchContainerRequest,
 															  WorkerManager workerManager) {
-		String url = String.format("http://%s:%s/api/containers", workerManager.getContainer().getPublicIpAddress(),
-			workerManager.getContainer().getPorts().stream().findFirst().get().getPublicPort());
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers", publicIpAddress, port);
 		HttpEntity<?> request = new HttpEntity<>(launchContainerRequest, headers);
 		try {
 			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
@@ -373,10 +404,11 @@ public class WorkerManagersService {
 	}
 
 	@Async
-	public CompletableFuture<List<Node>> getNodes(Container workerManager, boolean sync) {
+	public CompletableFuture<List<Node>> getNodes(WorkerManager workerManager, boolean sync) {
 		List<Node> nodes = new ArrayList<>();
-		String address = workerManager.getAddress();
-		String url = String.format("http://%s/api/nodes%s", address, sync ? "/sync" : "");
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/nodes%s", publicIpAddress, port, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
 			ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
@@ -402,7 +434,7 @@ public class WorkerManagersService {
 	public List<Node> getNodes(boolean sync) {
 		List<WorkerManager> workerManagers = getWorkerManagers();
 		List<CompletableFuture<List<Node>>> futureNodes =
-			workerManagers.stream().map(WorkerManager::getContainer).map(c -> getNodes(c, sync)).collect(Collectors.toList());
+			workerManagers.stream().map(workerManager -> getNodes(workerManager, sync)).collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureNodes.toArray(new CompletableFuture[0])).join();
 
@@ -425,8 +457,9 @@ public class WorkerManagersService {
 
 	@Async
 	public CompletableFuture<String> getContainerLogs(WorkerManager workerManager) {
-		String address = workerManager.getContainer().getAddress();
-		String url = String.format("http://%s/api/containers/logs", address);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers/logs", publicIpAddress, port);
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
@@ -441,8 +474,9 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<Container> replicateContainer(String managerId, String containerId, HostAddress toHostAddress) {
 		WorkerManager workerManager = getWorkerManager(managerId);
-		String address = workerManager.getContainer().getAddress();
-		String url = String.format("http://%s/api/containers/%s/replicate", address, containerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers/%s/replicate", publicIpAddress, port, containerId);
 		try {
 			HttpEntity<?> request = new HttpEntity<>(toHostAddress, headers);
 			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
@@ -457,8 +491,9 @@ public class WorkerManagersService {
 	@Async
 	public CompletableFuture<Container> migrateContainer(String managerId, String containerId, HostAddress hostAddress) {
 		WorkerManager workerManager = getWorkerManager(managerId);
-		String address = workerManager.getContainer().getAddress();
-		String url = String.format("http://%s/api/containers/%s/migrate", address, containerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers/%s/migrate", publicIpAddress, port, containerId);
 		HttpEntity<?> request = new HttpEntity<>(hostAddress, headers);
 		try {
 			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
@@ -470,26 +505,15 @@ public class WorkerManagersService {
 		}
 	}
 
-	private String getRegistrationUrl() {
-		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
-		String port = environment.getProperty("local.server.port");
-		return String.format("http://%s:%s/api/sync", hostname, port);
-	}
-
-	private String getSyncUrl() {
-		String hostname = hostsService.getManagerHostAddress().getPublicIpAddress();
-		String port = environment.getProperty("local.server.port");
-		return String.format("http://%s:%s/api/sync", hostname, port);
-	}
-
 	public void reset() {
 		workerManagers.deleteAll();
 	}
 
 	@Async
 	public void stopContainer(WorkerManager workerManager, String containerId) {
-		String address = workerManager.getContainer().getAddress();
-		String url = String.format("http://%s/api/containers/%s", address, containerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/containers/%s", publicIpAddress, port, containerId);
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
 			restTemplate.exchange(url, HttpMethod.DELETE, request, Container.class);
@@ -536,8 +560,9 @@ public class WorkerManagersService {
 
 	@Async
 	public CompletableFuture<Map<String, List<Container>>> launchApp(String appName, Coordinates coordinates, WorkerManager workerManager) {
-		String url = String.format("http://%s:%s/api/apps/%s/launch", appName, workerManager.getContainer().getPublicIpAddress(),
-			workerManager.getContainer().getPorts().stream().findFirst().get().getPublicPort());
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/apps/%s/launch", publicIpAddress, port, appName);
 		HttpEntity<?> request = new HttpEntity<>(coordinates, headers);
 		try {
 			Map<String, List<Container>> response = restTemplate.postForObject(url, request, Map.class);
@@ -551,7 +576,7 @@ public class WorkerManagersService {
 
 	public Map<String, List<Container>> launchApp(String appName, Coordinates coordinates) {
 		RegionEnum region = RegionEnum.getClosestRegion(coordinates);
-		String errorMessage = "";
+		String errorMessage;
 		final int retries = 5;
 		int tries = 0;
 		do {

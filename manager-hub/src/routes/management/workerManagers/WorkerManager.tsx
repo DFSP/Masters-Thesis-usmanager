@@ -53,7 +53,9 @@ import {IRegion} from "../regions/Region";
 import ManagedContainersList from "./ManagedContainersList";
 
 export interface IWorkerManager extends IDatabaseData {
-    container: IContainer,
+    containerId: string;
+    publicIpAddress: string;
+    port: number;
     region: IRegion,
     state: string,
 }
@@ -157,7 +159,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         let workerManagers = reply.data;
         if (workerManagers.length === 1) {
             const workerManager = workerManagers[0];
-            const publicIpAddress = workerManager.container.publicIpAddress;
+            const publicIpAddress = workerManager.publicIpAddress;
             super.toast(`<span class='green-text'>O gestor local foi lançado no host ${publicIpAddress} com o id ${this.mounted ? `<b class='white-text'>${workerManager.id}</b>` : `<a href='/gestores locais/${workerManager.id}'><b>${workerManager.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateWorkerManager(workerManager);
@@ -165,7 +167,7 @@ class WorkerManager extends BaseComponent<Props, State> {
             }
         } else {
             workerManagers = workerManagers.reverse();
-            super.toast(`<span class='green-text'>${workerManagers.length == 1 ? 'Foi lançado' : 'Foram lançados'} ${workerManagers.length} ${workerManagers.length == 1 ? 'gestor local' : 'gestores locais'}:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.container.publicIpAddress} => Contentor ${workerManager.container.id}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>${workerManagers.length == 1 ? 'Foi lançado' : 'Foram lançados'} ${workerManagers.length} ${workerManagers.length == 1 ? 'gestor local' : 'gestores locais'}:<br/><b class='white-text'>${workerManagers.map(workerManager => `${workerManager.id} => Host ${workerManager.publicIpAddress} => Contentor ${workerManager.containerId}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push("/gestores locais");
             }
@@ -225,12 +227,6 @@ class WorkerManager extends BaseComponent<Props, State> {
     private hostAddressesDropdown = (hostAddress: Partial<IHostAddress>): string =>
         hostAddress.publicIpAddress + (hostAddress.privateIpAddress ? ("/" + hostAddress.privateIpAddress) : '') + " - " + hostAddress.coordinates?.label;
 
-    private containerIdField = (container: IContainer) =>
-        container.id.toString();
-
-    private containerPublicIpAddressField = (container: IContainer) =>
-        container.publicIpAddress;
-
     private regionOption = (region: IRegion) =>
         region.region;
 
@@ -264,34 +260,26 @@ class WorkerManager extends BaseComponent<Props, State> {
                                                       }}/>
                     </>
                 : formWorkerManager && Object.entries(formWorkerManager).map((([key, value], index) =>
-                key === 'container'
-                    ? <>
-                        <Field<IContainer> key={index}
-                                           id={key}
-                                           label={key + " id"}
-                                           valueToString={this.containerIdField}
-                                           icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).container?.id}`}}/>
-                        <Field<IContainer>
-                            key={5000}
-                            id={key}
-                            label={"host"}
-                            valueToString={this.containerPublicIpAddressField}/>
-                    </>
-                    : key === 'region'
-                    ? <Field<IRegion> key={index}
-                                      id={key}
-                                      type='dropdown'
-                                      label={key}
-                                      valueToString={this.regionOption}
-                                      dropdown={{
-                                          defaultValue: "Selecionar a região",
-                                          emptyMessage: "Não há regiões disponíveis",
-                                          values: Object.values(this.props.regions),
-                                          optionToString: this.regionOption
-                                      }}/>
-                    : <Field key={index}
+                key === 'containerId'
+                    ? <Field key={index}
                              id={key}
-                             label={key}/>))
+                             label={key}
+                             icon={{linkedTo: `/contentores/${(formWorkerManager as Partial<IWorkerManager>).containerId}`}}/>
+                    : key === 'region'
+                        ? <Field<IRegion> key={index}
+                                          id={key}
+                                          type='dropdown'
+                                          label={key}
+                                          valueToString={this.regionOption}
+                                          dropdown={{
+                                              defaultValue: "Selecionar a região",
+                                              emptyMessage: "Não há regiões disponíveis",
+                                              values: Object.values(this.props.regions),
+                                              optionToString: this.regionOption
+                                          }}/>
+                        : <Field key={index}
+                                 id={key}
+                                 label={key}/>))
         );
     };
 
