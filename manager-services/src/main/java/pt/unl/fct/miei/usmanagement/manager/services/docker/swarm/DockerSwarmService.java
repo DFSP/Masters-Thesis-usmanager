@@ -51,6 +51,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerCoreService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
+import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,16 +77,18 @@ public class DockerSwarmService {
 	private final NodesService nodesService;
 	private final ContainersService containersService;
 	private final ConfigurationsService configurationsService;
+	private final SshService sshService;
 
 	public DockerSwarmService(DockerCoreService dockerCoreService, @Lazy HostsService hostsService,
 							  BashService bashService, NodesService nodesService, @Lazy ContainersService containersService,
-							  ConfigurationsService configurationsService) {
+							  ConfigurationsService configurationsService, SshService sshService) {
 		this.dockerCoreService = dockerCoreService;
 		this.hostsService = hostsService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.configurationsService = configurationsService;
+		this.sshService = sshService;
 	}
 
 	public DockerClient getSwarmLeader() {
@@ -172,7 +175,7 @@ public class DockerSwarmService {
 		try (DockerClient leaderClient = getSwarmLeader();
 			 DockerClient nodeClient = dockerCoreService.getDockerClient(hostAddress)) {
 			if (!rejoin) {
-				leaveSwarm(nodeClient);
+				leaveSwarm(nodeClient, hostAddress);
 				nodesService.removeHost(hostAddress);
 			}
 			log.info("{} is joining the swarm as {}", hostAddress, role);
@@ -228,11 +231,11 @@ public class DockerSwarmService {
 
 	public Optional<String> leaveSwarm(HostAddress hostAddress) {
 		try (DockerClient docker = dockerCoreService.getDockerClient(hostAddress)) {
-			return leaveSwarm(docker);
+			return leaveSwarm(docker, hostAddress);
 		}
 	}
 
-	private Optional<String> leaveSwarm(DockerClient docker) {
+	private Optional<String> leaveSwarm(DockerClient docker, HostAddress hostAddress) {
 		try {
 			log.info(docker.info().swarm().toString());
 			boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
@@ -243,8 +246,9 @@ public class DockerSwarmService {
 				if (isManager && managers != null && managers > 1) {
 					changeRole(nodeId, NodeRole.WORKER);
 				}
-				docker.leaveSwarm();
-				log.info("{} ({}) left the swarm", docker.getHost(), nodeId);
+				// docker.leaveSwarm(); bug when docker client threw exception with 'node is not part of the swarm'
+				List<String> result = hostsService.executeCommandSync("docker swarm leave", hostAddress);
+				log.info("{} ({}) left the swarm: {}", docker.getHost(), nodeId, result);
 				return Optional.of(nodeId);
 			}
 		}

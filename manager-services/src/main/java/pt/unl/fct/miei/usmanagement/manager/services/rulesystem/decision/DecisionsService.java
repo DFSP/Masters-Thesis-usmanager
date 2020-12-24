@@ -221,6 +221,7 @@ public class DecisionsService {
 	}
 
 	public ServiceDecision saveServiceDecision(ServiceDecision serviceDecision) {
+		log.info("Saving service decision: {}", ToStringBuilder.reflectionToString(serviceDecision));
 		return serviceDecisions.save(serviceDecision);
 	}
 
@@ -233,6 +234,7 @@ public class DecisionsService {
 	}
 
 	public HostDecision saveHostDecision(HostDecision hostDecision) {
+		log.info("Saving host decision: {}", ToStringBuilder.reflectionToString(hostDecision));
 		return hostDecisions.save(hostDecision);
 	}
 

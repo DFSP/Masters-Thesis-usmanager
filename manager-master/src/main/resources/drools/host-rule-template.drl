@@ -14,7 +14,7 @@ global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decisio
 
 template "host"
 
-rule "rule_host_@{ruleId}" salience @{priority}
+rule "host_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then

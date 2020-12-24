@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.scheduling.annotation.Async;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -175,6 +176,7 @@ public class HostsMonitoringService {
 	}
 
 	public HostMonitoringLog addHostMonitoringLog(HostMonitoringLog hostMonitoringLog) {
+		log.info("Saving host monitoring log: {}", ToStringBuilder.reflectionToString(hostMonitoringLog));
 		return hostMonitoringLogs.save(hostMonitoringLog);
 	}
 

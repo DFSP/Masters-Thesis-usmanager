@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.data.util.Pair;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.config.ManagerMasterProperties;
@@ -205,6 +206,7 @@ public class ServicesMonitoringService {
 	}
 
 	public ServiceMonitoringLog addServiceMonitoringLog(ServiceMonitoringLog serviceMonitoringLog) {
+		log.info("Saving service monitoring log: {}", ToStringBuilder.reflectionToString(serviceMonitoringLog));
 		return serviceMonitoringLogs.save(serviceMonitoringLog);
 	}
 

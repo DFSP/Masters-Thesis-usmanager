@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.services.hosts;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
@@ -61,6 +62,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -163,6 +165,11 @@ public class HostsService {
 		String machinePrivateIp = this.managerHostAddress.getPrivateIpAddress();
 		return Objects.equals(machinePublicIp, hostAddress.getPublicIpAddress())
 			&& Objects.equals(machinePrivateIp, hostAddress.getPrivateIpAddress());
+	}
+
+	@Async
+	public CompletableFuture<pt.unl.fct.miei.usmanagement.manager.nodes.Node> setupHostAsync(HostAddress hostAddress, NodeRole role) {
+		return CompletableFuture.completedFuture(setupHost(hostAddress, role));
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node setupHost(HostAddress hostAddress, NodeRole role) {

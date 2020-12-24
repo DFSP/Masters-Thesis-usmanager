@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Setter
 public class ServiceDecisionDTO {
 
-	private Long id;
+	/*private Long id;*/
 	private String containerId;
 	private String serviceName;
 	private String result;
@@ -30,7 +30,7 @@ public class ServiceDecisionDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hash(containerId, rule, timestamp);
 	}
 
 	@Override
@@ -42,14 +42,16 @@ public class ServiceDecisionDTO {
 			return false;
 		}
 		ServiceDecisionDTO other = (ServiceDecisionDTO) o;
-		return id != null && id.equals(other.getId());
+		return containerId != null && containerId.equals(other.getContainerId()) &&
+			rule != null && rule.equals(other.getRule()) &&
+			timestamp != null && timestamp.equals(other.getTimestamp());
 	}
 
 	@Override
 	public String toString() {
 		return "ServiceDecisionDTO{" +
-			"id=" + id +
-			", containerId='" + containerId + '\'' +
+			/*"id=" + id +
+			", */"containerId='" + containerId + '\'' +
 			", serviceName='" + serviceName + '\'' +
 			", result='" + result + '\'' +
 			", decision=" + decision +

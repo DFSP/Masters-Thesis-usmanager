@@ -17,7 +17,7 @@ import java.util.Objects;
 @Setter
 public class HostMonitoringLogDTO {
 
-	private Long id;
+	/*private Long id;*/
 	private String publicIpAddress;
 	private String privateIpAddress;
 	private String field;
@@ -26,7 +26,7 @@ public class HostMonitoringLogDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hash(publicIpAddress, privateIpAddress, field, timestamp);
 	}
 
 	@Override
@@ -38,14 +38,17 @@ public class HostMonitoringLogDTO {
 			return false;
 		}
 		HostMonitoringLogDTO other = (HostMonitoringLogDTO) o;
-		return id != null && id.equals(other.getId());
+		return publicIpAddress != null && publicIpAddress.equals(other.getPublicIpAddress()) &&
+			privateIpAddress != null && publicIpAddress.equals(other.getPrivateIpAddress()) &&
+			field != null && field.equalsIgnoreCase(other.getField()) &&
+			timestamp != null && timestamp.equals(other.getTimestamp());
 	}
 
 	@Override
 	public String toString() {
 		return "HostMonitoringLogDTO{" +
-			"id=" + id +
-			", publicIpAddress='" + publicIpAddress + '\'' +
+			/*"id=" + id +
+			", */"publicIpAddress='" + publicIpAddress + '\'' +
 			", privateIpAddress='" + privateIpAddress + '\'' +
 			", field='" + field + '\'' +
 			", value=" + value +

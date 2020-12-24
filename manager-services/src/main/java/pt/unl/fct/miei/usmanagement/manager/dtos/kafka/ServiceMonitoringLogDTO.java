@@ -17,7 +17,7 @@ import java.util.Objects;
 @Setter
 public class ServiceMonitoringLogDTO {
 
-	private Long id;
+	/*private Long id;*/
 	private String containerId;
 	private String serviceName;
 	private String field;
@@ -26,7 +26,7 @@ public class ServiceMonitoringLogDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hash(containerId, field, timestamp);
 	}
 
 	@Override
@@ -38,14 +38,16 @@ public class ServiceMonitoringLogDTO {
 			return false;
 		}
 		ServiceMonitoringLogDTO other = (ServiceMonitoringLogDTO) o;
-		return id != null && id.equals(other.getId());
+		return containerId != null && containerId.equals(other.getContainerId()) &&
+			field != null && field.equalsIgnoreCase(other.getField()) &&
+			timestamp != null && timestamp.equals(other.getTimestamp());
 	}
 
 	@Override
 	public String toString() {
 		return "ServiceMonitoringLogDTO{" +
-			"id=" + id +
-			", containerId='" + containerId + '\'' +
+			/*"id=" + id +
+			", */"containerId='" + containerId + '\'' +
 			", serviceName='" + serviceName + '\'' +
 			", field='" + field + '\'' +
 			", value=" + value +

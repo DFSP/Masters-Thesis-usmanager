@@ -26,7 +26,7 @@ public class ServiceEventDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hash(getId());
 	}
 
 	@Override

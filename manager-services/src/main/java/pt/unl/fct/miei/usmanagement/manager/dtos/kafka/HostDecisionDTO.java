@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Setter
 public class HostDecisionDTO {
 
-	private Long id;
+	/*private Long id;*/
 	private Decision decision;
 	private HostRule rule;
 	private String publicIpAddress;
@@ -31,7 +31,7 @@ public class HostDecisionDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hash(publicIpAddress, privateIpAddress, rule, timestamp);
 	}
 
 	@Override
@@ -43,14 +43,17 @@ public class HostDecisionDTO {
 			return false;
 		}
 		HostDecisionDTO other = (HostDecisionDTO) o;
-		return id != null && id.equals(other.getId());
+		return publicIpAddress != null && publicIpAddress.equals(other.getPublicIpAddress()) &&
+			privateIpAddress != null && publicIpAddress.equals(other.getPrivateIpAddress()) &&
+			rule != null && rule.equals(other.getRule()) &&
+			timestamp != null && timestamp.equals(other.getTimestamp());
 	}
 
 	@Override
 	public String toString() {
 		return "HostDecisionDTO{" +
-			"id=" + id +
-			", decision=" + decision +
+			/*"id=" + id +
+			", */"decision=" + decision +
 			", rule=" + rule +
 			", publicIpAddress='" + publicIpAddress + '\'' +
 			", privateIpAddress='" + privateIpAddress + '\'' +

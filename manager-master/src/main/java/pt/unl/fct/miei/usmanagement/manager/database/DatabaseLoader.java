@@ -1038,10 +1038,10 @@ public class DatabaseLoader {
 				serviceDependenciesService.addDependency(composePost.getValue(), composePostRedis.getValue());
 			}
 			if (!serviceDependenciesService.hasDependency(readHomeTimeline.getKey(), postStorage.getKey())) {
-				serviceDependenciesService.addDependency(homeTimelineRedis.getValue(), postStorage.getValue());
+				serviceDependenciesService.addDependency(readHomeTimeline.getValue(), postStorage.getValue());
 			}
 			if (!serviceDependenciesService.hasDependency(readHomeTimeline.getKey(), homeTimelineRedis.getKey())) {
-				serviceDependenciesService.addDependency(homeTimelineRedis.getValue(), homeTimelineRedis.getValue());
+				serviceDependenciesService.addDependency(readHomeTimeline.getValue(), homeTimelineRedis.getValue());
 			}
 			if (!serviceDependenciesService.hasDependency(media.getKey(), composePost.getKey())) {
 				serviceDependenciesService.addDependency(media.getValue(), composePost.getValue());

@@ -6,15 +6,15 @@ eventType
 decision
 priority
 
-package pt.unl.fct.miei.usmanagement.manager.worker.management.management.rulesystem;
+package pt.unl.fct.miei.usmanagement.manager.management.rulesystem;
 
-import pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision;
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision;
 
-global pt.unl.fct.miei.usmanagement.manager.management.rulesystem.decision.Decision hostDecision;
+global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision hostDecision;
 
 template "host"
 
-rule "rule_host_@{ruleId}" salience @{priority}
+rule "host_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then

@@ -14,7 +14,7 @@ global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decisio
 
 template "container"
 
-rule "rule_container_@{ruleId}" salience @{priority}
+rule "container_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then

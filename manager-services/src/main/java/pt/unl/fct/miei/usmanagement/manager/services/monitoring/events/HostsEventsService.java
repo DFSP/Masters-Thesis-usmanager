@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.services.monitoring.events;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
@@ -60,6 +61,7 @@ public class HostsEventsService {
 	}
 
 	public HostEvent addHostEvent(HostEvent hostEvent) {
+		log.info("Saving host event: {}", ToStringBuilder.reflectionToString(hostEvent));
 		return hostEvents.save(hostEvent);
 	}
 
