@@ -466,7 +466,7 @@ class CloudHost extends BaseComponent<Props, State> {
                           loading={this.state.loading}
                           href={isNewCloudHost
                               ? undefined
-                              : `https://${(cloudHost as ICloudHost).awsRegion.zone}.console.aws.amazon.com/ec2/v2/home?region=${(cloudHost as ICloudHost).awsRegion.zone}#InstanceDetails:instanceId=${(cloudHost as ICloudHost).instanceId}`}>
+                              : `https://${(cloudHost as ICloudHost).awsRegion?.zone}.console.aws.amazon.com/ec2/v2/home?region=${(cloudHost as ICloudHost).awsRegion?.zone}#InstanceDetails:instanceId=${(cloudHost as ICloudHost).instanceId}`}>
                         {isNewCloudHost ?
                             <Field key='coordinates' id='coordinates' type='map' label='select position'
                                    map={{

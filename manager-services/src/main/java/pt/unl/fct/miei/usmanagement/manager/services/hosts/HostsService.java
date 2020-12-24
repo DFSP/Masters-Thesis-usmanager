@@ -169,7 +169,6 @@ public class HostsService {
 			&& Objects.equals(machinePrivateIp, hostAddress.getPrivateIpAddress());
 	}
 
-	@Async
 	public void setupWorkerManagerHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up worker manager host");
 		setupHost(hostAddress, role);
