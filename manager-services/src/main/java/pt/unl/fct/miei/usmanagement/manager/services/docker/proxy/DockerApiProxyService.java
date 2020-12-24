@@ -66,15 +66,14 @@ public class DockerApiProxyService {
 		Gson gson = new Gson();
 		String command = String.format("DOCKER_API_PROXY=$(docker ps -q -f 'name=%s') && "
 				+ "if [ $DOCKER_API_PROXY ]; then echo $DOCKER_API_PROXY; "
-				+ "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
-				+ "docker pull %s && "
+				+ "else docker pull %s && "
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
-				+ "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
+				+ "-e %s=%s -e %s=%s -e %s=http://%s:%s "
 				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
 			serviceName, dockerRepository, serviceName, dockerApiProxyPort, 80, serviceName,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
-			ContainerConstants.Environment.PROXY_PASS, dockerApiPort,
+			ContainerConstants.Environment.PROXY_PASS, hostAddress.getPrivateIpAddress(), dockerApiPort,
 			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
 			ContainerConstants.Label.SERVICE_NAME, serviceName,
