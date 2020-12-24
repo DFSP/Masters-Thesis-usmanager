@@ -86,7 +86,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	}
 
 	private void requireEnvVars() {
-		Map<String, String> vars = new HashMap<>(3);
+		Map<String, String> vars = new HashMap<>(4);
 		vars.put(ContainerConstants.Environment.Manager.HOST_ADDRESS,
 			environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS));
 		vars.put(ContainerConstants.Environment.Manager.ID,

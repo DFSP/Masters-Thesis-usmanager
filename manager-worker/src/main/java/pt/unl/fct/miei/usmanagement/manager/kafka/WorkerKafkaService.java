@@ -546,6 +546,8 @@ public class WorkerKafkaService {
 					}
 					servicesService.addOrUpdateService(service);
 
+					log.info(service.getServiceName());
+					log.info(ServiceConstants.Name.DOCKER_API_PROXY);
 					if (service.getServiceName().equalsIgnoreCase(ServiceConstants.Name.DOCKER_API_PROXY)) {
 						hostsService.setupWorkerManagerHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
 					}

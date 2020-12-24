@@ -327,7 +327,10 @@ class WorkerManager extends BaseComponent<Props, State> {
                           switchDropdown={isNewWorkerManager ? {
                               options: currentForm === 'Por regiões' ? ['Num endereço'] : ['Por regiões'],
                               onSwitch: this.switchForm
-                          } : undefined}>
+                          } : undefined}
+                          href={isNewWorkerManager
+                              ? undefined
+                              : `http://${(workerManager as IWorkerManager).publicIpAddress}:${(workerManager as IWorkerManager).port}/api`}>
                         {this.formFields(isNewWorkerManager, formWorkerManager)}
                     </Form>
                 )}

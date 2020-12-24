@@ -43,6 +43,11 @@ import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 public class ManagerMasterStartup implements ApplicationListener<ApplicationReadyEvent> {
@@ -72,6 +77,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	@SneakyThrows
 	@Override
 	public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+		requireEnvVars();
 		String hostAddressJson = environment.getProperty(ContainerConstants.Label.MANAGER_ID);
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
@@ -84,6 +90,18 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		syncService.startCloudHostsDatabaseSynchronization();
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
+	}
+
+	private void requireEnvVars() {
+		Map<String, String> vars = new HashMap<>(1);
+		vars.put(ContainerConstants.Environment.Manager.ID,
+			environment.getProperty(ContainerConstants.Environment.Manager.ID));
+		log.info("Environment: {}", vars);
+		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
+		if (!requiredVars.isEmpty()) {
+			log.error("Usage: {} is required and {} is missing", vars.keySet(), requiredVars);
+			System.exit(1);
+		}
 	}
 
 }
