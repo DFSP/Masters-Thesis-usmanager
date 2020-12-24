@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Setter
 public class ServiceDTO {
 
-	private Long id;
 	private String serviceName;
 	private String dockerRepository;
 	private Integer defaultExternalPort;
@@ -40,13 +39,13 @@ public class ServiceDTO {
 	private Set<ServiceRuleDTO> serviceRules;
 	private Set<ServiceSimulatedMetricDTO> simulatedServiceMetrics;
 
-	public ServiceDTO(Long id) {
-		this.id = id;
+	public ServiceDTO(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hashCode(getServiceName());
 	}
 
 	@Override
@@ -58,14 +57,14 @@ public class ServiceDTO {
 			return false;
 		}
 		ServiceDTO other = (ServiceDTO) o;
-		return id != null && id.equals(other.getId());
+		return serviceName != null && serviceName.equals(other.getServiceName());
 	}
 
 	@Override
 	public String toString() {
 		return "ServiceDTO{" +
-			"id=" + id +
-			", serviceName='" + serviceName + '\'' +
+			/*"id=" + id +
+			", */"serviceName='" + serviceName + '\'' +
 			", dockerRepository='" + dockerRepository + '\'' +
 			", defaultExternalPort=" + defaultExternalPort +
 			", defaultInternalPort=" + defaultInternalPort +

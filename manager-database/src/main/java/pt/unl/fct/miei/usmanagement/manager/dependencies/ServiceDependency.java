@@ -53,13 +53,13 @@ public class ServiceDependency /*extends AbstractEntity<Long> */ {
 	private ServiceDependencyKey id;
 
 	@ManyToOne
-	@MapsId("serviceId")
-	@JoinColumn(name = "service_id")
+	@MapsId("serviceName")
+	@JoinColumn(name = "service_name")
 	private Service service;
 
 	@ManyToOne
-	@MapsId("dependencyId")
-	@JoinColumn(name = "dependency_id")
+	@MapsId("dependencyName")
+	@JoinColumn(name = "dependency_name")
 	private Service dependency;
 
 	@Override

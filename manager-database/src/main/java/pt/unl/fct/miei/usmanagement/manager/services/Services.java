@@ -36,17 +36,12 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
 import java.util.List;
 import java.util.Optional;
 
-public interface Services extends JpaRepository<Service, Long> {
+public interface Services extends JpaRepository<Service, String> {
 
 	@Query("select case when count(s) > 0 then true else false end "
 		+ "from Service s "
-		+ "where s.id = :serviceId")
-	boolean hasService(@Param("serviceId") long serviceId);
-
-	@Query("select case when count(s) > 0 then true else false end "
-		+ "from Service s "
-		+ "where lower(s.serviceName) = lower(:serviceName)")
-	boolean hasService(@Param("serviceName") String serviceName);
+		+ "where lower(s.serviceName) = lower(:name)")
+	boolean hasService(String name);
 
 	Optional<Service> findByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
 
@@ -104,7 +99,6 @@ public interface Services extends JpaRepository<Service, Long> {
 		+ "where lower(s.serviceName) = lower(:serviceName)")
 	List<Service> getDependents(@Param("serviceName") String serviceName);
 
-	//TODO confirm correctness
 	@Query("select d.service "
 		+ "from Service s join s.dependents d "
 		+ "where lower(s.serviceName) = lower(:serviceName) and lower(d.service.serviceName) = lower(:dependentName)")

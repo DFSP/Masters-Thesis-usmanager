@@ -60,8 +60,8 @@ public class AppService /*extends AbstractEntity<Long> */ {
 	private App app;
 
 	@ManyToOne
-	@MapsId("serviceId")
-	@JoinColumn(name = "service_id")
+	@MapsId("serviceName")
+	@JoinColumn(name = "service_name")
 	private Service service;
 
 	@Override

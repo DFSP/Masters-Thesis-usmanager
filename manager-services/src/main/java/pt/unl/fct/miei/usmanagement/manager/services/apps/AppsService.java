@@ -222,7 +222,7 @@ public class AppsService {
 	public void addService(String appName, String serviceName, int order) {
 		App app = getAppAndRelations(appName);
 		Service service = servicesService.getService(serviceName);
-		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getId())).app(app).service(service).launchOrder(order).build();
+		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getServiceName())).app(app).service(service).launchOrder(order).build();
 		app = addService(app, appService);
 		kafkaService.sendApp(app);
 	}
@@ -242,7 +242,7 @@ public class AppsService {
 	public void removeServices(String appName, List<String> services) {
 		App app = getAppAndRelations(appName);
 		log.info("Removing services {}", services);
-		app.getAppServices().removeIf(appService -> services.contains(servicesService.getService(appService.getId().getServiceId()).getServiceName()));
+		app.getAppServices().removeIf(appService -> services.contains(servicesService.getService(appService.getId().getServiceName()).getServiceName()));
 		app = apps.save(app);
 		kafkaService.sendApp(app);
 	}

@@ -241,7 +241,6 @@ public class ContainersService {
 		return saveContainer(container);
 	}
 
-	@Transactional
 	public Container updateContainer(Container container) {
 		log.info("Updating container {}", container.toString());
 		container = saveContainer(container);

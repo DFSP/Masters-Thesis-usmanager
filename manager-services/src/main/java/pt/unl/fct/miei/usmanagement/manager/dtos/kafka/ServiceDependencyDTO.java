@@ -39,8 +39,8 @@ public class ServiceDependencyDTO {
 	public String toString() {
 		return "ServiceDependencyDTO{" +
 			"id=" + id +
-			", service=" + (service == null ? "null" : service.getId()) +
-			", dependency=" + (dependency == null ? "null" : dependency.getId()) +
+			", service=" + (service == null ? "null" : service.getServiceName()) +
+			", dependency=" + (dependency == null ? "null" : dependency.getServiceName()) +
 			'}';
 	}
 }

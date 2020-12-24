@@ -76,20 +76,20 @@ public class ServicesController {
 	@PostMapping
 	public ServiceDTO addService(@RequestBody ServiceDTO serviceDTO) {
 		Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
-		Validation.validatePostRequest(service.getId());
+		Validation.validatePostRequest(service.getServiceName());
 		return ServiceMapper.MAPPER.fromService(servicesService.addService(service), context);
 	}
 
 	@PutMapping("/{serviceName}")
 	public ServiceDTO updateService(@PathVariable String serviceName, @RequestBody ServiceDTO serviceDTO) {
 		Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
-		Validation.validatePutRequest(service.getId());
+		Validation.validatePutRequest(service.getServiceName());
 		return ServiceMapper.MAPPER.fromService(servicesService.updateService(serviceName, service), context);
 	}
 
 	@DeleteMapping("/{serviceName}")
 	public void deleteService(@PathVariable String serviceName) {
-		servicesService.deleteService(serviceName);
+		servicesService.deleteServiceByName(serviceName);
 	}
 
 	@GetMapping("/{serviceName}/apps")

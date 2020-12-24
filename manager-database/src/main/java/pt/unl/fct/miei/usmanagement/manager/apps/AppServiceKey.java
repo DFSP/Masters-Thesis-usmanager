@@ -25,8 +25,8 @@ public class AppServiceKey implements Serializable {
 	@Column(name = "app_id")
 	private Long appId;
 
-	@Column(name = "service_id")
-	private Long serviceId;
+	@Column(name = "service_name")
+	private String serviceName;
 
 }
 

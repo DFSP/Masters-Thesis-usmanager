@@ -29,10 +29,8 @@ public interface ServiceDependencyMapper {
 		return set == null ? null : String.join(" ", set);
 	}
 
-	@Mapping(source = "id", target = "id")
 	ServiceDependency toServiceDependency(ServiceDependencyDTO serviceDependencyDTO, @Context CycleAvoidingMappingContext context);
 
-	@Mapping(source = "id", target = "id")
 	List<ServiceDependency> toServiceDependencies(List<ServiceDependencyDTO> serviceDependencyDTOs, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration

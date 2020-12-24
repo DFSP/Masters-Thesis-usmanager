@@ -61,14 +61,14 @@ public class KafkaCommunicationTester {
 
 	@Test
 	public void testMapDtoToEntity() {
-		ServiceDTO serviceDto = new ServiceDTO(1L);
-		ServiceDTO dependencyDto = new ServiceDTO(2L);
-		ServiceDependencyKey key = new ServiceDependencyKey(serviceDto.getId(), dependencyDto.getId());
+		ServiceDTO serviceDto = new ServiceDTO("service");
+		ServiceDTO dependencyDto = new ServiceDTO("dependency");
+		ServiceDependencyKey key = new ServiceDependencyKey(serviceDto.getServiceName(), dependencyDto.getServiceName());
 		ServiceDependencyDTO serviceDependencyDto = new ServiceDependencyDTO(key, serviceDto, dependencyDto);
 		serviceDto.setDependencies(Set.of(serviceDependencyDto));
 		Service service = ServiceMapper.MAPPER.toService(serviceDto, cycleAvoidingMappingContext);
 		assertThat(service).isNotNull();
-		assertThat(service.getId()).isEqualTo(1L);
+		assertThat(service.getServiceName()).isEqualTo("service");
 		Set<ServiceDependency> serviceDependencies = service.getDependencies();
 		assertThat(serviceDependencies).hasSize(1);
 		assertThat(serviceDependencies).extracting("service").containsExactly(service);
@@ -79,7 +79,7 @@ public class KafkaCommunicationTester {
 		ServiceDTO serviceDTO = getServiceDTO();
 		System.out.println(serviceDTO);
 		assertThat(serviceDTO).isNotNull();
-		assertThat(serviceDTO.getId()).isNotNull();
+		assertThat(serviceDTO.getServiceName()).isNotNull();
 
 		Set<ServiceDependencyDTO> serviceDependenciesDTO = serviceDTO.getDependencies();
 		System.out.println(serviceDependenciesDTO);
@@ -102,10 +102,10 @@ public class KafkaCommunicationTester {
 	}*/
 
 	private ServiceDTO getServiceDTO() {
-		Service service = Service.builder().id(1L).serviceName("service").build();
-		Service dependency = Service.builder().id(2L).serviceName("dependency").build();
+		Service service = Service.builder().serviceName("service").build();
+		Service dependency = Service.builder().serviceName("dependency").build();
 		ServiceDependency serviceDependency = ServiceDependency.builder()
-			.id(new ServiceDependencyKey(service.getId(), dependency.getId()))
+			.id(new ServiceDependencyKey(service.getServiceName(), dependency.getServiceName()))
 			.service(service)
 			.dependency(dependency)
 			.build();

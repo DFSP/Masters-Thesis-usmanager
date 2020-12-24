@@ -60,7 +60,7 @@ public class ServiceSimulatedMetricDTO {
 			", generic=" + generic +
 			", override=" + override +
 			", active=" + active +
-			", services=" + (services == null ? "services" : services.stream().map(ServiceDTO::getId).collect(Collectors.toSet())) +
+			", services=" + (services == null ? "services" : services.stream().map(ServiceDTO::getServiceName).collect(Collectors.toSet())) +
 			'}';
 	}
 }

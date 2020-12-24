@@ -20,12 +20,12 @@ public class ConfigurationsService {
 
 	public Configuration addConfiguration(String id) {
 		log.info("Saving configuration {}", id);
-		return configurations.saveAndFlush(Configuration.builder().id(id).build());
+		return configurations.save(Configuration.builder().id(id).build());
 	}
 
 	public Configuration addConfiguration(Configuration configuration) {
 		log.info("Saving configuration {}", configuration);
-		return configurations.saveAndFlush(configuration);
+		return configurations.save(configuration);
 	}
 
 	public List<Configuration> getConfigurations() {

@@ -68,7 +68,6 @@ import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.AppSimulatedMetric
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.operators.Operator;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.condition.Condition;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.Decision;
@@ -201,7 +200,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic apps with message {}: {}", appDTO.toString(), e.getMessage());
+				log.error("Error while processing topic apps with key={} and message={}: {}", key, appDTO.toString(), e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -228,7 +227,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic cloud-hosts with message {}: {}", cloudHostDTO.toString(), e.getMessage());
+				log.error("Error while processing topic cloud-hosts with key={} and message={}: {}", key, cloudHostDTO.toString(), e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -260,7 +259,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic component-types with message {}: {}", componentTypeDTO, e.getMessage());
+				log.error("Error while processing topic component-types with key={} and message={}: {}", key, componentTypeDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -312,7 +311,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic conditions with message {}: {}", conditionDTO, e.getMessage());
+				log.error("Error while processing topic conditions with key={} and message={}: {}", key, conditionDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -342,7 +341,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic containers with message {}: {}", containerDTO, e.getMessage());
+				log.error("Error while processing topic containers with key={} and message={}: {}", key, containerDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -368,7 +367,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic decisions with message {}: {}", decisionDTO, e.getMessage());
+				log.error("Error while processing topic decisions with key={} and message={}: {}", key, decisionDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -395,7 +394,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic edge-hosts with message {}: {}", edgeHostDTO, e.getMessage());
+				log.error("Error while processing topic edge-hosts with key={} and message={}: {}", key, edgeHostDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -419,7 +418,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic eips with message {}: {}", elasticIpDTO, e.getMessage());
+				log.error("Error while processing topic eips with key={} and message={}: {}", key, elasticIpDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -447,7 +446,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic fields with message {}: {}", fieldDTO, e.getMessage());
+				log.error("Error while processing topic fields with key={} and message={}: {}", key, fieldDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -475,7 +474,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic nodes with message {}: {}", nodeDTO, e.getMessage());
+				log.error("Error while processing topic nodes with key={} and message={}: {}", key, nodeDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -503,7 +502,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic operators with message {}: {}", operatorDTO, e.getMessage());
+				log.error("Error while processing topic operators with key={} and message={}: {}", key, operatorDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -519,8 +518,8 @@ public class WorkerKafkaService {
 			try {
 				pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
 				if (Objects.equal(key, "DELETE")) {
-					Long id = service.getId();
-					servicesService.deleteService(id);
+					String serviceName = service.getServiceName();
+					servicesService.deleteServiceByName(serviceName);
 				}
 				else {
 					Set<AppServiceDTO> appServices = serviceDTO.getAppServices();
@@ -545,16 +544,10 @@ public class WorkerKafkaService {
 						}
 					}
 					servicesService.addOrUpdateService(service);
-
-					log.info(service.getServiceName());
-					log.info(ServiceConstants.Name.DOCKER_API_PROXY);
-					if (service.getServiceName().equalsIgnoreCase(ServiceConstants.Name.DOCKER_API_PROXY)) {
-						hostsService.setupWorkerManagerHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
-					}
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic services with message {}: {}", serviceDTO.toString(), e.getMessage());
+				log.error("Error while processing topic services with key={} and message={}: {}", key, serviceDTO.toString(), e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -596,7 +589,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic simulated-host-metrics with message {}: {}", hostSimulatedMetricDTO, e.getMessage());
+				log.error("Error while processing topic simulated-host-metrics with key={} and message={}: {}", key, hostSimulatedMetricDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -630,7 +623,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic simulated-app-metrics with message {}: {}", appSimulatedMetricDTO, e.getMessage());
+				log.error("Error while processing topic simulated-app-metrics with key={} and message={}: {}", key, appSimulatedMetricDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -664,7 +657,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic simulated-service-metrics with message {}: {}", serviceSimulatedMetricDTO, e.getMessage());
+				log.error("Error while processing topic simulated-service-metrics with key={} and message={}: {}", key, serviceSimulatedMetricDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -697,7 +690,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic simulated-container-metrics with message {}: {}", containerSimulatedMetricDTO, e.getMessage());
+				log.error("Error while processing topic simulated-container-metrics with key={} and message={}: {}", key, containerSimulatedMetricDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -754,7 +747,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic host-rules with message {}: {}", hostRuleDTO, e.getMessage());
+				log.error("Error while processing topic host-rules with key={} and message={}: {}", key, hostRuleDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -804,7 +797,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic app-rules with message {}: {}", appRuleDTO, e.getMessage());
+				log.error("Error while processing topic app-rules with key={} and message={}: {}", key, appRuleDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -896,7 +889,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic container-rules with message {}: {}", containerRuleDTO, e.getMessage());
+				log.error("Error while processing topic container-rules with key={} and message={}: {}", key, containerRuleDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -924,7 +917,7 @@ public class WorkerKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic value-modes with message {}: {}", valueModeDTO.toString(), e.getMessage());
+				log.error("Error while processing topic value-modes with key={} and message={}: {}", key, valueModeDTO.toString(), e.getMessage());
 				e.printStackTrace();
 			}
 		}

@@ -861,7 +861,7 @@ public class DatabaseLoader {
 				.build();
 			testing = appsService.addApp(testing);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(testing.getId(), crashTesting.getValue().getId())).app(testing).service(crashTesting.getValue()).build())
+				AppService.builder().id(new AppServiceKey(testing.getId(), crashTesting.getValue().getServiceName())).app(testing).service(crashTesting.getValue()).build())
 			);
 		}
 
@@ -997,35 +997,35 @@ public class DatabaseLoader {
 				.build();
 			socialNetwork = appsService.addApp(socialNetwork);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePost.getValue().getId())).app(socialNetwork).service(composePost.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePostRedis.getValue().getId())).app(socialNetwork).service(composePostRedis.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), readHomeTimeline.getValue().getId())).app(socialNetwork).service(readHomeTimeline.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), media.getValue().getId())).app(socialNetwork).service(media.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMemcached.getValue().getId())).app(socialNetwork).service(mediaMemcached.getValue()).launchOrder(5).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMongodb.getValue().getId())).app(socialNetwork).service(mediaMongodb.getValue()).launchOrder(6).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorage.getValue().getId())).app(socialNetwork).service(postStorage.getValue()).launchOrder(7).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMemcached.getValue().getId())).app(socialNetwork).service(postStorageMemcached.getValue()).launchOrder(8).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMongodb.getValue().getId())).app(socialNetwork).service(postStorageMongodb.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraph.getValue().getId())).app(socialNetwork).service(socialGraph.getValue()).launchOrder(10).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMemcached.getValue().getId())).app(socialNetwork).service(socialGraphMemcached.getValue()).launchOrder(11).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMongodb.getValue().getId())).app(socialNetwork).service(socialGraphMongodb.getValue()).launchOrder(12).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), text.getValue().getId())).app(socialNetwork).service(text.getValue()).launchOrder(13).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), uniqueId.getValue().getId())).app(socialNetwork).service(uniqueId.getValue()).launchOrder(14).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShorten.getValue().getId())).app(socialNetwork).service(urlShorten.getValue()).launchOrder(15).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMemcached.getValue().getId())).app(socialNetwork).service(urlShortenMemcached.getValue()).launchOrder(16).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMongodb.getValue().getId())).app(socialNetwork).service(urlShortenMongodb.getValue()).launchOrder(17).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTag.getValue().getId())).app(socialNetwork).service(userTag.getValue()).launchOrder(18).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), user.getValue().getId())).app(socialNetwork).service(user.getValue()).launchOrder(19).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMemcached.getValue().getId())).app(socialNetwork).service(userMemcached.getValue()).launchOrder(20).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMongodb.getValue().getId())).app(socialNetwork).service(userMongodb.getValue()).launchOrder(21).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimeline.getValue().getId())).app(socialNetwork).service(userTimeline.getValue()).launchOrder(21).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineRedis.getValue().getId())).app(socialNetwork).service(userTimelineRedis.getValue()).launchOrder(22).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineMongodb.getValue().getId())).app(socialNetwork).service(userTimelineMongodb.getValue()).launchOrder(23).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), writeHomeTimeline.getValue().getId())).app(socialNetwork).service(writeHomeTimeline.getValue()).launchOrder(24).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), homeTimelineRedis.getValue().getId())).app(socialNetwork).service(homeTimelineRedis.getValue()).launchOrder(25).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), rabbitmq.getValue().getId())).app(socialNetwork).service(rabbitmq.getValue()).launchOrder(26).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), nginx.getValue().getId())).app(socialNetwork).service(nginx.getValue()).launchOrder(27).build(),
-				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), frontend.getValue().getId())).app(socialNetwork).service(frontend.getValue()).launchOrder(28).build())
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePost.getValue().getServiceName())).app(socialNetwork).service(composePost.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), composePostRedis.getValue().getServiceName())).app(socialNetwork).service(composePostRedis.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), readHomeTimeline.getValue().getServiceName())).app(socialNetwork).service(readHomeTimeline.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), media.getValue().getServiceName())).app(socialNetwork).service(media.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMemcached.getValue().getServiceName())).app(socialNetwork).service(mediaMemcached.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), mediaMongodb.getValue().getServiceName())).app(socialNetwork).service(mediaMongodb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorage.getValue().getServiceName())).app(socialNetwork).service(postStorage.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMemcached.getValue().getServiceName())).app(socialNetwork).service(postStorageMemcached.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), postStorageMongodb.getValue().getServiceName())).app(socialNetwork).service(postStorageMongodb.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraph.getValue().getServiceName())).app(socialNetwork).service(socialGraph.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMemcached.getValue().getServiceName())).app(socialNetwork).service(socialGraphMemcached.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), socialGraphMongodb.getValue().getServiceName())).app(socialNetwork).service(socialGraphMongodb.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), text.getValue().getServiceName())).app(socialNetwork).service(text.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), uniqueId.getValue().getServiceName())).app(socialNetwork).service(uniqueId.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShorten.getValue().getServiceName())).app(socialNetwork).service(urlShorten.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMemcached.getValue().getServiceName())).app(socialNetwork).service(urlShortenMemcached.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), urlShortenMongodb.getValue().getServiceName())).app(socialNetwork).service(urlShortenMongodb.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTag.getValue().getServiceName())).app(socialNetwork).service(userTag.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), user.getValue().getServiceName())).app(socialNetwork).service(user.getValue()).launchOrder(19).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMemcached.getValue().getServiceName())).app(socialNetwork).service(userMemcached.getValue()).launchOrder(20).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userMongodb.getValue().getServiceName())).app(socialNetwork).service(userMongodb.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimeline.getValue().getServiceName())).app(socialNetwork).service(userTimeline.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineRedis.getValue().getServiceName())).app(socialNetwork).service(userTimelineRedis.getValue()).launchOrder(22).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), userTimelineMongodb.getValue().getServiceName())).app(socialNetwork).service(userTimelineMongodb.getValue()).launchOrder(23).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), writeHomeTimeline.getValue().getServiceName())).app(socialNetwork).service(writeHomeTimeline.getValue()).launchOrder(24).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), homeTimelineRedis.getValue().getServiceName())).app(socialNetwork).service(homeTimelineRedis.getValue()).launchOrder(25).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), rabbitmq.getValue().getServiceName())).app(socialNetwork).service(rabbitmq.getValue()).launchOrder(26).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), nginx.getValue().getServiceName())).app(socialNetwork).service(nginx.getValue()).launchOrder(27).build(),
+				AppService.builder().id(new AppServiceKey(socialNetwork.getId(), frontend.getValue().getServiceName())).app(socialNetwork).service(frontend.getValue()).launchOrder(28).build())
 			);
 
 			if (!serviceDependenciesService.hasDependency(composePost.getKey(), rabbitmq.getKey())) {
@@ -1259,39 +1259,39 @@ public class DatabaseLoader {
 				.build();
 			media = appsService.addApp(media);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(media.getId(), uniqueId.getValue().getId())).app(media).service(uniqueId.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieIdDb.getValue().getId())).app(media).service(movieIdDb.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieIdMemcached.getValue().getId())).app(media).service(movieIdMemcached.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieId.getValue().getId())).app(media).service(movieId.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), text.getValue().getId())).app(media).service(text.getValue()).launchOrder(5).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), ratingRedis.getValue().getId())).app(media).service(ratingRedis.getValue()).launchOrder(6).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), rating.getValue().getId())).app(media).service(rating.getValue()).launchOrder(7).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), userDb.getValue().getId())).app(media).service(userDb.getValue()).launchOrder(8).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), userMemcached.getValue().getId())).app(media).service(userMemcached.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), user.getValue().getId())).app(media).service(user.getValue()).launchOrder(10).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), composeReviewMemcached.getValue().getId())).app(media).service(composeReviewMemcached.getValue()).launchOrder(11).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), composeReview.getValue().getId())).app(media).service(composeReview.getValue()).launchOrder(12).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageDb.getValue().getId())).app(media).service(reviewStorageDb.getValue()).launchOrder(13).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageMemcached.getValue().getId())).app(media).service(reviewStorageMemcached.getValue()).launchOrder(14).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorage.getValue().getId())).app(media).service(reviewStorage.getValue()).launchOrder(15).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), userReviewDb.getValue().getId())).app(media).service(userReviewDb.getValue()).launchOrder(16).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), userReviewRedis.getValue().getId())).app(media).service(userReviewRedis.getValue()).launchOrder(17).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), userReview.getValue().getId())).app(media).service(userReview.getValue()).launchOrder(18).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewDb.getValue().getId())).app(media).service(movieReviewDb.getValue()).launchOrder(19).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewRedis.getValue().getId())).app(media).service(movieReviewRedis.getValue()).launchOrder(20).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieReview.getValue().getId())).app(media).service(movieReview.getValue()).launchOrder(21).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), nginxWebServer.getValue().getId())).app(media).service(nginxWebServer.getValue()).launchOrder(21).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), castInfoDb.getValue().getId())).app(media).service(castInfoDb.getValue()).launchOrder(22).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), castInfoMemcached.getValue().getId())).app(media).service(castInfoMemcached.getValue()).launchOrder(23).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), castInfo.getValue().getId())).app(media).service(castInfo.getValue()).launchOrder(24).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), plotDb.getValue().getId())).app(media).service(plotDb.getValue()).launchOrder(25).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), plotMemcached.getValue().getId())).app(media).service(plotMemcached.getValue()).launchOrder(26).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), plot.getValue().getId())).app(media).service(plot.getValue()).launchOrder(27).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoDb.getValue().getId())).app(media).service(movieInfoDb.getValue()).launchOrder(28).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoMemcached.getValue().getId())).app(media).service(movieInfoMemcached.getValue()).launchOrder(29).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), movieInfo.getValue().getId())).app(media).service(movieInfo.getValue()).launchOrder(30).build(),
-				AppService.builder().id(new AppServiceKey(media.getId(), page.getValue().getId())).app(media).service(page.getValue()).launchOrder(31).build())
-				//AppService.builder().id(new AppServiceKey(media.getId(), jaeger.getValue().getId())).app(media).service(jaeger.getValue()).launchOrder(32).build())
+				AppService.builder().id(new AppServiceKey(media.getId(), uniqueId.getValue().getServiceName())).app(media).service(uniqueId.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieIdDb.getValue().getServiceName())).app(media).service(movieIdDb.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieIdMemcached.getValue().getServiceName())).app(media).service(movieIdMemcached.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieId.getValue().getServiceName())).app(media).service(movieId.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), text.getValue().getServiceName())).app(media).service(text.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), ratingRedis.getValue().getServiceName())).app(media).service(ratingRedis.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), rating.getValue().getServiceName())).app(media).service(rating.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userDb.getValue().getServiceName())).app(media).service(userDb.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userMemcached.getValue().getServiceName())).app(media).service(userMemcached.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), user.getValue().getServiceName())).app(media).service(user.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), composeReviewMemcached.getValue().getServiceName())).app(media).service(composeReviewMemcached.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), composeReview.getValue().getServiceName())).app(media).service(composeReview.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageDb.getValue().getServiceName())).app(media).service(reviewStorageDb.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorageMemcached.getValue().getServiceName())).app(media).service(reviewStorageMemcached.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), reviewStorage.getValue().getServiceName())).app(media).service(reviewStorage.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReviewDb.getValue().getServiceName())).app(media).service(userReviewDb.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReviewRedis.getValue().getServiceName())).app(media).service(userReviewRedis.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), userReview.getValue().getServiceName())).app(media).service(userReview.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewDb.getValue().getServiceName())).app(media).service(movieReviewDb.getValue()).launchOrder(19).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReviewRedis.getValue().getServiceName())).app(media).service(movieReviewRedis.getValue()).launchOrder(20).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieReview.getValue().getServiceName())).app(media).service(movieReview.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), nginxWebServer.getValue().getServiceName())).app(media).service(nginxWebServer.getValue()).launchOrder(21).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfoDb.getValue().getServiceName())).app(media).service(castInfoDb.getValue()).launchOrder(22).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfoMemcached.getValue().getServiceName())).app(media).service(castInfoMemcached.getValue()).launchOrder(23).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), castInfo.getValue().getServiceName())).app(media).service(castInfo.getValue()).launchOrder(24).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plotDb.getValue().getServiceName())).app(media).service(plotDb.getValue()).launchOrder(25).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plotMemcached.getValue().getServiceName())).app(media).service(plotMemcached.getValue()).launchOrder(26).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), plot.getValue().getServiceName())).app(media).service(plot.getValue()).launchOrder(27).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoDb.getValue().getServiceName())).app(media).service(movieInfoDb.getValue()).launchOrder(28).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfoMemcached.getValue().getServiceName())).app(media).service(movieInfoMemcached.getValue()).launchOrder(29).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), movieInfo.getValue().getServiceName())).app(media).service(movieInfo.getValue()).launchOrder(30).build(),
+				AppService.builder().id(new AppServiceKey(media.getId(), page.getValue().getServiceName())).app(media).service(page.getValue()).launchOrder(31).build())
+				//AppService.builder().id(new AppServiceKey(media.getId(), jaeger.getValue().getServiceName())).app(media).service(jaeger.getValue()).launchOrder(32).build())
 			);
 		}
 
@@ -1477,24 +1477,24 @@ public class DatabaseLoader {
 				.build();
 			hotelReservation = appsService.addApp(hotelReservation);
 			appServices.saveAll(List.of(
-				//AppService.builder().id(new AppServiceKey(hotelReservation.getId(), jaeger.getValue().getId())).app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedProfile.getValue().getId())).app(hotelReservation).service(memcachedProfile.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profileDb.getValue().getId())).app(hotelReservation).service(profileDb.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profile.getValue().getId())).app(hotelReservation).service(profile.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), search.getValue().getId())).app(hotelReservation).service(search.getValue()).launchOrder(5).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geoDb.getValue().getId())).app(hotelReservation).service(geoDb.getValue()).launchOrder(6).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geo.getValue().getId())).app(hotelReservation).service(geo.getValue()).launchOrder(7).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rateDb.getValue().getId())).app(hotelReservation).service(rateDb.getValue()).launchOrder(8).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedRate.getValue().getId())).app(hotelReservation).service(memcachedRate.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rate.getValue().getId())).app(hotelReservation).service(rate.getValue()).launchOrder(10).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendationDb.getValue().getId())).app(hotelReservation).service(recommendationDb.getValue()).launchOrder(12).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendation.getValue().getId())).app(hotelReservation).service(recommendation.getValue()).launchOrder(13).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), userDb.getValue().getId())).app(hotelReservation).service(userDb.getValue()).launchOrder(14).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), user.getValue().getId())).app(hotelReservation).service(user.getValue()).launchOrder(15).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservationDb.getValue().getId())).app(hotelReservation).service(reservationDb.getValue()).launchOrder(16).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedReserve.getValue().getId())).app(hotelReservation).service(memcachedReserve.getValue()).launchOrder(17).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservation.getValue().getId())).app(hotelReservation).service(reservation.getValue()).launchOrder(18).build(),
-				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), frontend.getValue().getId())).app(hotelReservation).service(frontend.getValue()).launchOrder(19).build())
+				//AppService.builder().id(new AppServiceKey(hotelReservation.getId(), jaeger.getValue().getServiceName())).app(hotelReservation).service(jaeger.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedProfile.getValue().getServiceName())).app(hotelReservation).service(memcachedProfile.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profileDb.getValue().getServiceName())).app(hotelReservation).service(profileDb.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), profile.getValue().getServiceName())).app(hotelReservation).service(profile.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), search.getValue().getServiceName())).app(hotelReservation).service(search.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geoDb.getValue().getServiceName())).app(hotelReservation).service(geoDb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), geo.getValue().getServiceName())).app(hotelReservation).service(geo.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rateDb.getValue().getServiceName())).app(hotelReservation).service(rateDb.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedRate.getValue().getServiceName())).app(hotelReservation).service(memcachedRate.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), rate.getValue().getServiceName())).app(hotelReservation).service(rate.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendationDb.getValue().getServiceName())).app(hotelReservation).service(recommendationDb.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), recommendation.getValue().getServiceName())).app(hotelReservation).service(recommendation.getValue()).launchOrder(13).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), userDb.getValue().getServiceName())).app(hotelReservation).service(userDb.getValue()).launchOrder(14).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), user.getValue().getServiceName())).app(hotelReservation).service(user.getValue()).launchOrder(15).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservationDb.getValue().getServiceName())).app(hotelReservation).service(reservationDb.getValue()).launchOrder(16).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), memcachedReserve.getValue().getServiceName())).app(hotelReservation).service(memcachedReserve.getValue()).launchOrder(17).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), reservation.getValue().getServiceName())).app(hotelReservation).service(reservation.getValue()).launchOrder(18).build(),
+				AppService.builder().id(new AppServiceKey(hotelReservation.getId(), frontend.getValue().getServiceName())).app(hotelReservation).service(frontend.getValue()).launchOrder(19).build())
 			);
 		}
 
@@ -1606,17 +1606,17 @@ public class DatabaseLoader {
 				.build();
 			onlineBoutique = appsService.addApp(onlineBoutique);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), payment.getValue().getId())).app(onlineBoutique).service(payment.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), email.getValue().getId())).app(onlineBoutique).service(email.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), carts.getValue().getId())).app(onlineBoutique).service(carts.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), recommendation.getValue().getId())).app(onlineBoutique).service(recommendation.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), catalogue.getValue().getId())).app(onlineBoutique).service(catalogue.getValue()).launchOrder(5).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), currency.getValue().getId())).app(onlineBoutique).service(currency.getValue()).launchOrder(6).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), shipping.getValue().getId())).app(onlineBoutique).service(shipping.getValue()).launchOrder(7).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), checkout.getValue().getId())).app(onlineBoutique).service(checkout.getValue()).launchOrder(8).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), ads.getValue().getId())).app(onlineBoutique).service(ads.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), frontend.getValue().getId())).app(onlineBoutique).service(frontend.getValue()).launchOrder(10).build(),
-				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), loadGenerator.getValue().getId())).app(onlineBoutique).service(loadGenerator.getValue()).launchOrder(11).build()));
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), payment.getValue().getServiceName())).app(onlineBoutique).service(payment.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), email.getValue().getServiceName())).app(onlineBoutique).service(email.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), carts.getValue().getServiceName())).app(onlineBoutique).service(carts.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), recommendation.getValue().getServiceName())).app(onlineBoutique).service(recommendation.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), catalogue.getValue().getServiceName())).app(onlineBoutique).service(catalogue.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), currency.getValue().getServiceName())).app(onlineBoutique).service(currency.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), shipping.getValue().getServiceName())).app(onlineBoutique).service(shipping.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), checkout.getValue().getServiceName())).app(onlineBoutique).service(checkout.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), ads.getValue().getServiceName())).app(onlineBoutique).service(ads.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), frontend.getValue().getServiceName())).app(onlineBoutique).service(frontend.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(onlineBoutique.getId(), loadGenerator.getValue().getServiceName())).app(onlineBoutique).service(loadGenerator.getValue()).launchOrder(11).build()));
 		}
 
 		if (!serviceDependenciesService.hasDependency(carts.getKey(), cartsRedis.getKey())) {
@@ -1701,11 +1701,11 @@ public class DatabaseLoader {
 				.build();
 			mixal = appsService.addApp(mixal);
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(mixal.getId(), movieDb.getValue().getId())).app(mixal).service(movieDb.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(mixal.getId(), movie.getValue().getId())).app(mixal).service(movie.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(mixal.getId(), prime.getValue().getId())).app(mixal).service(prime.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(mixal.getId(), serve.getValue().getId())).app(mixal).service(serve.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(mixal.getId(), webac.getValue().getId())).app(mixal).service(webac.getValue()).launchOrder(5).build()));
+				AppService.builder().id(new AppServiceKey(mixal.getId(), movieDb.getValue().getServiceName())).app(mixal).service(movieDb.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), movie.getValue().getServiceName())).app(mixal).service(movie.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), prime.getValue().getServiceName())).app(mixal).service(prime.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), serve.getValue().getServiceName())).app(mixal).service(serve.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(mixal.getId(), webac.getValue().getServiceName())).app(mixal).service(webac.getValue()).launchOrder(5).build()));
 		}
 		if (!serviceDependenciesService.hasDependency(serve.getKey(), movie.getKey())) {
 			serviceDependenciesService.addDependency(serve.getValue(), movie.getValue());
@@ -1779,19 +1779,19 @@ public class DatabaseLoader {
 			sockShop = appsService.addApp(sockShop);
 			log.info("{}", sockShop.getId());
 			appServices.saveAll(List.of(
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), rabbitmq.getValue().getId())).app(sockShop).service(rabbitmq.getValue()).launchOrder(1).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), queueMaster.getValue().getId())).app(sockShop).service(queueMaster.getValue()).launchOrder(2).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), shipping.getValue().getId())).app(sockShop).service(shipping.getValue()).launchOrder(3).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), ordersDb.getValue().getId())).app(sockShop).service(ordersDb.getValue()).launchOrder(4).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), orders.getValue().getId())).app(sockShop).service(orders.getValue()).launchOrder(5).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), cartsDb.getValue().getId())).app(sockShop).service(cartsDb.getValue()).launchOrder(6).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), carts.getValue().getId())).app(sockShop).service(carts.getValue()).launchOrder(7).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), payment.getValue().getId())).app(sockShop).service(payment.getValue()).launchOrder(8).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogueDb.getValue().getId())).app(sockShop).service(catalogueDb.getValue()).launchOrder(9).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogue.getValue().getId())).app(sockShop).service(catalogue.getValue()).launchOrder(10).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), userDb.getValue().getId())).app(sockShop).service(userDb.getValue()).launchOrder(11).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), user.getValue().getId())).app(sockShop).service(user.getValue()).launchOrder(12).build(),
-				AppService.builder().id(new AppServiceKey(sockShop.getId(), frontend.getValue().getId())).app(sockShop).service(frontend.getValue()).launchOrder(13).build()));
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), rabbitmq.getValue().getServiceName())).app(sockShop).service(rabbitmq.getValue()).launchOrder(1).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), queueMaster.getValue().getServiceName())).app(sockShop).service(queueMaster.getValue()).launchOrder(2).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), shipping.getValue().getServiceName())).app(sockShop).service(shipping.getValue()).launchOrder(3).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), ordersDb.getValue().getServiceName())).app(sockShop).service(ordersDb.getValue()).launchOrder(4).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), orders.getValue().getServiceName())).app(sockShop).service(orders.getValue()).launchOrder(5).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), cartsDb.getValue().getServiceName())).app(sockShop).service(cartsDb.getValue()).launchOrder(6).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), carts.getValue().getServiceName())).app(sockShop).service(carts.getValue()).launchOrder(7).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), payment.getValue().getServiceName())).app(sockShop).service(payment.getValue()).launchOrder(8).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogueDb.getValue().getServiceName())).app(sockShop).service(catalogueDb.getValue()).launchOrder(9).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), catalogue.getValue().getServiceName())).app(sockShop).service(catalogue.getValue()).launchOrder(10).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), userDb.getValue().getServiceName())).app(sockShop).service(userDb.getValue()).launchOrder(11).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), user.getValue().getServiceName())).app(sockShop).service(user.getValue()).launchOrder(12).build(),
+				AppService.builder().id(new AppServiceKey(sockShop.getId(), frontend.getValue().getServiceName())).app(sockShop).service(frontend.getValue()).launchOrder(13).build()));
 		}
 
 		if (!serviceDependenciesService.hasDependency(frontend.getKey(), user.getKey())) {

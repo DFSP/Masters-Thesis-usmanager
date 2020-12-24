@@ -22,10 +22,10 @@ public class ServiceDependencyKey implements Serializable {
 
 	private static final long serialVersionUID = 4040413050712579178L;
 
-	@Column(name = "service_id")
-	private Long serviceId;
+	@Column(name = "service_name")
+	private String serviceName;
 
-	@Column(name = "service_id")
-	private Long dependencyId;
+	@Column(name = "dependency_name")
+	private String dependencyName;
 
 }

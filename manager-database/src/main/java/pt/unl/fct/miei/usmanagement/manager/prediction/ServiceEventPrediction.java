@@ -88,7 +88,7 @@ public class ServiceEventPrediction /*extends AbstractEntity<Long> */ {
 	private int minimumReplicas;
 
 	@JsonIgnore
-	@JoinColumn(name = "service_id")
+	@JoinColumn(name = "service_name")
 	@ManyToOne
 	private Service service;
 

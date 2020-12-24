@@ -112,7 +112,7 @@ public class MasterKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic containers with message {}: {}", containerDTO, e.getMessage());
+				log.error("Error while processing topic containers with key={} and message={}: {}", key, containerDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -141,7 +141,7 @@ public class MasterKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic nodes with message {}: {}", nodeDTO, e.getMessage());
+				log.error("Error while processing topic nodes with key={} and message={}: {}", key, nodeDTO, e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -173,7 +173,7 @@ public class MasterKafkaService {
 				}
 			}
 			catch (Exception e) {
-				log.error("Error while processing topic cloud-hosts with message {}: {}", cloudHostDTO.toString(), e.getMessage());
+				log.error("Error while processing topic cloud-hosts with key={} and message={}: {}", key, cloudHostDTO.toString(), e.getMessage());
 				e.printStackTrace();
 			}
 		}

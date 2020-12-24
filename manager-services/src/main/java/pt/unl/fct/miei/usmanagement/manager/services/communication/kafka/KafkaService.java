@@ -545,11 +545,11 @@ public class KafkaService {
 	}
 
 	public void sendService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		send("services", ServiceMapper.MAPPER.fromService(service, context), service.getId());
+		send("services", ServiceMapper.MAPPER.fromService(service, context), service.getServiceName());
 	}
 
 	public void sendDeleteService(pt.unl.fct.miei.usmanagement.manager.services.Service service) {
-		delete("services", new ServiceDTO(service.getId()));
+		delete("services", new ServiceDTO(service.getServiceName()));
 	}
 
 	public void sendHostSimulatedMetric(HostSimulatedMetric hostSimulatedMetric) {

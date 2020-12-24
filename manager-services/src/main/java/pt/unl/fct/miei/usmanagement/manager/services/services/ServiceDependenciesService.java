@@ -21,7 +21,7 @@ public class ServiceDependenciesService {
 	public ServiceDependency addDependency(pt.unl.fct.miei.usmanagement.manager.services.Service service,
 										   pt.unl.fct.miei.usmanagement.manager.services.Service dependency) {
 		ServiceDependency serviceDependency = ServiceDependency.builder()
-			.id(new ServiceDependencyKey(service.getId(), dependency.getId()))
+			.id(new ServiceDependencyKey(service.getServiceName(), dependency.getServiceName()))
 			.service(service)
 			.dependency(dependency)
 			.build();

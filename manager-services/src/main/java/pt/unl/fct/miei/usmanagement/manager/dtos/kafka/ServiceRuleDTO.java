@@ -55,7 +55,7 @@ public class ServiceRuleDTO {
 			", priority=" + priority +
 			", generic=" + generic +
 			", decision=" + decision +
-			", services=" + (services == null ? "null" : services.stream().map(ServiceDTO::getId).collect(Collectors.toSet())) +
+			", services=" + (services == null ? "null" : services.stream().map(ServiceDTO::getServiceName).collect(Collectors.toSet())) +
 			", conditions=" + (conditions == null ? "null" : conditions.stream().map(ServiceRuleConditionDTO::getId).collect(Collectors.toSet())) +
 			'}';
 	}

@@ -30,10 +30,8 @@ public interface ServiceMapper {
 		return set == null || set.isEmpty() ? null : String.join(" ", set);
 	}
 
-	@Mapping(source = "id", target = "id")
 	Service toService(ServiceDTO serviceDTO, @Context CycleAvoidingMappingContext context);
 
-	@Mapping(source = "id", target = "id")
 	List<Service> toServices(List<ServiceDTO> serviceDTOs, @Context CycleAvoidingMappingContext context);
 
 	@InheritInverseConfiguration

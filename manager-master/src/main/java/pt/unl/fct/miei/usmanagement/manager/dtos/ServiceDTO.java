@@ -6,17 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppServiceDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceDependencyDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceEventPredictionDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceRuleDTO;
-import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.ServiceSimulatedMetricDTO;
 import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, scope = ServiceDTO.class)
 @AllArgsConstructor
@@ -25,7 +18,6 @@ import java.util.stream.Collectors;
 @Setter
 public class ServiceDTO {
 
-	private Long id;
 	private String serviceName;
 	private String dockerRepository;
 	private Integer defaultExternalPort;
@@ -42,7 +34,7 @@ public class ServiceDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hashCode(getServiceName());
 	}
 
 	@Override
@@ -54,14 +46,13 @@ public class ServiceDTO {
 			return false;
 		}
 		Service other = (Service) o;
-		return id != null && id.equals(other.getId());
+		return serviceName != null && serviceName.equals(other.getServiceName());
 	}
 
 	@Override
 	public String toString() {
 		return "ServiceDTO{" +
-			"id=" + id +
-			", serviceName='" + serviceName + '\'' +
+			"serviceName='" + serviceName + '\'' +
 			", dockerRepository='" + dockerRepository + '\'' +
 			", defaultExternalPort=" + defaultExternalPort +
 			", defaultInternalPort=" + defaultInternalPort +

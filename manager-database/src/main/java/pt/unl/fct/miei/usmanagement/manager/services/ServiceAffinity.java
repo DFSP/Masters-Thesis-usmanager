@@ -57,11 +57,11 @@ public class ServiceAffinity extends AbstractEntity<Long> {
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "service_id")
+	@JoinColumn(name = "service_name")
 	private Service service;
 
 	@ManyToOne
-	@JoinColumn(name = "other_service_id")
+	@JoinColumn(name = "other_service_name")
 	private Service otherService;
 
 	private float affinity;

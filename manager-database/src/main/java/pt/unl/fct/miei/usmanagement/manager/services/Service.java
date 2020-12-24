@@ -33,6 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.miei.usmanagement.manager.apps.AppService;
 import pt.unl.fct.miei.usmanagement.manager.dependencies.ServiceDependency;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ServiceSimulatedMetric;
@@ -68,12 +69,7 @@ import java.util.Set;
 public class Service /*extends AbstractEntity<Long> */ {
 
 	@Id
-	@GenericGenerator(name = "IdGenerator", strategy = "pt.unl.fct.miei.usmanagement.manager.IdGenerator")
-	@GeneratedValue(generator = "IdGenerator")
-	private Long id;
-
-	@NotNull
-	@Column(unique = true)
+	@NaturalId
 	private String serviceName;
 
 	@NotNull
@@ -123,7 +119,7 @@ public class Service /*extends AbstractEntity<Long> */ {
   	@JsonIgnore
   	@ManyToMany(fetch = FetchType.EAGER)
   	@JoinTable(name = "service_affinity",
-      	joinColumns = @JoinColumn(name = "service_id"),
+      	joinColumns = @JoinColumn(name = "service_name"),
       	inverseJoinColumns = @JoinColumn(name = "affinity_id")
   	)
   	private Set<ServiceAffinityEntity> affinities;*/
@@ -152,7 +148,7 @@ public class Service /*extends AbstractEntity<Long> */ {
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "service_rules",
-		joinColumns = @JoinColumn(name = "service_id"),
+		joinColumns = @JoinColumn(name = "service_name"),
 		inverseJoinColumns = @JoinColumn(name = "rule_id")
 	)
 	private Set<ServiceRule> serviceRules;
@@ -161,7 +157,7 @@ public class Service /*extends AbstractEntity<Long> */ {
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "service_simulated_metrics",
-		joinColumns = @JoinColumn(name = "service_id"),
+		joinColumns = @JoinColumn(name = "service_name"),
 		inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
 	)
 	private Set<ServiceSimulatedMetric> simulatedServiceMetrics;
@@ -214,7 +210,7 @@ public class Service /*extends AbstractEntity<Long> */ {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getId());
+		return Objects.hashCode(getServiceName());
 	}
 
 	@Override
@@ -226,7 +222,7 @@ public class Service /*extends AbstractEntity<Long> */ {
 			return false;
 		}
 		Service other = (Service) o;
-		return id != null && id.equals(other.getId());
+		return serviceName != null && serviceName.equals(other.getServiceName());
 	}
 
 }

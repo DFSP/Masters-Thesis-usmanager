@@ -34,11 +34,17 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.services.Service;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
 import java.util.HashMap;
@@ -56,18 +62,23 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 	private final SyncService syncService;
 	private final KafkaService kafkaService;
 	private final HeartbeatService heartbeatService;
+	private final ServicesService servicesService;
 	private final Environment environment;
+	private final DockerProperties dockerProperties;
 
 	public ManagerWorkerStartup(HostsService hostsService, ServicesMonitoringService servicesMonitoringService,
 								HostsMonitoringService hostsMonitoringService, SyncService syncService,
-								KafkaService kafkaService, HeartbeatService heartbeatService, Environment environment) {
+								KafkaService kafkaService, HeartbeatService heartbeatService, ServicesService servicesService, Environment environment,
+								DockerProperties dockerProperties) {
 		this.hostsService = hostsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.syncService = syncService;
 		this.kafkaService = kafkaService;
 		this.heartbeatService = heartbeatService;
+		this.servicesService = servicesService;
 		this.environment = environment;
+		this.dockerProperties = dockerProperties;
 	}
 
 	@SneakyThrows
@@ -83,10 +94,20 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
 		heartbeatService.startHeartbeat();
+		Service dockerApiProxy = Service.builder()
+			.serviceName(DockerApiProxyService.DOCKER_API_PROXY)
+			.dockerRepository(dockerProperties.getHub().getUsername() + "/nginx-basic-auth-proxy")
+			.defaultExternalPort(dockerProperties.getApiProxy().getPort())
+			.defaultInternalPort(80)
+			.outputLabel("${dockerApiProxyHost}")
+			.serviceType(ServiceTypeEnum.SYSTEM)
+			.build();
+		servicesService.addService(dockerApiProxy);
+		hostsService.setupWorkerManagerHost(hostsService.getManagerHostAddress(), NodeRole.MANAGER);
 	}
 
 	private void requireEnvVars() {
-		Map<String, String> vars = new HashMap<>(4);
+		Map<String, String> vars = new HashMap<>(3);
 		vars.put(ContainerConstants.Environment.Manager.HOST_ADDRESS,
 			environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS));
 		vars.put(ContainerConstants.Environment.Manager.ID,

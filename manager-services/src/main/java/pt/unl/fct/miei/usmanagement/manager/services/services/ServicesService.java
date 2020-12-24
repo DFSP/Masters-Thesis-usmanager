@@ -85,11 +85,6 @@ public class ServicesService {
 		return services.findAll();
 	}
 
-	public Service getService(Long id) {
-		return services.findById(id).orElseThrow(() ->
-			new EntityNotFoundException(Service.class, "id", id.toString()));
-	}
-
 	public Service getService(String serviceName) {
 		return services.findByServiceNameIgnoreCase(serviceName).orElseThrow(() ->
 			new EntityNotFoundException(Service.class, "serviceName", serviceName));
@@ -124,7 +119,7 @@ public class ServicesService {
 	}
 
 	public Service addIfNotPresent(Service service) {
-		Optional<Service> serviceOptional = services.findById(service.getId());
+		Optional<Service> serviceOptional = services.findById(service.getServiceName());
 		return serviceOptional.orElseGet(() -> {
 			service.clearAssociations();
 			return saveService(service);
@@ -132,95 +127,93 @@ public class ServicesService {
 	}
 
 	public Service addOrUpdateService(Service service) {
-		if (service.getId() != null) {
-			Optional<Service> serviceOptional = services.findById(service.getId());
-			if (serviceOptional.isPresent()) {
-				Service existingService = serviceOptional.get();
-				Set<ServiceRule> rules = service.getServiceRules();
-				if (rules != null) {
-					Set<ServiceRule> currentServiceRules = existingService.getServiceRules();
-					if (currentServiceRules == null) {
-						existingService.setServiceRules(new HashSet<>(rules));
-					}
-					else {
-						rules.iterator().forEachRemaining(rule -> {
-							if (!currentServiceRules.contains(rule)) {
-								rule.addService(existingService);
-							}
-						});
-						currentServiceRules.iterator().forEachRemaining(currentRule -> {
-							if (!rules.contains(currentRule)) {
-								currentRule.removeService(existingService);
-							}
-						});
-					}
+		Optional<Service> serviceOptional = services.findById(service.getServiceName());
+		if (serviceOptional.isPresent()) {
+			Service existingService = serviceOptional.get();
+			Set<ServiceRule> rules = service.getServiceRules();
+			if (rules != null) {
+				Set<ServiceRule> currentServiceRules = existingService.getServiceRules();
+				if (currentServiceRules == null) {
+					existingService.setServiceRules(new HashSet<>(rules));
 				}
-				Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
-				if (simulatedMetrics != null) {
-					Set<ServiceSimulatedMetric> currentSimulatedMetrics = existingService.getSimulatedServiceMetrics();
-					if (currentSimulatedMetrics == null) {
-						existingService.setSimulatedServiceMetrics(new HashSet<>(simulatedMetrics));
-					}
-					else {
-						simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
-							if (!currentSimulatedMetrics.contains(simulatedMetric)) {
-								simulatedMetric.addService(existingService);
-							}
-						});
-						currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
-							if (!simulatedMetrics.contains(currentSimulatedMetric)) {
-								currentSimulatedMetric.removeService(existingService);
-							}
-						});
-					}
+				else {
+					rules.iterator().forEachRemaining(rule -> {
+						if (!currentServiceRules.contains(rule)) {
+							rule.addService(existingService);
+						}
+					});
+					currentServiceRules.iterator().forEachRemaining(currentRule -> {
+						if (!rules.contains(currentRule)) {
+							currentRule.removeService(existingService);
+						}
+					});
 				}
-				Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
-				if (serviceEventPredictions != null) {
-					Set<ServiceEventPrediction> currentServiceEventPredictions = existingService.getEventPredictions();
-					if (currentServiceEventPredictions == null) {
-						existingService.setEventPredictions(new HashSet<>(serviceEventPredictions));
-					}
-					else {
-						currentServiceEventPredictions.retainAll(serviceEventPredictions);
-						currentServiceEventPredictions.addAll(serviceEventPredictions);
-					}
-				}
-				Set<AppService> appServices = service.getAppServices();
-				if (appServices != null) {
-					Set<AppService> currentAppServices = existingService.getAppServices();
-					if (currentAppServices == null) {
-						existingService.setAppServices(new HashSet<>(appServices));
-					}
-					else {
-						currentAppServices.retainAll(appServices);
-						currentAppServices.addAll(appServices);
-					}
-				}
-				Set<ServiceDependency> dependencies = service.getDependencies();
-				if (dependencies != null) {
-					Set<ServiceDependency> currentDependencies = existingService.getDependencies();
-					if (currentDependencies == null) {
-						existingService.setDependencies(new HashSet<>(dependencies));
-					}
-					else {
-						currentDependencies.retainAll(dependencies);
-						currentDependencies.addAll(dependencies);
-					}
-				}
-				Set<ServiceDependency> dependents = service.getDependents();
-				if (dependents != null) {
-					Set<ServiceDependency> currentDependents = existingService.getDependents();
-					if (currentDependents == null) {
-						existingService.setDependents(new HashSet<>(dependents));
-					}
-					else {
-						currentDependents.retainAll(dependents);
-						currentDependents.addAll(dependents);
-					}
-				}
-				EntityUtils.copyValidProperties(service, existingService);
-				return saveService(existingService);
 			}
+			Set<ServiceSimulatedMetric> simulatedMetrics = service.getSimulatedServiceMetrics();
+			if (simulatedMetrics != null) {
+				Set<ServiceSimulatedMetric> currentSimulatedMetrics = existingService.getSimulatedServiceMetrics();
+				if (currentSimulatedMetrics == null) {
+					existingService.setSimulatedServiceMetrics(new HashSet<>(simulatedMetrics));
+				}
+				else {
+					simulatedMetrics.iterator().forEachRemaining(simulatedMetric -> {
+						if (!currentSimulatedMetrics.contains(simulatedMetric)) {
+							simulatedMetric.addService(existingService);
+						}
+					});
+					currentSimulatedMetrics.iterator().forEachRemaining(currentSimulatedMetric -> {
+						if (!simulatedMetrics.contains(currentSimulatedMetric)) {
+							currentSimulatedMetric.removeService(existingService);
+						}
+					});
+				}
+			}
+			Set<ServiceEventPrediction> serviceEventPredictions = service.getEventPredictions();
+			if (serviceEventPredictions != null) {
+				Set<ServiceEventPrediction> currentServiceEventPredictions = existingService.getEventPredictions();
+				if (currentServiceEventPredictions == null) {
+					existingService.setEventPredictions(new HashSet<>(serviceEventPredictions));
+				}
+				else {
+					currentServiceEventPredictions.retainAll(serviceEventPredictions);
+					currentServiceEventPredictions.addAll(serviceEventPredictions);
+				}
+			}
+			Set<AppService> appServices = service.getAppServices();
+			if (appServices != null) {
+				Set<AppService> currentAppServices = existingService.getAppServices();
+				if (currentAppServices == null) {
+					existingService.setAppServices(new HashSet<>(appServices));
+				}
+				else {
+					currentAppServices.retainAll(appServices);
+					currentAppServices.addAll(appServices);
+				}
+			}
+			Set<ServiceDependency> dependencies = service.getDependencies();
+			if (dependencies != null) {
+				Set<ServiceDependency> currentDependencies = existingService.getDependencies();
+				if (currentDependencies == null) {
+					existingService.setDependencies(new HashSet<>(dependencies));
+				}
+				else {
+					currentDependencies.retainAll(dependencies);
+					currentDependencies.addAll(dependencies);
+				}
+			}
+			Set<ServiceDependency> dependents = service.getDependents();
+			if (dependents != null) {
+				Set<ServiceDependency> currentDependents = existingService.getDependents();
+				if (currentDependents == null) {
+					existingService.setDependents(new HashSet<>(dependents));
+				}
+				else {
+					currentDependents.retainAll(dependents);
+					currentDependents.addAll(dependents);
+				}
+			}
+			EntityUtils.copyValidProperties(service, existingService);
+			return saveService(existingService);
 		}
 		return saveService(service);
 	}
@@ -230,12 +223,12 @@ public class ServicesService {
 		return services.save(service);
 	}
 
-	public void deleteService(Long id) {
-		log.info("Deleting service {}", id);
-		services.deleteById(id);
+	public void deleteService(String serviceName) {
+		log.info("Deleting service {}", serviceName);
+		services.deleteById(serviceName);
 	}
 
-	public void deleteService(String serviceName) {
+	public void deleteServiceByName(String serviceName) {
 		Service service = getService(serviceName);
 		services.delete(service);
 		kafkaService.sendDeleteService(service);
@@ -262,7 +255,7 @@ public class ServicesService {
 		String appName = addServiceApp.getName();
 		int launchOrder = addServiceApp.getLaunchOrder();
 		App app = appsService.getApp(appName);
-		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getId())).app(app).service(service).launchOrder(launchOrder).build();
+		AppService appService = AppService.builder().id(new AppServiceKey(app.getId(), service.getServiceName())).app(app).service(service).launchOrder(launchOrder).build();
 		service.getAppServices().add(appService);
 		service = saveService(service);
 		kafkaService.sendService(service);
@@ -308,7 +301,7 @@ public class ServicesService {
 		Service service = getService(serviceName);
 		Service dependency = getService(dependencyName);
 		ServiceDependency serviceDependency = ServiceDependency.builder()
-			.id(new ServiceDependencyKey(service.getId(), dependency.getId())).service(service).dependency(dependency).build();
+			.id(new ServiceDependencyKey(service.getServiceName(), dependency.getServiceName())).service(service).dependency(dependency).build();
 		service = service.toBuilder().dependency(serviceDependency).build();
 		service = saveService(service);
 		kafkaService.sendService(service);
@@ -459,12 +452,6 @@ public class ServicesService {
 		return memoryConsumption == null ? 0 : memoryConsumption;
 	}
 
-	private void checkServiceExists(Long serviceId) {
-		if (!services.hasService(serviceId)) {
-			throw new EntityNotFoundException(Service.class, "id", serviceId.toString());
-		}
-	}
-
 	private void checkServiceExists(String serviceName) {
 		if (!services.hasService(serviceName)) {
 			throw new EntityNotFoundException(Service.class, "serviceName", serviceName);
@@ -480,10 +467,6 @@ public class ServicesService {
 
 	public boolean hasService(String name) {
 		return services.hasService(name);
-	}
-
-	public boolean hasService(Long id) {
-		return services.existsById(id);
 	}
 
 }
