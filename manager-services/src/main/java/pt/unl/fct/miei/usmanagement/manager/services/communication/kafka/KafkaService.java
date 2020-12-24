@@ -263,7 +263,7 @@ public class KafkaService {
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
-			populateTopics();
+			//populateTopics();
 		}
 
 		return kafkaBrokers;
