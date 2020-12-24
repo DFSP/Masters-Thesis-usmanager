@@ -237,10 +237,10 @@ public class WorkerManagersService {
 					+ "if [ $WORKER_MANAGER ]; then echo $WORKER_MANAGER; "
 					+ "else "
 					+ "docker pull %s && "
-					+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
+					+ "docker run -itd --name=%s -p %d:%d --hostname %s -v %s:%s --rm "
 					+ "-e %s=%s -e %s='%s' -e %s=%s "
 					+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s=%s %s; fi",
-				serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName,
+				serviceName, dockerRepository, serviceName, externalPort, internalPort, serviceName, "/var/run/docker.sock", "/var/run/docker.sock",
 				ContainerConstants.Environment.Manager.ID, id,
 				ContainerConstants.Environment.Manager.HOST_ADDRESS, gson.toJson(hostAddress),
 				ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS, kafkaService.getKafkaBrokersHosts(),
