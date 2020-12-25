@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.miei.usmanagement.manager.users;
+package pt.unl.fct.miei.usmanagement.manager.services.users;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -72,3 +72,4 @@ public class UsersService implements UserDetailsService {
 	}
 
 }
+

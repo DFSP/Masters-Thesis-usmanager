@@ -71,7 +71,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
-import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEventsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.ServicesEventsService;
 import pt.unl.fct.miei.usmanagement.manager.services.operators.OperatorsService;
@@ -86,9 +85,9 @@ import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registra
 import pt.unl.fct.miei.usmanagement.manager.services.valuemodes.ValueModesService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
-import pt.unl.fct.miei.usmanagement.manager.users.User;
-import pt.unl.fct.miei.usmanagement.manager.users.UserRoleEnum;
-import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.services.users.User;
+import pt.unl.fct.miei.usmanagement.manager.services.users.UserRoleEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.users.UsersService;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.ArrayList;

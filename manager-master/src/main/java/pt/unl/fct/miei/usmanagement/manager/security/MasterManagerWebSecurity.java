@@ -35,7 +35,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import pt.unl.fct.miei.usmanagement.manager.users.UsersService;
+import pt.unl.fct.miei.usmanagement.manager.services.users.UsersService;
 
 import java.util.List;
 

@@ -48,7 +48,7 @@ public class ManagerMasterConfiguration extends CachingConfigurerSupport impleme
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/api/**").allowCredentials(true);
+		registry.addMapping("/api/**");
 	}
 
 	@Override
