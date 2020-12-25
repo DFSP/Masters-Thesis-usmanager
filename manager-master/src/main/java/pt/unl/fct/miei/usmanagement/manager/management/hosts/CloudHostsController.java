@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import java.util.Arrays;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/hosts/cloud")
 public class CloudHostsController {

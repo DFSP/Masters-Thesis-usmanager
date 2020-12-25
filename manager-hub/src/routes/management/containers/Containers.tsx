@@ -32,9 +32,10 @@ import CardList from "../../../components/list/CardList";
 import {IContainer} from "./Container";
 import styles from './Containers.module.css'
 import BaseComponent from "../../../components/BaseComponent";
-import {loadContainers, loadNodes, reloadContainers} from "../../../actions";
+import {loadContainers, loadNodes, loadWorkerManagers, reloadContainers} from "../../../actions";
 import ActionButton from "../../../components/list/ActionButton";
 import {INode} from "../nodes/Node";
+import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 interface StateToProps {
     isLoading: boolean
@@ -43,12 +44,14 @@ interface StateToProps {
     isLoadingNodes: boolean;
     loadNodesError?: string | null;
     nodes: { [key: string]: INode };
+    workerManagers: { [key: string]: IWorkerManager };
 }
 
 interface DispatchToProps {
     loadContainers: () => void;
     reloadContainers: () => void;
     loadNodes: () => void;
+    loadWorkerManagers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -103,6 +106,16 @@ class Containers extends BaseComponent<Props, {}> {
         this.props.reloadContainers();
     };
 
+    private getManagerHost(container: IContainer) {
+        const managerId = container.managerId;
+        if (managerId) {
+            const workerManager = this.props.workerManagers[managerId];
+            if (workerManager) {
+                return `${workerManager.publicIpAddress}:${workerManager.port}`;
+            }
+        }
+        return undefined;
+    }
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
@@ -113,6 +126,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
         nodes: state.entities.nodes.data,
         isLoadingNodes: state.entities.nodes.isLoadingNodes,
         loadNodesError: state.entities.nodes.loadNodesError,
+        workerManagers: state.entities.workerManagers.data
     }
 );
 
@@ -120,6 +134,7 @@ const mapDispatchToProps: DispatchToProps = {
     loadContainers,
     reloadContainers,
     loadNodes,
+    loadWorkerManagers
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Containers);

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.logging;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ import pt.unl.fct.miei.usmanagement.manager.logging.LoggingEventService;
 
 import java.util.List;
 
-@RestController
+@CrossOrigin
 @RequestMapping("/logs")
 public class LoggingEventController {
 

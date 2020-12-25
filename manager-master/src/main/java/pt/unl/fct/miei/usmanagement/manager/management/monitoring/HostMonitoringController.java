@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/monitoring/hosts")
 public class HostMonitoringController {

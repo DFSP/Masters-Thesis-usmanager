@@ -26,6 +26,7 @@ package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {

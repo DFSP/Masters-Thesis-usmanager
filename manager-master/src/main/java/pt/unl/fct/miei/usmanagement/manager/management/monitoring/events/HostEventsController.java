@@ -24,6 +24,7 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.events;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.monitoring.events.HostsEven
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/events/hosts")
 public class HostEventsController {

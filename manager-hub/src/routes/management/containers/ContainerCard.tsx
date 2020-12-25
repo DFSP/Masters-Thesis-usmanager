@@ -42,6 +42,7 @@ interface State {
 interface ContainerCardProps {
     container: IContainer;
     nodes: { data: INode[], isLoading: boolean, error?: string | null },
+    manager?: string;
 }
 
 interface DispatchToProps {
@@ -123,7 +124,8 @@ class ContainerCard extends BaseComponent<Props, State> {
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;
         const privateIpAddress = node.labels['privateIpAddress'];
-        const url = `containers/${container?.id}/replicate`;
+        const manager = this.props.manager;
+        const url = `${manager ? `${manager}/api/` : ''}containers/${container?.id}/replicate`;
         this.setState({loading: true});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
@@ -150,7 +152,8 @@ class ContainerCard extends BaseComponent<Props, State> {
         const node = data.submenu;
         const publicIpAddress = node.publicIpAddress;
         const privateIpAddress = node.labels['privateIpAddress'];
-        const url = `containers/${container?.id}/migrate`;
+        const manager = this.props.manager;
+        const url = `${manager ? `${manager}/api/` : ''}containers/${container?.id}/migrate`;
         this.setState({loading: true});
         postData(url, {publicIpAddress: publicIpAddress, privateIpAddress: privateIpAddress},
             (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
@@ -218,6 +221,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         const container = this.getContainer();
         const {loading} = this.state;
         const CardContainer = Card<IContainer>();
+        const manager = this.props.manager;
         return <CardContainer id={`container-${container.id}`}
                               title={container.id.toString()}
                               link={{to: {pathname: `/contentores/${container.id}`, state: container}}}
@@ -227,7 +231,7 @@ class ContainerCard extends BaseComponent<Props, State> {
                               delete={{
                                   textButton: 'Parar',
                                   confirmMessage: `parar contentor ${container.id}`,
-                                  url: `containers/${container.id}`,
+                                  url: `${manager ? `${manager}/api/` : ''}containers/${container.id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
                               }}

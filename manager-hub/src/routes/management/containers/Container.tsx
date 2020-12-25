@@ -46,7 +46,7 @@ import {
     loadContainers,
     loadEdgeHosts,
     loadNodes,
-    loadServices
+    loadServices, loadWorkerManagers
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -78,6 +78,7 @@ import GenericServiceRuleList from "../services/GenericServiceRuleList";
 import {IRegion} from "../regions/Region";
 import {Point} from "react-simple-maps";
 import {IMarker} from "../../../components/map/Marker";
+import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 export interface IContainer extends IDatabaseData {
     type: ContainerType;
@@ -152,6 +153,7 @@ interface StateToProps {
     cloudHosts: { [key: string]: ICloudHost };
     edgeHosts: { [key: string]: IEdgeHost };
     containers: { [key: string]: IContainer };
+    workerManagers: { [key: string]: IWorkerManager };
 }
 
 interface DispatchToProps {
@@ -160,6 +162,7 @@ interface DispatchToProps {
     loadServices: () => void;
     loadCloudHosts: () => void;
     loadEdgeHosts: () => void;
+    loadWorkerManagers: () => void;
     addContainers: (containers: IContainer[]) => void;
     addContainerRules: (containerId: string, rules: string[]) => void;
     addContainerSimulatedMetrics: (containerId: string, simulatedMetrics: string[]) => void;
@@ -728,6 +731,7 @@ class Container extends BaseComponent<Props, State> {
         const formContainer = this.getFormContainer();
         // @ts-ignore
         const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
+        const manager = isNewContainer ? undefined : this.getManagerHost(container as IContainer);
         return (
             <>
                 {isLoading && <LoadingSpinner/>}
@@ -770,6 +774,17 @@ class Container extends BaseComponent<Props, State> {
             </>
         )
     };
+
+    private getManagerHost(container: IContainer) {
+        const managerId = container.managerId;
+        if (managerId) {
+            const workerManager = this.props.workerManagers[managerId];
+            if (workerManager) {
+                return `${workerManager.publicIpAddress}:${workerManager.port}`;
+            }
+        }
+        return undefined;
+    }
 
     private getPort = (ports: IContainerPort[]) => {
         for (let port of ports) {
@@ -900,6 +915,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const cloudHosts = state.entities.hosts.cloud.data;
     const edgeHosts = state.entities.hosts.edge.data;
     const containers = state.entities.containers.data;
+    const workerManagers = state.entities.workerManagers.data;
     return {
         isLoading,
         error,
@@ -911,7 +927,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         services,
         cloudHosts,
         edgeHosts,
-        containers
+        containers,
+        workerManagers
     }
 }
 
@@ -922,6 +939,7 @@ const mapDispatchToProps: DispatchToProps = {
     loadServices,
     loadCloudHosts,
     loadEdgeHosts,
+    loadWorkerManagers,
     addContainerRules,
     addContainerSimulatedMetrics,
 };

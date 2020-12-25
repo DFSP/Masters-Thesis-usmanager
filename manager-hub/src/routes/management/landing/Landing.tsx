@@ -85,7 +85,7 @@ class Landing extends React.Component<Props, State> {
         this.setState({center: !this.state.center})
 
     private getMarkerColor = (container: IContainer) =>
-        container.managerId === 'manager-master' ? 'Red' : this.mapRegionToColor(container.region);
+        this.mapRegionToColor(container.region);
 
     private mapRegionToColor = (region: IRegion) => {
         switch (region.region.toLocaleLowerCase()) {

@@ -1,5 +1,6 @@
 package pt.unl.fct.miei.usmanagement.manager.management.monitoring.requestlocations;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.location.NodeLocationReques
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/request-locations")
 public class RequestLocationsController {
