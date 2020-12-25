@@ -156,8 +156,8 @@ public class LocationRequestsService {
 		List<FutureNodeLocationRequests> futureNodeLocationRequests = nodesService.getReadyNodes().stream()
 			.map(node -> {
 				String hostname = node.getPublicIpAddress();
-				Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.REQUEST_LOCATION_MONITOR)
-					.map(Container::getPublicIpAddress).map(Integer::parseInt);
+				Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.PROMETHEUS)
+					.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 				CompletableFuture<Map<String, Integer>> futureLocationRequests;
 				if (port.isPresent()) {
 					futureLocationRequests = getNodeLocationRequests(hostname, port.get());

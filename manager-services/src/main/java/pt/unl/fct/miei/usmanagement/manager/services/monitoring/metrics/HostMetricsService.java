@@ -66,7 +66,7 @@ public class HostMetricsService {
 
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
-			.map(Container::getPublicIpAddress).map(Integer::parseInt);
+			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 		List<CompletableFuture<Optional<Double>>> futureMetrics = List.of(
 			PrometheusQueryEnum.TOTAL_MEMORY,
 			PrometheusQueryEnum.AVAILABLE_MEMORY,
@@ -119,7 +119,7 @@ public class HostMetricsService {
 
 	public Map<String, CompletableFuture<Optional<Double>>> getHostStats(HostAddress hostAddress) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
-			.map(Container::getPublicIpAddress).map(Integer::parseInt);
+			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 		// Stats from prometheus (node exporter)
 		return fieldsService.getFields().stream()
 			.filter(field -> field.getPrometheusQuery() != null)
