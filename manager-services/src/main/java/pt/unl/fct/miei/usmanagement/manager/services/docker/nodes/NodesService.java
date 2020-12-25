@@ -50,7 +50,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaSe
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 
 import java.util.ArrayList;
@@ -71,22 +70,21 @@ public class NodesService {
 	private final HostsService hostsService;
 	private final ContainersService containersService;
 	private final KafkaService kafkaService;
+	private final Environment environment;
 
 	private final Nodes nodes;
 
-	private final String managerId;
 	private final int threads;
 
 	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
-						@Lazy ContainersService containersService, KafkaService kafkaService,
-						Environment environment, Nodes nodes,
-						ParallelismProperties parallelismProperties) {
+						@Lazy ContainersService containersService, KafkaService kafkaService, Environment environment,
+						Nodes nodes, ParallelismProperties parallelismProperties) {
 		this.dockerSwarmService = dockerSwarmService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
 		this.kafkaService = kafkaService;
+		this.environment = environment;
 		this.nodes = nodes;
-		this.managerId = environment.getProperty(ContainerConstants.Label.MANAGER_ID);
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -303,7 +301,7 @@ public class NodesService {
 			.version(node.version().index())
 			.state(node.status().state())
 			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
-			.managerId(managerId)
+			.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
 			.labels(new HashMap<>(node.spec().labels()))
 			.build();
 	}
