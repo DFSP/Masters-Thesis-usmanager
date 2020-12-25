@@ -777,7 +777,7 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private getManagerHost(container: IContainer) {
-        const managerId = container.managerId;
+        const managerId = container?.managerId;
         if (managerId) {
             const workerManager = this.props.workerManagers[managerId];
             if (workerManager) {

@@ -616,7 +616,7 @@ class Node extends BaseComponent<Props, State> {
     ]);
 
     private getManagerHost(node: INode) {
-        const managerId = node.managerId;
+        const managerId = node?.managerId;
         if (managerId) {
             const workerManager = this.props.workerManagers[managerId];
             if (workerManager) {
