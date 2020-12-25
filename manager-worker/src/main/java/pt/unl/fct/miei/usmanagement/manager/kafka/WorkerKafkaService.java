@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleDTO;
@@ -75,8 +74,8 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
-import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaTopicKey;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
@@ -319,22 +318,21 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "containers", autoStartup = "false")
-	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerDTO> containerDTOs) {
+	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ContainerDTO> containerDTOs) {
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
-			String serviceName = containerDTO.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
-			if (!ServiceConstants.getSystemServices().contains(serviceName)
-				|| containerDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
-				i++;
+			KafkaTopicKey key = keys.get(i++);
+			log.debug("Received key={} message={}", key, containerDTO);
+			if (key != null && key.getManagerId() != null && !key.getManagerId().equalsIgnoreCase("manager-master")) {
 				continue;
 			}
-			String key = keys.get(i++);
-			log.debug("Received key={} message={}", key, containerDTO);
 			Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					String id = container.getId();
-					containersService.deleteContainer(id);
+					if (containersService.hasContainer(id)) {
+						containersService.deleteContainer(id);
+					}
 				}
 				else {
 					containersService.addOrUpdateContainer(container);
@@ -457,11 +455,10 @@ public class WorkerKafkaService {
 	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
-			if (nodeDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
-				i++;
+			String key = keys.get(i++);
+			if (key == null && nodeDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
 				continue;
 			}
-			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
 			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
 			try {

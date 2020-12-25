@@ -160,14 +160,15 @@ public class KafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final ZookeeperService zookeeperService;
-	private final ProducerFactory<String, Object> producerFactory;
+	private final ProducerFactory<KafkaTopicKey, Object> producerFactory;
 	private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 	private final KafkaBrokers kafkaBrokers;
-	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final KafkaTemplate<KafkaTopicKey, Object> kafkaTemplate;
 	private final String kafkaBootstrapServers;
 	private final AtomicLong increment;
 	private final CycleAvoidingMappingContext context;
-	private final boolean isMaster;
+
+	private final String managerId;
 	private boolean populated;
 
 	public KafkaService(@Lazy ContainersService containersService,
@@ -192,10 +193,10 @@ public class KafkaService {
 						@Lazy ContainerRulesService containerRulesService,
 						@Lazy ValueModesService valueModesService,
 						@Lazy ZookeeperService zookeeperService,
-						@Lazy ProducerFactory<String, Object> producerFactory,
+						@Lazy ProducerFactory<KafkaTopicKey, Object> producerFactory,
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
-						@Lazy KafkaTemplate<String, Object> kafkaTemplate,
+						@Lazy KafkaTemplate<KafkaTopicKey, Object> kafkaTemplate,
 						Environment environment) {
 		this.appsService = appsService;
 		this.cloudHostsService = cloudHostsService;
@@ -225,8 +226,7 @@ public class KafkaService {
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
 		this.kafkaBootstrapServers = environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS);
 		this.increment = new AtomicLong();
-		String id = environment.getProperty(ContainerConstants.Environment.Manager.ID);
-		this.isMaster = id == null || id.equalsIgnoreCase("manager-master");
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.populated = false;
 		this.context = new CycleAvoidingMappingContext();
 	}
@@ -656,9 +656,9 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (!isMaster || hasKafkaBrokers && populated) {
+		if (!managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
-			kafkaTemplate.send(topic, message);
+			kafkaTemplate.send(topic, new KafkaTopicKey(managerId), message);
 		}
 		else {
 			log.warn("Not sending message id={} to topic={} because hasKafkaBrokers={} and populated={}",
@@ -668,9 +668,9 @@ public class KafkaService {
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (!isMaster || hasKafkaBrokers && populated) {
+		if (!managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
-			kafkaTemplate.send(topic, "DELETE", id);
+			kafkaTemplate.send(topic, new KafkaTopicKey(managerId, "DELETE"), id);
 		}
 		else {
 			log.warn("Not sending DELETE id={} request to topic={} because hasKafkaBrokers={} and populated={}",

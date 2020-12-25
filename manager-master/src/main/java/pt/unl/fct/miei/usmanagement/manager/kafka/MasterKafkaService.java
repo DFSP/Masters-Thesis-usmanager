@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.HostDecision;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.decision.ServiceDecision;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaTopicKey;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
@@ -91,19 +92,17 @@ public class MasterKafkaService {
 	}
 
 	@KafkaListener(topics = "containers", autoStartup = "false")
-	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerDTO> containerDTOs) {
+	public void listenContainers(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ContainerDTO> containerDTOs) {
 		int i = 0;
 		for (ContainerDTO containerDTO : containerDTOs) {
-			String managerId = containerDTO.getManagerId();
-			if (managerId == null || managerId.equalsIgnoreCase("manager-master")) {
-				i++;
+			KafkaTopicKey key = keys.get(i++);
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
 				continue;
 			}
-			String key = keys.get(i++);
 			log.debug("Received key={} message={}", key, containerDTO);
 			Container container = ContainerMapper.MAPPER.toContainer(containerDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					String id = container.getId();
 					containersService.deleteContainer(id);
 				}

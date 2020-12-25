@@ -117,18 +117,18 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                                   }}
                                   loading={loading}
                                   bottomContextMenuItems={this.contextMenu()}>
+            <CardItem key={'state'}
+                      label={'State'}
+                      value={workerManager.state}/>
+            <CardItem key={'region'}
+                      label={'Region'}
+                      value={workerManager.region.region}/>
             <CardItem key={'container'}
                       label={'Container'}
                       value={workerManager.containerId}/>
             <CardItem key={'host'}
                       label={'Host'}
                       value={workerManager.publicIpAddress}/>
-            <CardItem key={'region'}
-                      label={'Region'}
-                      value={workerManager.region.region}/>
-            <CardItem key={'state'}
-                      label={'State'}
-                      value={workerManager.state}/>
         </CardWorkerManager>
     }
 
