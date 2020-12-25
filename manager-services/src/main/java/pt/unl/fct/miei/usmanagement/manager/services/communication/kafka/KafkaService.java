@@ -164,11 +164,10 @@ public class KafkaService {
 	private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 	private final KafkaBrokers kafkaBrokers;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
-	private final String managerId;
 	private final String kafkaBootstrapServers;
 	private final AtomicLong increment;
 	private final CycleAvoidingMappingContext context;
-	private boolean needsPopulate;
+	private boolean isMaster;
 	private boolean populated;
 
 	public KafkaService(@Lazy ContainersService containersService,
@@ -224,11 +223,10 @@ public class KafkaService {
 		this.kafkaBrokers = kafkaBrokers;
 		this.kafkaTemplate = kafkaTemplate;
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
-		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.kafkaBootstrapServers = environment.getProperty(ContainerConstants.Environment.Manager.KAFKA_BOOTSTRAP_SERVERS);
 		this.increment = new AtomicLong();
 		String id = environment.getProperty(ContainerConstants.Environment.Manager.ID);
-		this.needsPopulate = id == null || id.equalsIgnoreCase("manager-master");
+		this.isMaster = id == null || id.equalsIgnoreCase("manager-master");
 		this.populated = false;
 		this.context = new CycleAvoidingMappingContext();
 	}
@@ -658,7 +656,7 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && (!needsPopulate || populated)) {
+		if (!isMaster || hasKafkaBrokers && populated) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, message);
 		}
@@ -670,7 +668,7 @@ public class KafkaService {
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (hasKafkaBrokers && (!needsPopulate || populated)) {
+		if (!isMaster || hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, "DELETE", id);
 		}
