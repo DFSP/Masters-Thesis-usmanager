@@ -39,7 +39,6 @@ import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/component-types")
 public class ComponentTypesController {

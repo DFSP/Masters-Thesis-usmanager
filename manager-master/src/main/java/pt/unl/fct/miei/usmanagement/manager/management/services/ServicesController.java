@@ -52,7 +52,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/services")
 public class ServicesController {

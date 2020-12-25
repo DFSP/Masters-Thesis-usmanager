@@ -37,7 +37,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decisio
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/decisions")
 public class DecisionsController {

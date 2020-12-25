@@ -32,8 +32,6 @@ import pt.unl.fct.miei.usmanagement.manager.logging.LoggingEvent;
 import pt.unl.fct.miei.usmanagement.manager.logging.LoggingEventService;
 
 import java.util.List;
-
-@CrossOrigin
 @RequestMapping("/logs")
 public class LoggingEventController {
 

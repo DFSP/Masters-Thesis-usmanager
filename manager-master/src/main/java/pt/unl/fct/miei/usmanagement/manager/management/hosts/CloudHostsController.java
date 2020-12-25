@@ -25,7 +25,6 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import java.util.Arrays;
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/hosts/cloud")
 public class CloudHostsController {

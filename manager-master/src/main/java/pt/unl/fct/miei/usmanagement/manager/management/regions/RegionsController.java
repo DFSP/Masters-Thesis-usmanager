@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/regions")
 public class RegionsController {

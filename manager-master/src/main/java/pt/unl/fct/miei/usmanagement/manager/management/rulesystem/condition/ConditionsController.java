@@ -44,7 +44,6 @@ import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/rules/conditions")
 public class ConditionsController {

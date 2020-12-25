@@ -43,7 +43,6 @@ import pt.unl.fct.miei.usmanagement.manager.util.validate.Validation;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/simulated-metrics/hosts")
 public class HostSimulatedMetricsController {

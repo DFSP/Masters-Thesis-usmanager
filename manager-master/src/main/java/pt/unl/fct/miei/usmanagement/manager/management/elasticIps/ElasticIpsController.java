@@ -11,7 +11,6 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/eips")
 public class ElasticIpsController {

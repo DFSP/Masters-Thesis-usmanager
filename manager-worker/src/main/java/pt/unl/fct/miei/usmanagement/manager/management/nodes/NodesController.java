@@ -45,7 +45,6 @@ import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import java.util.List;
 import java.util.Objects;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/nodes")
 public class NodesController {

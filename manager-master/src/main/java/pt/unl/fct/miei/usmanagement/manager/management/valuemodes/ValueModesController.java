@@ -39,7 +39,6 @@ import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/value-modes")
 public class ValueModesController {

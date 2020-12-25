@@ -35,7 +35,6 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceMonitoringLog;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/monitoring/services")
 public class ServiceMonitoringController {

@@ -36,7 +36,6 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostMonitoringLog;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/monitoring/hosts")
 public class HostMonitoringController {

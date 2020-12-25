@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {

@@ -35,7 +35,6 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.HostEvent;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/events/hosts")
 public class HostEventsController {

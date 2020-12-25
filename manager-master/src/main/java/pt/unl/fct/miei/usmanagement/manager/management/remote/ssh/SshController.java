@@ -38,7 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 
 import java.util.Set;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/ssh")
 public class SshController {

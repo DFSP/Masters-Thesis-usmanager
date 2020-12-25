@@ -47,7 +47,7 @@ public class ManagerWorkerConfiguration extends CachingConfigurerSupport impleme
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**");
+		registry.addMapping("/api/**");
 	}
 
 	@Override

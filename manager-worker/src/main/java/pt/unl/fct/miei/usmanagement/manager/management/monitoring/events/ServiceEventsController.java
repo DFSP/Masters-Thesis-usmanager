@@ -34,7 +34,6 @@ import pt.unl.fct.miei.usmanagement.manager.monitoring.ServiceEvent;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/events/services")
 public class ServiceEventsController {

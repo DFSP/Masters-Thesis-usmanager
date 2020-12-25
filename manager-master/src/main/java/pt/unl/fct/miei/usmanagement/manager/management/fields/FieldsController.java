@@ -38,7 +38,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/fields")
 public class FieldsController {
