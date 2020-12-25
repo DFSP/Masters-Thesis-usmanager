@@ -33,5 +33,6 @@ public class ContainerDTO {
 	private RegionEnum region;
 	private String managerId;
 	private Coordinates coordinates;
+	private String state;
 
 }

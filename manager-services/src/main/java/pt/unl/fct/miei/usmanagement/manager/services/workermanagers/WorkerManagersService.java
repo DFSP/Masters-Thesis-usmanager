@@ -247,7 +247,6 @@ public class WorkerManagersService {
 	}
 
 	public void stopWorkerManager(String workerManagerId) {
-
 		WorkerManager workerManager = getWorkerManager(workerManagerId);
 		String containerId = workerManager.getContainerId();
 		workerManagers.delete(workerManager);
