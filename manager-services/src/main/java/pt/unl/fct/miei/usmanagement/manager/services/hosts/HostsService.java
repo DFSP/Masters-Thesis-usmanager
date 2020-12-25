@@ -176,7 +176,7 @@ public class HostsService {
 	public void setupWorkerManagerHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up worker manager host");
 		setupHost(hostAddress, role);
-		String command = String.format("docker ps -q -f 'name=%s", ServiceConstants.Name.WORKER_MANAGER);
+		String command = String.format("docker ps -q -f 'name=%s'", ServiceConstants.Name.WORKER_MANAGER);
 		List<String> output = executeCommandSync(command, hostAddress);
 		String containerId = output.size() > 0 ? output.get(output.size() - 1) : "";
 		containersService.addContainer(containerId);
