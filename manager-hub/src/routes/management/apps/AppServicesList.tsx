@@ -120,7 +120,7 @@ class AppServiceList extends BaseComponent<Props, State> {
             return;
         }
         const newLaunchOrder = Math.max(0, up.launchOrder + position);
-        if (newLaunchOrder == service.launchOrder) {
+        if (newLaunchOrder === service.launchOrder) {
             return;
         }
         let updateService = {...service, launchOrder: Math.max(0, up.launchOrder + position)};

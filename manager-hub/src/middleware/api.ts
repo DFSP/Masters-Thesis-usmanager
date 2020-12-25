@@ -27,7 +27,7 @@ import {camelizeKeys} from 'humps';
 import {IService} from "../routes/management/services/Service";
 import {IServiceDependency} from "../routes/management/services/ServiceDependencyList";
 import axios, {Method} from "axios";
-import {API_URL, REQUEST_TIMEOUT} from "../utils/api";
+import {REQUEST_TIMEOUT, getUrl} from "../utils/api";
 import {ILogs} from "../routes/management/logs/ManagementLogs";
 import {IRegion} from "../routes/management/regions/Region";
 import {IDependent} from "../routes/management/services/ServiceDependentList";
@@ -54,7 +54,7 @@ import {ISimulatedAppMetric} from "../routes/management/metrics/apps/SimulatedAp
 import {IKafkaBroker} from "../routes/management/kafka/KafkaBroker";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
-    const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
+    const url = getUrl(endpoint);
     return axios(url, {
         method: method || 'get',
         //TODO remove options

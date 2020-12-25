@@ -127,7 +127,7 @@ export default class Dialog extends BaseComponent<Props, State> {
                                style={this.state.scrollMaxHeight ? {maxHeight: Math.floor(this.state.scrollMaxHeight)} : undefined}>
                         {children}
                     </ScrollBar>
-                    {(footer == undefined || footer) &&
+                    {(footer === undefined || footer) &&
                     <div
                         className={`modal-footer dialog-footer`}>
                         <div>

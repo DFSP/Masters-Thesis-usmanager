@@ -359,7 +359,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         ];
         if (!this.isNew()) {
             tabs.push({
-                    title: 'Hosts geridos',
+                    title: 'Nós geridos',
                     id: 'managedHosts',
                     content: () => this.managedHosts(),
                     active: this.props.location.state?.selected === 'managedHosts'

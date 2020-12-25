@@ -35,6 +35,7 @@ import ActionContextMenuItem from "../../../components/contextmenu/ActionContext
 import {IReply, postData, putData} from "../../../utils/api";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 interface State {
     loading: boolean;
@@ -43,6 +44,7 @@ interface State {
 
 interface NodeCardProps {
     node: INode;
+    manager?: string;
 }
 
 interface DispatchToProps {
@@ -127,7 +129,8 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private leaveSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
+        const manager = this.props.manager;
+        const url = `${manager ? `${manager}/api/` : ''}nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
         this.setState({loading: true});
         putData(url, undefined,
             (reply: IReply<INode[]>) => this.onLeaveSuccess(reply.data),
@@ -155,7 +158,8 @@ class NodeCard extends BaseComponent<Props, State> {
 
     private rejoinSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.id}/join`;
+        const manager = this.props.manager;
+        const url = `${manager ? `${manager}/api/` : ''}nodes/${node?.id}/join`;
         this.setState({loading: true});
         postData(url, {},
             (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
@@ -189,6 +193,7 @@ class NodeCard extends BaseComponent<Props, State> {
         const node = this.getNode();
         const {loading} = this.state;
         const CardNode = Card<INode>();
+        const manager = this.props.manager;
         return <CardNode id={`node-${node.id}`}
                          title={node.id.toString()}
                          link={{to: {pathname: `/nós/${node.id}`, state: node}}}
@@ -202,7 +207,7 @@ class NodeCard extends BaseComponent<Props, State> {
                              ? undefined
                              : {
                                  textButton: 'Remover do swarm',
-                                 url: `nodes/${(node as INode).id}`,
+                                 url: `${manager ? `${manager}/api/` : ''}nodes/${(node as INode).id}`,
                                  confirmMessage: `remover o nó ${node?.id} do swarm`,
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure

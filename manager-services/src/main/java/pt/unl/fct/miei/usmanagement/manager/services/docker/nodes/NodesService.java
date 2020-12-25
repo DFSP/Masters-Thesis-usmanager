@@ -52,7 +52,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmSer
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,24 +71,22 @@ public class NodesService {
 	private final HostsService hostsService;
 	private final ContainersService containersService;
 	private final KafkaService kafkaService;
-	private final WorkerManagersService workerManagersService;
-	private final Environment environment;
 
 	private final Nodes nodes;
 
+	private final String managerId;
 	private final int threads;
 
 	public NodesService(@Lazy DockerSwarmService dockerSwarmService, @Lazy HostsService hostsService,
 						@Lazy ContainersService containersService, KafkaService kafkaService,
-						WorkerManagersService workerManagersService, Environment environment, Nodes nodes,
+						Environment environment, Nodes nodes,
 						ParallelismProperties parallelismProperties) {
 		this.dockerSwarmService = dockerSwarmService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
 		this.kafkaService = kafkaService;
-		this.workerManagersService = workerManagersService;
-		this.environment = environment;
 		this.nodes = nodes;
+		this.managerId = environment.getProperty(ContainerConstants.Label.MANAGER_ID);
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -188,11 +185,6 @@ public class NodesService {
 	}
 
 	public void removeNode(String nodeId) {
-		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
-		String managerId = node.getManagerId();
-		if (workerManagersService.hasWorkerManager(managerId)) {
-			workerManagersService.removeNode(managerId, nodeId);
-		}
 		dockerSwarmService.removeNode(nodeId);
 		deleteNode(nodeId);
 	}
@@ -261,27 +253,14 @@ public class NodesService {
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNodeSpecs(String nodeId,
 																		   pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
-		String managerId = getNode(nodeId).getManagerId();
-		if (workerManagersService.hasWorkerManager(managerId)) {
-			return workerManagersService.updateNode(managerId, nodeId, node);
-		}
-		else {
-			Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
-				node.getLabels());
-			node = fromSwarmNode(swarmNode);
-			return updateNode(node);
-		}
+		Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
+			node.getLabels());
+		node = fromSwarmNode(swarmNode);
+		return updateNode(node);
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node rejoinSwarm(String nodeId) {
-		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
-		String managerId = node.getManagerId();
-		if (workerManagersService.hasWorkerManager(managerId)) {
-			return workerManagersService.rejoinSwarm(managerId, nodeId);
-		}
-		else {
-			return dockerSwarmService.rejoinSwarm(nodeId);
-		}
+		return dockerSwarmService.rejoinSwarm(nodeId);
 		/*Node swarmNode = dockerSwarmService.rejoinSwarm(nodeId);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = getNode(nodeId);
 		nodes.delete(node);
@@ -324,19 +303,12 @@ public class NodesService {
 			.version(node.version().index())
 			.state(node.status().state())
 			.managerStatus(status == null ? null : new ManagerStatus(status.leader(), status.reachability(), status.addr()))
-			.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
+			.managerId(managerId)
 			.labels(new HashMap<>(node.spec().labels()))
 			.build();
 	}
 
 	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> leaveHost(HostAddress hostAddress) {
-		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
-		if (nodes.size() > 0) {
-			String managerId = nodes.get(0).getManagerId();
-			if (workerManagersService.hasWorkerManager(managerId)) {
-				return workerManagersService.leaveHost(managerId, hostAddress);
-			}
-		}
 		//containersService.migrateHostContainers(hostAddress);
 		new ForkJoinPool(threads).submit(() ->
 			containersService.getSystemContainers(hostAddress).parallelStream()
@@ -345,6 +317,7 @@ public class NodesService {
 		dockerSwarmService.leaveSwarm(hostAddress);
 		containersService.stopDockerApiProxy(hostAddress);
 		hostsService.stopBackgroundProcesses(hostAddress);
+		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = getHostNodes(hostAddress);
 		nodes.forEach(node -> node.setState("down"));
 		this.nodes.saveAll(nodes);
 		nodes.forEach(kafkaService::sendNode);

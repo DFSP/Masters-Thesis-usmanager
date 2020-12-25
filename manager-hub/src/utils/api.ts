@@ -30,7 +30,7 @@ export interface IReply<T> extends AxiosResponse<T> {
 
 }
 
-export const API_URL = 'http://localhost:8080/api';
+const API_URL = 'localhost:8080/api';
 export const REQUEST_TIMEOUT = 600000;
 const CancelToken = axios.CancelToken;
 export const cancelRequests: { [key: string]: CancelTokenSource } = {};
@@ -54,9 +54,13 @@ export function patchData<T>(url: string, requestBody: any,
     sendData<T>(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
 
+export function getUrl(endpoint?: string) {
+   return `http://${endpoint ? `${endpoint.includes(":") ? endpoint : (API_URL + '/' + endpoint)}` : API_URL}`;
+}
+
 function sendData<T>(endpoint: string, method: Method, data: any,
                      successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void) {
-    const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
+    const url = new URL(getUrl(endpoint));
     console.log(`${method} ${url} ${JSON.stringify(data)}`);
     axios(url.href, {
         method,
@@ -91,7 +95,7 @@ export function deleteData(endpoint: string,
                            successCallback: () => void,
                            failureCallback: (reason: string, data: any) => void,
                            data?: any): void {
-    const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
+    const url = new URL(getUrl(endpoint));
     console.log(`DELETE ${url}`);
     axios.delete(url.href, {
         // TODO set options from setupAxiosInterceptors instead, after login

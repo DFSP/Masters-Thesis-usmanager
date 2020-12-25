@@ -23,13 +23,13 @@
  */
 
 import axios, {AxiosResponse} from "axios";
-import {API_URL, setupAxiosInterceptors} from "./api";
+import {getUrl, setupAxiosInterceptors} from "./api";
 import Cookies from 'universal-cookie';
 
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
 export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse> =>
-    axios.get(`${API_URL}/basicauth`, {
+    axios.get(`${getUrl()}/basicauth`, {
         headers: {
             authorization: createBasicAuthToken(username, password)
         }

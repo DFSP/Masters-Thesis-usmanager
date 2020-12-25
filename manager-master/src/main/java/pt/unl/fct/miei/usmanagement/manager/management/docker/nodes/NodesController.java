@@ -75,7 +75,7 @@ public class NodesController {
 		String host = addNode.getHost();
 		List<Coordinates> coordinates = addNode.getCoordinates();
 		if (host == null && coordinates == null) {
-			throw new BadRequestException("Expected host address or coordinates to start nodes");
+			throw new BadRequestException("Expected host or coordinates to start nodes");
 		}
 		return nodesService.addNodes(role, host, coordinates);
 	}

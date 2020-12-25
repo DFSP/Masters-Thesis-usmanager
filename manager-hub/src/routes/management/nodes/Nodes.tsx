@@ -32,18 +32,21 @@ import CardList from "../../../components/list/CardList";
 import {INode} from "./Node";
 import styles from './Nodes.module.css'
 import BaseComponent from "../../../components/BaseComponent";
-import {loadNodes, syncNodes} from "../../../actions";
+import {loadNodes, loadWorkerManagers, syncNodes} from "../../../actions";
 import ActionButton from "../../../components/list/ActionButton";
+import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 interface StateToProps {
     isLoading: boolean
     error?: string | null;
     nodes: INode[];
+    workerManagers: { [key: string]: IWorkerManager };
 }
 
 interface DispatchToProps {
     loadNodes: (id?: string) => any;
     syncNodes: () => void;
+    loadWorkerManagers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -52,6 +55,7 @@ class Nodes extends BaseComponent<Props, {}> {
 
     public componentDidMount(): void {
         this.props.loadNodes();
+        this.props.loadWorkerManagers();
     }
 
     public render() {
@@ -79,7 +83,7 @@ class Nodes extends BaseComponent<Props, {}> {
     }
 
     private node = (node: INode): JSX.Element =>
-        <NodeCard key={node.id} node={node}/>;
+        <NodeCard key={node.id} node={node} manager={this.getManagerHost(node)}/>;
 
     private predicate = (node: INode, search: string): boolean =>
         node.id.toString().toLowerCase().includes(search)
@@ -91,6 +95,17 @@ class Nodes extends BaseComponent<Props, {}> {
         this.props.syncNodes();
     };
 
+    private getManagerHost(node: INode) {
+        const managerId = node.managerId;
+        if (managerId) {
+            const workerManager = this.props.workerManagers[managerId];
+            if (workerManager) {
+                return `${workerManager.publicIpAddress}:${workerManager.port}`;
+            }
+        }
+        return undefined;
+    }
+
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
@@ -98,12 +113,14 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
         isLoading: state.entities.nodes.isLoadingNodes,
         error: state.entities.nodes.loadNodesError,
         nodes: (state.entities.nodes.data && Object.values(state.entities.nodes.data).reverse()) || [],
+        workerManagers: state.entities.workerManagers.data
     }
 );
 
 const mapDispatchToProps: DispatchToProps = {
     loadNodes,
-    syncNodes
+    syncNodes,
+    loadWorkerManagers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Nodes);

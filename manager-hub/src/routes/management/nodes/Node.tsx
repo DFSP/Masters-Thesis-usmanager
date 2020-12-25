@@ -37,7 +37,15 @@ import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addNodes, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../../actions";
+import {
+    addNodes,
+    loadCloudHosts,
+    loadEdgeHosts,
+    loadNodes,
+    loadRegions,
+    loadWorkerManagers,
+    updateNode
+} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../regions/Region";
@@ -53,6 +61,7 @@ import {IDatabaseData} from "../../../components/IData";
 import {Point} from "react-simple-maps";
 import {ICoordinates} from "../../../components/map/LocationMap";
 import {IMarker} from "../../../components/map/Marker";
+import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
@@ -107,6 +116,7 @@ interface StateToProps {
     edgeHosts: { [key: string]: IEdgeHost };
     regions: { [key: string]: IRegion };
     nodes: { [key: string]: INode };
+    workerManagers: { [key: string]: IWorkerManager };
 }
 
 interface DispatchToProps {
@@ -116,6 +126,7 @@ interface DispatchToProps {
     loadEdgeHosts: () => void;
     loadCloudHosts: () => void;
     loadRegions: () => void;
+    loadWorkerManagers: () => void;
 }
 
 interface MatchParams {
@@ -153,6 +164,7 @@ class Node extends BaseComponent<Props, State> {
         this.props.loadEdgeHosts();
         this.props.loadCloudHosts();
         this.props.loadRegions();
+        this.props.loadWorkerManagers();
         this.mounted = true;
     };
 
@@ -529,6 +541,7 @@ class Node extends BaseComponent<Props, State> {
         const formNode = this.getFormNode();
         // @ts-ignore
         const nodeKey: (keyof INode) = formNode && Object.keys(formNode)[0];
+        const manager = isNewNode ? undefined : this.getManagerHost(node as INode);
         return (
             <>
                 {isLoading && <LoadingSpinner/>}
@@ -543,7 +556,7 @@ class Node extends BaseComponent<Props, State> {
                               loading={loading}
                               post={{
                                   textButton: isNewNode ? 'Entrar no swarm' : 'Guardar',
-                                  url: 'nodes',
+                                  url: `${manager ? `${manager}/api/` : ''}nodes`,
                                   successCallback: this.onPostSuccess,
                                   failureCallback: this.onPostFailure,
                                   result: this.onPostReply,
@@ -552,7 +565,7 @@ class Node extends BaseComponent<Props, State> {
                               put={(node as INode).state === 'down'
                                   ? undefined
                                   : {
-                                      url: `nodes/${(node as INode).id}`,
+                                      url: `${manager ? `${manager}/api/` : ''}nodes/${(node as INode).id}`,
                                       successCallback: this.onPutSuccess,
                                       failureCallback: this.onPutFailure,
                                       result: this.onPutReply,
@@ -564,7 +577,7 @@ class Node extends BaseComponent<Props, State> {
                                   : {
                                       textButton: 'Remover do swarm',
                                       confirmMessage: `remover o nó ${(node as INode).id} do swarm`,
-                                      url: `nodes/${(node as INode).id}`,
+                                      url: `${manager ? `${manager}/api/` : ''}nodes/${(node as INode).id}`,
                                       successCallback: this.onDeleteSuccess,
                                       failureCallback: this.onDeleteFailure
                                   }}
@@ -602,6 +615,16 @@ class Node extends BaseComponent<Props, State> {
         }
     ]);
 
+    private getManagerHost(node: INode) {
+        const managerId = node.managerId;
+        if (managerId) {
+            const workerManager = this.props.workerManagers[managerId];
+            if (workerManager) {
+                return `${workerManager.publicIpAddress}:${workerManager.port}`;
+            }
+        }
+        return undefined;
+    }
 }
 
 function removeFields(node: Partial<INode>) {
@@ -634,6 +657,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const cloudHosts = state.entities.hosts.cloud.data;
     const edgeHosts = state.entities.hosts.edge.data;
     const regions = state.entities.regions.data;
+    const workerManagers = state.entities.workerManagers.data;
     return {
         isLoading,
         error,
@@ -644,7 +668,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         nodes,
         cloudHosts,
         edgeHosts,
-        regions
+        regions,
+        workerManagers
     }
 }
 
@@ -655,6 +680,7 @@ const mapDispatchToProps: DispatchToProps = {
     loadCloudHosts,
     loadEdgeHosts,
     loadRegions,
+    loadWorkerManagers,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Node);

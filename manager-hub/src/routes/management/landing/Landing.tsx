@@ -85,7 +85,7 @@ class Landing extends React.Component<Props, State> {
         this.setState({center: !this.state.center})
 
     private getMarkerColor = (container: IContainer) =>
-        container.labels['masterManager'] === 'true' ? 'Red' : this.mapRegionToColor(container.region);
+        container.managerId === 'manager-master' ? 'Red' : this.mapRegionToColor(container.region);
 
     private mapRegionToColor = (region: IRegion) => {
         switch (region.region.toLocaleLowerCase()) {
@@ -124,7 +124,7 @@ class Landing extends React.Component<Props, State> {
             if (marker.title === '') {
                 marker.title += container.coordinates.label + '<br/>' + publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
-            else if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress != container.publicIpAddress) {
+            else if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress !== container.publicIpAddress) {
                 marker.title += publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
             marker.title += container.id.toString().substr(0, 10) + ' - ' + container.labels['serviceName'] + '<br/>';
@@ -142,7 +142,7 @@ class Landing extends React.Component<Props, State> {
             !containerMarkers.has(host.awsRegion.coordinates.latitude + ':' + host.awsRegion.coordinates.longitude)
             && !isEqual(host.state, awsInstanceStates.SHUTTING_DOWN) && !isEqual(host.state, awsInstanceStates.TERMINATED)
         ).map(host => ({
-                title: host.awsRegion.name + ' (' + host.awsRegion.zone + ')' + '<br/>' + host.instanceId.substr(0, 10) + '<br/>',
+                title: host.awsRegion.name + ' (' + host.awsRegion.zone + ')<br/>' + host.instanceId.substr(0, 10) + '<br/>',
                 label: host.publicIpAddress,
                 latitude: host.awsRegion.coordinates.latitude,
                 longitude: host.awsRegion.coordinates.longitude,

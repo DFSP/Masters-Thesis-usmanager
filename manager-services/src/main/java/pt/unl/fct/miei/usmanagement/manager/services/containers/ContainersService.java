@@ -69,7 +69,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -394,38 +393,17 @@ public class ContainersService {
 
 	public Container replicateContainer(String id, HostAddress toHostAddress) {
 		Container containerEntity = getContainer(id);
-		String managerId = containerEntity.getManagerId();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master")) {
-			try {
-				return workerManagersService.replicateContainer(managerId, id, toHostAddress).get();
-			}
-			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to replicate container %s at worker manager %s: %s", id, managerId, e.getMessage());
-			}
-		}
-		else {
-			Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
-			return container.map(this::addContainerFromDockerContainer)
-				.orElseThrow(() -> new ManagerException("Unable to replicate container %s", id));
-		}
+		Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, toHostAddress);
+		return container.map(this::addContainerFromDockerContainer)
+			.orElseThrow(() -> new ManagerException("Unable to replicate container %s", id));
 	}
 
 	public Container migrateContainer(String id, HostAddress hostAddress) {
 		Container container = getContainer(id);
-		String managerId = container.getManagerId();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master")) {
-			try {
-				return workerManagersService.migrateContainer(managerId, id, hostAddress).get();
-			}
-			catch (InterruptedException | ExecutionException e) {
-				throw new ManagerException("Failed to migrate container %s at worker manager %s: %s", id, managerId, e.getMessage());
-			}
-		}
-		else {
-			Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
-			return dockerContainer.map(this::addContainerFromDockerContainer)
-				.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
-		}
+		Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostAddress);
+		return dockerContainer.map(this::addContainerFromDockerContainer)
+			.orElseThrow(() -> new ManagerException("Unable to migrate container %s", id));
+
 	}
 
 	public Map<String, List<Container>> launchApp(List<Service> services, Coordinates coordinates) {
