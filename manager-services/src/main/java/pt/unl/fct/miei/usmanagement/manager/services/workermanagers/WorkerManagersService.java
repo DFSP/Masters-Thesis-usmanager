@@ -293,7 +293,7 @@ public class WorkerManagersService {
 		String url = String.format("http://%s:%d/api/containers%s", publicIpAddress, port, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Container[].class);
+			ResponseEntity<Container[]> response = restTemplate.exchange(url, sync ? HttpMethod.POST : HttpMethod.GET, request, Container[].class);
 			Container[] responseBody = response.getBody();
 			if (responseBody != null) {
 				containers.addAll(Arrays.asList(responseBody));
@@ -419,7 +419,7 @@ public class WorkerManagersService {
 		String url = String.format("http://%s:%d/api/nodes%s", publicIpAddress, port, sync ? "/sync" : "");
 		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<Node[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Node[].class);
+			ResponseEntity<Node[]> response = restTemplate.exchange(url, sync ? HttpMethod.POST : HttpMethod.GET, request, Node[].class);
 			Node[] responseBody = response.getBody();
 			if (responseBody != null) {
 				nodes.addAll(Arrays.asList(responseBody));
