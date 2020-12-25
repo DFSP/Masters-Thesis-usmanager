@@ -34,6 +34,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -51,6 +52,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,7 +95,7 @@ public class NodesService {
 		return nodes.findAll();
 	}
 
-	private List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes(Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> getNodes(Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
 		return filter == null ? getNodes() : getNodes().stream().filter(filter).collect(Collectors.toList());
 	}
 

@@ -116,6 +116,9 @@ public class Container /*extends AbstractEntity<String> */ {
 	@NotNull
 	private Coordinates coordinates;
 
+	@NotNull
+	private String state;
+
 	@Singular
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER)

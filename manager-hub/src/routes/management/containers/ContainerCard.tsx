@@ -242,6 +242,9 @@ class ContainerCard extends BaseComponent<Props, State> {
             <CardItem key={'managerId'}
                       label={'Manager'}
                       value={`${container.managerId}`}/>}
+            <CardItem key={'state'}
+                      label={'State'}
+                      value={container.state}/>
             <CardItem key={'type'}
                       label={'Type'}
                       value={`${container.type}`}/>

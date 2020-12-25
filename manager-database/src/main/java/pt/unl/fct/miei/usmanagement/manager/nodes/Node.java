@@ -22,6 +22,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,6 +47,7 @@ public class Node /*extends AbstractEntity<String> */ {
 
 	private long version;
 
+	@NotNull
 	private String state;
 
 	private ManagerStatus managerStatus;

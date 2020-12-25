@@ -38,6 +38,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pt.unl.fct.miei.usmanagement.manager.util.json.JsonPathArgumentResolver;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -61,7 +62,7 @@ public class ManagerWorkerConfiguration extends CachingConfigurerSupport impleme
 	public CacheManager cacheManager() {
 		// configure and return an implementation of Spring's CacheManager SPI
 		SimpleCacheManager cacheManager = new SimpleCacheManager();
-		cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("default")));
+		cacheManager.setCaches(Collections.singletonList(new ConcurrentMapCache("default")));
 		return cacheManager;
 	}
 

@@ -212,22 +212,22 @@ class NodeCard extends BaseComponent<Props, State> {
                                  successCallback: this.onDeleteSuccess,
                                  failureCallback: this.onDeleteFailure
                              }}>
-            <CardItem key={'hostName'}
-                      label={'Hostname'}
-                      value={node.publicIpAddress + '/' + node?.labels['privateIpAddress']}/>
+            {!!node?.managerId &&
+            <CardItem key={'managerId'}
+                      label={'Manager'}
+                      value={`${node.managerId}`}/>}
             <CardItem key={'state'}
                       label={'State'}
                       value={node.state}/>
+            <CardItem key={'hostName'}
+                      label={'Hostname'}
+                      value={node.publicIpAddress + '/' + node?.labels['privateIpAddress']}/>
             <CardItem key={'availability'}
                       label={'Availability'}
                       value={node.availability}/>
             <CardItem key={'role'}
                       label={'Role'}
                       value={node.role}/>
-            {!!node?.managerId &&
-            <CardItem key={'managerId'}
-                      label={'Manager'}
-                      value={`${node.managerId}`}/>}
         </CardNode>
     }
 

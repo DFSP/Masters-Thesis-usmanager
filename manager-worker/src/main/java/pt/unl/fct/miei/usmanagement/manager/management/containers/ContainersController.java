@@ -92,8 +92,8 @@ public class ContainersController {
 			containers.add(container);
 		}
 		else if (coordinates != null) {
-			for (Coordinates coordinate : coordinates) {
-				Container container = containersService.launchContainer(coordinate, serviceName, internalPort, externalPort);
+			for (Coordinates c : coordinates) {
+				Container container = containersService.launchContainer(c, serviceName, internalPort, externalPort);
 				containers.add(container);
 			}
 		}

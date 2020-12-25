@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.heartbeats.Heartbeat;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
+import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
+import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.configurations.ConfigurationsService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -21,8 +23,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstance
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
-import pt.unl.fct.miei.usmanagement.manager.nodes.ManagerStatus;
-import pt.unl.fct.miei.usmanagement.manager.nodes.NodeAvailability;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.time.LocalDateTime;
@@ -205,12 +205,9 @@ public class SyncService {
 			String serviceName = container.getServiceName();
 			String containerId = container.getId();
 			String managerId = container.getManagerId();
-			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
-			if (((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER))
+			if ((managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER))
 				&& !serviceName.equalsIgnoreCase(ServiceConstants.Name.WORKER_MANAGER)
-				&& !dockerContainerIds.containsKey(containerId)) ||
-				(heartbeat.isPresent()
-					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now()))) {
+				&& !dockerContainerIds.containsKey(containerId)) {
 				containersService.deleteContainer(containerId);
 				containerIterator.remove();
 				log.info("Removed invalid container {}", containerId);
@@ -226,6 +223,15 @@ public class SyncService {
 				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
 					container.setPublicIpAddress(currentPublicIpAddress);
 					log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
+					updated = true;
+				}
+				Optional<Heartbeat> heartbeat = managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)
+					? Optional.empty()
+					: heartbeatService.lastHeartbeat(managerId);
+				if (heartbeat.isPresent()
+					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
+					container.setState("down");
+					log.info("Synchronized container {} state from {} to {}", containerId, "ready", "down");
 					updated = true;
 				}
 				if (updated) {
@@ -302,10 +308,7 @@ public class SyncService {
 				continue;
 			}
 			String managerId = node.getManagerId();
-			Optional<Heartbeat> heartbeat = managerId == null ? Optional.empty() : heartbeatService.lastHeartbeat(managerId);
-			LocalDateTime timeout = LocalDateTime.now().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT));
-			if (((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId))
-				|| (heartbeat.isPresent() && heartbeat.get().getTimestamp().isAfter(timeout))) {
+			if ((managerId == null || managerId.equalsIgnoreCase("manager-master")) && !swarmNodesIds.containsKey(nodeId)) {
 				nodesService.deleteNode(nodeId);
 				nodesIterator.remove();
 				log.info("Removed invalid node {}", nodeId);
@@ -344,6 +347,16 @@ public class SyncService {
 				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
 					node.setPublicIpAddress(currentPublicIpAddress);
 					log.info("Synchronized node {} public ip address from {} to {}", nodeId, savedPublicIpAddress, currentPublicIpAddress);
+					updated = true;
+				}
+				Optional<Heartbeat> heartbeat = managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)
+					? Optional.empty()
+					: heartbeatService.lastHeartbeat(managerId);
+				if (heartbeat.isPresent()
+					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+					&& !node.getState().equalsIgnoreCase("down")) {
+					node.setState("down");
+					log.info("Synchronized node {} state from {} to {}", nodeId, "ready", "down");
 					updated = true;
 				}
 				if (updated) {

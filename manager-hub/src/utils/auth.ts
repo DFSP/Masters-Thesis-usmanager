@@ -53,5 +53,6 @@ export const getLoggedInUser = () =>
     new Cookies().get(USER_NAME_SESSION_ATTRIBUTE_NAME);
 
 export const logout = () => {
+    console.log("Logging out")
     new Cookies().remove(USER_NAME_SESSION_ATTRIBUTE_NAME);
 }

@@ -147,6 +147,7 @@ public class ContainersService {
 				.ports(dockerContainer.getPorts())
 				.labels(dockerContainer.getLabels())
 				.coordinates(dockerContainer.getCoordinates())
+				.state("ready")
 				.region(dockerContainer.getRegion())
 				.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
 				.build();
@@ -259,9 +260,8 @@ public class ContainersService {
 		return containers.findAll();
 	}
 
-
-	public List<Container> getContainers(WorkerManager workerManager) {
-		return containers.findByManagerId(workerManager.getId());
+	public List<Container> getContainers(String managerId) {
+		return containers.findByManagerId(managerId);
 	}
 
 	public Container getContainer(String containerId) {
@@ -284,8 +284,7 @@ public class ContainersService {
 		return filterContainersWithLabels(containers, labels);
 	}
 
-	private List<Container> filterContainersWithLabels(List<Container> containers,
-													   Set<Pair<String, String>> labels) {
+	private List<Container> filterContainersWithLabels(List<Container> containers, Set<Pair<String, String>> labels) {
 		// TODO try to build a database query instead
 		List<String> labelKeys = labels.stream().map(Pair::getFirst).collect(Collectors.toList());
 		return containers.stream()
