@@ -167,7 +167,7 @@ public class KafkaService {
 	private final String kafkaBootstrapServers;
 	private final AtomicLong increment;
 	private final CycleAvoidingMappingContext context;
-	private boolean isMaster;
+	private final boolean isMaster;
 	private boolean populated;
 
 	public KafkaService(@Lazy ContainersService containersService,
@@ -261,7 +261,7 @@ public class KafkaService {
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
-			//populateTopics();
+			populateTopics();
 		}
 
 		return kafkaBrokers;
