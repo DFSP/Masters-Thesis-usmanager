@@ -745,14 +745,14 @@ class Container extends BaseComponent<Props, State> {
                           showSaveButton={this.shouldShowSaveButton()}
                           post={{
                               textButton: 'Iniciar',
-                              url: 'containers',
+                              url: `${manager ? `${manager}/api/` : ''}containers`,
                               successCallback: this.onPostSuccess,
                               failureCallback: this.onPostFailure
                           }}
                         // delete button is never present on new nodes, so a type cast is safe
                           delete={{
                               textButton: 'Parar',
-                              url: `containers/${(container as IContainer).id}`,
+                              url: `${manager ? `${manager}/api/` : ''}containers/${(container as IContainer).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
                           }}

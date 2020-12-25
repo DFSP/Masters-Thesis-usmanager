@@ -14,5 +14,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=build /app/request-location-monitor request-location-monitor
 COPY --from=build docker-init.sh docker-init.sh
+RUN ["chmod", "+x", "docker-init.sh"]
 ENTRYPOINT ["./docker-init.sh"]
 CMD ["1919", "60000"]
