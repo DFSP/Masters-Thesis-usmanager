@@ -35,5 +35,6 @@ public class ServiceConstants {
 		public static final String LOAD_BALANCER = "load-balancer";
 		public static final String KAFKA = "kafka";
 		public static final String ZOOKEEPER = "zookeeper";
+		public static final String REQUEST_LOCATION_MONITOR = "request-location-monitor";
 	}
 }

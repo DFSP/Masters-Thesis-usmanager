@@ -53,7 +53,9 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerCon
 import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.loadbalancer.nginx.LoadBalancerService;
+import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.ContainerSimulatedMetricsService;
+import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.ContainerRulesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registration.RegistrationServerService;
@@ -89,6 +91,8 @@ public class ContainersService {
 	private final KafkaService kafkaService;
 	private final ZookeeperService zookeeperService;
 	private final LoadBalancerService loadBalancerService;
+	private final LocationRequestsService locationRequestsService;
+	private final PrometheusService prometheusService;
 	private final Environment environment;
 
 	private final Containers containers;
@@ -102,7 +106,8 @@ public class ContainersService {
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
 							 RegistrationServerService registrationServerService, LoadBalancerService nginxLoadBalancerService,
 							 KafkaService kafkaService, ZookeeperService zookeeperService,
-							 LoadBalancerService loadBalancerService, Environment environment, Containers containers,
+							 LoadBalancerService loadBalancerService, LocationRequestsService locationRequestsService, PrometheusService prometheusService,
+							 Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;
@@ -117,6 +122,8 @@ public class ContainersService {
 		this.kafkaService = kafkaService;
 		this.zookeeperService = zookeeperService;
 		this.loadBalancerService = loadBalancerService;
+		this.locationRequestsService = locationRequestsService;
+		this.prometheusService = prometheusService;
 		this.environment = environment;
 		this.containers = containers;
 		this.threads = parallelismProperties.getThreads();
@@ -253,9 +260,6 @@ public class ContainersService {
 		return containers.findAll();
 	}
 
-	public List<Container> getContainersAndEntities() {
-		return containers.getContainersAndEntities();
-	}
 
 	public List<Container> getContainers(WorkerManager workerManager) {
 		return containers.findByManagerId(workerManager.getId());
@@ -545,6 +549,14 @@ public class ContainersService {
 			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name())));
 	}
 
+	public Optional<Container> getSingletonContainer(HostAddress hostAddress, String name) {
+		return getHostContainersWithLabels(hostAddress, Set.of(
+			Pair.of(ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM.name()),
+			Pair.of(ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON.name()),
+			Pair.of(ContainerConstants.Label.SERVICE_NAME, name))
+		).stream().findFirst();
+	}
+
 	public Optional<ContainerStats> getContainerStats(String containerId, HostAddress hostAddress) {
 		Container container = getContainer(containerId);
 		return dockerContainersService.getContainerStats(container, hostAddress);
@@ -617,6 +629,16 @@ public class ContainersService {
 			addContainer(containerId);
 		}
 		return containerId;
+	}
+
+	public Optional<pt.unl.fct.miei.usmanagement.manager.containers.Container> launchRequestLocationMonitor(HostAddress hostAddress) {
+		String containerId = locationRequestsService.launchRequestLocationMonitor(hostAddress);
+		return addContainer(containerId);
+	}
+
+	public Optional<pt.unl.fct.miei.usmanagement.manager.containers.Container> launchPrometheus(HostAddress hostAddress) {
+		String containerId = prometheusService.launchPrometheus(hostAddress);
+		return addContainer(containerId);
 	}
 
 	public void stopContainers() {

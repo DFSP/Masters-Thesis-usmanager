@@ -26,9 +26,12 @@ package pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.MonitoringProperties;
@@ -46,23 +49,35 @@ import java.util.stream.Collectors;
 public class HostMetricsService {
 
 	private final PrometheusService prometheusService;
+	private final ContainersService containersService;
 	private final FieldsService fieldsService;
 	private final double maximumRamPercentage;
 	private final double maximumCpuPercentage;
 
-	public HostMetricsService(PrometheusService prometheusService, FieldsService fieldsService, MonitoringProperties monitoringProperties) {
+	public HostMetricsService(PrometheusService prometheusService, ContainersService containersService, FieldsService fieldsService, MonitoringProperties monitoringProperties) {
 		this.prometheusService = prometheusService;
+		this.containersService = containersService;
 		this.fieldsService = fieldsService;
 		this.maximumRamPercentage = monitoringProperties.getHosts().getMaximumRamPercentage();
 		this.maximumCpuPercentage = monitoringProperties.getHosts().getMaximumCpuPercentage();
 	}
 
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
+		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
+			.map(Container::getPublicIpAddress).map(Integer::parseInt);
 		List<CompletableFuture<Optional<Double>>> futureMetrics = List.of(
 			PrometheusQueryEnum.TOTAL_MEMORY,
 			PrometheusQueryEnum.AVAILABLE_MEMORY,
 			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
-			.stream().map(stat -> prometheusService.getStat(hostAddress, stat))
+			.stream().map(stat -> {
+				if (port.isPresent()) {
+					return prometheusService.getStat(hostAddress, port.get(), stat);
+				}
+				else {
+					Optional<Double> emptyOptional = Optional.empty();
+					return CompletableFuture.completedFuture(emptyOptional);
+				}
+			})
 			.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureMetrics.toArray(new CompletableFuture[0])).join();
@@ -101,10 +116,20 @@ public class HostMetricsService {
 	}
 
 	public Map<String, CompletableFuture<Optional<Double>>> getHostStats(HostAddress hostAddress) {
+		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
+			.map(Container::getPublicIpAddress).map(Integer::parseInt);
 		// Stats from prometheus (node exporter)
 		return fieldsService.getFields().stream()
 			.filter(field -> field.getPrometheusQuery() != null)
-			.collect(Collectors.toMap(Field::getName, field -> prometheusService.getStat(hostAddress, field.getPrometheusQuery())));
+			.collect(Collectors.toMap(Field::getName, field -> {
+				if (port.isPresent()) {
+					return prometheusService.getStat(hostAddress, port.get(), field.getPrometheusQuery());
+				}
+				else {
+					Optional<Double> emptyOptional = Optional.empty();
+					return CompletableFuture.completedFuture(emptyOptional);
+				}
+			}));
 	}
 
 }

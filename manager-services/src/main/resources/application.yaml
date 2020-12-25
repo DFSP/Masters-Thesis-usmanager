@@ -55,9 +55,9 @@ registration:
   client:
     port: 1906
 prometheus:
+  port: 9090
   node-exporter:
-    install-script: node-exporter-install.sh
-    install-script-path: src/main/resources/scripts/node-exporter-install.sh
+    install-script: src/main/resources/scripts/node-exporter-install.sh
 decision:
   start-host-on-events-count: 3
   stop-host-on-events-count: 3

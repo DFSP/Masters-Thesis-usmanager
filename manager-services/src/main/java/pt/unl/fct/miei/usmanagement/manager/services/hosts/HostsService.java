@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
@@ -65,11 +66,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -193,6 +197,37 @@ public class HostsService {
 		return dockerApiProxyContainerId;
 	}
 
+	private Container launchRequestLocationMonitor(HostAddress hostAddress) {
+		final int retries = 5;
+		int tries = 0;
+		Optional<Container> requestLocationMonitor;
+		do {
+			log.info("Launching prometheus container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			requestLocationMonitor = containersService.launchRequestLocationMonitor(hostAddress);
+			Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+		} while (requestLocationMonitor.isEmpty() && ++tries < retries);
+		if (requestLocationMonitor.isEmpty()) {
+			throw new ManagerException("Failed to launch prometheus at %s", hostAddress.toSimpleString());
+		}
+		return requestLocationMonitor.get();
+	}
+
+	private Container launchPrometheus(HostAddress hostAddress) {
+		final int retries = 5;
+		int tries = 0;
+		Optional<Container> prometheus;
+		do {
+			log.info("Launching prometheus container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			prometheus = containersService.launchPrometheus(hostAddress);
+			Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
+		} while (prometheus.isEmpty() && ++tries < retries);
+		if (prometheus.isEmpty()) {
+			throw new ManagerException("Failed to launch prometheus at %s", hostAddress.toSimpleString());
+		}
+		return prometheus.get();
+	}
+
+
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node setupHost(HostAddress hostAddress, NodeRole role) {
 		log.info("Setting up {} with role {}", hostAddress.toSimpleString(), role);
 		pt.unl.fct.miei.usmanagement.manager.nodes.Node node = null;
@@ -221,10 +256,15 @@ public class HostsService {
 			throw new ManagerException("Failed to setup %s with role %s", hostAddress.toSimpleString(), role.name());
 		}
 		containersService.addContainer(dockerApiProxyContainerId);
-		new ForkJoinPool(threads).submit(() ->
-			List.of(LocationRequestsService.REQUEST_LOCATION_MONITOR, ServiceConstants.Name.PROMETHEUS).parallelStream()
-				.forEach(service -> containersService.launchContainer(hostAddress, service, ContainerTypeEnum.SINGLETON))).join();
+		
+		Stream<Supplier<Container>> tasks = Stream.of(
+			() -> launchRequestLocationMonitor(hostAddress),
+			() -> launchPrometheus(hostAddress)
+		);
+		tasks.map(CompletableFuture::supplyAsync).collect(Collectors.toList()).forEach(CompletableFuture::join);
+
 		executeBackgroundProcess(ServiceConstants.Name.NODE_EXPORTER, hostAddress, ServiceConstants.Name.NODE_EXPORTER);
+
 		return node;
 	}
 

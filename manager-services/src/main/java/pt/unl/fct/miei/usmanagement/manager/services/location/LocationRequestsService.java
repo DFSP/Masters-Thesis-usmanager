@@ -24,19 +24,32 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.location;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -45,16 +58,22 @@ import java.util.stream.Collectors;
 @Service
 public class LocationRequestsService {
 
-	public static final String REQUEST_LOCATION_MONITOR = "request-location-monitor";
-
 	private final NodesService nodesService;
-	private final int locationRequestsPort;
+	private final HostsService hostsService;
+	private final ContainersService containersService;
+	
+	private final int port;
+	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
 	private final Map<String, Long> lastRequestTime;
 
-	public LocationRequestsService(NodesService nodesService, LocationRequestsProperties locationRequestsProperties) {
+	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
+								   ContainersService containersService, DockerProperties dockerProperties, LocationRequestsProperties locationRequestsProperties) {
 		this.nodesService = nodesService;
-		this.locationRequestsPort = locationRequestsProperties.getPort();
+		this.hostsService = hostsService;
+		this.containersService = containersService;
+		this.dockerHubUsername = dockerProperties.getHub().getUsername();
+		this.port = locationRequestsProperties.getPort();
 		this.restTemplate = new RestTemplate();
 		this.lastRequestTime = new HashMap<>();
 	}
@@ -134,7 +153,19 @@ public class LocationRequestsService {
 
 	public List<NodeLocationRequests> getNodesLocationRequests() {
 		List<FutureNodeLocationRequests> futureNodeLocationRequests = nodesService.getReadyNodes().stream()
-			.map(node -> new FutureNodeLocationRequests(node, getNodeLocationRequests(node.getPublicIpAddress())))
+			.map(node -> {
+				String hostname = node.getPublicIpAddress();
+				Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.REQUEST_LOCATION_MONITOR)
+					.map(Container::getPublicIpAddress).map(Integer::parseInt);
+				CompletableFuture<Map<String, Integer>> futureLocationRequests;
+				if (port.isPresent()) {
+					futureLocationRequests = getNodeLocationRequests(hostname, port.get());
+				}
+				else {
+					futureLocationRequests = CompletableFuture.completedFuture(Collections.emptyMap());
+				}
+				return new FutureNodeLocationRequests(node, futureLocationRequests);
+			})
 			.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futureNodeLocationRequests.stream().map(FutureNodeLocationRequests::getRequests)
@@ -156,8 +187,8 @@ public class LocationRequestsService {
 	}
 
 	@Async
-	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname) {
-		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, locationRequestsPort);
+	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname, int port) {
+		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();
 		Long interval = lastRequestTime.get(hostname);
 		if (interval != null && interval > 0) {
@@ -180,4 +211,25 @@ public class LocationRequestsService {
 		return CompletableFuture.completedFuture(locationMonitoringData);
 	}
 
+	public String launchRequestLocationMonitor(HostAddress hostAddress) {
+		String serviceName = ServiceConstants.Name.DOCKER_API_PROXY;
+		String dockerRepository = dockerHubUsername + "/" + serviceName;
+		int externalPort = hostsService.findAvailableExternalPort(hostAddress, port);
+		Gson gson = new Gson();
+		String command = String.format("REQUEST_LOCATION_MONITOR=$(docker ps -q -f 'name=%s') && "
+				+ "if [ $REQUEST_LOCATION_MONITOR ]; then echo $REQUEST_LOCATION_MONITOR; "
+				+ "else docker pull %s && "
+				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+			serviceName, dockerRepository, serviceName, externalPort, port, serviceName,
+			ContainerConstants.Label.US_MANAGER, true,
+			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
+			ContainerConstants.Label.SERVICE_NAME, serviceName,
+			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
+			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
+			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+			dockerRepository);
+		List<String> output = hostsService.executeCommandSync(command, hostAddress);
+		return output.get(output.size() - 1);
+	}
 }

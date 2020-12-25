@@ -77,6 +77,7 @@ registration:
   client:
     port: 1906
 prometheus:
+  port: 9090
   node-exporter:
     install-script: src/main/resources/scripts/node-exporter-install.sh
 monitoring:

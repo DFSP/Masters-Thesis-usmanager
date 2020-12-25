@@ -1956,7 +1956,7 @@ public class DatabaseLoader {
 		}
 		servicesMap.put(ServiceConstants.Name.LOAD_BALANCER, loadBalancer);
 
-		Service requestLocationMonitor;
+		/*Service requestLocationMonitor;
 		try {
 			requestLocationMonitor = servicesService.getService(LocationRequestsService.REQUEST_LOCATION_MONITOR);
 		}
@@ -1972,7 +1972,7 @@ public class DatabaseLoader {
 				.build();
 			requestLocationMonitor = servicesService.addService(requestLocationMonitor);
 		}
-		servicesMap.put(LocationRequestsService.REQUEST_LOCATION_MONITOR, requestLocationMonitor);
+		servicesMap.put(LocationRequestsService.REQUEST_LOCATION_MONITOR, requestLocationMonitor);*/
 
 		Service registrationServer;
 		try {
@@ -1993,7 +1993,7 @@ public class DatabaseLoader {
 		}
 		servicesMap.put(ServiceConstants.Name.REGISTRATION_SERVER, registrationServer);
 
-		Service prometheus;
+		/*Service prometheus;
 		try {
 			prometheus = servicesService.getService(ServiceConstants.Name.PROMETHEUS);
 		}
@@ -2009,7 +2009,7 @@ public class DatabaseLoader {
 				.build();
 			prometheus = servicesService.addService(prometheus);
 		}
-		servicesMap.put(ServiceConstants.Name.PROMETHEUS, prometheus);
+		servicesMap.put(ServiceConstants.Name.PROMETHEUS, prometheus);*/
 
 		Service kafka;
 		try {

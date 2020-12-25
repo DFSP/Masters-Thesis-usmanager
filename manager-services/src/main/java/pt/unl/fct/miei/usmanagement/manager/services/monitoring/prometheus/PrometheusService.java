@@ -24,13 +24,21 @@
 
 package pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.PrometheusQueryEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -44,17 +52,24 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PrometheusService {
 
+	private final HostsService hostsService;
+	
+	private final int port;
+	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
 
-	public PrometheusService() {
+	public PrometheusService(@Lazy HostsService hostsService, DockerProperties dockerProperties, PrometheusProperties prometheusProperties) {
+		this.hostsService = hostsService;
+		this.port = prometheusProperties.getPort();
+		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.restTemplate = new RestTemplate();
 	}
 
 	@Async
-	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, PrometheusQueryEnum prometheusQuery) {
+	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, int port, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
 		URI uri = UriComponentsBuilder
-			.fromHttpUrl(String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), PrometheusProperties.PORT))
+			.fromHttpUrl(String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), port))
 			.queryParam("query", URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8))
 			.queryParam("time", Double.toString((System.currentTimeMillis() * 1.0) / 1000.0))
 			.build(true).toUri();
@@ -72,6 +87,28 @@ public class PrometheusService {
 		}
 		Optional<Double> stat = value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
 		return CompletableFuture.completedFuture(stat);
+	}
+
+	public String launchPrometheus(HostAddress hostAddress) {
+		String serviceName = ServiceConstants.Name.DOCKER_API_PROXY;
+		String dockerRepository = dockerHubUsername + "/" + serviceName;
+		int externalPort = hostsService.findAvailableExternalPort(hostAddress, port);
+		Gson gson = new Gson();
+		String command = String.format("PROMETHEUS=$(docker ps -q -f 'name=%s') && "
+				+ "if [ $PROMETHEUS ]; then echo $PROMETHEUS; "
+				+ "else docker pull %s && "
+				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+			serviceName, dockerRepository, serviceName, externalPort, port, serviceName,
+			ContainerConstants.Label.US_MANAGER, true,
+			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
+			ContainerConstants.Label.SERVICE_NAME, serviceName,
+			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
+			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
+			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+			dockerRepository);
+		List<String> output = hostsService.executeCommandSync(command, hostAddress);
+		return output.get(output.size() - 1);
 	}
 
 }
