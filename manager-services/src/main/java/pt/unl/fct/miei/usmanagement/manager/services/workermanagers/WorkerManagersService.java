@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
-import pt.unl.fct.miei.usmanagement.manager.config.WorkerManagerRequestInterceptor;
+import pt.unl.fct.miei.usmanagement.manager.config.RestRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
@@ -102,7 +102,7 @@ public class WorkerManagersService {
 								 DockerSwarmService dockerSwarmService, BashService bashService, KafkaService kafkaService,
 								 CloudHostsService cloudHostsService,
 								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties,
-								 WorkerManagerRequestInterceptor workerManagerRequestInterceptor) {
+								 RestRequestInterceptor workerManagerRequestInterceptor) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -604,6 +604,19 @@ public class WorkerManagersService {
 		String url = String.format("http://%s:%d/api/nodes/%s", publicIpAddress, port, nodeId);
 		try {
 			restTemplate.delete(url);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	public Node updateNode(String managerId, String nodeId, Node node) {
+		WorkerManager workerManager = getWorkerManager(managerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/nodes/%s", publicIpAddress, port, nodeId);
+		try {
+			return restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(node), Node.class).getBody();
 		}
 		catch (HttpClientErrorException e) {
 			throw new ManagerException(e.getMessage());

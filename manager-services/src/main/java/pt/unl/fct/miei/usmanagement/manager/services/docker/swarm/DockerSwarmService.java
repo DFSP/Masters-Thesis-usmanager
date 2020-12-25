@@ -75,20 +75,15 @@ public class DockerSwarmService {
 	private final HostsService hostsService;
 	private final BashService bashService;
 	private final NodesService nodesService;
-	private final ContainersService containersService;
 	private final ConfigurationsService configurationsService;
-	private final SshService sshService;
 
 	public DockerSwarmService(DockerCoreService dockerCoreService, @Lazy HostsService hostsService,
-							  BashService bashService, NodesService nodesService, @Lazy ContainersService containersService,
-							  ConfigurationsService configurationsService, SshService sshService) {
+							  BashService bashService, @Lazy NodesService nodesService, ConfigurationsService configurationsService) {
 		this.dockerCoreService = dockerCoreService;
 		this.hostsService = hostsService;
 		this.bashService = bashService;
 		this.nodesService = nodesService;
-		this.containersService = containersService;
 		this.configurationsService = configurationsService;
-		this.sshService = sshService;
 	}
 
 	public DockerClient getSwarmLeader() {

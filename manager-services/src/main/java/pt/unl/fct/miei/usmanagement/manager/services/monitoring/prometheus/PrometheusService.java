@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import pt.unl.fct.miei.usmanagement.manager.config.RestRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -58,11 +59,13 @@ public class PrometheusService {
 	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
 
-	public PrometheusService(@Lazy HostsService hostsService, DockerProperties dockerProperties, PrometheusProperties prometheusProperties) {
+	public PrometheusService(@Lazy HostsService hostsService, DockerProperties dockerProperties, PrometheusProperties prometheusProperties,
+							 RestRequestInterceptor restRequestInterceptor) {
 		this.hostsService = hostsService;
 		this.port = prometheusProperties.getPort();
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.restTemplate = new RestTemplate();
+		this.restTemplate.setInterceptors(List.of(restRequestInterceptor));
 	}
 
 	@Async

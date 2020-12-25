@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-public class WorkerManagerRequestInterceptor implements org.springframework.http.client.ClientHttpRequestInterceptor {
+public class RestRequestInterceptor implements org.springframework.http.client.ClientHttpRequestInterceptor {
 
 	private final MultiValueMap<String, String> headers;
 
-	public WorkerManagerRequestInterceptor(DockerProperties dockerProperties) {
+	public RestRequestInterceptor(DockerProperties dockerProperties) {
 		String username = dockerProperties.getApiProxy().getUsername();
 		String password = dockerProperties.getApiProxy().getPassword();
 		byte[] auth = String.format("%s:%s", username, password).getBytes();

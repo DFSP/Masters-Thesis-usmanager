@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.config.RestRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
@@ -69,13 +70,14 @@ public class LocationRequestsService {
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
 								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
-								   LocationRequestsProperties locationRequestsProperties) {
+								   LocationRequestsProperties locationRequestsProperties, RestRequestInterceptor restRequestInterceptor) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.port = locationRequestsProperties.getPort();
 		this.restTemplate = new RestTemplate();
+		this.restTemplate.setInterceptors(List.of(restRequestInterceptor));
 		this.lastRequestTime = new HashMap<>();
 	}
 

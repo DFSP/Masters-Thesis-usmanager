@@ -261,10 +261,16 @@ public class NodesService {
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node updateNodeSpecs(String nodeId,
 																		   pt.unl.fct.miei.usmanagement.manager.nodes.Node node) {
-		Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
-			node.getLabels());
-		node = fromSwarmNode(swarmNode);
-		return updateNode(node);
+		String managerId = getNode(nodeId).getManagerId();
+		if (workerManagersService.hasWorkerManager(managerId)) {
+			return workerManagersService.updateNode(managerId, nodeId, node);
+		}
+		else {
+			Node swarmNode = dockerSwarmService.updateNode(nodeId, node.getAvailability().name(), node.getRole().name(),
+				node.getLabels());
+			node = fromSwarmNode(swarmNode);
+			return updateNode(node);
+		}
 	}
 
 	public pt.unl.fct.miei.usmanagement.manager.nodes.Node rejoinSwarm(String nodeId) {
