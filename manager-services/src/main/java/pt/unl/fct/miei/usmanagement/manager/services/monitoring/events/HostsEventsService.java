@@ -84,6 +84,7 @@ public class HostsEventsService {
 
 	public void reset() {
 		log.info("Clearing all host events");
+		decisionsService.getDecisions().forEach(Decision::removeHostEvents);
 		hostEvents.deleteAll();
 	}
 

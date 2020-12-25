@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
@@ -54,7 +55,8 @@ public class HostMetricsService {
 	private final double maximumRamPercentage;
 	private final double maximumCpuPercentage;
 
-	public HostMetricsService(PrometheusService prometheusService, ContainersService containersService, FieldsService fieldsService, MonitoringProperties monitoringProperties) {
+	public HostMetricsService(PrometheusService prometheusService, @Lazy ContainersService containersService,
+							  FieldsService fieldsService, MonitoringProperties monitoringProperties) {
 		this.prometheusService = prometheusService;
 		this.containersService = containersService;
 		this.fieldsService = fieldsService;

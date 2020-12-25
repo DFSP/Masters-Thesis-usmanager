@@ -202,7 +202,7 @@ public class HostsService {
 		int tries = 0;
 		Optional<Container> requestLocationMonitor;
 		do {
-			log.info("Launching prometheus container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
+			log.info("Launching request location monitor container on host {}, attempt {}/{}", hostAddress.toSimpleString(), tries + 1, retries);
 			requestLocationMonitor = containersService.launchRequestLocationMonitor(hostAddress);
 			Timing.sleep(tries + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
 		} while (requestLocationMonitor.isEmpty() && ++tries < retries);

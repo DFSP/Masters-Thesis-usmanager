@@ -97,6 +97,7 @@ public class ServicesEventsService {
 
 	public void reset() {
 		log.info("Clearing all service events");
+		decisionsService.getDecisions().forEach(Decision::removeServiceEvents);
 		serviceEvents.deleteAll();
 	}
 

@@ -106,8 +106,8 @@ public class ContainersService {
 							 ServicesService servicesService, HostsService hostsService, ConfigurationsService configurationsService,
 							 RegistrationServerService registrationServerService, LoadBalancerService nginxLoadBalancerService,
 							 KafkaService kafkaService, ZookeeperService zookeeperService,
-							 LoadBalancerService loadBalancerService, LocationRequestsService locationRequestsService, PrometheusService prometheusService,
-							 Environment environment, Containers containers,
+							 LoadBalancerService loadBalancerService, LocationRequestsService locationRequestsService,
+							 PrometheusService prometheusService, Environment environment, Containers containers,
 							 ParallelismProperties parallelismProperties) {
 		this.dockerContainersService = dockerContainersService;
 		this.containerRulesService = containerRulesService;

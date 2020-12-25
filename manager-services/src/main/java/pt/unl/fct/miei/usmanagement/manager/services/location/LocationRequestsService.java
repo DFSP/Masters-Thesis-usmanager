@@ -68,7 +68,8 @@ public class LocationRequestsService {
 	private final Map<String, Long> lastRequestTime;
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
-								   ContainersService containersService, DockerProperties dockerProperties, LocationRequestsProperties locationRequestsProperties) {
+								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
+								   LocationRequestsProperties locationRequestsProperties) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
@@ -212,7 +213,7 @@ public class LocationRequestsService {
 	}
 
 	public String launchRequestLocationMonitor(HostAddress hostAddress) {
-		String serviceName = ServiceConstants.Name.DOCKER_API_PROXY;
+		String serviceName = ServiceConstants.Name.REQUEST_LOCATION_MONITOR;
 		String dockerRepository = dockerHubUsername + "/" + serviceName;
 		int externalPort = hostsService.findAvailableExternalPort(hostAddress, port);
 		Gson gson = new Gson();

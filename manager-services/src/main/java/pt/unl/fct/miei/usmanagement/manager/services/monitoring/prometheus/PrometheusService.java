@@ -90,7 +90,7 @@ public class PrometheusService {
 	}
 
 	public String launchPrometheus(HostAddress hostAddress) {
-		String serviceName = ServiceConstants.Name.DOCKER_API_PROXY;
+		String serviceName = ServiceConstants.Name.PROMETHEUS;
 		String dockerRepository = dockerHubUsername + "/" + serviceName;
 		int externalPort = hostsService.findAvailableExternalPort(hostAddress, port);
 		Gson gson = new Gson();
