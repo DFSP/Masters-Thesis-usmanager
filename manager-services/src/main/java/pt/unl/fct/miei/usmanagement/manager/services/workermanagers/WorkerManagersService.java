@@ -35,10 +35,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
+import pt.unl.fct.miei.usmanagement.manager.config.WorkerManagerRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
@@ -52,7 +52,6 @@ import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
-import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
@@ -69,12 +68,9 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -98,7 +94,6 @@ public class WorkerManagersService {
 	private final CloudHostsService cloudHostsService;
 	private final HeartbeatService heartbeatService;
 
-	private final HttpHeaders headers;
 	private final RestTemplate restTemplate;
 	private final int threads;
 
@@ -106,7 +101,8 @@ public class WorkerManagersService {
 								 HostsService hostsService, ServicesService servicesService, DockerProperties dockerProperties,
 								 DockerSwarmService dockerSwarmService, BashService bashService, KafkaService kafkaService,
 								 CloudHostsService cloudHostsService,
-								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties) {
+								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties,
+								 WorkerManagerRequestInterceptor workerManagerRequestInterceptor) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -116,13 +112,8 @@ public class WorkerManagersService {
 		this.kafkaService = kafkaService;
 		this.cloudHostsService = cloudHostsService;
 		this.heartbeatService = heartbeatService;
-		String username = dockerProperties.getApiProxy().getUsername();
-		String password = dockerProperties.getApiProxy().getPassword();
-		byte[] auth = String.format("%s:%s", username, password).getBytes();
-		String basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
-		this.headers = new HttpHeaders();
-		this.headers.add("Authorization", basicAuthorization);
 		this.restTemplate = new RestTemplate();
+		this.restTemplate.setInterceptors(List.of(workerManagerRequestInterceptor));
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -268,7 +259,8 @@ public class WorkerManagersService {
 		workerManagers.delete(workerManager);
 		try {
 			containersService.stopContainer(containerId);
-		} catch (EntityNotFoundException e) {
+		}
+		catch (EntityNotFoundException e) {
 			log.error("Failed to stop container {} associated with worker manager {}", containerId, workerManager.getId());
 		}
 		heartbeatService.deleteHeartbeat(workerManager.getId());
@@ -279,8 +271,12 @@ public class WorkerManagersService {
 		workerManagers.delete(workerManager);
 	}
 
+	public boolean hasWorkerManager(String id) {
+		return workerManagers.hasWorkerManager(id);
+	}
+
 	private void checkWorkerManagerExists(String id) {
-		if (!workerManagers.hasWorkerManager(id)) {
+		if (!hasWorkerManager(id)) {
 			throw new EntityNotFoundException(WorkerManager.class, "id", id);
 		}
 	}
@@ -291,12 +287,10 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers%s", publicIpAddress, port, sync ? "/sync" : "");
-		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<Container[]> response = restTemplate.exchange(url, sync ? HttpMethod.POST : HttpMethod.GET, request, Container[].class);
-			Container[] responseBody = response.getBody();
-			if (responseBody != null) {
-				containers.addAll(Arrays.asList(responseBody));
+			Container[] response = sync ? restTemplate.postForObject(url, null, Container[].class) : restTemplate.getForObject(url, Container[].class);
+			if (response != null) {
+				containers.addAll(Arrays.asList(response));
 			}
 			return CompletableFuture.completedFuture(containers);
 		}
@@ -339,9 +333,8 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers", publicIpAddress, port);
-		HttpEntity<?> request = new HttpEntity<>(launchContainerRequest, headers);
 		try {
-			ResponseEntity<Container[]> response = restTemplate.exchange(url, HttpMethod.POST, request, Container[].class);
+			ResponseEntity<Container[]> response = restTemplate.postForEntity(url, launchContainerRequest, Container[].class);
 			Container[] responseBody = response.getBody();
 			List<Container> containers = new ArrayList<>();
 			if (responseBody != null) {
@@ -417,12 +410,10 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/nodes%s", publicIpAddress, port, sync ? "/sync" : "");
-		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<Node[]> response = restTemplate.exchange(url, sync ? HttpMethod.POST : HttpMethod.GET, request, Node[].class);
-			Node[] responseBody = response.getBody();
-			if (responseBody != null) {
-				nodes.addAll(Arrays.asList(responseBody));
+			Node[] response = sync ? restTemplate.postForObject(url, null, Node[].class) : restTemplate.getForObject(url, Node[].class);
+			if (response != null) {
+				nodes.addAll(Arrays.asList(response));
 			}
 			return CompletableFuture.completedFuture(nodes);
 		}
@@ -459,7 +450,7 @@ public class WorkerManagersService {
 		return nodes;
 	}
 
-	public List<Node> synchronizeDatabaseNodes() {
+	public List<Node> synchronizeNodesDatabase() {
 		return getNodes(true);
 	}
 
@@ -468,11 +459,9 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers/logs", publicIpAddress, port);
-		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-			String logs = response.getBody();
-			return CompletableFuture.completedFuture(logs);
+			String response = restTemplate.getForObject(url, String.class);
+			return CompletableFuture.completedFuture(response);
 		}
 		catch (HttpClientErrorException e) {
 			throw new ManagerException(e.getMessage());
@@ -486,9 +475,7 @@ public class WorkerManagersService {
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers/%s/replicate", publicIpAddress, port, containerId);
 		try {
-			HttpEntity<?> request = new HttpEntity<>(toHostAddress, headers);
-			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
-			Container container = response.getBody();
+			Container container = restTemplate.postForObject(url, toHostAddress, Container.class);
 			return CompletableFuture.completedFuture(container);
 		}
 		catch (HttpClientErrorException e) {
@@ -502,10 +489,8 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers/%s/migrate", publicIpAddress, port, containerId);
-		HttpEntity<?> request = new HttpEntity<>(hostAddress, headers);
 		try {
-			ResponseEntity<Container> response = restTemplate.exchange(url, HttpMethod.POST, request, Container.class);
-			Container container = response.getBody();
+			Container container = restTemplate.postForObject(url, null, Container.class);
 			return CompletableFuture.completedFuture(container);
 		}
 		catch (HttpClientErrorException e) {
@@ -522,39 +507,12 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers/%s", publicIpAddress, port, containerId);
-		HttpEntity<String> request = new HttpEntity<>(headers);
 		try {
-			restTemplate.exchange(url, HttpMethod.DELETE, request, Container.class);
+			restTemplate.delete(url);
 		}
 		catch (HttpClientErrorException e) {
 			throw new ManagerException(e.getMessage());
 		}
-	}
-
-	public void init() {
-		new Timer("schedule-setup-worker").schedule(new TimerTask() {
-			@Override
-			public void run() {
-				final int retries = 3;
-				for (int i = 0; i < retries; i++) {
-					try {
-						log.info("Setting up worker manager docker");
-						BashCommandResult result = bashService.executeCommandSync("docker swarm leave --force");
-						if (!result.isSuccessful()) {
-							log.info("Failed to setup worker manager: {}", result.getError());
-						}
-						else {
-							dockerSwarmService.initSwarm();
-							return;
-						}
-					}
-					catch (ManagerException e) {
-						log.error("Failed to setup worker manager: {}... Retrying ({}/{})", e.getMessage(), i + 1, retries);
-					}
-					Timing.sleep(i + 1, TimeUnit.SECONDS); // waits 1 seconds, then 2 seconds, then 3 seconds, etc
-				}
-			}
-		}, DELAY_BEFORE_SWARM_SETUP);
 	}
 
 	public boolean hasWorkerManager(Container container) {
@@ -571,9 +529,8 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/apps/%s/launch", publicIpAddress, port, appName);
-		HttpEntity<?> request = new HttpEntity<>(coordinates, headers);
 		try {
-			Map<String, List<Container>> response = restTemplate.postForObject(url, request, Map.class);
+			Map<String, List<Container>> response = restTemplate.postForObject(url, coordinates, Map.class);
 			log.info("Got reply from {}: {}", url, response);
 			return CompletableFuture.completedFuture(response);
 		}
@@ -608,8 +565,48 @@ public class WorkerManagersService {
 			WorkerManager workerManager = getWorkerManager(id);
 			workerManager = workerManager.toBuilder().state("down").build();
 			saveWorkerManager(workerManager);
-		} catch (EntityNotFoundException e) {
+		}
+		catch (EntityNotFoundException e) {
 			log.error("Failed to set worker manager to state down: {}", e.getMessage());
+		}
+	}
+
+	public List<Node> leaveHost(String managerId, HostAddress hostAddress) {
+		WorkerManager workerManager = getWorkerManager(managerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/nodes/%s/%s/leave", publicIpAddress, port, hostAddress.getPublicIpAddress(), hostAddress.getPrivateIpAddress());
+		try {
+			return restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(new HttpHeaders()), List.class).getBody();
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	public Node rejoinSwarm(String managerId, String nodeId) {
+		WorkerManager workerManager = getWorkerManager(managerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/nodes/%s/join", publicIpAddress, port, nodeId);
+		try {
+			return restTemplate.postForObject(url, null, Node.class);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
+		}
+	}
+
+	public void removeNode(String managerId, String nodeId) {
+		WorkerManager workerManager = getWorkerManager(managerId);
+		String publicIpAddress = workerManager.getPublicIpAddress();
+		int port = workerManager.getPort();
+		String url = String.format("http://%s:%d/api/nodes/%s", publicIpAddress, port, nodeId);
+		try {
+			restTemplate.delete(url);
+		}
+		catch (HttpClientErrorException e) {
+			throw new ManagerException(e.getMessage());
 		}
 	}
 }

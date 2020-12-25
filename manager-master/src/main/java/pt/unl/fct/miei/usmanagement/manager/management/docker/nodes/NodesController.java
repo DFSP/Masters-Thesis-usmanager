@@ -105,8 +105,8 @@ public class NodesController {
 	}
 
 	@PostMapping("/sync")
-	public List<Node> synchronizeDatabaseCloudHosts() {
-		List<Node> workerNodes = workerManagersService.synchronizeDatabaseNodes();
+	public List<Node> synchronizeNodesDatabase() {
+		List<Node> workerNodes = workerManagersService.synchronizeNodesDatabase();
 		List<Node> nodes = syncService.synchronizeNodesDatabase();
 		nodes.addAll(workerNodes);
 		return nodes;
