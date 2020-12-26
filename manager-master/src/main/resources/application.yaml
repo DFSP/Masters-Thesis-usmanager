@@ -43,7 +43,7 @@ ssh:
   connection-timeout: 10000
 edge:
   access:
-    key-file-path: src/main/resources/edge
+    key-file-path: edge
 aws:
   initial-max-instances: 0
   max-retries: 5
@@ -51,7 +51,7 @@ aws:
   access:
     key: AKIAS5UBHWDI3WO52EV5
     secret-key: ${secret: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}
-    key-file-path: src/main/resources/aws/ec2.pem
+    key-file-path: aws/ec2.pem
     username: ubuntu
   instance:
     security-group: default

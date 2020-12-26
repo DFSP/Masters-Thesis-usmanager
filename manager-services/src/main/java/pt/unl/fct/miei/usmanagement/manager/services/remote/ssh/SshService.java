@@ -48,11 +48,15 @@ import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.Prome
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -128,21 +132,24 @@ public class SshService {
 			}
 			publicKeyFile = awsKeyFilePath;
 		}
-		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), new File(publicKeyFile), timeout);
+		String path = Objects.requireNonNull(this.getClass().getClassLoader().getResource(publicKeyFile)).toExternalForm();
+		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), path, timeout);
 	}
 
 	private SSHClient initClient(HostAddress hostAddress) throws IOException {
 		return initClient(hostAddress, connectionTimeout);
 	}
 
-	private SSHClient initClient(String username, String hostname, File publicKeyFile, int timeout) throws IOException {
+	private SSHClient initClient(String username, String hostname, String publicKeyFile, int timeout) throws IOException {
 		SSHClient sshClient = new SSHClient();
 		sshClient.setConnectTimeout(timeout);
 		sshClient.addHostKeyVerifier(new PromiscuousVerifier());
 		log.info("Logging in to host {}@{} using key {}", username, hostname, publicKeyFile);
 		sshClient.connect(hostname);
 		PKCS8KeyFile keyFile = new PKCS8KeyFile();
-		keyFile.init(publicKeyFile);
+		InputStream is = getClass().getClassLoader().getResourceAsStream(publicKeyFile);
+		Reader reader = new InputStreamReader(is);
+		keyFile.init(reader);
 		sshClient.authPublickey(username, keyFile);
 		log.info("Successfully logged in to host {}@{}", username, hostname);
 		return sshClient;

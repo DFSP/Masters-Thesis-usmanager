@@ -21,6 +21,6 @@ RUN sh scripts/dockerfile-docker-install.sh scripts/dockerfile-docker-api-instal
 VOLUME /var/run/docker.sock
 WORKDIR /app
 COPY --from=build /usr/src/app/target/*.jar manager-master.jar
-ENV ID master-manager
+ENV ID manager-master
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","manager-master.jar"]
