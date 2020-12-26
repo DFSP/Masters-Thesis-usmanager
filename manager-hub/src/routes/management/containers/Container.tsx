@@ -752,7 +752,7 @@ class Container extends BaseComponent<Props, State> {
                           }}
                         // delete button is never present on new nodes, so a type cast is safe
                           delete={{
-                              textButton: 'Parar',
+                              textButton: (container as IContainer).state === 'ready' ? 'Parar' : 'Apagar',
                               url: `${manager ? `${manager}/api/` : ''}containers/${(container as IContainer).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure
@@ -777,14 +777,14 @@ class Container extends BaseComponent<Props, State> {
     };
 
     private getManagerHost(container: IContainer) {
-        const managerId = container?.managerId;
-        if (managerId) {
-            const workerManager = this.props.workerManagers[managerId];
-            if (workerManager) {
-                return `${workerManager.publicIpAddress}:${workerManager.port}`;
-            }
+        if (!container || container.state === 'down' || !container.managerId) {
+            return undefined;
         }
-        return undefined;
+        const workerManager = this.props.workerManagers[container.managerId];
+        if (!workerManager) {
+            return undefined;
+        }
+        return `${workerManager.publicIpAddress}:${workerManager.port}`;
     }
 
     private getPort = (ports: IContainerPort[]) => {

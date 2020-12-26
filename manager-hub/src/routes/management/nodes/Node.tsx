@@ -630,14 +630,14 @@ class Node extends BaseComponent<Props, State> {
     ]);
 
     private getManagerHost(node: INode) {
-        const managerId = node?.managerId;
-        if (managerId) {
-            const workerManager = this.props.workerManagers[managerId];
-            if (workerManager) {
-                return `${workerManager.publicIpAddress}:${workerManager.port}`;
-            }
+        if (!node || node.state === 'down' || !node.managerId) {
+            return undefined;
         }
-        return undefined;
+        const workerManager = this.props.workerManagers[node.managerId];
+        if (!workerManager) {
+            return undefined;
+        }
+        return `${workerManager.publicIpAddress}:${workerManager.port}`;
     }
 }
 

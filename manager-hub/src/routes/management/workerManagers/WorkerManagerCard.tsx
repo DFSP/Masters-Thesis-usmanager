@@ -110,7 +110,7 @@ class WorkerManagerCard extends BaseComponent<Props, State> {
                                   margin={'10px 0'}
                                   hoverable
                                   delete={{
-                                      textButton: 'Parar',
+                                      textButton: workerManager.state === 'ready' ? 'Parar' : 'Remover',
                                       url: `worker-managers/${workerManager?.id}`,
                                       successCallback: this.onStopSuccess,
                                       failureCallback: this.onStopFailure,

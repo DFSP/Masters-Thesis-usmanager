@@ -20,9 +20,8 @@ public class WorkerManagerRequestInterceptor implements org.springframework.http
 
 	private final MultiValueMap<String, String> headers;
 
-	public WorkerManagerRequestInterceptor(UsersService usersService) {
-		User admin = usersService.getUser("admin");
-		String username = admin.getUsername();
+	public WorkerManagerRequestInterceptor() {
+		String username = "admin";
 		String password = "admin";
 		byte[] auth = String.format("%s:%s", username, password).getBytes();
 		String basicAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));

@@ -319,7 +319,7 @@ class WorkerManager extends BaseComponent<Props, State> {
                               result: this.onPost,
                           }}
                           delete={{
-                              textButton: 'Parar',
+                              textButton: (workerManager as IWorkerManager).state === 'ready' ? 'Parar' : 'Remover',
                               url: `worker-managers/${(workerManager as IWorkerManager).id}`,
                               successCallback: this.onDeleteSuccess,
                               failureCallback: this.onDeleteFailure

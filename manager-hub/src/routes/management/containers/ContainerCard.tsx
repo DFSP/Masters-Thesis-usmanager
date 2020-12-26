@@ -229,8 +229,8 @@ class ContainerCard extends BaseComponent<Props, State> {
                               margin={'10px 0'}
                               hoverable
                               delete={{
-                                  textButton: 'Parar',
-                                  confirmMessage: `parar contentor ${container.id}`,
+                                  textButton: (container as IContainer).state === 'ready' ? 'Parar' : 'Apagar',
+                                  confirmMessage: (container as IContainer).state === 'ready' ? `parar contentor ${container.id}` : `apagar o contentor ${container.id}`,
                                   url: `${manager ? `${manager}/api/` : ''}containers/${container.id}`,
                                   successCallback: this.onDeleteSuccess,
                                   failureCallback: this.onDeleteFailure
