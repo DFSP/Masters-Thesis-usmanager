@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleConditionDTO;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppRuleDTO;
@@ -74,6 +75,7 @@ import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.AppRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ServiceRule;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.apps.AppsService;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaTopicKey;
 import pt.unl.fct.miei.usmanagement.manager.services.componenttypes.ComponentTypesService;
@@ -334,7 +336,8 @@ public class WorkerKafkaService {
 						containersService.deleteContainer(id);
 					}
 				}
-				else {
+				else if (container.getType() == ContainerTypeEnum.BY_REQUEST
+					&& ServiceConstants.getSystemServices().contains(container.getServiceName())) {
 					containersService.addOrUpdateContainer(container);
 				}
 			}
