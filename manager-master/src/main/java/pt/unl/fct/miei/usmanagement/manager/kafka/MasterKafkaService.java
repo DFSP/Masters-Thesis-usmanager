@@ -122,12 +122,10 @@ public class MasterKafkaService {
 	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
-			String managerId = nodeDTO.getManagerId();
-			if (managerId == null || managerId.equalsIgnoreCase("manager-master")) {
-				i++;
+			KafkaTopicKey key = keys.get(i++);
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
 				continue;
 			}
-			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
 			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
 			try {
@@ -151,13 +149,11 @@ public class MasterKafkaService {
 	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<CloudHostDTO> cloudHostDTOs) {
 		int i = 0;
 		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
-			WorkerManagerDTO workerManagerDTO = cloudHostDTO.getManagedByWorker();
-			if (workerManagerDTO == null) {
-				i++;
-				continue;
-			}
 			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, cloudHostDTO.toString());
+			if (key != null && key.getManagerId() != null && key.getManagerId().equalsIgnoreCase("manager-master")) {
+				continue;
+			}
 			CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
 			try {
 				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {

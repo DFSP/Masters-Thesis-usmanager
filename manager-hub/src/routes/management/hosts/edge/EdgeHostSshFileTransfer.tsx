@@ -81,7 +81,7 @@ class EdgeHostSshFileTransfer extends BaseComponent<Props, {}> {
                       values={command}
                       isNew={true}
                       post={{
-                          textButton: 'Upload',
+                          textButton: 'Carregar',
                           url: `hosts/edge/${this.props.edgeHost?.publicIpAddress}/${this.props.edgeHost?.privateIpAddress}/sftp`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure

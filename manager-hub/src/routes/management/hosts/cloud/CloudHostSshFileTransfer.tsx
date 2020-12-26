@@ -81,7 +81,7 @@ class CloudHostSshFileTransfer extends BaseComponent<Props, {}> {
                       values={command}
                       isNew={true}
                       post={{
-                          textButton: 'Upload',
+                          textButton: 'Carregar',
                           url: `hosts/cloud/${this.props.cloudHost?.instanceId}/sftp`,
                           successCallback: this.onPostSuccess,
                           failureCallback: this.onPostFailure

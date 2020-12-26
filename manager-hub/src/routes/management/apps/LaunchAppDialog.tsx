@@ -29,6 +29,7 @@ import {IMarker} from "../../../components/map/Marker";
 
 interface Props {
     launchAppCallback: (position: IMarker) => void;
+    markers: IMarker[];
 }
 
 interface State {
@@ -57,7 +58,7 @@ export default class LaunchAppDialog extends React.Component<Props, State> {
     }
 
     public render() {
-        const location = this.state.selectedPosition ? [this.state.selectedPosition] : [];
+        const location = this.state.selectedPosition ? [this.state.selectedPosition, ...this.props.markers] : this.props.markers;
         return <Dialog id={'launch-app-modal'}
                        title={'Selecionar a localização'}
                        fullscreen={true}

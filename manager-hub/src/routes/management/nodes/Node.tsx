@@ -86,23 +86,27 @@ export interface IManagerStatus {
 }
 
 interface INewNodeHost {
+    workerManager?: boolean;
     role?: string;
-    host?: string;
+    hostname?: string;
 }
 
 interface INewNodeLocation {
+    workerManager?: boolean;
     role?: string;
     coordinates?: Point[];
 }
 
 const buildNewNodeLocation = (): INewNodeLocation => ({
+    workerManager: undefined,
     role: undefined,
     coordinates: undefined,
 });
 
 const buildNewNodeHost = (): INewNodeHost => ({
+    workerManager: undefined,
     role: undefined,
-    host: undefined,
+    hostname: undefined,
 });
 
 interface StateToProps {
@@ -217,8 +221,8 @@ class Node extends BaseComponent<Props, State> {
 
     private onPostFailure = (reason: string, node: INewNodeHost | INewNodeLocation): void => {
         let message;
-        if ("host" in node && node.host) {
-            message = `Erro ao iniciar o nó no host ${node.host}`;
+        if ("hostname" in node && node.hostname) {
+            message = `Erro ao iniciar o nó no host ${node.hostname}`;
         } else if ("coordinates" in node) {
             message = `Erro ao iniciar um nó na localização ${node.coordinates}`;
         } else {
@@ -378,11 +382,11 @@ class Node extends BaseComponent<Props, State> {
         }, {});
 
     private getSelectableHosts = () => {
-        const nodesHostname = Object.values(this.props.nodes).map(node => node.publicIpAddress);
+        const nodesHostname = Object.values(this.props.nodes)/*.filter(node => node.state === 'ready')*/.map(node => node.publicIpAddress);
         const cloudHosts = Object.values(this.props.cloudHosts)
             .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
             .filter(instance => instance.state.name === 'running')
-            .map(instance => instance.publicIpAddress || instance.instanceId);
+            .map(instance => instance.publicIpAddress);
         const edgeHosts = Object.entries(this.props.edgeHosts)
             .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.publicIpAddress))
             .map(([hostname, _]) => hostname);
@@ -429,6 +433,11 @@ class Node extends BaseComponent<Props, State> {
                 currentForm === 'Num endereço'
                     ?
                     <>
+                        <Field key='workerManager'
+                               id='workerManager'
+                               type='checkbox'
+                               value={true}
+                               checkbox={{label: 'Gestor local'}}/>
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}
@@ -449,6 +458,11 @@ class Node extends BaseComponent<Props, State> {
                     </>
                     :
                     <>
+                        <Field key='workerManager'
+                               id='workerManager'
+                               type='checkbox'
+                               value={true}
+                               checkbox={{label: 'Gestor local'}}/>
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}

@@ -130,6 +130,7 @@ export default class LocationMap extends React.Component<Props, State> {
                       clickHighlight={clickHighlight} zoomable={zoomable} keepRatio={keepRatio} position={position}
                       center={this.center()}
                       onZoom={this.resizeMarkers}/>
+            <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
             <ReactTooltip html multiline>
                 {tooltip}
             </ReactTooltip>

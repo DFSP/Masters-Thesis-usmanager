@@ -143,10 +143,10 @@ public class NodesService {
 		return node;
 	}
 
-	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> addNodes(NodeRole role, String host, List<Coordinates> coordinates) {
+	public List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> addNodes(NodeRole role, String hostname, List<Coordinates> coordinates) {
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = new ArrayList<>();
-		if (host != null) {
-			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = hostsService.addHost(host, role);
+		if (hostname != null) {
+			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = hostsService.addHost(hostname, role);
 			nodes.add(node);
 			/*Node n = hostsService.addHost(host, role);
 			pt.unl.fct.miei.usmanagement.manager.nodes.Node node = fromSwarmNode(n);

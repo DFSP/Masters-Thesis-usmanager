@@ -164,7 +164,9 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
 
     private getSelectableContainers = () => {
         const {containers, ruleContainers, unsavedContainersIds} = this.props;
-        return Object.entries(containers).filter(([containerId, _]) => !ruleContainers.includes(containerId)
+        return Object.entries(containers).filter(([containerId, container]) =>
+            (container.labels['serviceType'] === 'FRONTEND' || container.labels['serviceType'] === 'BACKEND')
+            && !ruleContainers.includes(containerId)
             && !unsavedContainersIds.includes(containerId))
             .map(([_, container]) => container.name.replace('/', '') + " - " + container.id);
     };

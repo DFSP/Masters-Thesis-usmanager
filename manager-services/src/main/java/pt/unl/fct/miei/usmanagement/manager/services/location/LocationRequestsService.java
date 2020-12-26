@@ -31,8 +31,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import pt.unl.fct.miei.usmanagement.manager.config.RestRequestInterceptor;
-import pt.unl.fct.miei.usmanagement.manager.containers.Container;
+import pt.unl.fct.miei.usmanagement.manager.config.RequestLocationRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
@@ -62,7 +61,7 @@ public class LocationRequestsService {
 	private final NodesService nodesService;
 	private final HostsService hostsService;
 	private final ContainersService containersService;
-	
+
 	private final int port;
 	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
@@ -70,14 +69,14 @@ public class LocationRequestsService {
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
 								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
-								   LocationRequestsProperties locationRequestsProperties, RestRequestInterceptor restRequestInterceptor) {
+								   LocationRequestsProperties locationRequestsProperties, RequestLocationRequestInterceptor requestInterceptor) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.port = locationRequestsProperties.getPort();
 		this.restTemplate = new RestTemplate();
-		this.restTemplate.setInterceptors(List.of(restRequestInterceptor));
+		this.restTemplate.setInterceptors(List.of(requestInterceptor));
 		this.lastRequestTime = new HashMap<>();
 	}
 

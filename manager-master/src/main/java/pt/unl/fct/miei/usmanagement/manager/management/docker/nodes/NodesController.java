@@ -42,6 +42,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -73,12 +74,18 @@ public class NodesController {
 	@PostMapping
 	public List<Node> addNodes(@RequestBody AddNode addNode) {
 		NodeRole role = addNode.getRole();
-		String host = addNode.getHost();
+		String hostname = addNode.getHostname();
 		List<Coordinates> coordinates = addNode.getCoordinates();
-		if (host == null && coordinates == null) {
-			throw new BadRequestException("Expected host or coordinates to start nodes");
+		if (hostname == null && coordinates == null) {
+			throw new BadRequestException("Expected hostname or coordinates to start nodes");
 		}
-		return nodesService.addNodes(role, host, coordinates);
+		boolean isWorkerManager = addNode.isWorkerManager();
+		if (isWorkerManager) {
+			return workerManagersService.addNodes(addNode);
+		}
+		else {
+			return nodesService.addNodes(role, hostname, coordinates);
+		}
 	}
 
 	@PutMapping("/{id}")

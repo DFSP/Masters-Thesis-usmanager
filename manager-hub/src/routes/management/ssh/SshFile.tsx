@@ -76,7 +76,7 @@ class SshFile extends BaseComponent<Props, {}> {
                   values={command}
                   isNew={true}
                   post={{
-                      textButton: 'Upload',
+                      textButton: 'Carregar',
                       url: 'ssh/upload',
                       successCallback: this.onPostSuccess,
                       failureCallback: this.onPostFailure

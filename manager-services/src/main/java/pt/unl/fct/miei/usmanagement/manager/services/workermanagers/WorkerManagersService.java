@@ -29,16 +29,13 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
-import pt.unl.fct.miei.usmanagement.manager.config.RestRequestInterceptor;
+import pt.unl.fct.miei.usmanagement.manager.config.WorkerManagerRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
@@ -55,6 +52,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.AddNode;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
@@ -66,6 +64,8 @@ import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManagers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,7 +96,7 @@ public class WorkerManagersService {
 								 HostsService hostsService, ServicesService servicesService, KafkaService kafkaService,
 								 CloudHostsService cloudHostsService,
 								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties,
-								 RestRequestInterceptor workerManagerRequestInterceptor, NodesService nodesService) {
+								 WorkerManagerRequestInterceptor requestInterceptor, NodesService nodesService) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -106,7 +106,7 @@ public class WorkerManagersService {
 		this.heartbeatService = heartbeatService;
 		this.nodesService = nodesService;
 		this.restTemplate = new RestTemplate();
-		this.restTemplate.setInterceptors(List.of(workerManagerRequestInterceptor));
+		this.restTemplate.setInterceptors(List.of(requestInterceptor));
 		this.threads = parallelismProperties.getThreads();
 	}
 
@@ -566,4 +566,47 @@ public class WorkerManagersService {
 		}
 	}
 
+	public List<Node> addNodes(AddNode addNode) {
+		String hostname = addNode.getHostname();
+		List<Coordinates> coordinates = addNode.getCoordinates();
+		Map<RegionEnum, List<AddNode>> regionsRequests = new HashMap<>();
+		if (hostname != null) {
+			HostAddress hostAddress = hostsService.completeHostAddress(new HostAddress(addNode.getHostname()));
+			RegionEnum region = hostAddress.getRegion();
+			List<AddNode> requests = List.of(addNode);
+			regionsRequests.put(region, requests);
+		}
+		else if (coordinates != null) {
+			for (Coordinates c : coordinates) {
+				RegionEnum region = RegionEnum.getClosestRegion(c);
+				List<AddNode> requests = regionsRequests.get(region);
+				if (requests == null) {
+					requests = new LinkedList<>();
+				}
+				requests.add(addNode);
+				regionsRequests.put(region, requests);
+			}
+		}
+
+		List<List<Node>> regionNodes = new ForkJoinPool(threads).submit(() ->
+			regionsRequests.entrySet().parallelStream().map(regionRequests -> {
+				RegionEnum region = regionRequests.getKey();
+				WorkerManager workerManager = getRegionWorkerManager(region);
+				String publicIpAddress = workerManager.getPublicIpAddress();
+				int port = workerManager.getPort();
+				String url = String.format("http://%s:%d/api/nodes", publicIpAddress, port);
+				try {
+					log.info("Sending request {} to worker manager {}", url, workerManager.getId());
+					return (List<Node>) restTemplate.postForObject(url, addNode, List.class);
+				}
+				catch (HttpClientErrorException e) {
+					throw new ManagerException(e.getMessage());
+				}
+			}).collect(Collectors.toList())
+		).join();
+
+		List<Node> nodes = new ArrayList<>();
+		regionNodes.forEach(nodes::addAll);
+		return nodes;
+	}
 }

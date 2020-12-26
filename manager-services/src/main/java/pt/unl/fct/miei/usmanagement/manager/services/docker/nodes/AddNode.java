@@ -27,13 +27,15 @@ package pt.unl.fct.miei.usmanagement.manager.services.docker.nodes;
 import lombok.Data;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
+import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 
 @Data
 public final class AddNode {
 
-	private String host;
+	private boolean workerManager;
+	private String hostname;
 	private NodeRole role;
 	private List<Coordinates> coordinates;
 

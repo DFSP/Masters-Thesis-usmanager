@@ -44,7 +44,7 @@ import {
     addAppRules,
     addAppServices,
     addAppSimulatedMetrics,
-    loadApps,
+    loadApps, loadContainers,
     loadRegions,
     updateApp
 } from "../../../actions";
@@ -88,11 +88,13 @@ interface StateToProps {
     app: Partial<IApp>;
     formApp?: Partial<IApp>;
     regions: { [key: string]: IRegion };
+    containers: { [key: string]: IContainer };
 }
 
 interface DispatchToProps {
     loadApps: (name: string) => void;
     loadRegions: () => void;
+    loadContainers: () => void;
     addApp: (app: IApp) => void;
     updateApp: (previousApp: IApp, currentApp: IApp) => void;
     addAppServices: (appName: string, appServices: IAddAppService[]) => void;
@@ -391,6 +393,25 @@ class App extends BaseComponent<Props, State> {
             return fields;
         }, {});
 
+    private getContainersMarkers = (): IMarker[] => {
+        const containers: IContainer[] = Object.values(this.props.containers);
+        const markers = new Map<String, IMarker>();
+        containers
+            .forEach(container => {
+                const publicIpAddress = container.publicIpAddress;
+                const marker = markers.get(publicIpAddress) || {title: '', label: '', latitude: 0, longitude: 0};
+                if (marker.title === '') {
+                    marker.title += container.coordinates.label + '<br/>';
+                }
+                marker.title += container.id.toString().substr(0, 5) + ' - ' + container.labels['serviceName'] + '<br/>';
+                marker.label = publicIpAddress;
+                marker.latitude = container.coordinates.latitude;
+                marker.longitude = container.coordinates.longitude;
+                marker.color = 'green';
+                markers.set(publicIpAddress, marker);
+            });
+        return Array.from(markers.values());
+    }
 
     private app = () => {
         const {isLoading, error} = this.props;
@@ -440,7 +461,7 @@ class App extends BaseComponent<Props, State> {
                                              label={key}/>
                             )}
                         </Form>
-                        <LaunchAppDialog launchAppCallback={this.launchApp}/>
+                        <LaunchAppDialog launchAppCallback={this.launchApp} markers={this.getContainersMarkers()}/>
                     </>
                 )}
             </>
@@ -530,7 +551,7 @@ function removeFields(app: Partial<IApp>) {
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     const isLoading = state.entities.apps.isLoadingApps;
     const error = state.entities.apps.loadAppsError;
-    const name = props.match.params.name;
+    const name = props.match.params.name
     const app = isNew(props.location.search) ? buildNewApp() : state.entities.apps.data[name];
     let formApp;
     if (app) {
@@ -542,13 +563,15 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
         error,
         app,
         formApp,
-        regions: state.entities.regions.data
+        regions: state.entities.regions.data,
+        containers: state.entities.containers.data
     }
 }
 
 const mapDispatchToProps: DispatchToProps = {
     loadApps,
     loadRegions,
+    loadContainers,
     addApp,
     updateApp,
     addAppServices,

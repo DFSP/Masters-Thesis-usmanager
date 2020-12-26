@@ -216,22 +216,23 @@ public class SyncService {
 				boolean updated = false;
 				DockerContainer dockerContainer = dockerContainerIds.get(containerId);
 				if (dockerContainer == null) {
-					continue;
+					Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
+					if (heartbeat.isPresent()
+						&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+						&& !container.getState().equalsIgnoreCase("down")) {
+						container.setState("down");
+						log.info("Synchronized container {} state from {} to {}", containerId, "ready", "down");
+						updated = true;
+					}
 				}
-				String currentPublicIpAddress = dockerContainer.getHostAddress().getPublicIpAddress();
-				String savedPublicIpAddress = container.getHostAddress().getPublicIpAddress();
-				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
-					container.setPublicIpAddress(currentPublicIpAddress);
-					log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
-					updated = true;
-				}
-				Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
-				if (heartbeat.isPresent()
-					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
-					&& !container.getState().equalsIgnoreCase("down")) {
-					container.setState("down");
-					log.info("Synchronized container {} state from {} to {}", containerId, "ready", "down");
-					updated = true;
+				else {
+					String currentPublicIpAddress = dockerContainer.getHostAddress().getPublicIpAddress();
+					String savedPublicIpAddress = container.getHostAddress().getPublicIpAddress();
+					if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+						container.setPublicIpAddress(currentPublicIpAddress);
+						log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
+						updated = true;
+					}
 				}
 				if (updated) {
 					containersService.updateContainer(container);
