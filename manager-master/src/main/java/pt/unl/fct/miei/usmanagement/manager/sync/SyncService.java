@@ -245,7 +245,8 @@ public class SyncService {
 			Optional<Heartbeat> heartbeatOptional = heartbeatService.lastHeartbeat(workerManager.getId());
 			if (heartbeatOptional.isPresent()) {
 				Heartbeat heartbeat = heartbeatOptional.get();
-				if (heartbeat.getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
+				if (heartbeat.getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+					&& !workerManager.getState().equalsIgnoreCase("down")) {
 					workerManagersService.setWorkerManagerDown(heartbeat.getId());
 				}
 			}

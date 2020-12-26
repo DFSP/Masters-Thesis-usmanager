@@ -53,7 +53,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaSe
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.AddNode;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.heartbeats.HeartbeatService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
@@ -87,16 +86,14 @@ public class WorkerManagersService {
 	private final KafkaService kafkaService;
 	private final CloudHostsService cloudHostsService;
 	private final HeartbeatService heartbeatService;
-	private final NodesService nodesService;
 
 	private final RestTemplate restTemplate;
 	private final int threads;
 
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, KafkaService kafkaService,
-								 CloudHostsService cloudHostsService,
-								 @Lazy HeartbeatService heartbeatService, ParallelismProperties parallelismProperties,
-								 WorkerManagerRequestInterceptor requestInterceptor, NodesService nodesService) {
+								 CloudHostsService cloudHostsService, @Lazy HeartbeatService heartbeatService,
+								 ParallelismProperties parallelismProperties, WorkerManagerRequestInterceptor requestInterceptor) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -104,7 +101,6 @@ public class WorkerManagersService {
 		this.kafkaService = kafkaService;
 		this.cloudHostsService = cloudHostsService;
 		this.heartbeatService = heartbeatService;
-		this.nodesService = nodesService;
 		this.restTemplate = new RestTemplate();
 		this.restTemplate.setInterceptors(List.of(requestInterceptor));
 		this.threads = parallelismProperties.getThreads();
@@ -595,13 +591,26 @@ public class WorkerManagersService {
 				String publicIpAddress = workerManager.getPublicIpAddress();
 				int port = workerManager.getPort();
 				String url = String.format("http://%s:%d/api/nodes", publicIpAddress, port);
-				try {
-					log.info("Sending request {} to worker manager {}", url, workerManager.getId());
-					return (List<Node>) restTemplate.postForObject(url, addNode, List.class);
+				final int retries = 10;
+				String errorMessage = "";
+				for (int i = 0; i < retries; i++) {
+					String managerId = workerManager.getId();
+					if (heartbeatService.lastHeartbeat(managerId).isEmpty()) {
+						log.info("Waiting for worker manager {} on region {} to send the first heartbeat. {}/{}", managerId, region.getRegion(), i + 1, retries);
+						Timing.sleep(i + 1, TimeUnit.SECONDS);
+						continue;
+					}
+					try {
+						log.info("Sending request {} to worker manager {}", url, managerId);
+						return (List<Node>) restTemplate.postForObject(url, addNode, List.class);
+					}
+					catch (Exception e) {
+						errorMessage = e.getMessage();
+						log.info("Failed to start nodes on region {}: {}. Retrying {}/{}", region.getRegion(), errorMessage, i + 1, retries);
+						Timing.sleep(i + 1, TimeUnit.SECONDS);
+					}
 				}
-				catch (HttpClientErrorException e) {
-					throw new ManagerException(e.getMessage());
-				}
+				throw new ManagerException("Failed to start nodes on region %s: %s", region.getRegion(), errorMessage);
 			}).collect(Collectors.toList())
 		).join();
 

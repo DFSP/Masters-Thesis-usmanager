@@ -446,8 +446,8 @@ class Node extends BaseComponent<Props, State> {
                                    defaultValue: "Selecionar o cargo",
                                    values: ['MANAGER', 'WORKER']
                                }}/>
-                        <Field<string> key={'host'}
-                                       id={'host'}
+                        <Field<string> key={'hostname'}
+                                       id={'hostname'}
                                        label={'host'}
                                        type='dropdown'
                                        dropdown={{
