@@ -225,11 +225,10 @@ public class SyncService {
 					log.info("Synchronized container {} public ip address from {} to {}", containerId, savedPublicIpAddress, currentPublicIpAddress);
 					updated = true;
 				}
-				Optional<Heartbeat> heartbeat = managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)
-					? Optional.empty()
-					: heartbeatService.lastHeartbeat(managerId);
+				Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
 				if (heartbeat.isPresent()
-					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())) {
+					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+					&& !container.getState().equalsIgnoreCase("down")) {
 					container.setState("down");
 					log.info("Synchronized container {} state from {} to {}", containerId, "ready", "down");
 					updated = true;
@@ -317,48 +316,48 @@ public class SyncService {
 				boolean updated = false;
 				Node swarmNode = swarmNodesIds.get(nodeId);
 				if (swarmNode == null) {
-					continue;
+					Optional<Heartbeat> heartbeat = heartbeatService.lastHeartbeat(managerId);
+					if (heartbeat.isPresent()
+						&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
+						&& !node.getState().equalsIgnoreCase("down")) {
+						node.setState("down");
+						log.info("Synchronized node {} state from {} to {}", nodeId, "ready", "down");
+						updated = true;
+					}
 				}
-				NodeAvailability savedAvailability = node.getAvailability();
-				NodeAvailability currentAvailability = NodeAvailability.getNodeAvailability(swarmNode.spec().availability());
-				if (currentAvailability != savedAvailability) {
-					node.setAvailability(currentAvailability);
-					log.info("Synchronized node {} availability from {} to {}", nodeId, savedAvailability, currentAvailability);
-					updated = true;
+				else {
+					NodeAvailability savedAvailability = node.getAvailability();
+					NodeAvailability currentAvailability = NodeAvailability.getNodeAvailability(swarmNode.spec().availability());
+					if (currentAvailability != savedAvailability) {
+						node.setAvailability(currentAvailability);
+						log.info("Synchronized node {} availability from {} to {}", nodeId, savedAvailability, currentAvailability);
+						updated = true;
+					}
+					ManagerStatus savedManagerStatus = node.getManagerStatus();
+					com.spotify.docker.client.messages.swarm.ManagerStatus swarmNodeStatus = swarmNode.managerStatus();
+					ManagerStatus currentManagerStatus = swarmNodeStatus == null ? null :
+						new ManagerStatus(swarmNodeStatus.leader(), swarmNodeStatus.reachability(), swarmNodeStatus.addr());
+					if (!Objects.equals(currentManagerStatus, savedManagerStatus)) {
+						node.setManagerStatus(currentManagerStatus);
+						log.info("Synchronized node {} manager status from {} to {}", nodeId, savedManagerStatus, currentManagerStatus);
+						updated = true;
+					}
+					String savedState = node.getState();
+					String currentState = swarmNode.status().state();
+					if (!currentState.equalsIgnoreCase(savedState)) {
+						node.setState(currentState);
+						log.info("Synchronized node {} state from {} to {}", nodeId, savedState, currentState);
+						updated = true;
+					}
+					String currentPublicIpAddress = swarmNode.status().addr();
+					String savedPublicIpAddress = node.getPublicIpAddress();
+					if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
+						node.setPublicIpAddress(currentPublicIpAddress);
+						log.info("Synchronized node {} public ip address from {} to {}", nodeId, savedPublicIpAddress, currentPublicIpAddress);
+						updated = true;
+					}
 				}
-				ManagerStatus savedManagerStatus = node.getManagerStatus();
-				com.spotify.docker.client.messages.swarm.ManagerStatus swarmNodeStatus = swarmNode.managerStatus();
-				ManagerStatus currentManagerStatus = swarmNodeStatus == null ? null :
-					new ManagerStatus(swarmNodeStatus.leader(), swarmNodeStatus.reachability(), swarmNodeStatus.addr());
-				if (!Objects.equals(currentManagerStatus, savedManagerStatus)) {
-					node.setManagerStatus(currentManagerStatus);
-					log.info("Synchronized node {} manager status from {} to {}", nodeId, savedManagerStatus, currentManagerStatus);
-					updated = true;
-				}
-				String savedState = node.getState();
-				String currentState = swarmNode.status().state();
-				if (!currentState.equalsIgnoreCase(savedState)) {
-					node.setState(currentState);
-					log.info("Synchronized node {} state from {} to {}", nodeId, savedState, currentState);
-					updated = true;
-				}
-				String currentPublicIpAddress = swarmNode.status().addr();
-				String savedPublicIpAddress = node.getPublicIpAddress();
-				if (!Objects.equals(currentPublicIpAddress, savedPublicIpAddress)) {
-					node.setPublicIpAddress(currentPublicIpAddress);
-					log.info("Synchronized node {} public ip address from {} to {}", nodeId, savedPublicIpAddress, currentPublicIpAddress);
-					updated = true;
-				}
-				Optional<Heartbeat> heartbeat = managerId == null || managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)
-					? Optional.empty()
-					: heartbeatService.lastHeartbeat(managerId);
-				if (heartbeat.isPresent()
-					&& heartbeat.get().getTimestamp().plusSeconds(TimeUnit.MILLISECONDS.toSeconds(INVALID_TIMEOUT)).isBefore(LocalDateTime.now())
-					&& !node.getState().equalsIgnoreCase("down")) {
-					node.setState("down");
-					log.info("Synchronized node {} state from {} to {}", nodeId, "ready", "down");
-					updated = true;
-				}
+
 				if (updated) {
 					nodesService.updateNode(node);
 				}

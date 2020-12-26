@@ -93,7 +93,8 @@ class Containers extends BaseComponent<Props, {}> {
                            data: Object.values(this.props.nodes),
                            isLoading: this.props.isLoadingNodes,
                            error: this.props.loadNodesError
-                       }}/>;
+                       }}
+                       manager={this.getManagerHost(container)}/>;
 
     private predicate = (container: IContainer, search: string): boolean =>
         container.id.toString().toLowerCase().includes(search)
