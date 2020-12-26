@@ -119,7 +119,7 @@ public class MasterKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
-	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
+	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
 			String managerId = nodeDTO.getManagerId();
@@ -127,11 +127,11 @@ public class MasterKafkaService {
 				i++;
 				continue;
 			}
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
 			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					String id = node.getId();
 					nodesService.deleteNode(id);
 				}
@@ -148,7 +148,7 @@ public class MasterKafkaService {
 
 	@Transactional(noRollbackFor = org.hibernate.exception.ConstraintViolationException.class)
 	@KafkaListener(topics = "cloud-hosts", autoStartup = "false")
-	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<CloudHostDTO> cloudHostDTOs) {
+	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<CloudHostDTO> cloudHostDTOs) {
 		int i = 0;
 		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
 			WorkerManagerDTO workerManagerDTO = cloudHostDTO.getManagedByWorker();
@@ -156,11 +156,11 @@ public class MasterKafkaService {
 				i++;
 				continue;
 			}
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, cloudHostDTO.toString());
 			CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = cloudHost.getId();
 					cloudHostsService.deleteCloudHost(id);
 				}

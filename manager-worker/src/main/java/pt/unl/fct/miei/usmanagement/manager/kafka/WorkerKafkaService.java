@@ -176,14 +176,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "apps", autoStartup = "false")
-	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<AppDTO> appDTOs) {
+	public void listenApps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<AppDTO> appDTOs) {
 		int i = 0;
 		for (AppDTO appDTO : appDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, appDTO.toString());
 			try {
 				App app = AppMapper.MAPPER.toApp(appDTO, context);
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = app.getId();
 					appsService.deleteApp(id);
 				}
@@ -207,14 +207,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "cloud-hosts", autoStartup = "false")
-	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<CloudHostDTO> cloudHostDTOs) {
+	public void listenCloudHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<CloudHostDTO> cloudHostDTOs) {
 		int i = 0;
 		for (CloudHostDTO cloudHostDTO : cloudHostDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, cloudHostDTO.toString());
 			CloudHost cloudHost = CloudHostMapper.MAPPER.toCloudHost(cloudHostDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = cloudHost.getId();
 					cloudHostsService.deleteCloudHost(id);
 				}
@@ -234,14 +234,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "component-types", autoStartup = "false")
-	public void listenComponentTypes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ComponentTypeDTO> componentTypeDTOs) {
+	public void listenComponentTypes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ComponentTypeDTO> componentTypeDTOs) {
 		int i = 0;
 		for (ComponentTypeDTO componentTypeDTO : componentTypeDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, componentTypeDTO);
 			ComponentType componentType = ComponentTypeMapper.MAPPER.toComponentType(componentTypeDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = componentType.getId();
 					componentTypesService.deleteComponentType(id);
 				}
@@ -266,14 +266,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "conditions", autoStartup = "false")
-	public void listenConditions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ConditionDTO> conditionDTOs) {
+	public void listenConditions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ConditionDTO> conditionDTOs) {
 		int i = 0;
 		for (ConditionDTO conditionDTO : conditionDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, conditionDTO);
 			Condition condition = ConditionMapper.MAPPER.toCondition(conditionDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = condition.getId();
 					conditionsService.deleteCondition(id);
 				}
@@ -348,14 +348,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "decisions", autoStartup = "false")
-	public void listenDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<DecisionDTO> decisionDTOs) {
+	public void listenDecisions(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<DecisionDTO> decisionDTOs) {
 		int i = 0;
 		for (DecisionDTO decisionDTO : decisionDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, decisionDTO.toString());
 			Decision decision = DecisionMapper.MAPPER.toDecision(decisionDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = decision.getId();
 					decisionsService.deleteDecision(id);
 				}
@@ -373,14 +373,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "edge-hosts", autoStartup = "false")
-	public void listenEdgeHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<EdgeHostDTO> edgeHostDTOs) {
+	public void listenEdgeHosts(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<EdgeHostDTO> edgeHostDTOs) {
 		int i = 0;
 		for (EdgeHostDTO edgeHostDTO : edgeHostDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, edgeHostDTO.toString());
 			EdgeHost edgeHost = EdgeHostMapper.MAPPER.toEdgeHost(edgeHostDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = edgeHost.getId();
 					edgeHostsService.deleteEdgeHost(id);
 				}
@@ -400,14 +400,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "eips", autoStartup = "false")
-	public void listenElasticIps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ElasticIpDTO> elasticIpDTOs) {
+	public void listenElasticIps(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ElasticIpDTO> elasticIpDTOs) {
 		int i = 0;
 		for (ElasticIpDTO elasticIpDTO : elasticIpDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, elasticIpDTO.toString());
 			ElasticIp elasticIp = ElasticIpMapper.MAPPER.toElasticIp(elasticIpDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = elasticIp.getId();
 					elasticIpsService.deleteElasticIp(id);
 				}
@@ -424,14 +424,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "fields", autoStartup = "false")
-	public void listenFields(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<FieldDTO> fieldDTOs) {
+	public void listenFields(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<FieldDTO> fieldDTOs) {
 		int i = 0;
 		for (FieldDTO fieldDTO : fieldDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, fieldDTO.toString());
 			Field field = FieldMapper.MAPPER.toField(fieldDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = field.getId();
 					fieldsService.deleteField(id);
 				}
@@ -452,17 +452,17 @@ public class WorkerKafkaService {
 
 	/*@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "nodes", autoStartup = "false")
-	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<NodeDTO> nodeDTOs) {
+	public void listenNodes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<NodeDTO> nodeDTOs) {
 		int i = 0;
 		for (NodeDTO nodeDTO : nodeDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			if (key == null && nodeDTO.getRegion() != hostsService.getManagerHostAddress().getRegion()) {
 				continue;
 			}
 			log.debug("Received key={} message={}", key, nodeDTO.toString());
 			Node node = NodeMapper.MAPPER.toNode(nodeDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					String id = node.getId();
 					nodesService.deleteNode(id);
 				}
@@ -479,14 +479,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "operators", autoStartup = "false")
-	public void listenOperators(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<OperatorDTO> operatorDTOs) {
+	public void listenOperators(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<OperatorDTO> operatorDTOs) {
 		int i = 0;
 		for (OperatorDTO operatorDTO : operatorDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, operatorDTO.toString());
 			Operator operator = OperatorMapper.MAPPER.toOperator(operatorDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = operator.getId();
 					operatorsService.deleteOperator(id);
 				}
@@ -507,14 +507,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "services", autoStartup = "false")
-	public void listenService(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ServiceDTO> serviceDTOs) {
+	public void listenService(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ServiceDTO> serviceDTOs) {
 		int i = 0;
 		for (ServiceDTO serviceDTO : serviceDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, serviceDTO.toString());
 			try {
 				pt.unl.fct.miei.usmanagement.manager.services.Service service = ServiceMapper.MAPPER.toService(serviceDTO, context);
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					String serviceName = service.getServiceName();
 					servicesService.deleteServiceByName(serviceName);
 				}
@@ -552,15 +552,15 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-host-metrics", autoStartup = "false")
-	public void listenSimulatedHostMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+	public void listenSimulatedHostMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys,
 										   List<HostSimulatedMetricDTO> hostSimulatedMetricDTOs) {
 		int i = 0;
 		for (HostSimulatedMetricDTO hostSimulatedMetricDTO : hostSimulatedMetricDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, hostSimulatedMetricDTO.toString());
 			HostSimulatedMetric hostSimulatedMetric = HostSimulatedMetricMapper.MAPPER.toHostSimulatedMetric(hostSimulatedMetricDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = hostSimulatedMetric.getId();
 					hostSimulatedMetricsService.deleteHostSimulatedMetric(id);
 				}
@@ -594,15 +594,15 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-app-metrics", autoStartup = "false")
-	public void listenSimulatedAppMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+	public void listenSimulatedAppMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys,
 										  List<AppSimulatedMetricDTO> appSimulatedMetricDTOs) {
 		int i = 0;
 		for (AppSimulatedMetricDTO appSimulatedMetricDTO : appSimulatedMetricDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, appSimulatedMetricDTO.toString());
 			AppSimulatedMetric appSimulatedMetric = AppSimulatedMetricMapper.MAPPER.toAppSimulatedMetric(appSimulatedMetricDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = appSimulatedMetric.getId();
 					appSimulatedMetricsService.deleteAppSimulatedMetric(id);
 				}
@@ -628,15 +628,15 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-service-metrics", autoStartup = "false")
-	public void listenSimulatedServiceMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys,
+	public void listenSimulatedServiceMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys,
 											  List<ServiceSimulatedMetricDTO> serviceSimulatedMetricDTOs) {
 		int i = 0;
 		for (ServiceSimulatedMetricDTO serviceSimulatedMetricDTO : serviceSimulatedMetricDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, serviceSimulatedMetricDTO.toString());
 			ServiceSimulatedMetric serviceSimulatedMetric = ServiceSimulatedMetricMapper.MAPPER.toServiceSimulatedMetric(serviceSimulatedMetricDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = serviceSimulatedMetric.getId();
 					serviceSimulatedMetricsService.deleteServiceSimulatedMetric(id);
 				}
@@ -662,14 +662,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "simulated-container-metrics", autoStartup = "false")
-	public void listenSimulatedContainerMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerSimulatedMetricDTO> containerSimulatedMetricDTOs) {
+	public void listenSimulatedContainerMetrics(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ContainerSimulatedMetricDTO> containerSimulatedMetricDTOs) {
 		int i = 0;
 		for (ContainerSimulatedMetricDTO containerSimulatedMetricDTO : containerSimulatedMetricDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, containerSimulatedMetricDTO.toString());
 			ContainerSimulatedMetric containerSimulatedMetric = ContainerSimulatedMetricMapper.MAPPER.toContainerSimulatedMetric(containerSimulatedMetricDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = containerSimulatedMetric.getId();
 					containerSimulatedMetricsService.deleteContainerSimulatedMetric(id);
 				}
@@ -695,14 +695,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "host-rules", autoStartup = "false")
-	public void listenHostRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<HostRuleDTO> hostRuleDTOs) {
+	public void listenHostRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<HostRuleDTO> hostRuleDTOs) {
 		int i = 0;
 		for (HostRuleDTO hostRuleDTO : hostRuleDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, hostRuleDTO.toString());
 			HostRule hostRule = HostRuleMapper.MAPPER.toHostRule(hostRuleDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = hostRule.getId();
 					hostRulesService.deleteRule(id);
 				}
@@ -752,14 +752,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "app-rules", autoStartup = "false")
-	public void listenAppRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<AppRuleDTO> appRuleDTOs) {
+	public void listenAppRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<AppRuleDTO> appRuleDTOs) {
 		int i = 0;
 		for (AppRuleDTO appRuleDTO : appRuleDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, appRuleDTO.toString());
 			AppRule appRule = AppRuleMapper.MAPPER.toAppRule(appRuleDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = appRule.getId();
 					appRulesService.deleteRule(id);
 				}
@@ -802,14 +802,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "service-rules", autoStartup = "false")
-	public void listenServiceRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ServiceRuleDTO> serviceRuleDTOs) {
+	public void listenServiceRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ServiceRuleDTO> serviceRuleDTOs) {
 		int i = 0;
 		for (ServiceRuleDTO serviceRuleDTO : serviceRuleDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, serviceRuleDTO.toString());
 			ServiceRule serviceRule = ServiceRuleMapper.MAPPER.toServiceRule(serviceRuleDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = serviceRule.getId();
 					serviceRulesService.deleteRule(id);
 				}
@@ -848,14 +848,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "container-rules", autoStartup = "false")
-	public void listenContainerRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ContainerRuleDTO> containerRuleDTOs) {
+	public void listenContainerRules(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ContainerRuleDTO> containerRuleDTOs) {
 		int i = 0;
 		for (ContainerRuleDTO containerRuleDTO : containerRuleDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, containerRuleDTO.toString());
 			ContainerRule containerRule = ContainerRuleMapper.MAPPER.toContainerRule(containerRuleDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = containerRule.getId();
 					containerRulesService.deleteRule(id);
 				}
@@ -894,14 +894,14 @@ public class WorkerKafkaService {
 
 	@Transactional(noRollbackFor = ConstraintViolationException.class)
 	@KafkaListener(topics = "value-modes", autoStartup = "false")
-	public void listenValueModes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<String> keys, Set<ValueModeDTO> valueModeDTOs) {
+	public void listenValueModes(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) List<KafkaTopicKey> keys, Set<ValueModeDTO> valueModeDTOs) {
 		int i = 0;
 		for (ValueModeDTO valueModeDTO : valueModeDTOs) {
-			String key = keys.get(i++);
+			KafkaTopicKey key = keys.get(i++);
 			log.debug("Received key={} message={}", key, valueModeDTO.toString());
 			ValueMode valueMode = ValueModeMapper.MAPPER.toValueMode(valueModeDTO, context);
 			try {
-				if (Objects.equal(key, "DELETE")) {
+				if (key != null && Objects.equal(key.getOperation(), "DELETE")) {
 					Long id = valueMode.getId();
 					valueModesService.deleteValueMode(id);
 				}
