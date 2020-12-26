@@ -98,13 +98,13 @@ interface INewNodeLocation {
 }
 
 const buildNewNodeLocation = (): INewNodeLocation => ({
-    workerManager: undefined,
+    workerManager: false,
     role: undefined,
     coordinates: undefined,
 });
 
 const buildNewNodeHost = (): INewNodeHost => ({
-    workerManager: undefined,
+    workerManager: false,
     role: undefined,
     hostname: undefined,
 });

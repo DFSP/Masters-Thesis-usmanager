@@ -126,7 +126,7 @@ public class SshService {
 			}
 			catch (EntityNotFoundException ignored) {
 			}
-			publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
+			publicKeyFile = awsKeyFilePath;
 		}
 		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), new File(publicKeyFile), timeout);
 	}

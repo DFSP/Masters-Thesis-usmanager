@@ -29,7 +29,6 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -322,72 +321,78 @@ public class WorkerManagersService {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/containers", publicIpAddress, port);
-		try {
-			ResponseEntity<Container[]> response = restTemplate.postForEntity(url, launchContainerRequest, Container[].class);
-			Container[] responseBody = response.getBody();
-			List<Container> containers = new ArrayList<>();
-			if (responseBody != null) {
-				containers.addAll(Arrays.asList(responseBody));
+		final int retries = 10;
+		String errorMessage = "";
+		for (int i = 0; i < retries; i++) {
+			String managerId = workerManager.getId();
+			if (heartbeatService.lastHeartbeat(managerId).isEmpty()) {
+				log.info("Waiting for worker manager {} to send the first heartbeat. {}/{}", managerId, i + 1, retries);
+				Timing.sleep(i + 1, TimeUnit.SECONDS);
+				continue;
 			}
-			return CompletableFuture.completedFuture(containers);
+			try {
+				log.info("Sending request {} {} to worker manager {}", url, launchContainerRequest, managerId);
+				Container[] response = restTemplate.postForObject(url, launchContainerRequest, Container[].class);
+				List<Container> containers = new ArrayList<>();
+				if (response != null) {
+					containers.addAll(Arrays.asList(response));
+				}
+				return CompletableFuture.completedFuture(containers);
+			}
+			catch (Exception e) {
+				errorMessage = e.getMessage();
+				log.info("Failed to start container on worker manager {}: {}. Retrying {}/{}", managerId, errorMessage, i + 1, retries);
+				Timing.sleep(i + 1, TimeUnit.SECONDS);
+			}
 		}
-		catch (HttpClientErrorException e) {
-			throw new ManagerException(e.getMessage());
-		}
+		throw new ManagerException("Failed to start container on worker manager %s: %s", workerManager.getId(), errorMessage);
 	}
 
 	public List<Container> launchContainers(LaunchContainerRequest launchContainerRequest) {
 		HostAddress hostAddress = launchContainerRequest.getHostAddress();
 		List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
 		List<Container> containers = new ArrayList<>();
-		final int retries = 5;
-		int tries = 0;
-		do {
+		if (hostAddress != null) {
+			if (!hostAddress.isComplete()) {
+				hostAddress = hostsService.completeHostAddress(hostAddress);
+			}
+			RegionEnum region = hostAddress.getRegion();
+			WorkerManager workerManager = getRegionWorkerManager(region);
+
 			try {
-				if (hostAddress != null) {
-					if (!hostAddress.isComplete()) {
-						hostAddress = hostsService.completeHostAddress(hostAddress);
-					}
-					RegionEnum region = hostAddress.getRegion();
-					WorkerManager workerManager = getRegionWorkerManager(region);
-					// TODO when new workerManager, wait for it to start until requesting the action
-					List<Container> workerContainers = launchContainer(launchContainerRequest, workerManager).get();
-					containers.addAll(workerContainers);
-				}
-				else if (coordinates != null) {
-					List<WorkerManager> regionWorkerManagers = coordinates.stream().map(c -> {
-						RegionEnum region = RegionEnum.getClosestRegion(c);
-						return getRegionWorkerManager(region);
-					}).collect(Collectors.toList());
-					Map<WorkerManager, CompletableFuture<List<Container>>> futureContainers = regionWorkerManagers.stream().collect(Collectors.toMap(
-						workerManager -> workerManager,
-						workerManager -> launchContainer(launchContainerRequest, workerManager)
-					));
-
-					CompletableFuture.allOf(futureContainers.values().toArray(new CompletableFuture[0])).join();
-
-					for (Map.Entry<WorkerManager, CompletableFuture<List<Container>>> futureWorkerContainers : futureContainers.entrySet()) {
-						WorkerManager workerManager = futureWorkerContainers.getKey();
-						try {
-							List<Container> workerContainers = futureWorkerContainers.getValue().get();
-							containers.addAll(workerContainers);
-						}
-						catch (InterruptedException | ExecutionException e) {
-							e.printStackTrace();
-							throw new ManagerException("Failed to launch containers on worker from region %s", workerManager.getRegion());
-						}
-					}
-				}
+				List<Container> workerContainers = launchContainer(launchContainerRequest, workerManager).get();
+				containers.addAll(workerContainers);
 			}
 			catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
-				log.error("Failed to launch containers: {}... retrying ({}/{})", e.getMessage(), tries + 1, retries);
-				Timing.sleep(tries * 2, TimeUnit.SECONDS);
+				throw new ManagerException("Failed to launch containers on worker manager %s from region %s: %s",
+					workerManager.getId(), workerManager.getRegion(), e.getMessage());
 			}
-		} while (containers.isEmpty() && ++tries < retries);
+		}
+		else if (coordinates != null) {
+			List<WorkerManager> regionWorkerManagers = coordinates.stream().map(c -> {
+				RegionEnum region = RegionEnum.getClosestRegion(c);
+				return getRegionWorkerManager(region);
+			}).collect(Collectors.toList());
+			Map<WorkerManager, CompletableFuture<List<Container>>> futureContainers = regionWorkerManagers.stream().collect(Collectors.toMap(
+				workerManager -> workerManager,
+				workerManager -> launchContainer(launchContainerRequest, workerManager)
+			));
 
-		if (containers.isEmpty()) {
-			throw new ManagerException("Failed to launch containers");
+			CompletableFuture.allOf(futureContainers.values().toArray(new CompletableFuture[0])).join();
+
+			for (Map.Entry<WorkerManager, CompletableFuture<List<Container>>> futureWorkerContainers : futureContainers.entrySet()) {
+				WorkerManager workerManager = futureWorkerContainers.getKey();
+				try {
+					List<Container> workerContainers = futureWorkerContainers.getValue().get();
+					containers.addAll(workerContainers);
+				}
+				catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+					throw new ManagerException("Failed to launch containers on worker manager %s from region %s: %s",
+						workerManager.getId(), workerManager.getRegion(), e.getMessage());
+				}
+			}
 		}
 
 		return containers;
@@ -520,9 +525,8 @@ public class WorkerManagersService {
 		int port = workerManager.getPort();
 		String url = String.format("http://%s:%d/api/apps/%s/launch", publicIpAddress, port, appName);
 		try {
-			log.info("Sending request {} to worker manager {}", url, workerManager.getId());
+			log.info("Sending request {} {} to worker manager {}", url, coordinates, workerManager.getId());
 			Map<String, List<Container>> response = restTemplate.postForObject(url, coordinates, Map.class);
-			log.info("Got reply from {}: {}", url, response);
 			return CompletableFuture.completedFuture(response);
 		}
 		catch (HttpClientErrorException e) {
@@ -601,7 +605,7 @@ public class WorkerManagersService {
 						continue;
 					}
 					try {
-						log.info("Sending request {} to worker manager {}", url, managerId);
+						log.info("Sending request {} {} to worker manager {}", url, addNode, managerId);
 						return (List<Node>) restTemplate.postForObject(url, addNode, List.class);
 					}
 					catch (Exception e) {

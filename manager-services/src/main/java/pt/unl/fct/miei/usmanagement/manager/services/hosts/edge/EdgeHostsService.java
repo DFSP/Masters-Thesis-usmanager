@@ -88,8 +88,7 @@ public class EdgeHostsService {
 	public String getPrivateKeyFilePath(EdgeHost edgeHost) {
 		String username = edgeHost.getUsername();
 		String hostname = edgeHost.getHostname();
-		return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
-			hostname.replace(".", "_"));
+		return String.format("%s/%s_%s", edgeKeyFilePath, username, hostname.replace(".", "_"));
 	}
 
 	@Transactional(readOnly = true)
