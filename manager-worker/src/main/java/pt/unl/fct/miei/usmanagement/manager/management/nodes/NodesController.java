@@ -96,9 +96,10 @@ public class NodesController {
 		return nodesService.rejoinSwarm(id);
 	}
 
-	@DeleteMapping("/{hostname}/leave")
-	public void leaveSwarm(@PathVariable("hostname") String hostname) {
-		nodesService.leaveHost(new HostAddress(hostname));
+	@PutMapping("/{publicIpAddress}/{privateIpAddress}/leave")
+	public List<Node> leaveSwarm(@PathVariable("publicIpAddress") String publicIpAddress,
+								 @PathVariable("privateIpAddress") String privateIpAddress) {
+		return nodesService.leaveHost(new HostAddress(publicIpAddress, privateIpAddress));
 	}
 
 	@PostMapping("/sync")

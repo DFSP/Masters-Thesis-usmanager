@@ -102,7 +102,7 @@ class Landing extends React.Component<Props, State> {
             case 'asia':
                 return 'HotPink';
             case 'oceania':
-                return 'DarkSlateGray';
+                return 'Red';
         }
     }
 
@@ -127,7 +127,8 @@ class Landing extends React.Component<Props, State> {
             else if (marker.title !== '' && previousMarker && previousContainer?.publicIpAddress !== container.publicIpAddress) {
                 marker.title += publicIpAddress + '/' + privateIpAddress + ':<br/>';
             }
-            marker.title += container.id.toString().substr(0, 10) + ' - ' + container.labels['serviceName'] + '<br/>';
+            marker.title += container.id.toString().substr(0, 10) + ' - '
+                + container.labels['serviceName'] + (container.state === 'down' ? ' (down)' : '') + '<br/>';
             marker.label = publicIpAddress;
             marker.latitude = container.coordinates.latitude;
             marker.longitude = container.coordinates.longitude;

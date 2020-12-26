@@ -64,7 +64,6 @@ public class NodeDTO {
 			", version=" + version +
 			", state='" + state + '\'' +
 			", managerStatus=" + managerStatus +
-			", managerId='" + managerId + '\'' +
 			", labels=" + labels +
 			'}';
 	}

@@ -36,7 +36,6 @@ public class ContainerDTO {
 	private Set<ContainerPortMapping> ports;
 	private Map<String, String> labels;
 	private RegionEnum region;
-	private String managerId;
 	private Coordinates coordinates;
 	private String state;
 	private Set<ContainerRuleDTO> containerRules;
@@ -79,7 +78,6 @@ public class ContainerDTO {
 			", ports=" + ports +
 			", labels=" + labels +
 			", region=" + region +
-			", managerId='" + managerId + '\'' +
 			", coordinates=" + coordinates +
 			", containerRules=" + (containerRules == null ? "null" : containerRules.stream().map(ContainerRuleDTO::getId).collect(Collectors.toSet())) +
 			", simulatedContainerMetrics=" + (simulatedContainerMetrics == null ? "null" : simulatedContainerMetrics.stream()

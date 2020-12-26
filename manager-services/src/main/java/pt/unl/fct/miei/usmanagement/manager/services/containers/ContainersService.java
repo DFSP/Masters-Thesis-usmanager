@@ -149,7 +149,6 @@ public class ContainersService {
 				.coordinates(dockerContainer.getCoordinates())
 				.state("ready")
 				.region(dockerContainer.getRegion())
-				.managerId(environment.getProperty(ContainerConstants.Environment.Manager.ID))
 				.build();
 			return addContainer(container);
 		}

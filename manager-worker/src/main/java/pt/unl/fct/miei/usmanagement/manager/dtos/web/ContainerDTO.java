@@ -31,7 +31,6 @@ public class ContainerDTO {
 	private Set<ContainerPortMapping> ports;
 	private Map<String, String> labels;
 	private RegionEnum region;
-	private String managerId;
 	private Coordinates coordinates;
 	private String state;
 

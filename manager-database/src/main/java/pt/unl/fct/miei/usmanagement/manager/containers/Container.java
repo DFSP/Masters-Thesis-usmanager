@@ -111,13 +111,11 @@ public class Container /*extends AbstractEntity<String> */ {
 	@NotNull
 	private RegionEnum region;
 
-	private String managerId;
+	@NotNull
+	private String state;
 
 	@NotNull
 	private Coordinates coordinates;
-
-	@NotNull
-	private String state;
 
 	@Singular
 	@JsonIgnore
@@ -145,6 +143,10 @@ public class Container /*extends AbstractEntity<String> */ {
 	@JsonIgnore
 	public String getAddress() {
 		return String.format("%s:%s", publicIpAddress, labels.get(ContainerConstants.Label.SERVICE_PORT));
+	}
+
+	public String getManagerId() {
+		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
 	}
 
 	public void addRule(ContainerRule rule) {

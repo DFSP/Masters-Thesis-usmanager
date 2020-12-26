@@ -93,9 +93,9 @@ export interface IContainer extends IDatabaseData {
     ports: IContainerPort[];
     labels: IContainerLabel;
     region: IRegion;
-    coordinates: ICoordinates;
-    managerId: string | null;
     state: string;
+    managerId: string | null;
+    coordinates: ICoordinates;
     logs?: string;
     containerRules?: string[];
     containerSimulatedMetrics?: string[];

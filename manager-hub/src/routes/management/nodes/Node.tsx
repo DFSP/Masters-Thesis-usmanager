@@ -65,14 +65,14 @@ import {IWorkerManager} from "../workerManagers/WorkerManager";
 
 export interface INode extends IDatabaseData {
     publicIpAddress: string;
-    state: string;
     availability: string;
     role: string;
     version: number;
-    coordinates?: ICoordinates
     labels: INodeLabel;
     managerStatus: IManagerStatus;
     managerId: string | null;
+    state: string;
+    coordinates?: ICoordinates
 }
 
 export interface INodeLabel {
@@ -303,7 +303,12 @@ class Node extends BaseComponent<Props, State> {
 
     private rejoinSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.id}/join`;
+        if (!node) {
+            return;
+        }
+        const manager = this.getManagerHost(node);
+        console.log(manager)
+        const url = `${manager ? `${manager}/api/` : ''}nodes/${node.id}/join`;
         this.setState({loading: {method: 'post', url: url}});
         postData(url, {},
             (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
@@ -329,7 +334,11 @@ class Node extends BaseComponent<Props, State> {
 
     private leaveSwarm = () => {
         const node = this.getNode();
-        const url = `nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
+        if (!node) {
+            return;
+        }
+        const manager = this.getManagerHost(node);
+        const url = `${manager ? `${manager}/api/` : ''}nodes/${node?.publicIpAddress}/${node?.labels['privateIpAddress']}/leave`;
         this.setState({loading: {method: 'post', url: url}});
         putData(url, undefined,
             (reply: IReply<INode[]>) => this.onLeaveSuccess(reply.data),
@@ -630,7 +639,7 @@ class Node extends BaseComponent<Props, State> {
     ]);
 
     private getManagerHost(node: INode) {
-        if (!node || node.state === 'down' || !node.managerId) {
+        if (!node || !node.managerId) {
             return undefined;
         }
         const workerManager = this.props.workerManagers[node.managerId];

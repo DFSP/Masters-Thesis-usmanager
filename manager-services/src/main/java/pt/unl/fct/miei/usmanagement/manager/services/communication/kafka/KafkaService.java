@@ -656,25 +656,25 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (!managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId), message);
 		}
 		else {
-			log.warn("Not sending message id={} to topic={} because hasKafkaBrokers={} and populated={}",
-				id, topic, hasKafkaBrokers, populated);
+			log.warn("Not sending message id={} to topic={} because managerId={}, hasKafkaBrokers={} and populated={}",
+				id, topic, managerId, hasKafkaBrokers, populated);
 		}
 	}
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (!managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId, "DELETE"), id);
 		}
 		else {
-			log.warn("Not sending DELETE id={} request to topic={} because hasKafkaBrokers={} and populated={}",
-				id, topic, hasKafkaBrokers, populated);
+			log.warn("Not sending DELETE id={} request to topic={} because managerId={}, hasKafkaBrokers={} and populated={}",
+				id, topic, managerId, hasKafkaBrokers, populated);
 		}
 	}
 
