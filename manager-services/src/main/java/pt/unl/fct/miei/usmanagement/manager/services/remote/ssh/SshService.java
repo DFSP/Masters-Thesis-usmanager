@@ -56,7 +56,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -117,11 +116,11 @@ public class SshService {
 		if (!hostAddress.hasConnectionInfo()) {
 			hostAddress = hostsService.completeConnectionInfo(hostAddress);
 		}
-		String publicKeyFile;
+		String keyFile;
 		try {
 			EdgeHost edgeHost = edgeHostsService.getEdgeHostByAddress(hostAddress);
 			hostAddress = edgeHost.getAddress();
-			publicKeyFile = edgeHostsService.getPrivateKeyFilePath(edgeHost);
+			keyFile = edgeHostsService.getKeyFilePath(edgeHost);
 		}
 		catch (EntityNotFoundException e) {
 			try {
@@ -130,10 +129,9 @@ public class SshService {
 			}
 			catch (EntityNotFoundException ignored) {
 			}
-			publicKeyFile = awsKeyFilePath;
+			keyFile = awsKeyFilePath;
 		}
-		String path = Objects.requireNonNull(this.getClass().getClassLoader().getResource(publicKeyFile)).toExternalForm();
-		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), path, timeout);
+		return initClient(hostAddress.getUsername(), hostAddress.getPublicIpAddress(), keyFile, timeout);
 	}
 
 	private SSHClient initClient(HostAddress hostAddress) throws IOException {
