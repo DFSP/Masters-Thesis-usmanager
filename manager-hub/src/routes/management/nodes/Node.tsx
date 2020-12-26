@@ -224,7 +224,7 @@ class Node extends BaseComponent<Props, State> {
         if ("hostname" in node && node.hostname) {
             message = `Erro ao iniciar o nó no host ${node.hostname}`;
         } else if ("coordinates" in node) {
-            message = `Erro ao iniciar um nó na localização ${node.coordinates}`;
+            message = `Erro ao iniciar um nó na localização lat=${node.coordinates?.[0]} lon=${node.coordinates?.[1]}`;
         } else {
             message = `Erro ao iniciar o nó`;
         }

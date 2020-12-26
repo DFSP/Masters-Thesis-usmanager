@@ -70,12 +70,12 @@ public class NodesController {
 	@PostMapping
 	public List<Node> addNodes(@RequestBody AddNode addNode) {
 		NodeRole role = addNode.getRole();
-		String host = addNode.getHost();
+		String hostname = addNode.getHostname();
 		List<Coordinates> coordinates = addNode.getCoordinates();
-		if (host == null && coordinates == null) {
-			throw new BadRequestException("Expected host address or coordinates to start nodes");
+		if (hostname == null && coordinates == null) {
+			throw new BadRequestException("Expected hostname or coordinates to start nodes");
 		}
-		return nodesService.addNodes(role, host, coordinates);
+		return nodesService.addNodes(role, hostname, coordinates);
 	}
 
 	@PutMapping("/{id}")
