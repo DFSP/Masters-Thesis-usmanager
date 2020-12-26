@@ -27,15 +27,14 @@ package pt.unl.fct.miei.usmanagement.manager.services.docker.proxy;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
-import pt.unl.fct.miei.usmanagement.manager.services.Service;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 
 import java.util.List;
 
@@ -45,14 +44,16 @@ public class DockerApiProxyService {
 
 	private final HostsService hostsService;
 
+	private final String managerId;
 	private final String dockerApiProxyUsername;
 	private final String dockerApiProxyPassword;
 	private final int dockerApiProxyPort;
 	private final int dockerApiPort;
 	private final String dockerHubUsername;
 
-	public DockerApiProxyService(@Lazy HostsService hostsService, DockerProperties dockerProperties) {
+	public DockerApiProxyService(@Lazy HostsService hostsService, DockerProperties dockerProperties, Environment environment) {
 		this.hostsService = hostsService;
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
 		this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
 		this.dockerApiProxyPort = dockerProperties.getApiProxy().getPort();
@@ -69,7 +70,7 @@ public class DockerApiProxyService {
 				+ "else docker pull %s && "
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
 				+ "-e %s=%s -e %s=%s -e %s=http://%s:%s "
-				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s='%s' %s; fi",
 			serviceName, dockerRepository, serviceName, dockerApiProxyPort, 80, serviceName,
 			ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
 			ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
@@ -80,6 +81,7 @@ public class DockerApiProxyService {
 			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
 			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+			ContainerConstants.Label.MANAGER_ID, managerId,
 			dockerRepository);
 		List<String> output = hostsService.executeCommandSync(command, hostAddress);
 		return output.get(output.size() - 1);

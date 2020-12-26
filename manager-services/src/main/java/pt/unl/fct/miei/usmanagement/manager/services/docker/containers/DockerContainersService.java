@@ -40,6 +40,7 @@ import com.spotify.docker.client.messages.PortBinding;
 import com.spotify.docker.client.shaded.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.data.util.Pair;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.configurations.Configuration;
@@ -93,8 +94,6 @@ import java.util.stream.IntStream;
 @org.springframework.stereotype.Service
 public class DockerContainersService {
 
-	private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
-
 	private final static Pattern CONTAINER_ID_PATTERN = Pattern.compile("is already in use by container \\\\\"(.*)\\\\\"");
 
 	private final ContainersService containersService;
@@ -106,8 +105,9 @@ public class DockerContainersService {
 	private final RegistrationServerService registrationServerService;
 	private final HostsService hostsService;
 	private final ConfigurationsService configurationsService;
-
 	private final RegistrationProperties registrationProperties;
+
+	private final String managerId;
 	private final int dockerDelayBeforeStopContainer;
 	private final int threads;
 
@@ -116,7 +116,7 @@ public class DockerContainersService {
 								   ServiceDependenciesService serviceDependenciesService, LoadBalancerService nginxLoadBalancerService,
 								   RegistrationServerService registrationServerService, HostsService hostsService,
 								   RegistrationProperties registrationProperties, ContainerProperties containerProperties, ConfigurationsService configurationsService,
-								   ParallelismProperties parallelismProperties) {
+								   ParallelismProperties parallelismProperties, Environment environment) {
 		this.containersService = containersService;
 		this.dockerCoreService = dockerCoreService;
 		this.nodesService = nodesService;
@@ -126,6 +126,7 @@ public class DockerContainersService {
 		this.registrationServerService = registrationServerService;
 		this.hostsService = hostsService;
 		this.registrationProperties = registrationProperties;
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
 		this.configurationsService = configurationsService;
 		this.threads = parallelismProperties.getThreads();
@@ -365,6 +366,7 @@ public class DockerContainersService {
 				if (containerType == ContainerTypeEnum.SINGLETON && hostAddress.equals(hostsService.getManagerHostAddress())) {
 					containerLabels.put(ContainerConstants.Label.MASTER_MANAGER, String.valueOf(true));
 				}
+				containerLabels.put(ContainerConstants.Label.MANAGER_ID, managerId);
 				containerLabels.putAll(labels);
 
 				Set<String> volumes = service.getVolumes();

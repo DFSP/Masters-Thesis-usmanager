@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.services.location;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -62,6 +63,7 @@ public class LocationRequestsService {
 	private final HostsService hostsService;
 	private final ContainersService containersService;
 
+	private final String managerId;
 	private final int port;
 	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
@@ -69,11 +71,13 @@ public class LocationRequestsService {
 
 	public LocationRequestsService(NodesService nodesService, @Lazy HostsService hostsService,
 								   @Lazy ContainersService containersService, DockerProperties dockerProperties,
-								   LocationRequestsProperties locationRequestsProperties, RequestLocationRequestInterceptor requestInterceptor) {
+								   LocationRequestsProperties locationRequestsProperties, RequestLocationRequestInterceptor requestInterceptor,
+								   Environment environment) {
 		this.nodesService = nodesService;
 		this.hostsService = hostsService;
 		this.containersService = containersService;
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.port = locationRequestsProperties.getPort();
 		this.restTemplate = new RestTemplate();
 		this.restTemplate.setInterceptors(List.of(requestInterceptor));
@@ -222,7 +226,7 @@ public class LocationRequestsService {
 				+ "if [ $REQUEST_LOCATION_MONITOR ]; then echo $REQUEST_LOCATION_MONITOR; "
 				+ "else docker pull %s && "
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
-				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s='%s' %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, port, serviceName,
 			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
@@ -230,6 +234,7 @@ public class LocationRequestsService {
 			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
 			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+			ContainerConstants.Label.MANAGER_ID, managerId,
 			dockerRepository);
 		List<String> output = hostsService.executeCommandSync(command, hostAddress);
 		return output.get(output.size() - 1);

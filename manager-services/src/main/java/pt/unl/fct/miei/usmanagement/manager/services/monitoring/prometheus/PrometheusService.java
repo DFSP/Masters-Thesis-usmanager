@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -54,14 +55,16 @@ import java.util.concurrent.CompletableFuture;
 public class PrometheusService {
 
 	private final HostsService hostsService;
-	
+
+	private final String managerId;
 	private final int port;
 	private final String dockerHubUsername;
 	private final RestTemplate restTemplate;
 
 	public PrometheusService(@Lazy HostsService hostsService, DockerProperties dockerProperties, PrometheusProperties prometheusProperties,
-							 PrometheusRequestInterceptor requestInterceptor) {
+							 PrometheusRequestInterceptor requestInterceptor, Environment environment) {
 		this.hostsService = hostsService;
+		this.managerId = environment.getProperty(ContainerConstants.Environment.Manager.ID);
 		this.port = prometheusProperties.getPort();
 		this.dockerHubUsername = dockerProperties.getHub().getUsername();
 		this.restTemplate = new RestTemplate();
@@ -101,7 +104,7 @@ public class PrometheusService {
 				+ "if [ $PROMETHEUS ]; then echo $PROMETHEUS; "
 				+ "else docker pull %s && "
 				+ "docker run -itd --name=%s -p %d:%d --hostname %s --rm "
-				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s %s; fi",
+				+ "-l %s=%b -l %s=%s -l %s=%s -l %s=%s -l %s='%s' -l %s=%s -l %s='%s' %s; fi",
 			serviceName, dockerRepository, serviceName, externalPort, port, serviceName,
 			ContainerConstants.Label.US_MANAGER, true,
 			ContainerConstants.Label.CONTAINER_TYPE, ContainerTypeEnum.SINGLETON,
@@ -109,6 +112,7 @@ public class PrometheusService {
 			ContainerConstants.Label.SERVICE_TYPE, ServiceTypeEnum.SYSTEM,
 			ContainerConstants.Label.COORDINATES, gson.toJson(hostAddress.getCoordinates()),
 			ContainerConstants.Label.REGION, hostAddress.getRegion().name(),
+			ContainerConstants.Label.MANAGER_ID, managerId,
 			dockerRepository);
 		List<String> output = hostsService.executeCommandSync(command, hostAddress);
 		return output.get(output.size() - 1);
