@@ -29,31 +29,70 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
+import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
+import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
+
+import java.util.Objects;
+import java.util.function.Predicate;
 
 @Slf4j
 @Component
 public class ManagerWorkerShutdown implements ApplicationListener<ContextClosedEvent> {
 
-	private final SyncService syncService;
+	private final ContainersService containersService;
 	private final DockerSwarmService dockerSwarmService;
+	private final HostsMonitoringService hostsMonitoringService;
+	private final ServicesMonitoringService servicesMonitoringService;
+	private final SyncService syncService;
+	private final KafkaService kafkaService;
 
-	public ManagerWorkerShutdown(SyncService syncService, DockerSwarmService dockerSwarmService) {
+	public ManagerWorkerShutdown(ContainersService containersService, ServicesMonitoringService servicesMonitoringService,
+								 SyncService syncService, DockerSwarmService dockerSwarmService,
+								 HostsMonitoringService hostsMonitoringService, KafkaService kafkaService) {
+		this.containersService = containersService;
+		this.servicesMonitoringService = servicesMonitoringService;
 		this.syncService = syncService;
 		this.dockerSwarmService = dockerSwarmService;
+		this.hostsMonitoringService = hostsMonitoringService;
+		this.kafkaService = kafkaService;
 	}
 
 	@Override
 	public void onApplicationEvent(@NonNull ContextClosedEvent event) {
+		hostsMonitoringService.stopHostMonitoring();
+		servicesMonitoringService.stopServiceMonitoring();
 		syncService.stopContainersDatabaseSynchronization();
 		syncService.stopNodesDatabaseSynchronization();
-		/*try {
+		kafkaService.stop();
+		try {
+			Predicate<DockerContainer> containersPredicate = (dockerContainer) -> {
+				String serviceName = dockerContainer.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, "");
+				return !Objects.equals(serviceName, ServiceConstants.Name.DOCKER_API_PROXY);
+			};
+			containersService.stopContainers(containersPredicate);
+		}
+		catch (Exception e) {
+			log.error("Failed to stop all containers: {}", e.getMessage());
+		}
+		try {
 			dockerSwarmService.destroySwarm();
 		}
 		catch (Exception e) {
-			log.error("Failed to destroy the swarm: {}", e.getMessage());
-		}*/
+			log.error("Failed to completely destroy swarm: {}", e.getMessage());
+		}
+		try {
+			containersService.stopDockerApiProxies();
+		}
+		catch (Exception e) {
+			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
+		}
 	}
 
 }

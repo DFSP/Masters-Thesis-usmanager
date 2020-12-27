@@ -45,7 +45,7 @@ class SearchBar extends React.Component<Props, {}> {
         return (
             <form className={`col l2 xl3 ${styles.searchBarForm}`} noValidate autoComplete="off">
                 <div className={`input-field ${styles.searchBar}`}>
-                    <input id="search" type="search" placeholder="Filter" value={this.props.search}
+                    <input id="search" type="search" placeholder="Pesquisa" value={this.props.search}
                            onChange={this.setValue}/>
                     <label className="label-icon" htmlFor="search">
                         <i className="material-icons">search</i>
