@@ -114,6 +114,10 @@ public class Container /*extends AbstractEntity<String> */ {
 	@NotNull
 	private String state;
 
+	public String getManagerId() {
+		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
+	}
+
 	@NotNull
 	private Coordinates coordinates;
 
@@ -143,10 +147,6 @@ public class Container /*extends AbstractEntity<String> */ {
 	@JsonIgnore
 	public String getAddress() {
 		return String.format("%s:%s", publicIpAddress, labels.get(ContainerConstants.Label.SERVICE_PORT));
-	}
-
-	public String getManagerId() {
-		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
 	}
 
 	public void addRule(ContainerRule rule) {

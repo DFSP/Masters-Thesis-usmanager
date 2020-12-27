@@ -59,9 +59,9 @@ aws:
     type: t2.micro
     tag: us-manager
 docker:
-  install-script: src/main/resources/scripts/docker-install.sh/docker-install.sh
-  uninstall-script: src/main/resources/scripts/docker-uninstall.sh/docker-uninstall.sh
-  install-api-script: src/main/resources/scripts/docker-api-install.sh/docker-api-install.sh
+  install-script: scripts/docker-install.sh
+  uninstall-script: scripts/docker-uninstall.sh
+  install-api-script: scripts/docker-api-install.sh
   api:
     port: 2376
   api-proxy:
@@ -79,7 +79,7 @@ registration:
 prometheus:
   port: 9090
   node-exporter:
-    install-script: src/main/resources/scripts/node-exporter-install.sh
+    install-script: scripts/node-exporter-install.sh
 monitoring:
   hosts:
     period: 60000

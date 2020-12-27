@@ -29,6 +29,6 @@ import lombok.Data;
 @Data
 class CommandSftpData {
 
-	private final String hostname;
+	private String hostname;
 
 }

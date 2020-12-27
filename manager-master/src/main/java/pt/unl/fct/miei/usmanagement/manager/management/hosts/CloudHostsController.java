@@ -143,9 +143,9 @@ public class CloudHostsController {
 		}
 	}
 
-	@PostMapping("/{publicIpAddress}/sftp")
-	public void upload(@PathVariable String publicIpAddress, @RequestBody ExecuteSftpRequest request) {
-		sshService.uploadFile(new HostAddress(publicIpAddress), request.getFilename());
+	@PostMapping("/{instanceId}/sftp")
+	public void upload(@PathVariable String instanceId, @RequestBody ExecuteSftpRequest request) {
+		sshService.uploadFile(instanceId, request.getFilename());
 	}
 
 }

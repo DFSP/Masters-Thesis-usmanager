@@ -30,7 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 @Data
 public class ExecuteHostSftpRequest {
 
-	private final HostAddress hostAddress;
-	private final String filename;
+	private HostAddress hostAddress;
+	private String filename;
 
 }

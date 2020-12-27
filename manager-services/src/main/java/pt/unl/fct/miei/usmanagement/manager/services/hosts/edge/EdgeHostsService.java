@@ -49,6 +49,11 @@ import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.rules.HostRulesS
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -178,9 +183,15 @@ public class EdgeHostsService {
 		return edgeHost;
 	}
 
-	private void setupEdgeHost(EdgeHost edgeHost, char[] password) {
+	private void setupEdgeHost(EdgeHost edgeHost, char[] password) throws IOException {
 		HostAddress hostAddress = edgeHost.getAddress();
 		String keyFilePath = getKeyFilePath(edgeHost);
+		Path source = Paths.get(this.getClass().getResource(File.separator).getPath());
+		String folders = keyFilePath.substring(0, keyFilePath.lastIndexOf(File.separator));
+		Path newFolder = Paths.get(source.toAbsolutePath() + folders);
+		Files.createDirectories(newFolder);
+		keyFilePath = source.toAbsolutePath() + File.separator + keyFilePath;
+
 		log.info("Generating keys for edge host {}", hostAddress);
 
 		String generateKeysCommand = String.format("echo yes | ssh-keygen -m PEM -t rsa -b 4096 -f '%s' -q -N \"\" &&"

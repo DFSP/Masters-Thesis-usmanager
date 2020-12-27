@@ -260,7 +260,7 @@ public class ContainersService {
 	}
 
 	public List<Container> getContainers(String managerId) {
-		return containers.findByManagerId(managerId);
+		return getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Environment.Manager.ID, managerId)));
 	}
 
 	public Container getContainer(String containerId) {

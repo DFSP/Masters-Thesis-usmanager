@@ -1,246 +1,45 @@
-2020-12-26 22:48:50 jdbc[3]: exception
+2020-12-26 23:14:25 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:50 jdbc[3]: exception
+2020-12-26 23:14:25 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:51 jdbc[3]: exception
+2020-12-26 23:14:26 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:51 jdbc[3]: exception
+2020-12-26 23:14:26 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:27 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:52 jdbc[3]: exception
+2020-12-26 23:14:28 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:48:53 jdbc[4]: exception
+2020-12-26 23:14:28 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "LOGGING_EVENT" not found; SQL statement:
 INSERT INTO logging_event (timestmp, formatted_message, logger_name, level_string, thread_name, reference_flag, arg0, arg1, arg2, arg3, caller_filename, caller_class, caller_method, caller_line) VALUES (?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [42102-200]
-2020-12-26 22:49:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''containers'': FactoryBean threw except... (507)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-26 22:49:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: java.lang.IllegalArgumentException: Failed to create query for method public abstract java.util.List pt.unl.fct.miei... (349)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-2020-12-26 22:49:00 jdbc[3]: exception
-org.h2.jdbc.JdbcBatchUpdateException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''containers'': FactoryBean threw except... (507)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1235)
-	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
-	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
-	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
-	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
-	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
-	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
-	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
-	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
-	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
-	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
-	at ch.qos.logback.classic.Logger.log(Logger.java:765)
-	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
-	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
-	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
-	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'org.springframework.beans.factory.BeanCreationException: Error creating bean with name ''containers'': FactoryBean threw except... (507)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:457)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:429)
-	at org.h2.message.DbException.get(DbException.java:205)
-	at org.h2.value.TypeInfo.getValueTooLongException(TypeInfo.java:535)
-	at org.h2.value.TypeInfo.cast(TypeInfo.java:520)
-	at org.h2.table.Column.validateConvertUpdateSequence(Column.java:378)
-	at org.h2.table.Table.validateConvertUpdateSequence(Table.java:845)
-	at org.h2.command.dml.Insert.insertRows(Insert.java:187)
-	at org.h2.command.dml.Insert.update(Insert.java:151)
-	at org.h2.command.CommandContainer.update(CommandContainer.java:198)
-	at org.h2.command.Command.executeUpdate(Command.java:251)
-	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:191)
-	at org.h2.jdbc.JdbcPreparedStatement.executeBatch(JdbcPreparedStatement.java:1219)
-	at ch.qos.logback.classic.db.DBAppender.insertThrowable(DBAppender.java:288)
-	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:115)
-	at ch.qos.logback.classic.db.DBAppender.secondarySubAppend(DBAppender.java:43)
-	at ch.qos.logback.core.db.DBAppenderBase.append(DBAppenderBase.java:108)
-	at ch.qos.logback.core.UnsynchronizedAppenderBase.doAppend(UnsynchronizedAppenderBase.java:84)
-	at ch.qos.logback.core.spi.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:51)
-	at ch.qos.logback.classic.Logger.appendLoopOnAppenders(Logger.java:270)
-	at ch.qos.logback.classic.Logger.callAppenders(Logger.java:257)
-	at ch.qos.logback.classic.Logger.buildLoggingEventAndAppend(Logger.java:421)
-	at ch.qos.logback.classic.Logger.filterAndLog_0_Or3Plus(Logger.java:383)
-	at ch.qos.logback.classic.Logger.log(Logger.java:765)
-	at org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog.error(LogAdapter.java:433)
-	at org.springframework.boot.SpringApplication.reportFailure(SpringApplication.java:837)
-	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:812)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1237)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1226)
-	at pt.unl.fct.miei.usmanagement.manager.ManagerMasterApplication.main(ManagerMasterApplication.java:37)
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "'Caused by: java.lang.IllegalArgumentException: Failed to create query for method public abstract java.util.List pt.unl.fct.miei... (349)"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
-org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 1"; SQL statement:
-INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]

@@ -29,6 +29,6 @@ import lombok.Data;
 @Data
 public class ExecuteSftpRequest {
 
-	private final String filename;
+	private String filename;
 
 }

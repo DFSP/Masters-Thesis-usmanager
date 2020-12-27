@@ -51,6 +51,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -166,14 +169,19 @@ public class SshService {
 		return sshClient;
 	}
 
+	public void uploadFile(String instanceId, String filename) {
+		CloudHost cloudHost = cloudHostsService.getCloudHostById(instanceId);
+		uploadFile(cloudHost.getAddress(), filename);
+	}
+
 	public void uploadFile(HostAddress hostAddress, String filename) {
-		try (SSHClient sshClient = initClient(hostAddress);
-			 SFTPClient sftpClient = sshClient.newSFTPClient()) {
+		try (SSHClient sshClient = initClient(hostAddress); SFTPClient sftpClient = sshClient.newSFTPClient()) {
 			String scriptPath = scriptPaths.get(filename);
 			if (scriptPath == null) {
 				throw new EntityNotFoundException(File.class, "name", filename);
 			}
-			File file = new File(scriptPath);
+			Path source = Paths.get(this.getClass().getResource(File.separator).getPath());
+			File file = Paths.get(source.toAbsolutePath() + File.separator + scriptPath).toFile();
 			log.info("Transferring file {} to host {}", filename, hostAddress);
 			sftpClient.put(new FileSystemFile(file), filename);
 		}

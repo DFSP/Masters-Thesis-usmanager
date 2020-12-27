@@ -29,10 +29,10 @@ import lombok.Data;
 @Data
 class CommandSshData {
 
-	private final String hostname;
-	private final String username;
-	private final String password;
-	private final String name;
-	private final String command;
+	private String hostname;
+	private String username;
+	private String password;
+	private String name;
+	private String command;
 
 }

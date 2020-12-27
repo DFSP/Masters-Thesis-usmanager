@@ -30,8 +30,8 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 @Data
 public class ExecuteHostSshRequest {
 
-	private final HostAddress hostAddress;
-	private final String command;
-	private final boolean background;
+	private HostAddress hostAddress;
+	private String command;
+	private boolean background;
 
 }

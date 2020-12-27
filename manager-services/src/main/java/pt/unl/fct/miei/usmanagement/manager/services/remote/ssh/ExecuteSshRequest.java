@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 public class ExecuteSshRequest {
 
-	private final String command;
-	private final boolean background;
+	private String command;
+	private boolean background;
 
 }
