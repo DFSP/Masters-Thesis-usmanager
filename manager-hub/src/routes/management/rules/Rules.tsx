@@ -48,6 +48,15 @@ const Rules = () =>
                        ],
                    }}/>
         <div className={`${styles.collapsibleContainer}`}>
+            <Collapsible id={"rulesConditionCollapsible"}
+                         title={'Condições'}
+                         active
+                         headerClassname={styles.collapsibleSubtitle}
+                         bodyClassname={styles.collapsibleCardList}>
+                <RuleConditionsList/>
+            </Collapsible>
+        </div>
+        <div className={`${styles.collapsibleContainer}`}>
             <Collapsible id={"rulesHostCollapsible"}
                          title={'Hosts'}
                          active
@@ -81,15 +90,6 @@ const Rules = () =>
                          headerClassname={styles.collapsibleSubtitle}
                          bodyClassname={styles.collapsibleCardList}>
                 <RulesContainerList/>
-            </Collapsible>
-        </div>
-        <div className={`${styles.collapsibleContainer}`}>
-            <Collapsible id={"rulesConditionCollapsible"}
-                         title={'Condições'}
-                         active
-                         headerClassname={styles.collapsibleSubtitle}
-                         bodyClassname={styles.collapsibleCardList}>
-                <RuleConditionsList/>
             </Collapsible>
         </div>
     </MainLayout>;

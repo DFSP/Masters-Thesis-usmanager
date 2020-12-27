@@ -197,7 +197,7 @@ class NodeCard extends BaseComponent<Props, State> {
         return <CardNode id={`node-${node.id}`}
                          title={node.id.toString()}
                          link={{to: {pathname: `/nós/${node.id}`, state: node}}}
-                         height={'150px'}
+                         height={'179px'}
                          margin={'10px 0'}
                          hoverable
                          loading={loading}

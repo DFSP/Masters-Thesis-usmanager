@@ -81,8 +81,8 @@ interface INewEdgeHost extends IEdgeHost {
 const buildNewEdgeHost = (): Partial<INewEdgeHost> => ({
     username: undefined,
     password: undefined,
-    privateIpAddress: undefined,
     publicIpAddress: undefined,
+    privateIpAddress: undefined,
     publicDnsName: undefined,
     coordinates: undefined,
 });

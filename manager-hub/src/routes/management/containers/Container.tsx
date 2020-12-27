@@ -854,7 +854,7 @@ class Container extends BaseComponent<Props, State> {
             active: this.props.location.state?.selected === 'containerLabels'
         },
         {
-            title: 'Logs',
+            title: 'Registos',
             id: 'logs',
             content: () => this.logs(),
             hidden: this.isNew(),

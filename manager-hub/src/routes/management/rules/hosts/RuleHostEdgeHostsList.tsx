@@ -85,7 +85,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
         const isNew = this.isNew();
         return <ControlledList isLoading={!isNew ? this.props.isLoadingHostRule || this.props.isLoading : undefined}
                                error={this.props.loadHostRuleError || (isNew ? undefined : this.props.error)}
-                               emptyMessage={`Sem hosts edge associados`}
+                               emptyMessage={`Sem edge hosts associados`}
                                data={this.props.ruleEdgeHosts}
                                dropdown={{
                                    id: 'edgeHosts',

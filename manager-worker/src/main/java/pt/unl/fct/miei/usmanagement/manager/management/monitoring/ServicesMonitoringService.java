@@ -283,20 +283,20 @@ public class ServicesMonitoringService {
 				String appName = app.getName();
 				Map<String, Double> appSimulatedFields = appSimulatedMetricsService.getAppSimulatedMetricByApp(appName)
 					.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getField().getName()) || metric.isOverride()))
-					.collect(Collectors.toMap(metric -> metric.getField().getName(), appSimulatedMetricsService::randomizeFieldValue));
+					.collect(Collectors.toMap(metric -> metric.getField().getName(), appSimulatedMetricsService::randomizeFieldValue, (m1, m2) -> m1));
 				stats.putAll(appSimulatedFields);
 			}
 
 			// Simulated service metrics
 			Map<String, Double> serviceSimulatedFields = serviceSimulatedMetricsService.getServiceSimulatedMetricByService(serviceName)
 				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getField().getName()) || metric.isOverride()))
-				.collect(Collectors.toMap(metric -> metric.getField().getName(), serviceSimulatedMetricsService::randomizeFieldValue));
+				.collect(Collectors.toMap(metric -> metric.getField().getName(), serviceSimulatedMetricsService::randomizeFieldValue, (m1, m2) -> m1));
 			stats.putAll(serviceSimulatedFields);
 
 			// Simulated container metrics
 			Map<String, Double> containerSimulatedFields = containerSimulatedMetricsService.getServiceSimulatedMetricByContainer(containerId)
 				.stream().filter(metric -> metric.isActive() && (!stats.containsKey(metric.getField().getName()) || metric.isOverride()))
-				.collect(Collectors.toMap(metric -> metric.getField().getName(), containerSimulatedMetricsService::randomizeFieldValue));
+				.collect(Collectors.toMap(metric -> metric.getField().getName(), containerSimulatedMetricsService::randomizeFieldValue, (m1, m2) -> m1));
 			stats.putAll(containerSimulatedFields);
 
 			// Calculated metrics

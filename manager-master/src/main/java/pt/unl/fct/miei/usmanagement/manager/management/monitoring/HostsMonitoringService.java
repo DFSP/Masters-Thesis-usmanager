@@ -268,7 +268,7 @@ public class HostsMonitoringService {
 		// Simulated host metrics
 		Map<String, Double> hostSimulatedFields = hostSimulatedMetricsService.getHostSimulatedMetricByHost(hostAddress)
 			.stream().filter(metric -> metric.isActive() && (!validStats.containsKey(metric.getField().getName()) || metric.isOverride()))
-			.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue));
+			.collect(Collectors.toMap(metric -> metric.getField().getName(), hostSimulatedMetricsService::randomizeFieldValue, (m1, m2) -> m1));
 		validStats.putAll(hostSimulatedFields);
 
 		validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
