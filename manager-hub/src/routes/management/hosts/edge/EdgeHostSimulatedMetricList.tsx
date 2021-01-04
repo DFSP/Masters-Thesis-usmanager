@@ -143,7 +143,7 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/métricas simuladas/hosts/${simulatedMetric}`}
                           className={`${styles.link}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

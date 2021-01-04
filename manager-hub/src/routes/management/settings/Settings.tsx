@@ -119,7 +119,7 @@ class Settings extends BaseComponent<{}, State> {
     render() {
         const {selectedForm} = this.state;
         return <MainLayout>
-            <div className='row col s12 m12'>
+            {/*<div className='row col s12 m12'>
                 <div className={`${styles.container}`}>
                     <PerfectScrollbar>
                         <ul className={styles.optionsContainer}>
@@ -152,8 +152,7 @@ class Settings extends BaseComponent<{}, State> {
                         </button>
                     </div>
                 </div>
-            </div>
-
+            </div>*/}
         </MainLayout>
     }
 

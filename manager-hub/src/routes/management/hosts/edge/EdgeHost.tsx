@@ -170,7 +170,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
         const edgeHost = reply.data;
         const hostname = edgeHost.publicIpAddress + "-" + edgeHost.privateIpAddress;
-        super.toast(`<span class="green-text">O host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href='/hosts/edge/${hostname}'><b>${hostname}</b></a>`} foi configurado com sucesso</span>`);
+        super.toast(`<span class="green-text">O host ${this.mounted ? `<b>${hostname}</b>` : `<a href='/hosts/edge/${hostname}'><b>${hostname}</b></a>`} foi configurado com sucesso</span>`);
         this.props.addEdgeHost(edgeHost);
         this.saveEntities(edgeHost);
         if (this.mounted) {
@@ -185,7 +185,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     /*private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
         const edgeHost = reply.data;
         const hostname = edgeHost.publicIpAddress + '-' + edgeHost.privateIpAddress;
-        super.toast(`<span class="green-text">As alterações ao host ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href='/hosts/edge/${hostname}'><b>${hostname}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações ao host ${this.mounted ? `<b>${hostname}</b>` : `<a href='/hosts/edge/${hostname}'><b>${hostname}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(edgeHost);
         const previousEdgeHost = this.getEdgeHost();
         if (previousEdgeHost.id) {
@@ -201,7 +201,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         super.toast(`Não foi possível atualizar o host ${this.mounted ? `<b>${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b>` : `<a href='/hosts/edge/${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}'><b>${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b></a>`}`, 10000, reason, true);*/
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-        super.toast(`<span class="green-text">O edge host <b class="white-text">${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b> foi removido com sucesso</span>`);
+        super.toast(`<span class="green-text">O edge host <b>${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/hosts/edge`)
         }

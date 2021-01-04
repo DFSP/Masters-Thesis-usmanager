@@ -75,7 +75,7 @@ class ContainerCard extends BaseComponent<Props, State> {
         this.props.container || this.state.container;
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O contentor<b>${container.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

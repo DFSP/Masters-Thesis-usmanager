@@ -28,16 +28,3 @@
     justify-content: center;
     align-items: center;
 }
-
-.icon {
-    color: white;
-    font-size: 2rem;
-}
-
-.message {
-    color: white;
-    margin: 0 !important;
-    padding: 25px;
-    max-width: 50%;
-    word-wrap: break-word;
-}

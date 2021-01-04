@@ -164,7 +164,6 @@ public class AwsService {
 		return instances;
 	}
 
-	@Async
 	public CompletableFuture<List<Instance>> getInstances(AwsRegion region) {
 		List<Instance> instances = new ArrayList<>();
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
@@ -225,7 +224,6 @@ public class AwsService {
 		return instance;
 	}
 
-	@Async
 	public CompletableFuture<String> launchInstance(AwsRegion region, InstanceType type) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
 			.withImageId(region.getAmi().get(type))

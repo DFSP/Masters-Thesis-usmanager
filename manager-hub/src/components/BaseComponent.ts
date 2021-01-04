@@ -54,7 +54,7 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
         const id = this.getToastId();
         const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;
         if (!unique || !this.toasts.some(toast => toast.toast.options.html === html)) {
-            const toast = M.toast({html, displayLength, completeCallback: this.removeToast(id), classes: 'test'});
+            const toast = M.toast({html, displayLength, completeCallback: this.removeToast(id)});
             if (instance || unique) {
                 this.toasts.push({id: id, toast: toast});
             }

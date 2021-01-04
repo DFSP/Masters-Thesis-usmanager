@@ -65,7 +65,7 @@ class RuleHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleHost: IRuleHost): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleHost.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleHost.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

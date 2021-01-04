@@ -89,7 +89,8 @@ class Nodes extends BaseComponent<Props, {}> {
         node.id.toString().toLowerCase().includes(search)
         || node.publicIpAddress.toLowerCase().includes(search)
         || node.state.toLowerCase().includes(search)
-        || node.role.toLowerCase().includes(search);
+        || node.role.toLowerCase().includes(search)
+        || node.managerId.toLowerCase().includes(search);
 
     private syncNodes = () => {
         this.props.syncNodes();

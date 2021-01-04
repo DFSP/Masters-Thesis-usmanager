@@ -35,6 +35,7 @@ import LinkedContextMenuItem from "../contextmenu/LinkedContextMenuItem";
 import DividerContextMenuItem from "../contextmenu/DividerContextMenuItem";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import {isDarkMode} from "../../utils/bightnessMode";
 
 interface CardProps<T> {
     id: string;
@@ -92,7 +93,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
         const {loading} = this.state;
         const cardElement =
             <>
-                <ActionProgressBar loading={loading} backgroundColor={"#1F1F1F"} progressBarColor={"#e51220"}/>
+                <ActionProgressBar loading={loading} backgroundColor={'transparent'} progressBarColor={"#e51220"}/>
                 {this.cardElement()}
             </>;
         return (
@@ -192,7 +193,7 @@ class GenericCard<T> extends React.Component<Props<T>, State> {
                  style={childrenCount === 0 ? {borderBottom: '1px black solid'} : undefined}>
                 {title && <CardTitle title={title}/>}
                 {childrenCount > 0 && (
-                    <div className={`card gridCard`}
+                    <div className={`card grid-card`}
                          style={{height: this.getHeight()}}
                          ref={this.card}>
                         <ScrollBar ref={(ref) => this.scrollbar = ref} component='div'>

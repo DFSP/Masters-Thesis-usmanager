@@ -64,7 +64,7 @@ class Pagination extends React.Component<Props, {}> {
                     )}
                     {beforeEllipsis.length === 1 && (
                         <>
-                            <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
+                            <i className={`material-icons bottom three-dots`}>more_horiz</i>
                             {afterEllipsis.length === 1 && (
                                 betweenEllipsis.map((pageNumber, index) =>
                                     <PageNumber key={index} page={pageNumber} active={true}
@@ -74,7 +74,7 @@ class Pagination extends React.Component<Props, {}> {
                         </>
                     )}
                     {afterEllipsis.length === 1 && (
-                        <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
+                        <i className={`material-icons bottom three-dots`}>more_horiz</i>
                     )}
                     {afterEllipsis.map((pageNumber, index) =>
                         <PageNumber key={index} page={pageNumber}

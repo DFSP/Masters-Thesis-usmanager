@@ -96,6 +96,7 @@ public class NodesController {
 		return nodesService.rejoinSwarm(id);
 	}
 
+	// TODO DELETE /{publicIpAddress}/{privateIpAddress}
 	@PutMapping("/{publicIpAddress}/{privateIpAddress}/leave")
 	public List<Node> leaveSwarm(@PathVariable("publicIpAddress") String publicIpAddress,
 								 @PathVariable("privateIpAddress") String privateIpAddress) {

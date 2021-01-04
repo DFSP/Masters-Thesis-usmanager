@@ -221,7 +221,7 @@ class Service extends BaseComponent<Props, State> {
         super.toast(`Não foi possível guardar as alterações feitas ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (service: IService): void => {
-        super.toast(`<span class='green-text'>O serviço <b class='white-text'>${service.serviceName}</b> foi removido com sucesso</span>`);
+        super.toast(`<span class='green-text'>O serviço<b>${service.serviceName}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/serviços`);
         }

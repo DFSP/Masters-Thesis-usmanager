@@ -125,7 +125,6 @@ public class ElasticIpsService {
 		}
 	}
 
-	@Async
 	public CompletableFuture<String> allocateElasticIpAddress(RegionEnum region) {
 		String allocationId = awsService.allocateElasticIpAddress(region);
 		return CompletableFuture.completedFuture(allocationId);
@@ -239,7 +238,6 @@ public class ElasticIpsService {
 		return elasticIpAddresses;
 	}
 
-	@Async
 	public CompletableFuture<ReleaseAddressResult> releaseElasticIpAddress(String allocationId, RegionEnum region) {
 		ReleaseAddressResult result = awsService.releaseElasticIpAddress(allocationId, region);
 		ElasticIp elasticIp = getElasticIp(allocationId);

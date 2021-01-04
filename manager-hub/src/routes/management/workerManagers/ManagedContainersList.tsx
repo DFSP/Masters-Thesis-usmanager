@@ -76,7 +76,7 @@ class ManagedHostsList extends BaseComponent<Props, State> {
                 <Link to={`/contentores/${container.id}`}
                       className={`${listItemStyles.link}`}>
                     <div className={`${styles.listItemContent}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                         <span>{container.id.toString().substr(0, 10)} - {container.name}</span>
                     </div>
                 </Link>

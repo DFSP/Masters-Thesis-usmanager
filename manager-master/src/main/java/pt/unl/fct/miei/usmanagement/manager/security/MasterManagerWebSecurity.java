@@ -63,20 +63,11 @@ public class MasterManagerWebSecurity extends WebSecurityConfigurerAdapter {
 		http
 			.csrf().disable()
 			.headers().frameOptions().sameOrigin()
-			.and()
-			.authorizeRequests()
-			.antMatchers("/console/**").permitAll()
-			.and()
-			.authorizeRequests()
-			.anyRequest().authenticated()
-			.and()
-			.formLogin().permitAll()
-			.and()
-			.logout().permitAll()
-			.and()
-			.httpBasic()
-			.and()
-			.cors();
+			.and().authorizeRequests().anyRequest().authenticated()
+			.and().formLogin().permitAll()
+			.and().logout().permitAll()
+			.and().httpBasic()
+			.and().cors();
 	}
 
 	@Bean

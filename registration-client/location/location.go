@@ -75,25 +75,25 @@ func clear(serviceKey string) {
 func SendLocationTimer(sendInterval time.Duration) chan bool {
 	sendTicker := time.NewTicker(sendInterval)
 
-	stopChan := make(chan bool)
+	stopChannel := make(chan bool)
 	go func(ticker *time.Ticker) {
 		defer sendTicker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
-				sendAllData()
-			case <-stopChan:
+				sendRequestsData()
+			case <-stopChannel:
 				return
 			}
 		}
 
 	}(sendTicker)
 
-	return stopChan
+	return stopChannel
 }
 
-func sendAllData() {
+func sendRequestsData() {
 	for mapItem := range locationRequests.Iter() {
 		serviceKey := mapItem.Key
 		value := mapItem.Value

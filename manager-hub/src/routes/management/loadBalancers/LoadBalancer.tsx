@@ -147,14 +147,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
         let loadBalancers = reply.data;
         if (loadBalancers.length === 1) {
             const loadBalancer = loadBalancers[0];
-            super.toast(`<span class="green-text">O balanceador de carga ${this.mounted ? `<b class="white-text">${loadBalancer.id}</b>` : `<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`} foi iniciado</span>`);
+            super.toast(`<span class="green-text">O balanceador de carga ${this.mounted ? `<b>${loadBalancer.id}</b>` : `<a href='/balanceamento de carga/${loadBalancer.id}'><b>${loadBalancer.id}</b></a>`} foi iniciado</span>`);
             if (this.mounted) {
                 this.updateLoadBalancer(loadBalancer);
                 this.props.history.replace(loadBalancer.id.toString())
             }
         } else {
             loadBalancers = loadBalancers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${loadBalancers.length} balanceadores de carga: <br/><b class="white-text">${loadBalancers.map(loadBalancer => `Contentor ${loadBalancer.container.id} => Host ${loadBalancer.container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${loadBalancers.length} balanceadores de carga: <br/><b>${loadBalancers.map(loadBalancer => `Contentor ${loadBalancer.container.id} => Host ${loadBalancer.container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/balanceamento de carga');
             }
@@ -166,7 +166,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar um novo balanceador de carga`, 10000, reason, true);
 
     private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
-        super.toast(`<span class="green-text">O balanceador de carga <b class="white-text">${loadBalancer.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O balanceador de carga <b>${loadBalancer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/balanceamento de carga`)
         }

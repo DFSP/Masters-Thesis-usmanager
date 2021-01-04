@@ -69,7 +69,7 @@ const sidenavManagementLinks: ILink[] = [
     {link: '/kafka', name: 'Agentes Kafka'},
     {link: '/secure shell', name: 'Secure shell'},
     {link: '/configurações', name: 'Configurações'},
-    {link: '/logs', name: 'Logs'},
+    {link: '/registos', name: 'Registos'},
 ];
 
 const sidenavMonitoringLinks: ILink[] = [

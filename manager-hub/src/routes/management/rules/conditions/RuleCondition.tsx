@@ -144,7 +144,7 @@ class RuleCondition extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleCondition>): void => {
         const condition = reply.data;
-        super.toast(`<span class="green-text">Condition ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">Condition ${this.mounted ? `<b>${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addCondition(condition);
         if (this.mounted) {
             this.updateCondition(condition);
@@ -157,7 +157,7 @@ class RuleCondition extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleCondition>): void => {
         const condition = reply.data;
-        super.toast(`<span class="green-text">As alterações à condição ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à condição ${this.mounted ? `<b>${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`} foram guardadas com sucesso</span>`);
         const previousCondition = this.getCondition();
         if (previousCondition?.id) {
             this.props.updateCondition(previousCondition as IRuleCondition, condition)
@@ -172,7 +172,7 @@ class RuleCondition extends BaseComponent<Props, State> {
         super.toast(`Não foi possível guardar a condição ${this.mounted ? `<b>${condition.name}</b>` : `<a href='/regras/condições/${condition.name}'><b>${condition.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (condition: IRuleCondition): void => {
-        super.toast(`<span class="green-text">A condição <b class="white-text">${condition.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A condição <b>${condition.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regras/condições`)
         }

@@ -69,9 +69,9 @@ class Breadcrumbs extends React.Component<Props, State> {
             <div className={`${styles.container}`}>
                 {this.state.breadcrumbs.map(({title, link}, index) =>
                     link && index !== this.state.breadcrumbs.length - 1
-                        ? <Link key={index} className={`breadcrumb ${styles.breadcrumb} white-text`}
+                        ? <Link key={index} className={`breadcrumb ${styles.breadcrumb}`}
                                 to={link}>{title}</Link>
-                        : <span key={index} className={`breadcrumb ${styles.breadcrumb} white-text`}>{title}</span>
+                        : <span key={index} className={`breadcrumb ${styles.breadcrumb}`}>{title}</span>
                 )}
             </div>
         )

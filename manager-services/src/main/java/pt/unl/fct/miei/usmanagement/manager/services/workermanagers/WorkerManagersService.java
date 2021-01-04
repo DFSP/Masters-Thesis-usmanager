@@ -269,7 +269,6 @@ public class WorkerManagersService {
 		}
 	}
 
-	@Async
 	public CompletableFuture<List<Container>> getContainers(WorkerManager workerManager, boolean sync) {
 		List<Container> containers = new ArrayList<>();
 		String publicIpAddress = workerManager.getPublicIpAddress();
@@ -315,7 +314,6 @@ public class WorkerManagersService {
 		return getContainers(true);
 	}
 
-	@Async
 	public CompletableFuture<List<Container>> launchContainer(LaunchContainerRequest launchContainerRequest,
 															  WorkerManager workerManager) {
 		String publicIpAddress = workerManager.getPublicIpAddress();
@@ -398,7 +396,6 @@ public class WorkerManagersService {
 		return containers;
 	}
 
-	@Async
 	public CompletableFuture<List<Node>> getNodes(WorkerManager workerManager, boolean sync) {
 		List<Node> nodes = new ArrayList<>();
 		String publicIpAddress = workerManager.getPublicIpAddress();
@@ -448,7 +445,6 @@ public class WorkerManagersService {
 		return getNodes(true);
 	}
 
-	@Async
 	public CompletableFuture<String> getContainerLogs(WorkerManager workerManager) {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
@@ -462,7 +458,6 @@ public class WorkerManagersService {
 		}
 	}
 
-	@Async
 	public CompletableFuture<Container> replicateContainer(String managerId, String containerId, HostAddress toHostAddress) {
 		WorkerManager workerManager = getWorkerManager(managerId);
 		String publicIpAddress = workerManager.getPublicIpAddress();
@@ -477,7 +472,6 @@ public class WorkerManagersService {
 		}
 	}
 
-	@Async
 	public CompletableFuture<Container> migrateContainer(String managerId, String containerId) {
 		WorkerManager workerManager = getWorkerManager(managerId);
 		String publicIpAddress = workerManager.getPublicIpAddress();
@@ -496,7 +490,6 @@ public class WorkerManagersService {
 		workerManagers.deleteAll();
 	}
 
-	@Async
 	public void stopContainer(WorkerManager workerManager, String containerId) {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();
@@ -519,7 +512,6 @@ public class WorkerManagersService {
 		return workerManagerOptional.orElseGet(() -> saveWorkerManager(workerManager));
 	}
 
-	@Async
 	public CompletableFuture<Map<String, List<Container>>> launchApp(WorkerManager workerManager, String appName, Coordinates coordinates) {
 		String publicIpAddress = workerManager.getPublicIpAddress();
 		int port = workerManager.getPort();

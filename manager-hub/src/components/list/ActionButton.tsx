@@ -59,7 +59,7 @@ export default class ActionButton extends React.Component<Props, State> {
         const {icon, tooltip, automatic} = this.props;
         const {isActive} = this.state;
         return (
-            <div className={`btn-flat large white-text ${styles.button} ${isActive ? styles.buttonActive : ''}`}
+            <div className={`btn-flat large ${styles.button} ${isActive ? styles.buttonActive : ''}`}
                  data-for='tooltip'
                  data-tip={`${automatic ? (isActive ? tooltip.activatedText : tooltip.deactivatedText) : tooltip.text}`}
                  data-place={tooltip.position}

@@ -152,7 +152,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/serviços/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/serviços/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addSimulatedServiceMetric(simulatedMetric);
         this.saveEntities(simulatedMetric);
         if (this.mounted) {
@@ -166,7 +166,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
         const simulatedMetric = reply.data;
-        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/serviços/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/serviços/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(simulatedMetric);
         const previousSimulatedServiceMetric = this.getSimulatedServiceMetric();
         if (previousSimulatedServiceMetric.id) {
@@ -182,7 +182,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
         super.toast(`Não foi possível atualizar a métrica simulada ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href='/métricas simuladas/serviços/${simulatedMetric.name}'><b>${simulatedMetric.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
-        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b>${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/métricas simuladas/serviços`);
         }

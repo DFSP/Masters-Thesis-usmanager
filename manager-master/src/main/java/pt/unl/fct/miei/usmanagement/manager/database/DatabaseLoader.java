@@ -152,28 +152,22 @@ public class DatabaseLoader {
 
 			Map<String, ServiceRule> serviceRules = loadServiceRules(serviceRulesService, serviceRuleConditions, decisions, conditions);
 
-			hostsEventsService.reset();
-			servicesEventsService.reset();
-
-			hostsMonitoringService.reset();
-			servicesMonitoringService.reset();
-
 			List<EdgeHost> edgeHosts = loadEdgeHosts(edgeHostsService);
 
 			List<CloudHost> cloudHosts = loadCloudHosts(syncService);
 
+			hostsEventsService.reset();
+			servicesEventsService.reset();
+			hostsMonitoringService.reset();
+			servicesMonitoringService.reset();
 			nginxLoadBalancerService.reset();
 			registrationServerService.reset();
 			workerManagersService.reset();
 			zookeeperService.reset();
 			kafkaService.reset();
-
 			containersService.reset();
-
 			nodesService.reset();
-
 			elasticIpsService.reset();
-
 			configurationsService.reset();
 			heartbeatService.reset();
 		};

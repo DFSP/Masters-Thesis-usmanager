@@ -141,7 +141,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/hosts/cloud/${cloudHost}`}
                           className={`${styles.link}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

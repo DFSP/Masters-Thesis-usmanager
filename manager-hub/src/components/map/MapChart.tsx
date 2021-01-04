@@ -28,6 +28,7 @@ import * as d3Geo from "d3-geo";
 import {IMarker} from "./Marker";
 import {connect} from "react-redux";
 import {ReduxState} from "../../reducers";
+import {isDarkMode} from "../../utils/bightnessMode";
 
 const {geoPath} = d3Geo
 
@@ -171,8 +172,9 @@ class MapChart extends React.Component<Props, State> {
                                         }}
                                         style={{
                                             default: {
-                                                fill: "#D6D6DA",
-                                                outline: "none"
+                                                fill: isDarkMode() ? "#D6D6DA" : 'lightgrey',
+                                                outline: "none",
+                                                stroke: '#b3b3b3'
                                             },
                                             hover: {
                                                 fill: hover ? "#F53" : "#D6D6DA",

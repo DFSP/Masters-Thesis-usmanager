@@ -65,7 +65,7 @@ class RuleAppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleApp: IRuleApp): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleApp.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleApp.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

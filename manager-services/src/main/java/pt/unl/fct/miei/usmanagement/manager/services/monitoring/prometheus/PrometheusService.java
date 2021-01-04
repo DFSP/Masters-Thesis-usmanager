@@ -74,12 +74,14 @@ public class PrometheusService {
 	@Async
 	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, int port, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
+		String address = String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), port);
+		String query = URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8);
+		String time = Double.toString((System.currentTimeMillis() * 1.0) / 1000.0);
 		URI uri = UriComponentsBuilder
-			.fromHttpUrl(String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), port))
-			.queryParam("query", URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8))
-			.queryParam("time", Double.toString((System.currentTimeMillis() * 1.0) / 1000.0))
+			.fromHttpUrl(address)
+			.queryParam("query", query)
+			.queryParam("time", time)
 			.build(true).toUri();
-
 		QueryOutput queryOutput = restTemplate.getForObject(uri, QueryOutput.class);
 		if (queryOutput != null && Objects.equals(queryOutput.getStatus(), "success")) {
 			List<QueryResult> results = queryOutput.getData().getResult();
@@ -91,7 +93,9 @@ public class PrometheusService {
 				}
 			}
 		}
-		Optional<Double> stat = value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
+		Optional<Double> stat = value.isEmpty()
+			? Optional.empty()
+			: Optional.of(Double.parseDouble(value));
 		return CompletableFuture.completedFuture(stat);
 	}
 

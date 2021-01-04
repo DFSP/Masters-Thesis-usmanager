@@ -204,7 +204,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<ICloudHost>): void => {
         const cloudHost = reply.data;
-        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada e configurada com sucesso</span>`);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada e configurada com sucesso</span>`);
         this.props.addCloudHost(cloudHost);
         this.saveEntities(cloudHost);
         if (this.mounted) {
@@ -338,7 +338,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStartSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -365,7 +365,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onStopSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi parada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi parada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -392,7 +392,7 @@ class CloudHost extends BaseComponent<Props, State> {
     };
 
     private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
-        super.toast(`<span class="green-text">A instância <b class="white-text">${cloudHost.instanceId}</b> foi terminada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância <b>${cloudHost.instanceId}</b> foi terminada com sucesso</span>`, 15000);
         if (this.mounted) {
             this.props.history.push('/hosts/cloud');
         }
@@ -479,7 +479,7 @@ class CloudHost extends BaseComponent<Props, State> {
                                            title: region.zone + " | " + region.name,
                                            latitude: region.coordinates.latitude,
                                            longitude: region.coordinates.longitude,
-                                           color: 'green'
+                                           color: '#00FF00'
                                        }))
                                    }}/>
                             : formCloudHost && Object.keys(formCloudHost).map((key, index) =>

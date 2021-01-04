@@ -144,7 +144,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleContainer>): void => {
         const ruleContainer = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href='/regras/contentores/${ruleContainer.name}'><b>${ruleContainer.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href='/regras/contentores/${ruleContainer.name}'><b>${ruleContainer.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleContainer(ruleContainer);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -158,7 +158,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleContainer>): void => {
         const ruleContainer = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href='/regras/contentores/${ruleContainer.name}'><b>${ruleContainer.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href='/regras/contentores/${ruleContainer.name}'><b>${ruleContainer.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleContainer);
         const previousRuleContainer = this.getRuleContainer();
         if (previousRuleContainer?.id) {
@@ -174,7 +174,7 @@ class RuleContainer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível atualizar a regra ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href='/regras/contentores/${ruleContainer.name}><b>${ruleContainer.name}'</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleContainer: IRuleContainer): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleContainer.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleContainer.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regras/contentores`);
         }

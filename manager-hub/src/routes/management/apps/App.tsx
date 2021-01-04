@@ -203,7 +203,7 @@ class App extends BaseComponent<Props, State> {
         super.toast(`Não foi possível atualizar a aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class='green-text'>A aplicação <b class='white-text'>${app.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class='green-text'>A aplicação<b>${app.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/aplicações`);
         }
@@ -407,7 +407,7 @@ class App extends BaseComponent<Props, State> {
                 marker.label = publicIpAddress;
                 marker.latitude = container.coordinates.latitude;
                 marker.longitude = container.coordinates.longitude;
-                marker.color = 'green';
+                marker.color = '#00FF00';
                 markers.set(publicIpAddress, marker);
             });
         return Array.from(markers.values());

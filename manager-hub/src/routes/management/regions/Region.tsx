@@ -120,7 +120,7 @@ class Region extends BaseComponent<Props, State> {
 
     /*private onPostSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href='/regiões/${region.region}'><b>${region.region}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">Region ${this.mounted ? `<b>${region.region}</b>` : `<a href='/regiões/${region.region}'><b>${region.region}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRegion(region);
         if (this.mounted) {
             this.updateRegion(region);
@@ -133,7 +133,7 @@ class Region extends BaseComponent<Props, State> {
 
     /*private onPutSuccess = (reply: IReply<IRegion>): void => {
         const region = reply.data;
-        super.toast(`<span class="green-text">As alterações à região ${this.mounted ? `<b class="white-text">${region.region}</b>` : `<a href='/regiões/${region.region}'><b>${region.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à região ${this.mounted ? `<b>${region.region}</b>` : `<a href='/regiões/${region.region}'><b>${region.name}</b></a>`} foram guardadas com sucesso</span>`);
         const previousRegion = this.getRegion();
         if (previousRegion?.id) {
             this.props.updateRegion(previousRegion as IRegion, region)
@@ -148,7 +148,7 @@ class Region extends BaseComponent<Props, State> {
         super.toast(`Não foi possível atualizar a região ${this.mounted ? `<b>${region.region}</b>` : `<a href='/regiões/${region.name}'><b>${region.name}</b></a>`}`, 10000, reason, true);*/
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">A região <b class="white-text">${region.region}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A região <b>${region.region}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regiões`);
         }

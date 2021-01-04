@@ -65,7 +65,7 @@ class KafkaBrokerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (kafkaBroker: IKafkaBroker): void => {
-        super.toast(`<span class="green-text">O agente kafka <b class="white-text">${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O agente kafka <b>${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

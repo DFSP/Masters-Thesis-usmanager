@@ -69,9 +69,9 @@ export default class AddButton extends React.Component<Props, {}> {
                             {button.text}
                         </div>
                         <ul id={`dropdown-${dropdown.id}`}
-                            className={`dropdown-content ${styles.dropdown}`}>
-                            <li className={`${styles.disabled}`}>
-                                <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                            className={`dropdown-content dropdown`}>
+                            <li className={`disabled`}>
+                                <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : ''}`}>
                                     {dropdown.data.length ? dropdown.title : dropdown.empty}
                                 </a>
                             </li>

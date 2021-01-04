@@ -66,7 +66,7 @@ class ServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (service: IService): void => {
-        super.toast(`<span class="green-text">O serviço <b class="white-text">${service.serviceName}</b> foi removido com sucesso</span>`);
+        super.toast(`<span class="green-text">O serviço <b>${service.serviceName}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

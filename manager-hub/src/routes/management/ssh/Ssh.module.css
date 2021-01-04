@@ -26,18 +26,6 @@
     margin-bottom: 160px;
 }
 
-.commandsContainer {
-    position: absolute !important;
-    bottom: 50px;
-    left: 0;
-    min-width: 135px;
-    min-height: 44px;
-    background: #282828;
-    border: 1px solid #212121;
-    display: flex;
-    z-index: 997;
-}
-
 .commandsHeader {
     display: flex;
 }
@@ -45,18 +33,6 @@
 .commandsTitle {
     margin: 10px 5px 5px 5px;
     color: dimgrey;
-}
-
-.commands {
-    margin: 10px;
-    color: white;
-}
-
-.time {
-    font-size: 0.9rem;
-    color: #9e9e9e;
-    letter-spacing: 1px;
-    margin-right: 5px;
 }
 
 .hostname {
@@ -75,16 +51,11 @@
     color: #F44336;
 }
 
-.controlsMenuLeft {
-    height: 100%;
-    border-right: 1px solid #212121;
-}
-
-.controlsMenuLeft button:hover {
+.commands-controls-menu-left button:hover {
     background: transparent !important;
 }
 
-.controlsMenuLeft button {
+.commands-controls-menu-left button {
     margin: 5px;
     display: block;
 }

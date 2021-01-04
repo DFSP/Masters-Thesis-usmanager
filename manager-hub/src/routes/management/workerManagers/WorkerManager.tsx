@@ -179,7 +179,7 @@ class WorkerManager extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o gestor local`, 10000, reason, true);
 
     private onDeleteSuccess = (workerManager: IWorkerManager): void => {
-        super.toast(`<span class='green-text'>O gestor local <b class='white-text'>${workerManager.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O gestor local<b>${workerManager.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/gestores locais`)
         }

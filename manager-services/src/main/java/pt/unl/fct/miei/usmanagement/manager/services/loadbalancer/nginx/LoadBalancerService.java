@@ -226,7 +226,6 @@ public class LoadBalancerService {
 		return servicesServers;
 	}
 
-	@Async
 	public CompletableFuture<List<NginxServiceServers>> getServers(LoadBalancer loadBalancer) {
 		List<NginxServiceServers> servers = new ArrayList<>();
 		String url = String.format("%s/servers", getLoadBalancerApiUrl(loadBalancer));
@@ -239,7 +238,6 @@ public class LoadBalancerService {
 		return CompletableFuture.completedFuture(servers);
 	}
 
-	@Async
 	public CompletableFuture<List<NginxServer>> getServers(LoadBalancer loadBalancer, String serviceName) {
 		List<NginxServer> servers = new ArrayList<>();
 		String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
@@ -287,7 +285,6 @@ public class LoadBalancerService {
 		loadBalancers.forEach(loadBalancer -> addServer(loadBalancer, nginxServer, serviceName));
 	}
 
-	@Async
 	public void addServer(LoadBalancer loadBalancer, NginxServer nginxServer, String serviceName) {
 		String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
 		HttpEntity<NginxServer[]> request = new HttpEntity<>(new NginxServer[]{nginxServer}, headers);
@@ -309,7 +306,6 @@ public class LoadBalancerService {
 		}
 	}
 
-	@Async
 	public void removeServer(LoadBalancer loadBalancer, String serviceName, String server) {
 		String url = String.format("%s/%s/servers/%s", getLoadBalancerApiUrl(loadBalancer), serviceName, server);
 		try {

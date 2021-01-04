@@ -136,7 +136,7 @@ class RuleServiceConditionList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/regras/condições/${condition}`}
                           className={`${styles.link}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

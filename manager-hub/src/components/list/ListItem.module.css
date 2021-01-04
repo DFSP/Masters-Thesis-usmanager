@@ -36,6 +36,10 @@
     align-items: center;
 }
 
+.listItem:hover {
+    background-color: red;
+}
+
 .nonListContent {
     padding: 7px 5px;
     font-size: 1.05rem;
@@ -54,20 +58,12 @@
 
 .link {
     cursor: pointer;
-    margin: 0 0 0 25px;
+    padding: 0 0 0 25px;
     flex-grow: 1;
 }
 
-.link:hover > .listItemContent > .linkIcon, .link:hover > .linkedItemContent > .linkIcon, a:hover > .linkIcon {
+.link:hover > .listItemContent > .link-icon, .link:hover > .linkedItemContent > .link-icon, a:hover > .link-icon {
     display: block;
-}
-
-.linkIcon {
-    color: white;
-    height: 100%;
-    font-size: 15px;
-    margin: 5px 5px 0 0;
-    display: none;
 }
 
 .unsavedItem {

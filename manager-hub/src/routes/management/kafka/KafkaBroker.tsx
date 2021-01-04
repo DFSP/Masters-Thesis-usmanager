@@ -148,14 +148,14 @@ class KafkaBroker extends BaseComponent<Props, State> {
         let kafkaBrokers = reply.data;
         if (kafkaBrokers.length === 1) {
             const kafkaBroker = kafkaBrokers[0];
-            super.toast(`<span class="green-text">O agente kafka foi iniciado com o id ${this.mounted ? `<b class="white-text">${kafkaBroker.brokerId}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.brokerId}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O agente kafka foi iniciado com o id ${this.mounted ? `<b>${kafkaBroker.brokerId}</b>` : `<a href='/kafka/${kafkaBroker.brokerId}'><b>${kafkaBroker.brokerId}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateKafkaBroker(kafkaBroker);
                 this.props.history.replace(kafkaBroker.brokerId.toString())
             }
         } else {
             kafkaBrokers = kafkaBrokers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${kafkaBrokers.length} agentes kafka:<br/><b class="white-text">${kafkaBrokers.map(kafkaBroker => `Contentor ${kafkaBroker.container.id} => Host ${kafkaBroker.container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${kafkaBrokers.length} agentes kafka:<br/><b>${kafkaBrokers.map(kafkaBroker => `Contentor ${kafkaBroker.container.id} => Host ${kafkaBroker.container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/kafka');
             }
@@ -167,7 +167,7 @@ class KafkaBroker extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o agente kafka`, 10000, reason, true);
 
     private onDeleteSuccess = (kafkaBroker: IKafkaBroker): void => {
-        super.toast(`<span class="green-text">O agente kafka <b class="white-text">${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O agente kafka <b>${kafkaBroker.brokerId}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push('/kafka');
         }

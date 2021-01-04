@@ -32,5 +32,5 @@ interface Props {
 export const Error: React.FC<Props> = ({message}) =>
     <div className={`${styles.container}`}>
         <i className={`${styles.icon} material-icons`}>error_outline</i>
-        <h5 className={`${styles.message}`}>{message}</h5>
+        <h5 className='error-message'>{message}</h5>
     </div>;

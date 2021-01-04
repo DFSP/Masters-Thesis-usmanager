@@ -70,7 +70,7 @@ export interface INode extends IDatabaseData {
     version: number;
     labels: INodeLabel;
     managerStatus: IManagerStatus;
-    managerId: string | null;
+    managerId: string;
     state: string;
     coordinates?: ICoordinates
 }
@@ -213,7 +213,7 @@ class Node extends BaseComponent<Props, State> {
                 this.props.history.replace(node.id.toString());
             }
         } else {
-            super.toast(`<span class='green-text'>Os nós <b class='white-text'>${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> entraram no swarm</span>`);
+            super.toast(`<span class='green-text'>Os nós<b>${nodes.map(node => `${node.publicIpAddress} => ${node.id}`)}</b> entraram no swarm</span>`);
             this.props.history.push("/nós");
         }
         this.props.addNodes(nodes);
@@ -257,7 +257,7 @@ class Node extends BaseComponent<Props, State> {
         super.toast(`Não foi possível mudar o cargo do nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (node: INode): void => {
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
+        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> ${node.state === 'down' ? 'foi removido com sucesso do swarm' : 'saiu do swarm com sucesso.'}</span>`);
         if (this.mounted) {
             this.props.history.push(`/nós`);
         }
@@ -348,7 +348,7 @@ class Node extends BaseComponent<Props, State> {
     private onLeaveSuccess = (nodes: INode[]) => {
         let node = nodes[0];
         node = addCoordinates(node);
-        super.toast(`<span class='green-text'>O nó <b class='white-text'>${node.id}</b> saiu com sucesso do swarm</span>`);
+        super.toast(`<span class='green-text'>O nó<b>${node.id}</b> saiu com sucesso do swarm</span>`);
         const previousNode = this.getNode();
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)
@@ -417,7 +417,7 @@ class Node extends BaseComponent<Props, State> {
             marker.label = id;
             marker.latitude = coordinates.latitude;
             marker.longitude = coordinates.longitude;
-            marker.color = 'green';
+            marker.color = '#00FF00';
             markers.set(markerId, marker);
         });
         return Array.from(markers.values());

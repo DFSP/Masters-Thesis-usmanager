@@ -28,6 +28,7 @@ import {bindActionCreators} from "redux";
 import {hideConfirmationDialog} from "../../actions";
 import {connect} from "react-redux";
 import styles from './ConfirmDialog.module.css';
+import {capitalize} from "../../utils/text";
 
 
 interface DispatchToProps {
@@ -81,8 +82,8 @@ class ConfirmDialog extends React.Component<Props, {}> {
         return (
             <div id={this.props.id} className='modal dialog' ref={this.modal}>
                 <div className="modal-content">
-                    <div className="modal-message">{`Esta ação afeta definitivamente os dados: `}
-                        <div className="dialog-message">{message}.</div>
+                    <div className="modal-message">
+                        <div className="dialog-message">{capitalize(message)}?</div>
                     </div>
                 </div>
                 <div className={`modal-footer dialog-footer`}>

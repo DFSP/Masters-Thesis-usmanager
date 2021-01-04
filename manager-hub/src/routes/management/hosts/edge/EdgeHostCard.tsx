@@ -65,7 +65,7 @@ class EdgeHostCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-        super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b> foi removido com sucesso</span>`);
+        super.toast(`<span class="green-text">Edge host <b>${edgeHost.publicIpAddress}-${edgeHost.privateIpAddress}</b> foi removido com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

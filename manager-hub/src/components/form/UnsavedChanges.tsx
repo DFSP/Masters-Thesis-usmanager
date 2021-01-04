@@ -26,7 +26,7 @@ import React from "react";
 import styles from "./UnsavedChanges.module.css";
 
 const UnsavedChanges: React.FC = () =>
-    <div className={`${styles.container}`}>
+    <div className={`${styles.container} unsaved-changes`}>
         <div className={`${styles.message}`}>Modificações não guardadas</div>
     </div>;
 

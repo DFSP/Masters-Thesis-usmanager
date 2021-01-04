@@ -136,7 +136,7 @@ class AppRuleList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/regras/aplicações/${rule}`}
                           className={`${styles.link}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

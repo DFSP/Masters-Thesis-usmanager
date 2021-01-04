@@ -64,7 +64,7 @@ class RuleConditionCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (condition: IRuleCondition): void => {
-        super.toast(`<span class="green-text">A condição <b class="white-text">${condition.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A condição <b>${condition.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

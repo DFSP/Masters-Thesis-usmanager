@@ -95,7 +95,7 @@ class Tabs extends React.Component<Props, State> {
             <div>
                 {this.state.showScrollLeft &&
                 <button
-                    className={`btn-flat btn-small white-text left ${styles.scrollButton} ${styles.leftScrollButton}`}
+                    className={`btn-flat btn-small left scroll-button ${styles.leftScrollButton}`}
                     onTouchStart={this.setLeftScrollTimer}
                     onMouseDown={this.setLeftScrollTimer}
                     onTouchEnd={this.stopLeftScrollTimer}
@@ -104,7 +104,7 @@ class Tabs extends React.Component<Props, State> {
                 </button>}
                 {this.state.showScrollRight &&
                 <button
-                    className={`btn-flat btn-small white-text right ${styles.scrollButton} ${styles.rightScrollButton}`}
+                    className={`btn-flat btn-small right scroll-button ${styles.rightScrollButton}`}
                     onTouchStart={this.setRightScrollTimer}
                     onMouseDown={this.setRightScrollTimer}
                     onTouchEnd={this.stopRightScrollTimer}

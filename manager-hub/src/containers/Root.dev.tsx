@@ -144,7 +144,7 @@ export const managementAuthenticatedRoutes: { [path: string]: { title?: string, 
     "/kafka/:id": {component: KafkaBroker},
     "/secure shell": {component: Ssh},
     "/configurações": {component: Settings},
-    "/logs": {component: ManagementLogs, search: true},
+    "/registos": {component: ManagementLogs, search: true},
     "/*": {title: "404 - Not found", component: PageNotFound},
 };
 

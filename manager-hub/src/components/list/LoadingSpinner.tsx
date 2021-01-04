@@ -28,7 +28,7 @@ import styles from './LoadingSpinner.module.css';
 const LoadingSpinner: React.FC = () =>
     <div className={styles.container}>
         <div className="preloader-wrapper active">
-            <div className="spinner-layer spinner-white-only">
+            <div className="spinner-layer">
                 <div className="circle-clipper left">
                     <div className="circle"/>
                 </div>

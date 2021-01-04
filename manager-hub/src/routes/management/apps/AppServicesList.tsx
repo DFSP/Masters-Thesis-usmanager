@@ -203,7 +203,7 @@ class AppServiceList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/serviços/${serviceName}`}
                           className={`${listItemStyles.link}`}>
-                        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
                 <div className={`${styles.actions}`}>

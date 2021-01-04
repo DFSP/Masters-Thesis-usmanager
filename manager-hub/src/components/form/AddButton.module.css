@@ -22,33 +22,15 @@
  * SOFTWARE.
  */
 
-.dropdown {
-    width: auto !important;
-    overflow-y: hidden;
-    background-color: #282828;
-}
 
-ul.dropdown li a {
-    background-color: #282828;
-    font-size: 14px;
-}
 
-ul.dropdown li a:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-ul.dropdown li.disabled a {
-    border-bottom: solid 1px #666;
-    color: grey;
+.dialog {
+    outline: transparent;
+    overflow: hidden;
 }
 
 .dropdownEmpty {
     border-bottom: solid 1px black !important;
-}
-
-ul.dropdown li.disabled a:hover {
-    background-color: #282828;
-    cursor: default;
 }
 
 .nolabelCheckbox {
@@ -64,8 +46,4 @@ ul.dropdown li.disabled a:hover {
     margin-left: 24px;
     margin-bottom: 10px;
     user-select: none;
-}
-
-.button:hover {
-    background-color: #282828;
 }

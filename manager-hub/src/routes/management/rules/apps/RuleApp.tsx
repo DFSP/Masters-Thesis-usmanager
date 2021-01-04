@@ -143,7 +143,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleApp(ruleApp);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -157,7 +157,7 @@ class RuleApp extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleApp>): void => {
         const ruleApp = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleApp);
         const previousRuleApp = this.getRuleApp();
         if (previousRuleApp?.id) {
@@ -173,7 +173,7 @@ class RuleApp extends BaseComponent<Props, State> {
         super.toast(`Não foi possível guardar a regra ${this.mounted ? `<b>${ruleApp.name}</b>` : `<a href='/regras/aplicações/${ruleApp.name}'><b>${ruleApp.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleApp: IRuleApp): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleApp.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleApp.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regras/aplicações`);
         }

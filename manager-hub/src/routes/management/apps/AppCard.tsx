@@ -66,7 +66,7 @@ class AppCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (app: IApp): void => {
-        super.toast(`<span class='green-text'>A aplicação <b class='white-text'>${app.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class='green-text'>A aplicação<b>${app.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

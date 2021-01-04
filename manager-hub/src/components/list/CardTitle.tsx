@@ -31,6 +31,6 @@ interface CardTitleProps {
 }
 
 const CardTitle: React.FC<CardTitleProps> = ({title}) =>
-    <h6 className={`${styles.cardTitle}`}>{capitalize(title)}</h6>;
+    <h6 className={`card-title`}>{capitalize(title)}</h6>;
 
 export default CardTitle;

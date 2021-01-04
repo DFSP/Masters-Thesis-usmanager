@@ -94,7 +94,7 @@ export interface IContainer extends IDatabaseData {
     labels: IContainerLabel;
     region: IRegion;
     state: string;
-    managerId: string | null;
+    managerId: string;
     coordinates: ICoordinates;
     logs?: string;
     containerRules?: string[];
@@ -284,7 +284,7 @@ class Container extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (container: IContainer): void => {
-        super.toast(`<span class='green-text'>O contentor <b class='white-text'>${container.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class='green-text'>O contentor<b>${container.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/contentores`);
         }
@@ -592,7 +592,7 @@ class Container extends BaseComponent<Props, State> {
                 marker.label = publicIpAddress;
                 marker.latitude = container.coordinates.latitude;
                 marker.longitude = container.coordinates.longitude;
-                marker.color = 'green';
+                marker.color = '#00FF00';
                 markers.set(publicIpAddress, marker);
             });
         return Array.from(markers.values());

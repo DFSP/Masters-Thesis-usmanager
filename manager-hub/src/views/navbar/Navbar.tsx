@@ -78,7 +78,9 @@ class Navbar extends React.Component<Props, State> {
         if (!this.state.animate && prevSidenavVisibility !== currentSidenavVisibility) {
             this.setState({animate: true});
         }
-        ReactTooltip.rebuild();
+        if (this.state.darkMode != prevState.darkMode) {
+            ReactTooltip.rebuild();
+        }
     }
 
     private toggleBrightness = () => {
@@ -132,8 +134,7 @@ class Navbar extends React.Component<Props, State> {
                             {showSearchbar && <SearchBar/>}
                             <ul className='right'>
                                 {<button className={`btn-floating btn-flat btn-small brightnessButton`}
-                                         key={this.state.darkMode ? 'dark-mode' : 'light-mode'}
-                                         data-for='tooltip'
+                                         data-for={'dark-tooltip'}
                                          data-tip={this.state.darkMode ? 'Modo claro' : 'Modo escuro'}
                                          data-place='bottom' onClick={this.toggleBrightness}>
                                     <i className='material-icons'>{this.state.darkMode ? 'brightness_4' : 'brightness_7'}</i>
@@ -155,13 +156,15 @@ class Navbar extends React.Component<Props, State> {
                                     {loggedInUser}
                                 </li>
                                 <li>
-                                    <a data-for='tooltip' data-tip='GitHub' data-place='bottom'
+                                    <a data-for={'dark-tooltip'}
+                                       data-tip='GitHub' data-place='bottom'
                                        href='https://github.com/usmanager/' target='_blank' rel='noopener noreferrer'>
                                         <i className='material-icons'><GoMarkGithub/></i>
                                     </a>
                                 </li>
                                 <li>
-                                    <a data-for='tooltip' data-tip='Docker Hub' data-place='bottom'
+                                    <a data-for={'dark-tooltip'}
+                                       data-tip='Docker Hub' data-place='bottom'
                                        href='https://hub.docker.com/orgs/usmanager' target='_blank'
                                        rel='noopener noreferrer'>
                                         <i className='material-icons'><FaDocker/></i>

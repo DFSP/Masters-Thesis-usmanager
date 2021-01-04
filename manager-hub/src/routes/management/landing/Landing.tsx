@@ -147,7 +147,7 @@ class Landing extends React.Component<Props, State> {
                 label: host.publicIpAddress,
                 latitude: host.awsRegion.coordinates.latitude,
                 longitude: host.awsRegion.coordinates.longitude,
-                color: 'green'
+                color: '#00FF00'
             }))
 
         const edgeHosts: IEdgeHost[] = Object.values(this.props.edgeHosts);
@@ -157,7 +157,7 @@ class Landing extends React.Component<Props, State> {
                 label: host.publicIpAddress,
                 latitude: host.coordinates.latitude,
                 longitude: host.coordinates.longitude,
-                color: 'green'
+                color: '#00FF00'
             }))
 
         return [...Array.from(containerMarkers.values()), ...cloudHostsMarkers, ...edgeHostsMarkers];

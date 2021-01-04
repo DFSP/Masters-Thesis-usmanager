@@ -42,22 +42,6 @@
     width: 125px;
 }
 
-
-.pagination > li > a {
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-}
-
-.pagination li {
-    border: 1px solid transparent;
-}
-
-.pagination li.active {
-    background-color: #1F1F1F;
-    border: 1px solid black;
-}
-
 .pagination li.disabled {
     opacity: 0.25;
 }

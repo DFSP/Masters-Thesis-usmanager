@@ -26,12 +26,6 @@
     padding: 0 !important;
 }
 
-.scrollButton {
-    position: relative;
-    top: 48px;
-    margin-top: -40px;
-}
-
 .leftScrollButton {
     left: -48px;
 }

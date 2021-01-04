@@ -152,7 +152,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addRuleService(ruleService);
         this.saveEntities(reply.data);
         if (this.mounted) {
@@ -166,7 +166,7 @@ class RuleService extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IRuleService>): void => {
         const ruleService = reply.data;
-        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class="green-text">As alterações à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(ruleService);
         const previousRuleService = this.getRuleService();
         if (previousRuleService?.id) {
@@ -182,7 +182,7 @@ class RuleService extends BaseComponent<Props, State> {
         super.toast(`Não foi possível guardar as alterações feitas à regra ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href='/regras/serviços/${ruleService.name}'><b>${ruleService.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleService.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleService.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/regras/serviços`);
         }

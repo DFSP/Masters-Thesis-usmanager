@@ -65,7 +65,7 @@ class RegistrationServerCard extends BaseComponent<Props, State> {
     }
 
     private onStopSuccess = (registrationServer: IRegistrationServer): void => {
-        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O servidor de registo <b>${registrationServer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

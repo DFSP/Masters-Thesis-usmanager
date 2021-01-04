@@ -175,7 +175,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 </div>
                 {!isNew && (
                     <Link to={`/aplicações/${appName}`} className={`${listItemStyles.link}`}>
-                        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

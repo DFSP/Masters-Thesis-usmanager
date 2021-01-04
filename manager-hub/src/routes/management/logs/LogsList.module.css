@@ -28,35 +28,6 @@
 
 .list {
     margin: 20.5px;
-
-}
-
-.item {
-    background-color: #36393F;
-    width: 100vw;
-    padding: 3px 20px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-}
-
-.lastItem {
-    background-color: #36393F;
-    width: 100vw;
-    padding: 3px 20px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-}
-
-.column {
-    margin: 0 10px;
-}
-
-.headerItem {
-    composes: item;
-    padding-top: 5px;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
 }
 
 .headerColumn {

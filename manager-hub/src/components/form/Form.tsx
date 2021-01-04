@@ -443,7 +443,7 @@ class Form extends BaseComponent<Props, State> {
                                     </>
                                 )}
                             </div>
-                            <ActionProgressBar loading={!!loading}/>
+                            <ActionProgressBar loading={!!loading} backgroundColor={!!loading ? 'transparent' : 'black'} progressBarColor={"black"}/>
                         </div>
                     )}
                     {controlsMode?.includes('modal') ?

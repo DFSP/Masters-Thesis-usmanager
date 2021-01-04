@@ -70,7 +70,6 @@ public class RegistrationServerService {
 		return launchRegistrationServers(List.of(region)).get(0);
 	}
 
-	@Async
 	public CompletableFuture<RegistrationServer> launchRegistrationServer(HostAddress hostAddress) {
 		String registrationServerAddresses = getRegistrationServerAddresses();
 		Map<String, String> dynamicLaunchParams = Map.of("${zone}", registrationServerAddresses);

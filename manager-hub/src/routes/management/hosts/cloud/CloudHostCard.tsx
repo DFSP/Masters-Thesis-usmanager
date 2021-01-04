@@ -85,7 +85,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStartSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi iniciada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -112,7 +112,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onStopSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi parada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href='/hosts/cloud/${cloudHost.instanceId}'><b>${cloudHost.instanceId}</b></a>`} foi parada com sucesso</span>`, 15000);
         const previousCloudHost = this.getCloudHost();
         if (previousCloudHost?.id) {
             this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
@@ -139,7 +139,7 @@ class CloudHostCard extends BaseComponent<Props, State> {
     };
 
     private onTerminateSuccess = (cloudHost: ICloudHost) => {
-        super.toast(`<span class="green-text">A instância <b class="white-text">${cloudHost.instanceId}</b> foi terminada com sucesso</span>`, 15000);
+        super.toast(`<span class="green-text">A instância <b>${cloudHost.instanceId}</b> foi terminada com sucesso</span>`, 15000);
         if (this.mounted) {
             this.props.deleteCloudHost(cloudHost);
         }

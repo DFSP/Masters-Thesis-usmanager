@@ -136,7 +136,7 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
                 {!isNew && (
                     <Link to={`/serviços/${service}`}
                           className={`${styles.link}`}>
-                        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+                        <i className={`link-icon material-icons right`}>link</i>
                     </Link>
                 )}
             </ListItem>

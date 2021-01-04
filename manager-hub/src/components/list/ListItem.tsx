@@ -41,7 +41,7 @@ export default class ListItem<T> extends React.Component<ListItemProps<T>, {}> {
         return (
             link
                 ? <Link to={{pathname: link.pathname, state: link.state}}>
-                    <div id='listItem' className={`${styles.item}`}
+                    <div id='listItem' className={`${styles.item} linked-item`}
                          style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
                         {this.props.children}
                     </div>

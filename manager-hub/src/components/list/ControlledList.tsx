@@ -158,8 +158,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                             <i className='material-icons'>add</i>
                         </button>
                         <ul id={`dropdown-${dropdown.id}`}
-                            className={`dropdown-content ${styles.dropdown}`}>
-                            <li className={`${styles.disabled}`}>
+                            className={`dropdown-content dropdown`}>
+                            <li className='disabled'>
                                 <a className={`${!dropdown?.data.length ? 'dropdown-empty' : ''}`}>
                                     {dropdown.data.length ? dropdown.title : dropdown.empty}
                                 </a>

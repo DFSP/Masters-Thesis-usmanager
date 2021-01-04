@@ -58,7 +58,7 @@ class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
         const {list, predicate, search, paginate, ...otherProps} = this.props;
         const filteredList = list.filter((s: T) => predicate(s, search));
         if (list.length !== filteredList.length && filteredList.length === 0) {
-            return <Empty message={search} error={'No matches found'}/>;
+            return <Empty message={search} error={'Sem resultados'}/>;
         }
         if (paginate) {
             return <PagedList {...otherProps} list={filteredList} paginate={paginate}/>

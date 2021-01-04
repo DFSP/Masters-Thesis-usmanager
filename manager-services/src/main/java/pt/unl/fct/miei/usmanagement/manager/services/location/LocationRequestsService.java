@@ -192,7 +192,6 @@ public class LocationRequestsService {
 		return locationRequests;
 	}
 
-	@Async
 	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname, int port) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();

@@ -106,7 +106,7 @@ class LogsList extends React.Component<Props, {}> {
             case 'info':
                 return 'blue-text';
             case 'warn':
-                return 'yellow-text';
+                return 'orange-text';
             case 'error':
                 return 'red-text';
         }
@@ -130,26 +130,27 @@ class LogsList extends React.Component<Props, {}> {
 
     private header = (): JSX.Element =>
         <ListItem>
-            <div className={`${styles.headerItem}`}>
-        <span className={`${styles.timestampColumn}`}>
-          timestamp
-        </span>
+            <div className={`logs-header-item`}>
+                <span className={`${styles.timestampColumn}`}>
+                    timestamp
+                </span>
                 <span className={`${styles.levelColumn}`}>
-          level
-        </span>
+                    nível
+                </span>
                 <span className={`${styles.infoColumn}`}>
-          message
-        </span>
+                    mensagem
+                </span>
             </div>
         </ListItem>;
 
     private log = (log: ILogs, index: number, last: boolean): JSX.Element =>
         <ListItem>
-            <div className={`${last ? styles.lastItem : styles.item}`}>
+            <div className={`${last ? 'logs-last-item' : 'logs-item'}`}>
         <span className={`${styles.column}`}>
           {new Date(log.timestmp).toLocaleString()}
         </span>
-                <span className={`${styles.column} ${this.getLevelColor(log.levelString)}`} style={{margin: this.getLevelMargin(log.levelString)}}>
+                <span className={`${this.getLevelColor(log.levelString)}`}
+                      style={{margin: this.getLevelMargin(log.levelString)}}>
           {capitalize(log.levelString.toLowerCase())}
         </span>
                 <span className={`${styles.column}`}>

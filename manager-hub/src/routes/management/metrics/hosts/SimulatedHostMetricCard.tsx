@@ -65,7 +65,7 @@ class SimulatedHostMetricCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (simulatedMetric: ISimulatedHostMetric): void => {
-        super.toast(`<span class="green-text">A métrica simulada <b class="white-text">${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A métrica simulada <b>${simulatedMetric.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

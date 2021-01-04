@@ -101,7 +101,8 @@ class Containers extends BaseComponent<Props, {}> {
         || container.type.toLowerCase().includes(search)
         || container.name.includes(search)
         || container.publicIpAddress.toLowerCase().includes(search)
-        || container.labels['serviceType'].toLowerCase().includes(search);
+        || container.labels['serviceType'].toLowerCase().includes(search)
+        || container.managerId.toLowerCase().includes(search);
 
     private reloadContainers = () => {
         this.props.reloadContainers();

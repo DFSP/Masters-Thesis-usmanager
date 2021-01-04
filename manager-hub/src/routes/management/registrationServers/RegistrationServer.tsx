@@ -147,14 +147,14 @@ class RegistrationServer extends BaseComponent<Props, State> {
         let registrationServers = reply.data;
         if (registrationServers.length === 1) {
             const registrationServer = registrationServers[0];
-            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b class="white-text">${registrationServer.container.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.container.id}</b></a>`}</span>`);
+            super.toast(`<span class="green-text">O servidor de registo foi iniciado no contentor ${this.mounted ? `<b>${registrationServer.container.id}</b>` : `<a href='/servidores de registo/${registrationServer.id}'><b>${registrationServer.container.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateRegistrationServer(registrationServer);
                 this.props.history.replace(registrationServer.id.toString())
             }
         } else {
             registrationServers = registrationServers.reverse();
-            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b class="white-text">${registrationServers.map(registrationServer => `Contentor ${registrationServer.container.id} => Host ${registrationServer.container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class="green-text">Foram iniciados ${registrationServers.length} servidores de registo novos:<br/><b>${registrationServers.map(registrationServer => `Contentor ${registrationServer.container.id} => Host ${registrationServer.container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push('/servidores de registo');
             }
@@ -166,7 +166,7 @@ class RegistrationServer extends BaseComponent<Props, State> {
         super.toast(`Não foi possível lançar o servidor de registo`, 10000, reason, true);
 
     private onDeleteSuccess = (registrationServer: IRegistrationServer): void => {
-        super.toast(`<span class="green-text">O servidor de registo <b class="white-text">${registrationServer.id}</b> foi parado com sucesso</span>`);
+        super.toast(`<span class="green-text">O servidor de registo <b>${registrationServer.id}</b> foi parado com sucesso</span>`);
         if (this.mounted) {
             this.props.history.push(`/servidores de registo`)
         }

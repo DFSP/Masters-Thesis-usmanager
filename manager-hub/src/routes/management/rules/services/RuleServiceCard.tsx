@@ -65,7 +65,7 @@ class RuleServiceCard extends BaseComponent<Props, State> {
     }
 
     private onDeleteSuccess = (ruleService: IRuleService): void => {
-        super.toast(`<span class="green-text">A regra <b class="white-text">${ruleService.name}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A regra <b>${ruleService.name}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }

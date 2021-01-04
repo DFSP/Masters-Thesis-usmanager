@@ -95,7 +95,7 @@ class SshPanel extends React.Component<SshPanelProps, State> {
         const maxHeight = Math.max(body.scrollHeight, body.offsetHeight,
             html.clientHeight, html.scrollHeight, html.offsetHeight) - 50 - 56; // 56 for header and 50 for footer
         return <Resizable
-            className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
+            className={`commands-container ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
             style={{
                 width: this.state.panelWidth,
                 left: this.props.sidenavVisible ? '225px' : '0'
@@ -112,12 +112,12 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                     commandsHeight: this.state.commandsHeight + d.height,
                 });
             }}>
-            <div className={styles.controlsMenuLeft}>
+            <div className={'commands-controls-menu-left'}>
                 <ScrollBar ref={(ref) => {
                     this.leftControlsScrollbar = ref;
                 }}>
                     <button className='btn-floating btn-flat btn-small'
-                            data-for='tooltip' data-tip="Limpar" data-place='top'
+                            data-for='dark-tooltip' data-tip="Limpar" data-place='top'
                             onClick={this.clearCommands}>
                         <i className='material-icons grey-text'>delete_sweep</i>
                     </button>
@@ -135,13 +135,13 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                         </div>
                     </div>
                 </div>
-                <div className={styles.commands}>
+                <div className={'commands'}>
                     {this.filteredCommands().map((command: ICommand | IFileTransfer, index: number) => (
                         <div key={index}>
                             {'output' in command ?
                                 <>
                                     <div>
-                                        <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
+                                        <span className={'commands-time'}>{this.timestampToString(command.timestamp)}</span>
                                         {!this.props.filter &&
                                         <span
                                             className={styles.hostname}>{`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''}:`}</span>}
@@ -159,7 +159,7 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                                 :
                                 <>
                                     <div>
-                                        <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
+                                        <span className={'commands-time'}>{this.timestampToString(command.timestamp)}</span>
                                         O ficheiro {command.filename} foi transferido
                                         para o
                                         host {`${command.hostAddress.publicIpAddress}${command.hostAddress.privateIpAddress ? '/' + command.hostAddress.privateIpAddress : ''} com sucesso`}
@@ -175,7 +175,7 @@ class SshPanel extends React.Component<SshPanelProps, State> {
                     this.rightControlsScrollbar = ref;
                 }}>
                     <button className={`btn-floating btn-flat btn-small`}
-                            data-for='tooltip'
+                            data-for='dark-tooltip'
                             data-tip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Expandir' : 'Esconder'}
                             data-place='left'
                             onClick={this.toggleCommands}>

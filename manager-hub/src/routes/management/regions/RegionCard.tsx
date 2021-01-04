@@ -64,7 +64,7 @@ class RegionCard extends BaseComponent<Props, State> {
     }
 
     /*private onDeleteSuccess = (region: IRegion): void => {
-        super.toast(`<span class="green-text">A região <b class="white-text">${region.region}</b> foi apagada com sucesso</span>`);
+        super.toast(`<span class="green-text">A região <b>${region.region}</b> foi apagada com sucesso</span>`);
         if (this.mounted) {
             this.setState({loading: false});
         }
