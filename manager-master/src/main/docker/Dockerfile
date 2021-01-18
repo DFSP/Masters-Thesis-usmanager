@@ -17,7 +17,7 @@ RUN mvn -DskipTests clean package
 
 FROM adoptopenjdk/openjdk11:ubuntu-jre
 COPY manager-master/src/main/docker/scripts scripts
-RUN sh scripts/docker-install.sh scripts/docker-api-install.sh
+RUN sh scripts/dockerfile-docker-install.sh scripts/dockerfile-docker-api-install.sh
 VOLUME /var/run/docker.sock
 WORKDIR /app
 COPY --from=build /usr/src/app/target/*.jar manager-master.jar
