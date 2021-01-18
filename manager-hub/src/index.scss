@@ -1,5 +1,3 @@
-//$transition-effects: color .5s ease, background-color .5s ease;
-
 html {
   &.light-mode {
     background: whitesmoke;
@@ -8,7 +6,6 @@ html {
 }
 
 body {
-  //transition: $transition-effects;
   &:not(.light-mode) {
     .btn-flat {
       color: white;
@@ -43,6 +40,10 @@ body {
       background-color: #282828;
       border: 1px solid black;
       color: white;
+    }
+
+    .service-apps-collapsible-header {
+      background-color: #282828
     }
 
     ul.dropdown-content.select-dropdown li span {
@@ -333,10 +334,33 @@ body {
     .commands {
        color: white;
      }
+    .login-button {
+      color: white;
+    }
+
   }
 
   &.light-mode {
     background-color: whitesmoke;
+
+    input:-webkit-autofill {
+      -webkit-text-fill-color: black !important;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active  {
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+    }
+
+    .login-button {
+      color: black;
+    }
+
+    .service-apps-collapsible-header {
+      background-color: white;
+    }
 
     .commands {
       color: black;

@@ -191,7 +191,7 @@ class Service extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IService>): void => {
         const service = reply.data;
-        super.toast(`<span class='green-text'>O serviço ${this.mounted ? `<b class='white-text'>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class='green-text'>O serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addService(service);
         this.saveEntities(service);
         if (this.mounted) {
@@ -205,7 +205,7 @@ class Service extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IService>): void => {
         const service = reply.data;
-        super.toast(`<span class='green-text'>As alterações ao serviço ${this.mounted ? `<b class='white-text'>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class='green-text'>As alterações ao serviço ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href='/serviços/${service.serviceName}'><b>${service.serviceName}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(service);
         const previousService = this.getService();
         if (previousService.id) {

@@ -263,7 +263,7 @@ class Container extends BaseComponent<Props, State> {
         let containers = reply.data;
         if (containers.length === 1) {
             const container = containers[0];
-            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b class='white-text'>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`} começou a sua execução com sucesso no host ${container.publicIpAddress}</span>`);
+            super.toast(`<span class='green-text'>O contentor ${this.mounted ? `<b>${container.id}</b>` : `<a href='/contentores/${container.id}'><b>${container.id}</b></a>`} começou a sua execução com sucesso no host ${container.publicIpAddress}</span>`);
             this.saveEntities(container);
             if (this.mounted) {
                 this.updateContainer(container);
@@ -271,7 +271,7 @@ class Container extends BaseComponent<Props, State> {
             }
         } else {
             containers = containers.reverse();
-            super.toast(`<span class='green-text'>Foram lançados ${containers.length} contentores novos:<br/><b class='white-text'>${containers.map(container => `${container.id} => Host ${container.publicIpAddress}`).join('<br/>')}</b></span>`);
+            super.toast(`<span class='green-text'>Foram lançados ${containers.length} contentores novos:<br/><b>${containers.map(container => `${container.id} => Host ${container.publicIpAddress}`).join('<br/>')}</b></span>`);
             if (this.mounted) {
                 this.props.history.push("/contentores");
             }

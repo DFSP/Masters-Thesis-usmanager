@@ -58,13 +58,6 @@
 		<java.version>11</java.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>symmetricds</id>
-			<url>http://maven.jumpmind.com/repo</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
@@ -151,11 +144,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jumpmind.symmetric</groupId>
-			<artifactId>symmetric-server</artifactId>
-			<version>3.11.10</version>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>

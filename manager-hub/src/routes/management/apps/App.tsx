@@ -173,7 +173,7 @@ class App extends BaseComponent<Props, State> {
 
     private onPostSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class='green-text'>A aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foi guardada com sucesso</span>`);
+        super.toast(`<span class='green-text'>A aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foi guardada com sucesso</span>`);
         this.props.addApp(app);
         this.saveEntities(app);
         if (this.mounted) {
@@ -187,7 +187,7 @@ class App extends BaseComponent<Props, State> {
 
     private onPutSuccess = (reply: IReply<IApp>): void => {
         const app = reply.data;
-        super.toast(`<span class='green-text'>As mudanças à aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foram guardadas com sucesso</span>`);
+        super.toast(`<span class='green-text'>As mudanças à aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`} foram guardadas com sucesso</span>`);
         this.saveEntities(app);
         const previousApp = this.getApp();
         if (previousApp.id) {
@@ -200,7 +200,7 @@ class App extends BaseComponent<Props, State> {
     };
 
     private onPutFailure = (reason: string, app: IApp): void =>
-        super.toast(`Não foi possível atualizar a aplicação ${this.mounted ? `<b class='white-text'>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
+        super.toast(`Não foi possível atualizar a aplicação ${this.mounted ? `<b>${app.name}</b>` : `<a href='/aplicações/${app.name}'><b>${app.name}</b></a>`}`, 10000, reason, true);
 
     private onDeleteSuccess = (app: IApp): void => {
         super.toast(`<span class='green-text'>A aplicação<b>${app.name}</b> foi apagada com sucesso</span>`);

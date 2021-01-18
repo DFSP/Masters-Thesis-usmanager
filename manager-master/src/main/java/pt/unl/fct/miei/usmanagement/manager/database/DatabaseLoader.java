@@ -182,13 +182,13 @@ public class DatabaseLoader {
 
 		ServiceRule rxOver500000GenericServiceRule;
 		try {
-			rxOver500000GenericServiceRule = serviceRulesService.getRule("RxOver500000");
+			rxOver500000GenericServiceRule = serviceRulesService.getRule("Replicate when RX over 500000");
 		}
 		catch (EntityNotFoundException ignored) {
 			Decision serviceDecisionReplicate = decisions.get(RuleDecisionEnum.REPLICATE);
-			Condition rxBytesPerSecOver500000 = conditions.get("RxBytesPerSecOver500000");
+			Condition rxBytesPerSecOver500000 = conditions.get("Rx bytes per second over 500000");
 			rxOver500000GenericServiceRule = ServiceRule.builder()
-				.name("RxOver500000")
+				.name("Replicate when RX over 500000")
 				.priority(1)
 				.decision(serviceDecisionReplicate)
 				.generic(true)
@@ -201,7 +201,7 @@ public class DatabaseLoader {
 				.build();
 			serviceRuleConditions.save(rxOver500000Condition);
 		}
-		serviceRuleMap.put("RxOver500000", rxOver500000GenericServiceRule);
+		serviceRuleMap.put("Replicate when RX over 500000", rxOver500000GenericServiceRule);
 
 		return serviceRuleMap;
 	}
@@ -213,25 +213,25 @@ public class DatabaseLoader {
 
 		HostRule cpuAndRamOver90GenericHostRule;
 		try {
-			cpuAndRamOver90GenericHostRule = hostRulesService.getRule("CpuAndRamOver90");
+			cpuAndRamOver90GenericHostRule = hostRulesService.getRule("Cpu and ram over 90");
 		}
 		catch (EntityNotFoundException ignored) {
 			Decision hostDecisionOverwork = decisions.get(RuleDecisionEnum.OVERWORK);
 			cpuAndRamOver90GenericHostRule = HostRule.builder()
-				.name("CpuAndRamOver90")
+				.name("Cpu and ram over 90")
 				.priority(1)
 				.decision(hostDecisionOverwork)
 				.generic(true)
 				.build();
 			cpuAndRamOver90GenericHostRule = hostRulesService.addRule(cpuAndRamOver90GenericHostRule);
 
-			Condition cpuPercentageOver90 = conditions.get("CpuPercentageOver90");
+			Condition cpuPercentageOver90 = conditions.get("Cpu percentage over 90");
 			HostRuleCondition cpuOver90Condition = HostRuleCondition.builder()
 				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), cpuPercentageOver90.getId()))
 				.rule(cpuAndRamOver90GenericHostRule)
 				.condition(cpuPercentageOver90)
 				.build();
-			Condition ramPercentageOver90 = conditions.get("RamPercentageOver90");
+			Condition ramPercentageOver90 = conditions.get("Ram percentage over 90");
 			ruleConditionsService.saveHostRuleCondition(cpuOver90Condition);
 			HostRuleCondition ramOver90Condition = HostRuleCondition.builder()
 				.id(new RuleConditionKey(cpuAndRamOver90GenericHostRule.getId(), ramPercentageOver90.getId()))
@@ -240,7 +240,7 @@ public class DatabaseLoader {
 				.build();
 			ruleConditionsService.saveHostRuleCondition(ramOver90Condition);
 		}
-		hostRuleMap.put("CpuAndRamOver90", cpuAndRamOver90GenericHostRule);
+		hostRuleMap.put("Cpu and ram over 90", cpuAndRamOver90GenericHostRule);
 
 		return hostRuleMap;
 	}
@@ -255,12 +255,12 @@ public class DatabaseLoader {
 
 		Condition cpuPercentageOver90;
 		try {
-			cpuPercentageOver90 = conditionsService.getCondition("CpuPercentageOver90");
+			cpuPercentageOver90 = conditionsService.getCondition("Cpu percentage over 90");
 		}
 		catch (EntityNotFoundException ignored) {
 			Field cpuPercentage = fields.get("cpu-%");
 			cpuPercentageOver90 = Condition.builder()
-				.name("CpuPercentageOver90")
+				.name("Cpu percentage over 90")
 				.valueMode(effectiveValue)
 				.field(cpuPercentage)
 				.operator(greaterThan)
@@ -268,16 +268,16 @@ public class DatabaseLoader {
 				.build();
 			cpuPercentageOver90 = conditionsService.addCondition(cpuPercentageOver90);
 		}
-		conditionsMap.put("CpuPercentageOver90", cpuPercentageOver90);
+		conditionsMap.put("Cpu percentage over 90", cpuPercentageOver90);
 
 		Condition ramPercentageOver90;
 		try {
-			ramPercentageOver90 = conditionsService.getCondition("RamPercentageOver90");
+			ramPercentageOver90 = conditionsService.getCondition("Ram percentage over 90");
 		}
 		catch (EntityNotFoundException ignored) {
 			Field ramPercentage = fields.get("ram-%");
 			ramPercentageOver90 = Condition.builder()
-				.name("RamPercentageOver90")
+				.name("Ram percentage over 90")
 				.valueMode(effectiveValue)
 				.field(ramPercentage)
 				.operator(greaterThan)
@@ -285,16 +285,16 @@ public class DatabaseLoader {
 				.build();
 			ramPercentageOver90 = conditionsService.addCondition(ramPercentageOver90);
 		}
-		conditionsMap.put("RamPercentageOver90", ramPercentageOver90);
+		conditionsMap.put("Ram percentage over 90", ramPercentageOver90);
 
 		Condition rxBytesPerSecOver500000;
 		try {
-			rxBytesPerSecOver500000 = conditionsService.getCondition("RxBytesPerSecOver500000");
+			rxBytesPerSecOver500000 = conditionsService.getCondition("Rx bytes per second over 500000");
 		}
 		catch (EntityNotFoundException ignored) {
 			Field rxBytesPerSec = fields.get("rx-bytes-per-sec");
 			rxBytesPerSecOver500000 = Condition.builder()
-				.name("RxBytesPerSecOver500000")
+				.name("Rx bytes per second over 500000")
 				.valueMode(effectiveValue)
 				.field(rxBytesPerSec)
 				.operator(greaterThan)
@@ -302,16 +302,16 @@ public class DatabaseLoader {
 				.build();
 			rxBytesPerSecOver500000 = conditionsService.addCondition(rxBytesPerSecOver500000);
 		}
-		conditionsMap.put("RxBytesPerSecOver500000", rxBytesPerSecOver500000);
+		conditionsMap.put("Rx bytes per second over 500000", rxBytesPerSecOver500000);
 
 		Condition txBytesPerSecOver100000;
 		try {
-			txBytesPerSecOver100000 = conditionsService.getCondition("TxBytesPerSecOver100000");
+			txBytesPerSecOver100000 = conditionsService.getCondition("Tx bytes per second over 100000");
 		}
 		catch (EntityNotFoundException ignored) {
 			Field txBytesPerSec = fields.get("tx-bytes-per-sec");
 			txBytesPerSecOver100000 = Condition.builder()
-				.name("TxBytesPerSecOver100000")
+				.name("Tx bytes per second over 100000")
 				.valueMode(effectiveValue)
 				.field(txBytesPerSec)
 				.operator(greaterThan)
@@ -319,7 +319,7 @@ public class DatabaseLoader {
 				.build();
 			txBytesPerSecOver100000 = conditionsService.addCondition(txBytesPerSecOver100000);
 		}
-		conditionsMap.put("TxBytesPerSecOver100000", txBytesPerSecOver100000);
+		conditionsMap.put("Tx bytes per second over 100000", txBytesPerSecOver100000);
 
 		return conditionsMap;
 	}

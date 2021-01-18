@@ -28,6 +28,7 @@ import ReactTooltip from "react-tooltip";
 import {Point} from "react-simple-maps";
 import Marker, {IMarker} from "./Marker";
 import Dialog from "../dialogs/Dialog";
+import {isDarkMode} from "../../utils/bightnessMode";
 
 export interface ICoordinates {
     label?: string,
@@ -130,8 +131,8 @@ export default class LocationMap extends React.Component<Props, State> {
                       clickHighlight={clickHighlight} zoomable={zoomable} keepRatio={keepRatio} position={position}
                       center={this.center()}
                       onZoom={this.resizeMarkers}/>
-            <ReactTooltip id='dark-tooltip' effect='solid' type='dark'/>
-            <ReactTooltip html multiline>
+            {/*TODO: fix tooltip colors*/}
+            <ReactTooltip type={isDarkMode() ? 'dark' : 'light'} html multiline>
                 {tooltip}
             </ReactTooltip>
         </>;

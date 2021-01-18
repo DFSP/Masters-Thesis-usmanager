@@ -25,6 +25,7 @@
 package pt.unl.fct.miei.usmanagement.manager.containers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +58,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+@JsonPropertyOrder({ "id", "type", "created", "name", "image", "command", "network", "publicIpAddress", "privateIpAddress",
+	"mounts", "ports", "labels", "region", "state", "managerId", "coordinates" })
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -114,10 +117,6 @@ public class Container /*extends AbstractEntity<String> */ {
 	@NotNull
 	private String state;
 
-	public String getManagerId() {
-		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
-	}
-
 	@NotNull
 	private Coordinates coordinates;
 
@@ -147,6 +146,10 @@ public class Container /*extends AbstractEntity<String> */ {
 	@JsonIgnore
 	public String getAddress() {
 		return String.format("%s:%s", publicIpAddress, labels.get(ContainerConstants.Label.SERVICE_PORT));
+	}
+
+	public String getManagerId() {
+		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
 	}
 
 	public void addRule(ContainerRule rule) {

@@ -691,6 +691,10 @@ textarea {
     margin: 10px;
 }
 
+.collapsible-body {
+    border-bottom: unset;
+}
+
 .inline-field {
     padding-left: 0 !important;
 }

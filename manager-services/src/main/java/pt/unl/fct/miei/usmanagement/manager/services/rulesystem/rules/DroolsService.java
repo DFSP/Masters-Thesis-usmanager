@@ -204,7 +204,7 @@ public class DroolsService {
 		}
 		String[] ruleNameSplit = matchList.get(0).getRule().getName().split("_");
 		trackingAgendaEvent.reset();
-		return Long.parseLong(ruleNameSplit[2]);
+		return Long.parseLong(ruleNameSplit[1]);
 	}
 
 	@Getter

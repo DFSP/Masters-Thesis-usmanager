@@ -207,7 +207,7 @@ class Node extends BaseComponent<Props, State> {
         nodes = nodes.map(node => addCoordinates(node));
         if (nodes.length === 1) {
             let node = nodes[0];
-            super.toast(`<span class='green-text'>O host ${node.publicIpAddress} entrou no swarm com o id ${this.mounted ? `<b class='white-text'>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`}</span>`);
+            super.toast(`<span class='green-text'>O host ${node.publicIpAddress} entrou no swarm com o id ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`}</span>`);
             if (this.mounted) {
                 this.updateNode(node);
                 this.props.history.replace(node.id.toString());
@@ -238,11 +238,11 @@ class Node extends BaseComponent<Props, State> {
         const previousAvailability = previousNode?.availability;
         const previousRole = previousNode?.role;
         if (node.availability !== previousAvailability) {
-            super.toast(`<span class='green-text'>A disponibilidade do nó ${this.mounted ? `<b class='white-text'>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foi alterada para ${node.availability}</span>`);
+            super.toast(`<span class='green-text'>A disponibilidade do nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foi alterada para ${node.availability}</span>`);
         } else if (node.role !== previousRole) {
-            super.toast(`<span class='green-text'>O nó ${this.mounted ? `<b class='white-text'>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foi ${previousRole === 'MANAGER' ? 'despromovido' : 'promovido'} a ${node.role}</span>`);
+            super.toast(`<span class='green-text'>O nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foi ${previousRole === 'MANAGER' ? 'despromovido' : 'promovido'} a ${node.role}</span>`);
         } else {
-            super.toast(`<span class='green-text'>As alterações ao nó ${this.mounted ? `<b class='white-text'>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foram guardadas com sucesso</span>`);
+            super.toast(`<span class='green-text'>As alterações ao nó ${this.mounted ? `<b>${node.id}</b>` : `<a href='/nós/${node.id}'><b>${node.id}</b></a>`} foram guardadas com sucesso</span>`);
         }
         if (previousNode?.id) {
             this.props.updateNode(previousNode as INode, node)

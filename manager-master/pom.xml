@@ -59,13 +59,6 @@
 		</license>
 	</licenses>
 
-	<repositories>
-		<repository>
-			<id>symmetricds</id>
-			<url>http://maven.jumpmind.com/repo</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>pt.unl.fct.miei.usmanagement.manager</groupId>
@@ -137,12 +130,6 @@
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<version>2.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jumpmind.symmetric</groupId>
-			<artifactId>symmetric-server</artifactId>
-			<version>3.11.10</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

@@ -333,8 +333,8 @@ class Form extends BaseComponent<Props, State> {
                                             <i className='material-icons'>keyboard_arrow_down</i>
                                         </button>
                                         <ul id='switch-dropdown'
-                                            className={`dropdown-content ${styles.dropdown}`}>
-                                            <li className={`${styles.disabled}`}>
+                                            className={`dropdown-content dropdown`}>
+                                            <li className={`disabled`}>
                                                 <a>
                                                     {switchDropdown.title || 'Selecionar o tipo de formulário'}
                                                 </a>
@@ -422,8 +422,8 @@ class Form extends BaseComponent<Props, State> {
                                             <i className='material-icons'>add</i>
                                         </button>
                                         <ul id={`dropdown-${dropdown.id}`}
-                                            className={`dropdown-content ${styles.dropdown}`}>
-                                            <li className={`${styles.disabled}`}>
+                                            className='dropdown-content dropdown'>
+                                            <li className={`disabled`}>
                                                 <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : ''}`}>
                                                     {dropdown.data.length ? dropdown.title : dropdown.empty}
                                                 </a>
