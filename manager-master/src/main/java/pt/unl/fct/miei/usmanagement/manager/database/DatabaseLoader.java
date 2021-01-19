@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.fields.Field;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
 import pt.unl.fct.miei.usmanagement.manager.hosts.edge.EdgeHost;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
@@ -761,14 +762,14 @@ public class DatabaseLoader {
 	List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
 		List<EdgeHost> egeHosts = new ArrayList<>(1);
 
-		EdgeHost danielHost;
+		EdgeHost danielHost1;
 		try {
-			danielHost = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
+			danielHost1 = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
 		}
 		catch (EntityNotFoundException ignored) {
 			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
 			RegionEnum region = RegionEnum.getClosestRegion(coordinates);
-			danielHost = edgeHostsService.addEdgeHost(EdgeHost.builder()
+			danielHost1 = edgeHostsService.addEdgeHost(EdgeHost.builder()
 				.username("daniel")
 				.publicIpAddress("2.82.208.89")
 				.privateIpAddress("192.168.1.83")
@@ -777,7 +778,24 @@ public class DatabaseLoader {
 				.coordinates(coordinates)
 				.build());
 		}
-		egeHosts.add(danielHost);
+		egeHosts.add(danielHost1);
+
+		EdgeHost danielHost2;
+		try {
+			danielHost2 = edgeHostsService.getEdgeHostByAddress(new HostAddress("192.168.1.93", "192.168.1.93"));
+		}
+		catch (EntityNotFoundException ignored) {
+			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
+			RegionEnum region = RegionEnum.getClosestRegion(coordinates);
+			danielHost2 = edgeHostsService.addEdgeHost(EdgeHost.builder()
+				.username("daniel")
+				.publicIpAddress("192.168.1.93")
+				.privateIpAddress("192.168.1.93")
+				.region(region)
+				.coordinates(coordinates)
+				.build());
+		}
+		egeHosts.add(danielHost2);
 
 		return egeHosts;
 	}

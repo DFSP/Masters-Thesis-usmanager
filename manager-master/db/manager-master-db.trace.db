@@ -1331,3 +1331,9 @@ INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [
 org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.UK_HJMLC3LMHEDTK9JW71KSSIF9O_INDEX_1 ON PUBLIC.LOGGING_EVENT_EXCEPTION(EVENT_ID) VALUES 301"; SQL statement:
 INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [23505-200]
 (truncated)
+2021-01-19 13:02:25 jdbc[35]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constr... (516)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]
+2021-01-19 13:02:25 jdbc[35]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "TRACE_LINE VARCHAR(256)": "STRINGDECODE('Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: \""PUBL... (400)"; SQL statement:
+INSERT INTO logging_event_exception (event_id, i, trace_line) VALUES (?, ?, ?) [22001-200]

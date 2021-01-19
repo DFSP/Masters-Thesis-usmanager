@@ -35,7 +35,7 @@ sh src/main/resources/scripts/node-exporter-install.sh
 
 #### Local
 ```shell script
-export EXTERNAL_ID=manager-master
+export ID=manager-master
 mvn spring-boot:run
 ```
 
@@ -44,7 +44,7 @@ mvn spring-boot:run
 ##### Local
 ```shell script
 docker build -f docker/Dockerfile . -t manager-master
-docker run --rm -p 8080:8080 -e EXTERNAL_ID=manager-master manager-master
+docker run --rm -p 8080:8080 -e ID=manager-master manager-master
 ```
 
 ##### Docker hub
