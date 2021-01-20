@@ -762,23 +762,40 @@ public class DatabaseLoader {
 	List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
 		List<EdgeHost> egeHosts = new ArrayList<>(1);
 
-		//TODO se quiseres executar apenas localmente, define o valor do ip publico com o valor do ip privado
-		EdgeHost edgeHost;
+		EdgeHost danielHost1;
 		try {
-			edgeHost = edgeHostsService.getEdgeHostByAddress(new HostAddress("xxx.xxx.x.xx", "xxx.xxx.x.xx")); //TODO alterar ips
+			danielHost1 = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
 		}
 		catch (EntityNotFoundException ignored) {
-			Coordinates coordinates = new Coordinates("Portugal", -1, -1); //TODO: alterar as coordenadas
+			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
 			RegionEnum region = RegionEnum.getClosestRegion(coordinates);
-			edgeHost = edgeHostsService.addEdgeHost(EdgeHost.builder()
-				.username("username_do_pc") //TODO alterar username
-				.publicIpAddress("xxx.xxx.x.xx") //TODO alterar ips
-				.privateIpAddress("xxx.xxx.x.xx") //TODO alterar ips
+			danielHost1 = edgeHostsService.addEdgeHost(EdgeHost.builder()
+				.username("daniel")
+				.publicIpAddress("2.82.208.89")
+				.privateIpAddress("192.168.1.83")
+				.publicDnsName("danielfct.ddns.net")
 				.region(region)
 				.coordinates(coordinates)
 				.build());
 		}
-		egeHosts.add(edgeHost);
+		egeHosts.add(danielHost1);
+
+		EdgeHost danielHost2;
+		try {
+			danielHost2 = edgeHostsService.getEdgeHostByAddress(new HostAddress("192.168.1.93", "192.168.1.93"));
+		}
+		catch (EntityNotFoundException ignored) {
+			Coordinates coordinates = new Coordinates("Portugal", 39.575097, -8.909794);
+			RegionEnum region = RegionEnum.getClosestRegion(coordinates);
+			danielHost2 = edgeHostsService.addEdgeHost(EdgeHost.builder()
+				.username("daniel")
+				.publicIpAddress("192.168.1.93")
+				.privateIpAddress("192.168.1.93")
+				.region(region)
+				.coordinates(coordinates)
+				.build());
+		}
+		egeHosts.add(danielHost2);
 
 		return egeHosts;
 	}
