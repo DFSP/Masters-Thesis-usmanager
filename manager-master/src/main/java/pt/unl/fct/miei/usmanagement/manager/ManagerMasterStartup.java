@@ -33,13 +33,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
@@ -57,6 +57,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 	private final ElasticIpsService elasticIpsService;
 	private final ServicesMonitoringService servicesMonitoringService;
 	private final HostsMonitoringService hostsMonitoringService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
 	private final Environment environment;
 
@@ -65,13 +66,14 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 								@Lazy ElasticIpsService elasticIpsService,
 								@Lazy ServicesMonitoringService servicesMonitoringService,
 								@Lazy HostsMonitoringService hostsMonitoringService,
-								Environment environment) {
+								Environment environment, ManagerServicesConfiguration managerServicesConfiguration) {
 		this.hostsService = hostsService;
 		this.syncService = syncService;
 		this.elasticIpsService = elasticIpsService;
 		this.servicesMonitoringService = servicesMonitoringService;
 		this.hostsMonitoringService = hostsMonitoringService;
 		this.environment = environment;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
 	@SneakyThrows
@@ -82,12 +84,16 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		HostAddress hostAddress = hostAddressJson == null
 			? hostsService.setManagerHostAddress()
 			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
-		elasticIpsService.allocateElasticIpAddresses();
+		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+			elasticIpsService.allocateElasticIpAddresses();
+		}
 		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
 		hostsService.clusterHosts();
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
-		syncService.startCloudHostsDatabaseSynchronization();
+		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+			syncService.startCloudHostsDatabaseSynchronization();
+		}
 		syncService.startContainersDatabaseSynchronization();
 		syncService.startNodesDatabaseSynchronization();
 	}

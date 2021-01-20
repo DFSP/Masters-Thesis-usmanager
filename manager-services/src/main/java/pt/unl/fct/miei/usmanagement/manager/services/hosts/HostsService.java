@@ -27,11 +27,11 @@ package pt.unl.fct.miei.usmanagement.manager.services.hosts;
 import com.spotify.docker.client.messages.swarm.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerTypeEnum;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.MethodNotAllowedException;
@@ -44,17 +44,14 @@ import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.bash.BashService;
-import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
-import pt.unl.fct.miei.usmanagement.manager.services.location.LocationRequestsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.HostMetricsService;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshCommandResult;
 import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
@@ -87,6 +84,7 @@ public class HostsService {
 	private final SshService sshService;
 	private final BashService bashService;
 	private final HostMetricsService hostMetricsService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 	private final int maxWorkers;
 	private final int maxInstances;
 	private HostAddress managerHostAddress;
@@ -95,8 +93,8 @@ public class HostsService {
 	public HostsService(@Lazy NodesService nodesService, @Lazy ContainersService containersService,
 						DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
 						CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
-						HostMetricsService hostMetricsService, DockerProperties dockerProperties,
-						AwsProperties awsProperties, ParallelismProperties parallelismProperties) {
+						HostMetricsService hostMetricsService, ManagerServicesConfiguration managerServicesConfiguration,
+						DockerProperties dockerProperties, AwsProperties awsProperties, ParallelismProperties parallelismProperties) {
 		this.nodesService = nodesService;
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
@@ -105,6 +103,7 @@ public class HostsService {
 		this.sshService = sshService;
 		this.bashService = bashService;
 		this.hostMetricsService = hostMetricsService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 		this.maxWorkers = dockerProperties.getSwarm().getInitialMaxWorkers();
 		this.maxInstances = awsProperties.getInitialMaxInstances();
 		this.threads = parallelismProperties.getThreads();
@@ -112,8 +111,8 @@ public class HostsService {
 
 	public HostAddress setManagerHostAddress() {
 		String username = bashService.getUsername();
-		String publicIp = bashService.getPublicIp();
 		String privateIp = bashService.getPrivateIp();
+		String publicIp = managerServicesConfiguration.getMode() == Mode.LOCAL ? privateIp : bashService.getPublicIp();
 		this.managerHostAddress = completeHostAddress(new HostAddress(username, publicIp, privateIp));
 		log.info("Setting manager host address: {}", managerHostAddress.toString());
 		return managerHostAddress;
@@ -317,6 +316,9 @@ public class HostsService {
 	}
 
 	public HostAddress getCapableHost(double availableMemory, RegionEnum region, Predicate<pt.unl.fct.miei.usmanagement.manager.nodes.Node> filter) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return getManagerHostAddress();
+		}
 		log.info("Looking for node on region {} with <90% memory available and <90% cpu usage to launch service with {} expected ram usage",
 			region.getRegion(), availableMemory);
 		List<HostAddress> nodes = nodesService.getReadyNodes().stream()
@@ -342,6 +344,9 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestCapableHostIgnoring(double availableMemory, Coordinates coordinates, List<HostAddress> hostAddresses) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return getManagerHostAddress();
+		}
 		List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes = nodesService.getReadyNodes().stream().filter(node -> {
 			HostAddress hostAddress = node.getHostAddress();
 			return !hostAddresses.contains(hostAddress) && hostMetricsService.hostHasEnoughResources(hostAddress, availableMemory);
@@ -362,6 +367,9 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestNode(Coordinates coordinates, List<pt.unl.fct.miei.usmanagement.manager.nodes.Node> nodes) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return getManagerHostAddress();
+		}
 		nodes.sort((oneNode, anotherNode) -> {
 			double oneDistance = oneNode.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherNode.getCoordinates().distanceTo(coordinates);
@@ -378,6 +386,9 @@ public class HostsService {
 	}
 
 	public HostAddress getClosestHost(Coordinates coordinates, List<EdgeHost> edgeHosts, List<CloudHost> cloudHosts) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return getManagerHostAddress();
+		}
 		edgeHosts.sort((oneEdgeHost, anotherEdgeHost) -> {
 			double oneDistance = oneEdgeHost.getCoordinates().distanceTo(coordinates);
 			double anotherDistance = anotherEdgeHost.getCoordinates().distanceTo(coordinates);
