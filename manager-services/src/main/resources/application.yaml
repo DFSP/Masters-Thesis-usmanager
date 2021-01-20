@@ -1,8 +1,6 @@
 spring:
   application:
     name: manager-services
-##manager:
-##  mode: local
 ssh:
   connection-timeout: 10000
 edge:

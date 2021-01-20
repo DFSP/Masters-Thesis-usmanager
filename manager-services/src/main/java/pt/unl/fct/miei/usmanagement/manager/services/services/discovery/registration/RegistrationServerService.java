@@ -26,10 +26,10 @@ package pt.unl.fct.miei.usmanagement.manager.services.services.discovery.registr
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
-import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -38,6 +38,7 @@ import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServ
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,15 +54,20 @@ public class RegistrationServerService {
 
 	private final ContainersService containersService;
 	private final ElasticIpsService elasticIpsService;
+	private final HostsService hostsService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
 	private final RegistrationServers registrationServers;
 
 	private final int port;
 
 	public RegistrationServerService(@Lazy ContainersService containersService, ElasticIpsService elasticIpsService,
+									 HostsService hostsService, ManagerServicesConfiguration managerServicesConfiguration,
 									 RegistrationServers registrationServers, RegistrationProperties registrationProperties) {
 		this.containersService = containersService;
 		this.elasticIpsService = elasticIpsService;
+		this.hostsService = hostsService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 		this.registrationServers = registrationServers;
 		this.port = registrationProperties.getPort();
 	}
@@ -87,7 +93,9 @@ public class RegistrationServerService {
 				return CompletableFuture.completedFuture(regionRegistrationServers.get(0));
 			}
 			else {
-				HostAddress hostAddress = elasticIpsService.getHost(region);
+				HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
+					? hostsService.getManagerHostAddress()
+					: elasticIpsService.getHost(region);
 				return launchRegistrationServer(hostAddress);
 			}
 		}).collect(Collectors.toList());

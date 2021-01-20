@@ -28,13 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
-import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
@@ -62,12 +62,14 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 	private final NodesService nodesService;
 	private final SyncService syncService;
 	private final KafkaService kafkaService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
 	public ManagerMasterShutdown(ContainersService containersService, DockerSwarmService dockerSwarmService,
 								 ElasticIpsService elasticIpsService, CloudHostsService cloudHostsService,
 								 HostsMonitoringService hostsMonitoringService, ServicesMonitoringService servicesMonitoringService,
 								 HostsEventsService hostsEventsService, ServicesEventsService servicesEventsService,
-								 NodesService nodesService, SyncService syncService, KafkaService kafkaService) {
+								 NodesService nodesService, SyncService syncService, KafkaService kafkaService,
+								 ManagerServicesConfiguration managerServicesConfiguration) {
 		this.containersService = containersService;
 		this.dockerSwarmService = dockerSwarmService;
 		this.elasticIpsService = elasticIpsService;
@@ -79,6 +81,7 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		this.nodesService = nodesService;
 		this.syncService = syncService;
 		this.kafkaService = kafkaService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
 	@Override
@@ -99,17 +102,19 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		catch (Exception e) {
 			log.error("Failed to stop all containers: {}", e.getMessage());
 		}
-		try {
-			cloudHostsService.terminateInstances();
-		}
-		catch (Exception e) {
-			log.error("Failed to terminate all cloud instances: {}", e.getMessage());
-		}
-		try {
-			elasticIpsService.releaseElasticIpAddresses();
-		}
-		catch (Exception e) {
-			log.error("Failed to release elastic ip addresses: {}", e.getMessage());
+		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
+			try {
+				cloudHostsService.terminateInstances();
+			}
+			catch (Exception e) {
+				log.error("Failed to terminate all cloud instances: {}", e.getMessage());
+			}
+			try {
+				elasticIpsService.releaseElasticIpAddresses();
+			}
+			catch (Exception e) {
+				log.error("Failed to release elastic ip addresses: {}", e.getMessage());
+			}
 		}
 		try {
 			dockerSwarmService.destroySwarm();
@@ -123,10 +128,10 @@ public class ManagerMasterShutdown implements ApplicationListener<ContextClosedE
 		catch (Exception e) {
 			log.error("Failed to stop all docker api proxies: {}", e.getMessage());
 		}
-		/*hostsEventsService.reset();
+		hostsEventsService.reset();
 		servicesEventsService.reset();
 		hostsMonitoringService.reset();
-		servicesMonitoringService.reset();*/
+		servicesMonitoringService.reset();
 		nodesService.reset();
 	}
 
