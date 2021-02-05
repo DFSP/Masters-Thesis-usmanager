@@ -1,0 +1,1898 @@
+{
+  "id": 62,
+  "serviceName": "media-text",
+  "dockerRepository": "usmanager/media-text",
+  "defaultExternalPort": 10003,
+  "defaultInternalPort": 9090,
+  "defaultDb": null,
+  "launchCommand": "${textHost} ${externalPort} ${internalPort} ${hostname}",
+  "minimumReplicas": 1,
+  "maximumReplicas": 0,
+  "outputLabel": "${textHost}",
+  "serviceType": "BACKEND",
+  "environment": [],
+  "volumes": [],
+  "expectedMemoryConsumption": null,
+  "appServices": [
+    {
+      "id": {
+        "appId": 5,
+        "serviceId": 62
+      },
+      "launchOrder": 5,
+      "app": {
+        "id": 5,
+        "name": "Media",
+        "description": "This application contains microservices about movies including info, plots, reviews, etc.",
+        "appServices": [
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 64
+            },
+            "launchOrder": 6,
+            "app": 5,
+            "service": {
+              "id": 64,
+              "serviceName": "media-rating-redis",
+              "dockerRepository": "usmanager/media-rating-redis",
+              "defaultExternalPort": 6382,
+              "defaultInternalPort": 6379,
+              "defaultDb": null,
+              "launchCommand": "${rating-redisHost} ${externalPort} ${internalPort} ${hostname}",
+              "minimumReplicas": 1,
+              "maximumReplicas": 0,
+              "outputLabel": "${rating-redisHost}",
+              "serviceType": "DATABASE",
+              "environment": [],
+              "volumes": [],
+              "expectedMemoryConsumption": null,
+              "appServices": [
+                {
+                  "id": {
+                    "appId": 5,
+                    "serviceId": 64
+                  },
+                  "launchOrder": 6,
+                  "app": 5,
+                  "service": 64
+                }
+              ],
+              "dependencies": [],
+              "dependents": [
+                {
+                  "id": {
+                    "serviceId": 63,
+                    "dependencyId": 64
+                  },
+                  "service": {
+                    "id": 63,
+                    "serviceName": "media-rating",
+                    "dockerRepository": "usmanager/media-rating",
+                    "defaultExternalPort": 10004,
+                    "defaultInternalPort": 9090,
+                    "defaultDb": null,
+                    "launchCommand": "${ratingHost} ${externalPort} ${internalPort} ${hostname} ${RedisHost}",
+                    "minimumReplicas": 1,
+                    "maximumReplicas": 0,
+                    "outputLabel": "${ratingHost}",
+                    "serviceType": "BACKEND",
+                    "environment": [],
+                    "volumes": [],
+                    "expectedMemoryConsumption": null,
+                    "appServices": [
+                      {
+                        "id": {
+                          "appId": 5,
+                          "serviceId": 63
+                        },
+                        "launchOrder": 7,
+                        "app": 5,
+                        "service": 63
+                      }
+                    ],
+                    "dependencies": [
+                      {
+                        "id": {
+                          "serviceId": 63,
+                          "dependencyId": 68
+                        },
+                        "service": 63,
+                        "dependency": {
+                          "id": 68,
+                          "serviceName": "media-compose-review",
+                          "dockerRepository": "usmanager/media-compose-review",
+                          "defaultExternalPort": 10006,
+                          "defaultInternalPort": 9090,
+                          "defaultDb": null,
+                          "launchCommand": "${compose-reviewHost} ${externalPort} ${internalPort} ${hostname} ${MemcachedHost}",
+                          "minimumReplicas": 1,
+                          "maximumReplicas": 0,
+                          "outputLabel": "${compose-reviewHost}",
+                          "serviceType": "BACKEND",
+                          "environment": [],
+                          "volumes": [],
+                          "expectedMemoryConsumption": null,
+                          "appServices": [
+                            {
+                              "id": {
+                                "appId": 5,
+                                "serviceId": 68
+                              },
+                              "launchOrder": 12,
+                              "app": 5,
+                              "service": 68
+                            }
+                          ],
+                          "dependencies": [
+                            {
+                              "id": {
+                                "serviceId": 68,
+                                "dependencyId": 76
+                              },
+                              "service": 68,
+                              "dependency": {
+                                "id": 76,
+                                "serviceName": "media-movie-review",
+                                "dockerRepository": "usmanager/media-movie-review",
+                                "defaultExternalPort": 10009,
+                                "defaultInternalPort": 9090,
+                                "defaultDb": null,
+                                "launchCommand": "${movie-reviewHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${RedisHost}",
+                                "minimumReplicas": 1,
+                                "maximumReplicas": 0,
+                                "outputLabel": "${movie-reviewHost}",
+                                "serviceType": "BACKEND",
+                                "environment": [],
+                                "volumes": [],
+                                "expectedMemoryConsumption": null,
+                                "appServices": [
+                                  {
+                                    "id": {
+                                      "appId": 5,
+                                      "serviceId": 76
+                                    },
+                                    "launchOrder": 21,
+                                    "app": 5,
+                                    "service": 76
+                                  }
+                                ],
+                                "dependencies": [
+                                  {
+                                    "id": {
+                                      "serviceId": 76,
+                                      "dependencyId": 70
+                                    },
+                                    "service": 76,
+                                    "dependency": {
+                                      "id": 70,
+                                      "serviceName": "media-review-storage",
+                                      "dockerRepository": "usmanager/media-review-storage",
+                                      "defaultExternalPort": 10007,
+                                      "defaultInternalPort": 9090,
+                                      "defaultDb": null,
+                                      "launchCommand": "${review-storageHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${review-storageHost}",
+                                      "serviceType": "BACKEND",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 70
+                                          },
+                                          "launchOrder": 15,
+                                          "app": 5,
+                                          "service": 70
+                                        }
+                                      ],
+                                      "dependencies": [
+                                        {
+                                          "id": {
+                                            "serviceId": 70,
+                                            "dependencyId": 71
+                                          },
+                                          "service": 70,
+                                          "dependency": {
+                                            "id": 71,
+                                            "serviceName": "media-review-storage-db",
+                                            "dockerRepository": "usmanager/media-review-storage-db",
+                                            "defaultExternalPort": 42018,
+                                            "defaultInternalPort": 27017,
+                                            "defaultDb": null,
+                                            "launchCommand": "${review-storage-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${review-storage-dbHost}",
+                                            "serviceType": "DATABASE",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 71
+                                                },
+                                                "launchOrder": 13,
+                                                "app": 5,
+                                                "service": 71
+                                              }
+                                            ],
+                                            "dependencies": [],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 70,
+                                                  "dependencyId": 71
+                                                },
+                                                "service": 70,
+                                                "dependency": 71
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 70,
+                                            "dependencyId": 72
+                                          },
+                                          "service": 70,
+                                          "dependency": {
+                                            "id": 72,
+                                            "serviceName": "media-review-storage-memcached",
+                                            "dockerRepository": "usmanager/media-review-storage-memcached",
+                                            "defaultExternalPort": 21215,
+                                            "defaultInternalPort": 11211,
+                                            "defaultDb": null,
+                                            "launchCommand": "${review-storage-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${review-storage-memcachedHost}",
+                                            "serviceType": "DATABASE",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 72
+                                                },
+                                                "launchOrder": 14,
+                                                "app": 5,
+                                                "service": 72
+                                              }
+                                            ],
+                                            "dependencies": [],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 70,
+                                                  "dependencyId": 72
+                                                },
+                                                "service": 70,
+                                                "dependency": 72
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        }
+                                      ],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 73,
+                                            "dependencyId": 70
+                                          },
+                                          "service": {
+                                            "id": 73,
+                                            "serviceName": "media-user-review",
+                                            "dockerRepository": "usmanager/media-user-review",
+                                            "defaultExternalPort": 10008,
+                                            "defaultInternalPort": 9090,
+                                            "defaultDb": null,
+                                            "launchCommand": "${user-reviewHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${RedisHost}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${user-reviewHost}",
+                                            "serviceType": "BACKEND",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 73
+                                                },
+                                                "launchOrder": 18,
+                                                "app": 5,
+                                                "service": 73
+                                              }
+                                            ],
+                                            "dependencies": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 73,
+                                                  "dependencyId": 70
+                                                },
+                                                "service": 73,
+                                                "dependency": 70
+                                              },
+                                              {
+                                                "id": {
+                                                  "serviceId": 73,
+                                                  "dependencyId": 74
+                                                },
+                                                "service": 73,
+                                                "dependency": {
+                                                  "id": 74,
+                                                  "serviceName": "media-user-review-db",
+                                                  "dockerRepository": "usmanager/media-user-review-db",
+                                                  "defaultExternalPort": 43017,
+                                                  "defaultInternalPort": 27017,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${user-review-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${user-review-dbHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 74
+                                                      },
+                                                      "launchOrder": 16,
+                                                      "app": 5,
+                                                      "service": 74
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 73,
+                                                        "dependencyId": 74
+                                                      },
+                                                      "service": 73,
+                                                      "dependency": 74
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              },
+                                              {
+                                                "id": {
+                                                  "serviceId": 73,
+                                                  "dependencyId": 75
+                                                },
+                                                "service": 73,
+                                                "dependency": {
+                                                  "id": 75,
+                                                  "serviceName": "media-user-review-redis",
+                                                  "dockerRepository": "usmanager/media-user-review-redis",
+                                                  "defaultExternalPort": 6381,
+                                                  "defaultInternalPort": 6379,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${user-review-redisHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${user-review-redisHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 75
+                                                      },
+                                                      "launchOrder": 17,
+                                                      "app": 5,
+                                                      "service": 75
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 73,
+                                                        "dependencyId": 75
+                                                      },
+                                                      "service": 73,
+                                                      "dependency": 75
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              }
+                                            ],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 68,
+                                                  "dependencyId": 73
+                                                },
+                                                "service": 68,
+                                                "dependency": 73
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          },
+                                          "dependency": 70
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 76,
+                                            "dependencyId": 70
+                                          },
+                                          "service": 76,
+                                          "dependency": 70
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 68,
+                                            "dependencyId": 70
+                                          },
+                                          "service": 68,
+                                          "dependency": 70
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 76,
+                                      "dependencyId": 77
+                                    },
+                                    "service": 76,
+                                    "dependency": {
+                                      "id": 77,
+                                      "serviceName": "media-movie-review-db",
+                                      "dockerRepository": "usmanager/media-movie-review-db",
+                                      "defaultExternalPort": 44017,
+                                      "defaultInternalPort": 27017,
+                                      "defaultDb": null,
+                                      "launchCommand": "${movie-review-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${movie-review-dbHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 77
+                                          },
+                                          "launchOrder": 19,
+                                          "app": 5,
+                                          "service": 77
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 76,
+                                            "dependencyId": 77
+                                          },
+                                          "service": 76,
+                                          "dependency": 77
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 76,
+                                      "dependencyId": 78
+                                    },
+                                    "service": 76,
+                                    "dependency": {
+                                      "id": 78,
+                                      "serviceName": "media-movie-review-redis",
+                                      "dockerRepository": "usmanager/media-movie-review-redis",
+                                      "defaultExternalPort": 6380,
+                                      "defaultInternalPort": 6379,
+                                      "defaultDb": null,
+                                      "launchCommand": "${movie-review-redisHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${movie-review-redisHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 78
+                                          },
+                                          "launchOrder": 20,
+                                          "app": 5,
+                                          "service": 78
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 76,
+                                            "dependencyId": 78
+                                          },
+                                          "service": 76,
+                                          "dependency": 78
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  }
+                                ],
+                                "dependents": [
+                                  {
+                                    "id": {
+                                      "serviceId": 68,
+                                      "dependencyId": 76
+                                    },
+                                    "service": 68,
+                                    "dependency": 76
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 89,
+                                      "dependencyId": 76
+                                    },
+                                    "service": {
+                                      "id": 89,
+                                      "serviceName": "media-page",
+                                      "dockerRepository": "usmanager/media-page",
+                                      "defaultExternalPort": 9090,
+                                      "defaultInternalPort": 9090,
+                                      "defaultDb": null,
+                                      "launchCommand": "${pageHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${pageHost}",
+                                      "serviceType": "FRONTEND",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 89
+                                          },
+                                          "launchOrder": 31,
+                                          "app": 5,
+                                          "service": 89
+                                        }
+                                      ],
+                                      "dependencies": [
+                                        {
+                                          "id": {
+                                            "serviceId": 89,
+                                            "dependencyId": 84
+                                          },
+                                          "service": 89,
+                                          "dependency": {
+                                            "id": 84,
+                                            "serviceName": "media-plot-db",
+                                            "dockerRepository": "usmanager/media-plot-db",
+                                            "defaultExternalPort": 46017,
+                                            "defaultInternalPort": 27017,
+                                            "defaultDb": null,
+                                            "launchCommand": "${plot-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${plot-dbHost}",
+                                            "serviceType": "DATABASE",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 84
+                                                },
+                                                "launchOrder": 25,
+                                                "app": 5,
+                                                "service": 84
+                                              }
+                                            ],
+                                            "dependencies": [],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 89,
+                                                  "dependencyId": 84
+                                                },
+                                                "service": 89,
+                                                "dependency": 84
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 89,
+                                            "dependencyId": 86
+                                          },
+                                          "service": 89,
+                                          "dependency": {
+                                            "id": 86,
+                                            "serviceName": "media-movie-info",
+                                            "dockerRepository": "usmanager/media-movie-info",
+                                            "defaultExternalPort": 10012,
+                                            "defaultInternalPort": 9090,
+                                            "defaultDb": null,
+                                            "launchCommand": "${movie-infoHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${movie-infoHost}",
+                                            "serviceType": "BACKEND",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 86
+                                                },
+                                                "launchOrder": 30,
+                                                "app": 5,
+                                                "service": 86
+                                              }
+                                            ],
+                                            "dependencies": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 86,
+                                                  "dependencyId": 87
+                                                },
+                                                "service": 86,
+                                                "dependency": {
+                                                  "id": 87,
+                                                  "serviceName": "media-movie-info-db",
+                                                  "dockerRepository": "usmanager/media-movie-info-db",
+                                                  "defaultExternalPort": 47017,
+                                                  "defaultInternalPort": 27017,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${movie-info-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${movie-info-dbHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 87
+                                                      },
+                                                      "launchOrder": 28,
+                                                      "app": 5,
+                                                      "service": 87
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 86,
+                                                        "dependencyId": 87
+                                                      },
+                                                      "service": 86,
+                                                      "dependency": 87
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              },
+                                              {
+                                                "id": {
+                                                  "serviceId": 86,
+                                                  "dependencyId": 88
+                                                },
+                                                "service": 86,
+                                                "dependency": {
+                                                  "id": 88,
+                                                  "serviceName": "media-movie-info-memcached",
+                                                  "dockerRepository": "usmanager/media-movie-info-memcached",
+                                                  "defaultExternalPort": 11221,
+                                                  "defaultInternalPort": 11211,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${movie-info-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${movie-info-memcachedHost}",
+                                                  "serviceType": "BACKEND",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 88
+                                                      },
+                                                      "launchOrder": 29,
+                                                      "app": 5,
+                                                      "service": 88
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 86,
+                                                        "dependencyId": 88
+                                                      },
+                                                      "service": 86,
+                                                      "dependency": 88
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              }
+                                            ],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 89,
+                                                  "dependencyId": 86
+                                                },
+                                                "service": 89,
+                                                "dependency": 86
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 89,
+                                            "dependencyId": 76
+                                          },
+                                          "service": 89,
+                                          "dependency": 76
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 89,
+                                            "dependencyId": 80
+                                          },
+                                          "service": 89,
+                                          "dependency": {
+                                            "id": 80,
+                                            "serviceName": "media-cast-info",
+                                            "dockerRepository": "usmanager/media-cast-info",
+                                            "defaultExternalPort": 10010,
+                                            "defaultInternalPort": 9090,
+                                            "defaultDb": null,
+                                            "launchCommand": "${cast-infoHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${cast-infoHost}",
+                                            "serviceType": "BACKEND",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 80
+                                                },
+                                                "launchOrder": 24,
+                                                "app": 5,
+                                                "service": 80
+                                              }
+                                            ],
+                                            "dependencies": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 80,
+                                                  "dependencyId": 81
+                                                },
+                                                "service": 80,
+                                                "dependency": {
+                                                  "id": 81,
+                                                  "serviceName": "media-cast-info-db",
+                                                  "dockerRepository": "usmanager/media-cast-info-db",
+                                                  "defaultExternalPort": 45017,
+                                                  "defaultInternalPort": 27017,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${cast-info-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${cast-info-dbHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 81
+                                                      },
+                                                      "launchOrder": 22,
+                                                      "app": 5,
+                                                      "service": 81
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 80,
+                                                        "dependencyId": 81
+                                                      },
+                                                      "service": 80,
+                                                      "dependency": 81
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              },
+                                              {
+                                                "id": {
+                                                  "serviceId": 80,
+                                                  "dependencyId": 82
+                                                },
+                                                "service": 80,
+                                                "dependency": {
+                                                  "id": 82,
+                                                  "serviceName": "media-cast-info-memcached",
+                                                  "dockerRepository": "usmanager/media-cast-info-memcached",
+                                                  "defaultExternalPort": 11219,
+                                                  "defaultInternalPort": 11211,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${cast-info-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${cast-info-memcachedHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 82
+                                                      },
+                                                      "launchOrder": 23,
+                                                      "app": 5,
+                                                      "service": 82
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 80,
+                                                        "dependencyId": 82
+                                                      },
+                                                      "service": 80,
+                                                      "dependency": 82
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              }
+                                            ],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 89,
+                                                  "dependencyId": 80
+                                                },
+                                                "service": 89,
+                                                "dependency": 80
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        },
+                                        {
+                                          "id": {
+                                            "serviceId": 89,
+                                            "dependencyId": 83
+                                          },
+                                          "service": 89,
+                                          "dependency": {
+                                            "id": 83,
+                                            "serviceName": "media-plot",
+                                            "dockerRepository": "usmanager/media-plot",
+                                            "defaultExternalPort": 10011,
+                                            "defaultInternalPort": 9090,
+                                            "defaultDb": null,
+                                            "launchCommand": "${plotHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                            "minimumReplicas": 1,
+                                            "maximumReplicas": 0,
+                                            "outputLabel": "${plotHost}",
+                                            "serviceType": "BACKEND",
+                                            "environment": [],
+                                            "volumes": [],
+                                            "expectedMemoryConsumption": null,
+                                            "appServices": [
+                                              {
+                                                "id": {
+                                                  "appId": 5,
+                                                  "serviceId": 83
+                                                },
+                                                "launchOrder": 27,
+                                                "app": 5,
+                                                "service": 83
+                                              }
+                                            ],
+                                            "dependencies": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 83,
+                                                  "dependencyId": 85
+                                                },
+                                                "service": 83,
+                                                "dependency": {
+                                                  "id": 85,
+                                                  "serviceName": "media-plot-memcached",
+                                                  "dockerRepository": "usmanager/media-plot-memcached",
+                                                  "defaultExternalPort": 11220,
+                                                  "defaultInternalPort": 11211,
+                                                  "defaultDb": null,
+                                                  "launchCommand": "${plot-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                                  "minimumReplicas": 1,
+                                                  "maximumReplicas": 0,
+                                                  "outputLabel": "${plot-memcachedHost}",
+                                                  "serviceType": "DATABASE",
+                                                  "environment": [],
+                                                  "volumes": [],
+                                                  "expectedMemoryConsumption": null,
+                                                  "appServices": [
+                                                    {
+                                                      "id": {
+                                                        "appId": 5,
+                                                        "serviceId": 85
+                                                      },
+                                                      "launchOrder": 26,
+                                                      "app": 5,
+                                                      "service": 85
+                                                    }
+                                                  ],
+                                                  "dependencies": [],
+                                                  "dependents": [
+                                                    {
+                                                      "id": {
+                                                        "serviceId": 83,
+                                                        "dependencyId": 85
+                                                      },
+                                                      "service": 83,
+                                                      "dependency": 85
+                                                    }
+                                                  ],
+                                                  "eventPredictions": [],
+                                                  "serviceRules": [],
+                                                  "simulatedServiceMetrics": []
+                                                }
+                                              }
+                                            ],
+                                            "dependents": [
+                                              {
+                                                "id": {
+                                                  "serviceId": 89,
+                                                  "dependencyId": 83
+                                                },
+                                                "service": 89,
+                                                "dependency": 83
+                                              }
+                                            ],
+                                            "eventPredictions": [],
+                                            "serviceRules": [],
+                                            "simulatedServiceMetrics": []
+                                          }
+                                        }
+                                      ],
+                                      "dependents": [],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    },
+                                    "dependency": 76
+                                  }
+                                ],
+                                "eventPredictions": [],
+                                "serviceRules": [],
+                                "simulatedServiceMetrics": []
+                              }
+                            },
+                            {
+                              "id": {
+                                "serviceId": 68,
+                                "dependencyId": 69
+                              },
+                              "service": 68,
+                              "dependency": {
+                                "id": 69,
+                                "serviceName": "media-compose-review-memcached",
+                                "dockerRepository": "usmanager/media-compose-review-memcached",
+                                "defaultExternalPort": 10006,
+                                "defaultInternalPort": 9090,
+                                "defaultDb": null,
+                                "launchCommand": "${compose-review-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                "minimumReplicas": 1,
+                                "maximumReplicas": 0,
+                                "outputLabel": "${compose-review-memcachedHost}",
+                                "serviceType": "BACKEND",
+                                "environment": [],
+                                "volumes": [],
+                                "expectedMemoryConsumption": null,
+                                "appServices": [
+                                  {
+                                    "id": {
+                                      "appId": 5,
+                                      "serviceId": 69
+                                    },
+                                    "launchOrder": 11,
+                                    "app": 5,
+                                    "service": 69
+                                  }
+                                ],
+                                "dependencies": [],
+                                "dependents": [
+                                  {
+                                    "id": {
+                                      "serviceId": 68,
+                                      "dependencyId": 69
+                                    },
+                                    "service": 68,
+                                    "dependency": 69
+                                  }
+                                ],
+                                "eventPredictions": [],
+                                "serviceRules": [],
+                                "simulatedServiceMetrics": []
+                              }
+                            },
+                            {
+                              "id": {
+                                "serviceId": 68,
+                                "dependencyId": 70
+                              },
+                              "service": 68,
+                              "dependency": 70
+                            },
+                            {
+                              "id": {
+                                "serviceId": 68,
+                                "dependencyId": 73
+                              },
+                              "service": 68,
+                              "dependency": 73
+                            }
+                          ],
+                          "dependents": [
+                            {
+                              "id": {
+                                "serviceId": 63,
+                                "dependencyId": 68
+                              },
+                              "service": 63,
+                              "dependency": 68
+                            },
+                            {
+                              "id": {
+                                "serviceId": 59,
+                                "dependencyId": 68
+                              },
+                              "service": {
+                                "id": 59,
+                                "serviceName": "media-movie-id",
+                                "dockerRepository": "usmanager/media-movie-id",
+                                "defaultExternalPort": 10002,
+                                "defaultInternalPort": 9090,
+                                "defaultDb": null,
+                                "launchCommand": "${movie-idHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                "minimumReplicas": 1,
+                                "maximumReplicas": 0,
+                                "outputLabel": "${movie-idHost}",
+                                "serviceType": "BACKEND",
+                                "environment": [],
+                                "volumes": [],
+                                "expectedMemoryConsumption": null,
+                                "appServices": [
+                                  {
+                                    "id": {
+                                      "appId": 5,
+                                      "serviceId": 59
+                                    },
+                                    "launchOrder": 4,
+                                    "app": 5,
+                                    "service": 59
+                                  }
+                                ],
+                                "dependencies": [
+                                  {
+                                    "id": {
+                                      "serviceId": 59,
+                                      "dependencyId": 63
+                                    },
+                                    "service": 59,
+                                    "dependency": 63
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 59,
+                                      "dependencyId": 68
+                                    },
+                                    "service": 59,
+                                    "dependency": 68
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 59,
+                                      "dependencyId": 60
+                                    },
+                                    "service": 59,
+                                    "dependency": {
+                                      "id": 60,
+                                      "serviceName": "media-movie-id-db",
+                                      "dockerRepository": "usmanager/media-movie-id-db",
+                                      "defaultExternalPort": 40018,
+                                      "defaultInternalPort": 27017,
+                                      "defaultDb": null,
+                                      "launchCommand": "${movie-id-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${movie-id-dbHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 60
+                                          },
+                                          "launchOrder": 2,
+                                          "app": 5,
+                                          "service": 60
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 59,
+                                            "dependencyId": 60
+                                          },
+                                          "service": 59,
+                                          "dependency": 60
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 59,
+                                      "dependencyId": 61
+                                    },
+                                    "service": 59,
+                                    "dependency": {
+                                      "id": 61,
+                                      "serviceName": "media-movie-id-memcached",
+                                      "dockerRepository": "usmanager/media-movie-id-memcached",
+                                      "defaultExternalPort": 21212,
+                                      "defaultInternalPort": 11211,
+                                      "defaultDb": null,
+                                      "launchCommand": "${movie-id-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${movie-id-memcachedHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 61
+                                          },
+                                          "launchOrder": 3,
+                                          "app": 5,
+                                          "service": 61
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 59,
+                                            "dependencyId": 61
+                                          },
+                                          "service": 59,
+                                          "dependency": 61
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  }
+                                ],
+                                "dependents": [],
+                                "eventPredictions": [],
+                                "serviceRules": [],
+                                "simulatedServiceMetrics": []
+                              },
+                              "dependency": 68
+                            },
+                            {
+                              "id": {
+                                "serviceId": 62,
+                                "dependencyId": 68
+                              },
+                              "service": 62,
+                              "dependency": 68
+                            },
+                            {
+                              "id": {
+                                "serviceId": 65,
+                                "dependencyId": 68
+                              },
+                              "service": {
+                                "id": 65,
+                                "serviceName": "media-user",
+                                "dockerRepository": "usmanager/media-user",
+                                "defaultExternalPort": 10005,
+                                "defaultInternalPort": 9090,
+                                "defaultDb": null,
+                                "launchCommand": "${userHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+                                "minimumReplicas": 1,
+                                "maximumReplicas": 0,
+                                "outputLabel": "${userHost}",
+                                "serviceType": "BACKEND",
+                                "environment": [],
+                                "volumes": [],
+                                "expectedMemoryConsumption": null,
+                                "appServices": [
+                                  {
+                                    "id": {
+                                      "appId": 5,
+                                      "serviceId": 65
+                                    },
+                                    "launchOrder": 10,
+                                    "app": 5,
+                                    "service": 65
+                                  }
+                                ],
+                                "dependencies": [
+                                  {
+                                    "id": {
+                                      "serviceId": 65,
+                                      "dependencyId": 66
+                                    },
+                                    "service": 65,
+                                    "dependency": {
+                                      "id": 66,
+                                      "serviceName": "media-user-db",
+                                      "dockerRepository": "usmanager/media-user-db",
+                                      "defaultExternalPort": 41018,
+                                      "defaultInternalPort": 27017,
+                                      "defaultDb": null,
+                                      "launchCommand": "${user-dbHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${user-dbHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 66
+                                          },
+                                          "launchOrder": 8,
+                                          "app": 5,
+                                          "service": 66
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 65,
+                                            "dependencyId": 66
+                                          },
+                                          "service": 65,
+                                          "dependency": 66
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 65,
+                                      "dependencyId": 67
+                                    },
+                                    "service": 65,
+                                    "dependency": {
+                                      "id": 67,
+                                      "serviceName": "media-user-memcached",
+                                      "dockerRepository": "usmanager/media-user-memcached",
+                                      "defaultExternalPort": 21213,
+                                      "defaultInternalPort": 11211,
+                                      "defaultDb": null,
+                                      "launchCommand": "${user-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+                                      "minimumReplicas": 1,
+                                      "maximumReplicas": 0,
+                                      "outputLabel": "${user-memcachedHost}",
+                                      "serviceType": "DATABASE",
+                                      "environment": [],
+                                      "volumes": [],
+                                      "expectedMemoryConsumption": null,
+                                      "appServices": [
+                                        {
+                                          "id": {
+                                            "appId": 5,
+                                            "serviceId": 67
+                                          },
+                                          "launchOrder": 9,
+                                          "app": 5,
+                                          "service": 67
+                                        }
+                                      ],
+                                      "dependencies": [],
+                                      "dependents": [
+                                        {
+                                          "id": {
+                                            "serviceId": 65,
+                                            "dependencyId": 67
+                                          },
+                                          "service": 65,
+                                          "dependency": 67
+                                        }
+                                      ],
+                                      "eventPredictions": [],
+                                      "serviceRules": [],
+                                      "simulatedServiceMetrics": []
+                                    }
+                                  },
+                                  {
+                                    "id": {
+                                      "serviceId": 65,
+                                      "dependencyId": 68
+                                    },
+                                    "service": 65,
+                                    "dependency": 68
+                                  }
+                                ],
+                                "dependents": [],
+                                "eventPredictions": [],
+                                "serviceRules": [],
+                                "simulatedServiceMetrics": []
+                              },
+                              "dependency": 68
+                            },
+                            {
+                              "id": {
+                                "serviceId": 58,
+                                "dependencyId": 68
+                              },
+                              "service": {
+                                "id": 58,
+                                "serviceName": "media-unique-id",
+                                "dockerRepository": "usmanager/media-unique-id",
+                                "defaultExternalPort": 10001,
+                                "defaultInternalPort": 9090,
+                                "defaultDb": null,
+                                "launchCommand": "${unique-idHost} ${externalPort} ${internalPort} ${hostname}",
+                                "minimumReplicas": 1,
+                                "maximumReplicas": 0,
+                                "outputLabel": "${unique-idHost}",
+                                "serviceType": "BACKEND",
+                                "environment": [],
+                                "volumes": [],
+                                "expectedMemoryConsumption": null,
+                                "appServices": [
+                                  {
+                                    "id": {
+                                      "appId": 5,
+                                      "serviceId": 58
+                                    },
+                                    "launchOrder": 1,
+                                    "app": 5,
+                                    "service": 58
+                                  }
+                                ],
+                                "dependencies": [
+                                  {
+                                    "id": {
+                                      "serviceId": 58,
+                                      "dependencyId": 68
+                                    },
+                                    "service": 58,
+                                    "dependency": 68
+                                  }
+                                ],
+                                "dependents": [],
+                                "eventPredictions": [],
+                                "serviceRules": [],
+                                "simulatedServiceMetrics": []
+                              },
+                              "dependency": 68
+                            }
+                          ],
+                          "eventPredictions": [],
+                          "serviceRules": [],
+                          "simulatedServiceMetrics": []
+                        }
+                      },
+                      {
+                        "id": {
+                          "serviceId": 63,
+                          "dependencyId": 64
+                        },
+                        "service": 63,
+                        "dependency": 64
+                      }
+                    ],
+                    "dependents": [
+                      {
+                        "id": {
+                          "serviceId": 59,
+                          "dependencyId": 63
+                        },
+                        "service": 59,
+                        "dependency": 63
+                      }
+                    ],
+                    "eventPredictions": [],
+                    "serviceRules": [],
+                    "simulatedServiceMetrics": []
+                  },
+                  "dependency": 64
+                }
+              ],
+              "eventPredictions": [],
+              "serviceRules": [],
+              "simulatedServiceMetrics": []
+            }
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 65
+            },
+            "launchOrder": 10,
+            "app": 5,
+            "service": 65
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 66
+            },
+            "launchOrder": 8,
+            "app": 5,
+            "service": 66
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 67
+            },
+            "launchOrder": 9,
+            "app": 5,
+            "service": 67
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 68
+            },
+            "launchOrder": 12,
+            "app": 5,
+            "service": 68
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 69
+            },
+            "launchOrder": 11,
+            "app": 5,
+            "service": 69
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 70
+            },
+            "launchOrder": 15,
+            "app": 5,
+            "service": 70
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 71
+            },
+            "launchOrder": 13,
+            "app": 5,
+            "service": 71
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 72
+            },
+            "launchOrder": 14,
+            "app": 5,
+            "service": 72
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 73
+            },
+            "launchOrder": 18,
+            "app": 5,
+            "service": 73
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 74
+            },
+            "launchOrder": 16,
+            "app": 5,
+            "service": 74
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 75
+            },
+            "launchOrder": 17,
+            "app": 5,
+            "service": 75
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 76
+            },
+            "launchOrder": 21,
+            "app": 5,
+            "service": 76
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 77
+            },
+            "launchOrder": 19,
+            "app": 5,
+            "service": 77
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 78
+            },
+            "launchOrder": 20,
+            "app": 5,
+            "service": 78
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 79
+            },
+            "launchOrder": 21,
+            "app": 5,
+            "service": {
+              "id": 79,
+              "serviceName": "media-nginx-web-server",
+              "dockerRepository": "usmanager/media-nginx-web-server",
+              "defaultExternalPort": 18080,
+              "defaultInternalPort": 8080,
+              "defaultDb": null,
+              "launchCommand": "${nginx-web-serverHost} ${externalPort} ${internalPort} ${hostname}",
+              "minimumReplicas": 1,
+              "maximumReplicas": 0,
+              "outputLabel": "${nginx-web-serverHost}",
+              "serviceType": "FRONTEND",
+              "environment": [],
+              "volumes": [],
+              "expectedMemoryConsumption": null,
+              "appServices": [
+                {
+                  "id": {
+                    "appId": 5,
+                    "serviceId": 79
+                  },
+                  "launchOrder": 21,
+                  "app": 5,
+                  "service": 79
+                }
+              ],
+              "dependencies": [],
+              "dependents": [],
+              "eventPredictions": [],
+              "serviceRules": [],
+              "simulatedServiceMetrics": []
+            }
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 80
+            },
+            "launchOrder": 24,
+            "app": 5,
+            "service": 80
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 81
+            },
+            "launchOrder": 22,
+            "app": 5,
+            "service": 81
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 82
+            },
+            "launchOrder": 23,
+            "app": 5,
+            "service": 82
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 83
+            },
+            "launchOrder": 27,
+            "app": 5,
+            "service": 83
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 84
+            },
+            "launchOrder": 25,
+            "app": 5,
+            "service": 84
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 85
+            },
+            "launchOrder": 26,
+            "app": 5,
+            "service": 85
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 86
+            },
+            "launchOrder": 30,
+            "app": 5,
+            "service": 86
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 87
+            },
+            "launchOrder": 28,
+            "app": 5,
+            "service": 87
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 88
+            },
+            "launchOrder": 29,
+            "app": 5,
+            "service": 88
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 89
+            },
+            "launchOrder": 31,
+            "app": 5,
+            "service": 89
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 90
+            },
+            "launchOrder": 32,
+            "app": 5,
+            "service": {
+              "id": 90,
+              "serviceName": "media-jaeger",
+              "dockerRepository": "usmanager/media-jaeger",
+              "defaultExternalPort": 16686,
+              "defaultInternalPort": 16686,
+              "defaultDb": null,
+              "launchCommand": "${jaegerHost} ${externalPort} ${internalPort} ${hostname}",
+              "minimumReplicas": 1,
+              "maximumReplicas": 0,
+              "outputLabel": "${jaegerHost}",
+              "serviceType": "BACKEND",
+              "environment": [
+                "COLLECTOR_ZIPKIN_HTTP_PORT=9411"
+              ],
+              "volumes": [],
+              "expectedMemoryConsumption": null,
+              "appServices": [
+                {
+                  "id": {
+                    "appId": 5,
+                    "serviceId": 90
+                  },
+                  "launchOrder": 32,
+                  "app": 5,
+                  "service": 90
+                }
+              ],
+              "dependencies": [],
+              "dependents": [],
+              "eventPredictions": [],
+              "serviceRules": [],
+              "simulatedServiceMetrics": []
+            }
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 58
+            },
+            "launchOrder": 1,
+            "app": 5,
+            "service": 58
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 59
+            },
+            "launchOrder": 4,
+            "app": 5,
+            "service": 59
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 60
+            },
+            "launchOrder": 2,
+            "app": 5,
+            "service": 60
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 61
+            },
+            "launchOrder": 3,
+            "app": 5,
+            "service": 61
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 62
+            },
+            "launchOrder": 5,
+            "app": 5,
+            "service": 62
+          },
+          {
+            "id": {
+              "appId": 5,
+              "serviceId": 63
+            },
+            "launchOrder": 7,
+            "app": 5,
+            "service": 63
+          }
+        ],
+        "appRules": [],
+        "simulatedAppMetrics": []
+      },
+      "service": 62
+    }
+  ],
+  "dependencies": [
+    {
+      "id": {
+        "serviceId": 62,
+        "dependencyId": 68
+      },
+      "service": 62,
+      "dependency": 68
+    }
+  ],
+  "dependents": [],
+  "eventPredictions": [],
+  "serviceRules": [],
+  "simulatedServiceMetrics": []
+}

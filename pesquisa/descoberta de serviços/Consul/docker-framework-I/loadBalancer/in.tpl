@@ -1,1 +1,0 @@
-{{ range service "tokenmanager" }}  server {{ .Name }} {{ .Address }}:{{ .Port }}{{ end }}

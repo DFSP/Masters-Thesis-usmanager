@@ -22,3 +22,9 @@
 [submodule "usmanager/registration-client-csharp"]
 	path = usmanager/registration-client-csharp
 	url = https://github.com/usmanager/registration-client-csharp
+[submodule "usmanager/registration-client-typescript-node"]
+	path = usmanager/registration-client-typescript-node
+	url = https://github.com/usmanager/registration-client-typescript-node
+[submodule "usmanager/registration-client-typescript-node"]
+	path = usmanager/registration-client-python
+	url = https://github.com/usmanager/registration-client-python

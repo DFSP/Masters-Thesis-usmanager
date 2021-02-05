@@ -1,1 +1,0 @@
-# Static mongo 3 image

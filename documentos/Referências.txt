@@ -1,9 +1,0 @@
-                 Referencias
-
-. docker
-
-docker swarm:
-https://docs.docker.com/engine/swarm/admin_guide/
-https://docs.docker.com/engine/swarm/
-https://docs.docker.com/engine/swarm/how-swarm-mode-works/nodes/
-https://docs.docker.com/engine/swarm/key-concepts/

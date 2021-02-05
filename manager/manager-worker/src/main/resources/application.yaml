@@ -1,0 +1,139 @@
+#
+# MIT License
+#
+# Copyright (c) 2020 manager
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: manager-master
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    driverClassName: org.h2.Driver
+    #url: jdbc:h2:file:./db/manager-worker-db;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:manager-worker-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000
+    username: sa
+    password: admin
+    platform: h2
+  h2:
+    console:
+      enabled: true
+      path: /console
+      settings:
+        trace: false
+        web-allow-others: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        use_sql_comments: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, mappings
+manager-worker:
+  heartbeat-interval: 15000
+  tests:
+    enabled: ${tests:true}
+ssh:
+  connection-timeout: 10000
+edge:
+  access:
+    key-file-path: edge
+aws:
+  max-retries: 5
+  connection-timeout: 180000
+  access:
+    key: AKIAS5UBHWDI3WO52EV5
+    secret-key: ${secret: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}
+    key-file-path: aws/ec2.pem
+    username: ubuntu
+  instance:
+    security-group: default
+    key-pair: ec2
+    type: t2.micro
+    tag: us-manager
+docker:
+  install-script: scripts/docker-install.sh
+  uninstall-script: scripts/docker-uninstall.sh
+  install-api-script: scripts/docker-api-install.sh
+  api:
+    port: 2376
+  api-proxy:
+    username: username
+    password: password
+    port: 2375
+  hub:
+    username: usmanager
+  swarm:
+    initial-max-workers: 1
+registration:
+  port: 8761
+  client:
+    port: 1906
+prometheus:
+  port: 9090
+  node-exporter:
+    install-script: scripts/node-exporter-install.sh
+monitoring:
+  hosts:
+    period: 60000
+    maximum-cpu-percentage: 90
+    maximum-ram-percentage: 90
+    overwork-event-count: 3
+    underwork-event-count: 3
+  services:
+    period: 60000
+    replicate-event-count: 2
+    migrate-event-count: 2
+    stop-event-count: 3
+host:
+  maximum-hosts: 0
+  minimum-hosts: 1
+  local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
+container:
+  delay-before-stop: 30000
+nginx-load-balancer:
+  stop-delay: 300000
+location-request:
+  port: 1919
+  minimum-request-count-percentage: 15.0
+rules:
+  service-rule-template-file: drools/service-rule-template.drl
+  host-rule-template-file: drools/host-rule-template.drl
+parallelism:
+  threads: 8
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL=DEBUG:#trace: debug
+#debug: true

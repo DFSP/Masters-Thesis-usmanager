@@ -1,0 +1,16 @@
+{
+  "id": 59,
+  "serviceName": "media-movie-id",
+  "dockerRepository": "usmanager/media-movie-id",
+  "defaultExternalPort": 10002,
+  "defaultInternalPort": 9090,
+  "defaultDb": null,
+  "launchCommand": "${movie-idHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+  "minimumReplicas": 1,
+  "maximumReplicas": 0,
+  "outputLabel": "${movie-idHost}",
+  "serviceType": "BACKEND",
+  "environment": [],
+  "volumes": [],
+  "expectedMemoryConsumption": null
+}

@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: manager-services
+ssh:
+  connection-timeout: 10000
+edge:
+  access:
+    key-file-path: edge
+cloud:
+  aws:
+    credentials:
+      instanceProfile: true
+aws:
+  initial-max-instances: 2
+  max-retries: 10
+  delay-between-retries: 5000
+  connection-timeout: 180000
+  access:
+    key: AKIAS5UBHWDI3WO52EV5
+    secret-key: ${secret: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}
+    key-file-path: aws/ec2.pem
+    username: ubuntu
+  instance:
+    security-group: default
+    key-pair: ec2
+    type: t2.micro
+    tag: us-manager
+container:
+  database:
+    deploy-delay: 5000
+  delay-before-stop: 30000
+  monitor-period: 60000
+docker:
+  install-script: docker-install.sh
+  install-script-path: src/main/resources/scripts/docker-install.sh
+  uninstall-script: docker-uninstall.sh
+  uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
+  install-api-script: docker-api-install.sh
+  install-api-script-path: src/main/resources/scripts/docker-api-install.sh
+  api:
+    port: 2376
+  api-proxy:
+    username: username
+    password: password
+    port: 2375
+  hub:
+    username: usmanager
+  swarm:
+    manager: ${dockerManager:dpimenta.ddns.net}
+    initial-max-workers: 1
+registration:
+  port: 8761
+  client:
+    port: 1906
+prometheus:
+  port: 9090
+  node-exporter:
+    install-script: src/main/resources/scripts/node-exporter-install.sh
+decision:
+  start-host-on-events-count: 3
+  stop-host-on-events-count: 3
+  replicate-container-on-event-count: 2
+  migrate-container-on-event-count: 2
+  stop-container-on-event-count: 3
+host:
+  maximum-cpu-percentage: 90
+  maximum-hosts: 0
+  maximum-ram-percentage: 90
+  minimum-hosts: 1
+  monitor-period: 60000
+  local-machine-dns: test # from www.noip.com, to bypass router's dynamic ip
+nginx-load-balancer:
+  stop-delay: 300000
+location-request:
+  port: 1919
+  minimum-request-count-percentage: 15.0
+rules:
+  service-rule-template-file: service-rule-template.drl
+  host-rule-template-file: host-rule-template.drl

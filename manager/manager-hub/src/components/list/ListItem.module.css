@@ -1,0 +1,93 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 manager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+.item {
+    display: flex;
+    word-break: break-word;
+}
+
+.listItemContent {
+    padding: 15px 40px;
+    font-size: 1.05rem;
+    color: white;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.listItem:hover {
+    background-color: red;
+}
+
+.nonListContent {
+    padding: 7px 5px;
+    font-size: 1.05rem;
+    width: 100%;
+    color: white;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.linkedItemContent {
+    padding: 15px 40px;
+    font-size: 1.05rem;
+    color: white;
+}
+
+.link {
+    cursor: pointer;
+    padding: 0 0 0 25px;
+    flex-grow: 1;
+}
+
+.link:hover > .listItemContent > .link-icon, .link:hover > .linkedItemContent > .link-icon, a:hover > .link-icon {
+    display: block;
+}
+
+.unsavedItem {
+    color: #F44336;
+}
+
+.smallText {
+    font-size: 0.9rem;
+    color: #9e9e9e;
+    margin: 6px 10px 0 auto;
+}
+
+.arrow {
+    font-size: 20px;
+}
+
+.actions {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    margin: 0 10px 0 auto;
+    user-select: none;
+}
+
+.actionButton {
+    padding: 0 5px;
+}

@@ -1,5 +1,0 @@
-*.iml
-node_modules
-README.md
-.env.local
-.gitignore

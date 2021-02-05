@@ -1,8 +1,0 @@
-ENORM: A Framework For Edge NOde Resource Management
-Link: TODO
-
-Resumo: This paper is motivated to address the resource management challenge. We develop the first
-framework to manage edge nodes, namely the Edge NOde Resource Management (ENORM) framework. Mechanisms for
-provisioning and auto-scaling edge node resources are proposed
-
-TODO: Leitura detalhada do paper

@@ -1,6 +1,0 @@
-1704.04213 Managing Service-Heterogeneity using Osmotic Computing
-TODO: LINK
-
-Resumo: A fitness-based Osmosis algorithm is proposed to provide support for osmotic computing by making more effective use of existing Fog server resources. The proposed approach is capable of efficiently distributing and allocating services by following the principle of osmosis.
-
-TODO: leitura detalhada do documento

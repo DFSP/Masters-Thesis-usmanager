@@ -1,0 +1,127 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 manager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+.tabsContainer {
+    margin-bottom: 160px;
+}
+
+.commandsHeader {
+    display: flex;
+}
+
+.commandsTitle {
+    margin: 10px 5px 5px 5px;
+    color: dimgrey;
+}
+
+.hostname {
+    margin-right: 5px;
+}
+
+.command {
+}
+
+.commandResult {
+    word-break: break-all;
+}
+
+.exitStatus {
+    margin-left: 5px;
+    color: #F44336;
+}
+
+.commands-controls-menu-left button:hover {
+    background: transparent !important;
+}
+
+.commands-controls-menu-left button {
+    margin: 5px;
+    display: block;
+}
+
+.controlsMenuRight {
+    height: 100%;
+}
+
+.controlsMenuRight button {
+    margin: 5px 10px 5px 5px;
+    display: block;
+}
+
+.controlsMenuRight button:hover {
+    background: transparent !important;
+}
+
+@media only screen and (max-height: 488px) {
+    .commandsContainer {
+        visibility: hidden;
+    }
+}
+
+.showCommandsButton {
+    position: absolute;
+    bottom: 42px;
+    right: 0;
+}
+
+.toggleCommandsButton {
+    position: absolute;
+    right: 15px;
+}
+
+.toggleCommandsButton:hover {
+    background: transparent !important;
+}
+
+.shrink {
+    animation: shrink .25s forwards;
+}
+
+.expand {
+    animation: expand .25s forwards;
+}
+
+@keyframes shrink {
+    0% {
+        left: 0;
+        width: 100vw
+    }
+    100% {
+        left: 225px;
+        width: calc(100vw - 225px)
+    }
+}
+
+@keyframes expand {
+    0% {
+        left: 225px;
+        width: calc(100vw - 225px)
+    }
+    100% {
+        left: 0;
+        width: 100vw
+    }
+}
+
+

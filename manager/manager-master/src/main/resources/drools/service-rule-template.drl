@@ -1,0 +1,25 @@
+template header
+
+rule
+ruleId
+eventType
+decision
+priority
+
+package pt.unl.fct.miei.usmanagement.manager.management.rulesystem;
+
+import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision;
+
+global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decision containerDecision;
+
+template "service"
+
+rule "service_rule_@{ruleId}" salience @{priority}
+when
+    @{eventType}(@{rule})
+then
+    containerDecision.setDecision(@{decision});
+    containerDecision.setPriority(@{priority});
+end
+
+end template
