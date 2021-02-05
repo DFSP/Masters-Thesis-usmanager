@@ -1,0 +1,109 @@
+[
+  {
+    "id": {
+      "serviceId": 59,
+      "dependencyId": 60
+    },
+    "service": {
+      "id": 59,
+      "serviceName": "media-movie-id",
+      "dockerRepository": "usmanager/media-movie-id",
+      "defaultExternalPort": 10002,
+      "defaultInternalPort": 9090,
+      "defaultDb": null,
+      "launchCommand": "${movie-idHost} ${externalPort} ${internalPort} ${hostname} ${DatabaseHost} ${MemcachedHost}",
+      "minimumReplicas": 1,
+      "maximumReplicas": 0,
+      "outputLabel": "${movie-idHost}",
+      "serviceType": "BACKEND",
+      "environment": [],
+      "volumes": [],
+      "expectedMemoryConsumption": null
+    },
+    "dependency": {
+      "id": 60,
+      "serviceName": "media-movie-id-db",
+      "dockerRepository": "usmanager/media-movie-id-db",
+      "defaultExternalPort": 40018,
+      "defaultInternalPort": 27017,
+      "defaultDb": null,
+      "launchCommand": "${movie-id-dbHost} ${externalPort} ${internalPort} ${hostname}",
+      "minimumReplicas": 1,
+      "maximumReplicas": 0,
+      "outputLabel": "${movie-id-dbHost}",
+      "serviceType": "DATABASE",
+      "environment": [],
+      "volumes": [],
+      "expectedMemoryConsumption": null
+    }
+  },
+  {
+    "id": {
+      "serviceId": 59,
+      "dependencyId": 61
+    },
+    "service": 59,
+    "dependency": {
+      "id": 61,
+      "serviceName": "media-movie-id-memcached",
+      "dockerRepository": "usmanager/media-movie-id-memcached",
+      "defaultExternalPort": 21212,
+      "defaultInternalPort": 11211,
+      "defaultDb": null,
+      "launchCommand": "${movie-id-memcachedHost} ${externalPort} ${internalPort} ${hostname}",
+      "minimumReplicas": 1,
+      "maximumReplicas": 0,
+      "outputLabel": "${movie-id-memcachedHost}",
+      "serviceType": "DATABASE",
+      "environment": [],
+      "volumes": [],
+      "expectedMemoryConsumption": null
+    }
+  },
+  {
+    "id": {
+      "serviceId": 59,
+      "dependencyId": 63
+    },
+    "service": 59,
+    "dependency": {
+      "id": 63,
+      "serviceName": "media-rating",
+      "dockerRepository": "usmanager/media-rating",
+      "defaultExternalPort": 10004,
+      "defaultInternalPort": 9090,
+      "defaultDb": null,
+      "launchCommand": "${ratingHost} ${externalPort} ${internalPort} ${hostname} ${RedisHost}",
+      "minimumReplicas": 1,
+      "maximumReplicas": 0,
+      "outputLabel": "${ratingHost}",
+      "serviceType": "BACKEND",
+      "environment": [],
+      "volumes": [],
+      "expectedMemoryConsumption": null
+    }
+  },
+  {
+    "id": {
+      "serviceId": 59,
+      "dependencyId": 68
+    },
+    "service": 59,
+    "dependency": {
+      "id": 68,
+      "serviceName": "media-compose-review",
+      "dockerRepository": "usmanager/media-compose-review",
+      "defaultExternalPort": 10006,
+      "defaultInternalPort": 9090,
+      "defaultDb": null,
+      "launchCommand": "${compose-reviewHost} ${externalPort} ${internalPort} ${hostname} ${MemcachedHost}",
+      "minimumReplicas": 1,
+      "maximumReplicas": 0,
+      "outputLabel": "${compose-reviewHost}",
+      "serviceType": "BACKEND",
+      "environment": [],
+      "volumes": [],
+      "expectedMemoryConsumption": null
+    }
+  }
+]

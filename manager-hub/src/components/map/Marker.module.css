@@ -1,0 +1,6 @@
+.markerText {
+    font-family: system-ui, serif;
+    fill: #5D5A6D;
+    pointer-events: none;
+    z-index: 999;
+}

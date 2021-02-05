@@ -160,4 +160,3 @@ com tipo de acesso Programmatic access, e política AdministratorAccess. Substit
 ### Licença
 
 μsManager está licenciado com a [MIT license](LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
-
