@@ -1,5 +1,5 @@
 import http from "k6/http";
-import { check, group, sleep } from "k6";
+import { check, group, sleep, fail } from "k6";
 import { Rate } from "k6/metrics";
 
 if (__ENV["SERVICE_ADDRESS"] == null) {

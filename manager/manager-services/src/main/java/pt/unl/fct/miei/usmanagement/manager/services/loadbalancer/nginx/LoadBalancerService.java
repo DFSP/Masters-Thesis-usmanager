@@ -47,6 +47,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancers;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
@@ -332,8 +333,9 @@ public class LoadBalancerService {
 
 	public void stopLoadBalancer(String id) {
 		LoadBalancer loadBalancer = getLoadBalancer(id);
+		String containerId = loadBalancer.getContainer().getId();
 		loadBalancers.delete(loadBalancer);
-		containersService.deleteContainer(loadBalancer.getContainer());
+		containersService.stopContainer(containerId);
 	}
 
 	public void reset() {

@@ -29,10 +29,11 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.config.ParallelismProperties;
 import pt.unl.fct.miei.usmanagement.manager.config.WorkerManagerRequestInterceptor;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
@@ -85,6 +86,7 @@ public class WorkerManagersService {
 	private final KafkaService kafkaService;
 	private final CloudHostsService cloudHostsService;
 	private final HeartbeatService heartbeatService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
 	private final RestTemplate restTemplate;
 	private final int threads;
@@ -92,7 +94,8 @@ public class WorkerManagersService {
 	public WorkerManagersService(WorkerManagers workerManagers, @Lazy ContainersService containersService,
 								 HostsService hostsService, ServicesService servicesService, KafkaService kafkaService,
 								 CloudHostsService cloudHostsService, @Lazy HeartbeatService heartbeatService,
-								 ParallelismProperties parallelismProperties, WorkerManagerRequestInterceptor requestInterceptor) {
+								 ParallelismProperties parallelismProperties, WorkerManagerRequestInterceptor requestInterceptor,
+								 ManagerServicesConfiguration managerServicesConfiguration) {
 		this.workerManagers = workerManagers;
 		this.containersService = containersService;
 		this.hostsService = hostsService;
@@ -100,6 +103,7 @@ public class WorkerManagersService {
 		this.kafkaService = kafkaService;
 		this.cloudHostsService = cloudHostsService;
 		this.heartbeatService = heartbeatService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 		this.restTemplate = new RestTemplate();
 		this.restTemplate.setInterceptors(List.of(requestInterceptor));
 		this.threads = parallelismProperties.getThreads();
@@ -188,7 +192,9 @@ public class WorkerManagersService {
 							&& !elasticIpsService.hasElasticIpByPublicIp(node.getHostAddress().getPublicIpAddress());
 						HostAddress hostAddress = hostsService.getCapableHost(expectedMemoryConsumption, region, filter);*/
 						AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
-						HostAddress hostAddress = cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium, false).getAddress();
+						HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
+								? hostsService.getManagerHostAddress()
+								: cloudHostsService.launchInstance(awsRegion, InstanceType.T2Medium, false).getAddress();
 						return launchWorkerManager(hostAddress);
 					}
 				}).collect(Collectors.toList())).get();

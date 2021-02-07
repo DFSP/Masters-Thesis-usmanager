@@ -10,8 +10,10 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
 import pt.unl.fct.miei.usmanagement.manager.apps.App;
 import pt.unl.fct.miei.usmanagement.manager.componenttypes.ComponentType;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
 import pt.unl.fct.miei.usmanagement.manager.dtos.kafka.AppDTO;
@@ -100,6 +102,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersServic
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
+import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.edge.EdgeHostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.metrics.simulated.AppSimulatedMetricsService;
@@ -160,6 +163,9 @@ public class KafkaService {
 	private final ContainerRulesService containerRulesService;
 	private final ValueModesService valueModesService;
 	private final ZookeeperService zookeeperService;
+	private final HostsService hostsService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
+
 	private final ProducerFactory<KafkaTopicKey, Object> producerFactory;
 	private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 	private final KafkaBrokers kafkaBrokers;
@@ -193,6 +199,8 @@ public class KafkaService {
 						@Lazy ContainerRulesService containerRulesService,
 						@Lazy ValueModesService valueModesService,
 						@Lazy ZookeeperService zookeeperService,
+						@Lazy HostsService hostsService,
+						ManagerServicesConfiguration managerServicesConfiguration,
 						@Lazy ProducerFactory<KafkaTopicKey, Object> producerFactory,
 						KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
 						KafkaBrokers kafkaBrokers,
@@ -220,6 +228,8 @@ public class KafkaService {
 		this.elasticIpsService = elasticIpsService;
 		this.servicesService = servicesService;
 		this.zookeeperService = zookeeperService;
+		this.hostsService = hostsService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 		this.producerFactory = producerFactory;
 		this.kafkaBrokers = kafkaBrokers;
 		this.kafkaTemplate = kafkaTemplate;
@@ -246,7 +256,9 @@ public class KafkaService {
 				return CompletableFuture.completedFuture(regionKafkaBrokers.get(0));
 			}
 			else {
-				HostAddress hostAddress = elasticIpsService.getHost(region);
+				HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
+						? hostsService.getManagerHostAddress()
+						: elasticIpsService.getHost(region);
 				return launchKafkaBroker(hostAddress);
 			}
 		}).collect(Collectors.toList());
@@ -301,12 +313,14 @@ public class KafkaService {
 	}
 
 	public String getKafkaBrokersHosts() {
-		return kafkaBootstrapServers != null
-			? kafkaBootstrapServers
-			: elasticIpsService.getElasticIps().stream()
-			.filter(elasticIp -> elasticIp.getAssociationId() != null)
-			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT))
-			.collect(Collectors.joining(","));
+		if (kafkaBootstrapServers != null) {
+			return kafkaBootstrapServers;
+		}
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			return String.format("%s:%d", hostsService.getManagerHostAddress().getPrivateIpAddress(), PORT);
+		}
+		return elasticIpsService.getElasticIps().stream().filter(elasticIp -> elasticIp.getAssociationId() != null)
+			.map(elasticIp -> String.format("%s:%d", elasticIp.getPublicIp(), PORT)).collect(Collectors.joining(","));
 	}
 
 	private List<KafkaBroker> getKafkaBroker(RegionEnum region) {
