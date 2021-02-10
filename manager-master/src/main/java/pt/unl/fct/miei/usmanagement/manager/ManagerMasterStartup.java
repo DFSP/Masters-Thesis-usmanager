@@ -82,8 +82,8 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 		requireEnvVars();
 		String hostAddressJson = environment.getProperty(ContainerConstants.Environment.Manager.HOST_ADDRESS);
 		HostAddress hostAddress = hostAddressJson == null
-			? hostsService.setManagerHostAddress()
-			: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
+				? hostsService.setManagerHostAddress()
+				: hostsService.setManagerHostAddress(new Gson().fromJson(hostAddressJson, HostAddress.class));
 		if (managerServicesConfiguration.getMode() != Mode.LOCAL) {
 			elasticIpsService.allocateElasticIpAddresses();
 		}
@@ -100,8 +100,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 
 	private void requireEnvVars() {
 		Map<String, String> vars = new HashMap<>(1);
-		vars.put(ContainerConstants.Environment.Manager.ID,
-			environment.getProperty(ContainerConstants.Environment.Manager.ID));
+		vars.put(ContainerConstants.Environment.Manager.ID, environment.getProperty(ContainerConstants.Environment.Manager.ID));
 		log.info("Environment: {}", vars);
 		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
 		if (!requiredVars.isEmpty()) {

@@ -186,6 +186,10 @@ nav li {
     font-size: 15px;
 }
 
+.tabs .tab a:focus {
+    background-color: white;
+}
+
 .datepicker-controls .select-month input {
     width: 90px;
 }
@@ -330,10 +334,6 @@ ul.tabs {
     background: #1F1F1F;
 }
 
-.tabs .tab a:focus {
-    background-color: #282828;
-}
-
 .tabs .tab a,
 .tabs .tab a:hover,
 .tabs .tab a.active,
@@ -405,18 +405,6 @@ input {
     padding: 25px;
     max-width: 50%;
     word-wrap: break-word;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #36393F inset !important;
-}
-
-input:-webkit-autofill {
-    -webkit-text-fill-color: white !important;
-    caret-color: white;
 }
 
 .input-field .suffix {
@@ -689,10 +677,6 @@ textarea {
 
 .commands {
     margin: 10px;
-}
-
-.collapsible-body {
-    border-bottom: unset;
 }
 
 .inline-field {

@@ -12,6 +12,6 @@ import pt.unl.fct.miei.usmanagement.manager.Mode;
 @ConfigurationProperties("manager.services")
 public class ManagerServicesConfiguration {
 
-	private Mode mode;
+    private Mode mode;
 
 }

@@ -239,7 +239,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
                 <Collapsible id={'otherServicesList'}
                              title={'Ordem de lançamento dos outros serviços desta aplicação'}
                              active
-                             headerClassname='service-apps-collapsible-header'
                              onChange={this.updateModalScrollbar}>
                     <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>
                 </Collapsible>}

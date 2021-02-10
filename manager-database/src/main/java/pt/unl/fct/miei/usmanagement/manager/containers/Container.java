@@ -58,8 +58,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-@JsonPropertyOrder({ "id", "type", "created", "name", "image", "command", "network", "publicIpAddress", "privateIpAddress",
-	"mounts", "ports", "labels", "region", "state", "managerId", "coordinates" })
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -67,6 +65,8 @@ import java.util.Set;
 @Setter
 @Getter
 @ToString(exclude = {"containerRules", "simulatedContainerMetrics"})
+@JsonPropertyOrder({ "id", "type", "created", "name", "image", "command", "network", "publicIpAddress", "privateIpAddress", "mounts",
+		"ports", "labels", "region", "state", "managerId", "coordinates"})
 @Table(name = "containers")
 public class Container /*extends AbstractEntity<String> */ {
 
@@ -138,6 +138,10 @@ public class Container /*extends AbstractEntity<String> */ {
 	)
 	private Set<ContainerSimulatedMetric> simulatedContainerMetrics;
 
+	public String getManagerId() {
+		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
+	}
+
 	@JsonIgnore
 	public String getServiceName() {
 		return getLabels().get(ContainerConstants.Label.SERVICE_NAME);
@@ -146,10 +150,6 @@ public class Container /*extends AbstractEntity<String> */ {
 	@JsonIgnore
 	public String getAddress() {
 		return String.format("%s:%s", publicIpAddress, labels.get(ContainerConstants.Label.SERVICE_PORT));
-	}
-
-	public String getManagerId() {
-		return getLabels().get(ContainerConstants.Label.MANAGER_ID);
 	}
 
 	public void addRule(ContainerRule rule) {

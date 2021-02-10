@@ -35,6 +35,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.communication.kafka.KafkaSe
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.containers.DockerContainer;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.swarm.DockerSwarmService;
 import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.cloud.CloudHostsService;

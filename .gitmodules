@@ -1,0 +1,30 @@
+[submodule "usmanager/manager"]
+	path = usmanager/manager
+	url = https://github.com/usmanager/manager.git
+[submodule "usmanager/monitoring"]
+	path = usmanager/usmanager/monitoring
+	url = https://github.com/usmanager/monitoring.git
+[submodule "usmanager/data"]
+	path = usmanager/usmanager/data
+	url = https://github.com/usmanager/data.git
+[submodule "usmanager/microservices"]
+	path = usmanager/microservices
+	url = https://github.com/usmanager/microservices
+[submodule "usmanager/registration-client-java"]
+	path = usmanager/registration-client-java
+	url = https://github.com/usmanager/registration-client-java
+[submodule "usmanager/registration-client-go"]
+	path = usmanager/registration-client-go
+	url = https://github.com/usmanager/registration-client-go
+[submodule "usmanager/registration-client-cpp"]
+	path = usmanager/registration-client-cpp
+	url = https://github.com/usmanager/registration-client-cpp
+[submodule "usmanager/registration-client-csharp"]
+	path = usmanager/registration-client-csharp
+	url = https://github.com/usmanager/registration-client-csharp
+[submodule "usmanager/registration-client-typescript-node"]
+	path = usmanager/registration-client-typescript-node
+	url = https://github.com/usmanager/registration-client-typescript-node
+[submodule "usmanager/registration-client-typescript-node"]
+	path = usmanager/registration-client-python
+	url = https://github.com/usmanager/registration-client-python

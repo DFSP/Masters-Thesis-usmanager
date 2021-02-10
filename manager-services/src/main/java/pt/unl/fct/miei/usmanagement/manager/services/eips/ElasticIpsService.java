@@ -31,11 +31,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.util.EntityUtils;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -125,9 +121,8 @@ public class ElasticIpsService {
 		}
 	}
 
-	public CompletableFuture<String> allocateElasticIpAddress(RegionEnum region) {
-		String allocationId = awsService.allocateElasticIpAddress(region);
-		return CompletableFuture.completedFuture(allocationId);
+	public String allocateElasticIpAddress(RegionEnum region) {
+		return awsService.allocateElasticIpAddress(region);
 	}
 
 	public Map<RegionEnum, Address> allocateElasticIpAddresses() {
@@ -135,47 +130,33 @@ public class ElasticIpsService {
 		final int retries = 5;
 		for (int i = 0; i < retries; i++) {
 			try {
-				Map<RegionEnum, List<Address>> addresses = getElasticIpAddresses();
+				Map<RegionEnum, List<Address>> currentAddresses = getElasticIpAddresses();
 
 				RegionEnum[] regions = RegionEnum.values();
 
-				Map<RegionEnum, CompletableFuture<String>> futureElasticIpAddresses = new HashMap<>(regions.length);
+				Map<RegionEnum, CompletableFuture<?>> requests = new HashMap<>(regions.length);
 				for (RegionEnum region : regions) {
-					List<Address> regionAddresses = addresses.get(region);
-					if (regionAddresses != null && regionAddresses.size() > 0 && regionAddresses.get(0).getAssociationId() == null) {
-						Address address = regionAddresses.get(0);
-						futureElasticIpAddresses.put(region, CompletableFuture.completedFuture(address.getAllocationId()));
-					}
-					else {
-						futureElasticIpAddresses.put(region, allocateElasticIpAddress(region));
+					List<Address> addresses = currentAddresses.get(region);
+					if (addresses == null || addresses.isEmpty() || addresses.get(0).getAssociationId() != null) {
+						CompletableFuture<?> future = CompletableFuture
+								.supplyAsync(() -> allocateElasticIpAddress(region)).exceptionally(ex -> null);
+						requests.put(region, future);
 					}
 				}
 
-				CompletableFuture.allOf(futureElasticIpAddresses.values().toArray(new CompletableFuture[0])).join();
-
-				for (Map.Entry<RegionEnum, CompletableFuture<String>> futureElasticIpAddress : futureElasticIpAddresses.entrySet()) {
-					RegionEnum region = futureElasticIpAddress.getKey();
-					try {
-						futureElasticIpAddress.getValue().get();
-					}
-					catch (InterruptedException | ExecutionException e) {
-						throw new ManagerException("Failed to allocate elastic ip address for region %s: %s", region, e.getMessage());
-					}
-				}
+				CompletableFuture.allOf(requests.values().toArray(new CompletableFuture[0])).get();
 
 				Map<RegionEnum, Address> elasticIpAddresses = getElasticIpAddresses().entrySet().stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get(0)));
 				elasticIpAddresses.forEach((region, address) -> {
-					ElasticIp elasticIp = ElasticIp.builder().region(region)
-						.allocationId(address.getAllocationId())
-						.publicIp(address.getPublicIp())
-						.build();
+					ElasticIp elasticIp = ElasticIp.builder().region(region).allocationId(address.getAllocationId())
+						.publicIp(address.getPublicIp()).build();
 					addElasticIp(elasticIp);
 				});
 				return elasticIpAddresses;
 
 			}
-			catch (SdkClientException | ManagerException e) {
+			catch (SdkClientException | InterruptedException | ExecutionException | ManagerException e) {
 				errorMessage = e.getMessage();
 				log.error("Failed to allocate elastic ip addresses: {}. Retrying {}/{}", errorMessage, i + 1, retries);
 			}
@@ -205,13 +186,18 @@ public class ElasticIpsService {
 	}
 
 	private Map<RegionEnum, List<Address>> getElasticIpAddresses() {
-		Map<RegionEnum, CompletableFuture<List<Address>>> futureElasticIpAddresses = new HashMap<>();
+		Map<RegionEnum, List<Address>> elasticIpAddresses = new HashMap<>(RegionEnum.values().length);
+
+		Map<RegionEnum, CompletableFuture<?>> requests = new HashMap<>();
 		for (RegionEnum region : RegionEnum.values()) {
 			AwsRegion awsRegion = AwsRegion.getRegionsToAwsRegions().get(region);
 			final int retries = 3;
 			for (int i = 0; i < retries; i++) {
 				try {
-					futureElasticIpAddresses.put(region, awsService.getElasticIpAddresses(awsRegion));
+					CompletableFuture<?> future = CompletableFuture
+							.supplyAsync(() -> awsService.getElasticIpAddresses(awsRegion))
+							.thenAccept(elasticIps -> elasticIpAddresses.put(region, elasticIps));
+					requests.put(region, future);
 					break;
 				}
 				catch (SdkClientException e) {
@@ -221,45 +207,34 @@ public class ElasticIpsService {
 			}
 		}
 
-		CompletableFuture.allOf(futureElasticIpAddresses.values().toArray(new CompletableFuture[0])).join();
-
-		Map<RegionEnum, List<Address>> elasticIpAddresses = new HashMap<>(futureElasticIpAddresses.size());
-		for (Map.Entry<RegionEnum, CompletableFuture<List<Address>>> futureElasticIpAddress : futureElasticIpAddresses.entrySet()) {
-			RegionEnum region = futureElasticIpAddress.getKey();
-			try {
-				List<Address> addresses = futureElasticIpAddress.getValue().get();
-				elasticIpAddresses.put(region, addresses);
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Failed to get elastic ip addresses from region {}: {}", region, e.getMessage());
-			}
-		}
+		CompletableFuture.allOf(requests.values().toArray(new CompletableFuture[0])).join();
 
 		return elasticIpAddresses;
 	}
 
-	public CompletableFuture<ReleaseAddressResult> releaseElasticIpAddress(String allocationId, RegionEnum region) {
+	public ReleaseAddressResult releaseElasticIpAddress(String allocationId, RegionEnum region) {
 		ReleaseAddressResult result = awsService.releaseElasticIpAddress(allocationId, region);
 		ElasticIp elasticIp = getElasticIp(allocationId);
 		elasticIps.delete(elasticIp);
 		kafkaService.sendDeleteElasticIp(elasticIp);
 		log.info("Released elastic ip {}", allocationId);
-		return CompletableFuture.completedFuture(result);
+		return result;
 	}
 
 	public void releaseElasticIpAddresses() {
-		List<CompletableFuture<ReleaseAddressResult>> futureReleases = new LinkedList<>();
+		List<CompletableFuture<?>> requests = new LinkedList<>();
 
-		for (Map.Entry<RegionEnum, List<Address>> addresses : getElasticIpAddresses().entrySet()) {
-			RegionEnum region = addresses.getKey();
-			List<CompletableFuture<ReleaseAddressResult>> regionFutureReleases = addresses.getValue().stream()
-				.map(Address::getAllocationId)
-				.map(allocationId -> releaseElasticIpAddress(allocationId, region))
-				.collect(Collectors.toList());
-			futureReleases.addAll(regionFutureReleases);
+		for (Map.Entry<RegionEnum, List<Address>> regionElasticIpAddresses : getElasticIpAddresses().entrySet()) {
+			RegionEnum region = regionElasticIpAddresses.getKey();
+			List<Address> addresses = regionElasticIpAddresses.getValue();
+			for (Address address : addresses) {
+				String allocationId = address.getAllocationId();
+				CompletableFuture<?> releaseRequest = CompletableFuture.supplyAsync(() -> releaseElasticIpAddress(allocationId, region));
+				requests.add(releaseRequest);
+			}
 		}
 
-		CompletableFuture.allOf(futureReleases.toArray(new CompletableFuture[0])).join();
+		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
 	}
 
 	public void reset() {

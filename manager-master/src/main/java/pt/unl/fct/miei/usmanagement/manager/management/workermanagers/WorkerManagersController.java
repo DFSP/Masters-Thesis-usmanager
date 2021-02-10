@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.workermanagers;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +31,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -47,9 +48,11 @@ import java.util.stream.Collectors;
 public class WorkerManagersController {
 
 	private final WorkerManagersService workerManagersService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
-	public WorkerManagersController(WorkerManagersService workerManagersService) {
+	public WorkerManagersController(WorkerManagersService workerManagersService, ManagerServicesConfiguration managerServicesConfiguration) {
 		this.workerManagersService = workerManagersService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
 	@GetMapping
@@ -64,6 +67,9 @@ public class WorkerManagersController {
 
 	@PostMapping
 	public List<WorkerManager> launchWorkerManagers(@RequestBody LaunchWorkerManager launchWorkerManager) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			throw new BadRequestException("worker managers are not supported when using local execution mode");
+		}
 		HostAddress hostAddress = launchWorkerManager.getHostAddress();
 		List<String> regions = launchWorkerManager.getRegions();
 		if (hostAddress != null) {
@@ -74,7 +80,7 @@ public class WorkerManagersController {
 			return workerManagersService.launchWorkerManagers(regionsList);
 		}
 		else {
-			throw new BadRequestException("Expected host address or regions to start registration server");
+			throw new BadRequestException("expected host address or regions to start registration server");
 		}
 	}
 

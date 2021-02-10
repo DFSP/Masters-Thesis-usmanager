@@ -207,11 +207,11 @@ class AppServiceList extends BaseComponent<Props, State> {
                     </Link>
                 )}
                 <div className={`${styles.actions}`}>
-                    <div className={`btn-flat large ${styles.actionButton}`}
+                    <div className={`btn-flat large white-text ${styles.actionButton}`}
                          onClick={this.moveService(-1, service, index, list, update)}>
                         <i className='small material-icons'>arrow_upward</i>
                     </div>
-                    <div className={`btn-flat large ${styles.actionButton}`}
+                    <div className={`btn-flat large white-text ${styles.actionButton}`}
                          onClick={this.moveService(1, service, index, list, update)}>
                         <i className='small material-icons'>arrow_downward</i>
                     </div>

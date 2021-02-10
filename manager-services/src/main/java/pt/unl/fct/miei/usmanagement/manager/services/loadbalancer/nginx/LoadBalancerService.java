@@ -44,25 +44,18 @@ import pt.unl.fct.miei.usmanagement.manager.exceptions.EntityNotFoundException;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.ManagerException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
+import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancer;
 import pt.unl.fct.miei.usmanagement.manager.loadbalancers.LoadBalancers;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.registrationservers.RegistrationServer;
 import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.services.ServicesService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -203,30 +196,25 @@ public class LoadBalancerService {
 	}
 
 	public List<NginxServiceServers> getServers() {
-		List<CompletableFuture<List<NginxServiceServers>>> futureLoadBalancerServers = new LinkedList<>();
+		List<NginxServiceServers> loadBalancerServers = new LinkedList<>();
+
 		List<LoadBalancer> loadBalancers = getLoadBalancers();
+
+		CompletableFuture<?>[] requests = new CompletableFuture[loadBalancers.size()];
+		int count = 0;
 		for (LoadBalancer loadBalancer : loadBalancers) {
-			CompletableFuture<List<NginxServiceServers>> futureServers = getServers(loadBalancer);
-			futureLoadBalancerServers.add(futureServers);
+			CompletableFuture<?> future = CompletableFuture
+					.supplyAsync(() -> getServers(loadBalancer)).exceptionally(ex -> Collections.emptyList())
+					.thenAccept(loadBalancerServers::addAll);
+			requests[count++] = future;
 		}
 
-		CompletableFuture.allOf(futureLoadBalancerServers.toArray(new CompletableFuture[0])).join();
+		CompletableFuture.allOf(requests).join();
 
-		List<NginxServiceServers> servicesServers = new ArrayList<>();
-		for (CompletableFuture<List<NginxServiceServers>> loadBalancerServers : futureLoadBalancerServers) {
-			try {
-				List<NginxServiceServers> nginxServiceServers = loadBalancerServers.get();
-				servicesServers.addAll(nginxServiceServers);
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Failed to get servers from all load-balancers: {}", e.getMessage());
-			}
-		}
-
-		return servicesServers;
+		return loadBalancerServers;
 	}
 
-	public CompletableFuture<List<NginxServiceServers>> getServers(LoadBalancer loadBalancer) {
+	public List<NginxServiceServers> getServers(LoadBalancer loadBalancer) {
 		List<NginxServiceServers> servers = new ArrayList<>();
 		String url = String.format("%s/servers", getLoadBalancerApiUrl(loadBalancer));
 		HttpEntity<String> request = new HttpEntity<>(headers);
@@ -235,10 +223,10 @@ public class LoadBalancerService {
 		if (responseBody != null) {
 			servers.addAll(Arrays.asList(responseBody));
 		}
-		return CompletableFuture.completedFuture(servers);
+		return servers;
 	}
 
-	public CompletableFuture<List<NginxServer>> getServers(LoadBalancer loadBalancer, String serviceName) {
+	public List<NginxServer> getServers(LoadBalancer loadBalancer, String serviceName) {
 		List<NginxServer> servers = new ArrayList<>();
 		String url = String.format("%s/%s/servers", getLoadBalancerApiUrl(loadBalancer), serviceName);
 		HttpEntity<String> request = new HttpEntity<>(headers);
@@ -248,31 +236,26 @@ public class LoadBalancerService {
 			servers.addAll(Arrays.asList(responseBody));
 		}
 
-		return CompletableFuture.completedFuture(servers);
+		return servers;
 	}
 
 	public List<NginxServer> getServers(RegionEnum region, String serviceName) {
+		List<NginxServer> loadBalancerServiceServers = new LinkedList<>();
+
 		List<LoadBalancer> loadBalancers = getLoadBalancers(region);
 
-		List<CompletableFuture<List<NginxServer>>> futureLoadBalancerServers = new ArrayList<>();
+		CompletableFuture<?>[] requests = new CompletableFuture[loadBalancers.size()];
+		int count = 0;
 		for (LoadBalancer loadBalancer : loadBalancers) {
-			futureLoadBalancerServers.add(getServers(loadBalancer, serviceName));
+			CompletableFuture<?> future = CompletableFuture
+					.supplyAsync(() -> getServers(loadBalancer, serviceName)).exceptionally(ex -> Collections.emptyList())
+					.thenAccept(loadBalancerServiceServers::addAll);
+			requests[count++] = future;
 		}
 
-		CompletableFuture.allOf(futureLoadBalancerServers.toArray(new CompletableFuture[0])).join();
+		CompletableFuture.allOf(requests).join();
 
-		List<NginxServer> servers = new ArrayList<>();
-		for (CompletableFuture<List<NginxServer>> loadBalancerServers : futureLoadBalancerServers) {
-			try {
-				List<NginxServer> nginxServers = loadBalancerServers.get();
-				servers.addAll(nginxServers);
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Failed to get servers for service {} from load-balancer", serviceName);
-			}
-		}
-
-		return servers;
+		return loadBalancerServiceServers;
 	}
 
 	public void addServer(String serviceName, String server, Coordinates coordinates, RegionEnum region) {
@@ -332,8 +315,9 @@ public class LoadBalancerService {
 
 	public void stopLoadBalancer(String id) {
 		LoadBalancer loadBalancer = getLoadBalancer(id);
+		String containerId = loadBalancer.getContainer().getId();
 		loadBalancers.delete(loadBalancer);
-		containersService.deleteContainer(loadBalancer.getContainer());
+		containersService.stopContainer(containerId);
 	}
 
 	public void reset() {

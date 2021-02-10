@@ -27,6 +27,7 @@ package pt.unl.fct.miei.usmanagement.manager.hosts.edge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
@@ -51,11 +52,15 @@ public interface EdgeHosts extends JpaRepository<EdgeHost, Long> {
 	Optional<EdgeHost> findByAddress(@Param("publicIpAddress") String publicIpAddress,
 									 @Param("privateIpAddress") String privateIpAddress);
 
+	@Query("select h "
+			+ "from EdgeHost h "
+			+ "where h.local = true and h.privateIpAddress = :privateIpAddress")
+	Optional<EdgeHost> getLocalEdgeHost(String privateIpAddress);
+
 	@Query("select r "
 		+ "from EdgeHost h join h.hostRules r "
 		+ "where r.generic = false and h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
 	List<HostRule> getRules(@Param("publicIpAddress") String publicIpAddress, @Param("privateIpAddress") String privateIpAddress);
-
 
 	@Query("select r "
 		+ "from EdgeHost h join h.hostRules r "
@@ -83,5 +88,4 @@ public interface EdgeHosts extends JpaRepository<EdgeHost, Long> {
 		+ "from EdgeHost h "
 		+ "where h.publicIpAddress = :publicIpAddress and h.privateIpAddress = :privateIpAddress")
 	boolean hasEdgeHost(@Param("publicIpAddress") String publicIpAddress, @Param("privateIpAddress") String privateIpAddress);
-
 }

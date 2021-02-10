@@ -136,7 +136,8 @@ public class EdgeHostsService {
 		boolean setup = false;
 		final int retries = 5;
 		for (int i = 0; i < retries; i++) {
-			char[] password = System.console().readPassword("%s", "> Enter edge host password: ");
+			char[] password = System.console().readPassword("%s", "> Enter edge host '"
+					+ edgeHost.getUsername() + "@" + edgeHost.getPublicIpAddress() + "/" + edgeHost.getPrivateIpAddress() + "' password: ");
 			try {
 				setupEdgeHost(edgeHost, password);
 				setup = true;
@@ -406,5 +407,10 @@ public class EdgeHostsService {
 		return getEdgeHosts().stream()
 			.filter(host -> !nodesService.isPartOfSwarm(host.getAddress()))
 			.collect(Collectors.toList());
+	}
+
+	public EdgeHost getLocalEdgeHost(HostAddress hostAddress) {
+		return edgeHosts.getLocalEdgeHost(hostAddress.getPrivateIpAddress()).orElseThrow(() ->
+				new EntityNotFoundException(EdgeHost.class, "local", String.valueOf(true)));
 	}
 }

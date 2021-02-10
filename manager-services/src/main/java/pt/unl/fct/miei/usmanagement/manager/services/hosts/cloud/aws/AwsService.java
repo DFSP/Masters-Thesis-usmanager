@@ -70,14 +70,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.remote.ssh.SshService;
 import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -145,26 +139,44 @@ public class AwsService {
 		return amazonEC2;
 	}
 
+	public List<Instance> getInstancesSync(AwsRegion region) {
+		List<Instance> instances = new ArrayList<>();
+		DescribeInstancesRequest request = new DescribeInstancesRequest();
+		DescribeInstancesResult result;
+		try {
+			AmazonEC2 client = getEC2Client(region);
+			do {
+				result = client.describeInstances(request);
+				result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
+						.filter(this::isUsManagerInstance).forEach(instances::add);
+				request.setNextToken(result.getNextToken());
+			} while (result.getNextToken() != null);
+		}
+		catch (SdkClientException e) {
+			log.error("Unable to get instances from region {}: {}", region.getName(), e.getMessage());
+		}
+		return instances;
+	}
+
 	public List<Instance> getInstances() {
-		List<CompletableFuture<List<Instance>>> futureRegionsInstances = AwsRegion.getAwsRegions().stream()
-			.map(this::getInstances).collect(Collectors.toList());
-
-		CompletableFuture.allOf(futureRegionsInstances.toArray(new CompletableFuture[0])).join();
-
 		List<Instance> instances = new LinkedList<>();
-		futureRegionsInstances.forEach(futureInstances -> {
-			try {
-				instances.addAll(futureInstances.get());
-			}
-			catch (InterruptedException | ExecutionException e) {
-				log.error("Unable to get instances from every region");
-			}
-		});
+
+		List<AwsRegion> regions = AwsRegion.getAwsRegions();
+		CompletableFuture<?>[] requests = new CompletableFuture[regions.size()];
+		int count = 0;
+		for (AwsRegion region : regions) {
+			CompletableFuture<?> future = CompletableFuture
+					.supplyAsync(() -> this.getInstances(region)).exceptionally(ex -> Collections.emptyList())
+					.thenAccept(instances::addAll);
+			requests[count++] = future;
+		}
+
+		CompletableFuture.allOf(requests).join();
 
 		return instances;
 	}
 
-	public CompletableFuture<List<Instance>> getInstances(AwsRegion region) {
+	public List<Instance> getInstances(AwsRegion region) {
 		List<Instance> instances = new ArrayList<>();
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		DescribeInstancesResult result;
@@ -180,13 +192,13 @@ public class AwsService {
 		catch (SdkClientException e) {
 			log.error("Unable to get instances from region {}: {}", region.getName(), e.getMessage());
 		}
-		return CompletableFuture.completedFuture(instances);
+		return instances;
 	}
 
 	public Instance getInstance(String id, AwsRegion region) {
 		for (int i = 0; i < awsMaxRetries; i++) {
 			try {
-				List<Instance> instances = getInstances(region).get();
+				List<Instance> instances = getInstances(region);
 				return instances.stream().filter(instance -> instance.getInstanceId().equals(id))
 					.findFirst().orElseThrow(() -> new EntityNotFoundException(Instance.class, "id", id, "region", region.getName()));
 			}
@@ -204,14 +216,8 @@ public class AwsService {
 
 	public Instance createInstance(AwsRegion region, InstanceType type) {
 		log.info("Launching new instance of type {} at region {} {}", type, region.getZone(), region.getName());
-		String instanceId;
-		try {
-			instanceId = launchInstance(region, type).get();
-			configurationsService.addConfiguration(instanceId);
-		}
-		catch (InterruptedException | ExecutionException e) {
-			throw new ManagerException("Unable to launch instance on region: %s", region.getName(), e.getMessage());
-		}
+		String instanceId = launchInstance(region, type);
+		configurationsService.addConfiguration(instanceId);
 		Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING, region);
 		String publicIpAddress = instance.getPublicIpAddress();
 		log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
@@ -224,7 +230,7 @@ public class AwsService {
 		return instance;
 	}
 
-	public CompletableFuture<String> launchInstance(AwsRegion region, InstanceType type) {
+	public String launchInstance(AwsRegion region, InstanceType type) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest()
 			.withImageId(region.getAmi().get(type))
 			.withInstanceType(type)
@@ -240,7 +246,7 @@ public class AwsService {
 		CreateTagsRequest createTagsRequest = new CreateTagsRequest().withResources(instanceId)
 			.withTags(new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"));
 		amazonEC2.createTags(createTagsRequest);
-		return CompletableFuture.completedFuture(instanceId);
+		return instanceId;
 	}
 
 	public Instance startInstance(String instanceId, AwsRegion region, boolean wait) {
@@ -400,10 +406,10 @@ public class AwsService {
 		return ec2.disassociateAddress(disassociateAddressRequest);
 	}
 
-	public CompletableFuture<List<Address>> getElasticIpAddresses(AwsRegion region) {
+	public List<Address> getElasticIpAddresses(AwsRegion region) {
 		final AmazonEC2 ec2 = getEC2Client(region);
 		DescribeAddressesResult result = ec2.describeAddresses();
-		return CompletableFuture.completedFuture(result.getAddresses());
+		return result.getAddresses();
 	}
 
 	public ReleaseAddressResult releaseElasticIpAddress(String allocationId, RegionEnum region) {

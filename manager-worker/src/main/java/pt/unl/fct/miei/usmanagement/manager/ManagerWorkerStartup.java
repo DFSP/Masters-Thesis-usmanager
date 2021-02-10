@@ -79,7 +79,7 @@ public class ManagerWorkerStartup implements ApplicationListener<ApplicationRead
 		HostAddress hostAddress = new Gson().fromJson(hostAddressJson, HostAddress.class);
 		hostsService.setManagerHostAddress(hostAddress);
 		kafkaService.start();
-		hostsService.setupHost(hostAddress, NodeRole.MANAGER);
+		hostsService.setupWorkerManagerHost(hostAddress, NodeRole.MANAGER);
 		servicesMonitoringService.initServiceMonitorTimer();
 		hostsMonitoringService.initHostMonitorTimer();
 		syncService.startContainersDatabaseSynchronization();

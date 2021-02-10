@@ -56,6 +56,26 @@
     box-shadow: inherit;
 }
 
+.formDropdown {
+    width: auto !important;
+    overflow-y: hidden;
+    background-color: #282828;
+}
+
+ul.formDropdown li a {
+    background-color: #282828;
+    font-size: 14px;
+}
+
+ul.formDropdown li.disabled a:hover {
+    cursor: default;
+}
+
+ul.formDropdown li.disabled a {
+    border-bottom: solid 1px #666;
+    color: grey;
+}
+
 .dropdownEmpty {
     border-bottom: solid 1px black !important;
 }

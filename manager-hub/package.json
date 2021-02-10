@@ -13,6 +13,7 @@
       "email": "a.carrusca@campus.fct.unl.pt"
     }
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "usmanager/manager"

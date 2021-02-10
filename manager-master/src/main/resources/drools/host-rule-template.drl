@@ -14,12 +14,12 @@ global pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.Decisio
 
 template "host"
 
-rule "host_@{ruleId}" salience @{priority}
+rule "host_rule_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then
-    hostDecision.setDecision(@{decision});
-    hostDecision.setPriority(@{priority});
+    hostDecision.setDecision(@{decision})
+    hostDecision.setPriority(@{priority})
 end
 
 end template

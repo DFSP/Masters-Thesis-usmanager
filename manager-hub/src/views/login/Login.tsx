@@ -89,9 +89,9 @@ class Login extends BaseComponent<Props, State> {
                                 {showPassword ? "visibility_off" : "visibility"}
                             </i>
                         </div>
-                        <button className="btn btn-flat login-button right slide"
+                        <button className="btn btn-flat right slide"
                                 type="submit" tabIndex={0} onClick={this.handleLogin}>
-                            Entrar
+                            Login
                         </button>
                     </form>
                 </div>

@@ -319,7 +319,7 @@ class Container extends BaseComponent<Props, State> {
         const nodes = Object.values(this.props.nodes)
             .filter(node => node.state === 'ready' && (!id.includes('migrate') || node.publicIpAddress !== this.getContainer()?.publicIpAddress));
         return <ul id={id}
-                   className={`dropdown-content ${styles.dropdown}`}>
+                   className={`dropdown-content ${formStyles.formDropdown}`}>
             <li className={`${styles.disabled}`}>
                 <a className={`${!nodes.length ? 'dropdown-empty' : ''}`}>
                     {!nodes.length ? 'Sem nós disponíveis' : 'Selecionar o endereço'}

@@ -35,12 +35,12 @@ mvn spring-boot:run
 #### Docker
 ```shell script
 docker build -f ../manager-worker/src/main/docker/Dockerfile .. -t manager-worker
-docker run --rm -p 8081:8081 -v /var/run/docker.sock:/var/run/docker.sock -e ID=... -e HOST_ADDRESS=... -e KAFKA_BOOTSTRAP_SERVERS=... manager-worker
+docker run --rm -p 8081:8081 -v /var/run/docker.sock:/var/run/docker.sock -e EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... manager-worker
 ```
 
 ##### Hub
 ```shell script
-docker run --rm -p 8081:8081 -e -v /var/run/docker.sock:/var/run/docker.sock ID=... -e HOST_ADDRESS=... -e KAFKA_BOOTSTRAP_SERVERS=... usmanager/manager-worker
+docker run --rm -p 8081:8081 -e -v /var/run/docker.sock:/var/run/docker.sock EXTERNAL_ID=... -e HOST_ADDRESS=... -e REGISTRATION_URL=... usmanager/manager-worker
 ```
 
 ## Licença

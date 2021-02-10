@@ -78,6 +78,9 @@ class Navbar extends React.Component<Props, State> {
         if (!this.state.animate && prevSidenavVisibility !== currentSidenavVisibility) {
             this.setState({animate: true});
         }
+        if (this.state.darkMode != prevState.darkMode) {
+            ReactTooltip.rebuild();
+        }
     }
 
     private toggleBrightness = () => {

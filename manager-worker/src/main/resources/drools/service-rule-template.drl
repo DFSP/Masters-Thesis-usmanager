@@ -18,8 +18,8 @@ rule "container_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then
-    containerDecision.setDecision(@{decision});
-    containerDecision.setPriority(@{priority});
+    containerDecision.setDecision(@{decision})
+    containerDecision.setPriority(@{priority})
 end
 
 end template

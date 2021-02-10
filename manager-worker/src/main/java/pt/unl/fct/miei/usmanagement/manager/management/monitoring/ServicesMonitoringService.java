@@ -76,6 +76,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -314,7 +315,7 @@ public class ServicesMonitoringService {
 			calculatedMetrics.forEach((field, value) -> {
 				ServiceMonitoring monitoring = getContainerMonitoring(containerId, field);
 				double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
-				double bytesPerSec = Math.max(0, (value - lastValue) / interval);
+				double bytesPerSec = Math.max(0, (value - lastValue) / TimeUnit.MILLISECONDS.toSeconds(interval));
 				stats.put(field + "-per-sec", bytesPerSec);
 			});
 

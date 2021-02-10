@@ -45,14 +45,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.docker.DockerProperties;
 import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -90,12 +84,12 @@ public class LocationRequestsService {
 	}
 
 	public Map<String, List<LocationWeight>> getLocationsWeight() {
-		List<NodeLocationRequests> nodeLocationRequests = getNodesLocationRequests();
+		Map<Node, Map<String, Integer>> nodeLocationRequests = getNodesLocationRequests();
 
 		Map<String, List<LocationWeight>> servicesLocationsWeights = new HashMap<>();
-		for (NodeLocationRequests requests : nodeLocationRequests) {
-			Node node = requests.getNode();
-			requests.getRequests().forEach((service, count) -> {
+		for (Map.Entry<Node, Map<String, Integer>> requests : nodeLocationRequests.entrySet()) {
+			Node node = requests.getKey();
+			requests.getValue().forEach((service, count) -> {
 				List<LocationWeight> locationWeights = servicesLocationsWeights.get(service);
 				if (locationWeights == null) {
 					locationWeights = new ArrayList<>(1);
@@ -157,42 +151,34 @@ public class LocationRequestsService {
 		return coordinates;
 	}
 
-	public List<NodeLocationRequests> getNodesLocationRequests() {
-		List<FutureNodeLocationRequests> futureNodeLocationRequests = nodesService.getReadyNodes().stream()
-			.map(node -> {
-				String hostname = node.getPublicIpAddress();
-				Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.PROMETHEUS)
-					.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
-				CompletableFuture<Map<String, Integer>> futureLocationRequests;
-				if (port.isPresent()) {
-					futureLocationRequests = getNodeLocationRequests(hostname, port.get());
-				}
-				else {
-					futureLocationRequests = CompletableFuture.completedFuture(Collections.emptyMap());
-				}
-				return new FutureNodeLocationRequests(node, futureLocationRequests);
-			})
-			.collect(Collectors.toList());
+	public Map<Node, Map<String, Integer>> getNodesLocationRequests() {
+		Map<Node, Map<String, Integer>> nodeLocationRequests = new HashMap<>();
 
-		CompletableFuture.allOf(futureNodeLocationRequests.stream().map(FutureNodeLocationRequests::getRequests)
-			.toArray(CompletableFuture[]::new)).join();
+		List<Node> nodes = nodesService.getReadyNodes();
 
-		List<NodeLocationRequests> locationRequests = new ArrayList<>(futureNodeLocationRequests.size());
-		for (FutureNodeLocationRequests futureNodeLocationRequest : futureNodeLocationRequests) {
-			Node node = futureNodeLocationRequest.getNode();
-			try {
-				Map<String, Integer> locationRequest = futureNodeLocationRequest.getRequests().get();
-				locationRequests.add(new NodeLocationRequests(node, locationRequest));
+		CompletableFuture<?>[] requests = new CompletableFuture[nodes.size()];
+		int count = 0;
+		for (Node node : nodes) {
+			String hostname = node.getPublicIpAddress();
+			Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.REQUEST_LOCATION_MONITOR)
+				.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
+			if (port.isPresent()) {
+				CompletableFuture<?> request = CompletableFuture
+					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get()))
+					.thenAccept(locationRequests -> nodeLocationRequests.put(node, locationRequests));
+				requests[count++] = request;
 			}
-			catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+			else {
+				nodeLocationRequests.put(node, Collections.emptyMap());
 			}
 		}
 
-		return locationRequests;
+		CompletableFuture.allOf(requests).join();
+
+		return nodeLocationRequests;
 	}
 
-	public CompletableFuture<Map<String, Integer>> getNodeLocationRequests(String hostname, int port) {
+	public Map<String, Integer> getNodeLocationRequests(String hostname, int port) {
 		String url = String.format("http://%s:%s/api/location/requests?aggregation", hostname, port);
 		long currentRequestTime = System.currentTimeMillis();
 		Long interval = lastRequestTime.get(hostname);
@@ -213,7 +199,7 @@ public class LocationRequestsService {
 			log.error("Failed to get node {} location requests: {}", hostname, e.getMessage());
 		}
 
-		return CompletableFuture.completedFuture(locationMonitoringData);
+		return locationMonitoringData;
 	}
 
 	public String launchRequestLocationMonitor(HostAddress hostAddress) {

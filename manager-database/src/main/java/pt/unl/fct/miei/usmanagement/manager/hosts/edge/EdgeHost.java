@@ -88,6 +88,9 @@ public class EdgeHost /*extends AbstractEntity<Long> */ {
 	@NotNull
 	private Coordinates coordinates;
 
+	@JsonIgnore
+	private Boolean local;
+
 	@JsonIgnoreProperties({"edgeHost", "cloudHost"})
 	@ManyToOne
 	@JoinColumn(name = "managedByWorker_id")
