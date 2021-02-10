@@ -2001,7 +2001,7 @@ public class DatabaseLoader {
         } catch (EntityNotFoundException ignored) {
             zookeeper = Service.builder()
                     .serviceName(ServiceConstants.Name.ZOOKEEPER)
-                    .dockerRepository("wurstmeister/zookeeper")
+                    .dockerRepository("wurstmeister/zookeeper:3.4.6")
                     .defaultExternalPort(2181)
                     .defaultInternalPort(2181)
                     .outputLabel("${zookeeperHost}")

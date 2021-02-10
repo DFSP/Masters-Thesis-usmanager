@@ -24,7 +24,6 @@
 
 package pt.unl.fct.miei.usmanagement.manager.management.docker.nodes;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
 import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
@@ -42,7 +42,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -84,7 +83,11 @@ public class NodesController {
 			return workerManagersService.addNodes(addNode);
 		}
 		else {
-			return nodesService.addNodes(role, hostname, coordinates);
+			try {
+				return nodesService.addNodes(role, hostname, coordinates);
+			} catch (javax.ws.rs.BadRequestException e) {
+				throw new BadRequestException(e.getMessage());
+			}
 		}
 	}
 

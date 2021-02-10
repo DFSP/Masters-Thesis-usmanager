@@ -40,7 +40,6 @@ import pt.unl.fct.miei.usmanagement.manager.services.eips.ElasticIpsService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.HostsMonitoringService;
 import pt.unl.fct.miei.usmanagement.manager.management.monitoring.ServicesMonitoringService;
-import pt.unl.fct.miei.usmanagement.manager.services.regions.RegionsService;
 import pt.unl.fct.miei.usmanagement.manager.nodes.NodeRole;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 
@@ -101,8 +100,7 @@ public class ManagerMasterStartup implements ApplicationListener<ApplicationRead
 
 	private void requireEnvVars() {
 		Map<String, String> vars = new HashMap<>(1);
-		vars.put(ContainerConstants.Environment.Manager.ID,
-			environment.getProperty(ContainerConstants.Environment.Manager.ID));
+		vars.put(ContainerConstants.Environment.Manager.ID, environment.getProperty(ContainerConstants.Environment.Manager.ID));
 		log.info("Environment: {}", vars);
 		Set<String> requiredVars = vars.entrySet().stream().filter(e -> e.getValue() == null).map(Map.Entry::getKey).collect(Collectors.toSet());
 		if (!requiredVars.isEmpty()) {

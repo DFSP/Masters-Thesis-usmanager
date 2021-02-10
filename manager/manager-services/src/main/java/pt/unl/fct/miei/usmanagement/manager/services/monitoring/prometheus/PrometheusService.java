@@ -48,7 +48,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -71,8 +70,7 @@ public class PrometheusService {
 		this.restTemplate.setInterceptors(List.of(requestInterceptor));
 	}
 
-	@Async
-	public CompletableFuture<Optional<Double>> getStat(HostAddress hostAddress, int port, PrometheusQueryEnum prometheusQuery) {
+	public Optional<Double> getStat(HostAddress hostAddress, int port, PrometheusQueryEnum prometheusQuery) {
 		String value = "";
 		String address = String.format(PrometheusProperties.URL, hostAddress.getPublicIpAddress(), port);
 		String query = URLEncoder.encode(prometheusQuery.getQuery(), StandardCharsets.UTF_8);
@@ -93,10 +91,7 @@ public class PrometheusService {
 				}
 			}
 		}
-		Optional<Double> stat = value.isEmpty()
-			? Optional.empty()
-			: Optional.of(Double.parseDouble(value));
-		return CompletableFuture.completedFuture(stat);
+		return value.isEmpty() ? Optional.empty() : Optional.of(Double.parseDouble(value));
 	}
 
 	public String launchPrometheus(HostAddress hostAddress) {

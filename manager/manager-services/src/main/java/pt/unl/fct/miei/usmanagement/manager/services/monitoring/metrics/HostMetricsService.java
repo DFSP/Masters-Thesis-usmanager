@@ -37,12 +37,8 @@ import pt.unl.fct.miei.usmanagement.manager.services.fields.FieldsService;
 import pt.unl.fct.miei.usmanagement.manager.services.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.miei.usmanagement.manager.services.rulesystem.decision.MonitoringProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,35 +63,30 @@ public class HostMetricsService {
 	public boolean hostHasEnoughResources(HostAddress hostAddress, double expectedMemoryConsumption) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
-		List<CompletableFuture<Optional<Double>>> futureMetrics = List.of(
-			PrometheusQueryEnum.TOTAL_MEMORY,
-			PrometheusQueryEnum.AVAILABLE_MEMORY,
-			PrometheusQueryEnum.CPU_USAGE_PERCENTAGE)
-			.stream().map(stat -> {
-				if (port.isPresent()) {
-					return prometheusService.getStat(hostAddress, port.get(), stat);
-				}
-				else {
-					Optional<Double> emptyOptional = Optional.empty();
-					return CompletableFuture.completedFuture(emptyOptional);
-				}
-			})
-			.collect(Collectors.toList());
 
-		CompletableFuture.allOf(futureMetrics.toArray(new CompletableFuture[0])).join();
+		List<PrometheusQueryEnum> prometheusQueries = List.of(
+				PrometheusQueryEnum.TOTAL_MEMORY,
+				PrometheusQueryEnum.AVAILABLE_MEMORY,
+				PrometheusQueryEnum.CPU_USAGE_PERCENTAGE);
 
-		List<Optional<Double>> metrics;
-		try {
-			metrics = new ArrayList<>();
-			for (CompletableFuture<Optional<Double>> futureMetric : futureMetrics) {
-				Optional<Double> metric = futureMetric.get();
-				metrics.add(metric);
+		List<Optional<Double>> metrics = new ArrayList<>(prometheusQueries.size());
+
+		CompletableFuture<?>[] requests = new CompletableFuture[prometheusQueries.size()];
+		int count = 0;
+		for (PrometheusQueryEnum prometheusQuery : prometheusQueries) {
+			if (port.isEmpty()) {
+				metrics.add(Optional.empty());
+			}
+			else {
+				CompletableFuture<?> future = CompletableFuture
+						.supplyAsync(() -> prometheusService.getStat(hostAddress, port.get(), prometheusQuery))
+						.exceptionally(ex -> Optional.empty())
+						.thenAccept(metrics::add);
+				requests[count++] = future;
 			}
 		}
-		catch (InterruptedException | ExecutionException e) {
-			log.error("Unable to get metrics from prometheus for host {}: {}", hostAddress.toSimpleString(), e.getMessage());
-			return false;
-		}
+
+		CompletableFuture.allOf(requests).join();
 
 		Optional<Double> totalRam = metrics.get(0);
 		Optional<Double> availableRam = metrics.get(1);
@@ -117,7 +108,7 @@ public class HostMetricsService {
 		return false;
 	}
 
-	public Map<String, CompletableFuture<Optional<Double>>> getHostStats(HostAddress hostAddress) {
+	public Map<String, Optional<Double>> getHostStats(HostAddress hostAddress) {
 		Optional<Integer> port = containersService.getSingletonContainer(hostAddress, ServiceConstants.Name.PROMETHEUS)
 			.map(c -> c.getPorts().stream().findFirst().get().getPublicPort());
 		// Stats from prometheus (node exporter)
@@ -128,8 +119,7 @@ public class HostMetricsService {
 					return prometheusService.getStat(hostAddress, port.get(), field.getPrometheusQuery());
 				}
 				else {
-					Optional<Double> emptyOptional = Optional.empty();
-					return CompletableFuture.completedFuture(emptyOptional);
+					return Optional.empty();
 				}
 			}));
 	}

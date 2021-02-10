@@ -78,3 +78,28 @@ k6 run \
   -e REQUEST_BODY='{"regions":["Europe"]}' \
   executionTimes.js
 ```
+
+Configurar uma instância na cloud.
+```shell script
+k6 run \
+  -e METHOD=POST \
+  -e URL=hosts/cloud \
+  -e REQUEST_BODY='{"coordinates":{"label":"France","title":"France","longitude":-0.5001341691786153,"latitude":46.734370418273606}}' \
+  executionTimes.js
+```
+
+Terminar uma instância na cloud.
+```shell script
+k6 run \
+  -e METHOD=DELETE \
+  -e URL=hosts/cloud/i-07e7aaec6d82292a0 \
+  executionTimes.js
+```
+
+Sincronizar as instâncias virtuais na aws com a base de dados do gestor principal.
+```shell script
+k6 run \
+  -e METHOD=POST \
+  -e URL=hosts/cloud/sync \
+  executionTimes.js
+```

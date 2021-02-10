@@ -122,11 +122,7 @@ import pt.unl.fct.miei.usmanagement.manager.util.Timing;
 import pt.unl.fct.miei.usmanagement.manager.valuemodes.ValueMode;
 import pt.unl.fct.miei.usmanagement.manager.zookeeper.Zookeeper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -250,26 +246,23 @@ public class KafkaService {
 
 		int previousKafkaBrokersCount = getKafkaBrokers().size();
 
-		List<CompletableFuture<KafkaBroker>> futureKafkaBrokers = regions.stream().map(region -> {
+		List<KafkaBroker> kafkaBrokers = new ArrayList<>();
+
+		CompletableFuture<?>[] requests = new CompletableFuture[regions.size()];
+		int count = 0;
+		for (RegionEnum region : regions) {
 			List<KafkaBroker> regionKafkaBrokers = getKafkaBroker(region);
 			if (regionKafkaBrokers.size() > 0) {
-				return CompletableFuture.completedFuture(regionKafkaBrokers.get(0));
+				kafkaBrokers.addAll(regionKafkaBrokers);
 			}
 			else {
 				HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
 						? hostsService.getManagerHostAddress()
 						: elasticIpsService.getHost(region);
-				return launchKafkaBroker(hostAddress);
+				requests[count++] = CompletableFuture.supplyAsync(() -> launchKafkaBroker(hostAddress)).thenAccept(kafkaBrokers::add);
 			}
-		}).collect(Collectors.toList());
-
-		CompletableFuture.allOf(futureKafkaBrokers.toArray(new CompletableFuture[0])).join();
-
-		List<KafkaBroker> kafkaBrokers = new ArrayList<>();
-		for (CompletableFuture<KafkaBroker> futureKafkaBroker : futureKafkaBrokers) {
-			KafkaBroker kafkaBroker = futureKafkaBroker.join();
-			kafkaBrokers.add(kafkaBroker);
 		}
+		CompletableFuture.allOf(requests).join();
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
@@ -279,7 +272,7 @@ public class KafkaService {
 		return kafkaBrokers;
 	}
 
-	public CompletableFuture<KafkaBroker> launchKafkaBroker(HostAddress hostAddress) {
+	public KafkaBroker launchKafkaBroker(HostAddress hostAddress) {
 		RegionEnum region = hostAddress.getRegion();
 		List<Zookeeper> zookeepers = zookeeperService.getZookeepers(region);
 		if (zookeepers.size() == 0) {
@@ -305,7 +298,7 @@ public class KafkaService {
 			ContainerConstants.Label.KAFKA_BROKER_ID, String.valueOf(brokerId)
 		);
 		Container container = containersService.launchContainer(hostAddress, ServiceConstants.Name.KAFKA, environment, labels);
-		return CompletableFuture.completedFuture(saveKafkaBroker(container));
+		return saveKafkaBroker(container);
 	}
 
 	public List<KafkaBroker> getKafkaBrokers() {

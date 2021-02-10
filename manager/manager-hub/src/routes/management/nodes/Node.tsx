@@ -446,7 +446,7 @@ class Node extends BaseComponent<Props, State> {
                                id='workerManager'
                                type='checkbox'
                                value={true}
-                               checkbox={{label: 'Gestor local'}}/>
+                               checkbox={{label: 'Associar ao Gestor local'}}/>
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}
@@ -471,7 +471,7 @@ class Node extends BaseComponent<Props, State> {
                                id='workerManager'
                                type='checkbox'
                                value={true}
-                               checkbox={{label: 'Gestor local'}}/>
+                               checkbox={{label: 'Associar ao Gestor local'}}/>
                         <Field key={'role'}
                                id={'role'}
                                label={'role'}

@@ -1,6 +1,5 @@
 package pt.unl.fct.miei.usmanagement.manager.management.hosts;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +8,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.miei.usmanagement.manager.Mode;
+import pt.unl.fct.miei.usmanagement.manager.config.ManagerServicesConfiguration;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.AwsRegion;
 import pt.unl.fct.miei.usmanagement.manager.hosts.cloud.CloudHost;
@@ -32,15 +34,21 @@ public class CloudHostsController {
 	private final CloudHostsService cloudHostsService;
 	private final SshService sshService;
 	private final SyncService syncService;
+	private final ManagerServicesConfiguration managerServicesConfiguration;
 
-	public CloudHostsController(CloudHostsService cloudHostsService, SshService sshService, SyncService syncService) {
+	public CloudHostsController(CloudHostsService cloudHostsService, SshService sshService, SyncService syncService,
+								ManagerServicesConfiguration managerServicesConfiguration) {
 		this.cloudHostsService = cloudHostsService;
 		this.sshService = sshService;
 		this.syncService = syncService;
+		this.managerServicesConfiguration = managerServicesConfiguration;
 	}
 
 	@PostMapping
 	public CloudHost startCloudHost(@RequestBody AddCloudInstance addCloudInstance) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			throw new BadRequestException("cloud instances are not supported when using local execution mode");
+		}
 		return cloudHostsService.launchInstance(addCloudInstance.getCoordinates());
 	}
 
@@ -61,6 +69,9 @@ public class CloudHostsController {
 
 	@PutMapping("/{instanceId}/start")
 	public CloudHost startCloudInstance(@PathVariable String instanceId) {
+		if (managerServicesConfiguration.getMode() == Mode.LOCAL) {
+			throw new BadRequestException("cloud instances are not supported when using local execution mode");
+		}
 		return cloudHostsService.startInstance(instanceId, true);
 	}
 
