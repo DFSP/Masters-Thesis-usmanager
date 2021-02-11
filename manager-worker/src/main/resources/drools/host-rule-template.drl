@@ -18,8 +18,8 @@ rule "host_@{ruleId}" salience @{priority}
 when
     @{eventType}(@{rule})
 then
-    hostDecision.setDecision(@{decision})
-    hostDecision.setPriority(@{priority})
+    hostDecision.setDecision(@{decision});
+    hostDecision.setPriority(@{priority});
 end
 
 end template

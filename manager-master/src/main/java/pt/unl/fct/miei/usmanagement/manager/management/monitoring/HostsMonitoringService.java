@@ -265,9 +265,7 @@ public class HostsMonitoringService {
 
     private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<Node> nodes) {
         List<HostDecisionResult> decisions = new LinkedList<>();
-        hostDecisions.forEach(futureDecision -> {
-            HostDecisionResult decision;
-            decision = futureDecision;
+        hostDecisions.forEach(decision -> {
             HostAddress hostAddress = decision.getHostAddress();
             RuleDecisionEnum ruleDecision = decision.getDecision();
             HostEvent hostEvent = hostsEventsService.saveHostEvent(hostAddress, ruleDecision.toString());
