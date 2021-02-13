@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
 import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
@@ -48,6 +49,7 @@ import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManage
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
 import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -92,14 +94,26 @@ public class ContainersController {
 	@PostMapping
 	public List<Container> launchContainer(@RequestBody LaunchContainerRequest launchContainerRequest) {
 		HostAddress hostAddress = launchContainerRequest.getHostAddress();
+		String service = launchContainerRequest.getService();
+		int internalPort = launchContainerRequest.getInternalPort();
+		int externalPort = launchContainerRequest.getExternalPort();
 		if (hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress)) {
-			String service = launchContainerRequest.getService();
-			int internalPort = launchContainerRequest.getInternalPort();
-			int externalPort = launchContainerRequest.getExternalPort();
 			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
 		}
 		else {
-			return workerManagersService.launchContainers(launchContainerRequest);
+			boolean isWorkerManager = launchContainerRequest.isWorkerManager();
+			if (isWorkerManager) {
+				return workerManagersService.launchContainers(launchContainerRequest);
+			}
+			else {
+				List<Container> containers = new ArrayList<>();
+				List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
+				for (Coordinates c : coordinates) {
+					Container container = containersService.launchContainer(c, service, internalPort, externalPort);
+					containers.add(container);
+				}
+				return containers;
+			}
 		}
 	}
 

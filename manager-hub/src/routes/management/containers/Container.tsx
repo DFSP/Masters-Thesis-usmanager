@@ -635,6 +635,11 @@ class Container extends BaseComponent<Props, State> {
                 </>
                 :
                 <>
+                    <Field key='workerManager'
+                           id='workerManager'
+                           type='checkbox'
+                           value={true}
+                           checkbox={{label: 'Associar ao Gestor local'}}/>
                     <Field key={'service'}
                            id={'service'}
                            label={'service'}

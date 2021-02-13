@@ -226,7 +226,7 @@ class NodeCard extends BaseComponent<Props, State> {
                       label={'Availability'}
                       value={node.availability}/>
             <CardItem key={'role'}
-                      label={'Role'}
+                      label={'Swarm role'}
                       value={node.role}/>
         </CardNode>
     }
