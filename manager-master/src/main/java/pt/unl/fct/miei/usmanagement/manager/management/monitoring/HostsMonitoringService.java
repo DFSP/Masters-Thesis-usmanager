@@ -225,7 +225,7 @@ public class HostsMonitoringService {
         // Metrics from prometheus (node_exporter)
 		log.info("Getting prometheus metrics from host {}", hostAddress.toSimpleString());
         Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
-		log.info("Got prometheus metrics from host {}", stats);
+		log.info("Got prometheus metrics from host {}: {}", hostAddress.toSimpleString(), stats);
 
         Map<String, Double> validStats = stats.entrySet().stream()
                 .filter(stat -> stat.getValue().isPresent())
@@ -239,7 +239,7 @@ public class HostsMonitoringService {
 
         validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
 
-		log.info("Metrics for host {} after removing invalid values and applying simulated metrics", stats);
+		log.info("Metrics for host {} after removing invalid values and applying simulated metrics: {}", hostAddress.toSimpleString(), stats);
 
         return runRules(node, validStats);
     }

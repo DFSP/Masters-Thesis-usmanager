@@ -231,7 +231,7 @@ public class HostsMonitoringService {
 		// Metrics from prometheus (node_exporter)
 		log.info("Getting prometheus metrics from host {}", hostAddress.toSimpleString());
 		Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
-		log.info("Got prometheus metrics from host {}", stats);
+		log.info("Got prometheus metrics from host: {}", stats);
 
 		Map<String, Double> validStats = stats.entrySet().stream()
 				.filter(stat -> stat.getValue().isPresent())
