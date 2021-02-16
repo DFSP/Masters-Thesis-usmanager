@@ -156,8 +156,7 @@ public class LocationRequestsService {
 
 		List<Node> nodes = nodesService.getReadyNodes();
 
-		CompletableFuture<?>[] requests = new CompletableFuture[nodes.size()];
-		int count = 0;
+		List<CompletableFuture<?>> requests = new ArrayList<>();
 		for (Node node : nodes) {
 			String hostname = node.getPublicIpAddress();
 			Optional<Integer> port = containersService.getSingletonContainer(node.getHostAddress(), ServiceConstants.Name.REQUEST_LOCATION_MONITOR)
@@ -166,14 +165,14 @@ public class LocationRequestsService {
 				CompletableFuture<?> request = CompletableFuture
 					.supplyAsync(() -> getNodeLocationRequests(hostname, port.get()))
 					.thenAccept(locationRequests -> nodeLocationRequests.put(node, locationRequests));
-				requests[count++] = request;
+				requests.add(request);
 			}
 			else {
 				nodeLocationRequests.put(node, Collections.emptyMap());
 			}
 		}
 
-		CompletableFuture.allOf(requests).join();
+		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
 
 		return nodeLocationRequests;
 	}

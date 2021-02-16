@@ -266,7 +266,7 @@ public class WorkerManagersService {
 		catch (EntityNotFoundException e) {
 			log.error("Failed to stop container {} associated with worker manager {}", containerId, workerManager.getId());
 		}
-		heartbeatService.deleteHeartbeat(workerManager.getId());
+		//heartbeatService.deleteHeartbeat(workerManager.getId());
 	}
 
 	public void deleteWorkerManagerByContainer(Container container) {

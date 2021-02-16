@@ -194,7 +194,6 @@ public class HostsMonitoringService {
 			public void run() {
 				try {
 					monitorHostsTask();
-					locationRequestsService.getNodesLocationRequests();
 				}
 				catch (Exception e) {
 					log.error("Failed to execute monitor hosts task: {}", e.getMessage());
@@ -229,7 +228,6 @@ public class HostsMonitoringService {
 		HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
 		// Metrics from prometheus (node_exporter)
-		log.info("Getting prometheus metrics from host {}", hostAddress.toSimpleString());
 		Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
 		log.info("Got prometheus metrics from host: {}", stats);
 
