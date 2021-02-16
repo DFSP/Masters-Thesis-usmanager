@@ -26,7 +26,6 @@ package pt.unl.fct.miei.usmanagement.manager.management.containers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,17 +36,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.miei.usmanagement.manager.containers.Container;
 import pt.unl.fct.miei.usmanagement.manager.containers.ContainerConstants;
+import pt.unl.fct.miei.usmanagement.manager.exceptions.BadRequestException;
 import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 import pt.unl.fct.miei.usmanagement.manager.hosts.HostAddress;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.ContainerSimulatedMetric;
-import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
+import pt.unl.fct.miei.usmanagement.manager.nodes.Node;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.ContainerRule;
+import pt.unl.fct.miei.usmanagement.manager.services.ServiceConstants;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.ContainersService;
 import pt.unl.fct.miei.usmanagement.manager.services.containers.LaunchContainerRequest;
+import pt.unl.fct.miei.usmanagement.manager.services.docker.nodes.NodesService;
 import pt.unl.fct.miei.usmanagement.manager.services.hosts.HostsService;
 import pt.unl.fct.miei.usmanagement.manager.services.workermanagers.WorkerManagersService;
 import pt.unl.fct.miei.usmanagement.manager.sync.SyncService;
-import pt.unl.fct.miei.usmanagement.manager.workermanagers.WorkerManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,13 +64,15 @@ public class ContainersController {
 	private final WorkerManagersService workerManagersService;
 	private final SyncService syncService;
 	private final HostsService hostsService;
+	private final NodesService nodesService;
 
 	public ContainersController(ContainersService containersService, WorkerManagersService workerManagersService,
-								SyncService syncService, HostsService hostsService) {
+								SyncService syncService, HostsService hostsService, NodesService nodesService) {
 		this.containersService = containersService;
 		this.workerManagersService = workerManagersService;
 		this.syncService = syncService;
 		this.hostsService = hostsService;
+		this.nodesService = nodesService;
 	}
 
 	@GetMapping
@@ -97,23 +100,28 @@ public class ContainersController {
 		String service = launchContainerRequest.getService();
 		int internalPort = launchContainerRequest.getInternalPort();
 		int externalPort = launchContainerRequest.getExternalPort();
-		if (hostAddress != null && hostsService.getManagerHostAddress().equals(hostAddress)) {
-			return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
+		if (hostAddress != null) {
+			List<Node> nodes = nodesService.getHostNodes(hostAddress);
+			if (nodes.size() > 0) {
+				Node node = nodes.get(0);
+				if (node.getManagerId().equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER)) {
+					return List.of(containersService.launchContainer(hostAddress, service, internalPort, externalPort));
+				}
+			}
+			return workerManagersService.launchContainers(launchContainerRequest);
 		}
 		else {
 			boolean isWorkerManager = launchContainerRequest.isWorkerManager();
 			if (isWorkerManager) {
 				return workerManagersService.launchContainers(launchContainerRequest);
 			}
-			else {
-				List<Container> containers = new ArrayList<>();
-				List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
-				for (Coordinates c : coordinates) {
-					Container container = containersService.launchContainer(c, service, internalPort, externalPort);
-					containers.add(container);
-				}
-				return containers;
+			List<Container> containers = new ArrayList<>();
+			List<Coordinates> coordinates = launchContainerRequest.getCoordinates();
+			for (Coordinates c : coordinates) {
+				Container container = containersService.launchContainer(c, service, internalPort, externalPort);
+				containers.add(container);
 			}
+			return containers;
 		}
 	}
 

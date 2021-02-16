@@ -107,4 +107,8 @@ public class Node /*extends AbstractEntity<String> */ {
 		return id != null && id.equals(other.getId());
 	}
 
+	@Override
+	public String toString() {
+		return id;
+	}
 }

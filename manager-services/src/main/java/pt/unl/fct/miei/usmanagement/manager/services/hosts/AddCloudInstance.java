@@ -30,6 +30,7 @@ import pt.unl.fct.miei.usmanagement.manager.hosts.Coordinates;
 @Data
 public final class AddCloudInstance {
 
+	private boolean workerManager;
 	private Coordinates coordinates;
 
 }

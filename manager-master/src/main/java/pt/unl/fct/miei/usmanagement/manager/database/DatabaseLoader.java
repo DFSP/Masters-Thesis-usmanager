@@ -725,7 +725,7 @@ public class DatabaseLoader {
     List<EdgeHost> loadEdgeHosts(EdgeHostsService edgeHostsService) {
         List<EdgeHost> egeHosts = new ArrayList<>(1);
 
-        EdgeHost danielHost;
+        /*EdgeHost danielHost;
         try {
             danielHost = edgeHostsService.getEdgeHostByDns("danielfct.ddns.net");
         } catch (EntityNotFoundException ignored) {
@@ -741,7 +741,7 @@ public class DatabaseLoader {
                     .local(true)
                     .build());
         }
-        egeHosts.add(danielHost);
+        egeHosts.add(danielHost);*/
 
         EdgeHost danielHost2;
         try {

@@ -151,6 +151,12 @@ public class CloudHostsService {
 			new EntityNotFoundException(CloudHost.class, "address", address.toString()));
 	}
 
+	public List<CloudHost> getCloudHostByTypeAndRegion(InstanceType type, RegionEnum region) {
+		return this.cloudHosts.findByInstanceType(type.toString().toLowerCase()).stream()
+			.filter(cloudHost -> cloudHost.getAwsRegion().getRegion() == region)
+			.collect(Collectors.toList());
+	}
+
 	public CloudHost saveCloudHost(CloudHost cloudHost) {
 		log.info("Saving cloudHost {}", ToStringBuilder.reflectionToString(cloudHost));
 		return cloudHosts.save(cloudHost);
@@ -311,6 +317,7 @@ public class CloudHostsService {
 	public CloudHost launchInstance(AwsRegion region, InstanceType type) {
 		return launchInstance(region, type, true);
 	}
+
 	public CloudHost launchInstance(AwsRegion region, InstanceType type, boolean joinSwarm) {
 		String instanceId = null;
 		try {

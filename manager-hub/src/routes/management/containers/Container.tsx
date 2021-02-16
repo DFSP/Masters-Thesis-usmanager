@@ -122,6 +122,7 @@ interface INewContainerHost {
 }
 
 interface INewContainerLocation {
+    workerManager?: boolean,
     service?: string,
     externalPort?: number,
     internalPort?: number,
@@ -136,6 +137,7 @@ const buildNewContainerHost = (): INewContainerHost => ({
 });
 
 const buildNewContainerLocation = (): INewContainerLocation => ({
+    workerManager: false,
     service: undefined,
     externalPort: undefined,
     internalPort: undefined,

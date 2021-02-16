@@ -10,23 +10,24 @@ const failureRate = new Rate("failure_rate");
 const url = `http://${__ENV["SERVICE_ADDRESS"]}`;
 
 export let options = {
-    stages: [
-        { target: 1, duration: "1m" },
-        { target: 50, duration: "1m30s" },
-        { target: 50, duration: "2m" },
-        { target: 1, duration: "1m30s" },
-        { target: 1, duration: "1m" },
-    ],
-    ext: {
-        loadimpact: {
-            projectID: 3524085,
-            name: 'sock-shop-catalogue-load-tests',
-            distribution: {
-                gb: { loadZone: "amazon:gb:london", percent: 50 },
-                us: { loadZone: "amazon:us:portland", percent: 50 }
-            }
-        }
-    }
+    iterations: 1
+    //stages: [
+//    { target: 1, duration: "1m" },
+//      { target: 50, duration: "1m30s" },
+//      { target: 50, duration: "2m" },
+//      { target: 1, duration: "1m30s" },
+//      { target: 1, duration: "1m" },
+    //  ],
+    //ext: {
+    //  loadimpact: {
+    //       projectID: 3524085,
+    //       name: 'sock-shop-catalogue-load-tests',
+    //       distribution: {
+    //           gb: { loadZone: "amazon:gb:london", percent: 50 },
+    //           us: { loadZone: "amazon:us:portland", percent: 50 }
+    //       }
+    //   }
+    //}
 };
 
 function generateJsonBody(URL, responseJson) {
@@ -45,7 +46,7 @@ function generateJsonBody(URL, responseJson) {
 export default function() {
     let response = http.get(url + "/catalogue");
     //console.log('URL: ' + response.url + '\nDuration: ' + response.timings.duration + 'ms');
-    const staticReqs = generateJsonBody(url, JSON.parse(response.body));
+    //const staticReqs = generateJsonBody(url, JSON.parse(response.body));
     let checkRes = check(response, {
         //"http2 is used": (r) => r.proto === "HTTP/2.0",
         "status is 200": (r) => r.status === 200,
@@ -54,18 +55,18 @@ export default function() {
     failureRate.add(!checkRes);
 
     // Load static assets, all requests
-    group("Static Assets", function () {
+    //group("Static Assets", function () {
         // Execute multiple requests in parallel like a browser, to fetch some static resources
-        let resps = http.batch(
-            staticReqs
-        );
+      //  let resps = http.batch(
+       //     staticReqs
+       // );
         
         // Combine check() call with failure tracking
         /*failureRate.add(!check(resps, {
             "status is 200": (r) => r[0].status === 200 && r[1].status === 200,
             "reused connection": (r) => r[0].timings.connecting == 0,
         })); */
-    });
+    //});
 
     sleep(Math.random() * 2 + 1.1); // Random sleep between 1.1s and 3.1s
 }

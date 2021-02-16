@@ -24,10 +24,12 @@
 
 package pt.unl.fct.miei.usmanagement.manager.hosts.cloud;
 
+import com.amazonaws.services.ec2.model.InstanceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pt.unl.fct.miei.usmanagement.manager.metrics.simulated.HostSimulatedMetric;
+import pt.unl.fct.miei.usmanagement.manager.regions.RegionEnum;
 import pt.unl.fct.miei.usmanagement.manager.rulesystem.rules.HostRule;
 
 import java.util.List;
@@ -86,4 +88,9 @@ public interface CloudHosts extends JpaRepository<CloudHost, Long> {
 	@Query("select h "
 		+ "from CloudHost h left join fetch h.hostRules left join fetch h.simulatedHostMetrics")
 	List<CloudHost> getCloudHostsAndRelations();
+
+	@Query("select h "
+		+ "from CloudHost h "
+		+ "where h.instanceType = :type")
+	List<CloudHost> findByInstanceType(String type);
 }

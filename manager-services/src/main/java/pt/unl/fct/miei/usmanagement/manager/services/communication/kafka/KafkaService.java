@@ -663,7 +663,7 @@ public class KafkaService {
 
 	public void send(String topic, Object message, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER) || hasKafkaBrokers && populated) {
 			log.info("Sending {} to topic={}", ToStringBuilder.reflectionToString(message), topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId), message);
 		}
@@ -675,7 +675,7 @@ public class KafkaService {
 
 	public void delete(String topic, Object id) {
 		boolean hasKafkaBrokers = hasKafkaBrokers();
-		if (managerId != null && !managerId.equalsIgnoreCase("manager-master") || hasKafkaBrokers && populated) {
+		if (managerId != null && !managerId.equalsIgnoreCase(ServiceConstants.Name.MASTER_MANAGER) || hasKafkaBrokers && populated) {
 			log.info("Sending DELETE id={} request to topic={}", id, topic);
 			kafkaTemplate.send(topic, new KafkaTopicKey(managerId, "DELETE"), id);
 		}
