@@ -220,7 +220,9 @@ public class HostsMonitoringService {
         HostAddress hostAddress = new HostAddress(node.status().addr(), node.spec().labels().get(NodeConstants.Label.PRIVATE_IP_ADDRESS));
 
         // Metrics from prometheus (node_exporter)
-        Map<String, Optional<Double>> stats = CompletableFuture.supplyAsync(() -> hostMetricsService.getHostStats(hostAddress)).join();
+		log.info("Getting prometheus metrics from host {}", hostAddress.toSimpleString());
+        Map<String, Optional<Double>> stats = hostMetricsService.getHostStats(hostAddress);
+		log.info("Got prometheus metrics from host {}", stats);
 
         Map<String, Double> validStats = stats.entrySet().stream()
                 .filter(stat -> stat.getValue().isPresent())
@@ -233,6 +235,8 @@ public class HostsMonitoringService {
         validStats.putAll(hostSimulatedFields);
 
         validStats.forEach((stat, value) -> saveHostMonitoring(hostAddress, stat, value));
+
+		log.info("Metrics for host {} after removing invalid values and applying simulated metrics", stats);
 
         return runRules(node, validStats);
     }

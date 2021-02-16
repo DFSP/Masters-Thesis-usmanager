@@ -248,21 +248,22 @@ public class KafkaService {
 
 		List<KafkaBroker> kafkaBrokers = new ArrayList<>();
 
-		CompletableFuture<?>[] requests = new CompletableFuture[regions.size()];
-		int count = 0;
+		List<CompletableFuture<?>> requests = new LinkedList<>();
 		for (RegionEnum region : regions) {
 			List<KafkaBroker> regionKafkaBrokers = getKafkaBroker(region);
 			if (regionKafkaBrokers.size() > 0) {
+				log.info("kafka broker already running at {}", region);
 				kafkaBrokers.addAll(regionKafkaBrokers);
 			}
 			else {
 				HostAddress hostAddress = managerServicesConfiguration.getMode() == Mode.LOCAL
 						? hostsService.getManagerHostAddress()
 						: elasticIpsService.getHost(region);
-				requests[count++] = CompletableFuture.supplyAsync(() -> launchKafkaBroker(hostAddress)).thenAccept(kafkaBrokers::add);
+				requests.add(CompletableFuture.supplyAsync(() -> launchKafkaBroker(hostAddress)).thenAccept(kafkaBrokers::add));
 			}
 		}
-		CompletableFuture.allOf(requests).join();
+
+		CompletableFuture.allOf(requests.toArray(new CompletableFuture[0])).join();
 
 		if (previousKafkaBrokersCount == 0) {
 			startConsumers();
